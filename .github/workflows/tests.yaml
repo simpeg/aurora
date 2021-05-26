@@ -1,0 +1,57 @@
+name: Testing
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+jobs:
+  setup-build:
+    name: Ex1 (${{ matrix.python-version }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-latest"]
+        python-version: [3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Conda
+      uses: s-weigand/setup-conda@v1
+      with:
+        update-conda: true
+        conda-channels: conda-forge
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Env
+      shell: bash
+      run: |
+        python --version
+        conda create -n aurora-test
+        source activate aurora-test
+        conda config --add channels conda-forge
+        conda install pytest
+        conda install pytest-cov
+        pip install git+https://github.com/kujaku11/mt_metadata.git
+        #pip install -e git+https://github.com/kujaku11/mth5_test_data.git#egg=mth5_test_data
+        
+    - name: Install Our Package
+      shell: bash
+      run: |
+        source activate aurora-test
+        pip install -e .
+        conda list
+
+    - name: Run Tests
+      shell: bash
+      run: |
+        source activate aurora-test
+        pytest -v --cov=./ --cov-report=xml --cov=aurora
+        
+    - name: "Upload coverage to Codecov"
+      uses: codecov/codecov-action@v1
+      with:
+        fail_ci_if_error: true
