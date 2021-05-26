@@ -160,7 +160,7 @@ def main():
 
     print("@ToDo Insert an integrated test showing common usage of sliding window\
     for 2D arrays, for example windowing for dnff")
-    #test_fourier_transform()
+
     print("finito")
 
 if __name__ == "__main__":
