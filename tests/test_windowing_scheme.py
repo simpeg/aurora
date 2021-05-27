@@ -66,7 +66,6 @@ def test_apply_sliding_window_to_xarray(return_xarray=False):
 
 def test_can_apply_taper():
     import matplotlib.pyplot as plt
-    from iris_mt_scratch.sandbox.time_series.window_helpers import apply_taper_to_windowed_array
     N = 10000
     qq = np.random.random(N)
     windowing_scheme = WindowingScheme(num_samples_window=64, num_samples_overlap=50,
@@ -74,10 +73,6 @@ def test_can_apply_taper():
     print(windowing_scheme.num_samples_advance)
     print(windowing_scheme.available_number_of_windows(N))
     windowed_data = windowing_scheme.apply_sliding_window(qq)
-    print("replace this call with self.apply_taper(windowed_data")
-    #<TEST 1>
-    #tapered_windowed_data = apply_taper_to_windowed_array(windowing_scheme.taper, windowed_data)
-    #</TEST 1>
     tapered_windowed_data = windowing_scheme.apply_taper(windowed_data)
 
 

@@ -49,10 +49,7 @@ TODO: decide if "family" should be "taper_family"
 config to be called num_samples
 
 """
-# import iris_mt_scratch.logging_util import init_logging
-# logger = init_logging(__name__,module_name = 'aurora.time_series.taper')
 
-import logging
 import numpy as np
 import scipy.signal as ssig
 
