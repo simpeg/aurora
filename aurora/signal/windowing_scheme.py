@@ -7,7 +7,7 @@ It is often referred to as a "sliding window" or a "striding window".  It is bas
 to say how far to advance at each stride (or step).
 
 To generate an array of windows we only need window length and an overlap (or equivalently an advance).  We
-normally descibe sliding windows in terms of overlap but we code in terms of "window_advance".
+normally describe sliding windows in terms of overlap but we code in terms of "window_advance".
 
 Note that choices of window length (L) and overlap (V)  are usually made with some knowledge of
 time series sampling rate, duration, and the frequency band of interest.  We can create a module
@@ -58,15 +58,13 @@ import copy
 import numpy as np
 import xarray as xr
 
-from iris_mt_scratch.sandbox.time_series.apodization_window import ApodizationWindow
+from aurora.signal.apodization_window import ApodizationWindow
 
 #from iris_mt_scratch.sandbox.time_series.window_helpers import sliding_window
-from iris_mt_scratch.sandbox.time_series.window_helpers import apply_taper_to_windowed_array
-from iris_mt_scratch.sandbox.time_series.window_helpers import available_number_of_windows_in_array
-from iris_mt_scratch.sandbox.time_series.window_helpers import SLIDING_WINDOW_FUNCTIONS
+from aurora.signal.window_helpers import apply_taper_to_windowed_array
+from aurora.signal.time_series.window_helpers import available_number_of_windows_in_array
+from aurora.signal.time_series.window_helpers import SLIDING_WINDOW_FUNCTIONS
 
-
-#number_of_available_windows_in_array
 
 
 class WindowingScheme(ApodizationWindow):
