@@ -26,13 +26,14 @@ def test_can_inititalize_apodization_window():
     #<?>
     #sorting out which of slepian or dpss is causing failure.
     #just muted dpss and got a fail.
-    # apodization_window = ApodizationWindow(taper_family='slepian',
-    #                                        num_samples_window=64,
-    #                                        additional_args={"width":0.3})
-    # print(apodization_window.summary)
-    # apodization_window = ApodizationWindow(taper_family='custom', num_samples_window=64,
-    #                                        taper=np.abs(np.random.randn(64)))
-    # print(apodization_window.summary)
+    
+    apodization_window = ApodizationWindow(taper_family='slepian',
+                                           num_samples_window=64,
+                                           additional_args={"width":0.3})
+    print(apodization_window.summary)
+    apodization_window = ApodizationWindow(taper_family='custom', num_samples_window=64,
+                                           taper=np.abs(np.random.randn(64)))
+    print(apodization_window.summary)
     #</?>
 
 def main():
