@@ -34,19 +34,15 @@ Example 2
 In this case num_samples_window is defined by the array.
 "array" = [1, 2, 3, 4, 5, 4, 3, 2, 1]
 
-If "array" is non-empty then the assumption is that we are in the user defined case.
+If "array" is non-empty then assume the user-defined case.
 
-It is a little bit unsatisfying that the args need to be ordered for scipy.signal.get_window().
-It is suggested that you use OrderedDict() for any windows that have more than one additional args.
+It is a little bit unsatisfying that the args need to be ordered for
+scipy.signal.get_window().  Probably use OrderedDict()
+for any windows that have more than one additional args.
 
 For example
 "taper_family" = 'general_gaussian'
 "additional_args" = OrderedDict("power":1.5, "sigma":7)
-
-
-TODO: decide if "family" should be "taper_family"
-
-config to be called num_samples
 
 """
 
@@ -89,6 +85,14 @@ class ApodizationWindow(object):
 
     Instantiate an apodization window object.
 
+
+        Parameters
+        ----------
+        kwargs:
+        taper_family
+        num_samples_window
+        taper
+        additional_args
     """
     def __init__(self, **kwargs):
         """
@@ -118,12 +122,15 @@ class ApodizationWindow(object):
     @property
     def summary(self):
         """
-        Returns a string comprised of the taper_family, number_of_samples, and True/False if self.taper is not None
+        Returns a string comprised of the taper_family, number_of_samples, 
+        and True/False if self.taper is not None
         -------
 
         """
-        string1 = f"{self.taper_family} {self.num_samples_window} taper_exists={bool(self.taper.any())}"
-        string2 = f"NENBW:{self.nenbw:.3f}, CG:{self.coherent_gain:.3f} window factor={self.apodization_factor:.3f}"
+        string1 = f"{self.taper_family} {self.num_samples_window}"
+        string1 += f" taper_exists={bool(self.taper.any())}"
+        string2 = f"NENBW:{self.nenbw:.3f}, CG:{self.coherent_gain:.3f}"
+        string2 += f"window factor={self.apodization_factor:.3f}"
         return "\n".join([string1, string2])
 
     def __str__(self):
@@ -140,7 +147,7 @@ class ApodizationWindow(object):
     def make(self):
         """
         this is just a wrapper call to scipy.signal
-        @note: see scipy.signal.get_window for a description of what is
+        Note: see scipy.signal.get_window for a description of what is
         expected in args[1:]. http://docs.scipy.org/doc/scipy/reference/
         generated/scipy.signal.get_window.html
 
