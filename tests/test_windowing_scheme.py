@@ -34,8 +34,16 @@ def test_instantiate_windowing_scheme():
     ws = WindowingScheme(num_samples_window=128, num_samples_overlap=32, num_samples_data=1000,
                          taper_family='hamming')
     ws.sampling_rate = 50.0
+    #assert(ws.sampling_rate==50)
     print(ws.window_duration)
+    print(ws)
     print("assert some condtion here")
+    #assert allows checking bool as well,
+    #rather than just printing it will tell you if that particular statement
+    #fails.
+    #
+    #good for manual checks of values
+    #see: https://github.com/simpeg/discretize/blob/main/tests/base/test_basemesh.py
     return
 
 def test_apply_sliding_window():
@@ -56,7 +64,7 @@ def test_apply_sliding_window_can_return_xarray():
 
 def test_apply_sliding_window_to_xarray(return_xarray=False):
     N = 10000
-    xrd = xr.DataArray(np.random.randn(N), dims=["time", ],
+    xrd = xr.DataArray(np.random.randn(N,1), dims=["time", "channel"],
                        coords={"time": np.arange(N)})
     windowing_scheme = WindowingScheme(num_samples_window=64, num_samples_overlap=50)
     ww = windowing_scheme.apply_sliding_window(xrd, return_xarray=return_xarray)

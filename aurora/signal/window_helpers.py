@@ -44,7 +44,7 @@ def sliding_window_crude(data, num_samples_window, num_samples_advance, num_wind
 
     Parameters
     ----------
-    data
+    data: numpy array
     num_samples_window
     num_samples_advance
     num_windows

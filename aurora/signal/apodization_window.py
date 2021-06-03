@@ -124,6 +124,8 @@ class ApodizationWindow(object):
         """
         Returns a string comprised of the taper_family, number_of_samples, 
         and True/False if self.taper is not None
+
+        Note: ? cal this __str__()
         -------
 
         """
@@ -135,6 +137,7 @@ class ApodizationWindow(object):
 
     def __str__(self):
         """
+        ? __repr__?
         """
         return f"{self.taper}"
 
@@ -156,6 +159,7 @@ class ApodizationWindow(object):
         window_args = [v for k,v in self.additional_args.items()]
         window_args.insert(0, self.taper_family)
         window_args = tuple(window_args)
+        #print(f"\n\nWINDOW args {window_args}")
         self.taper = ssig.get_window(window_args, self.num_samples_window)
         self.apodization_factor#calculate
         return
