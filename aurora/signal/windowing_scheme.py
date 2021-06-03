@@ -327,7 +327,8 @@ class WindowingScheme(ApodizationWindow):
         np.fft.fftfreq(self.num_samples_window, d=dt)
         pass
 
-    def apply_fft(self, data, spectral_density_correction=True, detrend=True):
+    def apply_fft(self, data, spectral_density_correction=True,
+                  detrend_type="linear"):
         """
         lets assume we have already applied sliding window and taper.
         Things to think about:
@@ -339,12 +340,14 @@ class WindowingScheme(ApodizationWindow):
         """
         #ONLY SUPPORTS DATASET AT THIS POINT
         if isinstance(data, xr.Dataset):
-            spectral_ds = fft_xr_ds(data, self.sampling_rate, detrend=detrend)
+            spectral_ds = fft_xr_ds(data, self.sampling_rate,
+                                    detrend_type=detrend_type)
             if spectral_density_correction:
                 spectral_ds = self.apply_spectral_density_calibration(spectral_ds)
         elif isinstance(data, xr.DataArray):
             xrds = data.to_dataset("channel")
-            spectral_ds = fft_xr_ds(xrds, self.sampling_rate, detrend=detrend)
+            spectral_ds = fft_xr_ds(xrds, self.sampling_rate,
+                                    detrend_type=detrend_type)
             if spectral_density_correction:
                 spectral_ds = self.apply_spectral_density_calibration(spectral_ds)
             spectral_ds = spectral_ds.to_array("channel")
@@ -430,7 +433,7 @@ def spectral_density_calibration_factor(coherent_gain, enbw, dt, N):
 
 
 
-def fft_xr_ds(dataset, sample_rate, one_sided=True, detrend=True):
+def fft_xr_ds(dataset, sample_rate, one_sided=True, detrend_type="linear"):
     """
     assume you have an xr.dataset or xr.DataArray.  It is 2D.
     This should call window_helpers.apply_fft_to_windowed_array
@@ -469,9 +472,14 @@ def fft_xr_ds(dataset, sample_rate, one_sided=True, detrend=True):
         data = dataset[key].data
         window_means = data.mean(axis=operation_axis)
         demeaned_data = (data.T - window_means).T
-        if detrend:
+        if detrend_type: #neither False nor None
+            #axis=1 should be changed to be xarray aware of the time axis
+            #overwrite data=True probably best for most applications but
+            #be careful with that.  Do we want to avoid this in general?
+            #could we be possibly overwriting stuff on MTH5 in future?
             import scipy.signal as ssig
-            ssig.detrend(demeaned_data, axis=1, overwrite_data=True)
+            ssig.detrend(demeaned_data, axis=1, overwrite_data=True,
+                         type=detrend_type)
 
         print("MAY NEED TO ADD DETRENDING OR PREWHITENING HERE AS PREP FOR FFT")
         fspec_array = np.fft.fft(demeaned_data, axis=1)
