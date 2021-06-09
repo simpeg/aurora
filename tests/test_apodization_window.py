@@ -22,6 +22,12 @@ def test_kaiser():
                                            additional_args={"beta": 8})
     print(apodization_window.summary)
 
+def test_tukey():
+    apodization_window = ApodizationWindow(taper_family='tukey',
+                                           num_samples_window=30000,
+                                           additional_args={"alpha": 0.25})
+
+    print(apodization_window.summary)
 def test_dpss():
     #<?>
     # Passes locally but fails on miniconda ci test... not sure why,
@@ -63,6 +69,7 @@ def main():
     test_slepian()
     test_dpss()
     test_custom()
+    test_tukey()
 #    test_can_inititalize_apodization_window()
 
 if __name__ == "__main__":

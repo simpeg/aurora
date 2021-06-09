@@ -1,9 +1,14 @@
+"""
+TODO: Add a test that uses detrending constant, none and linear for fft
+or maybe make an fft test module?
+"""
 import numpy as np
 import xarray as xr
 
 from aurora.signal.time_axis_helpers import make_time_axis
 from aurora.signal.windowing_scheme import WindowingScheme
 from aurora.signal.windowing_scheme import fft_xr_ds
+
 
 def get_test_windowing_scheme(num_samples_window=32, num_samples_overlap=8, sampling_rate=None):
     windowing_scheme = WindowingScheme(num_samples_window=num_samples_window,
