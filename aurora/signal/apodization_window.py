@@ -52,6 +52,10 @@ import scipy.signal as ssig
 
 class ApodizationWindow(object):
     """
+    #<FROM HEINZEL>
+    ENBW: Eective Noise BandWidth, see Equation (22)
+    NENBW Normalized Equivalent Noise BandWidth, see Equation (21)
+    #</FROM HEINZEL>
     usage: apod_window = ApodizationWindow()
     @type taper_family: string
     @ivar taper_family: Specify the taper type - boxcar, kaiser, hanning, etc
