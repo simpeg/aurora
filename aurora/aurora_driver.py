@@ -4,6 +4,10 @@
 TODO: MTH5 updated so that run provides a channel which returns a channel response.
 It seems like we need both a Run and a RunTS object to be able to access calibration
 info and data in the same environment
+TODO: add sample_interval property to RunTS
+TODO: Rethink the inputs here ... take the PKD Data, merge it together with SAO
+and make an MTH5 out of it.  Do the little fixy fixys to make the metadata right
+and then store in repo.
 
 """
 
@@ -18,7 +22,6 @@ import time
 import xarray as xr
 
 from aurora.signal.windowing_scheme import WindowingScheme
-# from iris_mt_scratch.sandbox.time_series.multivariate_time_series import MultiVariateTimeSeries
 from aurora.general_helper_functions import FIGURES_PATH
 from aurora.general_helper_functions import SANDBOX
 from aurora.general_helper_functions import TEST_BAND_FILE
@@ -47,11 +50,18 @@ def set_driver_parameters():
     driver_parameters["run_ts_from_xml_01"] = 1#False #True
     driver_parameters["initialize_data"] = True
     driver_parameters["dataset_id"] = "pkd_test_00"
+    driver_parameters["dataset_id"] = "synthetic"
     driver_parameters["BULK SPECTRA"] = False
 
     return driver_parameters
 
 def test_runts_from_xml(dataset_id, runts_obj=False):
+    """
+    Migrate this test out of driver once the Quanterra FIR filters are solved.
+    :param dataset_id:
+    :param runts_obj:
+    :return:
+    """
     dataset_id = "pkd_test_00"
     #
     test_dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
