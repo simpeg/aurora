@@ -21,8 +21,8 @@ from pathlib import Path
 import xarray as xr
 
 #from iris_mt_scratch.sandbox.time_series.multivariate_time_series import MultiVariateTimeSeries
-from aurora.io_helpers.test_data import get_example_data
-from aurora.io_helpers.test_data import TEST_DATA_SET_CONFIGS
+from aurora.sandbox.io_helpers.test_data import get_example_data
+from aurora.sandbox.io_helpers.test_data import TEST_DATA_SET_CONFIGS
 from aurora.sandbox.xml_sandbox import describe_inventory_stages
 from mt_metadata.timeseries import Experiment
 from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
@@ -321,7 +321,6 @@ def main():
     driver_parameters = set_driver_parameters()
     #<CREATE METADATA XML>
     if driver_parameters["create_xml"]:
-        #from iris_mt_scratch.sandbox.io_helpers.test_data import TEST_DATA_SET_CONFIGS
         dataset_ids = ["pkd_test_00", "sao_test_00",]
         for dataset_id in dataset_ids:
             test_dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]

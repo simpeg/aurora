@@ -2,7 +2,7 @@ from collections import OrderedDict
 import numpy as np
 
 from aurora.interval import Interval
-from aurora.io_helpers.emtf_band_setup import EMTFBandSetupFile
+from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
 
 
 class FrequencyBand(Interval):

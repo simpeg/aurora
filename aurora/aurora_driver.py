@@ -26,9 +26,9 @@ from aurora.general_helper_functions import FIGURES_PATH
 from aurora.general_helper_functions import SANDBOX
 from aurora.general_helper_functions import TEST_BAND_FILE
 from aurora.general_helper_functions import read_complex, save_complex
-from aurora.io_helpers.test_data import get_example_array_list
-from aurora.io_helpers.test_data import get_example_data
-from aurora.io_helpers.test_data import TEST_DATA_SET_CONFIGS
+from aurora.sandbox.io_helpers.test_data import get_example_array_list
+from aurora.sandbox.io_helpers.test_data import get_example_data
+from aurora.sandbox.io_helpers.test_data import TEST_DATA_SET_CONFIGS
 from aurora.sandbox.mth5_helpers import cast_run_to_run_ts
 from aurora.sandbox.mth5_helpers import get_experiment_from_obspy_inventory
 from aurora.sandbox.mth5_helpers import HEXY
@@ -71,8 +71,8 @@ def test_runts_from_xml(dataset_id, runts_obj=False):
     inventory = test_dataset_config.get_inventory_from_iris(ensure_inventory_stages_are_named=True)
     experiment = get_experiment_from_obspy_inventory(inventory)
 
-#    experiment.surveys[0].filters["fir_fs2d5"]
-#    experiment.surveys[0].filters["fir_fs2d5"].decimation_input_sample_rate
+    experiment.surveys[0].filters["fir_fs2d5"]
+    experiment.surveys[0].filters["fir_fs2d5"].decimation_input_sample_rate
 #    hx.channel_response_filter.filters_list[3].name
 #    hx.channel_response_filter.filters_list[3].decimation_input_sample_rate
     test_dataset_config.save_xml(experiment)

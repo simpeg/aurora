@@ -270,7 +270,6 @@ def get_channel(component, station_id="", start=None, sampling_rate=None, load_a
                 component_station_label=False):
     """
     One off - specifically for loading PKD and SAO data for May 24th spectral tests.
-    Move this into either io_helpers or into
     Parameters
     ----------
     component
