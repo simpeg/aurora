@@ -13,12 +13,10 @@ from mth5.mth5 import MTH5
 # \test1.asc")
 fn = Path(r"test1.asc")
 df = pd.read_csv(fn, names=["hx", "hy", "hz", "ex", "ey"], sep="\s+")
-<<<<<<< HEAD
-print(df)
-=======
+#print(df)
+
 sample_rate = 1
 # loop over stations and make them ChannelTS objects
->>>>>>> ac5c59f2ebe0d2dba00c84885c831853f2efc3c2
 ch_list = []
 for col in df.columns:
     data = df[col].values
@@ -42,11 +40,8 @@ runts = RunTS(array_list=ch_list)
 # add in metadata
 runts.station_metadata.id = "mt001"
 runts.run_metadata.id = "001"
-<<<<<<< HEAD
-=======
 
 # plot the data
->>>>>>> ac5c59f2ebe0d2dba00c84885c831853f2efc3c2
 runts.plot()
 
 # make an MTH5
