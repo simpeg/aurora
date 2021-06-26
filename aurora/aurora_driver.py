@@ -58,6 +58,8 @@ def set_driver_parameters():
 def test_runts_from_xml(dataset_id, runts_obj=False):
     """
     Migrate this test out of driver once the Quanterra FIR filters are solved.
+    Also, this is really about mth5 creation and is a separate topic from
+    aurora pipeline.  This is an Element#1 aspect of the proposal.
     :param dataset_id:
     :param runts_obj:
     :return:

@@ -129,6 +129,8 @@ class TRME(RegressionEstimator):
 
     def sigma(self, QHY, Y_or_Yc, correction_factor=1.0):
         """
+        These are the error variances.
+        TODO: Move this method to the base class
         Computes the squared norms difference of the output channels from the
         "output channels inner-product with Q"
 
@@ -250,7 +252,7 @@ class TRME(RegressionEstimator):
 
     def redescend(self, Y_predicted, sigma, ):
         """
-        % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+        % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
         function[YC, E_psiPrime] = RedescendWt(Y, YP, sig, u0)
 
         % inputs
@@ -296,12 +298,13 @@ class TRME(RegressionEstimator):
             b0 = self.solve_overdetermined()
             return b0
 
+        #<INITIAL ESTIMATE>
         Q, R = self.qr_decomposition(self.X)
         QH = np.conjugate(np.transpose(Q))
         # initial LS estimate b0, error variances sigma
         QHY = np.matmul(QH, self.Y)
         b0 = solve_triangular(R, QHY)
-
+        # </INITIAL ESTIMATE>
 
         if self.iter_control.max_number_of_iterations > 0:
             converged = False;
