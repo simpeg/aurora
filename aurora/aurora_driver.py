@@ -21,7 +21,7 @@ import scipy.signal as ssig
 import time
 import xarray as xr
 
-from aurora.signal.windowing_scheme import WindowingScheme
+
 from aurora.general_helper_functions import FIGURES_PATH
 from aurora.general_helper_functions import SANDBOX
 from aurora.general_helper_functions import TEST_BAND_FILE
@@ -29,13 +29,14 @@ from aurora.general_helper_functions import read_complex, save_complex
 from aurora.io_helpers.test_data import get_example_array_list
 from aurora.io_helpers.test_data import get_example_data
 from aurora.io_helpers.test_data import TEST_DATA_SET_CONFIGS
-from aurora.signal.frequency_band import FrequencyBands
-from aurora.signal.frequency_band_helpers import extract_band
-from aurora.signal.frequency_band_helpers import frequency_band_edges
 from aurora.sandbox.mth5_helpers import cast_run_to_run_ts
 from aurora.sandbox.mth5_helpers import get_experiment_from_obspy_inventory
 from aurora.sandbox.mth5_helpers import HEXY
 from aurora.sandbox.mth5_helpers import embed_experiment_into_run
+from aurora.time_series.frequency_band import FrequencyBands
+from aurora.time_series.frequency_band_helpers import extract_band
+from aurora.time_series.frequency_band_helpers import frequency_band_edges
+from aurora.time_series.windowing_scheme import WindowingScheme
 from aurora.transfer_function.iter_control import IterControl
 from aurora.transfer_function.transfer_function_header import TransferFunctionHeader
 from aurora.transfer_function.TTFZ import TTFZ
