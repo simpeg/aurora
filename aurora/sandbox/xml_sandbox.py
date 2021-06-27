@@ -30,7 +30,6 @@ from lxml import etree, objectify
 from pathlib import Path
 
 from aurora.general_helper_functions import FIGURES_PATH
-from mth5.utils.pathing import DATA_DIR
 from mth5_test_data.util import MTH5_TEST_DATA_DIR
 
 from mt_metadata.base.helpers import element_to_dict

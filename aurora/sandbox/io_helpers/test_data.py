@@ -19,7 +19,8 @@ from aurora.sandbox.xml_sandbox import get_response_inventory_from_iris
 from aurora.sandbox.xml_sandbox import describe_inventory_stages
 from mth5.timeseries.channel_ts import ChannelTS
 from mth5.timeseries.run_ts import RunTS
-from mth5.utils.pathing import DATA_DIR
+from mth5_test_data.util import MTH5_TEST_DATA_DIR as DATA_DIR
+#~/.cache/iris_mt/mth5_test_data/mth5_test_data
 
 HEXY = ['hx','hy','ex','ey'] #default components list
 

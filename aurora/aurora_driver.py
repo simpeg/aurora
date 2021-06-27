@@ -33,6 +33,7 @@ from aurora.sandbox.mth5_helpers import cast_run_to_run_ts
 from aurora.sandbox.mth5_helpers import get_experiment_from_obspy_inventory
 from aurora.sandbox.mth5_helpers import HEXY
 from aurora.sandbox.mth5_helpers import embed_experiment_into_run
+from aurora.sandbox.mth5_helpers import test_runts_from_xml
 from aurora.time_series.frequency_band import FrequencyBands
 from aurora.time_series.frequency_band_helpers import extract_band
 from aurora.time_series.frequency_band_helpers import frequency_band_edges
@@ -52,39 +53,10 @@ def set_driver_parameters():
     driver_parameters["initialize_data"] = True
     driver_parameters["dataset_id"] = "pkd_test_00"
     driver_parameters["dataset_id"] = "synthetic"
-    driver_parameters["BULK SPECTRA"] = False
+    driver_parameters["BULK SPECTRA"] = True
 
     return driver_parameters
 
-def test_runts_from_xml(dataset_id, runts_obj=False):
-    """
-    Migrate this test out of driver once the Quanterra FIR filters are solved.
-    Also, this is really about mth5 creation and is a separate topic from
-    aurora pipeline.  This is an Element#1 aspect of the proposal.
-    :param dataset_id:
-    :param runts_obj:
-    :return:
-    """
-    dataset_id = "pkd_test_00"
-    #
-    test_dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
-    inventory = test_dataset_config.get_inventory_from_iris(ensure_inventory_stages_are_named=True)
-    experiment = get_experiment_from_obspy_inventory(inventory)
-
-    experiment.surveys[0].filters["fir_fs2d5"]
-    experiment.surveys[0].filters["fir_fs2d5"].decimation_input_sample_rate
-#    hx.channel_response_filter.filters_list[3].name
-#    hx.channel_response_filter.filters_list[3].decimation_input_sample_rate
-    test_dataset_config.save_xml(experiment)
-    h5_path = Path("PKD.h5")
-    run_obj = embed_experiment_into_run("PKD", experiment, h5_path=h5_path)
-
-    if runts_obj:
-        array_list = get_example_array_list(components_list=HEXY,
-                                            load_actual=True,
-                                            station_id="PKD")
-        runts_obj = cast_run_to_run_ts(run_obj, array_list=array_list)
-    return experiment, run_obj, runts_obj
 
 
 
@@ -122,15 +94,15 @@ def main():
 
 
         fft_obj = windowing_scheme.apply_fft(tapered_obj)
-        from iris_mt_scratch.sandbox.time_series.test_calibration import \
-            parkfield_sanity_check
-        show_response_curves = False
+        from aurora.sandbox.test_calibration import parkfield_sanity_check
+        show_response_curves = True
         show_spectra = False
         # Maybe better to make parkfield_sanity_check start from run_ts and
         # run_obj once we have run_ts behaving correct w.r.t. data channels?
-        parkfield_sanity_check(fft_obj, run_obj, figures_path=FIGURES_BUCKET,
+        parkfield_sanity_check(fft_obj, run_obj, figures_path=FIGURES_PATH,
                                show_response_curves=show_response_curves,
-                               show_spectra=show_spectra)
+                               show_spectra=show_spectra,
+                               include_decimation=True)
         #</BULK SPECTRA CALIBRATION>
 
 
