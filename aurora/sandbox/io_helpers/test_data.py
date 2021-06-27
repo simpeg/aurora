@@ -84,11 +84,12 @@ def scan_network_for_nonconformity(inventory):
                         stage.stage_gain *= 1e-9
                 #print(f"{channel}")
             # <Tesla to nanoTesla>
-        #print("HI")
-    return  inventory
+    return inventory
 
 class TestDataSetConfig(object):
     """
+    Note this is actually IRIS-specific.  We should create another type of test
+    dataset for mth5
     Need:
     -iris_metadata_parameters
     -data_parameters (how to rover, or load from local)
@@ -104,6 +105,7 @@ class TestDataSetConfig(object):
         self.description = None
         self.dataset_id = None
         self.components_list = None #
+
 
     def get_inventory_from_iris(self, ensure_inventory_stages_are_named=True):
 
@@ -221,6 +223,22 @@ def make_test_configs():
 
     test_data_set_configs["fap_test"] = test_data_set
     # </FAP>
+
+    # # <SYNTHETIC> ?Not needed?
+    # dataset_id = "synthetic"
+    # test_data_set = TestDataSetConfig()
+    # test_data_set.dataset_id = dataset_id
+    # test_data_set.network = "XX"
+    # test_data_set.station = "sythetic_station_01"
+    # test_data_set.starttime = UTCDateTime("1977-03-02T14:56:00")
+    # test_data_set.endtime = None  # UTCDateTime("2004-09-28T23:59:59")
+    # test_data_set.channel_codes = "LQ1,LQ2,LF1,LF2, LF3"
+    # test_data_set.description = "emtf historical synthetic test dataset"
+    #
+    # test_data_set_configs[dataset_id] = test_data_set
+    # # </SYNTHETIC>
+
+
     return test_data_set_configs
 
 
