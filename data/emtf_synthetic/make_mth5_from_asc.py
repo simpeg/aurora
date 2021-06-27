@@ -16,7 +16,7 @@ SYNTHETIC_DATA = INPUT_ASCII_DATA.parent.joinpath("emtf_synthetic.h5")
 RUN_ID = "001"
 STATION_ID = "mt001"
 SAMPLE_RATE = 1.0
-CF = CoefficientFilter()
+COEFF_FILTER = CoefficientFilter()
 #</GLOBAL CFG>
 
 
@@ -36,6 +36,7 @@ def create_mth5_synthetic_file(plot=False):
             # add metadata to the channel here
             chts.channel_metadata.dipole_length = 50
 
+
         elif col in ["hx", "hy", "hz"]:
             chts = ChannelTS(channel_type="magnetic", data=data,
                              channel_metadata=meta_dict)
@@ -52,6 +53,10 @@ def create_mth5_synthetic_file(plot=False):
     # plot the data
     if plot:
         runts.plot()
+
+    # add the filter:
+    #survey = Survey()
+    #survey.filters = {'filter1':COEFF_FILTER}
 
     # make an MTH5
     m = MTH5()
