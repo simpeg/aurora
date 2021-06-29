@@ -22,6 +22,7 @@ UNITS = "SI"
 ACTIVE_FILTERS = [cf1, cf10]
 #</FILTERS>
 #<GLOBAL CFG>
+#make this an object? or leave as dict?
 STATION_01_CFG = {}
 STATION_01_CFG["ascii_data_path"] = Path(r"test1.asc")
 STATION_01_CFG["columns"] = ["hx", "hy", "hz", "ex", "ey"]
@@ -41,26 +42,25 @@ STATION_01_CFG["run_id"] = "001"
 STATION_01_CFG["station_id"] = "mt001"
 STATION_01_CFG["sample_rate"] = 1.0
 
+STATION_02_CFG = STATION_01_CFG.copy()
+STATION_02_CFG["ascii_data_path"] = Path(r"test2.asc")
+STATION_02_CFG["station_id"] = "mt002"
 
-#INPUT_TEST1_ASCII_DATA = Path(r"test1.asc")
-#INPUT_TEST2_ASCII_DATA = Path(r"test2.asc")
+
+
 parent_data_path = STATION_01_CFG["ascii_data_path"].parent
 SYNTHETIC_DATA = parent_data_path.joinpath("emtf_synthetic.h5")
-# RUN_ID = "001"
-# STATION_ID = "mt001"
-# SAMPLE_RATE = 1.0
-# COEFF_FILTER = CoefficientFilter()
 #</GLOBAL CFG>
 
 
 
-# make filters:
-ACTIVE_FILTERS = []
-cf1 = make_coefficient_filter(name="1")
-cf10 = make_coefficient_filter(gain=100, name="10")
-UNITS = "SI"
-ACTIVE_FILTERS = [cf1, cf10]
-COLUMNS = ["hx", "hy", "hz", "ex", "ey"]
+# # make filters:
+# ACTIVE_FILTERS = []
+# cf1 = make_coefficient_filter(name="1")
+# cf10 = make_coefficient_filter(gain=100, name="10")
+# UNITS = "SI"
+# ACTIVE_FILTERS = [cf1, cf10]
+# COLUMNS = ["hx", "hy", "hz", "ex", "ey"]
 def create_mth5_synthetic_file(plot=False):
     df = pd.read_csv(STATION_01_CFG["ascii_data_path"],
                      names=STATION_01_CFG["columns"], sep="\s+")
