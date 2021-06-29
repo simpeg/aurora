@@ -53,34 +53,21 @@ SYNTHETIC_DATA = parent_data_path.joinpath("emtf_synthetic.h5")
 #</GLOBAL CFG>
 
 
-
-# # make filters:
-# ACTIVE_FILTERS = []
-# cf1 = make_coefficient_filter(name="1")
-# cf10 = make_coefficient_filter(gain=100, name="10")
-# UNITS = "SI"
-# ACTIVE_FILTERS = [cf1, cf10]
-# COLUMNS = ["hx", "hy", "hz", "ex", "ey"]
-def create_mth5_synthetic_file(plot=False):
-    df = pd.read_csv(STATION_01_CFG["ascii_data_path"],
-                     names=STATION_01_CFG["columns"], sep="\s+")
-    for col in STATION_01_CFG["columns"]:
-        df[col] += STATION_01_CFG["noise_scalar"][col]*np.random.randn(len(df))
-
-    # loop over stations and make them ChannelTS objects
-    # we need to add a tag in the channels
-    # so that when you call a run it will get all the filters with it.
+def create_run_ts_from_station_config(cfg, df):
+    """
+    loop over stations and make them ChannelTS objects
+    we need to add a tag in the channels
+    so that when you call a run it will get all the filters with it.
+    """
     ch_list = []
     for col in df.columns:
         data = df[col].values
-        # meta_dict = {"component": col,
-        #              "sample_rate": SAMPLE_RATE,
-        #              "filter.name":[cf1.name, cf10.name]}
+
         if col in ["ex", "ey"]:
             meta_dict = {"component": col,
-                         "sample_rate": STATION_01_CFG["sample_rate"],
-                         "filter.name": STATION_01_CFG["filters"][col],
-                        }
+                         "sample_rate": cfg["sample_rate"],
+                         "filter.name": cfg["filters"][col],
+                         }
             chts = ChannelTS(channel_type="electric", data=data,
                              channel_metadata=meta_dict)
             # add metadata to the channel here
@@ -89,9 +76,9 @@ def create_mth5_synthetic_file(plot=False):
 
         elif col in ["hx", "hy", "hz"]:
             meta_dict = {"component": col,
-                         "sample_rate": STATION_01_CFG["sample_rate"],
-                         "filter.name": STATION_01_CFG["filters"][col],
-                        }
+                         "sample_rate": cfg["sample_rate"],
+                         "filter.name": cfg["filters"][col],
+                         }
             chts = ChannelTS(channel_type="magnetic", data=data,
                              channel_metadata=meta_dict)
 
@@ -101,8 +88,19 @@ def create_mth5_synthetic_file(plot=False):
     runts = RunTS(array_list=ch_list)
 
     # add in metadata
-    runts.station_metadata.id = STATION_01_CFG["station_id"]
-    runts.run_metadata.id = STATION_01_CFG["run_id"]
+    runts.station_metadata.id = cfg["station_id"]
+    runts.run_metadata.id = cfg["run_id"]
+    return runts
+
+def create_mth5_synthetic_file(plot=False):
+    #read in data
+    df = pd.read_csv(STATION_01_CFG["ascii_data_path"],
+                     names=STATION_01_CFG["columns"], sep="\s+")
+    #add noise
+    for col in STATION_01_CFG["columns"]:
+        df[col] += STATION_01_CFG["noise_scalar"][col]*np.random.randn(len(df))
+    #cast to run_ts
+    runts = create_run_ts_from_station_config(STATION_01_CFG, df)
 
     # plot the data
     if plot:
