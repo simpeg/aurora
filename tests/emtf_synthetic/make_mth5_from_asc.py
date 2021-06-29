@@ -4,32 +4,55 @@ Created on Fri Jun 25 16:03:21 2021
 
 @author: jpeacock
 """
+
 import numpy as np
 from pathlib import Path
+from random import seed
 import pandas as pd
 from mth5.timeseries import ChannelTS, RunTS
 from mth5.mth5 import MTH5
-from mt_metadata.timeseries.filters.coefficient_filter import CoefficientFilter
 
+from filter_helpers import make_coefficient_filter
+seed(0)
+#<FILTERS>
+ACTIVE_FILTERS = []
+cf1 = make_coefficient_filter(name="1")
+cf10 = make_coefficient_filter(gain=100, name="10")
+UNITS = "SI"
+ACTIVE_FILTERS = [cf1, cf10]
+#</FILTERS>
 #<GLOBAL CFG>
-INPUT_ASCII_DATA = Path(r"test1.asc")
-SYNTHETIC_DATA = INPUT_ASCII_DATA.parent.joinpath("emtf_synthetic.h5")
-RUN_ID = "001"
-STATION_ID = "mt001"
-SAMPLE_RATE = 1.0
-COEFF_FILTER = CoefficientFilter()
+STATION_01_CFG = {}
+STATION_01_CFG["ascii_data_path"] = Path(r"test1.asc")
+STATION_01_CFG["columns"] = ["hx", "hy", "hz", "ex", "ey"]
+STATION_01_CFG["noise_scalar"] = {}
+for col in STATION_01_CFG["columns"]:
+    STATION_01_CFG["noise_scalar"][col] = 0.0
+STATION_01_CFG["filters"] = {}
+for col in STATION_01_CFG["columns"]:
+    STATION_01_CFG["filters"][col] = []
+for col in STATION_01_CFG["columns"]:
+    if col in ["ex", "ey"]:
+        STATION_01_CFG["filters"][col] = [cf1.name,]
+for col in STATION_01_CFG["columns"]:
+    if col in ["hx", "hy", "hz"]:
+        STATION_01_CFG["filters"][col] = [cf1.name,cf10.name]
+STATION_01_CFG["run_id"] = "001"
+STATION_01_CFG["station_id"] = "mt001"
+STATION_01_CFG["sample_rate"] = 1.0
+
+
+#INPUT_TEST1_ASCII_DATA = Path(r"test1.asc")
+#INPUT_TEST2_ASCII_DATA = Path(r"test2.asc")
+parent_data_path = STATION_01_CFG["ascii_data_path"].parent
+SYNTHETIC_DATA = parent_data_path.joinpath("emtf_synthetic.h5")
+# RUN_ID = "001"
+# STATION_ID = "mt001"
+# SAMPLE_RATE = 1.0
+# COEFF_FILTER = CoefficientFilter()
 #</GLOBAL CFG>
 
-def make_coefficient_filter(gain=1.0, name="unit_conversion"):
-    #in general, you need to add all required fields from the
-    #standards.json
-    coeff_filter = CoefficientFilter()
-    cf = CoefficientFilter()
-    cf.units_in = "digital counts"
-    cf.units_out = "millivolts"
-    cf.gain = gain
-    cf.name = name
-    return cf
+
 
 # make filters:
 ACTIVE_FILTERS = []
@@ -39,10 +62,10 @@ UNITS = "SI"
 ACTIVE_FILTERS = [cf1, cf10]
 COLUMNS = ["hx", "hy", "hz", "ex", "ey"]
 def create_mth5_synthetic_file(plot=False):
-    df = pd.read_csv(INPUT_ASCII_DATA,
-                     names=["hx", "hy", "hz", "ex", "ey"], sep="\s+")
-    for col in COLUMNS:
-        df[col] += 0.0*np.random.randn(len(df))
+    df = pd.read_csv(STATION_01_CFG["ascii_data_path"],
+                     names=STATION_01_CFG["columns"], sep="\s+")
+    for col in STATION_01_CFG["columns"]:
+        df[col] += STATION_01_CFG["noise_scalar"][col]*np.random.randn(len(df))
 
     # loop over stations and make them ChannelTS objects
     # we need to add a tag in the channels
@@ -55,8 +78,9 @@ def create_mth5_synthetic_file(plot=False):
         #              "filter.name":[cf1.name, cf10.name]}
         if col in ["ex", "ey"]:
             meta_dict = {"component": col,
-                         "sample_rate": SAMPLE_RATE,
-                         "filter.name": [cf1.name,]}
+                         "sample_rate": STATION_01_CFG["sample_rate"],
+                         "filter.name": STATION_01_CFG["filters"][col],
+                        }
             chts = ChannelTS(channel_type="electric", data=data,
                              channel_metadata=meta_dict)
             # add metadata to the channel here
@@ -65,8 +89,9 @@ def create_mth5_synthetic_file(plot=False):
 
         elif col in ["hx", "hy", "hz"]:
             meta_dict = {"component": col,
-                         "sample_rate": SAMPLE_RATE,
-                         "filter.name": [cf1.name, cf10.name]}
+                         "sample_rate": STATION_01_CFG["sample_rate"],
+                         "filter.name": STATION_01_CFG["filters"][col],
+                        }
             chts = ChannelTS(channel_type="magnetic", data=data,
                              channel_metadata=meta_dict)
 
@@ -76,21 +101,20 @@ def create_mth5_synthetic_file(plot=False):
     runts = RunTS(array_list=ch_list)
 
     # add in metadata
-    runts.station_metadata.id = STATION_ID
-    runts.run_metadata.id = RUN_ID
+    runts.station_metadata.id = STATION_01_CFG["station_id"]
+    runts.run_metadata.id = STATION_01_CFG["run_id"]
 
     # plot the data
     if plot:
         runts.plot()
 
     #survey = Survey()
-    #survey.filters = {'filter1':COEFF_FILTER}
 
     # make an MTH5
     m = MTH5()
     m.open_mth5(SYNTHETIC_DATA, mode="w")
-    station_group = m.add_station(STATION_ID)
-    run_group = station_group.add_run(RUN_ID)
+    station_group = m.add_station(STATION_01_CFG["station_id"])
+    run_group = station_group.add_run(STATION_01_CFG["run_id"])
     run_group.from_runts(runts)
     #add filters
     for fltr in ACTIVE_FILTERS:
@@ -124,11 +148,13 @@ def read_the_sythetic_mth5():
     TF_OUTPUT_CHANNELS = ["ex", "ey"]  # optional, default ["ex", "ey", "hz"]
     TF_REFERENCE_CHANNELS = None  # optional, default ["hx", "hy"],
     UNITS = "SI"
+    SAMPLE_RATE = STATION_01_CFG["sample_rate"]
     #<CONFIG>
     m = MTH5()
     m.open_mth5(SYNTHETIC_DATA, mode="a")
     #m.survey_group.
-    run_obj = m.get_run(STATION_ID, RUN_ID)
+    run_obj = m.get_run(STATION_01_CFG["station_id"],
+                        STATION_01_CFG["run_id"])
     runts = run_obj.to_runts()
     ds = runts.dataset
     windowing_scheme = WindowingScheme(taper_family="hamming",
