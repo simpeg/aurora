@@ -35,6 +35,7 @@ def make_coefficient_filter(gain=1.0, name="unit_conversion"):
 ACTIVE_FILTERS = []
 cf1 = make_coefficient_filter(name="1")
 cf10 = make_coefficient_filter(gain=100, name="10")
+UNITS = "SI"
 ACTIVE_FILTERS = [cf1, cf10]
 COLUMNS = ["hx", "hy", "hz", "ex", "ey"]
 def create_mth5_synthetic_file(plot=False):
@@ -200,7 +201,7 @@ def read_the_sythetic_mth5():
 
         transfer_function_obj.set_tf(i_band, regression_estimator, band.center_period)
 
-    transfer_function_obj.apparent_resistivity()
+    transfer_function_obj.apparent_resistivity(units=UNITS)
     from aurora.transfer_function.rho_plot import RhoPlot
 
     plotter = RhoPlot(transfer_function_obj)

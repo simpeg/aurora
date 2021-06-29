@@ -22,7 +22,7 @@ class TTFZ(TTF):
         super(TTFZ, self).__init__(*args)
 
 
-    def apparent_resistivity(self):
+    def apparent_resistivity(self, units="SI"):
         """
         ap_res(...) : computes app. res., phase, errors, given imped., cov.
         %USAGE: [rho,rho_se,ph,ph_se] = ap_res(z,sig_s,sig_e,periods) ;
@@ -58,11 +58,17 @@ class TTFZ(TTF):
         # apparent resistivities
         #rxy = self.T * (abs(Zxy) ** 2) / 5.
         #ryx = self.T * (abs(Zyx) ** 2) / 5.
-        rxy = 2e-7 * self.T * (abs(Zxy) ** 2)
-        ryx = 2e-7*  self.T * (abs(Zyx) ** 2)
-
-        rxy_se = 2 * np.sqrt(self.T * rxy / 5) * Zxy_se
-        ryx_se = 2 * np.sqrt(self.T * ryx / 5) * Zyx_se
+        if units=="SI":
+            rxy = 2e-7 * self.T * (abs(Zxy) ** 2)
+            ryx = 2e-7*  self.T * (abs(Zyx) ** 2)
+            print("ERRORS NOT CORRECT FOR SI")
+            rxy_se = 2 * np.sqrt(self.T * rxy / 5) * Zxy_se
+            ryx_se = 2 * np.sqrt(self.T * ryx / 5) * Zyx_se
+        else:
+            rxy = self.T * (abs(Zxy) ** 2) / 5.
+            ryx = self.T * (abs(Zyx) ** 2) / 5.
+            rxy_se = 2 * np.sqrt(self.T * rxy / 5) * Zxy_se
+            ryx_se = 2 * np.sqrt(self.T * ryx / 5) * Zyx_se
 
         self.rho[:,:] = np.vstack((rxy, ryx)).T
         self.rho_se[:,:] = np.vstack((rxy_se, ryx_se)).T;

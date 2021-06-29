@@ -53,7 +53,7 @@ def set_driver_parameters():
     driver_parameters["initialize_data"] = True
     driver_parameters["dataset_id"] = "pkd_test_00"
     driver_parameters["dataset_id"] = "synthetic"
-    driver_parameters["BULK SPECTRA"] = True
+    driver_parameters["BULK SPECTRA"] = False
 
     return driver_parameters
 
@@ -122,7 +122,7 @@ def main():
     #NUMBER_OF_BANDS_PER_DECADE = 8#optional, only when BAND_SETUP=="XXXX"
     TF_LOCAL_SITE = "PKD      "    #This comes from mth5/mt_metadata aurora#18
     TF_REMOTE_SITE = None #"SAO"   #This comes from mth5/mt_metadata aurora#18
-    TF_PROCESSING_SCHEME = "OLS"#""RME" #"OLS","RME", #required
+    TF_PROCESSING_SCHEME = "RME" #"OLS","RME", #required
     TF_INPUT_CHANNELS = ["hx", "hy"]    #optional, default ["hx", "hy"]
     TF_OUTPUT_CHANNELS = ["ex", "ey"]    #optional, default ["ex", "ey", "hz"]
     TF_REFERENCE_CHANNELS = None   #optional, default ["hx", "hy"],
@@ -157,6 +157,9 @@ def main():
         if UNITS=="SI":
             if channel_id[0].lower() =='h':
                 calibration_response /= 1e-9 #SI Units
+        elif UNITS=="MT":
+            if channel_id[0].lower() =='e':
+                calibration_response /= 1e6 #SI Units
         stft_obj[channel_id].data /= calibration_response
         print("multiply")
     # <CALIBRATE>
@@ -207,7 +210,7 @@ def main():
             regression_estimator = RegressionEstimator(X=X, Y=Y)
             Z = regression_estimator.estimate_ols()
             print(f"{TF_PROCESSING_SCHEME}, \n {Z}")
-        #elif TF_PROCESSING_SCHEME=="RME":
+        elif TF_PROCESSING_SCHEME=="RME":
             iter_control = IterControl(max_number_of_iterations=MAX_NUMBER_OF_ITERATIONS)
             regression_estimator = TRME(X=X, Y=Y, iter_control=iter_control)
             Z = regression_estimator.estimate()
@@ -228,7 +231,7 @@ def main():
         transfer_function_obj.set_tf(i_band, regression_estimator, T)
         print("Yay!")
     print("OK")
-    transfer_function_obj.apparent_resistivity()
+    transfer_function_obj.apparent_resistivity(units=UNITS)
     from aurora.transfer_function.rho_plot import RhoPlot
     plotter = RhoPlot(transfer_function_obj)
     fig, axs = plt.subplots(nrows=2)
