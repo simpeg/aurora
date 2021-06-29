@@ -3,6 +3,9 @@
 Created on Fri Jun 25 16:03:21 2021
 
 @author: jpeacock
+
+Want to create a station1.h5, station2.h5 and array.h5
+where array has 2 stations.
 """
 
 import numpy as np
@@ -12,45 +15,11 @@ import pandas as pd
 from mth5.timeseries import ChannelTS, RunTS
 from mth5.mth5 import MTH5
 
-from filter_helpers import make_coefficient_filter
+from synthetic_station_config import STATION_01_CFG
+from synthetic_station_config import STATION_02_CFG
+from synthetic_station_config import ACTIVE_FILTERS
+
 seed(0)
-#<FILTERS>
-ACTIVE_FILTERS = []
-cf1 = make_coefficient_filter(name="1")
-cf10 = make_coefficient_filter(gain=100, name="10")
-UNITS = "SI"
-ACTIVE_FILTERS = [cf1, cf10]
-#</FILTERS>
-#<GLOBAL CFG>
-#make this an object? or leave as dict?
-STATION_01_CFG = {}
-STATION_01_CFG["ascii_data_path"] = Path(r"test1.asc")
-STATION_01_CFG["columns"] = ["hx", "hy", "hz", "ex", "ey"]
-STATION_01_CFG["noise_scalar"] = {}
-for col in STATION_01_CFG["columns"]:
-    STATION_01_CFG["noise_scalar"][col] = 0.0
-STATION_01_CFG["filters"] = {}
-for col in STATION_01_CFG["columns"]:
-    STATION_01_CFG["filters"][col] = []
-for col in STATION_01_CFG["columns"]:
-    if col in ["ex", "ey"]:
-        STATION_01_CFG["filters"][col] = [cf1.name,]
-for col in STATION_01_CFG["columns"]:
-    if col in ["hx", "hy", "hz"]:
-        STATION_01_CFG["filters"][col] = [cf1.name,cf10.name]
-STATION_01_CFG["run_id"] = "001"
-STATION_01_CFG["station_id"] = "mt001"
-STATION_01_CFG["sample_rate"] = 1.0
-
-STATION_02_CFG = STATION_01_CFG.copy()
-STATION_02_CFG["ascii_data_path"] = Path(r"test2.asc")
-STATION_02_CFG["station_id"] = "mt002"
-
-
-
-parent_data_path = STATION_01_CFG["ascii_data_path"].parent
-SYNTHETIC_DATA = parent_data_path.joinpath("emtf_synthetic.h5")
-#</GLOBAL CFG>
 
 
 def create_run_ts_from_station_config(cfg, df):
@@ -92,15 +61,15 @@ def create_run_ts_from_station_config(cfg, df):
     runts.run_metadata.id = cfg["run_id"]
     return runts
 
-def create_mth5_synthetic_file(plot=False):
+def create_mth5_synthetic_file(station_cfg, plot=False):
     #read in data
-    df = pd.read_csv(STATION_01_CFG["ascii_data_path"],
-                     names=STATION_01_CFG["columns"], sep="\s+")
+    df = pd.read_csv(station_cfg["raw_data_path"],
+                     names=station_cfg["columns"], sep="\s+")
     #add noise
-    for col in STATION_01_CFG["columns"]:
-        df[col] += STATION_01_CFG["noise_scalar"][col]*np.random.randn(len(df))
+    for col in station_cfg["columns"]:
+        df[col] += station_cfg["noise_scalar"][col]*np.random.randn(len(df))
     #cast to run_ts
-    runts = create_run_ts_from_station_config(STATION_01_CFG, df)
+    runts = create_run_ts_from_station_config(station_cfg, df)
 
     # plot the data
     if plot:
@@ -110,9 +79,9 @@ def create_mth5_synthetic_file(plot=False):
 
     # make an MTH5
     m = MTH5()
-    m.open_mth5(SYNTHETIC_DATA, mode="w")
-    station_group = m.add_station(STATION_01_CFG["station_id"])
-    run_group = station_group.add_run(STATION_01_CFG["run_id"])
+    m.open_mth5(station_cfg["mth5_path"], mode="w")
+    station_group = m.add_station(station_cfg["station_id"])
+    run_group = station_group.add_run(station_cfg["run_id"])
     run_group.from_runts(runts)
     #add filters
     for fltr in ACTIVE_FILTERS:
@@ -121,13 +90,20 @@ def create_mth5_synthetic_file(plot=False):
     m.close_mth5()
 
 
-def read_the_sythetic_mth5():
+def process_sythetic_mth5_single_station(station_cfg):
+    """
+    Note that we will need a check that the processing config sample rates agree
+    with the data sampling rates otherwise raise Exception
+    :param station_cfg:
+    :return:
+    """
     import matplotlib.pyplot as plt
     from aurora.general_helper_functions import SANDBOX
     from aurora.time_series.windowing_scheme import WindowingScheme
     from aurora.time_series.frequency_band import FrequencyBands
     from aurora.time_series.frequency_band_helpers import extract_band
     from aurora.transfer_function.iter_control import IterControl
+    from aurora.transfer_function.rho_plot import RhoPlot
     from aurora.transfer_function.transfer_function_header import \
         TransferFunctionHeader
     from aurora.transfer_function.TTFZ import TTFZ
@@ -139,20 +115,20 @@ def read_the_sythetic_mth5():
     BAND_SETUP_FILE = SANDBOX.joinpath("bs_256.cfg")
     NUM_SAMPLES_WINDOW = 256
     MAX_NUMBER_OF_ITERATIONS = 10
-    TF_LOCAL_SITE = "PKD      "  # This comes from mth5/mt_metadata aurora#18
+    TF_LOCAL_SITE = station_cfg["station_id"]  # from mth5/mt_metadata aurora#18
     TF_REMOTE_SITE = None  # "SAO"   #This comes from mth5/mt_metadata aurora#18
     TF_PROCESSING_SCHEME = "RME"  # ""RME" #"OLS","RME", #required
     TF_INPUT_CHANNELS = ["hx", "hy"]  # optional, default ["hx", "hy"]
     TF_OUTPUT_CHANNELS = ["ex", "ey"]  # optional, default ["ex", "ey", "hz"]
     TF_REFERENCE_CHANNELS = None  # optional, default ["hx", "hy"],
     UNITS = "SI"
-    SAMPLE_RATE = STATION_01_CFG["sample_rate"]
+    SAMPLE_RATE = station_cfg["sample_rate"]
     #<CONFIG>
     m = MTH5()
-    m.open_mth5(SYNTHETIC_DATA, mode="a")
-    #m.survey_group.
-    run_obj = m.get_run(STATION_01_CFG["station_id"],
-                        STATION_01_CFG["run_id"])
+    m.open_mth5(station_cfg["mth5_path"], mode="a")
+
+    run_obj = m.get_run(station_cfg["station_id"], station_cfg["run_id"])
+
     runts = run_obj.to_runts()
     ds = runts.dataset
     windowing_scheme = WindowingScheme(taper_family="hamming",
@@ -160,11 +136,8 @@ def read_the_sythetic_mth5():
                                         num_samples_overlap=192,
                                         sampling_rate=runts.sample_rate)
     windowed_obj = windowing_scheme.apply_sliding_window(runts.dataset)
-    print("windowed_obj", windowed_obj)
     tapered_obj = windowing_scheme.apply_taper(windowed_obj)
-    print("tapered_obj", tapered_obj)
     stft_obj = windowing_scheme.apply_fft(tapered_obj)
-    print("stft_obj", stft_obj)
     #<CALIBRATE>
     for channel_id in stft_obj.keys():
         mth5_channel = run_obj.get_channel(channel_id)
@@ -179,9 +152,7 @@ def read_the_sythetic_mth5():
     #</CALIBRATE>
 
     stft_obj_xrda = stft_obj.to_array("channel")
-#     frequencies = stft_obj.frequency.data[1:]
-#     # print(f"Lower Bound:{frequencies[0]}, Upper bound:{frequencies[-1]}")
-#
+
     frequency_bands = FrequencyBands()
     if BAND_SETUP == "EMTF":
         frequency_bands.from_emtf_band_setup(filepath=BAND_SETUP_FILE,
@@ -226,25 +197,26 @@ def read_the_sythetic_mth5():
         transfer_function_obj.set_tf(i_band, regression_estimator, band.center_period)
 
     transfer_function_obj.apparent_resistivity(units=UNITS)
-    from aurora.transfer_function.rho_plot import RhoPlot
 
     plotter = RhoPlot(transfer_function_obj)
     fig, axs = plt.subplots(nrows=2)
     plotter.rho_sub_plot(axs[0])
     plotter.phase_sub_plot(axs[1])
-    # plotter.rho_plot2()
-    # plotter.phase_plot()
     plt.show()
     print(transfer_function_obj.rho.shape)
     print(transfer_function_obj.rho[0])
     print(transfer_function_obj.rho[-1])
     print("OK")
+    return
 
 
 
 def main():
-    create_mth5_synthetic_file()
-    read_the_sythetic_mth5()
+    create_mth5_synthetic_file(STATION_01_CFG)
+    create_mth5_synthetic_file(STATION_02_CFG)
+    process_sythetic_mth5_single_station(STATION_01_CFG)
+    process_sythetic_mth5_single_station(STATION_02_CFG)
+    #process_sythetic_mth5(STATION_02_CFG)
 
 if __name__ == '__main__':
     main()
