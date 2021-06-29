@@ -53,7 +53,7 @@ def set_driver_parameters():
     driver_parameters["initialize_data"] = True
     driver_parameters["dataset_id"] = "pkd_test_00"
     driver_parameters["dataset_id"] = "synthetic"
-    driver_parameters["BULK SPECTRA"] = False
+    driver_parameters["BULK SPECTRA"] = True
 
     return driver_parameters
 

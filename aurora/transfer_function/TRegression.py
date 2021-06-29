@@ -188,7 +188,7 @@ class RegressionEstimator(object):
             else:
                 print("Failed QR decompostion sanity check")
                 raise Exception
-        return# Q, R
+        return Q, R
 
     @property
     def Q(self):

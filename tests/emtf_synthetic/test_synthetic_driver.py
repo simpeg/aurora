@@ -1,7 +1,7 @@
 from make_mth5_from_asc import create_mth5_synthetic_file
 from make_mth5_from_asc import create_mth5_synthetic_file_for_array
 from test_processing import process_sythetic_mth5_single_station
-
+from test_processing import process_sythetic_mth5_remote_reference
 from synthetic_station_config import STATION_01_CFG
 from synthetic_station_config import STATION_02_CFG
 from synthetic_station_config import ACTIVE_FILTERS
