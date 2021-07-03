@@ -61,6 +61,11 @@ class ProcessingConfig(BaseDict):
     # @property
     # def emtf_band_setup_file(self):
     #     return str(self._emtf_band_setup_file)
+    #
+    # @emtf_band_setup_file.setter
+    # def emtf_band_setup_file(self, emtf_band_setup_file):
+    #     self._emtf_band_setup_file = Path(emtf_band_setup_file)
+
 
     @property
     def local_station_id(self, local_station_id):
@@ -69,60 +74,8 @@ class ProcessingConfig(BaseDict):
     @local_station_id.setter
     def local_station_id(self, local_station_id):
         self._local_station_id = local_station_id
-    #
-    # @emtf_band_setup_file.setter
-    # def emtf_band_setup_file(self, emtf_band_setup_file):
-    #     self._emtf_band_setup_file = Path(emtf_band_setup_file)
-        #return str(self._emtf_band_setup_file)
 
-    # def to_json(self, json_path, indent=" " * 4):
-    #     """
-    #     Write processing config to json
-    #     Parameters
-    #     ----------
-    #     json_path: pathlib.Path or str
-    #         full path to json file
-    #     indent str
-    #         json indentation string
-    #
-    #     Returns
-    #     json_path: pathlib.Path or str
-    #         full path to json file
-    #     -------
-    #
-    #     """
-    #     """
-    #
-    #     :return: full path to json file
-    #     :rtype: Path
-    #
-    #             """
-    #
-    #     json_path = Path(json_path)
-    #
-    #     json_dict = dict(
-    #         [(k, v) for k, v in self.items() if k not in ["logger"]])
-    #     with open(json_fn, "w") as fid:
-    #         json.dump(json_dict, fid, cls=NumpyEncoder, indent=indent)
-    #
-    #     return json_path
-    #
-    #
-    # def from_json(self, json_path):
-    #     json_fn = Path(json_path)
-    #     if not json_path.exists():
-    #         msg = f"JSON schema file {json_path} does not exist"
-    #         print(msg)
-    #         raise Exception
-    #
-    #     with open(json_path, "r") as fid:
-    #         json_dict = json.load(fid)
-    #
-    #     # valid_dict = {}
-    #     # for k, v in json_dict.items():
-    #     #     valid_dict[k] = validators.validate_value_dict(v)
-    #     # self.update(valid_dict)
-    #     return json_dict
+
 
 def test_can_create_config():
     cfg = ProcessingConfig()
