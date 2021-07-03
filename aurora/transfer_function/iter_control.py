@@ -137,4 +137,5 @@ class IterControl(object):
             correction factor used when
         """
         cfac = 1. / (2 * (1. - (1. + self.r0) * np.exp(-self.r0)))
+        #cfac = 1. / (1. - np.exp(-self.r0));
         return cfac

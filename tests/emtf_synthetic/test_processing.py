@@ -31,20 +31,22 @@ def process_sythetic_mth5_single_station(station_cfg):
 
     #<CONFIG>
     TAPER_FAMILY = "hamming"
-    NUM_SAMPLES_WINDOW = 256
-    NUM_SAMPLES_OVERLAP = 192
+    NUM_SAMPLES_WINDOW = 128
+    NUM_SAMPLES_OVERLAP = 32#int(3*NUM_SAMPLES_WINDOW/4)#192
+
     BAND_SETUP = "EMTF"
     BAND_SETUP_FILE = SANDBOX.joinpath("bs_256.cfg")
     MAX_NUMBER_OF_ITERATIONS = 10
     TF_LOCAL_SITE = station_cfg["station_id"]  # from mth5/mt_metadata aurora#18
     TF_REMOTE_SITE = None  # "SAO"   #This comes from mth5/mt_metadata aurora#18
-    TF_PROCESSING_SCHEME = "RME"  # ""RME" #"OLS","RME", #required
+    TF_PROCESSING_SCHEME = "OLS"  # ""RME" #"OLS","RME", #required
     TF_INPUT_CHANNELS = ["hx", "hy"]  # optional, default ["hx", "hy"]
     TF_OUTPUT_CHANNELS = ["ex", "ey"]  # optional, default ["ex", "ey", "hz"]
     TF_REFERENCE_CHANNELS = None  # optional, default ["hx", "hy"],
-    UNITS = "SI"
+    UNITS = "MT"
     SAMPLE_RATE = station_cfg["sample_rate"]
     #<CONFIG>
+
     m = MTH5()
     m.open_mth5(station_cfg["mth5_path"], mode="a")
 
@@ -59,16 +61,16 @@ def process_sythetic_mth5_single_station(station_cfg):
     tapered_obj = windowing_scheme.apply_taper(windowed_obj)
     stft_obj = windowing_scheme.apply_fft(tapered_obj)
     #<CALIBRATE>
-    for channel_id in stft_obj.keys():
-        mth5_channel = run_obj.get_channel(channel_id)
-        channel_filter = mth5_channel.channel_response_filter
-        calibration_response = channel_filter.complex_response(
-        stft_obj.frequency.data)
-
-    # if UNITS == "SI":
-    #     if channel_id[0].lower() == 'h':
-    #         calibration_response /= 1e-9  # SI Units
-        stft_obj[channel_id].data /= calibration_response
+    # for channel_id in stft_obj.keys():
+    #     mth5_channel = run_obj.get_channel(channel_id)
+    #     channel_filter = mth5_channel.channel_response_filter
+    #     calibration_response = channel_filter.complex_response(
+    #     stft_obj.frequency.data)
+    #
+    # # if UNITS == "SI":
+    # #     if channel_id[0].lower() == 'h':
+    # #         calibration_response /= 1e-9  # SI Units
+    #     stft_obj[channel_id].data /= calibration_response
     #</CALIBRATE>
 
     stft_obj_xrda = stft_obj.to_array("channel")
@@ -107,7 +109,7 @@ def process_sythetic_mth5_single_station(station_cfg):
             iter_control = IterControl(max_number_of_iterations=MAX_NUMBER_OF_ITERATIONS)
             regression_estimator = TRME(X=X, Y=Y, iter_control=iter_control)
             Z = regression_estimator.estimate()
-            print(f"RME{TF_PROCESSING_SCHEME}, \n {Z}")
+            print(f"{band.center_period} {TF_PROCESSING_SCHEME}, \n {Z}")
         else:
             print(f"processing_scheme {TF_PROCESSING_SCHEME} not supported")
             print(f"processing_scheme must be one of OLS, RME "
@@ -140,8 +142,8 @@ def process_sythetic_mth5_remote_reference(station_cfg1, station_cfg2):
 
     #<CONFIG>
     TAPER_FAMILY = "hamming"
-    NUM_SAMPLES_WINDOW = 256
-    NUM_SAMPLES_OVERLAP = 192
+    NUM_SAMPLES_WINDOW = 128#256
+    NUM_SAMPLES_OVERLAP = 32#192
     BAND_SETUP = "EMTF"
     BAND_SETUP_FILE = SANDBOX.joinpath("bs_256.cfg")
     MAX_NUMBER_OF_ITERATIONS = 10
@@ -152,7 +154,7 @@ def process_sythetic_mth5_remote_reference(station_cfg1, station_cfg2):
     TF_INPUT_CHANNELS = ["hx", "hy"]  # optional, default ["hx", "hy"]
     TF_OUTPUT_CHANNELS = ["ex", "ey"]  # optional, default ["ex", "ey", "hz"]
     TF_REFERENCE_CHANNELS = ["hx", "hy"]# optional, default ["hx", "hy"],
-    UNITS = "SI"
+    UNITS = "MT"
     SAMPLE_RATE = station_cfg1["sample_rate"]
     #<CONFIG>
 

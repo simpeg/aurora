@@ -17,7 +17,7 @@ def main():
     create_mth5_synthetic_file_for_array([STATION_01_CFG, STATION_02_CFG])
     process_sythetic_mth5_single_station(STATION_01_CFG)
     process_sythetic_mth5_single_station(STATION_02_CFG)
-    #process_sythetic_mth5(STATION_02_CFG)
+    process_sythetic_mth5_remote_reference(STATION_01_CFG, STATION_02_CFG)
 
 if __name__ == '__main__':
     main()

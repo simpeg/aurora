@@ -87,8 +87,10 @@ def create_config_for_test_case(test_case_id):
     if test_case_id == "synthetic test 1":
         from aurora.general_helper_functions import SANDBOX
         cfg = ProcessingConfig()
+        cfg.local_station_id = "test1"
+        cfg.sample_rate = 1.0
         cfg.emtf_band_setup_file = str(SANDBOX.joinpath("bs_256.cfg"))
-        json_path = "_".join(test_case_id)
+        json_path = test_case_id.replace(" ","_")
         cfg.to_json(json_path)
 
 
