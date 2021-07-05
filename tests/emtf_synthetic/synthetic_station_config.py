@@ -1,3 +1,4 @@
+from aurora.sandbox.processing_config import ProcessingConfig
 from filter_helpers import make_coefficient_filter
 from pathlib import Path
 
@@ -9,7 +10,10 @@ UNITS = "MT"
 ACTIVE_FILTERS = [cf1, cf10]
 #</FILTERS>
 
-#<GLOBAL CFG>
+#<MTH5 CREATION CONFIG>
+# def get_mth5_config(test_case_id):
+#     if test_case_id=="test1":
+#         cfg = {}
 #make this an object? or leave as dict?
 STATION_01_CFG = {}
 STATION_01_CFG["raw_data_path"] = Path(r"test1.asc")
@@ -37,4 +41,4 @@ STATION_02_CFG["raw_data_path"] = Path(r"test2.asc")
 STATION_02_CFG["mth5_path"] = Path(r"test2.h5")
 STATION_02_CFG["station_id"] = "test2"
 
-#</GLOBAL CFG>
+#</MTH5 CREATION CONFIG>

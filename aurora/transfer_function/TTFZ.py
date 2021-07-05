@@ -64,11 +64,14 @@ class TTFZ(TTF):
             print("ERRORS NOT CORRECT FOR SI")
             rxy_se = 2 * np.sqrt(self.T * rxy / 5) * Zxy_se
             ryx_se = 2 * np.sqrt(self.T * ryx / 5) * Zyx_se
-        else:
+        elif units=="MT":
             rxy = self.T * (abs(Zxy) ** 2) / 5.
             ryx = self.T * (abs(Zyx) ** 2) / 5.
             rxy_se = 2 * np.sqrt(self.T * rxy / 5) * Zxy_se
             ryx_se = 2 * np.sqrt(self.T * ryx / 5) * Zyx_se
+        else:
+            print("ERROR: only SI and MT units supported")
+            raise Exception
 
         self.rho[:,:] = np.vstack((rxy, ryx)).T
         self.rho_se[:,:] = np.vstack((rxy_se, ryx_se)).T;
