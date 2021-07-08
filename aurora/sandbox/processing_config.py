@@ -17,8 +17,12 @@ class ProcessingConfig(BaseDict):
 
     def __init__(self, *args, **kwargs):
         self.mth5_path = kwargs.get("mth5_path", "")
+        #str or Path()
 
         # <FOURIER TRANSFORM CONFIG>
+        # self.spectral_transform_config = {}
+        # spectral_transform_config["taper_family"] = "hamming"
+        
         self.taper_family = "hamming"
         self.taper_additional_args = {}
         self.num_samples_window = 128
@@ -60,6 +64,10 @@ class ProcessingConfig(BaseDict):
         if self.sample_rate <=0:
             print("sample rate not given")
             raise Exception
+
+    # def __setitem__(self, key, value):
+    #     #self.__dict__[key] = validators.validate_value_dict(value)
+    #     self.__dict__[key] = value
 
     # @property
     # def emtf_band_setup_file(self):

@@ -21,7 +21,7 @@ from pathlib import Path
 
 
 
-def process_sythetic_mth5_single_station(processing_cfg, run_id):#station_cfg):
+def process_sythetic_mth5_single_station(processing_cfg, run_id):
     """
     Note that we will need a check that the processing config sample rates agree
     with the data sampling rates otherwise raise Exception

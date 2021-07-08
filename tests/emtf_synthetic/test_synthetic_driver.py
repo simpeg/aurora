@@ -22,7 +22,7 @@ def test_process_mth5():
 
 
 def main():
-    #test_create_mth5()
+    test_create_mth5()
     test_process_mth5()
 
 if __name__ == '__main__':

@@ -41,8 +41,7 @@ fap_xml_example = ""
 #single_station_xml_template = Path("single_station_mt.xml")
 def test_runts_from_xml(dataset_id, runts_obj=False):
     """
-    Migrate this test out of driver once the Quanterra FIR filters are solved.
-    Also, this is really about mth5 creation and is a separate topic from
+    This function is an example of mth5 creation.  It is a separate topic from
     aurora pipeline.  This is an Element#1 aspect of the proposal.
     :param dataset_id:
     :param runts_obj:

@@ -86,14 +86,16 @@ def scan_network_for_nonconformity(inventory):
             # <Tesla to nanoTesla>
     return inventory
 
-class TestDataSetConfig(object):
+class IRISDatasetConfig(object):
     """
-    Note this is actually IRIS-specific.  We should create another type of test
-    dataset for mth5
+    This class contains the information needed to uniquely specify a
+    dataset that will be accessed from IRIS.
+    This config will only work for single stations.
+
     Need:
     -iris_metadata_parameters
     -data_parameters (how to rover, or load from local)
-    -a way to speecify station-channel, this config will only work for single stations.
+    -a way to specify station-channel, this config will only work for single stations.
 
     """
     def __init__(self):
@@ -182,7 +184,7 @@ def make_test_configs():
     test_data_set_configs = {}
 
     #<pkd_test_00 Single station>
-    test_data_set = TestDataSetConfig()
+    test_data_set = IRISDatasetConfig()
     test_data_set.dataset_id = "pkd_test_00"
     test_data_set.network = "BK"
     test_data_set.station = "PKD"
@@ -197,7 +199,7 @@ def make_test_configs():
     #</pkd_test_00 Single station>
 
     # <sao_test_00 Single station>
-    test_data_set = TestDataSetConfig()
+    test_data_set = IRISDatasetConfig()
     test_data_set.dataset_id = "sao_test_00"
     test_data_set.network = "BK"
     test_data_set.station = "SAO"
@@ -212,7 +214,7 @@ def make_test_configs():
     # </sao_test_00 Single station>
 
     #<FAP>
-    test_data_set = TestDataSetConfig()
+    test_data_set = IRISDatasetConfig()
     test_data_set.dataset_id = "fap_test"
     test_data_set.network = "EM"
     test_data_set.station = "FL001"
@@ -223,20 +225,6 @@ def make_test_configs():
 
     test_data_set_configs["fap_test"] = test_data_set
     # </FAP>
-
-    # # <SYNTHETIC> ?Not needed?
-    # dataset_id = "synthetic"
-    # test_data_set = TestDataSetConfig()
-    # test_data_set.dataset_id = dataset_id
-    # test_data_set.network = "XX"
-    # test_data_set.station = "sythetic_station_01"
-    # test_data_set.starttime = UTCDateTime("1977-03-02T14:56:00")
-    # test_data_set.endtime = None  # UTCDateTime("2004-09-28T23:59:59")
-    # test_data_set.channel_codes = "LQ1,LQ2,LF1,LF2, LF3"
-    # test_data_set.description = "emtf historical synthetic test dataset"
-    #
-    # test_data_set_configs[dataset_id] = test_data_set
-    # # </SYNTHETIC>
 
 
     return test_data_set_configs
