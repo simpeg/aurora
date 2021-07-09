@@ -145,7 +145,8 @@ class RegressionEstimator(object):
 
     def check_number_of_observations_xy_consistent(self):
         if self.Y.shape[0] != self.X.shape[0]:
-            print(f"X has {self.X.shape[0]} rows but Y has {self.Y.shape[0]}")
+            print(f"Design matrix (X) has {self.X.shape[0]} rows but data (Y) "
+                  f"has {self.Y.shape[0]}")
             raise Exception
 
     @property
@@ -187,7 +188,7 @@ class RegressionEstimator(object):
             else:
                 print("Failed QR decompostion sanity check")
                 raise Exception
-        return# Q, R
+        return Q, R
 
     @property
     def Q(self):

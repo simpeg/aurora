@@ -2,6 +2,8 @@
 follows Gary's TTF.m in
 iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
 
+2021-07-02 Removed some prototype methods intended to edit specific station data
+when many stations are being processed.  MMT methods to be addressed later.
 """
 
 import numpy as np
@@ -148,50 +150,6 @@ class TTF(object):
         self.num_segments[:self.num_channels_out, i_band] = regression_estimator.n_data
         return
 
-    # def set_tf_row(self,i_band, i_row, regression_estimator, T):
-    #     """
-    #     @Gary this TF object appears to be 4-dimensional, not 3D ...
-    #     This was going back and forth with Maxim and Gary and this stuff was
-    #     being used in the context of the Multiple Station program.
-    #
-    #     Perhaps consider using this later.
-    #     This was notionally about fixing individual rows of the TF
-    #     like say you have a good channel and a bad channel at a station,
-    #     you can esimate at least part of the TF
-    #
-    #     Parameters
-    #     ----------
-    #     i_band
-    #     i_row
-    #     regression_estimator
-    #     T
-    #
-    #     Returns
-    #     -------
-    #
-    #     """
-    #     if not self.initialized:
-    #         print('Initialize TTrFunGeneral obect before calling setTF')
-    #         raise Exception
-    #     print("@Gary: What is up with this block here?")
-    #     #if nargin < 6:
-    #     #    iSite = 1;
-    #
-    #     n_data = regression_estimator.n_data  # use the class luke
-    #     #[nData, ~] = size(TRegObj.Y);
-    #     n, m = regression_estimator.b.shape
-    #
-    #     self.FullCov[ib, iSite] = 0;
-    #     if (n == self.num_channels_in) & (m == 1):
-    #         self.TF[i_row,:, i_band, iSite] = TRegObj.b
-    #         self.R2[ir, ib, iSite] = regression_estimator.R2
-    #         self.periods[ib, iSite] = T
-    #         self.num_segments[ir, ib, iSite] = n_data
-    #     else:
-    #         print('regression_estimator not proper size for operation in '
-    #               'setTFRow')
-    #         raise Exception
-    #     return
 
     def standard_error(self):
         stderr = np.zeros(self.TF.shape)
@@ -207,6 +165,13 @@ class TTF(object):
     def get_frequencies(self):
         return 1. / self.T
     #</TO BE DEPRECATED/MERGE WITH BandAveragingScheme>
+
+
+    def from_emtf_zfile(self):
+        pass
+
+    def to_emtf_zfile(self):
+        pass
 
 def test_ttf():
     from iris_mt_scratch.sandbox.transfer_function.transfer_function_header \

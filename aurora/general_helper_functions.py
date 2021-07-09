@@ -7,7 +7,9 @@ from pathlib import Path
 import aurora
 
 init_file = inspect.getfile(aurora)
-SANDBOX = Path(init_file).parent.joinpath("sandbox")
+AURORA_PATH = Path(init_file).parent.parent
+TEST_PATH = AURORA_PATH.joinpath("tests")
+SANDBOX = AURORA_PATH.joinpath("aurora", "sandbox")
 DATA_PATH = SANDBOX.joinpath("data")
 DATA_PATH.mkdir(exist_ok=True, parents=True)
 FIGURES_PATH = DATA_PATH.joinpath("figures")

@@ -20,9 +20,9 @@ import pandas as pd
 from pathlib import Path
 import xarray as xr
 
-#from iris_mt_scratch.sandbox.time_series.multivariate_time_series import MultiVariateTimeSeries
-from aurora.io_helpers.test_data import get_example_data
-from aurora.io_helpers.test_data import TEST_DATA_SET_CONFIGS
+from aurora.sandbox.io_helpers.test_data import get_example_array_list
+from aurora.sandbox.io_helpers.test_data import get_example_data
+from aurora.sandbox.io_helpers.test_data import TEST_DATA_SET_CONFIGS
 from aurora.sandbox.xml_sandbox import describe_inventory_stages
 from mt_metadata.timeseries import Experiment
 from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
@@ -30,7 +30,6 @@ from mt_metadata.utils import STATIONXML_02
 from mth5.mth5 import MTH5
 from mth5.timeseries.channel_ts import ChannelTS
 from mth5.timeseries.run_ts import RunTS
-from mth5.utils.pathing import DATA_DIR
 
 HEXY = ['hx','hy','ex','ey'] #default components list
 xml_path = Path("/home/kkappler/software/irismt/mt_metadata/data/xml")
@@ -40,7 +39,34 @@ single_station_xml_template = STATIONXML_02 # Fails for "no survey key"
 fap_xml_example = ""
 
 #single_station_xml_template = Path("single_station_mt.xml")
+def test_runts_from_xml(dataset_id, runts_obj=False):
+    """
+    Migrate this test out of driver once the Quanterra FIR filters are solved.
+    Also, this is really about mth5 creation and is a separate topic from
+    aurora pipeline.  This is an Element#1 aspect of the proposal.
+    :param dataset_id:
+    :param runts_obj:
+    :return:
+    """
+    dataset_id = "pkd_test_00"
+    #
+    test_dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
+    inventory = test_dataset_config.get_inventory_from_iris(ensure_inventory_stages_are_named=True)
+    experiment = get_experiment_from_obspy_inventory(inventory)
 
+    experiment.surveys[0].filters["fir_fs2d5_2000.0"]
+    experiment.surveys[0].filters[
+        "fir_fs2d5_200.0"].decimation_input_sample_rate
+    test_dataset_config.save_xml(experiment)
+    h5_path = Path("PKD.h5")
+    run_obj = embed_experiment_into_run("PKD", experiment, h5_path=h5_path)
+
+    if runts_obj:
+        array_list = get_example_array_list(components_list=HEXY,
+                                            load_actual=True,
+                                            station_id="PKD")
+        runts_obj = cast_run_to_run_ts(run_obj, array_list=array_list)
+    return experiment, run_obj, runts_obj
 
 #<GET EXPERIMENT>
 def get_experiment_from_xml_path(xml):
@@ -321,7 +347,6 @@ def main():
     driver_parameters = set_driver_parameters()
     #<CREATE METADATA XML>
     if driver_parameters["create_xml"]:
-        #from iris_mt_scratch.sandbox.io_helpers.test_data import TEST_DATA_SET_CONFIGS
         dataset_ids = ["pkd_test_00", "sao_test_00",]
         for dataset_id in dataset_ids:
             test_dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
