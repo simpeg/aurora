@@ -19,22 +19,24 @@ apodization  windows available via scipy.signal.get_window()
     }
 
 The Taper Config has 2 possible forms:
-1. Standard form: ["taper_family", "num_samples_window", "additional_args"]
+1. Standard form for accessing scipy.signal:
+["taper_family", "num_samples_window", "additional_args"]
+2. User-defined : for defining custom tapers
 
-Example 1
+Example 1 : Standard form
 "taper_family" = "hamming"
 "num_samples_window" = 128
 "additional_args" = {}
 
-Example 2
+Example 2 : Standard form
 "taper_family" = "kaiser"
 "num_samples_window" = 64
 "additional_args" = {"beta":8}
 
+Examples 3 : User Defined
 2. user-defined: ["array"]
 In this case num_samples_window is defined by the array.
 "array" = [1, 2, 3, 4, 5, 4, 3, 2, 1]
-
 If "array" is non-empty then assume the user-defined case.
 
 It is a little bit unsatisfying that the args need to be ordered for
