@@ -39,10 +39,57 @@ single_station_xml_template = STATIONXML_02 # Fails for "no survey key"
 fap_xml_example = ""
 
 #single_station_xml_template = Path("single_station_mt.xml")
+
+def mth5_from_iris_database(dataset_config, load_data=True,
+                            target_folder=Path()):
+    """
+    This can work in a way that uses data, or just initializes the mth5
+
+    Parameters
+    ----------
+    metadata_config:
+
+    Returns
+    -------
+
+    """
+    inventory = dataset_config.get_inventory_from_iris(ensure_inventory_stages_are_named=True)
+    experiment = get_experiment_from_obspy_inventory(inventory)
+    
+    h5_path = target_folder.joinpath(f"{dataset_config.dataset_id}.h5")
+    mth5_obj = initialize_mth5(h5_path)
+    mth5_obj.from_experiment(experiment)
+
+    run_count = 1
+    for station_id in mth5_obj.station_list:
+        print(station_id)
+        run_id = str(run_count).zfill(3)
+        print(f"run_id {run_id}")
+        run_obj = mth5_obj.get_run(station_id, str(run_count).zfill(3))
+        print("OK you have created the run")
+        print("next step it to check the run is ok and embed data")
+        print("once the data are there, then you can need to save the h5")
+        print("follow the example in the synthetc data maker to do this")
+        print(experiment.surveys[0].stations[0].runs[0])
+        check_run_channels_have_expected_properties(run_obj)
+
+        array_list = get_example_array_list(components_list=HEXY,
+                                        load_actual=True,
+                                        station_id="PKD")
+        runts_obj = cast_run_to_run_ts(run_obj, array_list=array_list)
+    
+    
+    return
+
+
 def test_runts_from_xml(dataset_id, runts_obj=False):
     """
     This function is an example of mth5 creation.  It is a separate topic from
     aurora pipeline.  This is an Element#1 aspect of the proposal.
+
+    We base this on a dataset_id but really it needs a dataset config,
+    so probably taking a config as an input would be more modular.
+    The flow here is to get the inventory object from the iris database using
     :param dataset_id:
     :param runts_obj:
     :return:
@@ -168,6 +215,28 @@ def test_experiment_from_station_xml():
     mt_experiment = translator.xml_to_mt(stationxml_fn=STATIONXML_02)
     return
 
+def initialize_mth5(h5_path, mode="w"):
+    """
+
+    Parameters
+    ----------
+    h5_path
+    mode
+
+    Returns
+    -------
+
+    """
+    if h5_path is None:
+        h5_path = Path("test.h5")
+    else:
+        h5_path = Path(h5_path)
+    if h5_path.exists():
+        h5_path.unlink()
+    mth5_obj = MTH5()
+    mth5_obj.open_mth5(str(h5_path), "w")
+    return mth5_obj
+
 
 def embed_experiment_into_run(station_id, experiment, h5_path=None):
     """
@@ -208,14 +277,7 @@ def embed_experiment_into_run(station_id, experiment, h5_path=None):
     TODO: @Jared: can we make mth5_obj.open_mth5(str(h5_path), "w")
     work with Path() object rather than str(path)?
     """
-    if h5_path is None:
-        h5_path = Path("test.h5")
-    else:
-        h5_path = Path(h5_path)
-    if h5_path.exists():
-        h5_path.unlink()
-    mth5_obj = MTH5()
-    mth5_obj.open_mth5(str(h5_path), "w")
+    mth5_obj = initialize_mth5(h5_path)
     mth5_obj.from_experiment(experiment)
 
     if "REW09" in mth5_obj.station_list: #old test

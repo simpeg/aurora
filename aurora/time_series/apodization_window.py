@@ -1,7 +1,8 @@
 """
-Based loosely on TaperModule() concept developed by kkappler in 2012, this is
-a leaner version intended to support most apodization windows available via
-scipy.signal.get_window()
+@author: kkappler
+
+Module to manage windowing prior to FFT.  Intended to support most
+apodization  windows available via scipy.signal.get_window()
 
 
     Supported Window types = ['boxcar', 'triang', 'blackman', 'hamming', 'hann',
@@ -52,29 +53,10 @@ import scipy.signal as ssig
 
 class ApodizationWindow(object):
     """
-    #<FROM HEINZEL>
-    ENBW: Eective Noise BandWidth, see Equation (22)
-    NENBW Normalized Equivalent Noise BandWidth, see Equation (21)
-    #</FROM HEINZEL>
-    usage: apod_window = ApodizationWindow()
-    @type taper_family: string
-    @ivar taper_family: Specify the taper type - boxcar, kaiser, hanning, etc
-    @type num_samples_window: Integer
-    @ivar num_samples_window: The number of samples in the taper
-    @type taper: numpy array
-    @ivar taper: The actual taper window itself
-    @type coherentGain: float
-    @ivar coherentGain:
-    @type NENBW: float
-    @ivar NENBW: normalized equivalent noise bandwidth
-    @type S1: float
-    @ivar S1: window sum
-    @type S2: float
-    @ivar S2: sum of squares of taper elements
+    Instantiate an apodization window object.  Example usages:
+    apod_window = ApodizationWindow()
+    taper=ApodizationWindow(taper_family='hanning', num_samples_window=55 )
 
-    @author: kkappler
-    @note: example usage:
-        tpr=ApodizationWindow(taper_family='hanning', num_samples_window=55 )
 
     Window factors S1, S2, CG, ENBW are modelled after Heinzel et al. p12-14
     [1] Spectrum and spectral density estimation by the Discrete Fourier transform
@@ -86,17 +68,26 @@ class ApodizationWindow(object):
     [2] Harris FJ. On the use of windows for harmonic analysis with the discrete
     Fourier transform. Proceedings of the IEEE. 1978 Jan;66(1):51-83.
 
+    <Nomenclature from Heinzel et al.>
+    ENBW: Eective Noise BandWidth, see Equation (22)
+    NENBW Normalized Equivalent Noise BandWidth, see Equation (21)
+    </Nomenclature from Heinzel et al.>
 
-    Instantiate an apodization window object.
 
 
         Parameters
         ----------
         kwargs:
-        taper_family
-        num_samples_window
-        taper
-        additional_args
+        taper_family : string
+            Specify the taper type - boxcar, kaiser, hanning, etc
+        num_samples_window : int
+            The number of samples in the taper
+        taper : numpy array
+            The actual window coefficients themselves.  This can be passed if a
+            particular custom window is desired.
+        additional_args: dictionary
+            These are any additional requirements scipy needs in order to
+            generate the window.
     """
     def __init__(self, **kwargs):
         """
@@ -172,22 +163,27 @@ class ApodizationWindow(object):
 
     @property
     def S1(self):
+        """sum of the window coefficients"""
         if getattr(self, "_S1", None) is None:
             self._S1 = sum(self.taper)
         return self._S1
 
     @property
     def S2(self):
+        """sum of squares of the window coefficients"""
         if getattr(self, "_S2", None) is None:
             self._S2 = sum(self.taper**2)
         return self._S2
 
     @property
     def coherent_gain(self):
+        """ DC gain of the window normalized by window length"""
         return self.S1 / self.num_samples_window
 
     @property
     def nenbw(self):
+        """NENBW Normalized Equivalent Noise BandWidth, see Equation (21) in
+        Heinzel et al 2002"""
         return self.num_samples_window * self.S2 / (self.S1 ** 2)
 
     @property

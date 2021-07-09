@@ -50,11 +50,11 @@ def process_sythetic_mth5_single_station(processing_cfg, run_id):
     tapered_obj = windowing_scheme.apply_taper(windowed_obj)
     stft_obj = windowing_scheme.apply_fft(tapered_obj)
     #<CALIBRATE>
-    # for channel_id in stft_obj.keys():
-    #     mth5_channel = run_obj.get_channel(channel_id)
-    #     channel_filter = mth5_channel.channel_response_filter
-    #     calibration_response = channel_filter.complex_response(
-    #     stft_obj.frequency.data)
+    for channel_id in stft_obj.keys():
+        mth5_channel = run_obj.get_channel(channel_id)
+        channel_filter = mth5_channel.channel_response_filter
+        calibration_response = channel_filter.complex_response(
+        stft_obj.frequency.data)
     #
     # # if UNITS == "SI":
     # #     if channel_id[0].lower() == 'h':
