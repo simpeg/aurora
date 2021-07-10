@@ -97,7 +97,8 @@ def create_mth5_synthetic_file(station_cfg, plot=False):
 
     m.close_mth5()
 
-def create_mth5_synthetic_file_for_array(station_cfgs, h5_name="test12rr.h5",
+def create_mth5_synthetic_file_for_array(station_cfgs,
+                                         h5_name=Path("data","test12rr.h5"),
                                          plot=False):
     # open an MTH5
     m = MTH5()

@@ -1,12 +1,13 @@
-from aurora.sandbox.processing_config import ProcessingConfig
+from pathlib import Path
 
 from aurora.general_helper_functions import SANDBOX
 from aurora.general_helper_functions import TEST_PATH
+from aurora.sandbox.processing_config import ProcessingConfig
 
 def create_config_for_test_case(test_case_id):
     if test_case_id in ["test1", "test2", "test12rr"]:
         cfg = ProcessingConfig()
-        cfg.mth5_path = f"{test_case_id}.h5"
+        cfg.mth5_path = str(Path("data",f"{test_case_id}.h5"))
         cfg.num_samples_window = 128
         cfg.num_samples_overlap = 32
         cfg.local_station_id = f"{test_case_id}"
@@ -18,7 +19,7 @@ def create_config_for_test_case(test_case_id):
             cfg.local_station_id = "test1"
             cfg.remote_reference_station_id = "test2"
         json_fn = test_case_id.replace(" ","_") + "_processing_config.json"
-        json_path = TEST_PATH.joinpath("emtf_synthetic", json_fn)
+        json_path = TEST_PATH.joinpath("emtf_synthetic", "config", json_fn)
         cfg.to_json(json_path)
     else:
         print(f"test_case_id {test_case_id} not recognized")

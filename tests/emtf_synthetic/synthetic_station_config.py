@@ -17,8 +17,8 @@ ACTIVE_FILTERS = [unity_coeff_filter, cf_multipy_10, cf_divide_10]
 #         cfg = {}
 #make this an object? or leave as dict?
 STATION_01_CFG = {}
-STATION_01_CFG["raw_data_path"] = Path(r"test1.asc")
-STATION_01_CFG["mth5_path"] = Path(r"test1.h5")
+STATION_01_CFG["raw_data_path"] = Path("data","test1.asc")
+STATION_01_CFG["mth5_path"] = Path("data", "test1.h5")
 STATION_01_CFG["columns"] = ["hx", "hy", "hz", "ex", "ey"]
 #STATION_01_CFG["columns"] = ["hz", "hx", "hy", "ex", "ey"]
 STATION_01_CFG["noise_scalar"] = {}
@@ -38,8 +38,8 @@ STATION_01_CFG["station_id"] = "test1"
 STATION_01_CFG["sample_rate"] = 1.0
 
 STATION_02_CFG = STATION_01_CFG.copy()
-STATION_02_CFG["raw_data_path"] = Path(r"test2.asc")
-STATION_02_CFG["mth5_path"] = Path(r"test2.h5")
+STATION_02_CFG["raw_data_path"] = Path("data","test2.asc")
+STATION_02_CFG["mth5_path"] = Path("data", "test2.h5")
 STATION_02_CFG["station_id"] = "test2"
 
 #</MTH5 CREATION CONFIG>
