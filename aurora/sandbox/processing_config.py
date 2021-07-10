@@ -10,7 +10,6 @@ from pathlib import Path
 
 import json
 
-from aurora.general_helper_functions import TEST_PATH
 from mt_metadata.base import BaseDict
 
 class ProcessingConfig(BaseDict):
@@ -115,33 +114,9 @@ def test_can_create_config():
     cfg.local_station_id = "PKD"
     cfg.validate()
 
-def create_config_for_test_case(test_case_id):
-    if test_case_id in ["test1", "test2", "test12rr"]:
-        from aurora.general_helper_functions import SANDBOX
-        cfg = ProcessingConfig()
-        cfg.mth5_path = f"{test_case_id}.h5"
-        cfg.num_samples_window = 128
-        cfg.num_samples_overlap = 32
-        cfg.local_station_id = f"{test_case_id}"
-        cfg.sample_rate = 1.0
-        cfg.emtf_band_setup_file = str(SANDBOX.joinpath("bs_256.cfg"))
-        cfg.estimation_engine = "RME"
-        if test_case_id=="test12rr":
-            cfg.reference_channels = ["hx", "hy"]
-            cfg.local_station_id = "test1"
-            cfg.remote_reference_station_id = "test2"
-        json_fn = test_case_id.replace(" ","_") + "_processing_config.json"
-        json_path = TEST_PATH.joinpath("emtf_synthetic", json_fn)
-        cfg.to_json(json_path)
-    else:
-        print(f"test_case_id {test_case_id} not recognized")
-        raise Exception
 
 def main():
     test_can_create_config()
-    create_config_for_test_case("test1")
-    create_config_for_test_case("test2")
-    create_config_for_test_case("test12rr")
 
 if __name__ == '__main__':
     main()

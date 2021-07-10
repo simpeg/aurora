@@ -22,9 +22,18 @@ seed(0)
 
 def create_run_ts_from_station_config(cfg, df):
     """
-    loop over stations and make them ChannelTS objects
-    we need to add a tag in the channels
+    Loop over stations and make them ChannelTS objects.
+    Need to add a tag in the channels
     so that when you call a run it will get all the filters with it.
+    Parameters
+    ----------
+    cfg
+    df : pandas.DataFrame
+        time series data in columns labelled from ["ex", "ey", "hx", "hy", "hz"]
+
+    Returns
+    -------
+
     """
     ch_list = []
     for col in df.columns:
@@ -88,7 +97,7 @@ def create_mth5_synthetic_file(station_cfg, plot=False):
 
     m.close_mth5()
 
-def create_mth5_synthetic_file_for_array(station_cfgs, h5_name='array.h5',
+def create_mth5_synthetic_file_for_array(station_cfgs, h5_name="test12rr.h5",
                                          plot=False):
     # open an MTH5
     m = MTH5()
