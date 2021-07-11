@@ -19,7 +19,9 @@ def create_config_for_test_case(test_case_id):
             cfg.local_station_id = "test1"
             cfg.remote_reference_station_id = "test2"
         json_fn = test_case_id.replace(" ","_") + "_processing_config.json"
-        json_path = TEST_PATH.joinpath("emtf_synthetic", "config", json_fn)
+        config_path = TEST_PATH.joinpath("emtf_synthetic", "config")
+        config_path.mkdir(exist_ok=True)
+        json_path = config_path.joinpath(json_fn)
         cfg.to_json(json_path)
     else:
         print(f"test_case_id {test_case_id} not recognized")

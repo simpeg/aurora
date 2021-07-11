@@ -54,7 +54,7 @@ def test_process_mth5():
 
 
 def main():
-    #test_create_mth5()
+    test_create_mth5()
     test_create_processing_configs()
     test_process_mth5()
 
