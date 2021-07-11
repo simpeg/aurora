@@ -1,15 +1,15 @@
 from pathlib import Path
+
+from aurora.pipelines.process_mth5 import process_mth5_decimation_level
 from make_mth5_from_asc import create_mth5_synthetic_file
 from make_mth5_from_asc import create_mth5_synthetic_file_for_array
-from aurora.transfer_function.rho_plot import RhoPlot
-from aurora.pipelines.process_mth5 import process_mth5_decimation_level
+from make_processing_configs import create_config_for_test_case
 from synthetic_station_config import STATION_01_CFG
 from synthetic_station_config import STATION_02_CFG
 from synthetic_station_config import ACTIVE_FILTERS
-from test_create_processing_configs import create_config_for_test_case
-
 
 def plot_tf_obj(tf_obj):
+    from aurora.transfer_function.rho_plot import RhoPlot
     import matplotlib.pyplot as plt
     plotter = RhoPlot(tf_obj)
     fig, axs = plt.subplots(nrows=2)
