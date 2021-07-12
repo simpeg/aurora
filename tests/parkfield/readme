@@ -1,0 +1,10 @@
+In the data/ filder is an h5 file here is made from two dataframes.
+One is keyed as "pkd" and the other as "sao".
+Each of these dataframes were created from raw 
+ascii time series of integer counts.
+They each have columns named
+hx      hy      ex     ey
+
+Compression was used as per the following when the file was created:
+pkd_df.to_hdf(h5_fn, key, complib='zlib', complevel=5)
+

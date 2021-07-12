@@ -211,7 +211,6 @@ def run_obj_from_mth5(mth5_obj):
         run_obj = mth5_obj.get_run("REW09", "a")
     elif "PKD" in mth5_obj.station_list: #pkd test
         run_obj = mth5_obj.get_run("PKD", "001") #this run is created here
-        print(experiment.surveys[0].stations[0].runs[0])
         check_run_channels_have_expected_properties(run_obj)
     else:
         print("skipping creation of run ")
@@ -242,7 +241,6 @@ def mth5_run_from_experiment(station_id, experiment, h5_path=None):
 
 def cast_run_to_run_ts(run, array_list=None, station_id=None):
     """
-    add to mth5 helpers?
     basically embed data into a run_ts object.
     array_list = get_example_array_list(components_list=HEXY,
                                         load_actual=True,

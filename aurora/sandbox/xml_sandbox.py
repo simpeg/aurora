@@ -30,7 +30,6 @@ from lxml import etree, objectify
 from pathlib import Path
 
 from aurora.general_helper_functions import FIGURES_PATH
-from mth5_test_data.util import MTH5_TEST_DATA_DIR
 
 from mt_metadata.base.helpers import element_to_dict
 from mt_metadata.timeseries import Station
@@ -93,8 +92,8 @@ def test_get_example_em_xml_from_iris_via_web():
 
 def test_get_example_xml_inventory():
     print("test_get_example_xml_inventory")
-    test_file_name = MTH5_TEST_DATA_DIR.joinpath("iris", "fdsn-station_2021-03-09T04_44_51.xml")
-    inventory = read_inventory(test_file_name.__str__())
+    test_file_name = "fdsn-station_2021-03-09T04_44_51.xml"
+    inventory = read_inventory(test_file_name)
     iterate_through_mtml(inventory)
     print('ok')
 
