@@ -373,15 +373,15 @@ def set_driver_parameters():
     return driver_parameters
 
 def test_can_access_fap_filters():
-    from aurora.sandbox.io_helpers.test_data import IRISDatasetConfig
+    from aurora.sandbox.io_helpers.iris_dataset_config import IRISDatasetConfig
 
     test_data_set = IRISDatasetConfig()
     test_data_set.dataset_id = "fap_test"
     test_data_set.network = "EM"
     test_data_set.station = "FL001"
-    test_data_set.starttime = None  # UTCDateTime("2004-09-28T00:00:00")
-    test_data_set.endtime = None  # UTCDateTime("2004-09-28T23:59:59")
-    test_data_set.channel_codes = "MFN"  # BQ2,BQ3,BT1,BT2"
+    test_data_set.starttime = None
+    test_data_set.endtime = None
+    test_data_set.channel_codes = "MFN"
     test_data_set.description = "test of a fap xml"
 
     fap_inventory = test_dataset_config.get_inventory_from_iris(

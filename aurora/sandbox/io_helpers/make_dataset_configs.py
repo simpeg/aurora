@@ -1,6 +1,6 @@
 #TODO: Move this into tests/parkfield after factoring out FAP test
 from obspy import UTCDateTime
-from aurora.sandbox.io_helpers.test_data import IRISDatasetConfig
+from aurora.sandbox.io_helpers.iris_dataset_config import IRISDatasetConfig
 
 HEXY = ['hx','hy','ex','ey'] #default components list
 #<CREATE TEST CONFIGS>
