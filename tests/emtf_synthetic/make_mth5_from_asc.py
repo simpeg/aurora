@@ -27,7 +27,9 @@ def create_run_ts_from_station_config(cfg, df):
     so that when you call a run it will get all the filters with it.
     Parameters
     ----------
-    cfg
+    cfg: dict
+        one-off data structure used to hold information mth5 needs to initialize
+        Specifically sample_rate, filters,
     df : pandas.DataFrame
         time series data in columns labelled from ["ex", "ey", "hx", "hy", "hz"]
 
@@ -74,7 +76,9 @@ def create_mth5_synthetic_file(station_cfg, plot=False):
                      names=station_cfg["columns"], sep="\s+")
     #add noise
     for col in station_cfg["columns"]:
-        df[col] += station_cfg["noise_scalar"][col]*np.random.randn(len(df))
+        if station_cfg["noise_scalar"][col]:
+            df[col] += station_cfg["noise_scalar"][col]*np.random.randn(len(df))
+
     #cast to run_ts
     runts = create_run_ts_from_station_config(station_cfg, df)
 

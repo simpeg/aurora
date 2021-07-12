@@ -1,17 +1,8 @@
 """
-20210511: This script is intended to run an example version of end-to-end processing.
-        #import xml.etree.ElementTree as ET
-        #tree = ET.parse(xml_path)
-        # mt_root_element = tree.getroot()
-        # mt_experiment = Experiment()
-        # mt_experiment.from_xml(mt_root_element)
 
-
-TODO: MTH5 updated so that channel now returns a channel response
-The question is how to propagate the response information to Attributes RunTS
-
-20210520: This is a copy of aurora_driver.py which is going to be overwritten.  Most of the tests and tools
-are associated with MTH5 helper stuffs so moved to mth5_helpers.py for now.  Needs a clean up.
+20210520: This is a copy of aurora_driver.py which is going to be overwritten.
+Most of the tests and tools are associated with MTH5 helper stuffs so moved
+to mth5_helpers.py for now.  Needs a clean up.
 """
 
 import datetime
@@ -38,7 +29,28 @@ electric_xml_template = xml_path.joinpath("mtml_electrode_example.xml")
 single_station_xml_template = STATIONXML_02 # Fails for "no survey key"
 fap_xml_example = ""
 
-#single_station_xml_template = Path("single_station_mt.xml")
+def initialize_mth5(h5_path, mode="w"):
+    """
+
+    Parameters
+    ----------
+    h5_path
+    mode
+
+    Returns
+    -------
+
+    """
+    if h5_path is None:
+        h5_path = Path("test.h5")
+    else:
+        h5_path = Path(h5_path)
+    if h5_path.exists():
+        h5_path.unlink()
+    mth5_obj = MTH5()
+    mth5_obj.open_mth5(str(h5_path), "w")
+    return mth5_obj
+
 
 def mth5_from_iris_database(dataset_config, load_data=True,
                             target_folder=Path()):
@@ -55,31 +67,13 @@ def mth5_from_iris_database(dataset_config, load_data=True,
     """
     inventory = dataset_config.get_inventory_from_iris(ensure_inventory_stages_are_named=True)
     experiment = get_experiment_from_obspy_inventory(inventory)
-    
+
+    # make an MTH5
     h5_path = target_folder.joinpath(f"{dataset_config.dataset_id}.h5")
     mth5_obj = initialize_mth5(h5_path)
     mth5_obj.from_experiment(experiment)
 
-    run_count = 1
-    for station_id in mth5_obj.station_list:
-        print(station_id)
-        run_id = str(run_count).zfill(3)
-        print(f"run_id {run_id}")
-        run_obj = mth5_obj.get_run(station_id, str(run_count).zfill(3))
-        print("OK you have created the run")
-        print("next step it to check the run is ok and embed data")
-        print("once the data are there, then you can need to save the h5")
-        print("follow the example in the synthetc data maker to do this")
-        print(experiment.surveys[0].stations[0].runs[0])
-        check_run_channels_have_expected_properties(run_obj)
-
-        array_list = get_example_array_list(components_list=HEXY,
-                                        load_actual=True,
-                                        station_id="PKD")
-        runts_obj = cast_run_to_run_ts(run_obj, array_list=array_list)
-    
-    
-    return
+    return mth5_obj
 
 
 def test_runts_from_xml(dataset_id, runts_obj=False):
@@ -107,7 +101,7 @@ def test_runts_from_xml(dataset_id, runts_obj=False):
         "fir_fs2d5_200.0"].decimation_input_sample_rate
     test_dataset_config.save_xml(experiment)
     h5_path = Path("PKD.h5")
-    run_obj = embed_experiment_into_run("PKD", experiment, h5_path=h5_path)
+    run_obj = mth5_run_from_experiment("PKD", experiment, h5_path=h5_path)
 
     if runts_obj:
         array_list = get_example_array_list(components_list=HEXY,
@@ -128,7 +122,7 @@ def get_experiment_from_obspy_inventory(inventory):
     translator = XMLInventoryMTExperiment()
     experiment = translator.xml_to_mt(inventory_object=inventory)
     return experiment
-
+#</GET EXPERIMENT>
 
 
 
@@ -186,6 +180,7 @@ def check_run_channels_have_expected_properties(run):
 
 def test_experiment_from_station_xml():
     """
+    TODO: Move this test into mt_metadata.  This is not an aurora test.
     This test passes but when we use the hack of setting magnetic to "T" instead of "F" in
     fdsn_tools.py it fails for no code "F"
     Returns
@@ -199,71 +194,19 @@ def test_experiment_from_station_xml():
     mt_experiment = translator.xml_to_mt(stationxml_fn=STATIONXML_02)
     return
 
-def initialize_mth5(h5_path, mode="w"):
+
+def run_obj_from_mth5(mth5_obj):
     """
+    one off method showing how we create runs in an mth5 object
 
     Parameters
     ----------
-    h5_path
-    mode
+    mth5_obj
 
     Returns
     -------
 
     """
-    if h5_path is None:
-        h5_path = Path("test.h5")
-    else:
-        h5_path = Path(h5_path)
-    if h5_path.exists():
-        h5_path.unlink()
-    mth5_obj = MTH5()
-    mth5_obj.open_mth5(str(h5_path), "w")
-    return mth5_obj
-
-
-def embed_experiment_into_run(station_id, experiment, h5_path=None):
-    """
-    2021-05-12: Trying to initialize RunTS class from xml metadata.
-
-    THis function served two purposes
-    1. it was a proving ground for fiddling around with runs and xmls.
-    2. It is specifically used by the driver for loading runs from PKD
-    or SAO.
-
-    It should therefore be factored into some general run stuffs and
-
-    This will give us a single station run for now
-
-
-    Tried several ways to manually assign run properties
-    Here are some sample commands I may need this week.
-    #ch = get_channel("hx", station_id="PKD", load_actual=True)
-    #hx.from_channel_ts(ch,how="data")
-    # run_01.metadata.sample_rate = 40.0
-    # run_01.metadata.time_period.start = datetime.datetime(2004,9,28,0,0,0)
-    # run_01.metadata.time_period.end = datetime.datetime(2004, 9, 28, 2, 0, 0)
-    #run_01.station_metadata = "PKD"
-    #run_01.write_metadata()
-    #?run_01.from_channel_ts()
-
-
-    Parameters
-    ----------
-    direct_from_xml
-
-    Returns  type(run_obj)
-    -------
-    type(run_obj)
-
-
-
-    TODO: @Jared: can we make mth5_obj.open_mth5(str(h5_path), "w")
-    work with Path() object rather than str(path)?
-    """
-    mth5_obj = initialize_mth5(h5_path)
-    mth5_obj.from_experiment(experiment)
-
     if "REW09" in mth5_obj.station_list: #old test
         run_obj = mth5_obj.get_run("REW09", "a")
     elif "PKD" in mth5_obj.station_list: #pkd test
@@ -274,6 +217,24 @@ def embed_experiment_into_run(station_id, experiment, h5_path=None):
         print("skipping creation of run ")
         raise Exception
 
+    return run_obj
+
+def mth5_run_from_experiment(station_id, experiment, h5_path=None):
+    """
+
+    Parameters
+    ----------
+    station_id
+    experiment
+    h5_path
+
+    Returns
+    -------
+
+    """
+    mth5_obj = initialize_mth5(h5_path)
+    mth5_obj.from_experiment(experiment)
+    run_obj = run_obj_from_mth5(mth5_obj)
     return run_obj
 
 
@@ -432,7 +393,7 @@ def main():
         test_dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
         pkd_xml = test_dataset_config.get_station_xml_filename()
         experiment = get_experiment_from_xml_path(pkd_xml)
-        run_obj = embed_experiment_into_run("PKD", experiment)
+        run_obj = mth5_run_from_experiment("PKD", experiment)
         runts_obj = cast_run_to_run_ts(run_obj, station_id="PKD")
         # </METHOD2>
 
@@ -440,7 +401,7 @@ def main():
     if driver_parameters["run_ts_from_xml_03"]:
         try:
             experiment = get_experiment_from_xml_path(single_station_xml_template)
-            run_obj = embed_experiment_into_run("REW09", experiment)
+            run_obj = mth5_run_from_experiment("REW09", experiment)
             runts_obj = cast_run_to_run_ts(run_obj)
         except KeyError:
             print("FDSN TIDE HACK CAUSING EXCEPTION")

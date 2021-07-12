@@ -11,22 +11,32 @@ UNITS = "MT"
 ACTIVE_FILTERS = [unity_coeff_filter, cf_multipy_10, cf_divide_10]
 #</FILTERS>
 
+# class StationConfig(object):
+#     def __init__(self, **kwargs):
+#         self.raw_data_path = kwargs.get("raw_data_path", None)
+#         self.columns = ["hx", "hy", "hz", "ex", "ey"]
+#         self.mth5_path = kwargs.get("mth5_path", None)
+#
+#         #<depends on columns>
+#         self.noise_scalar = {}
+#         for col in self.columns:
+#             self.noise_scalar[col] = 0.0
+#
+#         #</depends on columns>
+
 #<MTH5 CREATION CONFIG>
-# def get_mth5_config(test_case_id):
-#     if test_case_id=="test1":
-#         cfg = {}
 #make this an object? or leave as dict?
 STATION_01_CFG = {}
 STATION_01_CFG["raw_data_path"] = Path("data","test1.asc")
 STATION_01_CFG["mth5_path"] = Path("data", "test1.h5")
+
 STATION_01_CFG["columns"] = ["hx", "hy", "hz", "ex", "ey"]
-#STATION_01_CFG["columns"] = ["hz", "hx", "hy", "ex", "ey"]
 STATION_01_CFG["noise_scalar"] = {}
 for col in STATION_01_CFG["columns"]:
     STATION_01_CFG["noise_scalar"][col] = 0.0
 STATION_01_CFG["filters"] = {}
-for col in STATION_01_CFG["columns"]:
-    STATION_01_CFG["filters"][col] = []
+# for col in STATION_01_CFG["columns"]:
+#     STATION_01_CFG["filters"][col] = []
 for col in STATION_01_CFG["columns"]:
     if col in ["ex", "ey"]:
         STATION_01_CFG["filters"][col] = [unity_coeff_filter.name,]

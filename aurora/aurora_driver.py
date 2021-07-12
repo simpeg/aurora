@@ -30,9 +30,7 @@ from aurora.sandbox.io_helpers.make_dataset_configs import TEST_DATA_SET_CONFIGS
 from aurora.sandbox.io_helpers.test_data import get_example_array_list
 from aurora.sandbox.io_helpers.test_data import get_example_data
 from aurora.sandbox.mth5_helpers import cast_run_to_run_ts
-from aurora.sandbox.mth5_helpers import get_experiment_from_obspy_inventory
 from aurora.sandbox.mth5_helpers import HEXY
-from aurora.sandbox.mth5_helpers import embed_experiment_into_run
 from aurora.sandbox.mth5_helpers import test_runts_from_xml
 from aurora.time_series.frequency_band import FrequencyBands
 from aurora.time_series.frequency_band_helpers import extract_band
