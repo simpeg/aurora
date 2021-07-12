@@ -13,7 +13,6 @@ import datetime
 import numpy as np
 import pandas as pd
 
-from obspy import UTCDateTime
 
 from aurora.sandbox.xml_sandbox import get_response_inventory_from_iris
 from aurora.sandbox.xml_sandbox import describe_inventory_stages
@@ -119,60 +118,6 @@ class IRISDatasetConfig(object):
         print(f"saved experiement to {output_xml_path}")
         return
 
-#<CREATE TEST CONFIGS>
-def make_test_configs():
-    test_data_set_configs = {}
-
-    #<pkd_test_00 Single station>
-    test_data_set = IRISDatasetConfig()
-    test_data_set.dataset_id = "pkd_test_00"
-    test_data_set.network = "BK"
-    test_data_set.station = "PKD"
-    test_data_set.starttime = UTCDateTime("2004-09-28T00:00:00")
-    test_data_set.endtime = UTCDateTime("2004-09-28T23:59:59")
-    #test_data_set.channel_codes = "LQ2,LQ3,LT1,LT2"
-    test_data_set.channel_codes = "BQ2,BQ3,BT1,BT2"
-    test_data_set.description = "2h of PKD data for 2004-09-28 midnight UTC until 0200"
-    test_data_set.components_list = HEXY
-
-    test_data_set_configs[test_data_set.dataset_id] = test_data_set
-    #</pkd_test_00 Single station>
-
-    # <sao_test_00 Single station>
-    test_data_set = IRISDatasetConfig()
-    test_data_set.dataset_id = "sao_test_00"
-    test_data_set.network = "BK"
-    test_data_set.station = "SAO"
-    test_data_set.starttime = UTCDateTime("2004-09-28T00:00:00")
-    test_data_set.endtime = UTCDateTime("2004-09-28T23:59:59")
-    #test_data_set.channel_codes = "LQ2,LQ3,LT1,LT2"
-    test_data_set.channel_codes = "BQ2,BQ3,BT1,BT2"
-    test_data_set.description = "2h of SAO data for 2004-09-28 midnight UTC until 0200"
-    test_data_set.components_list = HEXY
-
-    test_data_set_configs[test_data_set.dataset_id] = test_data_set
-    # </sao_test_00 Single station>
-
-    #<FAP>
-    test_data_set = IRISDatasetConfig()
-    test_data_set.dataset_id = "fap_test"
-    test_data_set.network = "EM"
-    test_data_set.station = "FL001"
-    test_data_set.starttime = None#UTCDateTime("2004-09-28T00:00:00")
-    test_data_set.endtime = None#UTCDateTime("2004-09-28T23:59:59")
-    test_data_set.channel_codes = "MFN"#BQ2,BQ3,BT1,BT2"
-    test_data_set.description = "test of a fap xml"
-
-    test_data_set_configs["fap_test"] = test_data_set
-    # </FAP>
-
-
-    return test_data_set_configs
-
-
-TEST_DATA_SET_CONFIGS = make_test_configs()
-
-#</CREATE TEST CONFIGS>
 
 
 class TestDataHelper(object):
@@ -213,10 +158,10 @@ class TestDataHelper(object):
 
 DEFAULT_SAMPLING_RATE = 40.0
 DEFAULT_START_TIME = datetime.datetime(2004, 9, 28, 0, 0, 0)
-def get_channel(component, station_id="", start=None, sampling_rate=None, load_actual=True,
-                component_station_label=False):
+def get_channel(component, station_id="", start=None, sampling_rate=None,
+                load_actual=True, component_station_label=False):
     """
-    One off - specifically for loading PKD and SAO data for May 24th spectral tests.
+    One off - specifically for loading PKD and SAO data for spectral tests.
     Parameters
     ----------
     component
@@ -270,7 +215,9 @@ def get_channel(component, station_id="", start=None, sampling_rate=None, load_a
 def get_example_array_list(components_list=None, load_actual=True, station_id=None,
                            component_station_label=False):
     """
-    instantites a list of Channel objects with data embedded.  This is used to create a
+    instantites a list of Channel objects with data embedded.
+    This is used to pass data to mth5 objects when creating test datasets.
+
     Parameters
     ----------
     components_list

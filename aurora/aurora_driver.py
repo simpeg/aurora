@@ -26,9 +26,9 @@ from aurora.general_helper_functions import FIGURES_PATH
 from aurora.general_helper_functions import SANDBOX
 from aurora.general_helper_functions import TEST_BAND_FILE
 from aurora.general_helper_functions import read_complex, save_complex
+from aurora.sandbox.io_helpers.make_dataset_configs import TEST_DATA_SET_CONFIGS
 from aurora.sandbox.io_helpers.test_data import get_example_array_list
 from aurora.sandbox.io_helpers.test_data import get_example_data
-from aurora.sandbox.io_helpers.test_data import TEST_DATA_SET_CONFIGS
 from aurora.sandbox.mth5_helpers import cast_run_to_run_ts
 from aurora.sandbox.mth5_helpers import get_experiment_from_obspy_inventory
 from aurora.sandbox.mth5_helpers import HEXY
@@ -209,7 +209,7 @@ def main():
         if TF_PROCESSING_SCHEME=="OLS":
             regression_estimator = RegressionEstimator(X=X, Y=Y)
             Z = regression_estimator.estimate_ols()
-            print(f"{TF_PROCESSING_SCHEME}, \n {Z}")
+            print(f"OLS{TF_PROCESSING_SCHEME} \n {Z}")
         elif TF_PROCESSING_SCHEME=="RME":
             iter_control = IterControl(max_number_of_iterations=MAX_NUMBER_OF_ITERATIONS)
             regression_estimator = TRME(X=X, Y=Y, iter_control=iter_control)

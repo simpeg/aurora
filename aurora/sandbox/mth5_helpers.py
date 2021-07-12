@@ -20,9 +20,9 @@ import pandas as pd
 from pathlib import Path
 import xarray as xr
 
+from aurora.sandbox.io_helpers.make_dataset_configs import TEST_DATA_SET_CONFIGS
 from aurora.sandbox.io_helpers.test_data import get_example_array_list
 from aurora.sandbox.io_helpers.test_data import get_example_data
-from aurora.sandbox.io_helpers.test_data import TEST_DATA_SET_CONFIGS
 from aurora.sandbox.xml_sandbox import describe_inventory_stages
 from mt_metadata.timeseries import Experiment
 from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
@@ -84,11 +84,13 @@ def mth5_from_iris_database(dataset_config, load_data=True,
 
 def test_runts_from_xml(dataset_id, runts_obj=False):
     """
+    THIS METHOD SHOULD BE DEPRECATED ONCE THE PARKFIELD EXAMPLE TEST IS RUNNING
     This function is an example of mth5 creation.  It is a separate topic from
     aurora pipeline.  This is an Element#1 aspect of the proposal.
 
     We base this on a dataset_id but really it needs a dataset config,
     so probably taking a config as an input would be more modular.
+
     The flow here is to get the inventory object from the iris database using
     :param dataset_id:
     :param runts_obj:
@@ -126,24 +128,6 @@ def get_experiment_from_obspy_inventory(inventory):
     translator = XMLInventoryMTExperiment()
     experiment = translator.xml_to_mt(inventory_object=inventory)
     return experiment
-
-
-
-def get_inventory_from_test_data_config(dataset_id):
-    """
-
-    Parameters
-    ----------
-    dataset_id: dataset_id = "pkd_test_00"
-
-    Returns
-    -------
-
-    """
-    from iris_mt_scratch.sandbox.io_helpers.test_data import TEST_DATA_SET_CONFIGS
-    test_dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
-    inventory = test_dataset_config.get_inventory_from_iris(ensure_inventory_stages_are_named=True)
-    return inventory
 
 
 
@@ -389,7 +373,19 @@ def set_driver_parameters():
     return driver_parameters
 
 def test_can_access_fap_filters():
-    fap_inventory = get_inventory_from_test_data_config("fap_test")
+    from aurora.sandbox.io_helpers.test_data import IRISDatasetConfig
+
+    test_data_set = IRISDatasetConfig()
+    test_data_set.dataset_id = "fap_test"
+    test_data_set.network = "EM"
+    test_data_set.station = "FL001"
+    test_data_set.starttime = None  # UTCDateTime("2004-09-28T00:00:00")
+    test_data_set.endtime = None  # UTCDateTime("2004-09-28T23:59:59")
+    test_data_set.channel_codes = "MFN"  # BQ2,BQ3,BT1,BT2"
+    test_data_set.description = "test of a fap xml"
+
+    fap_inventory = test_dataset_config.get_inventory_from_iris(
+        ensure_inventory_stages_are_named=True)
     describe_inventory_stages(fap_inventory)
     #<HERE IS THE SPOT TO DROP TRACE TO REVIEW INGEST OF FAP>
     experiment = get_experiment_from_obspy_inventory(fap_inventory)
