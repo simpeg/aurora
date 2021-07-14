@@ -6,8 +6,8 @@ from pathlib import Path
 ACTIVE_FILTERS = []
 unity_coeff_filter = make_coefficient_filter(name="1", gain=1.0)
 cf_multipy_10 = make_coefficient_filter(gain=10.0, name="10")
-cf_divide_10= make_coefficient_filter(gain=0.1, name="10")
-UNITS = "MT"
+cf_divide_10= make_coefficient_filter(gain=0.1, name="0.1")
+#UNITS = "MT"
 ACTIVE_FILTERS = [unity_coeff_filter, cf_multipy_10, cf_divide_10]
 #</FILTERS>
 

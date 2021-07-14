@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from aurora.pipelines.process_mth5 import process_mth5_decimation_level
+from aurora.sandbox.plot_helpers import plot_tf_obj
 from make_mth5_from_asc import create_mth5_synthetic_file
 from make_mth5_from_asc import create_mth5_synthetic_file_for_array
 from make_processing_configs import create_config_for_test_case
@@ -8,14 +9,6 @@ from synthetic_station_config import STATION_01_CFG
 from synthetic_station_config import STATION_02_CFG
 from synthetic_station_config import ACTIVE_FILTERS
 
-def plot_tf_obj(tf_obj):
-    from aurora.transfer_function.rho_plot import RhoPlot
-    import matplotlib.pyplot as plt
-    plotter = RhoPlot(tf_obj)
-    fig, axs = plt.subplots(nrows=2)
-    plotter.rho_sub_plot(axs[0])
-    plotter.phase_sub_plot(axs[1])
-    plt.show()
 
 
 def test_create_mth5():
@@ -31,19 +24,16 @@ def test_create_processing_configs():
 def test_synthetic_1():
     test_cfg = Path("config", "test1_processing_config.json")
     tf_obj = process_mth5_decimation_level(test_cfg, STATION_01_CFG["run_id"])
-    print("GET PLOTTER FROM MTpy")
     plot_tf_obj(tf_obj)
 
 def test_synthetic_2():
     test_cfg = test_cfg = Path("config", "test2_processing_config.json")
     tf_obj = process_mth5_decimation_level(test_cfg, STATION_02_CFG["run_id"])
-    print("GET PLOTTER FROM MTpy")
     plot_tf_obj(tf_obj)
 
 def test_synthetic_rr12():
     test_cfg = test_cfg = Path("config", "test12rr_processing_config.json")
     tf_obj = process_mth5_decimation_level(test_cfg, STATION_01_CFG["run_id"])
-    print("GET PLOTTER FROM MTpy")
     plot_tf_obj(tf_obj)
 
 
