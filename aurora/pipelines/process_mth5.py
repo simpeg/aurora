@@ -14,7 +14,7 @@ from aurora.transfer_function.TTFZ import TTFZ
 
 from mth5.mth5 import MTH5
 
-def run_ts_to_calibrated_stft(run_ts, run_obj, config):
+def run_ts_to_calibrated_stft(run_ts, run_obj, config, units="MT"):
     windowing_scheme = WindowingScheme(
         taper_family=config.taper_family,
         num_samples_window=config.num_samples_window,
@@ -31,10 +31,10 @@ def run_ts_to_calibrated_stft(run_ts, run_obj, config):
         calibration_response = channel_filter.complex_response(
             stft_obj.frequency.data)
     #
-    # # if UNITS == "SI":
-    # #     if channel_id[0].lower() == 'h':
-    # #         calibration_response /= 1e-9  # SI Units
-    #     stft_obj[channel_id].data /= calibration_response
+        # if units == "SI":
+        #     if channel_id[0].lower() == 'h':
+        #         calibration_response /= 1e-9  # SI Units
+        stft_obj[channel_id].data /= calibration_response
     # </CALIBRATE>
 
     stft_obj_xrda = stft_obj.to_array("channel")
@@ -73,7 +73,7 @@ def validate_sample_rate(run_ts, config):
     return
 
 
-def process_mth5_decimation_level(processing_cfg, run_id):
+def process_mth5_decimation_level(processing_cfg, run_id, units="MT"):
     """
     Processing pipeline for a single decimation_level
     Note that we will need a check that the processing config sample rates agree
@@ -96,7 +96,7 @@ def process_mth5_decimation_level(processing_cfg, run_id):
     local_run_ts = local_run_obj.to_runts()
     validate_sample_rate(local_run_ts, config)
     local_stft_obj = run_ts_to_calibrated_stft(local_run_ts, local_run_obj,
-                                             config)
+                                             config, units=units)
 
     if config.remote_reference_station_id:
         remote_run_obj = m.get_run(config["remote_reference_station_id"],
@@ -142,7 +142,7 @@ def process_mth5_decimation_level(processing_cfg, run_id):
         print(f"{band.center_period} {config.estimation_engine}, \n {Z}")
         transfer_function_obj.set_tf(i_band, regression_estimator, band.center_period)
 
-    transfer_function_obj.apparent_resistivity(units="MT")
+    transfer_function_obj.apparent_resistivity(units=units)
     print(transfer_function_obj.rho.shape)
     print(transfer_function_obj.rho[0])
     print(transfer_function_obj.rho[-1])
