@@ -41,13 +41,6 @@ class IRISDatasetConfig(object):
 
         return inventory
 
-    def get_test_dataset(self):
-        array_list = get_example_array_list(components_list=self.components_list,
-                                            load_actual=True,
-                                            station_id=self.station,
-                                            component_station_label=False)
-        mvts = RunTS(array_list=array_list)
-        return mvts
 
     def get_data_via_rover(self):
         """

@@ -79,6 +79,7 @@ def mth5_from_iris_database(dataset_config, load_data=True,
 def test_runts_from_xml(dataset_id, runts_obj=False):
     """
     THIS METHOD SHOULD BE DEPRECATED ONCE THE PARKFIELD EXAMPLE TEST IS RUNNING
+    This means after github issues #33 and #34 are closed.
     This function is an example of mth5 creation.  It is a separate topic from
     aurora pipeline.  This is an Element#1 aspect of the proposal.
 

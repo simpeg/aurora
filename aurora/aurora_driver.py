@@ -27,11 +27,8 @@ from aurora.general_helper_functions import SANDBOX
 from aurora.general_helper_functions import TEST_BAND_FILE
 from aurora.general_helper_functions import read_complex, save_complex
 from aurora.sandbox.io_helpers.make_dataset_configs import TEST_DATA_SET_CONFIGS
-from aurora.sandbox.io_helpers.test_data import get_example_array_list
-from aurora.sandbox.io_helpers.test_data import get_example_data
 from aurora.sandbox.mth5_helpers import cast_run_to_run_ts
 from aurora.sandbox.mth5_helpers import HEXY
-from aurora.sandbox.mth5_helpers import test_runts_from_xml
 from aurora.time_series.frequency_band import FrequencyBands
 from aurora.time_series.frequency_band_helpers import extract_band
 from aurora.time_series.frequency_band_helpers import frequency_band_edges
@@ -47,8 +44,6 @@ from aurora.transfer_function.TRegression import RegressionEstimator
 
 def set_driver_parameters():
     driver_parameters = {}
-    driver_parameters["run_ts_from_xml_01"] = 1#False #True
-    driver_parameters["initialize_data"] = True
     driver_parameters["dataset_id"] = "pkd_test_00"
     driver_parameters["dataset_id"] = "synthetic"
     driver_parameters["BULK SPECTRA"] = True
@@ -68,17 +63,19 @@ def main():
     driver_parameters = set_driver_parameters()
     dataset_id = driver_parameters["dataset_id"]
 
-    #<TEST RunTS FROM XML>
-    if driver_parameters["run_ts_from_xml_01"]:
-        experiment, run_obj, runts_obj = test_runts_from_xml(dataset_id,
-                                                             runts_obj=True)
-    #</TEST RunTS FROM XML>
+    #<LOAD FROM MTH5>
+    from aurora.general_helper_functions import TEST_PATH
+    from mth5.mth5 import MTH5
+    parkfield_h5_path = TEST_PATH.joinpath("parkfield", "pkd_test_00.h5")
+    m = MTH5()
+    m.open_mth5(parkfield_h5_path, mode="r")
+    run_id = "001"
+    station_id = "PKD"
+    run_obj = m.get_run(station_id, run_id)
+    run_ts_obj = run_obj.to_runts()
+    experiment = m.to_experiment()
+    #<LOAD FROM MTH5>
 
-    #<INITIALIZE DATA AND METADATA>
-    if driver_parameters["initialize_data"]:
-        #ADD from_miniseed
-        pkd_mvts = get_example_data(station_id="PKD", component_station_label=False)
-    #</INITIALIZE DATA>
 
     #<PROCESS DATA>
         #<BULK SPECTRA CALIBRATION>
@@ -87,7 +84,7 @@ def main():
                                            num_samples_window=288000,
                                            num_samples_overlap=0,
                                            sampling_rate=40.0)
-        windowed_obj = windowing_scheme.apply_sliding_window(pkd_mvts.dataset)
+        windowed_obj = windowing_scheme.apply_sliding_window(run_ts_obj.dataset)
         tapered_obj = windowing_scheme.apply_taper(windowed_obj)
 
 
@@ -126,7 +123,7 @@ def main():
     TF_REFERENCE_CHANNELS = None   #optional, default ["hx", "hy"],
 
     MAX_NUMBER_OF_ITERATIONS = 10
-    # </AT EACH DEIMATION LEVEL>
+    # </AT EACH DECIMATION LEVEL>
     DECIMATIONS = [1,4,4,4]
     #</CONFIG>
     filters_dict = experiment.surveys[0].filters
@@ -135,7 +132,7 @@ def main():
                                        num_samples_window=NUM_SAMPLES_WINDOW,
                                        num_samples_overlap=NUM_SAMPLES_OVERLAP,
                                        sampling_rate=SAMPLING_RATE)
-    windowed_obj = windowing_scheme.apply_sliding_window(pkd_mvts.dataset)
+    windowed_obj = windowing_scheme.apply_sliding_window(run_ts_obj.dataset)
 
     print("windowed_obj", windowed_obj)
 
@@ -143,7 +140,7 @@ def main():
     print("tapered_obj", tapered_obj)
     print("ADD A FLAG TO THESE SO YOU KNOW IF TAPER IS APPLIED OR NOT")
 
-    stft_obj = windowing_scheme.apply_fft(tapered_obj)#, pkd_mvts.sample_rate)
+    stft_obj = windowing_scheme.apply_fft(tapered_obj)
     print("stft_obj", stft_obj)
     #<CALIBRATE>
 
