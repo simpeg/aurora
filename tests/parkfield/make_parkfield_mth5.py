@@ -67,10 +67,24 @@ def create_from_iris(dataset_id):
     return
 
 
-def create_from_local_data():
+def create_from_local_data(dataset_id):
     from aurora.sandbox.io_helpers.test_data import get_example_array_list
+    import datetime
+    from obspy import UTCDateTime
+    from obspy.core import Trace
+    from obspy.core import Stream
     dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
     inventory = dataset_config.get_inventory_from_iris(ensure_inventory_stages_are_named=True)
+    experiment = get_experiment_from_obspy_inventory(inventory)
+    run_metadata = experiment.surveys[0].stations[0].runs[0]
+    station_id = "PKD"
+    start_time = UTCDateTime("2004-09-28T00:00:00.000000Z")
+    end_time = UTCDateTime("2004-09-28T01:59:59.975000Z")
+    target_folder = Path()
+    h5_path = target_folder.joinpath(f"ascii_{dataset_config.dataset_id}.h5")
+    mth5_obj = initialize_mth5(h5_path)
+    mth5_obj.from_experiment(experiment)
+    station_group = mth5_obj.get_station(station_id)
     #</20210713>
     array_list = get_example_array_list(components_list=HEXY,
                                         load_actual=True,
@@ -103,77 +117,6 @@ def create_from_local_data():
     run_group.from_runts(run_ts_obj)
 
     mth5_obj.close_mth5()
-    # # #
-    # # #
-    # # #<COPIED FROM IRIS DMC EXAMPLE>
-    # # station_group = mth5_obj.get_station(station)
-    # #
-    # # # runs can be split into channels with similar start times and sample rates
-    # # start_times = sorted(
-    # #     list(set([tr.stats.starttime.isoformat() for tr in streams])))
-    # # end_times = sorted(
-    # #     list(set([tr.stats.endtime.isoformat() for tr in streams])))
-    # #
-    # # for index, times in enumerate(zip(start_times, end_times), 1):
-    # #     run_id = f"{index:03}"
-    # #     run_stream = streams.slice(UTCDateTime(times[0]), UTCDateTime(times[1]))
-    # #     run_ts_obj = RunTS()
-    # #     # need to add run metadata because in the stationxml the channel metadata
-    # #     # is only one entry for all similar channels regardless of their duration
-    # #     # so we need to make sure that propagates to the MTH5.
-    # #     run_ts_obj.from_obspy_stream(run_stream, run_metadata)
-    # #     run_ts_obj.run_metadata.id = run_id
-    # #     run_group = station_group.add_run(run_id)
-    # #     run_group.from_runts(run_ts_obj)
-    # #
-    # # if to_stationxml:
-    # #     new_inv = translator.mt_to_xml(m.to_experiment(),
-    # #                                    stationxml_fn=local_path.joinpath(
-    # #                                        f"{station}_from_mth5.xml"))
-    # #
-    # # if not interact:
-    # #     m.close_mth5()
-    # # #</COPIED FROM IRIS DMC EXAMPLE>
-    # # #
-    # # #
-    # # #mth5_obj = mth5_from_iris_database(dataset_config)
-    # # #filters are accessed like this:
-    # # #mth5_obj.filters_group.filter_dict
-    # # run_count = 1
-    # # for station_id in mth5_obj.station_list:
-    # #     print(station_id)
-    # #     run_id = str(run_count).zfill(3)
-    # #     print(f"run_id {run_id}")
-    # #     run_obj = mth5_obj.get_run(station_id, str(run_count).zfill(3))
-    # #     print("OK you have created the run")
-    # #     print("next step it to check the run is ok")
-    # #
-    # #     print("once the data are there, then you can need to save the h5")
-    # #     print("follow the example in the synthetic data maker to do this")
-    # #     #print(experiment.surveys[0].stations[0].runs[0])
-    # #     check_run_channels_have_expected_properties(run_obj)
-    # #
-    # #     array_list = get_example_array_list(components_list=HEXY,
-    # #                                     load_actual=True,
-    # #                                     station_id=station_id)
-    # #     #HERE IS WHERE WE WILL NEED TO ADD FILTERS
-    # #     #run_obj has filters right now
-    # #
-    # #     runts_obj = cast_run_to_run_ts(run_obj, array_list=array_list)
-    # #     # run_obj still has filters
-    # #     station_group = mth5_obj.add_station(station_id)
-    # #     run_group = station_group.add_run(run_id)
-    # #     # run_group still has filters
-    # #     #this action here is removing the filters ... we need to add the data
-    # #     # to the
-    # #     run_group.from_runts(runts_obj)
-    # #     # # add filters
-    # #     # for fltr in ACTIVE_FILTERS:
-    # #     #     cf_group = m.filters_group.add_filter(fltr)
-    # #     # make an MTH5
-    # # mth5_obj.close_mth5()
-    #
-    # pass
 
 def test_can_read_back_data():
     from mth5.mth5 import MTH5
@@ -190,8 +133,8 @@ def test_can_read_back_data():
 
 def main():
     dataset_id = "pkd_test_00"
-    create_from_iris(dataset_id)
-    create_from_local_data(dataset_id)
+    #create_from_iris(dataset_id)
+    #create_from_local_data(dataset_id)
     test_can_read_back_data()
 
 if __name__ == '__main__':

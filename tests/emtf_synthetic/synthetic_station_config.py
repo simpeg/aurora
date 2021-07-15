@@ -26,6 +26,7 @@ ACTIVE_FILTERS = [unity_coeff_filter, cf_multipy_10, cf_divide_10]
 
 #<MTH5 CREATION CONFIG>
 #make this an object? or leave as dict?
+
 STATION_01_CFG = {}
 STATION_01_CFG["raw_data_path"] = Path("data","test1.asc")
 STATION_01_CFG["mth5_path"] = Path("data", "test1.h5")
