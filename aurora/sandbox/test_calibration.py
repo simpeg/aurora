@@ -53,7 +53,7 @@ def parkfield_sanity_check(fft_obj, run_obj, show_response_curves=False,
 
     frequencies = fft_obj.frequency.data[1:] #drop DC, add flag for dropping DC
     figures_path.mkdir(parents=True, exist_ok=True)
-
+    #fft_obj = fft_obj.to_dataset("channel")#? works?
     channel_keys = list(fft_obj.data_vars.keys())
     print(f"channel_keys: {channel_keys}")
     for key in channel_keys:
@@ -105,10 +105,9 @@ def parkfield_sanity_check(fft_obj, run_obj, show_response_curves=False,
         n_smooth = 131
         show_raw = 0
         raw_spectral_density = fft_obj[key].data[:, 1:]
-        # raw_spectral_density = np.abs(fft_obj[key].data[:, 1:])
         raw_spectral_density = raw_spectral_density.squeeze()  # only for full window - need to recognize this or workaround
         calibrated_data_pz = raw_spectral_density / pz_calibration_response
-        # calibrated_data_pz = raw_spectral_density / abs_pz_calibration_response
+
         if bf4:
             calibrated_data_fap = raw_spectral_density / abs_bf4_resp
 

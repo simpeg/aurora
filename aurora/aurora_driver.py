@@ -95,7 +95,8 @@ def main():
     run_obj = m.get_run(station_id, run_id)
     experiment = m.to_experiment()
     run_ts_obj = run_obj.to_runts()
-    #m.close_mth5()
+    #m.close_mth5() #closing the mth5 renders other functions unable to
+    # access it -- this will surely be an issue when we dask... ?
     #<LOAD FROM MTH5>
 
 

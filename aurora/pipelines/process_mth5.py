@@ -14,6 +14,20 @@ from aurora.transfer_function.TTFZ import TTFZ
 
 from mth5.mth5 import MTH5
 
+def calibrate_stft_obj(stft_obj, run_obj):
+    for channel_id in stft_obj.keys():
+        mth5_channel = run_obj.get_channel(channel_id)
+        channel_filter = mth5_channel.channel_response_filter
+        calibration_response = channel_filter.complex_response(
+            stft_obj.frequency.data)
+
+        # if units == "SI":
+        #     if channel_id[0].lower() == 'h':
+        #         calibration_response /= 1e-9  # SI Units
+        stft_obj[channel_id].data /= calibration_response
+    return stft_obj
+
+
 def run_ts_to_calibrated_stft(run_ts, run_obj, config, units="MT"):
     windowing_scheme = WindowingScheme(
         taper_family=config.taper_family,
@@ -24,18 +38,19 @@ def run_ts_to_calibrated_stft(run_ts, run_obj, config, units="MT"):
     windowed_obj = windowing_scheme.apply_sliding_window(run_ts.dataset)
     tapered_obj = windowing_scheme.apply_taper(windowed_obj)
     stft_obj = windowing_scheme.apply_fft(tapered_obj)
-    # <CALIBRATE>
-    for channel_id in stft_obj.keys():
-        mth5_channel = run_obj.get_channel(channel_id)
-        channel_filter = mth5_channel.channel_response_filter
-        calibration_response = channel_filter.complex_response(
-            stft_obj.frequency.data)
-    #
-        # if units == "SI":
-        #     if channel_id[0].lower() == 'h':
-        #         calibration_response /= 1e-9  # SI Units
-        stft_obj[channel_id].data /= calibration_response
-    # </CALIBRATE>
+    #stft_obj = calibrate_stft_obj(stft_obj, run_obj)
+    # # <CALIBRATE>
+    # for channel_id in stft_obj.keys():
+    #     mth5_channel = run_obj.get_channel(channel_id)
+    #     channel_filter = mth5_channel.channel_response_filter
+    #     calibration_response = channel_filter.complex_response(
+    #         stft_obj.frequency.data)
+    # #
+    #     # if units == "SI":
+    #     #     if channel_id[0].lower() == 'h':
+    #     #         calibration_response /= 1e-9  # SI Units
+    #     stft_obj[channel_id].data /= calibration_response
+    # # </CALIBRATE>
 
     stft_obj_xrda = stft_obj.to_array("channel")
     return stft_obj_xrda
