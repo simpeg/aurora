@@ -5,37 +5,42 @@ from pathlib import Path
 plt.ion()
 
 
-def load_bf4_fap_for_parkfield_test_using_mt_metadata():
+def load_bf4_fap_for_parkfield_test_using_mt_metadata(frequencies):
     """
 
     Returns
     -------
 
     """
-    pass
-
-
-def load_bf4_fap_for_parkfield_test_using_qf_methods(frequencies):
-    """
-    This function to be removed/deprecated as soon as we have a FAP table
-    consistent with BF4 response archived at IRIS
-    Parameters
-    ----------
-    frequencies
-
-    Returns
-    -------
-
-    """
-    from .qf.instrument import DeployedInstrument
-    from .qf.instrument import Instrument
-    bf4_coil = Instrument(make="emi", model="bf4", serial_number=9819,
-                          channel=0, epoch=0)
-    deployed_bf4 = DeployedInstrument(sensor=bf4_coil)
-    deployed_bf4.get_response_function()
-    bf4_resp = deployed_bf4.response_function(frequencies)
+    from aurora.time_series.filters.filter_helpers import \
+        make_frequency_response_table_filter
+    bf4_obj = make_frequency_response_table_filter(case="bf4")
+    bf4_resp = bf4_obj.complex_response(frequencies)
     bf4_resp *= 421721.0  # CPV compensation
     return bf4_resp
+
+
+# def load_bf4_fap_for_parkfield_test_using_qf_methods(frequencies):
+#     """
+#     This function to be removed/deprecated as soon as we have a FAP table
+#     consistent with BF4 response archived at IRIS
+#     Parameters
+#     ----------
+#     frequencies
+#
+#     Returns
+#     -------
+#
+#     """
+#     from .qf.instrument import DeployedInstrument
+#     from .qf.instrument import Instrument
+#     bf4_coil = Instrument(make="emi", model="bf4", serial_number=9819,
+#                           channel=0, epoch=0)
+#     deployed_bf4 = DeployedInstrument(sensor=bf4_coil)
+#     deployed_bf4.get_response_function()
+#     bf4_resp = deployed_bf4.response_function(frequencies)
+#     bf4_resp *= 421721.0  # CPV compensation
+#     return bf4_resp
 
 
 
@@ -82,11 +87,7 @@ def parkfield_sanity_check(fft_obj, run_obj, show_response_curves=False,
 
         # <FAP RSP>
         if bf4:
-            from aurora.time_series.filters.filter_helpers import \
-                make_frequency_response_table_filter
-            bf4_obj = make_frequency_response_table_filter(case="bf4")
-            bf4_resp = bf4_obj.complex_response(frequencies)
-            bf4_resp *= 421721.0  # CPV compensation
+            bf4_resp = load_bf4_fap_for_parkfield_test_using_mt_metadata(frequencies)
             #bf4_resp = load_bf4_fap_for_parkfield_test_using_qf_methods(
             # frequencies)
             abs_bf4_resp = np.abs(bf4_resp)
