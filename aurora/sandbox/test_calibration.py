@@ -7,6 +7,21 @@ plt.ion()
 
 def load_bf4_fap_for_parkfield_test_using_mt_metadata(frequencies):
     """
+    ToDo: we could go so far as to add the hardware repsonses (AAF and
+    digitizer) here but anywhere away from the Nyquist we are getting
+    reasonable results, and near the Nyquist the filters are insuffucient to
+    calibrate.  It looks from the plots like the intrinsic noise in the data
+    is larger than that in the DAQ and as a result we appear to
+    overcompensate in calibration.  This is not surprising.
+    Parameters
+    ----------
+    frequencies
+
+    Returns
+    -------
+
+    """
+    """
 
     Returns
     -------
