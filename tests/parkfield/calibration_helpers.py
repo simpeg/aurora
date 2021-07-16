@@ -31,7 +31,7 @@ def load_bf4_fap_for_parkfield_test_using_mt_metadata(frequencies):
         make_frequency_response_table_filter
     bf4_obj = make_frequency_response_table_filter(case="bf4")
     bf4_resp = bf4_obj.complex_response(frequencies)
-    bf4_resp *= 421721.0  # CPV compensation
+    bf4_resp *= 421721.0  # counts-per-volt compensation
     return bf4_resp
 
 
