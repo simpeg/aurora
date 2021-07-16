@@ -31,6 +31,18 @@ single_station_xml_template = STATIONXML_02 # Fails for "no survey key"
 fap_xml_example = ""
 
 
+def test_can_read_back_data(mth5_path, station_id, run_id):
+    processing_config = {}
+    processing_config["mth5_path"] = "pkd_test_00.h5"
+    processing_config["local_station_id"] = "PKD"
+    config = processing_config
+    m = MTH5()
+    m.open_mth5(config["mth5_path"], mode="r")
+    local_run_obj = m.get_run(config["local_station_id"], run_id)
+    local_run_ts = local_run_obj.to_runts()
+    print("success")
+    return
+
 def ingest_config(processing_cfg):
     """
 
