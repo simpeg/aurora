@@ -51,6 +51,26 @@ def set_driver_parameters():
     return driver_parameters
 
 
+def test_bulk_spectra_have_correct_units(run_obj, run_ts_obj):
+    # <BULK SPECTRA CALIBRATION>
+    windowing_scheme = WindowingScheme(taper_family="hamming",
+                                       num_samples_window=288000,
+                                       num_samples_overlap=0,
+                                       sampling_rate=40.0)
+    windowed_obj = windowing_scheme.apply_sliding_window(run_ts_obj.dataset)
+    tapered_obj = windowing_scheme.apply_taper(windowed_obj)
+
+    fft_obj = windowing_scheme.apply_fft(tapered_obj)
+    from aurora.sandbox.test_calibration import parkfield_sanity_check
+    show_response_curves = True
+    show_spectra = False
+    # Maybe better to make parkfield_sanity_check start from run_ts and
+    # run_obj once we have run_ts behaving correct w.r.t. data channels?
+    parkfield_sanity_check(fft_obj, run_obj, figures_path=FIGURES_PATH,
+                           show_response_curves=show_response_curves,
+                           show_spectra=show_spectra,
+                           include_decimation=True)
+    # </BULK SPECTRA CALIBRATION>
 
 
 def main():
@@ -66,38 +86,22 @@ def main():
     #<LOAD FROM MTH5>
     from aurora.general_helper_functions import TEST_PATH
     from mth5.mth5 import MTH5
+    run_id = "001"
+    station_id = "PKD"
+
     parkfield_h5_path = TEST_PATH.joinpath("parkfield", "pkd_test_00.h5")
     m = MTH5()
     m.open_mth5(parkfield_h5_path, mode="r")
-    run_id = "001"
-    station_id = "PKD"
     run_obj = m.get_run(station_id, run_id)
-    run_ts_obj = run_obj.to_runts()
     experiment = m.to_experiment()
+    run_ts_obj = run_obj.to_runts()
+    #m.close_mth5()
     #<LOAD FROM MTH5>
 
 
     #<PROCESS DATA>
         #<BULK SPECTRA CALIBRATION>
-    if driver_parameters["BULK SPECTRA"]:
-        windowing_scheme = WindowingScheme(taper_family="hamming",
-                                           num_samples_window=288000,
-                                           num_samples_overlap=0,
-                                           sampling_rate=40.0)
-        windowed_obj = windowing_scheme.apply_sliding_window(run_ts_obj.dataset)
-        tapered_obj = windowing_scheme.apply_taper(windowed_obj)
-
-
-        fft_obj = windowing_scheme.apply_fft(tapered_obj)
-        from aurora.sandbox.test_calibration import parkfield_sanity_check
-        show_response_curves = True
-        show_spectra = False
-        # Maybe better to make parkfield_sanity_check start from run_ts and
-        # run_obj once we have run_ts behaving correct w.r.t. data channels?
-        parkfield_sanity_check(fft_obj, run_obj, figures_path=FIGURES_PATH,
-                               show_response_curves=show_response_curves,
-                               show_spectra=show_spectra,
-                               include_decimation=True)
+    test_bulk_spectra_have_correct_units(run_obj, run_ts_obj)
         #</BULK SPECTRA CALIBRATION>
 
 
