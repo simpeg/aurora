@@ -146,7 +146,7 @@ def describe_inventory_stages(inventory, assign_names=False):
     if new_names_were_assigned:
         inventory.networks = networks
         print("NETWORKS REASSIGNED")
-    return #inventory
+    return
 
 
 

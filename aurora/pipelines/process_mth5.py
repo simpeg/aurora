@@ -38,7 +38,7 @@ def run_ts_to_calibrated_stft(run_ts, run_obj, config, units="MT"):
     windowed_obj = windowing_scheme.apply_sliding_window(run_ts.dataset)
     tapered_obj = windowing_scheme.apply_taper(windowed_obj)
     stft_obj = windowing_scheme.apply_fft(tapered_obj)
-    #stft_obj = calibrate_stft_obj(stft_obj, run_obj)
+    stft_obj = calibrate_stft_obj(stft_obj, run_obj)
     # # <CALIBRATE>
     # for channel_id in stft_obj.keys():
     #     mth5_channel = run_obj.get_channel(channel_id)
