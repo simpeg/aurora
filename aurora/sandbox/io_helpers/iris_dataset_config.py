@@ -1,7 +1,6 @@
 from aurora.sandbox.io_helpers.inventory_review import scan_inventory_for_nonconformity
 from aurora.sandbox.xml_sandbox import describe_inventory_stages
 from aurora.sandbox.xml_sandbox import get_response_inventory_from_iris
-from mth5_test_data.util import MTH5_TEST_DATA_DIR as DATA_DIR
 
 class IRISDatasetConfig(object):
     """
@@ -37,7 +36,6 @@ class IRISDatasetConfig(object):
         inventory = scan_inventory_for_nonconformity(inventory)
         if ensure_inventory_stages_are_named:
             describe_inventory_stages(inventory, assign_names=True)
-            # describe_inventory_stages(inventory, assign_names=False)
 
         return inventory
 
@@ -51,21 +49,22 @@ class IRISDatasetConfig(object):
         -------
 
         """
+
         pass
 
-    def get_station_xml_filename(self, tag=""):
-        """
-        Placeholder in case we need to make many of these
-        TODO: Modify so the path comes from the dataset_id, not the station_id...
-
-        """
-        filebase = f"{self.dataset_id}.xml"
-        if tag:
-            filebase = f"{tag}_{filebase}"
-        target_folder = DATA_DIR.joinpath("iris",f"{self.network}")
-        target_folder.mkdir(exist_ok=True)
-        xml_filepath = target_folder.joinpath(filebase)
-        return xml_filepath
+    # def get_station_xml_filename(self, tag=""):
+    #     """
+    #     Placeholder in case we need to make many of these
+    #     TODO: Modify so the path comes from the dataset_id, not the station_id...
+    #
+    #     """
+    #     filebase = f"{self.dataset_id}.xml"
+    #     if tag:
+    #         filebase = f"{tag}_{filebase}"
+    #     target_folder = DATA_DIR.joinpath("iris",f"{self.network}")
+    #     target_folder.mkdir(exist_ok=True)
+    #     xml_filepath = target_folder.joinpath(filebase)
+    #     return xml_filepath
 
     def save_xml(self, experiment, tag=""):
         """

@@ -4,6 +4,10 @@ In the first iteration it will be a dictionary representing the config at a
 single decimation level.  We will later (probably) bind a collection of these
 together keyed by decimation_level_id.
 
+A good way to approach the various decimation levels maybe to allow a
+processing config to generate a decimated config.  After all, it is unlikely
+that one will change parameters besides the frequency bands, and even these
+are reusable provided we use an EMTF-style band averaging scheme
 """
 #from collections.abc import MutableMapping
 from pathlib import Path
@@ -16,7 +20,11 @@ class ProcessingConfig(BaseDict):
 
     def __init__(self, *args, **kwargs):
         self.mth5_path = kwargs.get("mth5_path", "")
+        self.decimation_level_id = kwargs.get("decimation_level", 0)
         #str or Path()
+
+        #<DECIMATION CONFIG>
+        #<DECIMATION CONFIG>
 
         # <FOURIER TRANSFORM CONFIG>
         # self.spectral_transform_config = {}
