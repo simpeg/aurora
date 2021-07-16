@@ -15,14 +15,8 @@ def load_bf4_fap_for_parkfield_test_using_mt_metadata(frequencies):
     overcompensate in calibration.  This is not surprising.
     Parameters
     ----------
-    frequencies
-
-    Returns
-    -------
-
-    """
-    """
-
+    frequencies : numpy array
+        Array of frequencies at which to evaluate the bf response function
     Returns
     -------
 
@@ -31,7 +25,7 @@ def load_bf4_fap_for_parkfield_test_using_mt_metadata(frequencies):
         make_frequency_response_table_filter
     bf4_obj = make_frequency_response_table_filter(case="bf4")
     bf4_resp = bf4_obj.complex_response(frequencies)
-    bf4_resp *= 421721.0  # counts-per-volt compensation
+    bf4_resp *= 421721.0  # counts-per-volt compensation for PKD
     return bf4_resp
 
 
@@ -53,11 +47,11 @@ def parkfield_sanity_check(fft_obj, run_obj, show_response_curves=False,
 
     frequencies = fft_obj.frequency.data[1:] #drop DC, add flag for dropping DC
     figures_path.mkdir(parents=True, exist_ok=True)
-    #fft_obj = fft_obj.to_dataset("channel")#? works?
     channel_keys = list(fft_obj.data_vars.keys())
     print(f"channel_keys: {channel_keys}")
+
     for key in channel_keys:
-        print(f"CHANNEL {key}")
+        print(f"calibrating channel {key}")
         if key[0].lower() == "h":
             bf4 = True
             response_units = "V/nT"
@@ -69,22 +63,16 @@ def parkfield_sanity_check(fft_obj, run_obj, show_response_curves=False,
 
         channel = run_obj.get_channel(key)
 
-        # <PZRSP>
-        #owing to issue #32 in mth5 I am going to modify this to use a different
-        #way to calibrate for now
+        # pole-zero calibration response
         pz_calibration_response = channel.channel_response_filter.complex_response(
             frequencies, include_decimation=include_decimation)
 
-        # </PZRSP>
-
-        # <FAP RSP>
+        # Frequency response table response
         if bf4:
             bf4_resp = load_bf4_fap_for_parkfield_test_using_mt_metadata(frequencies)
             abs_bf4_resp = np.abs(bf4_resp)
 
-        # </FAP RSP>
-
-        # <CF RESPONSES>
+        # compare responses graphically
         plt.figure(1)
         plt.clf()
         plt.loglog(frequencies, np.abs(pz_calibration_response),
@@ -99,13 +87,13 @@ def parkfield_sanity_check(fft_obj, run_obj, show_response_curves=False,
         plt.savefig(figures_path.joinpath(png_name))
         if show_response_curves:
             plt.show()
-        # </CF RESPONSES>
 
-
+        #create smoothed amplitude spectra
         n_smooth = 131
         show_raw = 0
         raw_spectral_density = fft_obj[key].data[:, 1:]
-        raw_spectral_density = raw_spectral_density.squeeze()  # only for full window - need to recognize this or workaround
+        raw_spectral_density = raw_spectral_density.squeeze()
+        #squeeze because there is only one FFT window
         calibrated_data_pz = raw_spectral_density / pz_calibration_response
 
         if bf4:
@@ -122,16 +110,16 @@ def parkfield_sanity_check(fft_obj, run_obj, show_response_curves=False,
                 np.abs(calibrated_data_fap), n_smooth)
         if show_raw:
             plt.loglog(frequencies, calibrated_data_pz, color='b',
-                       label='pole-zero')
+                       label="pole-zero")
             if bf4:
                 plt.loglog(frequencies, calibrated_data_fap, color='r',
-                       label='fap EMI')
+                       label="response table (EMI)")
         if n_smooth:
             plt.loglog(frequencies, smooth_calibrated_data_pz, color='b',
-                       label='smooth pole-zero')
+                       label="smooth pole-zero")
             if bf4:
                 plt.loglog(frequencies, smooth_calibrated_data_fap, color='r',
-                       label='fap EMI')
+                       label="response table (EMI)")
 
         plt.legend()
         plt.grid(True, which="both", ls="-")
