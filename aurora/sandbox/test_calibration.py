@@ -35,29 +35,6 @@ def load_bf4_fap_for_parkfield_test_using_mt_metadata(frequencies):
     return bf4_resp
 
 
-# def load_bf4_fap_for_parkfield_test_using_qf_methods(frequencies):
-#     """
-#     This function to be removed/deprecated as soon as we have a FAP table
-#     consistent with BF4 response archived at IRIS
-#     Parameters
-#     ----------
-#     frequencies
-#
-#     Returns
-#     -------
-#
-#     """
-#     from .qf.instrument import DeployedInstrument
-#     from .qf.instrument import Instrument
-#     bf4_coil = Instrument(make="emi", model="bf4", serial_number=9819,
-#                           channel=0, epoch=0)
-#     deployed_bf4 = DeployedInstrument(sensor=bf4_coil)
-#     deployed_bf4.get_response_function()
-#     bf4_resp = deployed_bf4.response_function(frequencies)
-#     bf4_resp *= 421721.0  # CPV compensation
-#     return bf4_resp
-
-
 
 def parkfield_sanity_check(fft_obj, run_obj, show_response_curves=False,
                            show_spectra=True, figures_path=Path(""),
@@ -103,8 +80,6 @@ def parkfield_sanity_check(fft_obj, run_obj, show_response_curves=False,
         # <FAP RSP>
         if bf4:
             bf4_resp = load_bf4_fap_for_parkfield_test_using_mt_metadata(frequencies)
-            #bf4_resp = load_bf4_fap_for_parkfield_test_using_qf_methods(
-            # frequencies)
             abs_bf4_resp = np.abs(bf4_resp)
 
         # </FAP RSP>
