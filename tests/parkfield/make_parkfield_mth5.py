@@ -11,20 +11,19 @@ from obspy.core import Stream
 from obspy.core import Trace
 
 from aurora.sandbox.io_helpers.make_dataset_configs import TEST_DATA_SET_CONFIGS
-from aurora.sandbox.mth5_helpers import cast_run_to_run_ts
-from aurora.sandbox.mth5_helpers import check_run_channels_have_expected_properties
 from aurora.sandbox.mth5_helpers import get_experiment_from_obspy_inventory
 from aurora.sandbox.mth5_helpers import initialize_mth5
-from aurora.sandbox.mth5_helpers import mth5_from_iris_database
 from aurora.sandbox.mth5_helpers import test_can_read_back_data
 from mth5.timeseries import RunTS
-
+from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 
 
 def create_from_iris(dataset_id):
     dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
     inventory = dataset_config.get_inventory_from_iris(ensure_inventory_stages_are_named=True)
-    experiment = get_experiment_from_obspy_inventory(inventory)
+    translator = XMLInventoryMTExperiment()
+    experiment = translator.xml_to_mt(inventory_object=inventory)
+    #experiment = get_experiment_from_obspy_inventory(inventory)
     run_metadata = experiment.surveys[0].stations[0].runs[0]
     target_folder = Path()
     h5_path = target_folder.joinpath(f"{dataset_config.dataset_id}.h5")
