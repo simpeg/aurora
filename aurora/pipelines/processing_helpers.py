@@ -1,8 +1,61 @@
+
 from aurora.time_series.frequency_band_helpers import extract_band
+from aurora.time_series.frequency_band import FrequencyBands
+from aurora.time_series.windowing_scheme import WindowingScheme
 from aurora.transfer_function.iter_control import IterControl
+from aurora.transfer_function.transfer_function_header import \
+    TransferFunctionHeader
 from aurora.transfer_function.TRME import TRME
 from aurora.transfer_function.TRME_RR import TRME_RR
 
+
+
+def configure_frequency_bands(config):
+    frequency_bands = FrequencyBands()
+    if config["band_setup_style"] == "EMTF":
+        frequency_bands.from_emtf_band_setup(
+            filepath=config.emtf_band_setup_file,
+            sampling_rate=config.sample_rate,
+            decimation_level=1,
+            num_samples_window=config.num_samples_window)
+    else:
+        print("TODO:Write a method to choose lower and upper bounds, "
+              "and number of bands to split it into")
+    return frequency_bands
+
+
+def transfer_function_header_from_config(config):
+    transfer_function_header = TransferFunctionHeader(
+        processing_scheme=config.estimation_engine,
+        local_site=config.local_station_id,
+        remote_site=config.remote_reference_station_id,
+        input_channels=config.input_channels,
+        output_channels=config.output_channels,
+        reference_channels=config.reference_channels)
+    return transfer_function_header
+
+
+def validate_sample_rate(run_ts, config):
+    if run_ts.sample_rate != config.sample_rate:
+        print(f"sample rate in run time series {local_run_ts.sample_rate} and "
+              f"processing config {config.sample_rate} do not match")
+        raise Exception
+    return
+
+def run_ts_to_calibrated_stft(run_ts, run_obj, config, units="MT"):
+    windowing_scheme = WindowingScheme(
+        taper_family=config.taper_family,
+        num_samples_window=config.num_samples_window,
+        num_samples_overlap=config.num_samples_overlap,
+        sampling_rate=run_ts.sample_rate)
+
+    windowed_obj = windowing_scheme.apply_sliding_window(run_ts.dataset)
+    tapered_obj = windowing_scheme.apply_taper(windowed_obj)
+    stft_obj = windowing_scheme.apply_fft(tapered_obj)
+    stft_obj = calibrate_stft_obj(stft_obj, run_obj, units=units)
+
+    stft_obj_xrda = stft_obj.to_array("channel")
+    return stft_obj_xrda
 
 def calibrate_stft_obj(stft_obj, run_obj, units="MT"):
     """
