@@ -1,6 +1,8 @@
 from pathlib import Path
 
+from aurora.pipelines.processing_helpers import calibrate_stft_obj
 from aurora.sandbox.processing_config import ProcessingConfig
+#from aurora.sandbox.processing_config import RunConfig
 from aurora.time_series.frequency_band import FrequencyBands
 from aurora.time_series.frequency_band_helpers import extract_band
 from aurora.time_series.windowing_scheme import WindowingScheme
@@ -13,23 +15,6 @@ from aurora.transfer_function.TTFZ import TTFZ
 
 
 from mth5.mth5 import MTH5
-
-def calibrate_stft_obj(stft_obj, run_obj, units="MT"):
-    for channel_id in stft_obj.keys():
-        mth5_channel = run_obj.get_channel(channel_id)
-        channel_filter = mth5_channel.channel_response_filter
-        calibration_response = channel_filter.complex_response(
-            stft_obj.frequency.data)
-
-        if units == "SI":
-            print("Warning: SI Units are not robustly supported issue #36")
-            #This is not robust, and is really only here for the parkfield test
-            #We should add units support as a general fix and handle the
-            # parkfield case by converting to "MT" units in calibration filters
-            if channel_id[0].lower() == 'h':
-                calibration_response /= 1e-9  # SI Units
-        stft_obj[channel_id].data /= calibration_response
-    return stft_obj
 
 
 def run_ts_to_calibrated_stft(run_ts, run_obj, config, units="MT"):
@@ -80,6 +65,7 @@ def validate_sample_rate(run_ts, config):
     return
 
 
+
 def process_mth5_decimation_level(processing_cfg, run_id, units="MT"):
     """
     Processing pipeline for a single decimation_level
@@ -92,8 +78,11 @@ def process_mth5_decimation_level(processing_cfg, run_id, units="MT"):
     if isinstance(processing_cfg, Path) or isinstance(processing_cfg, str):
         config = ProcessingConfig()
         config.from_json(processing_cfg)
-    else:
+    elif isinstance(processing_cfg, ProcessingConfig):
         config = processing_cfg
+    else:
+        print(f"Unrecognized config of type {type(ProcessingConfig)}")
+        raise Exception
 
 
     m = MTH5()
@@ -155,3 +144,24 @@ def process_mth5_decimation_level(processing_cfg, run_id, units="MT"):
     print(transfer_function_obj.rho[-1])
     return transfer_function_obj
 
+
+def process_mth5_run(run_cfg, run_id, units="MT"):
+    from aurora.sandbox.processing_config import RunConfig
+    if isinstance(run_cfg, Path) or isinstance(run_cfg, str):
+        config = RunConfig()
+        config.from_json(run_cfg)
+    elif isinstance(run_cfg, RunConfig):
+        config = run_cfg
+    else:
+        print(f"Unrecognized config of type {type(run_cfg)}")
+        raise Exception
+
+
+
+
+    m = MTH5()
+    m.open_mth5(config["mth5_path"], mode="r")
+
+    local_run_obj = m.get_run(config["local_station_id"], run_id)
+    local_run_ts = local_run_obj.to_runts()
+    validate_sample_rate(local_run_ts, config)
