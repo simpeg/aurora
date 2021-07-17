@@ -1,16 +1,17 @@
 from pathlib import Path
 
 from aurora.pipelines.processing_helpers import calibrate_stft_obj
+from aurora.pipelines.processing_helpers import process_transfer_functions
 from aurora.sandbox.processing_config import ProcessingConfig
 #from aurora.sandbox.processing_config import RunConfig
 from aurora.time_series.frequency_band import FrequencyBands
-from aurora.time_series.frequency_band_helpers import extract_band
+#from aurora.time_series.frequency_band_helpers import extract_band
 from aurora.time_series.windowing_scheme import WindowingScheme
-from aurora.transfer_function.iter_control import IterControl
+#from aurora.transfer_function.iter_control import IterControl
 from aurora.transfer_function.transfer_function_header import \
     TransferFunctionHeader
-from aurora.transfer_function.TRME import TRME
-from aurora.transfer_function.TRME_RR import TRME_RR
+#from aurora.transfer_function.TRME import TRME
+#from aurora.transfer_function.TRME_RR import TRME_RR
 from aurora.transfer_function.TTFZ import TTFZ
 
 
@@ -101,42 +102,51 @@ def process_mth5_decimation_level(processing_cfg, run_id, units="MT"):
         remote_stft_obj = run_ts_to_calibrated_stft(remote_run_ts,
                                                     remote_run_obj,
                                                     config)
+    else:
+        remote_stft_obj = None
 
     frequency_bands = configure_frequency_bands(config)
     transfer_function_header = transfer_function_header_from_config(config)
     transfer_function_obj = TTFZ(transfer_function_header,
                                  frequency_bands.number_of_bands)
 
-    for i_band in range(frequency_bands.number_of_bands):
-        band = frequency_bands.band(i_band)
-        band_dataarray = extract_band(band, local_stft_obj)
-        band_dataset = band_dataarray.to_dataset("channel")
-        X = band_dataset[config.input_channels]
-        Y = band_dataset[config.output_channels]
-        if config.remote_reference_station_id:
-            band_dataarray = extract_band(band, remote_stft_obj)
-            band_dataset = band_dataarray.to_dataset("channel")
-            RR = band_dataset[config.reference_channels]
-
-        if config.estimation_engine == "OLS":
-            regression_estimator = RegressionEstimator(X=X, Y=Y)
-            Z = regression_estimator.estimate_ols()
-        elif config.estimation_engine=="RME":
-            iter_control = IterControl(max_number_of_iterations=config.max_number_of_iterations)
-            regression_estimator = TRME(X=X, Y=Y, iter_control=iter_control)
-            Z = regression_estimator.estimate()
-        elif config.estimation_engine=="TRME_RR":
-            iter_control = IterControl(max_number_of_iterations=config.max_number_of_iterations)
-            regression_estimator = TRME_RR(X=X, Y=Y, Z=RR,
-                                           iter_control=iter_control)
-            Z = regression_estimator.estimate()
-        else:
-            print(f"processing_scheme {config.estimation_engine} not supported")
-            print(f"processing_scheme must be one of OLS, RME "
-            f"not supported")
-            raise Exception
-        print(f"{band.center_period} {config.estimation_engine}, \n {Z}")
-        transfer_function_obj.set_tf(i_band, regression_estimator, band.center_period)
+    transfer_function_obj = process_transfer_functions(config,
+                                                       frequency_bands,
+                                                       local_stft_obj,
+                                                       remote_stft_obj,
+                                                       transfer_function_obj)
+    #Factor to process_transfer_functions(config, frequency_bands,
+    # local_stft_obj, remote_stft_obj, transfer_function_obj)
+    # for i_band in range(frequency_bands.number_of_bands):
+    #     band = frequency_bands.band(i_band)
+    #     band_dataarray = extract_band(band, local_stft_obj)
+    #     band_dataset = band_dataarray.to_dataset("channel")
+    #     X = band_dataset[config.input_channels]
+    #     Y = band_dataset[config.output_channels]
+    #     if config.remote_reference_station_id:
+    #         band_dataarray = extract_band(band, remote_stft_obj)
+    #         band_dataset = band_dataarray.to_dataset("channel")
+    #         RR = band_dataset[config.reference_channels]
+    #
+    #     if config.estimation_engine == "OLS":
+    #         regression_estimator = RegressionEstimator(X=X, Y=Y)
+    #         Z = regression_estimator.estimate_ols()
+    #     elif config.estimation_engine=="RME":
+    #         iter_control = IterControl(max_number_of_iterations=config.max_number_of_iterations)
+    #         regression_estimator = TRME(X=X, Y=Y, iter_control=iter_control)
+    #         Z = regression_estimator.estimate()
+    #     elif config.estimation_engine=="TRME_RR":
+    #         iter_control = IterControl(max_number_of_iterations=config.max_number_of_iterations)
+    #         regression_estimator = TRME_RR(X=X, Y=Y, Z=RR,
+    #                                        iter_control=iter_control)
+    #         Z = regression_estimator.estimate()
+    #     else:
+    #         print(f"processing_scheme {config.estimation_engine} not supported")
+    #         print(f"processing_scheme must be one of OLS, RME "
+    #         f"not supported")
+    #         raise Exception
+    #     print(f"{band.center_period} {config.estimation_engine}, \n {Z}")
+    #     transfer_function_obj.set_tf(i_band, regression_estimator, band.center_period)
 
     transfer_function_obj.apparent_resistivity(units=units)
     print(transfer_function_obj.rho.shape)
