@@ -22,6 +22,10 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT"):
             stft_obj.frequency.data)
 
         if units == "SI":
+            print("Warning: SI Units are not robustly supported issue #36")
+            #This is not robust, and is really only here for the parkfield test
+            #We should add units support as a general fix and handle the
+            # parkfield case by converting to "MT" units in calibration filters
             if channel_id[0].lower() == 'h':
                 calibration_response /= 1e-9  # SI Units
         stft_obj[channel_id].data /= calibration_response
@@ -39,7 +43,7 @@ def run_ts_to_calibrated_stft(run_ts, run_obj, config, units="MT"):
     tapered_obj = windowing_scheme.apply_taper(windowed_obj)
     stft_obj = windowing_scheme.apply_fft(tapered_obj)
     stft_obj = calibrate_stft_obj(stft_obj, run_obj, units=units)
-    
+
     stft_obj_xrda = stft_obj.to_array("channel")
     return stft_obj_xrda
 
