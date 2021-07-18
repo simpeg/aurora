@@ -161,6 +161,8 @@ class RunConfig(BaseDict):
         json_dict = {}
         json_dict["config_id"] = self.config_id
         json_dict["mth5_path"] = self.mth5_path
+        json_dict["local_station_id"] = self.local_station_id
+        json_dict["reference_station_id"] = self.reference_station_id
         print(self.decimation_level_ids)
         for dec_level_id in self.decimation_level_ids:
             json_dict[dec_level_id] = self_dict[dec_level_id].__dict__
@@ -193,6 +195,8 @@ class RunConfig(BaseDict):
 
         self.config_id = json_dict.pop("config_id")
         self.mth5_path = json_dict.pop("mth5_path")
+        self.local_station_id = json_dict.pop("local_station_id")
+        self.reference_station_id = json_dict.pop("reference_station_id")
         decimation_level_ids = sorted(json_dict.keys())
         for decimation_level_id in decimation_level_ids:
             decimation_level_processing_config = ProcessingConfig()

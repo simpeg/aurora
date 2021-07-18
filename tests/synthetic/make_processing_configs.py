@@ -53,6 +53,7 @@ def create_run_config_for_test_case(test_case_id):
             run_config.local_station_id = "test1"
             run_config.reference_station_id = "test2"
 
+
         downsample_factor = 1.0
         for i_decimation_level in range(len(decimation_factors)):
             decimation_factor = decimation_factors[i_decimation_level]
@@ -62,9 +63,12 @@ def create_run_config_for_test_case(test_case_id):
             cfg.decimation_factor = decimation_factor
             cfg.num_samples_window = 256
             cfg.num_samples_overlap = 192
-            cfg.sample_rate = run_config.initial_sample_rate / downsample_factor
+            cfg.sample_rate = run_config.initial_sample_rate * downsample_factor
             cfg.emtf_band_setup_file = str(SANDBOX.joinpath("bs_256.cfg"))
             cfg.estimation_engine = "RME"
+            if test_case_id=="test12rr":
+                cfg.estimation_engine = "TRME_RR"
+                cfg.reference_channels = run_config.reference_channels #HACKY
             run_config.decimation_level_configs[i_decimation_level] = cfg
 
         json_fn = test_case_id.replace(" ","_") + "_run_config.json"
