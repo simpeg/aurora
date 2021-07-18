@@ -1,0 +1,24 @@
+{
+    "mth5_path": "/home/kkappler/software/irismt/aurora/tests/parkfield/pkd_test_00.h5",
+    "taper_family": "hamming",
+    "taper_additional_args": {},
+    "num_samples_window": 256,
+    "num_samples_overlap": 128,
+    "sample_rate": 40.0,
+    "band_setup_style": "EMTF",
+    "emtf_band_setup_file": "/home/kkappler/software/irismt/aurora/aurora/sandbox/bs_256.cfg",
+    "minimum_number_of_cycles": 10,
+    "max_number_of_iterations": 10,
+    "local_station_id": "PKD",
+    "reference_station_id": "",
+    "estimation_engine": "RME",
+    "input_channels": [
+        "hx",
+        "hy"
+    ],
+    "output_channels": [
+        "ex",
+        "ey"
+    ],
+    "reference_channels": []
+}
