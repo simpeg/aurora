@@ -13,6 +13,16 @@ from mth5.mth5 import MTH5
 
 
 
+def get_remote_stft(config, mth5_obj, run_id):
+    if config.reference_station_id:
+        remote_run_obj = mth5_obj.get_run(config["reference_station_id"], run_id)
+        remote_run_ts = remote_run_obj.to_runts()
+        remote_stft_obj = run_ts_to_calibrated_stft(remote_run_ts,
+                                                    remote_run_obj,
+                                                    config)
+    else:
+        remote_stft_obj = None
+    return remote_stft_obj
 
 def process_mth5_decimation_level(processing_cfg, run_id, units="MT"):
     """
@@ -33,24 +43,24 @@ def process_mth5_decimation_level(processing_cfg, run_id, units="MT"):
         raise Exception
 
 
-    m = MTH5()
-    m.open_mth5(config["mth5_path"], mode="r")
+    mth5_obj = MTH5()
+    mth5_obj.open_mth5(config["mth5_path"], mode="r")
 
-    local_run_obj = m.get_run(config["local_station_id"], run_id)
+    local_run_obj = mth5_obj.get_run(config["local_station_id"], run_id)
     local_run_ts = local_run_obj.to_runts()
     validate_sample_rate(local_run_ts, config)
     local_stft_obj = run_ts_to_calibrated_stft(local_run_ts, local_run_obj,
                                              config, units=units)
 
-    if config.remote_reference_station_id:
-        remote_run_obj = m.get_run(config["remote_reference_station_id"],
-                                   run_id)
-        remote_run_ts = remote_run_obj.to_runts()
-        remote_stft_obj = run_ts_to_calibrated_stft(remote_run_ts,
-                                                    remote_run_obj,
-                                                    config)
-    else:
-        remote_stft_obj = None
+    remote_stft_obj = get_remote_stft(config, mth5_obj, run_id)
+    # if config.reference_station_id:
+    #     remote_run_obj = m.get_run(config["reference_station_id"], run_id)
+    #     remote_run_ts = remote_run_obj.to_runts()
+    #     remote_stft_obj = run_ts_to_calibrated_stft(remote_run_ts,
+    #                                                 remote_run_obj,
+    #                                                 config)
+    # else:
+    #     remote_stft_obj = None
 
     frequency_bands = configure_frequency_bands(config)
     transfer_function_header = transfer_function_header_from_config(config)
@@ -80,9 +90,6 @@ def process_mth5_run(run_cfg, run_id, units="MT"):
     else:
         print(f"Unrecognized config of type {type(run_cfg)}")
         raise Exception
-
-
-
 
     m = MTH5()
     m.open_mth5(config["mth5_path"], mode="r")

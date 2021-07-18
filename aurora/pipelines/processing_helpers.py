@@ -28,7 +28,7 @@ def transfer_function_header_from_config(config):
     transfer_function_header = TransferFunctionHeader(
         processing_scheme=config.estimation_engine,
         local_site=config.local_station_id,
-        remote_site=config.remote_reference_station_id,
+        remote_site=config.reference_station_id,
         input_channels=config.input_channels,
         output_channels=config.output_channels,
         reference_channels=config.reference_channels)
@@ -95,7 +95,7 @@ def process_transfer_functions(config, frequency_bands, local_stft_obj,
         band_dataset = band_dataarray.to_dataset("channel")
         X = band_dataset[config.input_channels]
         Y = band_dataset[config.output_channels]
-        if config.remote_reference_station_id:
+        if config.reference_station_id:
             band_dataarray = extract_band(band, remote_stft_obj)
             band_dataset = band_dataarray.to_dataset("channel")
             RR = band_dataset[config.reference_channels]

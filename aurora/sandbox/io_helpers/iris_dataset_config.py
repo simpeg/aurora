@@ -52,19 +52,6 @@ class IRISDatasetConfig(object):
 
         pass
 
-    # def get_station_xml_filename(self, tag=""):
-    #     """
-    #     Placeholder in case we need to make many of these
-    #     TODO: Modify so the path comes from the dataset_id, not the station_id...
-    #
-    #     """
-    #     filebase = f"{self.dataset_id}.xml"
-    #     if tag:
-    #         filebase = f"{tag}_{filebase}"
-    #     target_folder = DATA_DIR.joinpath("iris",f"{self.network}")
-    #     target_folder.mkdir(exist_ok=True)
-    #     xml_filepath = target_folder.joinpath(filebase)
-    #     return xml_filepath
 
     def save_xml(self, experiment, tag=""):
         """
