@@ -46,8 +46,8 @@ def test_process_mth5():
     process_synthetic_rr12()
 
 def main():
-    test_create_mth5()
-    test_create_run_configs()
+    #test_create_mth5()
+    #test_create_run_configs()
     test_process_mth5()
 
 if __name__ == '__main__':

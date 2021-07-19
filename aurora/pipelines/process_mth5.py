@@ -4,6 +4,7 @@ from aurora.pipelines.processing_helpers import calibrate_stft_obj
 from aurora.pipelines.processing_helpers import configure_frequency_bands
 from aurora.pipelines.processing_helpers import process_transfer_functions
 from aurora.pipelines.processing_helpers import run_ts_to_calibrated_stft
+from aurora.pipelines.processing_helpers import run_ts_to_stft
 from aurora.pipelines.processing_helpers import transfer_function_header_from_config
 from aurora.pipelines.processing_helpers import validate_sample_rate
 from aurora.sandbox.processing_config import ProcessingConfig
@@ -38,52 +39,51 @@ def get_remote_stft(config, mth5_obj, run_id):
         remote_stft_obj = None
     return remote_stft_obj
 
-# def process_mth5_decimation_level(processing_cfg, run_id, units="MT"):
-#     """
-#     Processing pipeline for a single decimation_level
-#     Note that we will need a check that the processing config sample rates agree
-#     with the data sampling rates otherwise raise Exception
-#     This method can be single station or remote based on the process cfg
-#     :param processing_cfg:
-#     :return:
-#     """
-#     if isinstance(processing_cfg, Path) or isinstance(processing_cfg, str):
-#         config = ProcessingConfig()
-#         config.from_json(processing_cfg)
-#     elif isinstance(processing_cfg, ProcessingConfig):
-#         config = processing_cfg
-#     else:
-#         print(f"Unrecognized config of type {type(ProcessingConfig)}")
-#         raise Exception
-#
-#
-#     mth5_obj = MTH5()
-#     mth5_obj.open_mth5(config["mth5_path"], mode="r")
-#
-#     local_run_obj = mth5_obj.get_run(config["local_station_id"], run_id)
-#     local_run_ts = local_run_obj.to_runts()
-#     validate_sample_rate(local_run_ts, config)
-#     local_stft_obj = run_ts_to_calibrated_stft(local_run_ts, local_run_obj,
-#                                              config, units=units)
-#
-#     remote_stft_obj = get_remote_stft(config, mth5_obj, run_id)
-#
-#     frequency_bands = configure_frequency_bands(config)
-#     transfer_function_header = transfer_function_header_from_config(config)
-#     transfer_function_obj = TTFZ(transfer_function_header,
-#                                  frequency_bands.number_of_bands)
-#
-#     transfer_function_obj = process_transfer_functions(config,
-#                                                        frequency_bands,
-#                                                        local_stft_obj,
-#                                                        remote_stft_obj,
-#                                                        transfer_function_obj)
-#
-#     transfer_function_obj.apparent_resistivity(units=units)
-#     print(transfer_function_obj.rho.shape)
-#     print(transfer_function_obj.rho[0])
-#     print(transfer_function_obj.rho[-1])
-#     return transfer_function_obj
+
+def prototype_decimate(config, run_run_ts):
+    """
+
+    Parameters
+    ----------
+    config : DecimationConfig object
+    run_run_ts
+
+    Returns
+    -------
+
+    """
+    import numpy as np
+    import scipy.signal as ssig
+    import xarray as xr
+
+    run_obj = run_run_ts["run"]
+    run_xrts = run_run_ts["mvts"]
+    run_obj.metadata.sample_rate = config.sample_rate
+
+    #<Replace with rolling mean, somethng that works with time>
+    # and preferably takes the average time, not the start of th
+    slicer = slice(None, None, config.decimation_factor)
+    downsampled_time_axis = run_xrts.time.data[slicer]
+    #<Replace with rolling mean, somethng that works with time>
+
+    num_observations = len(downsampled_time_axis)
+    channel_labels = list(run_xrts.data_vars.keys()) #run_ts.channels
+    num_channels = len(channel_labels)
+    new_data = np.full((num_observations, num_channels), np.nan)
+    for i_ch, ch_label in enumerate(channel_labels):
+        new_data[:, i_ch] = ssig.decimate(run_xrts[ch_label],
+                                          config.decimation_factor)
+
+
+    xr_da = xr.DataArray(new_data, dims=["time", "channel"],
+                       coords={"time": downsampled_time_axis,
+                               "channel": channel_labels}
+                       )
+
+    xr_ds = xr_da.to_dataset("channel")
+    result = {"run":run_obj, "mvts":xr_ds}
+
+    return result
 
 def process_mth5_decimation_level(config, local, remote, units="MT"):
     """
@@ -104,15 +104,24 @@ def process_mth5_decimation_level(config, local, remote, units="MT"):
 
     """
     local_run_obj = local["run"]
-    local_run_ts = local["mvts"]
-    local_stft_obj = run_ts_to_calibrated_stft(local_run_ts, local_run_obj,
-                                             config, units=units)
+    local_run_xrts = local["mvts"]
+    local_stft_obj = run_ts_to_stft(config, local_run_xrts)
+    local_stft_obj = calibrate_stft_obj(local_stft_obj, local_run_obj,
+                                        units=units)
+    local_stft_obj = local_stft_obj.to_array("channel")
+    print("WHY are we changin to a data array? Maybe only for extract_band?")
+    # local_stft_obj = run_ts_to_calibrated_stft(local_run_ts, local_run_obj,
+    #                                          config, units=units)
     remote_run_obj = remote["run"]
-    remote_run_ts = remote["mvts"]
+    remote_run_xrts = remote["mvts"]
     if config.reference_station_id:
-        remote_stft_obj = run_ts_to_calibrated_stft(remote_run_ts,
-                                                    remote_run_obj,
-                                                    config, units=units)
+        remote_stft_obj = run_ts_to_stft(config, remote_run_xrts)
+        remote_stft_obj = calibrate_stft_obj(remote_stft_obj, remote_run_obj,
+                                            units=units)
+        remote_stft_obj = remote_stft_obj.to_array("channel")
+        # remote_stft_obj = run_ts_to_calibrated_stft(remote_run_ts,
+        #                                             remote_run_obj,
+        #                                             config, units=units)
     else:
         remote_stft_obj = None
 
@@ -170,7 +179,7 @@ def get_data_from_decimation_level_from_mth5(config, mth5_obj, run_id):
     local_run_obj = mth5_obj.get_run(config["local_station_id"], run_id)
     local_run_ts = local_run_obj.to_runts()
     validate_sample_rate(local_run_ts, config)
-    local = {"run":local_run_obj, "mvts":local_run_ts}
+    local = {"run":local_run_obj, "mvts":local_run_ts.dataset}
     # </LOCAL>
 
     # <REMOTE>
@@ -179,10 +188,9 @@ def get_data_from_decimation_level_from_mth5(config, mth5_obj, run_id):
                                           run_id)
         remote_run_ts = remote_run_obj.to_runts()
         validate_sample_rate(remote_run_ts, config)
+        remote = {"run": remote_run_obj, "mvts": remote_run_ts.dataset}
     else:
-        remote_run_obj = None
-        remote_run_ts = None
-    remote = {"run": remote_run_obj, "mvts": remote_run_ts}
+        remote = {"run": None, "mvts": None}
     # </REMOTE>
     return local, remote
 
@@ -205,6 +213,7 @@ def process_mth5_run(run_cfg, run_id, units="MT"):
           f"decimation levels to process: {config.decimation_level_ids}")
     local_run_obj = mth5_obj.get_run(config["local_station_id"], run_id)
     local_run_ts = local_run_obj.to_runts()
+    tf_collection = {}
     #validate_sample_rate(local_run_ts, config)
     for dec_level_id in config.decimation_level_ids:
         print("get a processing config")
@@ -222,18 +231,21 @@ def process_mth5_run(run_cfg, run_id, units="MT"):
                 processing_config, mth5_obj, run_id)
         else:
             print("ADD PROTOTYPE DECIMATION METHOD HERE")
-            pass
-            return
-            # local = prototype_decimate(local)
-            # remote = prototype_decimate(remote)
+            local = prototype_decimate(processing_config, local)
+            if config.reference_station_id:
+                remote = prototype_decimate(processing_config, remote)
 
         # </GET DATA>
 
-        tf_obj = process_mth5_decimation_level(processing_config, local, remote)
+        tf_obj = process_mth5_decimation_level(processing_config, local,
+                                               remote, units=units)
+        tf_collection[dec_level_id] = tf_obj
         from aurora.sandbox.plot_helpers import plot_tf_obj
         plot_tf_obj(tf_obj)
         #<Identify if we need to decimate>
         print("cast to cfg")
+    return tf_collection
+
 
 
 

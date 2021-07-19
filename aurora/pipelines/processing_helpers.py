@@ -42,19 +42,38 @@ def validate_sample_rate(run_ts, config):
         raise Exception
     return
 
-def run_ts_to_calibrated_stft(run_ts, run_obj, config, units="MT"):
-    windowing_scheme = WindowingScheme(
-        taper_family=config.taper_family,
-        num_samples_window=config.num_samples_window,
-        num_samples_overlap=config.num_samples_overlap,
-        sampling_rate=run_ts.sample_rate)
 
-    windowed_obj = windowing_scheme.apply_sliding_window(run_ts.dataset)
+def run_ts_to_stft(config, run_xrts):
+    """
+
+    Parameters
+    ----------
+    config : ShortTimeFourierTransformConfig object
+    run_ts ; mth5.RunTS (but could be replaced by the xr.dataset....)
+
+    Returns
+    -------
+
+    """
+    windowing_scheme = WindowingScheme(
+    taper_family = config.taper_family,
+    num_samples_window = config.num_samples_window,
+    num_samples_overlap = config.num_samples_overlap,
+    sampling_rate = config.sample_rate)
+
+    windowed_obj = windowing_scheme.apply_sliding_window(run_xrts)
     tapered_obj = windowing_scheme.apply_taper(windowed_obj)
     stft_obj = windowing_scheme.apply_fft(tapered_obj)
+    return stft_obj
+
+
+def run_ts_to_calibrated_stft(run_ts, run_obj, config, units="MT"):
+
+    stft_obj = run_ts_to_stft(config, run_ts.dataset)
     stft_obj = calibrate_stft_obj(stft_obj, run_obj, units=units)
 
     stft_obj_xrda = stft_obj.to_array("channel")
+    print("why bother making this an array here?")
     return stft_obj_xrda
 
 def calibrate_stft_obj(stft_obj, run_obj, units="MT"):
@@ -91,6 +110,7 @@ def process_transfer_functions(config, frequency_bands, local_stft_obj,
                                remote_stft_obj, transfer_function_obj):
     for i_band in range(frequency_bands.number_of_bands):
         band = frequency_bands.band(i_band)
+        #expecitng dataArray as local_stft_obj
         band_dataarray = extract_band(band, local_stft_obj)
         band_dataset = band_dataarray.to_dataset("channel")
         X = band_dataset[config.input_channels]

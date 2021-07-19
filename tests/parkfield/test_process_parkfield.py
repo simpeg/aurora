@@ -1,5 +1,4 @@
 from pathlib import Path
-from aurora.pipelines.process_mth5 import process_mth5_decimation_level
 from aurora.sandbox.plot_helpers import plot_tf_obj
 
 
