@@ -383,6 +383,7 @@ class WindowingScheme(ApodizationWindow):
             print(f"scaling of {type(data)} not yet supported")
             raise Exception
         return dataset
+
 #<PROPERTIES THAT NEED SAMPLING RATE>
 #these may be moved elsewhere later
     @property
@@ -448,7 +449,8 @@ def fft_xr_ds(dataset, sample_rate, one_sided=True, detrend_type="linear"):
     TODO: Review nf_sjvk
     """
     import numpy as np
-    #for each DataArray in the Dataset, we will apply fft along the within-window-time axis.
+    #for each DataArray in the Dataset, we will apply fft along the
+    # within-window-time axis.
     #SET AXIS:
     operation_axis = 1
     output_ds = xr.Dataset()
@@ -467,9 +469,9 @@ def fft_xr_ds(dataset, sample_rate, one_sided=True, detrend_type="linear"):
         #if np.mod(samples_per_window, 2) == 0:
         #    harmonic_frequencies[-1] *= -1
         ##Nyquist is negative
-    for key in dataset.keys():
-        print(f"key {key}")
-        data = dataset[key].data
+    for channel_id in dataset.keys():
+        print(f"channel_id {channel_id}")
+        data = dataset[channel_id].data
         window_means = data.mean(axis=operation_axis)
         demeaned_data = (data.T - window_means).T
         if detrend_type: #neither False nor None
@@ -489,5 +491,5 @@ def fft_xr_ds(dataset, sample_rate, one_sided=True, detrend_type="linear"):
         xrd = xr.DataArray(fspec_array, dims=["time", "frequency"],
                            coords={"frequency": harmonic_frequencies,
                                    "time": dataset.time.data})
-        output_ds.update({key:xrd})
+        output_ds.update({channel_id:xrd})
     return output_ds

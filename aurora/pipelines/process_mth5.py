@@ -218,15 +218,14 @@ def process_mth5_run(run_cfg, run_id, units="MT"):
     for dec_level_id in config.decimation_level_ids:
         print("get a processing config")
         processing_config = config.decimation_level_configs[dec_level_id]
-
+        processing_config.local_station_id = config.local_station_id
+        processing_config.reference_station_id = config.reference_station_id
         # <GET DATA>
         # Careful here -- for multiple station processing we will need to load
         # many time series' here.  Will probably have another version of
         # process_mth5_run for MMT
 
         if dec_level_id == 0:
-            processing_config.local_station_id = config.local_station_id
-            processing_config.reference_station_id = config.reference_station_id
             local, remote = get_data_from_decimation_level_from_mth5(
                 processing_config, mth5_obj, run_id)
         else:
