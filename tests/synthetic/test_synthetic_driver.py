@@ -26,7 +26,7 @@ def test_create_run_configs():
 def process_synthetic_1():
     test_config = Path("config", "test1_run_config.json")
     run_id = "001"
-    process_mth5_run(test_config, run_id, units="MT")
+    tf_collection = process_mth5_run(test_config, run_id, units="MT")
     print("RETURN TF OBJ AND PLOT ENMASSE ONCE MULTIDEC IS RUNNING")
 
 def process_synthetic_2():
@@ -42,8 +42,8 @@ def process_synthetic_rr12():
 
 def test_process_mth5():
     process_synthetic_1()
-    process_synthetic_2()
-    process_synthetic_rr12()
+    #process_synthetic_2()
+    #process_synthetic_rr12()
 
 def main():
     #test_create_mth5()

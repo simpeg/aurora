@@ -97,8 +97,8 @@ class FrequencyBand(Interval):
         Parameters
         ----------
         frequencies: numpy array
-            Intended to represent the one-sided frequency axis of the data
-            that has been FFT-ed
+            Intended to represent the one-sided (positive) frequency axis of
+            the data that has been FFT-ed
 
         Returns
         -------
@@ -149,9 +149,38 @@ class FrequencyBands(object):
     is not a general solution.  There is no reason to force the user to have
     bands that abutt one another.  Therefore, changing to stop supporting
     band_edges 1-D array.  band_edges will need to be a 2d array.  n_bands, 2
+
+    20210720: In fact, it would be more general, and explicit to pass a
+    vector of lower_bound_edges and upper_bound_edges.  Also, there should be
+    other ways to populate this class, for example by passing it frequency_band
+    objects, self.append(frequency_band).  However, that opens the door for
+    overlapping frequency bands which in general are not well ordered without
+    choosing an order operation (band center would be a good one - but then
+    we may have non-unique band centers!)  However, this should be quite
+    rare, and I am not actually sure it is possible to get the same center
+    frequency if we are using logarithmic band centers.  The only issue with
+    an append method is that after we append a band, we will need to perform
+    an ordering/sorting on individual band edges.
+
+
+    To add complexity, another use
+    case maybe that we wish to support bands with gaps at certain harmonics,
+    the way this is currently set up, all harmonics between the lower_bound
+    and the upper bounds are considered to be part of the band, but if we
+    have a known "bad harmonic" or several noisy harmoincs within a band
+    there is currently no way using somple FrequencyBand objects that we can
+    excise these harmonics.  We could add a "ignore" list of either
+    frequencies, bands or harmonics, but that is for later.
     """
 
     def __init__(self, **kwargs):
+        """
+
+        Parameters
+        ----------
+        kwargs
+        band_edges: 2d numpy array
+        """
         self.gates = None
         self.band_edges = kwargs.get("band_edges", None)
         #self.bands = OrderedDict()
@@ -160,6 +189,36 @@ class FrequencyBands(object):
     @property
     def number_of_bands(self):
         return self.band_edges.shape[0]
+
+    def validate(self):
+        """
+        placeholder for sanity checks.
+        Main reason this is here is in anticipation of supporting an append()
+        method to this class that accepts FrequencyBand objects.  In that
+        case we would like to re-order the band edges
+        Returns
+        -------
+
+        """
+        band_centers = self.band_centers()
+
+        #check band centers are monotonically increasing
+        monotone_condition = np.all(band_centers[1:] > band_centers[:-1])
+        if monotone_condition:
+            pass
+        else:
+            print("Band Centers are Not Monotonic.  This probably means that "
+                  "the bands are being defined in an adhoc / on the fly way")
+            print("This condition untested 20210720")
+            print("Attempting to reorganize bands")
+            #use np.argsort to rorganize the bands
+            self.band_edges = self.band_edges[np.argsort(band_centers),:]
+
+        #check other conditions?:
+
+        return
+
+
 
     def bands(self):
         """
@@ -186,6 +245,28 @@ class FrequencyBands(object):
                                        )
 
         return frequency_band
+
+    def band_centers(self, frequency_or_period="frequency"):
+        """
+        Parameters
+        ----------
+        frequency_or_period : str
+        "frequency" or "period" determines if the vector of band centers is
+        returned in "Hz" or "s"
+
+        Returns
+        -------
+        band_centers : numpy array
+            center frequencies of the bands in Hz or in s
+
+        """
+        band_centers = np.full(self.number_of_bands, np.nan)
+        for i_band in range(self.number_of_bands):
+            frequency_band = self.band(i_band)
+            band_centers[i_band] = frequency_band.center_frequency
+        if frequency_or_period == "period":
+            band_centers = 1./band_centers
+        return band_centers
 
     def from_emtf_band_setup(self, filepath, decimation_level, sampling_rate,
                              num_samples_window):

@@ -27,8 +27,8 @@ def configure_frequency_bands(config):
 def transfer_function_header_from_config(config):
     transfer_function_header = TransferFunctionHeader(
         processing_scheme=config.estimation_engine,
-        local_site=config.local_station_id,
-        remote_site=config.reference_station_id,
+        local_station_id=config.local_station_id,
+        reference_station_id=config.reference_station_id,
         input_channels=config.input_channels,
         output_channels=config.output_channels,
         reference_channels=config.reference_channels)

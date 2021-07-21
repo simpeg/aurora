@@ -33,28 +33,38 @@ class TransferFunctionHeader(object):
             These are the channels being used from the RR station. This is a
             channel list -- usually [?, ?]
         processing_scheme: str
-            One of "single station" or "remote reference".  Future versions
-            will include , "multivariate array", "multiple remote",
+            Denotes the regression engine used to estimate the transfer
+            function.  One of "OLS" or "RME", "RME_RR.  Future
+            versions could include , "multivariate array", "multiple remote",
             etc.
 
         """
-        self.processing_scheme = kwargs.get("processing_scheme",
-                                            "single_station")
+        self.processing_scheme = kwargs.get("processing_scheme", None)
         self._local_station = kwargs.get("local_station", None)
-        self.remote_site = kwargs.get("remote_site", None)
+        self._reference_station = kwargs.get("reference_station", None)
         self.input_channels = kwargs.get("input_channels", ["hx", "hy"])
         self.output_channels = kwargs.get("output_channels", ["ex", "ey"])
         self.reference_channels = kwargs.get("reference_channels", [])
         self.user_meta_data = None #placeholder for anything
-        #<ByPass mt_metadata classes>
-        self._local_station_id = kwargs.get("local_station_id", None)
 
+        # <ByPass mt_metadata classes>
+        self._local_station_id = kwargs.get("local_station_id", None)
+        self._reference_station_id = kwargs.get("local_station_id", None)
+        # </ByPass mt_metadata classes>
     @property
     def local_station_id(self):
         try:
             station_id = self.local_station.id
         except:
             station_id = self._local_station_id
+        return station_id
+
+    @property
+    def reference_station_id(self):
+        try:
+            station_id = self.reference_station.id
+        except:
+            station_id = self._reference_station_id
         return station_id
 
     @property

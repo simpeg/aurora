@@ -213,13 +213,14 @@ def process_mth5_run(run_cfg, run_id, units="MT"):
           f"decimation levels to process: {config.decimation_level_ids}")
     local_run_obj = mth5_obj.get_run(config["local_station_id"], run_id)
     local_run_ts = local_run_obj.to_runts()
-    tf_collection = {}
+    tf_dict = {}
     #validate_sample_rate(local_run_ts, config)
     for dec_level_id in config.decimation_level_ids:
         print("get a processing config")
         processing_config = config.decimation_level_configs[dec_level_id]
         processing_config.local_station_id = config.local_station_id
         processing_config.reference_station_id = config.reference_station_id
+
         # <GET DATA>
         # Careful here -- for multiple station processing we will need to load
         # many time series' here.  Will probably have another version of
@@ -229,7 +230,6 @@ def process_mth5_run(run_cfg, run_id, units="MT"):
             local, remote = get_data_from_decimation_level_from_mth5(
                 processing_config, mth5_obj, run_id)
         else:
-            print("ADD PROTOTYPE DECIMATION METHOD HERE")
             local = prototype_decimate(processing_config, local)
             if config.reference_station_id:
                 remote = prototype_decimate(processing_config, remote)
@@ -238,11 +238,13 @@ def process_mth5_run(run_cfg, run_id, units="MT"):
 
         tf_obj = process_mth5_decimation_level(processing_config, local,
                                                remote, units=units)
-        tf_collection[dec_level_id] = tf_obj
+        tf_dict[dec_level_id] = tf_obj
         from aurora.sandbox.plot_helpers import plot_tf_obj
         plot_tf_obj(tf_obj)
-        #<Identify if we need to decimate>
         print("cast to cfg")
+    from aurora.transfer_function.transfer_function_collection import TransferFunctionCollection
+    tf_collection = TransferFunctionCollection(header=tf_obj.tf_header,
+                                               tf_dict=tf_dict)
     return tf_collection
 
 
