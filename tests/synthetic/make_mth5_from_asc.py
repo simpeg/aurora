@@ -50,6 +50,8 @@ def create_run_ts_from_station_config(cfg, df):
                              channel_metadata=meta_dict)
             # add metadata to the channel here
             chts.channel_metadata.dipole_length = 50
+            if col == "ey":
+                chts.channel_metadata.measurement_azimuth = 90.0
 
 
         elif col in ["hx", "hy", "hz"]:
@@ -59,6 +61,8 @@ def create_run_ts_from_station_config(cfg, df):
                          }
             chts = ChannelTS(channel_type="magnetic", data=data,
                              channel_metadata=meta_dict)
+            if col == "hy":
+                chts.channel_metadata.measurement_azimuth = 90.0
 
         ch_list.append(chts)
 
@@ -93,8 +97,10 @@ def create_mth5_synthetic_file(station_cfg, plot=False):
     m = MTH5()
     m.open_mth5(station_cfg["mth5_path"], mode="w")
     station_group = m.add_station(station_cfg["station_id"])
+
     run_group = station_group.add_run(station_cfg["run_id"])
     run_group.from_runts(runts)
+
     #add filters
     for fltr in ACTIVE_FILTERS:
         cf_group = m.filters_group.add_filter(fltr)

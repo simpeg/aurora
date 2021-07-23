@@ -194,7 +194,8 @@ def get_data_from_decimation_level_from_mth5(config, mth5_obj, run_id):
     # </REMOTE>
     return local, remote
 
-def process_mth5_run(run_cfg, run_id, units="MT"):
+def process_mth5_run(run_cfg, run_id, units="MT", show_plot=True,
+                     z_file_path=None):
     """
     Stages here:
     1. Read in the config and figure out how many decimation levels there are
@@ -239,12 +240,16 @@ def process_mth5_run(run_cfg, run_id, units="MT"):
         tf_obj = process_mth5_decimation_level(processing_config, local,
                                                remote, units=units)
         tf_dict[dec_level_id] = tf_obj
-        from aurora.sandbox.plot_helpers import plot_tf_obj
-        plot_tf_obj(tf_obj)
-        print("cast to cfg")
+        if show_plot:
+            from aurora.sandbox.plot_helpers import plot_tf_obj
+
+            plot_tf_obj(tf_obj, out_filename="out")
+
     from aurora.transfer_function.transfer_function_collection import TransferFunctionCollection
     tf_collection = TransferFunctionCollection(header=tf_obj.tf_header,
                                                tf_dict=tf_dict)
+    if z_file_path:
+        tf_collection.write_emtf_z_file(z_file_path, run_obj=local_run_obj)
     return tf_collection
 
 

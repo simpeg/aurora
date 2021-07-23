@@ -25,8 +25,14 @@ def test_create_run_configs():
 
 def process_synthetic_1():
     test_config = Path("config", "test1_run_config.json")
+    z_file_path = Path("test1_aurora.zss")
+    z_file_path = z_file_path.absolute()
     run_id = "001"
-    tf_collection = process_mth5_run(test_config, run_id, units="MT")
+    tf_collection = process_mth5_run(test_config, run_id, units="MT",
+                                     show_plot=True,
+                                     z_file_path=z_file_path)
+    #z_file_path = Path("test1_aurora.zss")
+    #tf_collection.write_emtf_z_file("test1_aurora.zss")
     print("RETURN TF OBJ AND PLOT ENMASSE ONCE MULTIDEC IS RUNNING")
 
 def process_synthetic_2():
@@ -41,6 +47,7 @@ def process_synthetic_rr12():
 
 
 def test_process_mth5():
+    create_mth5_synthetic_file(STATION_01_CFG, plot=False)
     process_synthetic_1()
     #process_synthetic_2()
     #process_synthetic_rr12()

@@ -68,12 +68,20 @@ class TransferFunctionHeader(object):
         return station_id
 
     @property
+    def local_station(self):
+        return self._local_station
+
+    @property
     def num_input_channels(self):
         return len(self.input_channels)
 
     @property
     def num_output_channels(self):
         return len(self.output_channels)
+
+    @property
+    def local_channels(self):
+        return self.input_channels + self.output_channels
 
     #<TO BE DEPRECATED>
     def array_header_to_tf_header(self, array_header, sites):
