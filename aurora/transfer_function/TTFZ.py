@@ -19,8 +19,8 @@ class TTFZ(TransferFunction):
     phi
     phi_se
     """
-    def __init__(self, *args):
-        super(TTFZ, self).__init__(*args)
+    def __init__(self, *args, **kwargs):
+        super(TTFZ, self).__init__(*args, **kwargs)
 
 
     def apparent_resistivity(self, units="SI"):

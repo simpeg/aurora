@@ -8,7 +8,7 @@ Note that a single transfer function object is associated with a station,
 which we call the "local_station".  In a database of TFs we could add a column
 for local_station and one for reference station.
 """
-
+import numpy as np
 from aurora.transfer_function.emtf_z_file_helpers import make_orientation_block_of_z_file
 
 EMTF_REGRESSION_ENGINE_LABELS = {}
@@ -102,17 +102,27 @@ class TransferFunctionCollection(object):
         # depending on 2 or 3 channels.
         for i_dec in self.tf_dict.keys():
             tf = self.tf_dict[i_dec]
-            for period in tf.periods:
-                print(f"Period {period}")
-                line1 = f"period :      {period}    "
+            periods = tf.frequency_bands.band_centers(frequency_or_period="period")
+            periods = np.flip(periods) #EMTF works in increasing period
+            #for i_period, period in periods:
+            for i_band, band in enumerate(tf.frequency_bands.bands()):
+                print(i_band, band)
+                line1 = f"period :      {band.center_period:.5f}    "
                 line1 += f"decimation level   {i_dec+1}:    "
-                print("we need a mapping from the frequency_bands object to "
-                      "the indices of the harmonics")
-                print("Need access to the FrequencyBands object for this")
-                #this can be done via the FrequencyBands object.
-                #can we access it?
-                #we need the config
-                #line1 += f"freq. band from    {} to {}\n"
+                #<Make a method of processing config?>
+                freqs = num_frequencies_str = np.fft.fftfreq(
+                    tf.processing_config.num_samples_window, 1./tf.processing_config.sample_rate)
+                fc_indices = band.fourier_coefficient_indices(freqs)
+                #<Make a method of processing config?>
+                fc_indices_str = f"{fc_indices[0]} to   {fc_indices[-1]}"
+                line1 += f"freq. band from   {fc_indices_str}\n"
+                print("TF DICT")
+                # self.tf_dict[0].num_segments
+                # array([[622., 1244., 1244., 1866., 1866., 2488., 3110., 3732.,
+                #         4354., 4976., 5598.],
+                #        [622., 1244., 1244., 1866., 1866., 2488., 3110., 3732.,
+                #         4354., 4976., 5598.]])
+                # line2 = number of data point    309 sampling freq.   0.250 Hz
             pass
         #    for
         #     period :      4.65455    decimation level   1    freq. band from   25 to   30

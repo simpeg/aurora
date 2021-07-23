@@ -63,7 +63,7 @@ class TransferFunction(object):
     Nout
     Nin
     """
-    def __init__(self, tf_header, frequency_bands):
+    def __init__(self, tf_header, frequency_bands, **kwargs):
         """
         change 2021-07-23 to require a frequency_bands object.  We may want
         to just pass the band_edges.  I'm not a fan of forcing dependency of
@@ -86,7 +86,8 @@ class TransferFunction(object):
         self.Cov_NN = None
         self.R2 = None
         self.initialized = False
-        self.processing_config = None
+        self.processing_config = kwargs.get("processing_config", None)
+        self.num_segments
         if self.tf_header is not None:
             if self.num_bands is not None:
                 self._initialize_arrays()

@@ -220,14 +220,18 @@ class FrequencyBands(object):
 
 
 
-    def bands(self):
+    def bands(self, direction="increasing_period"):
         """
         make this a generator for iteration over bands
         Returns
         -------
 
         """
-        raise NotImplementedError
+        band_indices = range(self.number_of_bands)
+        if direction=="increasing_period":
+            band_indices = np.flip(band_indices)
+        return (self.band(i_band) for i_band in band_indices)
+        #raise NotImplementedError
 
     def band(self, i_band):
         """

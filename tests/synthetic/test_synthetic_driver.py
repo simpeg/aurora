@@ -29,7 +29,7 @@ def process_synthetic_1():
     z_file_path = z_file_path.absolute()
     run_id = "001"
     tf_collection = process_mth5_run(test_config, run_id, units="MT",
-                                     show_plot=True,
+                                     show_plot=False,
                                      z_file_path=z_file_path)
     #z_file_path = Path("test1_aurora.zss")
     #tf_collection.write_emtf_z_file("test1_aurora.zss")
