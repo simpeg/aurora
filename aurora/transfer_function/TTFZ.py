@@ -4,9 +4,10 @@ iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_1
 """
 import numpy as np
 
-from aurora.transfer_function.TTF import TTF
+#from aurora.transfer_function.TTF import TTF
+from aurora.transfer_function.base import TransferFunction
 
-class TTFZ(TTF):
+class TTFZ(TransferFunction):
     """
     subclass to support some more MT impedance specficic functions  --
     initially just apparent resistivity and pbase for diagonal elements

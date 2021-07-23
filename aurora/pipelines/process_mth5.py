@@ -129,7 +129,7 @@ def process_mth5_decimation_level(config, local, remote, units="MT"):
     frequency_bands = configure_frequency_bands(config)
     transfer_function_header = transfer_function_header_from_config(config)
     transfer_function_obj = TTFZ(transfer_function_header,
-                                 frequency_bands.number_of_bands)
+                                 frequency_bands)
 
     transfer_function_obj = process_transfer_functions(config,
                                                        frequency_bands,

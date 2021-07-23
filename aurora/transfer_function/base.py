@@ -4,27 +4,36 @@ iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_1
 
 2021-07-02 Removed some prototype methods intended to edit specific station data
 when many stations are being processed.  MMT methods to be addressed later.
+
+2021-07-20: Addressing Issue #12.  If we are going to use xarray it is
+tempting to use the frequency band centers as the axis for the arrays
+here, rather than simple integer indexing.  This has the advantage of
+making the data structures more explicit and self describing.  We can also
+continue to use integer indices to assign and access tf values if needed.
+However, one concern I have is that if we use floating point numbers for the
+frequencies (or periods) we run the risk of machine roundoff error giving
+problems down stream.  One way around this is to add a .band_centers()
+methdd to FrequencyBands() which will provide is a list of band centers and
+then rather than access by the band center, we can use an access method that
+gets us the frequencies between the band_egdes, which will be a unique frequency
+... however, if we use overlapping bands this will in general get complicated.
+However, for an MT TF representation, we do not in general use overlapping
+bands.  A reasonably general, and simple solution is to make FrequencyBands
+support an iterable of bands, accessable by integer position, and by center
+frequency.
 """
 
 import numpy as np
 import xarray as xr
 
 
-class TTF(object):
+class TransferFunction(object):
     """
     Class to contain transfer function array.
+    2021-07-21: adding processing_config so that it lives with this object.
+    This will facilitate the writing of z-files if we use a band setup file
+    that is not of EMTF style
 
-    Supports full covariance, arbitrary number of input / output
-    channels (but for MT  # input channels = Nin is always 2!)
-
-    Instantiated with no arguments or 2. When there are 2, these must be:
-    TTF(NBands,Header).
-
-    Example:
-    Zxx = Z(1, 1, Period)
-    Zxy = Z(1, 2, Period)
-    Zyx = Z(2, 1, Period)
-    Zyy = Z(2, 2, Period)
 
     Parameters:
     TF : numpy array
@@ -54,12 +63,22 @@ class TTF(object):
     Nout
     Nin
     """
-    def __init__(self, tf_header, num_bands):
+    def __init__(self, tf_header, frequency_bands):
+        """
+        change 2021-07-23 to require a frequency_bands object.  We may want
+        to just pass the band_edges.  I'm not a fan of forcing dependency of
+        TF on the FrequencyBands class, but it will simplify writting the z_file
+        interfaces.  The old TTF.py class shows an example that just accepted
+        num_bands as an initialation variable.
+
+        Parameters
+        ----------
+        tf_header
+        frequency_bands
+        """
         print("TODO: change self.T to self.period")
         self.tf_header = tf_header
-        self.num_bands = num_bands #it would be nice if this was a property
-        # that depended on some other attr of the processing scheme... surely
-        # this number is already known-- it comes from the data being processed
+        self.frequency_bands = frequency_bands
         self.T = None # replace with periods
         self.num_segments = None
         #self.periods = None
@@ -67,14 +86,31 @@ class TTF(object):
         self.Cov_NN = None
         self.R2 = None
         self.initialized = False
+        self.processing_config = None
         if self.tf_header is not None:
             if self.num_bands is not None:
                 self._initialize_arrays()
 
-
+    @property
+    def num_bands(self):
+        #temporary function to allow access to old property num_bands used in
+        # the matlab codes for initialization
+        return self.frequency_bands.number_of_bands
 
     def _initialize_arrays(self):
         """
+        There are four separate data strucutres, indexed by period here:
+
+        TF (num_channels_out, num_channels_in)
+        Cov_SS (num_channels_in, num_channels_in),
+        Cov_NN (num_channels_out, num_channels_out),
+        R2 num_channels_out)
+
+        We use frequency in Fourier domain and period in TF domain.  Might
+        be better to be consistent.  It would be inexpensive to duplicate
+        the axis and simply provide both.
+
+        Each of these is indexed by period (or frequency)
         TODO: These may be better cast as xarrays.  Review after curves up
         and running
 
@@ -129,7 +165,7 @@ class TTF(object):
         BandAveragingScheme() class will
         """
         if self.TF is None:
-            print('Initialize TTF obect before calling setTF')
+            print('Initialize TransferFunction obect before calling setTF')
             raise Exception
 
         n_data = regression_estimator.n_data #use the class
@@ -177,7 +213,7 @@ def test_ttf():
     from iris_mt_scratch.sandbox.transfer_function.transfer_function_header \
         import TransferFunctionHeader
     tfh = TransferFunctionHeader()
-    ttf = TTF(tfh, 32)
+    ttf = TransferFunction(tfh, 32)
     ttf.set_tf(1,2,3)
 
 def main():
