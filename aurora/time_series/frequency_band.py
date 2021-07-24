@@ -220,7 +220,7 @@ class FrequencyBands(object):
 
 
 
-    def bands(self, direction="increasing_period"):
+    def bands(self, direction="increasing_frequency"):
         """
         make this a generator for iteration over bands
         Returns

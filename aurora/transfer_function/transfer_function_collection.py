@@ -57,7 +57,7 @@ class TransferFunctionCollection(object):
         except:
             processing_scheme = self.header.processing_scheme
         f.writelines(f"{processing_scheme}\n")
-        f.writelines(f"station: {self.header.local_station_id}\n")
+        f.writelines(f"station    :{self.header.local_station_id}\n")
         # </processing scheme>
 
         # <location>
@@ -102,10 +102,15 @@ class TransferFunctionCollection(object):
         # depending on 2 or 3 channels.
         for i_dec in self.tf_dict.keys():
             tf = self.tf_dict[i_dec]
+            tf_xr = tf.to_xarray()
+            cov_ss_xr = tf.cov_ss_to_xarray()
+            cov_nn_xr = tf.cov_nn_to_xarray()
             periods = tf.frequency_bands.band_centers(frequency_or_period="period")
             periods = np.flip(periods) #EMTF works in increasing period
             #for i_period, period in periods:
-            for i_band, band in enumerate(tf.frequency_bands.bands()):
+            for i_band, band in enumerate(tf.frequency_bands.bands(
+                    direction="increasing_period")):
+
                 print(i_band, band)
                 line1 = f"period :      {band.center_period:.5f}    "
                 line1 += f"decimation level   {i_dec+1}:    "
@@ -116,13 +121,55 @@ class TransferFunctionCollection(object):
                 #<Make a method of processing config?>
                 fc_indices_str = f"{fc_indices[0]} to   {fc_indices[-1]}"
                 line1 += f"freq. band from   {fc_indices_str}\n"
-                print("TF DICT")
-                # self.tf_dict[0].num_segments
-                # array([[622., 1244., 1244., 1866., 1866., 2488., 3110., 3732.,
-                #         4354., 4976., 5598.],
-                #        [622., 1244., 1244., 1866., 1866., 2488., 3110., 3732.,
-                #         4354., 4976., 5598.]])
-                # line2 = number of data point    309 sampling freq.   0.250 Hz
+                f.writelines(line1)
+                freq_index = tf.frequency_index(band.center_frequency)
+                num_segments = tf.num_segments.data[0, freq_index]
+                line2 = f"number of data point    {num_segments} "
+                line2 += f"sampling freq.   {tf.processing_config.sample_rate} Hz\n"
+                f.writelines(line2)
+
+
+                f.writelines(f"  Transfer Functions\n")
+                #write the tf:
+                #rows are output channels (hz, ex, ey), cols are input
+                # channels (hx, hy)
+                period_index = tf.period_index(band.center_period)
+                line = ""
+                for out_ch in tf.tf_header.output_channels:
+                    for inp_ch in tf.tf_header.input_channels:
+                        print(out_ch, inp_ch)
+                        chchtf = tf_xr.loc[out_ch, inp_ch, :]
+
+                        line += f"{np.real(chchtf.data[period_index]):.5f}  "
+                        line += f"{np.imag(chchtf.data[period_index]):.5f}  "
+                    line += "\n"
+                f.writelines(line)
+
+
+                f.writelines(f"    Inverse Coherent Signal Power Matrix\n")
+                line = ""
+                for i, inp_ch1 in enumerate(tf.tf_header.input_channels):
+                    for inp_ch2 in tf.tf_header.input_channels[:i+1]:
+                        cond1 = cov_ss_xr.input_channel_1 == inp_ch1
+                        cond2 = cov_ss_xr.input_channel_2 == inp_ch2
+                        chchss = cov_ss_xr.where(cond1 & cond2, drop=True)
+                        chchss = chchss.data.squeeze()
+                        line += f"{chchss.data[period_index]:.5f}  "
+                    line += "\n"
+                f.writelines(line)
+
+                f.writelines(f"  Residual Covariance\n")
+                line = ""
+                for i, out_ch1 in enumerate(tf.tf_header.output_channels):
+                    for out_ch2 in tf.tf_header.output_channels[:i+1]:
+                        cond1 = cov_nn_xr.output_channel_1 == out_ch1
+                        cond2 = cov_nn_xr.output_channel_2 == out_ch2
+                        chchnn = cov_nn_xr.where(cond1 & cond2, drop=True)
+                        chchnn = chchnn.data.squeeze()
+                        line += f"{chchnn.data[period_index]:.5f}  "
+                    line += "\n"
+                f.writelines(line)
+
             pass
         #    for
         #     period :      4.65455    decimation level   1    freq. band from   25 to   30

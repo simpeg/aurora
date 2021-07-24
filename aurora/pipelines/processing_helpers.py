@@ -108,8 +108,8 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT"):
 
 def process_transfer_functions(config, frequency_bands, local_stft_obj,
                                remote_stft_obj, transfer_function_obj):
-    for i_band in range(frequency_bands.number_of_bands):
-        band = frequency_bands.band(i_band)
+    for i_band, band in enumerate(frequency_bands.bands()):
+        print(i_band, band.center_period)
         #expecitng dataArray as local_stft_obj
         band_dataarray = extract_band(band, local_stft_obj)
         band_dataset = band_dataarray.to_dataset("channel")
