@@ -97,8 +97,11 @@ def create_mth5_synthetic_file(station_cfg, plot=False):
     m = MTH5()
     m.open_mth5(station_cfg["mth5_path"], mode="w")
     station_group = m.add_station(station_cfg["station_id"])
-
+    station_group.metadata.location.latitude = station_cfg["latitude"]
+    print("DEBUG: casting latitude in the above line does not wind up being "
+          "in the run")
     run_group = station_group.add_run(station_cfg["run_id"])
+    run_group.station_group.metadata.location.latitude = station_cfg["latitude"]
     run_group.from_runts(runts)
 
     #add filters

@@ -47,6 +47,7 @@ for col in STATION_01_CFG["columns"]:
 STATION_01_CFG["run_id"] = "001"
 STATION_01_CFG["station_id"] = "test1"
 STATION_01_CFG["sample_rate"] = 1.0
+STATION_01_CFG["latitude"] = 17.996
 
 STATION_02_CFG = STATION_01_CFG.copy()
 STATION_02_CFG["raw_data_path"] = Path("data","test2.asc")
