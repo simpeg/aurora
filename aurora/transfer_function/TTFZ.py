@@ -90,11 +90,11 @@ class TTFZ(TransferFunction):
 
 
 def test_ttfz():
-    from iris_mt_scratch.sandbox.transfer_function.transfer_function_header \
+    from aurora.transfer_function.transfer_function_header \
         import TransferFunctionHeader
     tfh = TransferFunctionHeader()
     ttfz = TTFZ(tfh, 32)
-    ttfz.set_tf(1,2,3)
+
 
 def main():
     test_ttfz()
