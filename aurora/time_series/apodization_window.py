@@ -105,7 +105,7 @@ class ApodizationWindow(object):
         self.taper_family = kwargs.get('taper_family', 'boxcar')
         self._num_samples_window = kwargs.get('num_samples_window', 0)
         self._taper = kwargs.get('taper', np.empty(0))
-        self.additional_args = kwargs.get('additional_args', {})
+        self.additional_args = kwargs.get('taper_additional_args', {})
 
         self._coherent_gain = None
         self._nenbw = None
@@ -217,9 +217,13 @@ def test_can_inititalize_apodization_window():
     print(apodization_window.summary)
     apodization_window = ApodizationWindow(taper_family='blackmanharris', num_samples_window=256)
     print(apodization_window.summary)
-    apodization_window = ApodizationWindow(taper_family='kaiser', num_samples_window=128, additional_args={"beta":8})
+    apodization_window = ApodizationWindow(taper_family='kaiser',
+                                           num_samples_window=128,
+                                           taper_additional_args={"beta":8})
     print(apodization_window.summary)
-    apodization_window = ApodizationWindow(taper_family='slepian', num_samples_window=64, additional_args={"width":0.3})
+    apodization_window = ApodizationWindow(taper_family='dpss',
+                                           num_samples_window=64,
+                                           taper_additional_args={"alpha":3})
     print(apodization_window.summary)
     apodization_window = ApodizationWindow(taper_family='custom', num_samples_window=64,
                                            taper=np.abs(np.random.randn(64)))

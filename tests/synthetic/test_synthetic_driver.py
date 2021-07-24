@@ -47,7 +47,8 @@ def process_synthetic_rr12():
 
 
 def test_process_mth5():
-    create_mth5_synthetic_file(STATION_01_CFG, plot=False)
+    #create_mth5_synthetic_file(STATION_01_CFG, plot=False)
+    create_run_config_for_test_case("test1")
     process_synthetic_1()
     #process_synthetic_2()
     #process_synthetic_rr12()

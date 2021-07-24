@@ -59,6 +59,7 @@ def run_ts_to_stft(config, run_xrts):
     taper_family = config.taper_family,
     num_samples_window = config.num_samples_window,
     num_samples_overlap = config.num_samples_overlap,
+    taper_additional_args=config.taper_additional_args,
     sampling_rate = config.sample_rate)
 
     windowed_obj = windowing_scheme.apply_sliding_window(run_xrts)

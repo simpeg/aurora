@@ -38,8 +38,8 @@ class ProcessingConfig(BaseDict):
         # self.spectral_transform_config = {}
         # spectral_transform_config["taper_family"] = "hamming"
         
-        self.taper_family = "hamming"
-        self.taper_additional_args = {}
+        self.taper_family = "dpss"
+        self.taper_additional_args = {"alpha":3.0}
         self.num_samples_window = 256
         self.num_samples_overlap = int(self.num_samples_window*3./4)
         self.sample_rate = 0.0
