@@ -79,9 +79,7 @@ class TransferFunction(object):
         print("TODO: change self.T to self.period")
         self.tf_header = tf_header
         self.frequency_bands = frequency_bands
-        self.T = None # replace with periods
         self.num_segments = None
-        #self.periods = None
         self.Cov_SS = None
         self.Cov_NN = None
         self.R2 = None
@@ -121,7 +119,6 @@ class TransferFunction(object):
 
         """
         if self.tf_header is not None:
-            self.T =  np.zeros(self.num_bands)
             self.TF = np.zeros((self.num_channels_out, self.num_channels_in,
                                self.num_bands), dtype=np.complex128)
             # <make num_segments an xarray>
@@ -143,6 +140,11 @@ class TransferFunction(object):
                                    self.num_channels_out, self.num_bands))
             self.R2 = np.zeros((self.num_channels_out, self.num_bands))
             self.initialized = True
+
+    @property
+    def T(self):
+        return self.frequency_bands.band_centers(
+            frequency_or_period="period")
 
     @property
     def periods(self):
@@ -212,17 +214,14 @@ class TransferFunction(object):
                                    "period": self.T})
         return xra
 
-    def set_tf(self, i_band, regression_estimator, T):
+    def set_tf(self, regression_estimator, period):
         """
         This sets TF elements for one band, using contents of TRegression
         object.  This version assumes there are estimates for Nout output
         channels
-        TODO: can we get away from the integer i_band index and obtain the
-        integer from a band_object? Please
-        TODO: i_band and T are not independent and not both needed here. A
-        BandAveragingScheme() class will
+
         """
-        frequency_index = self.frequency_index(1./T)
+        index = self.period_index(period)
         if self.TF is None:
             print('Initialize TransferFunction obect before calling setTF')
             raise Exception
@@ -233,18 +232,17 @@ class TransferFunction(object):
         # if any(size(TRegObj.b)~=[obj.Nin obj.Nout])
         #     error('Regression object not consistent with declared dimensions of TF')
         #     raise Exception
-        self.T[i_band] = T;
-        self.TF[:,:, i_band] = regression_estimator.b.T #check dims are consitent
+        self.TF[:,:, index] = regression_estimator.b.T #check dims are consitent
         if regression_estimator.noise_covariance is not None:
-            self.Cov_NN[:,:, i_band] = regression_estimator.noise_covariance
+            self.Cov_NN[:,:, index] = regression_estimator.noise_covariance
         if regression_estimator.inverse_signal_covariance is not None:
-            self.Cov_SS[:,:, i_band] = regression_estimator.inverse_signal_covariance
+            self.Cov_SS[:,:, index] = regression_estimator.inverse_signal_covariance
         if regression_estimator.R2 is not None:
-            self.R2[:, i_band] = regression_estimator.R2;
+            self.R2[:, index] = regression_estimator.R2;
         # <assign with xarray>
-        self.num_segments.data[:,frequency_index] = regression_estimator.n_data
+        self.num_segments.data[:,index] = regression_estimator.n_data
         # </assign with xarray>
-        #self.num_segments[:self.num_channels_out, i_band] =
+        #self.num_segments[:self.num_channels_out, index] =
         # regression_estimator.n_data
         return
 
@@ -257,11 +255,11 @@ class TransferFunction(object):
         return stderr
 
     #<TO BE DEPRECATED/MERGE WITH BandAveragingScheme>
-    def get_num_bands(self):
-        return len(self.T)
-
-    def get_frequencies(self):
-        return 1. / self.T
+    # def get_num_bands(self):
+    #     return len(self.T)
+    #
+    # def get_frequencies(self):
+    #     return 1. / self.T
     #</TO BE DEPRECATED/MERGE WITH BandAveragingScheme>
 
 
@@ -272,11 +270,11 @@ class TransferFunction(object):
         pass
 
 def test_ttf():
-    from iris_mt_scratch.sandbox.transfer_function.transfer_function_header \
+    from aurora.transfer_function.transfer_function_header \
         import TransferFunctionHeader
     tfh = TransferFunctionHeader()
     ttf = TransferFunction(tfh, 32)
-    ttf.set_tf(1,2,3)
+
 
 def main():
     test_ttf()

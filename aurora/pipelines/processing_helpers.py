@@ -106,10 +106,10 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT"):
     return stft_obj
 
 
-def process_transfer_functions(config, frequency_bands, local_stft_obj,
+def process_transfer_functions(config, local_stft_obj,
                                remote_stft_obj, transfer_function_obj):
-    for i_band, band in enumerate(frequency_bands.bands()):
-        print(i_band, band.center_period)
+    for band in transfer_function_obj.frequency_bands.bands():
+        print(f"Processing band {band.center_period}s")
         #expecitng dataArray as local_stft_obj
         band_dataarray = extract_band(band, local_stft_obj)
         band_dataset = band_dataarray.to_dataset("channel")
@@ -138,5 +138,5 @@ def process_transfer_functions(config, frequency_bands, local_stft_obj,
             f"not supported")
             raise Exception
         print(f"{band.center_period} {config.estimation_engine}, \n {Z}")
-        transfer_function_obj.set_tf(i_band, regression_estimator, band.center_period)
+        transfer_function_obj.set_tf(regression_estimator, band.center_period)
     return transfer_function_obj

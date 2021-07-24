@@ -133,7 +133,6 @@ def process_mth5_decimation_level(config, local, remote, units="MT"):
                                  processing_config=config)
 
     transfer_function_obj = process_transfer_functions(config,
-                                                       frequency_bands,
                                                        local_stft_obj,
                                                        remote_stft_obj,
                                                        transfer_function_obj)
