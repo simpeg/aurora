@@ -126,10 +126,11 @@ class ApodizationWindow(object):
         -------
 
         """
+        self.test_linear_spectral_density_factor()
         string1 = f"{self.taper_family} {self.num_samples_window}"
-        string1 += f" taper_exists={bool(self.taper.any())}"
-        string2 = f"NENBW:{self.nenbw:.3f}, CG:{self.coherent_gain:.3f}"
-        string2 += f"window factor={self.apodization_factor:.3f}"
+        string1 += f" taper_exists = {bool(self.taper.any())}"
+        string2 = f"NENBW = {self.nenbw:.3f}, CG = {self.coherent_gain:.3f},  "
+        string2 += f"window factor = {self.apodization_factor:.3f}"
         return "\n".join([string1, string2])
 
     def __str__(self):
@@ -143,6 +144,7 @@ class ApodizationWindow(object):
         if self._num_samples_window==0:
             self._num_samples_window = len(self.taper)
         return self._num_samples_window
+
 
     def make(self):
         """
@@ -204,6 +206,34 @@ class ApodizationWindow(object):
         """Effective Noise BandWidth = fs*NENBW/N = fs S2/(S1**2)"""
 
         return fs * self.S2 / (self.S1**2)
+
+    def test_linear_spectral_density_factor(self):
+        """
+        This is just a test to verify some algebra
+        Claim:
+        The lsd_calibration factors
+        A      (1./coherent_gain)*np.sqrt((2*dt)/(nenbw*N))
+        and
+        B      np.sqrt(2/(sample_rate*self.S2))
+        are identical.
+
+        Note sqrt(2*dt)==sqrt(2*sample_rate) so we can cancel these terms and
+        A=B IFF
+        (1./coherent_gain) * np.sqrt(1/(nenbw*N)) == 1/np.sqrt(S2)
+        which I show in githib aurora issue #3 via .
+        (CG**2) * NENBW *N   =  S2
+
+        Returns
+        -------
+
+        """
+        lsd_factor1 = (1./self.coherent_gain)*np.sqrt(1./(self.nenbw*self.num_samples_window))
+        lsd_factor2 = 1. / np.sqrt(self.S2)
+        if not np.isclose(lsd_factor1, lsd_factor2):
+            print(f"factor1 {lsd_factor1} vs factor2 {lsd_factor2}")
+            print("Incompatible spectral density factors")
+            raise Exception
+
 
     @property
     def taper(self):
