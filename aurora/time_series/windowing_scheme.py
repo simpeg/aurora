@@ -402,19 +402,30 @@ class WindowingScheme(ApodizationWindow):
     @property
     def spectral_density_calibration_factor(self):
         factor = spectral_density_calibration_factor(self.coherent_gain, self.nenbw, self.dt, self.num_samples_window)
+        factor2 = self.spectral_density_calibration_factor2
+        if factor != factor2:
+            print("Incompatible spectral density factors")
+            raise Exception
+
         return factor
 
+    @property
+    def spectral_density_calibration_factor2(self):
+        factor = np.sqrt(2/(self.sampling_rate*self.S2))
+        return factor
 #</PROPERTIES THAT NEED SAMPLING RATE>
 
 
-def spectral_density_calibration_factor(coherent_gain, enbw, dt, N):
+def spectral_density_calibration_factor(coherent_gain, nenbw, dt, N):
     """
+
     scales the spectra for the effects of the windowing, and converts to spectral density
+    There are several ways to compute this factor.
     spectral_calibration = (1/0.54)*np.sqrt((2*0.025)/(1.36*288000)) #hamming
     Parameters
     ----------
     coherent_gain
-    enbw
+    nenbw
     dt
     N
 
@@ -422,9 +433,30 @@ def spectral_density_calibration_factor(coherent_gain, enbw, dt, N):
     -------
 
     """
-    spectral_density_calibration_factor = (1./coherent_gain)*np.sqrt((2*dt)/(enbw*N))
+    spectral_density_calibration_factor = (1./coherent_gain)*np.sqrt((2*dt)/(
+            nenbw*N))
     return spectral_density_calibration_factor
 
+def spectral_density_calibration_factor2():
+    """
+
+    scales the spectra for the effects of the windowing, and converts to spectral density
+    There are several ways to compute this factor.
+    spectral_calibration = (1/0.54)*np.sqrt((2*0.025)/(1.36*288000)) #hamming
+    Parameters
+    ----------
+    coherent_gain
+    nenbw
+    dt
+    N
+
+    Returns
+    -------
+
+    """
+    spectral_density_calibration_factor = (1./coherent_gain)*np.sqrt((2*dt)/(
+            nenbw*N))
+    return spectral_density_calibration_factor
 
 
 def fft_xr_ds(dataset, sample_rate, one_sided=True, detrend_type="linear",

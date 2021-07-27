@@ -188,6 +188,23 @@ class ApodizationWindow(object):
         Heinzel et al 2002"""
         return self.num_samples_window * self.S2 / (self.S1 ** 2)
 
+    def enbw(self, fs):
+        """
+        Notes that unlike NENBW, CG, S1, S2, this is not a pure property of the
+        window -- but instead this is a property of the window combined with
+        the sample rate.
+        Parameters
+        ----------
+        fs : sampling frequency (1/dt)
+
+        Returns
+        -------
+
+        """
+        """Effective Noise BandWidth = fs*NENBW/N = fs S2/(S1**2)"""
+
+        return fs * self.S2 / (self.S1**2)
+
     @property
     def taper(self):
         return self._taper
