@@ -363,7 +363,6 @@ class WindowingScheme(ApodizationWindow):
 
     def apply_spectral_density_calibration(self, dataset):
         """
-
         Parameters
         ----------
         dataset
@@ -375,13 +374,7 @@ class WindowingScheme(ApodizationWindow):
 
         """
         scale_factor = self.spectral_density_calibration_factor
-        if isinstance(dataset, xr.Dataset):
-            for key in dataset.keys():
-                print(f"applying spectral density calibration to {key}")
-                dataset[key].data *= scale_factor
-        else:
-            print(f"scaling of {type(data)} not yet supported")
-            raise Exception
+        dataset *= scale_factor
         return dataset
 
 #<PROPERTIES THAT NEED SAMPLING RATE>
@@ -434,8 +427,10 @@ def spectral_density_calibration_factor(coherent_gain, enbw, dt, N):
 
 
 
-def fft_xr_ds(dataset, sample_rate, one_sided=True, detrend_type="linear"):
+def fft_xr_ds(dataset, sample_rate, one_sided=True, detrend_type="linear",
+              prewhitening=None):
     """
+    TODO: Add support for "first difference" prewhitening
     assume you have an xr.dataset or xr.DataArray.  It is 2D.
     This should call window_helpers.apply_fft_to_windowed_array
     or get moved to window_helpers.py
