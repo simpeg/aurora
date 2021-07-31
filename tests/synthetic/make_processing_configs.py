@@ -27,11 +27,13 @@ def create_run_config_for_test_case(test_case_id):
             cfg = ProcessingConfig()
             cfg.decimation_level_id = i_decimation_level
             cfg.decimation_factor = decimation_factor
-            cfg.num_samples_window = 256
-            cfg.num_samples_overlap = 192
+            cfg.num_samples_window = 128
+            cfg.num_samples_overlap = 32
             cfg.sample_rate = run_config.initial_sample_rate * downsample_factor
-            cfg.emtf_band_setup_file = str(SANDBOX.joinpath("bs_256.cfg"))
+            #cfg.emtf_band_setup_file = str(SANDBOX.joinpath("bs_256.cfg"))
+            cfg.emtf_band_setup_file = str(SANDBOX.joinpath("bs_test.cfg"))
             cfg.estimation_engine = "RME"
+            cfg.output_channels = ["hz", "ex", "ey"]
             if test_case_id=="test12rr":
                 cfg.estimation_engine = "TRME_RR"
                 cfg.reference_channels = run_config.reference_channels #HACKY

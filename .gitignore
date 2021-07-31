@@ -1,4 +1,5 @@
 tests/emtf_synthetic/data/*h5
+aurora/sandbox/data
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -39,12 +39,13 @@ class ProcessingConfig(BaseDict):
         # spectral_transform_config["taper_family"] = "hamming"
         
         self.taper_family = "dpss"
-        self.taper_additional_args = {"alpha":10.0}
-        # self.taper_family = "hamming"
-        # self.taper_additional_args = {}
+        self.taper_additional_args = {"alpha":3.0}
+        self.taper_family = "hamming"
+        self.taper_additional_args = {}
         self.num_samples_window = 256
         self.num_samples_overlap = int(self.num_samples_window*3./4)
         self.sample_rate = 0.0
+        self.prewhitening_type = "first difference"
         # </FOURIER TRANSFORM CONFIG>
 
         # <FREQUENCY BANDS>

@@ -8,6 +8,7 @@ from aurora.transfer_function.transfer_function_header import \
 from aurora.transfer_function.TRME import TRME
 from aurora.transfer_function.TRME_RR import TRME_RR
 
+import scipy.signal as ssig
 
 
 def configure_frequency_bands(config):
@@ -16,7 +17,7 @@ def configure_frequency_bands(config):
         frequency_bands.from_emtf_band_setup(
             filepath=config.emtf_band_setup_file,
             sampling_rate=config.sample_rate,
-            decimation_level=1,
+            decimation_level=config.decimation_level_id+1,
             num_samples_window=config.num_samples_window)
     else:
         print("TODO:Write a method to choose lower and upper bounds, "
@@ -42,8 +43,58 @@ def validate_sample_rate(run_ts, config):
         raise Exception
     return
 
+def run_ts_to_stft_scipy(config, run_xrts_orig):
+    """
+    Parameters
+    ----------
+    config
+    run_xrts
 
-def run_ts_to_stft(config, run_xrts):
+    Returns
+    -------
+
+    """
+    import xarray as xr
+    if config["prewhitening_type"] == "first difference":
+        run_xrts = run_xrts_orig.diff("time")
+    else:
+        run_xrts = run_xrts_orig
+    windowing_scheme = WindowingScheme(
+        taper_family=config.taper_family,
+        num_samples_window=config.num_samples_window,
+        num_samples_overlap=config.num_samples_overlap,
+        taper_additional_args=config.taper_additional_args,
+        sampling_rate=config.sample_rate)
+    #stft_obj = run_xrts.copy(deep=True)
+    output_ds = xr.Dataset()
+    for channel_id in run_xrts.data_vars:
+        ff, tt, specgm = ssig.spectrogram(run_xrts[channel_id].data,
+                                        fs=config.sample_rate,
+                                  window=windowing_scheme.taper,
+                                  nperseg=config.num_samples_window,
+                                  noverlap=config.num_samples_overlap,
+                                  detrend="linear", scaling='density',
+                                  mode="complex")
+        ff = ff[:-1] #drop Nyquist
+        specgm = specgm[:-1,:] #drop Nyquist
+        tt = tt - tt[0]
+        tt *= config.sample_rate
+        time_axis = run_xrts.time.data[tt.astype(int)]
+        xrd = xr.DataArray(specgm.T, dims=["time", "frequency"],
+                           coords={"frequency": ff,
+                                   "time": time_axis})
+        output_ds.update({channel_id: xrd})
+
+    if config["prewhitening_type"] == "first difference":
+        from aurora.time_series.frequency_domain_helpers import \
+            get_fft_harmonics
+        from numpy import pi
+        freqs = get_fft_harmonics(config.num_samples_window, config.sample_rate)
+        prewhitening_correction = 1.j * 2 * pi * freqs #jw
+        output_ds /= prewhitening_correction
+    return  output_ds
+
+def run_ts_to_stft(config, run_xrts_orig):
     """
 
     Parameters
@@ -55,6 +106,7 @@ def run_ts_to_stft(config, run_xrts):
     -------
 
     """
+    from aurora.time_series.windowed_time_series import WindowedTimeSeries
     windowing_scheme = WindowingScheme(
     taper_family = config.taper_family,
     num_samples_window = config.num_samples_window,
@@ -62,9 +114,29 @@ def run_ts_to_stft(config, run_xrts):
     taper_additional_args=config.taper_additional_args,
     sampling_rate = config.sample_rate)
 
+    if config["prewhitening_type"] == "first difference":
+        run_xrts = run_xrts_orig.diff("time")
+    else:
+        run_xrts = run_xrts_orig
+
     windowed_obj = windowing_scheme.apply_sliding_window(run_xrts)
-    tapered_obj = windowing_scheme.apply_taper(windowed_obj)
+    windowed_obj = WindowedTimeSeries.detrend(data=windowed_obj,
+                                              detrend_type="linear")
+
+    tapered_obj = windowed_obj * windowing_scheme.taper
+    # stft_obj = WindowedTimeSeries.apply_stft(data=tapered_obj,
+    #                                          sampling_rate=windowing_scheme.sampling_rate,
+    #                                          detrend_type="linear",
+    # scale_factor=windowing_scheme.linear_spectral_density_calibration_factor)
     stft_obj = windowing_scheme.apply_fft(tapered_obj)
+    if config["prewhitening_type"] == "first difference":
+        from aurora.time_series.frequency_domain_helpers import \
+            get_fft_harmonics
+        from numpy import pi
+        freqs = get_fft_harmonics(config.num_samples_window, config.sample_rate)
+        prewhitening_correction = 1.j * 2 * pi * freqs #jw
+        stft_obj /= prewhitening_correction
+
     return stft_obj
 
 
@@ -111,9 +183,7 @@ def process_transfer_functions(config, local_stft_obj,
                                remote_stft_obj, transfer_function_obj):
     for band in transfer_function_obj.frequency_bands.bands():
         print(f"Processing band {band.center_period}s")
-        #expecitng dataArray as local_stft_obj
-        band_dataarray = extract_band(band, local_stft_obj)
-        band_dataset = band_dataarray.to_dataset("channel")
+        band_dataset = extract_band(band, local_stft_obj)
         X = band_dataset[config.input_channels]
         Y = band_dataset[config.output_channels]
         if config.reference_station_id:

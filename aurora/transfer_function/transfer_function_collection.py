@@ -74,7 +74,8 @@ class TransferFunctionCollection(object):
             if declination is None:
                 declination = 0.0
 
-        location_str = f"coordinate  {latitude}  {longitude}  {declination}\n"
+        location_str = f"coordinate  {latitude}  {longitude}  declination" \
+            f"  {declination}\n"
         f.writelines(location_str)
         # </location>
 
@@ -124,7 +125,7 @@ class TransferFunctionCollection(object):
                 f.writelines(line1)
                 freq_index = tf.frequency_index(band.center_frequency)
                 num_segments = tf.num_segments.data[0, freq_index]
-                line2 = f"number of data point    {num_segments} "
+                line2 = f"number of data point    {int(num_segments)} "
                 line2 += f"sampling freq.   {tf.processing_config.sample_rate} Hz\n"
                 f.writelines(line2)
 
@@ -189,3 +190,61 @@ class TransferFunctionCollection(object):
 
 
         f.close()
+        return
+
+
+    def rho_phi_plot(self, show=True, aux_data=None):
+        import matplotlib.pyplot as plt
+        fig, axs = plt.subplots(nrows=2)
+        #plotter.rho_sub_plot(axs[0], ttl_str=ttl_str)
+        #plotter.phase_sub_plot(axs[1], ttl_str=ttl_str)
+
+        color_cyc = {0:'r',1:'orange', 2:"g",3:"b", 4:"k"}
+        for i_dec in self.tf_dict.keys():
+            tf = self.tf_dict[i_dec]
+            tf_xr = tf.to_xarray()
+            rxy = tf.rho[:, 1]
+            axs[0].loglog(tf.periods, rxy, marker="o",
+                          color=color_cyc[i_dec],  linestyle='None',
+                          label=f"aurora {i_dec}")
+
+
+            phi = tf.phi
+            #rotate phases so all are positive:
+            negative_phi_indices = np.where(phi<0)[0]
+            phi[negative_phi_indices] += 180.0
+            axs[1].semilogx(tf.periods, phi[:, 0], marker="o",
+                            color=color_cyc[i_dec],  linestyle='None',)
+        if aux_data:
+            try:
+                decimation_levels = list(set(aux_data.decimation_levels))
+                shape_cyc = {0:"s", 1:"v", 2:"*", 3:"^"}
+
+                axs[0].loglog(axs[0].get_xlim(), 100 * np.ones(2), color="k")
+                axs[1].semilogx(axs[1].get_xlim(), 45 * np.ones(2), color="k")
+                for i_dec in decimation_levels:
+                    ndx = np.where(aux_data.decimation_levels==i_dec)[0]
+                    axs[0].loglog(aux_data.periods[ndx], aux_data.rxy[ndx],
+                                  marker=shape_cyc[i_dec-1], color="k",
+                                  linestyle='None', label=f"emtf "
+                        f"{int(i_dec-1)}")
+                    axs[1].semilogx(aux_data.periods[ndx], aux_data.pxy[ndx],
+                          marker=shape_cyc[i_dec - 1], color="k",
+                          linestyle='None', )
+            except:
+                #for i_dec in aux_data.decimation_levels
+                axs[0].loglog(aux_data.periods, aux_data.rxy, marker="s",
+                              color="k", linestyle='None', )
+                axs[1].semilogx(aux_data.periods, aux_data.pxy, marker="s",
+                                color="k", linestyle='None', )
+        axs[0].legend(ncol=2)
+        axs[1].legend()
+
+        axs[1].set_xlabel('Period (s)');
+        axs[0].set_ylabel('$\Omega$-m');
+        axs[1].set_ylabel('Degrees');
+
+        ttl_str = tf.tf_header.local_station_id
+        axs[0].set_title(ttl_str)
+        if show:
+            plt.show()

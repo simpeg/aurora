@@ -123,6 +123,7 @@ class FrequencyBand(Interval):
 
     @property
     def center_frequency(self):
+        #return (self.lower_bound + self.upper_bound)/2
         return np.sqrt(self.lower_bound * self.upper_bound)
 
     @property
@@ -315,7 +316,7 @@ class FrequencyBands(object):
         emtf_band_df = emtf_band_setup.get_decimation_level(decimation_level)
         df = sampling_rate / (num_samples_window)
         half_df = df / 2.0
-
+        #half_df /=100
         lower_edges = (emtf_band_df.lower_bound_index * df) - half_df
         upper_edges = (emtf_band_df.upper_bound_index * df) + half_df
         band_edges = np.vstack((lower_edges.values, upper_edges.values)).T

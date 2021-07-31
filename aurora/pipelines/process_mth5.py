@@ -5,6 +5,7 @@ from aurora.pipelines.processing_helpers import configure_frequency_bands
 from aurora.pipelines.processing_helpers import process_transfer_functions
 from aurora.pipelines.processing_helpers import run_ts_to_calibrated_stft
 from aurora.pipelines.processing_helpers import run_ts_to_stft
+from aurora.pipelines.processing_helpers import run_ts_to_stft_scipy
 from aurora.pipelines.processing_helpers import transfer_function_header_from_config
 from aurora.pipelines.processing_helpers import validate_sample_rate
 from aurora.sandbox.processing_config import ProcessingConfig
@@ -106,10 +107,9 @@ def process_mth5_decimation_level(config, local, remote, units="MT"):
     local_run_obj = local["run"]
     local_run_xrts = local["mvts"]
     local_stft_obj = run_ts_to_stft(config, local_run_xrts)
+    #local_stft_obj = run_ts_to_stft_scipy(config, local_run_xrts)
     local_stft_obj = calibrate_stft_obj(local_stft_obj, local_run_obj,
                                         units=units)
-    local_stft_obj = local_stft_obj.to_array("channel")
-    print("WHY are we changin to a data array? Maybe only for extract_band?")
     # local_stft_obj = run_ts_to_calibrated_stft(local_run_ts, local_run_obj,
     #                                          config, units=units)
     remote_run_obj = remote["run"]
