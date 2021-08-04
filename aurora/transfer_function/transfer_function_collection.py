@@ -193,9 +193,10 @@ class TransferFunctionCollection(object):
         return
 
 
-    def rho_phi_plot(self, show=True, aux_data=None):
+    def rho_phi_plot(self, show=True, aux_data=None, xy_or_yx="xy", ttl_str=""):
         import matplotlib.pyplot as plt
-        fig, axs = plt.subplots(nrows=2)
+        from aurora.transfer_function.emtf_z_file_helpers import merge_tf_collection_to_match_z_file
+        fig, axs = plt.subplots(nrows=2,figsize = (8.5, 11), dpi=300 )
         #plotter.rho_sub_plot(axs[0], ttl_str=ttl_str)
         #plotter.phase_sub_plot(axs[1], ttl_str=ttl_str)
 
@@ -203,32 +204,45 @@ class TransferFunctionCollection(object):
         for i_dec in self.tf_dict.keys():
             tf = self.tf_dict[i_dec]
             tf_xr = tf.to_xarray()
-            rxy = tf.rho[:, 1]
-            axs[0].loglog(tf.periods, rxy, marker="o",
+            if xy_or_yx=="xy":
+                aurora_rho = tf.rho[:, 0]
+            else:
+                aurora_rho = tf.rho[:, 1]
+            axs[0].loglog(tf.periods, aurora_rho, marker="o",
                           color=color_cyc[i_dec],  linestyle='None',
                           label=f"aurora {i_dec}")
 
 
-            phi = tf.phi
+            if xy_or_yx=="xy":
+                aurora_phi = tf.phi[:, 0]
+            else:
+                aurora_phi = tf.phi[:, 1]
             #rotate phases so all are positive:
-            negative_phi_indices = np.where(phi<0)[0]
-            phi[negative_phi_indices] += 180.0
-            axs[1].semilogx(tf.periods, phi[:, 0], marker="o",
+            negative_phi_indices = np.where(aurora_phi<0)[0]
+            aurora_phi[negative_phi_indices] += 180.0
+            axs[1].semilogx(tf.periods, aurora_phi, marker="o",
                             color=color_cyc[i_dec],  linestyle='None',)
         if aux_data:
             try:
                 decimation_levels = list(set(aux_data.decimation_levels))
                 shape_cyc = {0:"s", 1:"v", 2:"*", 3:"^"}
+                if xy_or_yx == "xy":
+                    emtf_rho = aux_data.rxy
+                    emtf_phi = aux_data.pxy
+                else:
+                    emtf_rho = aux_data.ryx
+                    emtf_phi = aux_data.pyx
 
                 axs[0].loglog(axs[0].get_xlim(), 100 * np.ones(2), color="k")
                 axs[1].semilogx(axs[1].get_xlim(), 45 * np.ones(2), color="k")
                 for i_dec in decimation_levels:
+
                     ndx = np.where(aux_data.decimation_levels==i_dec)[0]
-                    axs[0].loglog(aux_data.periods[ndx], aux_data.rxy[ndx],
+                    axs[0].loglog(aux_data.periods[ndx], emtf_rho[ndx],
                                   marker=shape_cyc[i_dec-1], color="k",
                                   linestyle='None', label=f"emtf "
                         f"{int(i_dec-1)}")
-                    axs[1].semilogx(aux_data.periods[ndx], aux_data.pxy[ndx],
+                    axs[1].semilogx(aux_data.periods[ndx], emtf_phi[ndx],
                           marker=shape_cyc[i_dec - 1], color="k",
                           linestyle='None', )
             except:
@@ -244,7 +258,11 @@ class TransferFunctionCollection(object):
         axs[0].set_ylabel('$\Omega$-m');
         axs[1].set_ylabel('Degrees');
 
-        ttl_str = tf.tf_header.local_station_id
+        ttl_str = f"{tf.tf_header.local_station_id} {xy_or_yx} \n{ttl_str}"
         axs[0].set_title(ttl_str)
+        from aurora.general_helper_functions import FIGURES_PATH
+        figure_basename = f"synthetic_{tf.tf_header.local_station_id}_{xy_or_yx}.png"
+        out_file = FIGURES_PATH.joinpath(figure_basename)
+        plt.savefig(out_file)
         if show:
             plt.show()

@@ -38,3 +38,43 @@ def make_orientation_block_of_z_file(run_obj):
             print(f"No channel {channel_id} in run")
             pass
     return output_strings
+
+
+
+def merge_tf_collection_to_match_z_file(aux_data, tf_collection):
+    """
+    Currently this is only used for the synthtetic test, but maybe useful for
+    other tests.  Given data from a z_file, and a tf_collection,
+    the tf_collection may have several TF estimates at the same frequency
+    from multiple decimation levels.  This tries to make a single array as a
+    function of period for all rho and phi
+    Parameters
+    ----------
+    aux_data
+    tf_collection
+
+    Returns
+    -------
+
+    """
+    import numpy as np
+    rxy = np.full(len(aux_data.decimation_levels), np.nan)
+    ryx = np.full(len(aux_data.decimation_levels), np.nan)
+    pxy = np.full(len(aux_data.decimation_levels), np.nan)
+    pyx = np.full(len(aux_data.decimation_levels), np.nan)
+    dec_levels = list(set(aux_data.decimation_levels))
+    dec_levels = [int(x) for x in dec_levels]
+    dec_levels.sort()
+    for dec_level in dec_levels:
+        aurora_tf = tf_collection.tf_dict[ dec_level-1 ]
+        indices = np.where(aux_data.decimation_levels==dec_level)[0]
+        for ndx in indices:
+            period = aux_data.periods[ndx]
+            #find the nearest period in aurora_tf
+            aurora_ndx = np.argmin(np.abs(aurora_tf.periods-period))
+            rxy[ndx] = aurora_tf.rho[aurora_ndx, 0]
+            ryx[ndx] = aurora_tf.rho[aurora_ndx, 1]
+            pxy[ndx] = aurora_tf.phi[aurora_ndx, 0]
+            pyx[ndx] = aurora_tf.phi[aurora_ndx, 1]
+
+    return rxy, ryx, pxy, pyx
