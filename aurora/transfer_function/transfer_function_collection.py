@@ -8,6 +8,7 @@ Note that a single transfer function object is associated with a station,
 which we call the "local_station".  In a database of TFs we could add a column
 for local_station and one for reference station.
 """
+import fortranformat as ff
 import numpy as np
 from aurora.transfer_function.emtf_z_file_helpers import make_orientation_block_of_z_file
 
@@ -56,9 +57,17 @@ class TransferFunctionCollection(object):
                 self.header.processing_scheme]
         except:
             processing_scheme = self.header.processing_scheme
-        f.writelines(f"{processing_scheme}\n")
-        f.writelines(f"station    :{self.header.local_station_id}\n")
+
+        #data_format = ff.FortranRecordWriter('(a80)')
+        #line = f"{data_format.write([processing_scheme])}\n"
+        line = f"{processing_scheme}"
+        line += (80-len(line))*" "+"\n"
+        f.writelines(line)
         # </processing scheme>
+
+        station_line = f"station    :{self.header.local_station_id}"
+        station_line += (32 - len(station_line)) * " " + "\n"
+        f.writelines(station_line)
 
         # <location>
         #could also use self.header.local_station object here
@@ -101,6 +110,8 @@ class TransferFunctionCollection(object):
         #Given that the channel ordering is fixed (hxhyhzexey) and that hxhy
         # are always the input channels, the TF is ordered hzexey or exey
         # depending on 2 or 3 channels.
+        data_format = ff.FortranRecordWriter('(16E12.4)')
+        # lineformat.write([a]) # f"{floatnum:.5f}  "
         for i_dec in self.tf_dict.keys():
             tf = self.tf_dict[i_dec]
             tf_xr = tf.to_xarray()
@@ -134,23 +145,15 @@ class TransferFunctionCollection(object):
                 line = ""
                 #<below would be clearer if it used TF xarray representation
                 # rather than out_ch, inp_ch indices
-                import fortranformat as ff
-                data_format = ff.FortranRecordWriter('(16E12.4)')
-                #lineformat.write([a])
+
                 for out_ch in tf.tf_header.output_channels:
                     for inp_ch in tf.tf_header.input_channels:
                         print(out_ch, inp_ch)
                         chchtf = tf_xr.loc[out_ch, inp_ch, :]
                         real_part = np.real(chchtf.data[period_index])
                         imag_part = np.imag(chchtf.data[period_index])
-                        #line += "{0:0.4E}  ".format(real_part)
-                        #line += "{0:0.4E}  ".format(imag_part)
-                        # line += f"{np.real(chchtf.data[period_index]):.5f}  "
-                        # line += f"{np.imag(chchtf.data[period_index]):.5f}  "
                         line += f"{data_format.write([real_part])}"
                         line += f"{data_format.write([imag_part])}"
-                        #data_format
-
                     line += "\n"
                 f.writelines(line)
 
@@ -163,7 +166,9 @@ class TransferFunctionCollection(object):
                         cond2 = cov_ss_xr.input_channel_2 == inp_ch2
                         chchss = cov_ss_xr.where(cond1 & cond2, drop=True)
                         chchss = chchss.data.squeeze()
-                        line += f"{chchss.data[period_index]:.5f}  "
+                        chchss_float = chchss.data[period_index]
+                        line += f"{data_format.write([chchss_float])}"
+                        #line += f"{chchss.data[period_index]:.5f}  "
                     line += "\n"
                 f.writelines(line)
 
@@ -175,7 +180,9 @@ class TransferFunctionCollection(object):
                         cond2 = cov_nn_xr.output_channel_2 == out_ch2
                         chchnn = cov_nn_xr.where(cond1 & cond2, drop=True)
                         chchnn = chchnn.data.squeeze()
-                        line += f"{chchnn.data[period_index]:.5f}  "
+                        chchnn_float = chchnn.data[period_index]
+                        line += f"{data_format.write([chchnn_float])}"
+                        #line += f"{chchnn.data[period_index]:.5f}  "
                     line += "\n"
                 f.writelines(line)
 

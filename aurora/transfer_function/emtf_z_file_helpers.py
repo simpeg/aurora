@@ -3,6 +3,7 @@ These methods can possibly be moved under mt_metadata, or mth5
 
 They extract info needed to setup emtf_z files.
 """
+import fortranformat as ff
 EMTF_CHANNEL_ORDER = ["hx", "hy", "hz", "ex", "ey"]
 def make_orientation_block_of_z_file(run_obj):
     """
@@ -24,15 +25,21 @@ def make_orientation_block_of_z_file(run_obj):
 
     """
     output_strings = []
-    for channel_id in EMTF_CHANNEL_ORDER:
+    for i_ch, channel_id in enumerate(EMTF_CHANNEL_ORDER):
         try:
             channel = run_obj.get_channel(channel_id)
             azimuth = channel.metadata.measurement_azimuth
             tilt = channel.metadata.measurement_tilt
             station_id = run_obj.station_group.name
             emtf_channel_id = channel_id.capitalize()
-            out_str = f"{channel_id}     {azimuth}     {tilt} " \
-                f"{station_id[0:3]} {emtf_channel_id}\n"
+            #format(i5, 1x, f8.2, 1x, f8.2, 1x, a3, 2x, a6) #Fortran Format
+            ff_format = ff.FortranRecordWriter("(i5, 1x, f8.2, 1x, f8.2, 1x, "
+                                               "a3, 1x, a3)")
+            fortran_str = ff_format.write([i_ch+1, azimuth, tilt, station_id,
+                                           emtf_channel_id])
+            out_str = f"{fortran_str}\n"
+            # out_str = f"{i_ch + 1}     {azimuth}     {tilt} " \
+            #     f"{station_id[0:3]} {emtf_channel_id}\n"
             output_strings.append(out_str)
         except:
             print(f"No channel {channel_id} in run")
