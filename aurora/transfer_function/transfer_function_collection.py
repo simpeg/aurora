@@ -108,18 +108,14 @@ class TransferFunctionCollection(object):
             cov_nn_xr = tf.cov_nn_to_xarray()
             periods = tf.frequency_bands.band_centers(frequency_or_period="period")
             periods = np.flip(periods) #EMTF works in increasing period
-            #for i_period, period in periods:
-            for i_band, band in enumerate(tf.frequency_bands.bands(
-                    direction="increasing_period")):
-
-                print(i_band, band)
+            for band in tf.frequency_bands.bands(direction="increasing_period"):
                 line1 = f"period :      {band.center_period:.5f}    "
                 line1 += f"decimation level   {i_dec+1}:    "
                 #<Make a method of processing config?>
-                freqs = num_frequencies_str = np.fft.fftfreq(
+                freqs = np.fft.fftfreq(
                     tf.processing_config.num_samples_window, 1./tf.processing_config.sample_rate)
                 fc_indices = band.fourier_coefficient_indices(freqs)
-                #<Make a method of processing config?>
+                #</Make a method of processing config?>
                 fc_indices_str = f"{fc_indices[0]} to   {fc_indices[-1]}"
                 line1 += f"freq. band from   {fc_indices_str}\n"
                 f.writelines(line1)
@@ -136,13 +132,25 @@ class TransferFunctionCollection(object):
                 # channels (hx, hy)
                 period_index = tf.period_index(band.center_period)
                 line = ""
+                #<below would be clearer if it used TF xarray representation
+                # rather than out_ch, inp_ch indices
+                import fortranformat as ff
+                data_format = ff.FortranRecordWriter('(16E12.4)')
+                #lineformat.write([a])
                 for out_ch in tf.tf_header.output_channels:
                     for inp_ch in tf.tf_header.input_channels:
                         print(out_ch, inp_ch)
                         chchtf = tf_xr.loc[out_ch, inp_ch, :]
+                        real_part = np.real(chchtf.data[period_index])
+                        imag_part = np.imag(chchtf.data[period_index])
+                        #line += "{0:0.4E}  ".format(real_part)
+                        #line += "{0:0.4E}  ".format(imag_part)
+                        # line += f"{np.real(chchtf.data[period_index]):.5f}  "
+                        # line += f"{np.imag(chchtf.data[period_index]):.5f}  "
+                        line += f"{data_format.write([real_part])}"
+                        line += f"{data_format.write([imag_part])}"
+                        #data_format
 
-                        line += f"{np.real(chchtf.data[period_index]):.5f}  "
-                        line += f"{np.imag(chchtf.data[period_index]):.5f}  "
                     line += "\n"
                 f.writelines(line)
 
