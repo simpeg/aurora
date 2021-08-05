@@ -38,7 +38,8 @@ class TransferFunctionCollection(object):
 
     def write_emtf_z_file(self, z_file_path, run_obj=None):
         """
-        first cut - could probably move this into EMTFUtils() class
+        Could probably move this into EMTFUtils() class
+        Based on EMTF/T/wrt_z.f
 
         Issues to review:
         This seems to insist that channels be ordered:
@@ -65,11 +66,13 @@ class TransferFunctionCollection(object):
         f.writelines(line)
         # </processing scheme>
 
+        #format('station    :', a20)
         station_line = f"station    :{self.header.local_station_id}"
         station_line += (32 - len(station_line)) * " " + "\n"
         f.writelines(station_line)
 
         # <location>
+        #105   format('coordinate ',f9.3,1x,f9.3,1x,' declination ',f8.2)
         #could also use self.header.local_station object here
         if run_obj is None:
             latitude = 1007.996
@@ -89,6 +92,7 @@ class TransferFunctionCollection(object):
         # </location>
 
         # <num channels / num frequencies>
+        #110   format('number of channels ',i3,2x,' number of frequencies ',i4)
         num_frequencies = self.total_number_of_frequencies
         num_channels_str = f"number of channels   {self.total_number_of_channels}"
         num_frequencies_str = f"number of frequencies   {num_frequencies}"
@@ -110,8 +114,8 @@ class TransferFunctionCollection(object):
         #Given that the channel ordering is fixed (hxhyhzexey) and that hxhy
         # are always the input channels, the TF is ordered hzexey or exey
         # depending on 2 or 3 channels.
+        #120   format('period : ',f12.5,3x,' decimation level ',i3,3x,+       ' freq. band from ',i4,' to ',i4)
         data_format = ff.FortranRecordWriter('(16E12.4)')
-        # lineformat.write([a]) # f"{floatnum:.5f}  "
         for i_dec in self.tf_dict.keys():
             tf = self.tf_dict[i_dec]
             tf_xr = tf.to_xarray()
@@ -123,8 +127,9 @@ class TransferFunctionCollection(object):
                 line1 = f"period :      {band.center_period:.5f}    "
                 line1 += f"decimation level   {i_dec+1}:    "
                 #<Make a method of processing config?>
-                freqs = np.fft.fftfreq(
-                    tf.processing_config.num_samples_window, 1./tf.processing_config.sample_rate)
+                sample_rate = tf.processing_config.sample_rate
+                num_samples_window = tf.processing_config.num_samples_window
+                freqs = np.fft.fftfreq(num_samples_window, 1./sample_rate)
                 fc_indices = band.fourier_coefficient_indices(freqs)
                 #</Make a method of processing config?>
                 fc_indices_str = f"{fc_indices[0]} to   {fc_indices[-1]}"
@@ -143,9 +148,6 @@ class TransferFunctionCollection(object):
                 # channels (hx, hy)
                 period_index = tf.period_index(band.center_period)
                 line = ""
-                #<below would be clearer if it used TF xarray representation
-                # rather than out_ch, inp_ch indices
-
                 for out_ch in tf.tf_header.output_channels:
                     for inp_ch in tf.tf_header.input_channels:
                         print(out_ch, inp_ch)
