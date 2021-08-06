@@ -215,15 +215,15 @@ class TRME(RegressionEstimator):
             self.expectation_psi_prime[k] = 1.0 * np.sum(w == 1) / self.n_data;
         return
 
-    def qr_decomposition(self, X, sanity_check=False):
-        [Q, R] = np.linalg.qr(X)
-        if sanity_check:
-            if np.isclose(np.matmul(Q, R) - self.X, 0).all():
-                pass
-            else:
-                print("Failed QR decompostion sanity check")
-                raise Exception
-        return Q, R
+    # def qr_decomposition(self, X, sanity_check=False):
+    #     [Q, R] = np.linalg.qr(X)
+    #     if sanity_check:
+    #         if np.isclose(np.matmul(Q, R) - self.X, 0).all():
+    #             pass
+    #         else:
+    #             print("Failed QR decompostion sanity check")
+    #             raise Exception
+    #     return Q, R
 
     def update_predicted_data(self):
         pass
@@ -278,11 +278,9 @@ class TRME(RegressionEstimator):
 
         #<INITIAL ESTIMATE>
         Q, R = self.qr_decomposition(self.X)
-        QH = np.conjugate(np.transpose(Q))
-        # initial LS estimate b0, error variances sigma
+        QH = Q.conj().T
         QHY = np.matmul(QH, self.Y)
         b0 = solve_triangular(R, QHY)
-        # </INITIAL ESTIMATE>
 
         if self.iter_control.max_number_of_iterations > 0:
             converged = False;
@@ -297,6 +295,7 @@ class TRME(RegressionEstimator):
 
         sigma = self.sigma(QHY, self.Y)
         self.iter_control.number_of_iterations = 0;
+        # </INITIAL ESTIMATE>
 
         while not converged:
             self.iter_control.number_of_iterations += 1
@@ -331,7 +330,7 @@ class TRME(RegressionEstimator):
 
         if self.iter_control.return_covariance:
             # compute error covariance matrices
-            self.inverse_signal_covariance= np.linalg.inv(np.matmul(R.conj().T,R));
+            self.inverse_signal_covariance= np.linalg.inv(R.conj().T @ R)
 
             res_clean = self.Yc - YP;
             SSR_clean = np.conj(res_clean.conj().T @ res_clean);
