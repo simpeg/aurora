@@ -86,6 +86,13 @@ def configure_frequency_bands(config):
     """
     May want to make config a "frequency band config object", but maybe not.
     For now just using a flat config structure (per decimation level)
+
+    These methods could also be placed under FrequencyBands() class as
+    init_from_emtf()
+    init_from_bounds_array()
+    init_from_default()
+
+
     Parameters
     ----------
     config : aurora.sandbox.processing_config.ProcessingConfig

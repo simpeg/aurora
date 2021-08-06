@@ -209,18 +209,19 @@ def process_mth5_run(run_cfg, run_id, units="MT", show_plot=True,
     -------
 
     """
-    config, mth5_obj = initialize_pipeline(run_cfg)
-    print(f"config indicates there are {config.number_of_decimation_levels} "
-          f"decimation levels to process: {config.decimation_level_ids}")
-    local_run_obj = mth5_obj.get_run(config["local_station_id"], run_id)
+    run_config, mth5_obj = initialize_pipeline(run_cfg)
+    print(f"config indicates {run_config.number_of_decimation_levels} "
+          f"decimation levels to process: {run_config.decimation_level_ids}")
+    local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
     local_run_ts = local_run_obj.to_runts()
     tf_dict = {}
-    #validate_sample_rate(local_run_ts, config)
-    for dec_level_id in config.decimation_level_ids:
+
+    for dec_level_id in run_config.decimation_level_ids:
         print("get a processing config")
-        processing_config = config.decimation_level_configs[dec_level_id]
-        processing_config.local_station_id = config.local_station_id
-        processing_config.reference_station_id = config.reference_station_id
+        print("TODO: Add a genertor or iterator to RunConfig() object")
+        processing_config = run_config.decimation_level_configs[dec_level_id]
+        processing_config.local_station_id = run_config.local_station_id
+        processing_config.reference_station_id = run_config.reference_station_id
 
         # <GET DATA>
         # Careful here -- for multiple station processing we will need to load
@@ -232,7 +233,7 @@ def process_mth5_run(run_cfg, run_id, units="MT", show_plot=True,
                 processing_config, mth5_obj, run_id)
         else:
             local = prototype_decimate(processing_config, local)
-            if config.reference_station_id:
+            if processing_config.reference_station_id:
                 remote = prototype_decimate(processing_config, remote)
 
         # </GET DATA>

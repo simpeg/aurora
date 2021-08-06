@@ -213,7 +213,7 @@ class TransferFunctionCollection(object):
     def rho_phi_plot(self, show=True, aux_data=None, xy_or_yx="xy", ttl_str=""):
         import matplotlib.pyplot as plt
         from aurora.transfer_function.emtf_z_file_helpers import merge_tf_collection_to_match_z_file
-        fig, axs = plt.subplots(nrows=2,figsize = (8.5, 11), dpi=300 )
+        fig, axs = plt.subplots(nrows=2,figsize = (11, 8.5), dpi=300 )
         #plotter.rho_sub_plot(axs[0], ttl_str=ttl_str)
         #plotter.phase_sub_plot(axs[1], ttl_str=ttl_str)
 

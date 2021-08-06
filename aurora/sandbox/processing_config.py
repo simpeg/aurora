@@ -46,6 +46,7 @@ class ProcessingConfig(BaseDict):
         self.num_samples_overlap = int(self.num_samples_window*3./4)
         self.sample_rate = 0.0
         self.prewhitening_type = "first difference"
+        self.extra_pre_fft_detrend_type = "linear"
         # </FOURIER TRANSFORM CONFIG>
 
         # <FREQUENCY BANDS>
