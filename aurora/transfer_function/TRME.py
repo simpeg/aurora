@@ -134,9 +134,9 @@ class TRME(RegressionEstimator):
         Computes the squared norms difference of the output channels from the
         "output channels inner-product with Q"
 
-        This seems like it is more like sigma^2 than sigma.  i.e. it is a
-        variance.  Especially in the context or the redecnd using it's sqrt to
-        normalize the residual amplitudes
+        ToDo: Rename this to sigma_squared, or residual_variance rather than sigma.
+        It is a variance.  Especially in the context or the redecnd using
+        it's sqrt to normalize the residual amplitudes
 
         Parameters
         ----------
@@ -171,37 +171,15 @@ class TRME(RegressionEstimator):
         Y2 = np.linalg.norm(Y_or_Yc, axis=0)**2 #variance?
         QHY2 = np.linalg.norm(QHY, axis=0)**2
         sigma = correction_factor * (Y2 - QHY2) / self.n_data;
+
+        # try:
+        #     assert (sigma > 0).all()
+        # except:
+        #     print(sigma)
+        #     raise Exception
         return sigma
 
-    def solve_overdetermined(self):
-        """
-        Overdetermined problem...use svd to invert, return
-        NOTE: the solution IS non - unique... and by itself RME is not setup
-        to do anything sensible to resolve the non - uniqueness(no prior info
-        is passed!).  This is stop-gap, to prevent errors when using RME as
-        part of some other estimation scheme!
 
-        We basically never get here and when we do we dont trust the results
-        https://docs.scipy.org/doc/numpy-1.9.2/reference/generated/numpy.linalg.svd.html
-        https://www.mathworks.com/help/matlab/ref/double.svd.html
-        Returns
-        -------
-
-        """
-        print("STILL NEEDS TO BE TRANSLATED")
-        #Return None /nan and flag it is a valid solution
-        #for aurora 2021 Sept.
-        U, s, V = np.linalg.svd(self.X, full_matrices=False)
-        #[u, s, v] = svd(self.X, 'econ');
-        sInv = 1. / diag(s);
-        self.b = v * diag(sInv) * u.T * self.Y;
-        if self.iter_control.return_covariance:
-            self.noise_covariance = np.zeros(self.n_channels_out,
-                                             self.n_channels_out);
-            self.inverse_signal_covariance = np.zeros(self.n_param,
-                                                      self.n_param);
-
-        return self.b
 
     def apply_huber_weights(self, sigma, YP):
         """

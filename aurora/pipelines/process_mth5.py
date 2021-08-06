@@ -10,7 +10,9 @@ from aurora.pipelines.processing_helpers import validate_sample_rate
 from aurora.sandbox.processing_config import ProcessingConfig
 from aurora.sandbox.processing_config import RunConfig
 from aurora.time_series.frequency_band_helpers import configure_frequency_bands
+from aurora.transfer_function.transfer_function_collection import TransferFunctionCollection
 from aurora.transfer_function.TTFZ import TTFZ
+
 
 from mth5.mth5 import MTH5
 
@@ -217,8 +219,7 @@ def process_mth5_run(run_cfg, run_id, units="MT", show_plot=True,
     tf_dict = {}
 
     for dec_level_id in run_config.decimation_level_ids:
-        print("get a processing config")
-        print("TODO: Add a genertor or iterator to RunConfig() object")
+
         processing_config = run_config.decimation_level_configs[dec_level_id]
         processing_config.local_station_id = run_config.local_station_id
         processing_config.reference_station_id = run_config.reference_station_id
@@ -241,12 +242,11 @@ def process_mth5_run(run_cfg, run_id, units="MT", show_plot=True,
         tf_obj = process_mth5_decimation_level(processing_config, local,
                                                remote, units=units)
         tf_dict[dec_level_id] = tf_obj
+
         if show_plot:
             from aurora.sandbox.plot_helpers import plot_tf_obj
-
             plot_tf_obj(tf_obj, out_filename="out")
 
-    from aurora.transfer_function.transfer_function_collection import TransferFunctionCollection
     tf_collection = TransferFunctionCollection(header=tf_obj.tf_header,
                                                tf_dict=tf_dict)
     if z_file_path:

@@ -126,11 +126,14 @@ class RegressionEstimator(object):
             XY = XY.to_dataset("channel")
         n_channels = len(XY)
         n_frequency = len(XY.frequency)
+
         try:
             n_segments = len(XY.time)
         except TypeError:
+            #could occur because time is not iterable,
+            #corresponds to overdetermined problem
             n_segments = 1
-            #overdetermined problem
+
         n_fc_per_channel = n_frequency * n_segments
 
         output_array = np.full((n_fc_per_channel, n_channels),
@@ -140,8 +143,55 @@ class RegressionEstimator(object):
         for i_ch, key in enumerate(channel_keys):
             output_array[:, i_ch] = XY[key].data.ravel()
         return output_array
-    
 
+
+    def solve_overdetermined(self):
+        """
+        20210806
+        This method was originally in TRME.m, but it does not depend in
+        general on using RME method so I am putting it in the base class.
+
+        We basically never get here and when we do we dont trust the results
+        https://docs.scipy.org/doc/numpy-1.9.2/reference/generated/numpy.linalg.svd.html
+        https://www.mathworks.com/help/matlab/ref/double.svd.html
+
+        <ORIGINAL MATLAB>
+            <COMMENT>
+        Overdetermined problem...use svd to invert, return
+        NOTE: the solution IS non - unique... and by itself RME is not setup
+        to do anything sensible to resolve the non - uniqueness(no prior info
+        is passed!).  This is stop-gap, to prevent errors when using RME as
+        part of some other estimation scheme!
+            </COMMENT>
+            <CODE>
+        [u,s,v] = svd(obj.X,'econ');
+        sInv = 1./diag(s);
+        obj.b = v*diag(sInv)*u'*obj.Y;
+        if ITER.returnCovariance
+           obj.Cov_NN = zeros(K,K);
+           obj.Cov_SS = zeros(nParam,nParam);
+        end
+        result = obj.b
+            </CODE>
+        </ORIGINAL MATLAB>
+
+
+        -------
+
+        """
+        #print("Overdetermined problem needs to be coded, see aurora issue #4")
+        #raise NotImplementedError
+
+        U, s, V = np.linalg.svd(self.X, full_matrices=False)
+        sInv = 1. / s
+        self.b = V.T@ (np.diag(sInv) @ U.T) * self.Y
+        if self.iter_control.return_covariance:
+            self.noise_covariance = np.zeros((self.n_channels_out,
+                                             self.n_channels_out));
+            self.inverse_signal_covariance = np.zeros((self.n_param,
+                                                      self.n_param));
+
+        return self.b
 
     def check_number_of_observations_xy_consistent(self):
         if self.Y.shape[0] != self.X.shape[0]:
