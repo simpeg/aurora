@@ -1,8 +1,6 @@
 from pathlib import Path
 from aurora.sandbox.plot_helpers import plot_tf_obj
-
-
-
+from aurora.time_series.frequency_band_helpers import configure_frequency_bands
 
 processing_cfg = Path("config", "pkd_processing_config.json")
 processing_cfg = Path("config", "ascii_pkd_processing_config.json")
@@ -23,7 +21,6 @@ def process_mth5_decimation_level(processing_cfg, run_id, units="MT"):
     from pathlib import Path
     from aurora.sandbox.processing_config import ProcessingConfig
     from mth5.mth5 import MTH5
-    from aurora.pipelines.processing_helpers import configure_frequency_bands
     from aurora.pipelines.processing_helpers import process_transfer_functions
     from aurora.pipelines.processing_helpers import run_ts_to_calibrated_stft
     from aurora.pipelines.processing_helpers import transfer_function_header_from_config

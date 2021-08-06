@@ -11,19 +11,6 @@ from aurora.transfer_function.TRME_RR import TRME_RR
 import scipy.signal as ssig
 
 
-def configure_frequency_bands(config):
-    frequency_bands = FrequencyBands()
-    if config["band_setup_style"] == "EMTF":
-        frequency_bands.from_emtf_band_setup(
-            filepath=config.emtf_band_setup_file,
-            sampling_rate=config.sample_rate,
-            decimation_level=config.decimation_level_id+1,
-            num_samples_window=config.num_samples_window)
-    else:
-        print("TODO:Write a method to choose lower and upper bounds, "
-              "and number of bands to split it into")
-    return frequency_bands
-
 
 def transfer_function_header_from_config(config):
     transfer_function_header = TransferFunctionHeader(
