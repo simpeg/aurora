@@ -24,9 +24,9 @@ iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_1
     %  Parameters that control regression M-estimates are defined in ITER
 
 """
-
 import numpy as np
-from aurora.transfer_function.TRegression import RegressionEstimator
+from aurora.transfer_function.regression.base import RegressionEstimator
+
 class TRME_RR(RegressionEstimator):
     def __init__(self, **kwargs):
         """

@@ -83,7 +83,7 @@ http://matlab.izmiran.ru/help/techdoc/ref/mldivide.html
 import numpy as np
 from scipy.linalg import solve_triangular
 
-from aurora.transfer_function.TRegression import RegressionEstimator
+from aurora.transfer_function.regression.base import RegressionEstimator
 
 class TRME(RegressionEstimator):
 

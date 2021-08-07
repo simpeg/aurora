@@ -1,6 +1,6 @@
 def plot_tf_obj(tf_obj, out_filename=None):
     print("GET PLOTTER FROM MTpy")
-    from aurora.transfer_function.rho_plot import RhoPlot
+    from aurora.transfer_function.plot.rho_plot import RhoPlot
     import matplotlib.pyplot as plt
     plotter = RhoPlot(tf_obj)
     fig, axs = plt.subplots(nrows=2)

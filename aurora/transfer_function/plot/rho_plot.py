@@ -6,7 +6,7 @@ iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_1
 import matplotlib.pyplot as plt
 import numpy as np
 
-from aurora.transfer_function.error_bar_helpers import err_log
+from aurora.transfer_function.plot.error_bar_helpers import err_log
 
 plt.ioff()
 class RhoPlot(object):

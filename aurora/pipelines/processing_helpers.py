@@ -5,8 +5,8 @@ from aurora.time_series.windowing_scheme import WindowingScheme
 from aurora.transfer_function.iter_control import IterControl
 from aurora.transfer_function.transfer_function_header import \
     TransferFunctionHeader
-from aurora.transfer_function.TRME import TRME
-from aurora.transfer_function.TRME_RR import TRME_RR
+from aurora.transfer_function.regression.TRME import TRME
+from aurora.transfer_function.regression.TRME_RR import TRME_RR
 
 import scipy.signal as ssig
 
