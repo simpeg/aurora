@@ -65,7 +65,7 @@ Matlab's reference to the "economy" rerpresentation is what Trefethen and Bau
 call the "reduced QR factorization".  Golub & Van Loan (1996, §5.2) call Q1R1
 the thin QR factorization of A;
 
-There are sevearl discussions online about the differences in
+There are several discussions online about the differences in
 numpy, scipy, sklearn, skcuda etc.
 https://mail.python.org/pipermail/numpy-discussion/2012-November/064485.html
 We will default to using numpy for now.

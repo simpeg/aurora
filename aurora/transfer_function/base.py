@@ -223,7 +223,7 @@ class TransferFunction(object):
         """
         index = self.period_index(period)
         if self.TF is None:
-            print('Initialize TransferFunction obect before calling setTF')
+            print('Initialize TransferFunction obejct before calling setTF')
             raise Exception
 
         # use TregObj to fill in full impedance, error bars for a
@@ -253,14 +253,6 @@ class TransferFunction(object):
             for k in range(self.num_channels_in):
                 stderr[j, k,:] = np.sqrt(self.Cov_NN[j, j,:] * self.Cov_SS[k, k,:]);
         return stderr
-
-    #<TO BE DEPRECATED/MERGE WITH BandAveragingScheme>
-    # def get_num_bands(self):
-    #     return len(self.T)
-    #
-    # def get_frequencies(self):
-    #     return 1. / self.T
-    #</TO BE DEPRECATED/MERGE WITH BandAveragingScheme>
 
 
     def from_emtf_zfile(self):

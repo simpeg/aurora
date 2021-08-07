@@ -194,9 +194,9 @@ def process_transfer_functions(config, local_stft_obj,
         band_dataset = extract_band(band, local_stft_obj)
         X = band_dataset[config.input_channels]
         Y = band_dataset[config.output_channels]
+        print("Handle nan of input channels")
         if config.reference_station_id:
-            band_dataarray = extract_band(band, remote_stft_obj)
-            band_dataset = band_dataarray.to_dataset("channel")
+            band_dataset = extract_band(band, remote_stft_obj)
             RR = band_dataset[config.reference_channels]
 
         if config.estimation_engine == "OLS":

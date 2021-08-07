@@ -102,14 +102,17 @@ class RegressionEstimator(object):
 
     def cast_data_to_2d_for_regression(self, XY):
         """
-        When the data are "harvested" from frequency bands they have a
-        typical STFT structure, which means one axis is time (the time of the
-        window that was FFT-ed) and the other is frequency.  However we make
-        no distinction between Fourier coefficients (or bins) within a band,
-        so we need to gather all the FCs for each channel into a 1D array.
-        This performs that reshaping (ravelling) operation
+        When the data for a frequency band are extracted from the STFT and
+        passed to RegressionEstimator they have a typical STFT structure:
+        One axis is time (the time of the window that was FFT-ed) and the
+        other axis is frequency.  However we make no distinction between the
+        harmonics (or bins) within a band.  We need to gather all the FCs for
+        each channel into a 1D array.
+        This method performs that reshaping (ravelling) operation.  This
+        ravelling makes xarray less natural to use because the frequency and
+        time axes are now mixed.
 
-        It is not important how we unravel the FCs but it is important that
+        *It is not important how we unravel the FCs but it is important that
         we use the same scheme for X and Y.
 
         Parameters
@@ -224,10 +227,17 @@ class RegressionEstimator(object):
     def is_overdetermined(self):
         return self.n_param > self.n_data
 
-    # ADD NAN MANAGEMENT HERE
+    def mask_input_channels(self):
+        """
+        ADD NAN MANAGEMENT HERE
+        Returns
+        -------
+
+        """
+        pass
 
 
-    # <MAY SUPERCLASS REGRESSION ESTIMATOR LEAVING THIS AN ABSTRACT BASE CLASS>
+
     def qr_decomposition(self, X, sanity_check=False):
         Q, R = np.linalg.qr(X)
         self._Q = Q
