@@ -1,7 +1,9 @@
-from aurora.sandbox.processing_config import ProcessingConfig
-from aurora.time_series.filters.filter_helpers import make_coefficient_filter
+import random
 from pathlib import Path
 
+from aurora.time_series.filters.filter_helpers import make_coefficient_filter
+
+random.seed(0)
 #<FILTERS>
 ACTIVE_FILTERS = []
 unity_coeff_filter = make_coefficient_filter(name="1", gain=1.0)
@@ -32,9 +34,19 @@ STATION_01_CFG["raw_data_path"] = Path("data","test1.asc")
 STATION_01_CFG["mth5_path"] = Path("data", "test1.h5")
 
 STATION_01_CFG["columns"] = ["hx", "hy", "hz", "ex", "ey"]
+
 STATION_01_CFG["noise_scalar"] = {}
 for col in STATION_01_CFG["columns"]:
     STATION_01_CFG["noise_scalar"][col] = 0.0
+
+# adding to support issue #59
+#create a tuple of index, n_samples that get set to nan
+STATION_01_CFG["nan_indices"] = {}
+for col in STATION_01_CFG["columns"]:
+    STATION_01_CFG["nan_indices"][col] = []
+    if col == "hx":
+        STATION_01_CFG["nan_indices"][col].append([11, 100])
+
 STATION_01_CFG["filters"] = {}
 # for col in STATION_01_CFG["columns"]:
 #     STATION_01_CFG["filters"][col] = []
@@ -53,5 +65,7 @@ STATION_02_CFG = STATION_01_CFG.copy()
 STATION_02_CFG["raw_data_path"] = Path("data","test2.asc")
 STATION_02_CFG["mth5_path"] = Path("data", "test2.h5")
 STATION_02_CFG["station_id"] = "test2"
-
+STATION_02_CFG["nan_indices"] = {}
+for col in STATION_02_CFG["columns"]:
+    STATION_02_CFG["nan_indices"][col] = []
 #</MTH5 CREATION CONFIG>
