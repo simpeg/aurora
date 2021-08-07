@@ -22,6 +22,8 @@ def process_mth5_decimation_level(processing_cfg, run_id, units="MT"):
     from aurora.sandbox.processing_config import ProcessingConfig
     from mth5.mth5 import MTH5
     from aurora.pipelines.processing_helpers import process_transfer_functions
+    from aurora.pipelines.processing_helpers import run_ts_to_stft
+    from aurora.pipelines.processing_helpers import calibrate_stft_obj
     from aurora.pipelines.processing_helpers import run_ts_to_calibrated_stft
     from aurora.pipelines.processing_helpers import transfer_function_header_from_config
     from aurora.pipelines.processing_helpers import validate_sample_rate
@@ -53,7 +55,6 @@ def process_mth5_decimation_level(processing_cfg, run_id, units="MT"):
                                  frequency_bands)
 
     transfer_function_obj = process_transfer_functions(config,
-                                                       frequency_bands,
                                                        local_stft_obj,
                                                        remote_stft_obj,
                                                        transfer_function_obj)

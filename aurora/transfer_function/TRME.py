@@ -316,10 +316,10 @@ class TRME(RegressionEstimator):
             while self.iter_control.continue_redescending:
                 self.iter_control._number_of_redescending_iterations += 1
                 #add setter here
-                YP = np.matmul(Q, QHYc) # predict from cleaned data
+                YP = Q @ QHYc  # predict from cleaned data
                 self.redescend(YP, sigma) #update cleaned data, and expectation
                 # updated error variance estimates, computed using cleaned data
-                QHYc = np.matmul(QH, self.Yc)
+                QHYc = QH @ self.Yc
                 self.b = solve_triangular(R, QHYc)
                 sigma = self.sigma(QHYc, self.Yc)
             # crude estimate of expectation of psi ... accounting for
@@ -332,12 +332,12 @@ class TRME(RegressionEstimator):
             # compute error covariance matrices
             self.inverse_signal_covariance= np.linalg.inv(R.conj().T @ R)
 
-            res_clean = self.Yc - YP;
-            SSR_clean = np.conj(res_clean.conj().T @ res_clean);
-            res = self.Y-YP;
-            SSR = np.conj(np.matmul(res.conj().T, res));
+            res_clean = self.Yc - YP
+            SSR_clean = np.conj(res_clean.conj().T @ res_clean)
+            res = self.Y - YP
+            SSR = np.conj( res.conj().T @ res)
             Yc2 = np.abs(self.Yc)**2
-            SSYC = np.sum(Yc2, axis=0);
+            SSYC = np.sum(Yc2, axis=0)
             inv_psi_prime2 = np.diag(1. / (self.expectation_psi_prime**2))
             degrees_of_freedom = self.n_data-self.n_param
             self.noise_covariance = inv_psi_prime2 @ SSR_clean / degrees_of_freedom

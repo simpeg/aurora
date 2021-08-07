@@ -140,13 +140,22 @@ def run_ts_to_stft(config, run_xrts_orig):
 
 
 def run_ts_to_calibrated_stft(run_ts, run_obj, config, units="MT"):
+    """
+    Parameters
+    ----------
+    run_ts
+    run_obj
+    config
+    units
 
+    Returns
+    -------
+
+    """
     stft_obj = run_ts_to_stft(config, run_ts.dataset)
     stft_obj = calibrate_stft_obj(stft_obj, run_obj, units=units)
 
-    stft_obj_xrda = stft_obj.to_array("channel")
-    print("why bother making this an array here?")
-    return stft_obj_xrda
+    return stft_obj
 
 def calibrate_stft_obj(stft_obj, run_obj, units="MT"):
     """
