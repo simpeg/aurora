@@ -96,6 +96,21 @@ def process_synthetic_1_overdetermined():
     run_id = "001"
     process_mth5_run(test_config, run_id, units="MT")
 
+def process_synthetic_1_with_nans():
+    """
+    Just like process_synthetic_1, but I made the window ridiculously long so
+    that we encounter the overdetermined problem. We actually pass that test
+    but in testing I found that at the next band over, which has more data
+    because there are multipe FCs the sigma in TRME comes out as negative.
+    I would have thought we were mathematically protected from this
+    Returns
+    -------
+
+    """
+    test_config = Path("config", "test1_run_config_nan.json")
+    run_id = "001"
+    process_mth5_run(test_config, run_id, units="MT")
+
 def process_synthetic_1():
     test_config = Path("config", "test1_run_config.json")
     run_id = "001"
@@ -115,6 +130,7 @@ def process_synthetic_rr12():
 def test_process_mth5():
     #create_mth5_synthetic_file(STATION_01_CFG, plot=False)
     #process_synthetic_1_overdetermined()
+    #process_synthetic_1_with_nans()
     process_synthetic_1_standard()
     #create_run_config_for_test_case("test1")
     #process_synthetic_1()

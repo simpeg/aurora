@@ -97,12 +97,16 @@ def create_mth5_synthetic_file(station_cfg, plot=False, add_nan_values=False):
         if station_cfg["noise_scalar"][col]:
             df[col] += station_cfg["noise_scalar"][col]*np.random.randn(len(df))
 
+
     if add_nan_values:
-        new_path = Path(station_cfg["mth5_path"].__str__().replace(".h5", "_nan.h5"))
-        station_cfg["mth5_path"] = new_path
+        mth5_path = Path(station_cfg["mth5_path"].__str__().replace(".h5",
+                                                               "_nan.h5"))
         for col in station_cfg["columns"]:
             for [ndx,num_nan] in station_cfg["nan_indices"][col]:
                 df[col].loc[ndx:ndx+num_nan] = np.nan
+    else:
+        mth5_path = station_cfg["mth5_path"]
+
     #cast to run_ts
     runts = create_run_ts_from_station_config(station_cfg, df)
 
@@ -115,7 +119,7 @@ def create_mth5_synthetic_file(station_cfg, plot=False, add_nan_values=False):
 
     # make an MTH5
     m = MTH5()
-    m.open_mth5(station_cfg["mth5_path"], mode="w")
+    m.open_mth5(mth5_path, mode="w")
     station_group = m.add_station(station_cfg["station_id"])
 
     #<try assign location>
