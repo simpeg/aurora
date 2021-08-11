@@ -11,6 +11,7 @@ import numpy as np
 import xarray as xr
 from aurora.transfer_function.iter_control import IterControl
 
+
 class RegressionEstimator(object):
     """
     Abstract base class for solving Y = X*b + epsilon for b, complex-valued
@@ -25,8 +26,10 @@ class RegressionEstimator(object):
     When we "regress Y on X", we use the values of variable X to predict
     those of Y.
 
-    Typically operates on single "frequency_band"s one-at-a-time/
-    Allows multiple columns of Y, but estimates b for each column separately
+    Typically operates on single "frequency_band".
+    Allows multiple columns of Y, but estimates b for each column separately.
+
+
     Estimated signal and noise covariance matrices can be used to compute error
     together to compute covariance for the matrix of regression coefficients b
 
@@ -37,6 +40,8 @@ class RegressionEstimator(object):
 
     Properties created with the ``@property`` decorator should be documented
     in the property's getter method.
+
+
 
     Attributes
     ----------
@@ -55,6 +60,9 @@ class RegressionEstimator(object):
     b : numpy array (normally 2-dimensional)
         Matrix of regression coefficients, i.e. the solution to the regression
         problem.  In our context they are the "Transfer Function"
+        The dimension of b, to match X and Y is [n_input_ch, n_output_ch]
+        When we are solving "channel-by-channel", b is usually [2,1].
+
     inverse_signal_covariance: numpy array (????-Dimensional)
         This was Cov_SS in Gary's matlab codes
         Formula? Reference?
@@ -98,7 +106,19 @@ class RegressionEstimator(object):
 
         self._Q = None
         self._R = None
-        self._QH = None #conjugate transpose of Q (Hermitian operator)
+        self._QH = None  # conjugate transpose of Q (Hermitian operator)
+
+    def b_to_xarray(self):
+        print("TEST IMPLEMENTATION")
+        xra = xr.DataArray(
+            self.b,
+            dims=["input_channel", "output_channel"],
+            coords={
+                "input_channel": list(self._X.data_vars),
+                "output_channel": list(self._Y.data_vars),
+            },
+        )
+        return xra
 
     def cast_data_to_2d_for_regression(self, XY):
         """
@@ -117,7 +137,7 @@ class RegressionEstimator(object):
 
         Parameters
         ----------
-        XY: either X or Y of the regression nomenclature.  Should be an 
+        XY: either X or Y of the regression nomenclature.  Should be an
         xarray.Dataset already splitted on channel
 
         Returns
@@ -133,20 +153,20 @@ class RegressionEstimator(object):
         try:
             n_segments = len(XY.time)
         except TypeError:
-            #could occur because time is not iterable,
-            #corresponds to overdetermined problem
+            # could occur because time is not iterable,
+            # corresponds to overdetermined problem
             n_segments = 1
 
         n_fc_per_channel = n_frequency * n_segments
 
-        output_array = np.full((n_fc_per_channel, n_channels),
-                               np.nan+1.j*np.nan, dtype=np.complex128)
+        output_array = np.full(
+            (n_fc_per_channel, n_channels), np.nan + 1.0j * np.nan, dtype=np.complex128
+        )
 
         channel_keys = list(XY.keys())
         for i_ch, key in enumerate(channel_keys):
             output_array[:, i_ch] = XY[key].data.ravel()
         return output_array
-
 
     def solve_overdetermined(self):
         """
@@ -182,24 +202,24 @@ class RegressionEstimator(object):
         -------
 
         """
-        #print("Overdetermined problem needs to be coded, see aurora issue #4")
-        #raise NotImplementedError
+        # print("Overdetermined problem needs to be coded, see aurora issue #4")
+        # raise NotImplementedError
 
         U, s, V = np.linalg.svd(self.X, full_matrices=False)
-        sInv = 1. / s
-        self.b = V.T@ (np.diag(sInv) @ U.T) * self.Y
+        sInv = 1.0 / s
+        self.b = V.T @ (np.diag(sInv) @ U.T) * self.Y
         if self.iter_control.return_covariance:
-            self.noise_covariance = np.zeros((self.n_channels_out,
-                                             self.n_channels_out));
-            self.inverse_signal_covariance = np.zeros((self.n_param,
-                                                      self.n_param));
+            self.noise_covariance = np.zeros((self.n_channels_out, self.n_channels_out))
+            self.inverse_signal_covariance = np.zeros((self.n_param, self.n_param))
 
         return self.b
 
     def check_number_of_observations_xy_consistent(self):
         if self.Y.shape[0] != self.X.shape[0]:
-            print(f"Design matrix (X) has {self.X.shape[0]} rows but data (Y) "
-                  f"has {self.Y.shape[0]}")
+            print(
+                f"Design matrix (X) has {self.X.shape[0]} rows but data (Y) "
+                f"has {self.Y.shape[0]}"
+            )
             raise Exception
 
     @property
@@ -213,7 +233,7 @@ class RegressionEstimator(object):
         """
         return self.X.shape[0]
 
-    #REPLACE WITH n_channels_in
+    # REPLACE WITH n_channels_in
     @property
     def n_param(self):
         return self.X.shape[1]
@@ -235,8 +255,6 @@ class RegressionEstimator(object):
 
         """
         pass
-
-
 
     def qr_decomposition(self, X, sanity_check=False):
         Q, R = np.linalg.qr(X)
@@ -261,7 +279,7 @@ class RegressionEstimator(object):
     @property
     def QH(self):
         if self._QH is None:
-            self._QH = Q.conj().T
+            self._QH = self.Q.conj().T
         return self._QH
 
     def estimate_ols(self, mode="solve"):
@@ -287,8 +305,9 @@ class RegressionEstimator(object):
         -------
 
         """
-        if mode.lower()=="qr":
+        if mode.lower() == "qr":
             from scipy.linalg import solve_triangular
+
             self.qr_decomposition(self.X)
             b = solve_triangular(self.R, self.QH @ self.Y)
         else:
@@ -297,10 +316,10 @@ class RegressionEstimator(object):
             XH = np.conj(X.T)
             XHX = XH @ X
             XHY = XH @ Y
-            if mode.lower()=="brute_force":
+            if mode.lower() == "brute_force":
                 XHX_inv = np.linalg.inv(XHX)
                 b = np.matmul(XHX_inv, XHY)
-            elif mode.lower()=="solve":
+            elif mode.lower() == "solve":
                 b = np.linalg.solve(XHX, XHY)
             else:
                 print(f"mode {mode} not recognized")
@@ -308,13 +327,10 @@ class RegressionEstimator(object):
         self.b = b
         return b
 
-
     def estimate(self):
         print("this method is not defined for the abstract base class")
         print("But we put OLS in here for dev")
         Z = self.estimate_ols(mode="qr")
         return Z
+
     # </MAY SUPERCLASS REGRESSION ESTIMATOR LEAVING THIS AN ABSTRACT BASE CLASS>
-
-
-
