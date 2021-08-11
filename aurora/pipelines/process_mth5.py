@@ -91,8 +91,8 @@ def prototype_decimate(config, run_run_ts):
 def process_mth5_decimation_level(config, local, remote, units="MT"):
     """
     Processing pipeline for a single decimation_level
-    Note that we will need a check that the processing config sample rates agree
-    with the data sampling rates otherwise raise Exception
+    TODO: Add a check that the processing config sample rates agree with the 
+    data sampling rates otherwise raise Exception
     This method can be single station or remote based on the process cfg
     :param processing_cfg:
     :return:

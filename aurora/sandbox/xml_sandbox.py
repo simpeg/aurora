@@ -8,7 +8,7 @@ This is a xml reader prototype for the filter.xml
 Filter application info: they always have either "value" or "poles_zeros"
 
 
-#import xml.etree.ElementTree as ET
+#import xml.etree.cElementTree as ET
 #tree = ET.parse(xml_path)
 # mt_root_element = tree.getroot()
 # mt_experiment = Experiment()
@@ -26,22 +26,26 @@ import pandas as pd
 import pdb
 #import xmltodict as xd
 
-from lxml import etree, objectify
 from pathlib import Path
 
 from aurora.general_helper_functions import FIGURES_PATH
 
 from mt_metadata.base.helpers import element_to_dict
 from mt_metadata.timeseries import Station
-import xml.etree.cElementTree as ET
 
-#<FROM TIM>
 from obspy.clients.fdsn import Client
 from obspy import UTCDateTime
 from obspy import read_inventory
 
 
 def test_instantiate_and_export_mth5_metadata_example():
+    """
+    ToDo: Move this function into mth5_helpers.  It does not depend on xml so
+    shouldn't be in xml_sandbox.
+    Returns
+    -------
+
+    """
     print("test_instantiate_and_export_mth5_metadata_example")
     mt_station = Station()
     json_string = mt_station.to_json(required=False, nested=True)
@@ -97,12 +101,12 @@ def test_get_example_xml_inventory():
     iterate_through_mtml(inventory)
     print('ok')
 
+
 def describe_inventory_stages(inventory, assign_names=False):
     """
-    Scans iinventory looking for stages.  Has option to assign names to stages, these are used as keys in MTH5
-    Modifies inventory in place.
+    Scans inventory looking for stages.  Has option to assign names to stages,
+    these names are used as keys in MTH5. Modifies inventory in place.
 
-    ToDo: Best practice to return inventory or no?
     Parameters
     ----------
     inventory
@@ -145,7 +149,7 @@ def describe_inventory_stages(inventory, assign_names=False):
                         #plt.show()
     if new_names_were_assigned:
         inventory.networks = networks
-        print("NETWORKS REASSIGNED")
+        print("Inventory Networks Reassigned")
     return
 
 

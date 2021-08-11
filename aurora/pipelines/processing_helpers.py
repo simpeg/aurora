@@ -1,3 +1,9 @@
+"""
+Split this into a module for time_domain processing helpers,
+and transfer_function_processing helpers.
+
+
+"""
 
 from aurora.time_series.frequency_band_helpers import extract_band
 from aurora.time_series.frequency_band import FrequencyBands
@@ -12,17 +18,7 @@ import scipy.signal as ssig
 
 
 
-def transfer_function_header_from_config(config):
-    transfer_function_header = TransferFunctionHeader(
-        processing_scheme=config.estimation_engine,
-        local_station_id=config.local_station_id,
-        reference_station_id=config.reference_station_id,
-        input_channels=config.input_channels,
-        output_channels=config.output_channels,
-        reference_channels=config.reference_channels)
-    return transfer_function_header
-
-
+#<TIME SERIES PIPELINE HELPERS>
 def validate_sample_rate(run_ts, config):
     if run_ts.sample_rate != config.sample_rate:
         print(f"sample rate in run time series {local_run_ts.sample_rate} and "
@@ -185,37 +181,132 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT"):
                 calibration_response /= 1e-9  # SI Units
         stft_obj[channel_id].data /= calibration_response
     return stft_obj
+#</TIME SERIES PIPELINE HELPERS>
 
+
+
+
+#<TF PROCESSING HELPERS>
+#TODO: Make all these regression methods accept kwargs on init so that
+#none of them choke if we pass them Z=None or iter_control=None
+from aurora.transfer_function.regression.base import RegressionEstimator
+REGRESSION_LIBRARY = {
+    "OLS" : RegressionEstimator,
+    "RME" : TRME,
+    "TRME_RR": TRME_RR
+}
+
+def get_regression_class(config):
+    try:
+        regression_class = REGRESSION_LIBRARY[config.estimation_engine]
+    except:
+        print(f"processing_scheme {config.estimation_engine} not supported")
+        print(f"processing_scheme must be one of OLS, RME ")
+        raise Exception
+    return regression_class
+
+def set_up_iter_control(config):
+    """
+    TODO: Review: maybe better to just make this the __init__ method of the
+    IterControl object, iter_control = IterControl(config)
+
+
+    Parameters
+    ----------
+    config
+
+    Returns
+    -------
+
+    """
+    if config.estimation_engine in ["RME", "TRME_RR"]:  
+        iter_control = IterControl(max_number_of_iterations=config.max_number_of_iterations)
+    elif config.estimation_engine in ["OLS", ]:
+        iter_control = None
+    return iter_control
+
+def transfer_function_header_from_config(config):
+    transfer_function_header = TransferFunctionHeader(
+        processing_scheme=config.estimation_engine,
+        local_station_id=config.local_station_id,
+        reference_station_id=config.reference_station_id,
+        input_channels=config.input_channels,
+        output_channels=config.output_channels,
+        reference_channels=config.reference_channels)
+    return transfer_function_header
+
+def get_band_for_tf_estimate(band, config, local_stft_obj, remote_stft_obj):
+    """
+    Get data for TF estimation for a particular band.
+
+    Parameters
+    ----------
+    band : aurora.time_series.frequency_band.FrequencyBand
+        object with lower_bound and upper_bound to tell stft object which 
+        subarray to return 
+    config : aurora.sandbox.processing_config.ProcessingConfig
+        information about the input and output channels needed for TF 
+        estimation problem setup
+    local_stft_obj : xarray.core.dataset.Dataset or None
+        Time series of Fourier coefficients for the station whose TF is to be
+        estimated
+    remote_stft_obj : xarray.core.dataset.Dataset or None
+        Time series of Fourier coefficients for the remote reference station 
+
+    Returns
+    -------
+    X, Y, RR : xarray.core.dataset.Dataset or None
+        data structures as local_stft_object and remote_stft_object, but
+        restricted only to input_channels, output_channels,
+        reference_channels and also the frequency axes are restricted to
+        being within the frequency band given as an input argument.
+    """
+    print(f"Processing band {band.center_period}s")
+    band_dataset = extract_band(band, local_stft_obj)
+    X = band_dataset[config.input_channels]
+    Y = band_dataset[config.output_channels]
+    print("TODO: Handle nan of input channels HERE!")
+    if config.reference_station_id:
+        band_dataset = extract_band(band, remote_stft_obj)
+        RR = band_dataset[config.reference_channels]
+    else:
+        RR = None
+
+    return X, Y, RR
 
 def process_transfer_functions(config, local_stft_obj,
-                               remote_stft_obj, transfer_function_obj):
-    for band in transfer_function_obj.frequency_bands.bands():
-        print(f"Processing band {band.center_period}s")
-        band_dataset = extract_band(band, local_stft_obj)
-        X = band_dataset[config.input_channels]
-        Y = band_dataset[config.output_channels]
-        print("Handle nan of input channels")
-        if config.reference_station_id:
-            band_dataset = extract_band(band, remote_stft_obj)
-            RR = band_dataset[config.reference_channels]
+                               remote_stft_obj, transfer_function_obj,
+                               estimate_per_channel=True):
+    """
+    This method is very similar to TTFestBand.
+    20210810: This method currently estimates all the TF coefficients in a
+    single call to estimate().  That is OK, especially if there is no missing
+    data but EMTF estimates the TF for each output channel independently
+    
+    Parameters
+    ----------
+    config
+    local_stft_obj
+    remote_stft_obj
+    transfer_function_obj
 
-        if config.estimation_engine == "OLS":
-            regression_estimator = RegressionEstimator(X=X, Y=Y)
-            Z = regression_estimator.estimate_ols()
-        elif config.estimation_engine=="RME":
-            iter_control = IterControl(max_number_of_iterations=config.max_number_of_iterations)
-            regression_estimator = TRME(X=X, Y=Y, iter_control=iter_control)
-            Z = regression_estimator.estimate()
-        elif config.estimation_engine=="TRME_RR":
-            iter_control = IterControl(max_number_of_iterations=config.max_number_of_iterations)
-            regression_estimator = TRME_RR(X=X, Y=Y, Z=RR,
-                                           iter_control=iter_control)
-            Z = regression_estimator.estimate()
-        else:
-            print(f"processing_scheme {config.estimation_engine} not supported")
-            print(f"processing_scheme must be one of OLS, RME "
-            f"not supported")
-            raise Exception
-        print(f"{band.center_period} {config.estimation_engine}, \n {Z}")
+    Returns
+    -------
+
+    """
+    iter_control = set_up_iter_control(config)
+    regression_class = get_regression_class(config)
+    for band in transfer_function_obj.frequency_bands.bands():
+        X, Y, RR = get_band_for_tf_estimate(band,
+                                            config,
+                                            local_stft_obj,
+                                            remote_stft_obj)
+
+        regression_estimator = regression_class(X=X, Y=Y, Z=RR,
+                                                iter_control=iter_control)
+
+        Z = regression_estimator.estimate()
+
         transfer_function_obj.set_tf(regression_estimator, band.center_period)
     return transfer_function_obj
+#</TF PROCESSING HELPERS>
