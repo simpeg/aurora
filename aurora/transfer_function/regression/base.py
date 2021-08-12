@@ -63,9 +63,9 @@ class RegressionEstimator(object):
         The dimension of b, to match X and Y is [n_input_ch, n_output_ch]
         When we are solving "channel-by-channel", b is usually [2,1].
 
-    inverse_signal_covariance: numpy array (????-Dimensional)
-        This was Cov_SS in Gary's matlab codes
-        Formula? Reference?
+    inverse_signal_covariance: numpy array (n_input_ch, n_input_ch)
+        This was Cov_SS in Gary's matlab codes.  It is basically inv(X.H @ X)
+        Reference needed
     noise_covariance : numpy array (????-Dimensional)
         This was Cov_NN in Gary's matlab codes
         Formula?  Reference?
@@ -93,8 +93,8 @@ class RegressionEstimator(object):
         self._X = kwargs.get("X", None)
         self._Y = kwargs.get("Y", None)
         self.b = None
-        self.inverse_signal_covariance = None
-        self.noise_covariance = None
+        self.cov_nn = None
+        self.cov_ss_inv = None
         self.squared_coherence = None
         self.iter_control = kwargs.get("iter_control", IterControl())
 
@@ -108,14 +108,22 @@ class RegressionEstimator(object):
         self._R = None
         self._QH = None  # conjugate transpose of Q (Hermitian operator)
 
+    @property
+    def inverse_signal_covariance(self):
+        return self.cov_ss_inv
+
+    @property
+    def noise_covariance(self):
+        return self.cov_nn
+
     def b_to_xarray(self):
         print("TEST IMPLEMENTATION")
         xra = xr.DataArray(
-            self.b,
-            dims=["input_channel", "output_channel"],
+            np.transpose(self.b),
+            dims=["output_channel", "input_channel"],
             coords={
-                "input_channel": list(self._X.data_vars),
                 "output_channel": list(self._Y.data_vars),
+                "input_channel": list(self._X.data_vars),
             },
         )
         return xra
@@ -204,7 +212,10 @@ class RegressionEstimator(object):
         """
         # print("Overdetermined problem needs to be coded, see aurora issue #4")
         # raise NotImplementedError
-
+        print(
+            "Warning inverse_signal_covariance is not xarray, may break things "
+            "downstream"
+        )
         U, s, V = np.linalg.svd(self.X, full_matrices=False)
         sInv = 1.0 / s
         self.b = V.T @ (np.diag(sInv) @ U.T) * self.Y
@@ -332,5 +343,3 @@ class RegressionEstimator(object):
         print("But we put OLS in here for dev")
         Z = self.estimate_ols(mode="qr")
         return Z
-
-    # </MAY SUPERCLASS REGRESSION ESTIMATOR LEAVING THIS AN ABSTRACT BASE CLASS>

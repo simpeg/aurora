@@ -27,22 +27,23 @@ iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_1
 import numpy as np
 from aurora.transfer_function.regression.base import RegressionEstimator
 
+
 class TRME_RR(RegressionEstimator):
     def __init__(self, **kwargs):
         """
-    %   class constructor for TRME_RR objects
-    %    Robust remote reference estimator, for arbitray number of
-    %     input channels (i.e., columns of design matrix).
-    %    X gives the local input, Z is the reference
-    %       (matrices of the same size)
-    %  As for regrM.m the model  is Y = X*b, and multiple columns
-    %    of Y (predicted or output variables) are allowed (estimates
-    %    of b for each column are computed separately)
-    %
-    %   Usage: obj = TRME_RR(X,Z,Y,iter);
+        %   class constructor for TRME_RR objects
+        %    Robust remote reference estimator, for arbitray number of
+        %     input channels (i.e., columns of design matrix).
+        %    X gives the local input, Z is the reference
+        %       (matrices of the same size)
+        %  As for regrM.m the model  is Y = X*b, and multiple columns
+        %    of Y (predicted or output variables) are allowed (estimates
+        %    of b for each column are computed separately)
+        %
+        %   Usage: obj = TRME_RR(X,Z,Y,iter);
 
-        needs X, Y, Z, iter
-        :param kwargs:
+            needs X, Y, Z, iter
+            :param kwargs:
         """
         super(TRME_RR, self).__init__(**kwargs)
         self._Z = kwargs.get("Z", None)
@@ -65,7 +66,8 @@ class TRME_RR(RegressionEstimator):
 
     def check_for_enough_data_for_rr_estimate(self):
         if self.n_param > self.n_data:
-            print(f"not enough data for RR estimate: # param = {self.n_param} # data = {self.n_data}")
+            error_msg = "not enough data for RR estimate:"
+            print(f"{error_msg} # param = {self.n_param} # data = {self.n_data}")
             raise Exception
 
     def check_reference_data_shape(self):
@@ -73,7 +75,7 @@ class TRME_RR(RegressionEstimator):
             print("sizes of local and remote do not agree in RR estimation routine")
             raise Exception
 
-    #<COMMON RME METHODS>
+    # <COMMON RME METHODS>
     @property
     def r0(self):
         return self.iter_control.r0
@@ -108,7 +110,7 @@ class TRME_RR(RegressionEstimator):
             residuals = np.abs(self.Y[:, k] - YP[:, k])
             w = np.minimum(r0s / residuals, 1.0)
             self.Yc[:, k] = w * self.Y[:, k] + (1 - w) * YP[:, k]
-            self.expectation_psi_prime[k] = 1.0 * np.sum(w == 1) / self.n_data;
+            self.expectation_psi_prime[k] = 1.0 * np.sum(w == 1) / self.n_data
         return
 
     # </COMMON RME METHODS>
@@ -129,85 +131,86 @@ class TRME_RR(RegressionEstimator):
         """
         Q, R = self.qr_decomposition(self.Z)
         # initial LS RR estimate b0, error variances sigma
-        #[Q, ~] = qr(obj.Z, 0);#0 means "economy" -- same as np.lnalg default
+        # [Q, ~] = qr(obj.Z, 0);#0 means "economy" -- same as np.lnalg default
         QHX = self.Q.conj().T @ self.X
         QHY = self.Q.conj().T @ self.Y
-        #We need to get the properties of QHX, QXY to trace the flow of the
+        # We need to get the properties of QHX, QXY to trace the flow of the
         # solution in matlab using mldivide
-        b0 = np.linalg.solve(QHX, QHY)   #b0 = QTX\QTY;
-        #predicted data
-        Yhat = self.X @ b0;
+        b0 = np.linalg.solve(QHX, QHY)  # b0 = QTX\QTY;
+        # predicted data
+        Yhat = self.X @ b0
         # intial estimate of error variance
-        res = self.Y - Yhat;
-        sigma = np.sum(res * np.conj(res), axis=0) / self.n_data;
+        res = self.Y - Yhat
+        sigma = np.sum(res * np.conj(res), axis=0) / self.n_data
         cfac = self.iter_control.correction_factor
         if self.iter_control.max_number_of_iterations > 0:
             converged = False
-            cfac = 1. / (1. - np.exp(-self.iter_control.r0));
+            cfac = 1.0 / (1.0 - np.exp(-self.iter_control.r0))
 
         else:
             converged = True
-            E_psiPrime = 1;
+            self.expectation_psi_prime = 1
             Yhat = self.X @ b0
             self.b = b0
             self.Yc = self.Y
 
-        #<CONVERGENCE STUFF>
-        self.iter_control.number_of_iterations = 0;
+        # <CONVERGENCE STUFF>
+        self.iter_control.number_of_iterations = 0
 
         while not converged:
             self.iter_control.number_of_iterations += 1
             # cleaned data
-            self.apply_huber_weights(sigma, Yhat);#TRME_RR
+            self.apply_huber_weights(sigma, Yhat)
+            # TRME_RR
             # updated error variance estimates, computed using cleaned data
             QHY = Q.conj().T @ self.Yc
             self.b = np.linalg.solve(QHX, QHY)  # self.b = QTX\QTY
             Yhat = self.X @ self.b
-            res = self.Yc - Yhat;
-            sigma = cfac * np.sum(res * np.conj(res), axis=0) / self.n_data;
+            res = self.Yc - Yhat
+            sigma = cfac * np.sum(res * np.conj(res), axis=0) / self.n_data
             converged = self.iter_control.converged(self.b, b0)
             b0 = self.b
-        #</CONVERGENCE STUFF>
+        # </CONVERGENCE STUFF>
 
-
-        #<REDESCENDING STUFF>
+        # <REDESCENDING STUFF>
         while self.iter_control.continue_redescending:
-        # one iteration with redescending influence curve cleaned data
+            # one iteration with redescending influence curve cleaned data
             self.iter_control._number_of_redescending_iterations += 1
-            #[obj.Yc, E_psiPrime] = RedescendWt(obj.Y, Yhat, sigma, ITER.u0) # #TRME_RR
+            # [obj.Yc, E_psiPrime] = RedescendWt(obj.Y, Yhat, sigma, ITER.u0) # #TRME_RR
             self.redescend(Yhat, sigma)  # update cleaned data, and expectation
-            #updated error variance estimates, computed using cleaned data
+            # updated error variance estimates, computed using cleaned data
             QHYc = self.QH @ self.Yc
-            self.b = np.linalg.solve(QHX, QHYc)         #QHX\QHYc
+            self.b = np.linalg.solve(QHX, QHYc)  # QHX\QHYc
             Yhat = self.X * self.b
-            res = self.Yc - Yhat  #res_clean!
+            res = self.Yc - Yhat  # res_clean!
 
-        # crude estimate of expectation of psi accounting for redescending influence curve
+        # crude estimate of expectation of psi accounts for redescending influence curve
         self.expectation_psi_prime = 2 * self.expectation_psi_prime - 1
-        #</REDESCENDING STUFF>
+        # </REDESCENDING STUFF>
 
-        #<ERROR COVARIANCES>
-        #oh dear!
-        #obj.Cov_SS = (self.ZH @self.X) \ (self.XH @ self.X) / (self.XH @self.Z)
+        # <ERROR COVARIANCES>
+        # oh dear!
+        # obj.Cov_SS = (self.ZH @self.X) \ (self.XH @ self.X) / (self.XH @self.Z)
         # I broke the above line into B/A where
-        #B = (self.ZH @self.X) \ (self.XH @ self.X)
+        # B = (self.ZH @self.X) \ (self.XH @ self.X), and A = (self.XH @self.Z)
         # Then follow matlab cookbok, B/A for matrices = (A'\B')
         ZH = self.Z.conj().T
         XH = self.X.conj().T
-        B = np.linalg.solve(ZH @self.X, XH @ self.X)
-        A = XH @self.Z
-        #following matlab cookbok, B/A for matrices = (A'\B')
-        self.inverse_signal_covariance = np.linalg.solve(A.conj().T,B.conj().T).conj().T
+        B = np.linalg.solve(ZH @ self.X, XH @ self.X)
+        A = XH @ self.Z
+        self.inverse_signal_covariance = (
+            np.linalg.solve(A.conj().T, B.conj().T).conj().T
+        )
 
         # need to look at how we should compute adjusted residual cov
         # to make consistent with tranmt
-        SSR_clean= np.conj(res.conj().T @ res)
-        res = self.Yc-Yhat #ERROR? Yc-->Y?
+        SSR_clean = np.conj(res.conj().T @ res)
+        res = self.Yc - Yhat  # ERROR? Yc-->Y?
         SSR = np.conj(res.conj().T @ res)
-        #% SSY = real(sum(Y.* conj(Y), 1));
+        # % SSY = real(sum(Y.* conj(Y), 1));
         Yc2 = np.abs(self.Yc) ** 2
-        SSYC = np.sum(Yc2, axis=0);
-        inv_psi_prime2 = np.diag(1. / (self.expectation_psi_prime ** 2))
+        SSYC = np.sum(Yc2, axis=0)
+        inv_psi_prime2 = np.diag(1.0 / (self.expectation_psi_prime ** 2))
         degrees_of_freedom = self.n_data - self.n_param
         self.noise_covariance = inv_psi_prime2 @ SSR_clean / degrees_of_freedom
         self.R2 = 1 - np.diag(np.real(SSR)).T / SSYC
@@ -215,5 +218,4 @@ class TRME_RR(RegressionEstimator):
         # R2 = 1 - [diag(real(SSR))'./SSY; ...
         # (1. / E_psiPrime). * diag(real(SSRC))'./SSYC];
         # R2(R2 < 0) = 0;
-        #</ERROR COVARIANCES>
-
+        # </ERROR COVARIANCES>

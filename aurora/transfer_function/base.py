@@ -43,15 +43,14 @@ class TransferFunction(object):
     Header : transfer_function_header.TransferFunctionHeader() object.
         TF header contains local site header, remote site header if
         appropriate, and information about estimation approach???
-    Cov_SS : numpy array
-        inverse signal power matrix.  How do we track the channels
-        relationship? maybe xarray here as well
-    Cov_NN : numpy array
-        noise covariance matrix: see comment at Cov_SS above
+    cov_ss_inv : numpy array
+        inverse signal power matrix.  aka Cov_SS in EMTF matlab codes
+    cov_nn : numpy array
+        noise covariance matrix: aka Cov_NN in EMTF matlab codes
     num_segments : integer array?
         Number of samples used to estimate TF for each band, and for each \
         output channel (might be different for different channels)
-    R2 : numpy array
+    R2 : xarray.DataArray
         multiple coherence for each output channel / band
     FullCov : boolean
         true if full covariance is provided
@@ -81,8 +80,8 @@ class TransferFunction(object):
         self.tf_header = tf_header
         self.frequency_bands = frequency_bands
         self.num_segments = None
-        self.Cov_SS = None
-        self.Cov_NN = None
+        self.cov_ss_inv = None
+        self.cov_nn = None
         self.R2 = None
         self.initialized = False
         self.processing_config = kwargs.get("processing_config", None)
@@ -90,6 +89,10 @@ class TransferFunction(object):
         if self.tf_header is not None:
             if self.num_bands is not None:
                 self._initialize_arrays()
+
+    @property
+    def tf(self):
+        return self.transfer_function
 
     @property
     def num_bands(self):
@@ -102,7 +105,7 @@ class TransferFunction(object):
         There are four separate data strucutres, indexed by period here:
 
         TF (num_channels_out, num_channels_in)
-        Cov_SS (num_channels_in, num_channels_in),
+        cov_ss_inv (num_channels_in, num_channels_in, num_bands),
         Cov_NN (num_channels_out, num_channels_out),
         R2 num_channels_out)
 
@@ -119,54 +122,71 @@ class TransferFunction(object):
         -------
 
         """
-        if self.tf_header is not None:
+        if self.tf_header is None:
+            print("header needed to allocate transfer function arrays")
+            raise Exception
 
-            # <Make TF array an xarray>
-            tf_array = np.zeros(
-                (self.num_channels_out, self.num_channels_in, self.num_bands),
-                dtype=np.complex128,
-            )
-            tf_xr = xr.DataArray(
-                tf_array,
-                dims=["output_channel", "input_channel", "frequency"],
-                coords={
-                    "frequency": self.frequency_bands.band_centers(),
-                    "output_channel": self.tf_header.output_channels,
-                    "input_channel": self.tf_header.input_channels,
-                },
-            )
-            self.tf_xr = tf_xr
+        # <Make TF xarray>
+        tf_array_dims = (self.num_channels_out, self.num_channels_in, self.num_bands)
+        tf_array = np.zeros(tf_array_dims, dtype=np.complex128)
+        self.transfer_function = xr.DataArray(
+            tf_array,
+            dims=["output_channel", "input_channel", "frequency"],
+            coords={
+                "frequency": self.frequency_bands.band_centers(),
+                "output_channel": self.tf_header.output_channels,
+                "input_channel": self.tf_header.input_channels,
+            },
+        )
+        # </Make TF xarray>
 
-            # leave the old definition of self.TF for now
-            self.TF = np.zeros(
-                (self.num_channels_out, self.num_channels_in, self.num_bands),
-                dtype=np.complex128,
-            )
-            # </Make TF array an xarray>
+        # <Make num_segments xarray>
+        num_segments = np.zeros((self.num_channels_out, self.num_bands), dtype=np.int32)
+        num_segments_xr = xr.DataArray(
+            num_segments,
+            dims=["channel", "frequency"],
+            coords={
+                "frequency": self.frequency_bands.band_centers(),
+                "channel": self.tf_header.output_channels,
+            },
+        )
+        self.num_segments = num_segments_xr
+        # </Make num_segments xarray>
 
-            # <make num_segments an xarray>
+        # <Make inverse signal covariance>
+        cov_ss_dims = (self.num_channels_in, self.num_channels_in, self.num_bands)
+        cov_ss_inv = np.zeros(cov_ss_dims, dtype=np.complex128)
+        self.cov_ss_inv = xr.DataArray(
+            cov_ss_inv,
+            dims=["input_channel_1", "input_channel_2", "period"],
+            coords={
+                "input_channel_1": self.tf_header.input_channels,
+                "input_channel_2": self.tf_header.input_channels,
+                "period": self.T,
+            },
+        )
+        # </Make inverse signal covariance>
 
-            self.num_segments = np.zeros((self.num_channels_out, self.num_bands))
-            num_segments = np.zeros((self.num_channels_out, self.num_bands))
-            num_segments_xr = xr.DataArray(
-                num_segments,
-                dims=["channel", "frequency"],
-                coords={
-                    "frequency": self.frequency_bands.band_centers(),
-                    "channel": self.tf_header.output_channels,
-                },
-            )
-            self.num_segments = num_segments_xr
-            # </make num_segments an xarray>
-
-            self.Cov_SS = np.zeros(
-                (self.num_channels_in, self.num_channels_in, self.num_bands)
-            )
-            self.Cov_NN = np.zeros(
-                (self.num_channels_out, self.num_channels_out, self.num_bands)
-            )
-            self.R2 = np.zeros((self.num_channels_out, self.num_bands))
-            self.initialized = True
+        # <Make noise covariance>
+        cov_nn_dims = (self.num_channels_out, self.num_channels_out, self.num_bands)
+        cov_nn = np.zeros(cov_nn_dims, dtype=np.complex128)
+        self.cov_nn = xr.DataArray(
+            cov_nn,
+            dims=["output_channel_1", "output_channel_2", "period"],
+            coords={
+                "output_channel_1": self.tf_header.output_channels,
+                "output_channel_2": self.tf_header.output_channels,
+                "period": self.T,
+            },
+        )
+        # </Make inverse signal covariance>
+        # self.R2 = np.zeros((self.num_channels_out, self.num_bands))
+        self.R2 = xr.DataArray(
+            np.zeros((self.num_channels_out, self.num_bands)),
+            dims=["output_channel", "period"],
+            coords={"output_channel": self.tf_header.output_channels, "period": self.T},
+        )
+        self.initialized = True
 
     @property
     def T(self):
@@ -207,42 +227,6 @@ class TransferFunction(object):
         #            #"decimation_level"]
         # df = pd.DataFrame(columns=columns)
 
-    def to_xarray(self, array="TF"):
-        xra = xr.DataArray(
-            self.TF,
-            dims=["output_channel", "input_channel", "period"],
-            coords={
-                "output_channel": self.tf_header.output_channels,
-                "input_channel": self.tf_header.input_channels,
-                "period": self.T,
-            },
-        )
-        return xra
-
-    def cov_ss_to_xarray(self):
-        xra = xr.DataArray(
-            self.Cov_SS,
-            dims=["input_channel_1", "input_channel_2", "period"],
-            coords={
-                "input_channel_1": self.tf_header.input_channels,
-                "input_channel_2": self.tf_header.input_channels,
-                "period": self.T,
-            },
-        )
-        return xra
-
-    def cov_nn_to_xarray(self):
-        xra = xr.DataArray(
-            self.Cov_NN,
-            dims=["output_channel_1", "output_channel_2", "period"],
-            coords={
-                "output_channel_1": self.tf_header.output_channels,
-                "output_channel_2": self.tf_header.output_channels,
-                "period": self.T,
-            },
-        )
-        return xra
-
     def set_tf(self, regression_estimator, period):
         """
         This sets TF elements for one band, using contents of TRegression
@@ -251,55 +235,55 @@ class TransferFunction(object):
 
         """
         index = self.period_index(period)
-        if self.TF is None:
-            print("Initialize TransferFunction obejct before calling setTF")
-            raise Exception
 
-        # use TregObj to fill in full impedance, error bars for a
-        print("TODO: Convert the following commented check into python")
-        print("although an exception will br raised anyhow actually")
-        # if any(size(TRegObj.b)~=[obj.Nin obj.Nout])
-        #     error('Regression object not consistent with declared dimensions of TF')
-        #     raise Exception
         tf = regression_estimator.b_to_xarray()
-        self.TF[:, :, index] = regression_estimator.b.T  # check dims are consitent
+        for out_ch in self.tf_header.output_channels:
+            for inp_ch in self.tf_header.input_channels:
+                self.tf[:, :, index].loc[out_ch, inp_ch] = tf.loc[out_ch, inp_ch]
+
         if regression_estimator.noise_covariance is not None:
-            self.Cov_NN[:, :, index] = regression_estimator.noise_covariance
+            for out_ch_1 in self.tf_header.output_channels:
+                for out_ch_2 in self.tf_header.output_channels:
+                    tmp = regression_estimator.cov_nn.loc[out_ch_1, out_ch_2]
+                    self.cov_nn[:, :, index].loc[out_ch_1, out_ch_2] = tmp
+
         if regression_estimator.inverse_signal_covariance is not None:
-            self.Cov_SS[:, :, index] = regression_estimator.inverse_signal_covariance
+            for inp_ch_1 in self.tf_header.input_channels:
+                for inp_ch_2 in self.tf_header.input_channels:
+                    tmp = regression_estimator.cov_ss_inv.loc[inp_ch_1, inp_ch_2]
+                    self.cov_ss_inv[:, :, index].loc[inp_ch_1, inp_ch_2] = tmp
+
         if regression_estimator.R2 is not None:
             self.R2[:, index] = regression_estimator.R2
-        # <assign with xarray>
+            # TODO: make channel explcit here? e.g.
+            # for i,out_ch in enumerate(self.tf_header.output_channels):
+            #     self.R2[:,index].loc[out_ch] =  regression_estimator.R2[i]
+
         self.num_segments.data[:, index] = regression_estimator.n_data
-        # </assign with xarray>
-        # self.num_segments[:self.num_channels_out, index] =
-        # regression_estimator.n_data
+
         return
 
     def standard_error(self):
-        stderr = np.zeros(self.TF.shape)
-        for j in range(self.num_channels_out):
-            for k in range(self.num_channels_in):
-                stderr[j, k, :] = np.sqrt(self.Cov_NN[j, j, :] * self.Cov_SS[k, k, :])
-        return stderr
+        stderr = np.zeros(self.tf.data.shape)
+        standard_error = xr.DataArray(
+            stderr,
+            dims=["output_channel", "input_channel", "period"],
+            coords={
+                "output_channel": self.tf_header.output_channels,
+                "input_channel": self.tf_header.input_channels,
+                "period": self.T,
+            },
+        )
+        for out_ch in self.tf_header.output_channels:
+            for inp_ch in self.tf_header.input_channels:
+                for T in self.T:
+                    cov_ss = self.cov_ss_inv.loc[inp_ch, inp_ch, T]
+                    cov_nn = self.cov_nn.loc[out_ch, out_ch, T]
+                    standard_error.loc[out_ch, inp_ch, T] = np.sqrt(cov_ss * cov_nn)
+        return standard_error
 
     def from_emtf_zfile(self):
         pass
 
     def to_emtf_zfile(self):
         pass
-
-
-def test_ttf():
-    from aurora.transfer_function.transfer_function_header import TransferFunctionHeader
-
-    tfh = TransferFunctionHeader()
-    ttf = TransferFunction(tfh, 32)
-
-
-def main():
-    test_ttf()
-
-
-if __name__ == "__main__":
-    main()

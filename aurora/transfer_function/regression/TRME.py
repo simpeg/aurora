@@ -21,11 +21,13 @@ iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_1
 initialization:
 obj = TRME(X=X, Y=Y, iter_control=iter)
 
-TODO: set Q, R to be variables asssociated with this class (actually put Q,
-R inside RegressionEstimator())
+
+
+TODO: set Q, R to be variables asssociated with this class (actually put Q, R inside
+RegressionEstimator())
 TODO: Move TRME to RME-Regression-Estimator
 
-THe QR-decomposition is employed on the matrix of independent variables.
+The QR-decomposition is employed on the matrix of independent variables.
 X = Q R where Q is unitary/orthogonal and R upper triangular.
 Since X is [n_data x n_channels_in] Q is [n_data x n_data].  Wikipedia has a
 nice description of the QR factorization:
@@ -39,6 +41,9 @@ so that Q is not square, and not in fact unitary.
 Really Q = [Q1 | Q2] where Q1 has as many columns as there are input variables
 and Q2 is a matrix of zeros.  In this case QQH is the projection matrix,
 or hat matrix equivalent to X(XHX)^-1XH.
+
+Notes that Q is not unitary, but this is because its inverse is not defined (as it
+isn't square). Q does however obey: Q.H @ Q = I.
 
 The use of QHY is not so much physically meaningful as it is a trick to
 compute more efficiently QQHY.  ? Really are we doing fewer calculations?
@@ -82,11 +87,12 @@ http://matlab.izmiran.ru/help/techdoc/ref/mldivide.html
 """
 import numpy as np
 from scipy.linalg import solve_triangular
+import xarray as xr
 
 from aurora.transfer_function.regression.base import RegressionEstimator
 
-class TRME(RegressionEstimator):
 
+class TRME(RegressionEstimator):
     def __init__(self, **kwargs):
         """
 
@@ -112,7 +118,6 @@ class TRME(RegressionEstimator):
         self.expectation_psi_prime = np.ones(self.n_channels_out)
         self.sigma_squared = np.zeros(self.n_channels_out)
 
-
     @property
     def r0(self):
         return self.iter_control.r0
@@ -123,9 +128,8 @@ class TRME(RegressionEstimator):
 
     @property
     def correction_factor(self):
-        #MOVE THIS METHOD INTO AN RME-Specific CONFIG
+        # MOVE THIS METHOD INTO AN RME-Specific CONFIG
         return self.iter_control.correction_factor
-
 
     def sigma(self, QHY, Y_or_Yc, correction_factor=1.0):
         """
@@ -168,9 +172,9 @@ class TRME(RegressionEstimator):
         sigma : numpy array
 
         """
-        Y2 = np.linalg.norm(Y_or_Yc, axis=0)**2 #variance?
-        QHY2 = np.linalg.norm(QHY, axis=0)**2
-        sigma = correction_factor * (Y2 - QHY2) / self.n_data;
+        Y2 = np.linalg.norm(Y_or_Yc, axis=0) ** 2  # variance?
+        QHY2 = np.linalg.norm(QHY, axis=0) ** 2
+        sigma = correction_factor * (Y2 - QHY2) / self.n_data
 
         # try:
         #     assert (sigma > 0).all()
@@ -178,8 +182,6 @@ class TRME(RegressionEstimator):
         #     print(sigma)
         #     raise Exception
         return sigma
-
-
 
     def apply_huber_weights(self, sigma, YP):
         """
@@ -203,32 +205,24 @@ class TRME(RegressionEstimator):
         inputs are data (Y) and predicted (YP), estiamted
         error variances (for each column) and Huber parameter r0
         allows for multiple columns of data
-
-        
         """
-        #Y_cleaned = np.zeros(self.Y.shape, dtype=np.complex128)
+        # Y_cleaned = np.zeros(self.Y.shape, dtype=np.complex128)
         for k in range(self.n_channels_out):
             r0s = self.r0 * np.sqrt(sigma[k])
             residuals = np.abs(self.Y[:, k] - YP[:, k])
-            w = np.minimum(r0s/residuals, 1.0)
+            w = np.minimum(r0s / residuals, 1.0)
             self.Yc[:, k] = w * self.Y[:, k] + (1 - w) * YP[:, k]
-            self.expectation_psi_prime[k] = 1.0 * np.sum(w == 1) / self.n_data;
+            self.expectation_psi_prime[k] = 1.0 * np.sum(w == 1) / self.n_data
         return
-
-    # def qr_decomposition(self, X, sanity_check=False):
-    #     [Q, R] = np.linalg.qr(X)
-    #     if sanity_check:
-    #         if np.isclose(np.matmul(Q, R) - self.X, 0).all():
-    #             pass
-    #         else:
-    #             print("Failed QR decompostion sanity check")
-    #             raise Exception
-    #     return Q, R
 
     def update_predicted_data(self):
         pass
 
-    def redescend(self, Y_predicted, sigma, ):
+    def redescend(
+        self,
+        Y_predicted,
+        sigma,
+    ):
         """
         % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
         function[YC, E_psiPrime] = RedescendWt(Y, YP, sig, u0)
@@ -242,20 +236,20 @@ class TRME(RegressionEstimator):
         % allows
         for multiple columns of data
         """
-        #Y_cleaned = np.zeros(self.Y.shape, dtype=np.complex128)
+        # Y_cleaned = np.zeros(self.Y.shape, dtype=np.complex128)
         for k in range(self.n_channels_out):
 
-            r = np.abs(Y[:, k] - Y_predicted[:, k]) / np.sqrt(sigma[k])
-            t = -np.exp(self.u0 * (r - u0))
+            r = np.abs(self.Y[:, k] - Y_predicted[:, k]) / np.sqrt(sigma[k])
+            t = -np.exp(self.u0 * (r - self.u0))
             w = np.exp(t)
 
             # cleaned data
-            self.Yc[:, k] = w * Y[:, k] + (1 - w) * Y_predicted[:, k]
+            self.Yc[:, k] = w * self.Y[:, k] + (1 - w) * Y_predicted[:, k]
 
             # computation of E(psi')
-            t = u0 * (t * r)
+            t = self.u0 * (t * r)
             t = w * (1 + t)
-            self.expectation_psi_prime[k] = np.sum(t[t>0]) / self.n_data
+            self.expectation_psi_prime[k] = np.sum(t[t > 0]) / self.n_data
         return
 
     def estimate(self):
@@ -276,48 +270,48 @@ class TRME(RegressionEstimator):
             b0 = self.solve_overdetermined()
             return b0
 
-        #<INITIAL ESTIMATE>
+        # <INITIAL ESTIMATE>
         Q, R = self.qr_decomposition(self.X)
         QH = Q.conj().T
         QHY = np.matmul(QH, self.Y)
         b0 = solve_triangular(R, QHY)
 
         if self.iter_control.max_number_of_iterations > 0:
-            converged = False;
+            converged = False
         else:
             converged = True
-            self.expectation_psi_prime = np.ones(self.n_channels_out) #let
+            self.expectation_psi_prime = np.ones(self.n_channels_out)  # let
             # this be defualt
-            YP = np.matmul(Q, QHY);#not sure we need this?  only in the case
+            YP = np.matmul(Q, QHY)
+            # not sure we need this?  only in the case
             # that we want the covariance and do no huber and no redescend
-            self.b = b0;
-            self.Yc = self.Y;
+            self.b = b0
+            self.Yc = self.Y
 
         sigma = self.sigma(QHY, self.Y)
-        self.iter_control.number_of_iterations = 0;
+        self.iter_control.number_of_iterations = 0
         # </INITIAL ESTIMATE>
 
         while not converged:
             self.iter_control.number_of_iterations += 1
-            YP = np.matmul(Q, QHY) # predicted data,
+            YP = np.matmul(Q, QHY)  # predicted data,
             self.apply_huber_weights(sigma, YP)
             QHYc = np.matmul(QH, self.Yc)
-            self.b = solve_triangular(R, QHYc) #self.b = R\QTY;
+            self.b = solve_triangular(R, QHYc)  # self.b = R\QTY;
 
-            #update error variance estimates, computed using cleaned data
-            sigma = self.sigma(QHYc, self.Yc,
-                               correction_factor=self.correction_factor)
-            converged = self.iter_control.converged(self.b, b0);
-            b0 = self.b;
+            # update error variance estimates, computed using cleaned data
+            sigma = self.sigma(QHYc, self.Yc, correction_factor=self.correction_factor)
+            converged = self.iter_control.converged(self.b, b0)
+            b0 = self.b
 
         if self.iter_control.max_number_of_redescending_iterations:
             print(b0)
-            #self.iter_control.number_of_redescending_iterations = 0;
+            # self.iter_control.number_of_redescending_iterations = 0;
             while self.iter_control.continue_redescending:
                 self.iter_control._number_of_redescending_iterations += 1
-                #add setter here
+                # add setter here
                 YP = Q @ QHYc  # predict from cleaned data
-                self.redescend(YP, sigma) #update cleaned data, and expectation
+                self.redescend(YP, sigma)  # update cleaned data, and expectation
                 # updated error variance estimates, computed using cleaned data
                 QHYc = QH @ self.Yc
                 self.b = solve_triangular(R, QHYc)
@@ -326,23 +320,79 @@ class TRME(RegressionEstimator):
             # redescending influence curve
             self.expectation_psi_prime = 2 * self.expectation_psi_prime - 1
 
-        result = self.b;
-
         if self.iter_control.return_covariance:
-            # compute error covariance matrices
-            self.inverse_signal_covariance= np.linalg.inv(R.conj().T @ R)
+            self.compute_inverse_signal_covariance()
+            self.compute_noise_covariance(YP)
+            self.compute_squared_coherence(YP)
 
-            res_clean = self.Yc - YP
-            SSR_clean = np.conj(res_clean.conj().T @ res_clean)
-            res = self.Y - YP
-            SSR = np.conj( res.conj().T @ res)
-            Yc2 = np.abs(self.Yc)**2
-            SSYC = np.sum(Yc2, axis=0)
-            inv_psi_prime2 = np.diag(1. / (self.expectation_psi_prime**2))
-            degrees_of_freedom = self.n_data-self.n_param
-            self.noise_covariance = inv_psi_prime2 @ SSR_clean / degrees_of_freedom
-            self.R2 = 1-np.diag(np.real(SSR)).T / SSYC
-            self.R2[self.R2 < 0] = 0
         return self.b
-            
-            
+
+    def compute_noise_covariance(self, YP):
+        """
+        res_clean: The cleaned data minus the predicted data. The residuals
+        SSR_clean: Sum of squares of the residuals.  Diagonal is real
+        Parameters
+        ----------
+        YP
+
+        Returns
+        -------
+
+        """
+        res_clean = self.Yc - YP
+        SSR_clean = np.conj(res_clean.conj().T @ res_clean)
+        degrees_of_freedom = self.n_data - self.n_param
+        inv_psi_prime2 = np.diag(1.0 / (self.expectation_psi_prime ** 2))
+        cov_nn = inv_psi_prime2 @ SSR_clean / degrees_of_freedom
+
+        self.cov_nn = xr.DataArray(
+            cov_nn,
+            dims=["output_channel_1", "output_channel_2"],
+            coords={
+                "output_channel_1": list(self._Y.data_vars),
+                "output_channel_2": list(self._Y.data_vars),
+            },
+        )
+        return
+
+    def compute_inverse_signal_covariance(self):
+        """
+        Note that because X = QR, we have
+        X.H @ X = (QR).H @ QR = R.H Q.H Q R = R.H @ R
+        i.e. computing R.H @ R below is just computing the signal covariance matrix of X
+        Returns
+        -------
+
+        """
+        cov_ss_inv = np.linalg.inv(self.R.conj().T @ self.R)
+
+        self.cov_ss_inv = xr.DataArray(
+            cov_ss_inv,
+            dims=["input_channel_1", "input_channel_2"],
+            coords={
+                "input_channel_1": list(self._X.data_vars),
+                "input_channel_2": list(self._X.data_vars),
+            },
+        )
+        return
+
+    def compute_squared_coherence(self, YP):
+        """
+        res: Residuals: The original data minus the predicted data.
+        #SSR : Sum of squares of the residuals.  Diagonal is real
+        Parameters
+        ----------
+        YP
+
+        Returns
+        -------
+
+        """
+        res = self.Y - YP
+        SSR = np.conj(res.conj().T @ res)
+        Yc2 = np.abs(self.Yc) ** 2
+        SSYC = np.sum(Yc2, axis=0)
+        self.R2 = 1 - np.diag(np.real(SSR)).T / SSYC
+        self.R2[self.R2 < 0] = 0
+        # array([ 0.97713185,  0.97552176,  0.97480946])
+        return
