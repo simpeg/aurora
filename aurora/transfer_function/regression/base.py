@@ -45,18 +45,18 @@ class RegressionEstimator(object):
 
     Attributes
     ----------
-    _X : xarray.Dataset or xarray.DataArray ... still trying to decide
-        numpy array (normally 2-dimensional)
-        These are the independent variables.  In the matlab codes each
-        observation was a row and each parameter (channel) is a column
+    _X : xarray.Dataset
+        X.data is numpy array (normally 2-dimensional)
+        These are the independent variables.  Like the matlab codes each observation
+        corresponds to a row and each parameter (channel) is a column.
     X :  numpy array (normally 2-dimensional)
         This is a "pure array" representation of _X used to emulate Gary
         Egbert's matlab codes. It may or may not be deprecated.
-    _Y : xarray.Dataset or xarray.DataArray
-        These are the dependent variables.
+    _Y : xarray.Dataset
+        These are the dependent variables, aranged same as X above.
     Y : numpy array (normally 2-dimensional)
-        These are the dependent variables.  In the matlab codes each
-        observation was a row and each parameter (channel) is a column
+        This is a "pure array" representation of _X used to emulate Gary
+        Egbert's matlab codes. It may or may not be deprecated.
     b : numpy array (normally 2-dimensional)
         Matrix of regression coefficients, i.e. the solution to the regression
         problem.  In our context they are the "Transfer Function"
@@ -66,10 +66,10 @@ class RegressionEstimator(object):
     inverse_signal_covariance: numpy array (n_input_ch, n_input_ch)
         This was Cov_SS in Gary's matlab codes.  It is basically inv(X.H @ X)
         Reference needed
-    noise_covariance : numpy array (????-Dimensional)
+    noise_covariance : numpy array (n_output_ch, n_output_ch)
         This was Cov_NN in Gary's matlab codes
-        Formula?  Reference?
-    squared_coherence: numpy array (????-Dimensional)
+        Reference needed
+    squared_coherence: numpy array (n_output_ch)
         This was R2 in Gary's matlab codes
         Formula?  Reference?
         Squared coherence (top row is using raw data, bottom cleaned, with crude
@@ -107,6 +107,7 @@ class RegressionEstimator(object):
         self._Q = None
         self._R = None
         self._QH = None  # conjugate transpose of Q (Hermitian operator)
+        self._QHY = None  #
 
     @property
     def inverse_signal_covariance(self):
@@ -161,8 +162,8 @@ class RegressionEstimator(object):
         try:
             n_segments = len(XY.time)
         except TypeError:
-            # could occur because time is not iterable,
-            # corresponds to overdetermined problem
+            # Could occur because time is not iterable if only one element
+            # This case corresponds to an underdetermined problem
             n_segments = 1
 
         n_fc_per_channel = n_frequency * n_segments
@@ -176,7 +177,7 @@ class RegressionEstimator(object):
             output_array[:, i_ch] = XY[key].data.ravel()
         return output_array
 
-    def solve_overdetermined(self):
+    def solve_underdetermined(self):
         """
         20210806
         This method was originally in TRME.m, but it does not depend in
@@ -210,18 +211,13 @@ class RegressionEstimator(object):
         -------
 
         """
-        # print("Overdetermined problem needs to be coded, see aurora issue #4")
-        # raise NotImplementedError
-        print(
-            "Warning inverse_signal_covariance is not xarray, may break things "
-            "downstream"
-        )
         U, s, V = np.linalg.svd(self.X, full_matrices=False)
-        sInv = 1.0 / s
-        self.b = V.T @ (np.diag(sInv) @ U.T) * self.Y
+        S_inv = np.diag(1.0 / s)
+        self.b = (V.T @ S_inv @ U.T) * self.Y
         if self.iter_control.return_covariance:
-            self.noise_covariance = np.zeros((self.n_channels_out, self.n_channels_out))
-            self.inverse_signal_covariance = np.zeros((self.n_param, self.n_param))
+            print("Warning covariances are not xarray, may break things downstream")
+            self.cov_nn = np.zeros((self.n_channels_out, self.n_channels_out))
+            self.cov_ss_inv = np.zeros((self.n_param, self.n_param))
 
         return self.b
 
@@ -255,7 +251,7 @@ class RegressionEstimator(object):
         return self.Y.shape[1]
 
     @property
-    def is_overdetermined(self):
+    def is_underdetermined(self):
         return self.n_param > self.n_data
 
     def mask_input_channels(self):
@@ -292,6 +288,21 @@ class RegressionEstimator(object):
         if self._QH is None:
             self._QH = self.Q.conj().T
         return self._QH
+
+    @property
+    def QHY(self):
+        if self._QHY is None:
+            self._QHY = self.QH @ self.Y
+        return self._QHY
+
+    @property
+    def QHYc(self):
+        if self._QHYc is None:
+            self.update_QHYc()
+        return self._QHYc
+
+    def update_QHYc(self):
+        self._QHYc = self.QH @ self.Yc
 
     def estimate_ols(self, mode="solve"):
         """

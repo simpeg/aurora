@@ -170,21 +170,26 @@ class TRME(RegressionEstimator):
         Returns
         -------
         sigma : numpy array
+            One entry per output channel.
 
         """
         Y2 = np.linalg.norm(Y_or_Yc, axis=0) ** 2  # variance?
         QHY2 = np.linalg.norm(QHY, axis=0) ** 2
         sigma = correction_factor * (Y2 - QHY2) / self.n_data
 
-        # try:
-        #     assert (sigma > 0).all()
-        # except:
-        #     print(sigma)
-        #     raise Exception
+        try:
+            assert (sigma > 0).all()
+        except AssertionError:
+            print("WARNING - Negative error variances observed")
+            print(sigma)
+            print("Setting sigma to zero - Negative sigma_squared observed")
+            sigma *= 0
+            # raise Exception
         return sigma
 
     def apply_huber_weights(self, sigma, YP):
         """
+        Updates the values of self.Yc and self.expectation_psi_prime
 
         Parameters
         ----------
@@ -196,10 +201,7 @@ class TRME(RegressionEstimator):
 
         Returns
         -------
-        Updates the values of self.Yc and self.expectation_psi_prime
 
-        """
-        """
         function [YC,E_psiPrime] = HuberWt(Y,YP,sig,r0)
 
         inputs are data (Y) and predicted (YP), estiamted
@@ -266,41 +268,43 @@ class TRME(RegressionEstimator):
         -------
 
         """
-        if self.is_overdetermined:
-            b0 = self.solve_overdetermined()
+        if self.is_underdetermined:
+            b0 = self.solve_underdetermined()
             return b0
 
         # <INITIAL ESTIMATE>
-        Q, R = self.qr_decomposition(self.X)
-        QH = Q.conj().T
-        QHY = np.matmul(QH, self.Y)
-        b0 = solve_triangular(R, QHY)
+        self.qr_decomposition(self.X)
+        b0 = solve_triangular(self.R, self.QHY)
 
         if self.iter_control.max_number_of_iterations > 0:
             converged = False
         else:
             converged = True
-            self.expectation_psi_prime = np.ones(self.n_channels_out)  # let
-            # this be defualt
-            YP = np.matmul(Q, QHY)
-            # not sure we need this?  only in the case
-            # that we want the covariance and do no huber and no redescend
+            self.expectation_psi_prime = np.ones(self.n_channels_out)  # defualt
+            YP = self.Q @ self.QHY
+            # YP needed only in case we want covariance and no huber and no redescend
             self.b = b0
             self.Yc = self.Y
 
-        sigma = self.sigma(QHY, self.Y)
+        sigma = self.sigma(self.QHY, self.Y)
         self.iter_control.number_of_iterations = 0
         # </INITIAL ESTIMATE>
 
         while not converged:
             self.iter_control.number_of_iterations += 1
-            YP = np.matmul(Q, QHY)  # predicted data,
+            if self.iter_control.number_of_iterations == 1:
+                YP = self.Q @ self.QHY  # predicted data, initial estimate
+            else:
+                YP = self.Q @ self.QHYc
             self.apply_huber_weights(sigma, YP)
-            QHYc = np.matmul(QH, self.Yc)
-            self.b = solve_triangular(R, QHYc)  # self.b = R\QTY;
+            self.update_QHYc()
+            # QHYc = self.QH @ self.Yc
+            self.b = solve_triangular(self.R, self.QHYc)  # self.b = R\QTY;
 
             # update error variance estimates, computed using cleaned data
-            sigma = self.sigma(QHYc, self.Yc, correction_factor=self.correction_factor)
+            sigma = self.sigma(
+                self.QHYc, self.Yc, correction_factor=self.correction_factor
+            )
             converged = self.iter_control.converged(self.b, b0)
             b0 = self.b
 
@@ -310,12 +314,12 @@ class TRME(RegressionEstimator):
             while self.iter_control.continue_redescending:
                 self.iter_control._number_of_redescending_iterations += 1
                 # add setter here
-                YP = Q @ QHYc  # predict from cleaned data
+                YP = self.Q @ self.QHYc  # predict from cleaned data
                 self.redescend(YP, sigma)  # update cleaned data, and expectation
                 # updated error variance estimates, computed using cleaned data
-                QHYc = QH @ self.Yc
-                self.b = solve_triangular(R, QHYc)
-                sigma = self.sigma(QHYc, self.Yc)
+                self.update_QHYc()  # QHYc = self.QH @ self.Yc
+                self.b = solve_triangular(self.R, self.QHYc)
+                sigma = self.sigma(self.QHYc, self.Yc)
             # crude estimate of expectation of psi ... accounting for
             # redescending influence curve
             self.expectation_psi_prime = 2 * self.expectation_psi_prime - 1
