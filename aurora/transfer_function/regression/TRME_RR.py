@@ -25,6 +25,8 @@ iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_1
 
 """
 import numpy as np
+import xarray as xr
+
 from aurora.transfer_function.regression.base import RegressionEstimator
 
 
@@ -188,34 +190,93 @@ class TRME_RR(RegressionEstimator):
         self.expectation_psi_prime = 2 * self.expectation_psi_prime - 1
         # </REDESCENDING STUFF>
 
-        # <ERROR COVARIANCES>
-        # oh dear!
-        # obj.Cov_SS = (self.ZH @self.X) \ (self.XH @ self.X) / (self.XH @self.Z)
+        # <Covariance and Coherence>
+        self.compute_inverse_signal_covariance()
+
+        # Below is a comment from the matlab codes:
+        # "need to look at how we should compute adjusted residual cov to make
+        # consistent with tranmt"
+        self.compute_noise_covariance(Yhat)
+        self.compute_squared_coherence(Yhat)
+
+        # </Covariance and Coherence>
+
+    def compute_inverse_signal_covariance(self):
+        """
+        Matlab code was :
+        # Cov_SS = (self.ZH @self.X) \ (self.XH @ self.X) / (self.XH @self.Z)"
         # I broke the above line into B/A where
         # B = (self.ZH @self.X) \ (self.XH @ self.X), and A = (self.XH @self.Z)
-        # Then follow matlab cookbok, B/A for matrices = (A'\B')
+        Then follow matlab cookbok, B/A for matrices = (A'\B')
+        """
         ZH = self.Z.conj().T
         XH = self.X.conj().T
         B = np.linalg.solve(ZH @ self.X, XH @ self.X)
         A = XH @ self.Z
-        self.inverse_signal_covariance = (
-            np.linalg.solve(A.conj().T, B.conj().T).conj().T
-        )
+        cov_ss_inv = np.linalg.solve(A.conj().T, B.conj().T).conj().T
 
-        # need to look at how we should compute adjusted residual cov
-        # to make consistent with tranmt
-        SSR_clean = np.conj(res.conj().T @ res)
-        res = self.Yc - Yhat  # ERROR? Yc-->Y?
+        self.cov_ss_inv = xr.DataArray(
+            cov_ss_inv,
+            dims=["input_channel_1", "input_channel_2"],
+            coords={
+                "input_channel_1": list(self._X.data_vars),
+                "input_channel_2": list(self._X.data_vars),
+            },
+        )
+        return
+
+    def compute_noise_covariance(self, Yhat):
+        """
+        res_clean: The cleaned data minus the predicted data. The residuals
+        SSR_clean: Sum of squares of the residuals.  Diagonal is real
+        Parameters
+        ----------
+        YP
+
+        Returns
+        -------
+
+        """
+        res_clean = self.Yc - Yhat
+        SSR_clean = np.conj(res_clean.conj().T @ res_clean)
+        degrees_of_freedom = self.n_data - self.n_param
+        inv_psi_prime2 = np.diag(1.0 / (self.expectation_psi_prime ** 2))
+        cov_nn = inv_psi_prime2 @ SSR_clean / degrees_of_freedom
+
+        self.cov_nn = xr.DataArray(
+            cov_nn,
+            dims=["output_channel_1", "output_channel_2"],
+            coords={
+                "output_channel_1": list(self._Y.data_vars),
+                "output_channel_2": list(self._Y.data_vars),
+            },
+        )
+        return
+
+    def compute_squared_coherence(self, Yhat):
+        """
+        TODO: Compare this method with compute_squared_coherence in TRME.  I think
+        they are identical, in which case we can merge them, and maybe even put into
+        the regression base class.
+
+        TODO: Also, RegressionEstimator may be better as a more abstract base class and
+        we can have a QRRegressionEstimator() class between base and {TRME, TRME_RR}
+
+        res: Residuals: The original data minus the predicted data.
+        SSR : Sum of squares of the residuals.  Diagonal is real
+        Parameters
+        ----------
+        YP
+
+        Returns
+        -------
+
+        """
+        res = self.Y - Yhat
         SSR = np.conj(res.conj().T @ res)
-        # % SSY = real(sum(Y.* conj(Y), 1));
         Yc2 = np.abs(self.Yc) ** 2
         SSYC = np.sum(Yc2, axis=0)
-        inv_psi_prime2 = np.diag(1.0 / (self.expectation_psi_prime ** 2))
-        degrees_of_freedom = self.n_data - self.n_param
-        self.noise_covariance = inv_psi_prime2 @ SSR_clean / degrees_of_freedom
         self.R2 = 1 - np.diag(np.real(SSR)).T / SSYC
         self.R2[self.R2 < 0] = 0
-        # R2 = 1 - [diag(real(SSR))'./SSY; ...
-        # (1. / E_psiPrime). * diag(real(SSRC))'./SSYC];
-        # R2(R2 < 0) = 0;
-        # </ERROR COVARIANCES>
+        # array([ 0.97713185,  0.97552176,  0.97480946])
+        return
