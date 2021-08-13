@@ -70,8 +70,7 @@ class ZFile:
         for i in range(self.nchannels):
             line = f.readline().strip()
             match = re.match(
-                r"\s*\d+\s+(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s+\w*\s+" r"(\w+)",
-                line
+                r"\s*\d+\s+(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s+\w*\s+" r"(\w+)", line
             )
             self.orientation[i, 0] = float(match.group(1))
             self.orientation[i, 1] = float(match.group(2))
@@ -126,8 +125,8 @@ class ZFile:
             # extract period
             line = f.readline().strip()
             match = re.match(
-                    r"\s*period\s*:\s+(\d+\.?\d*)\s+" r"decimation\s+level", line
-                )
+                r"\s*period\s*:\s+(\d+\.?\d*)\s+" r"decimation\s+level", line
+            )
             # self.periods[i] = float(
             #     re.match(
             #         r"\s*period\s*:\s+(\d+\.?\d*)\s+" r"decimation\s+level", line
@@ -189,26 +188,13 @@ class ZFile:
                             values[2 * k + 1]
                         )
 
-            # val1_r, val1_i = f.readline().strip().split()
-            # val2_r, val2_i, val3_r, val3_i = f.readline().strip().split()
-            # val4_r, val4_i, val5_r, val5_i, val6_r, val6_i = f.readline().strip().split()
-            # self.sigma_e[i, 0, 0] = float(val1_r) + 1.j * float(val1_i)
-            # self.sigma_e[i, 1, 0] = float(val2_r) + 1.j * float(val2_i)
-            # self.sigma_e[i, 0, 1] = float(val2_r) - 1.j * float(val2_i)
-            # self.sigma_e[i, 1, 1] = float(val3_r) + 1.j * float(val3_i)
-            # self.sigma_e[i, 2, 0] = float(val4_r) + 1.j * float(val4_i)
-            # self.sigma_e[i, 0, 2] = float(val4_r) - 1.j * float(val4_i)
-            # self.sigma_e[i, 2, 1] = float(val5_r) + 1.j * float(val5_i)
-            # self.sigma_e[i, 1, 2] = float(val5_r) - 1.j * float(val5_i)
-            # self.sigma_e[i, 2, 2] = float(val6_r) + 1.j * float(val6_i)
-
         f.close()
 
     def impedance(self, angle=0.0):
         """
         u,v are identity matrices if angle=0
-        :param angle: 
-        :return: 
+        :param angle:
+        :return:
         """
         # check to see if there are actually electric fields in the TFs
         if "Ex" not in self.channels and "Ey" not in self.channels:
@@ -236,7 +222,7 @@ class ZFile:
         u[hy_index, hy_index] = np.sin(
             (self.orientation[hy_index, 0] - angle) * np.pi / 180.0
         )
-        u = np.linalg.inv(u) #Identity if angle=0
+        u = np.linalg.inv(u)  # Identity if angle=0
 
         # build transformation matrix for predicted channels (electric fields)
         ex_index = self.channels.index("Ex")
@@ -275,6 +261,7 @@ class ZFile:
             rotated_sigma_e[:, ex_index - 2, ex_index - 2]
             * rotated_sigma_s[:, hx_index, hx_index]
         )
+
         var[:, 0, 1] = np.real(
             rotated_sigma_e[:, ex_index - 2, ex_index - 2]
             * rotated_sigma_s[:, hy_index, hy_index]
@@ -352,22 +339,23 @@ class ZFile:
 
         return tipper, error
 
-
     def apparent_resistivity(self):
         z_tensor, error = self.impedance()
         Zxy = z_tensor[:, 0, 1]
         Zyx = z_tensor[:, 1, 0]
         T = self.periods
-        self.rxy = T * (abs(Zxy) ** 2) / 5.
-        self.ryx = T * (abs(Zyx) ** 2) / 5.
+        self.rxy = T * (abs(Zxy) ** 2) / 5.0
+        self.ryx = T * (abs(Zyx) ** 2) / 5.0
         self.pxy = np.rad2deg(np.arctan(np.imag(Zxy) / np.real(Zxy)))
         self.pyx = np.rad2deg(np.arctan(np.imag(Zyx) / np.real(Zyx)))
         return
 
+
 def test_reader():
-    from pathlib import Path
-    import matplotlib.pyplot as plt
-    z_path = Path("/home/kkappler/software/irismt/iris-mt-scratch/iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/EMTF/test/results/test1.zss")
+    # import matplotlib.pyplot as plt
+    from aurora.general_helper_functions import TEST_PATH
+
+    z_path = TEST_PATH.joinpath("synthetic", "emtf_output", "test1.zss")
     z_obj = ZFile(z_path)
     z_obj.load()
     print(z_obj)
@@ -390,6 +378,6 @@ def test_reader():
 def main():
     test_reader()
 
-if __name__ == '__main__':
-    main()
 
+if __name__ == "__main__":
+    main()

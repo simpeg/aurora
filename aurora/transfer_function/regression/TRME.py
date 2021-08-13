@@ -18,15 +18,14 @@ iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_1
 
 %  Parameters that control regression M-estimates are defined in ITER
 
-initialization:
-obj = TRME(X=X, Y=Y, iter_control=iter)
-
 
 
 TODO: set Q, R to be variables asssociated with this class (actually put Q, R inside
 RegressionEstimator())
 TODO: Move TRME to RME-Regression-Estimator
+TODO: Consider making a QR-Estimator class between RegressionEstimator and RMEEstimator
 
+# <QR-decomposition Notes>
 The QR-decomposition is employed on the matrix of independent variables.
 X = Q R where Q is unitary/orthogonal and R upper triangular.
 Since X is [n_data x n_channels_in] Q is [n_data x n_data].  Wikipedia has a
@@ -35,22 +34,35 @@ https://en.wikipedia.org/wiki/QR_decomposition
 On a high level, the point of the QR decomposition is to transform the data
 into a domain where the inversion is done with a triangular matrix.
 
+I use the symbol QH to denote the conjugate transpose.
+
 Note that we employ here the "economical" form of the QR decompostion,
-so that Q is not square, and not in fact unitary.
+so that Q is not square, and not in fact unitary.  This is because its inverse is not
+defined (as it isn't square). Q does however obey: Q.H @ Q = I.
 
 Really Q = [Q1 | Q2] where Q1 has as many columns as there are input variables
-and Q2 is a matrix of zeros.  In this case QQH is the projection matrix,
-or hat matrix equivalent to X(XHX)^-1XH.
+and Q2 is a matrix of zeros.
 
-Notes that Q is not unitary, but this is because its inverse is not defined (as it
-isn't square). Q does however obey: Q.H @ Q = I.
+QQH is the projection matrix, or hat matrix equivalent to X(XHX)^-1XH.
+https://math.stackexchange.com/questions/3360485/projection-matrix-expressed-as-qr-identity
 
-The use of QHY is not so much physically meaningful as it is a trick to
-compute more efficiently QQHY.  ? Really are we doing fewer calculations?
+The quantity QHY floating around is a convenience matrix that makes computing the
+predicted data less numerically expensive.  The use of QHY is not so much physically
+meaningful as it is a trick to compute more efficiently the predicted data QQHY.
 
+Y_predicted = QQHY (since QQH is proj mtx)
+but, when computing the sums of squares of Y_predicted, such as we do in the error
+variances calculation, we can compute  QHY2 = np.linalg.norm(QHY, axis=0) ** 2
+instead of QQHY2 = YP2 = np.linalg.norm(YP, axis=0) ** 2 since
+YP.H @ YP = QQHY.H @ QQHY = QHY.H @ Q.H @ Q @ QHY = QHY.H @ QHY.
+The predicted data has to lie in span of the columns in the design matrix X.
+The predicted data has to be a linear combination of the columns of Y.
+Q is an orthoganal basis for the columns of X.
+So the predicted data is Q*QH*Y
+Write it out by hand and you'll see it.
+The norms of QQHY and QHY are the same
 
-
-< MATLAB Documentation >
+    < MATLAB Documentation >
 [Q,R] = qr(A) performs a QR decomposition on m-by-n matrix A such that A = Q*R.
 The factor R is an m-by-n upper-triangular matrix, and the factor Q is an
 m-by-m orthogonal matrix.
@@ -64,7 +76,7 @@ If m <= n, then the economy-size decomposition is the same as the regular decomp
 
 If you specify a third output with the economy-size decomposition, then it is
 returned as a permutation vector such that A(:,P) = Q*R.
-< /MATLAB Documentation >
+    < /MATLAB Documentation >
 
 Matlab's reference to the "economy" rerpresentation is what Trefethen and Bau
 call the "reduced QR factorization".  Golub & Van Loan (1996, §5.2) call Q1R1
@@ -76,11 +88,13 @@ https://mail.python.org/pipermail/numpy-discussion/2012-November/064485.html
 We will default to using numpy for now.
 Note that numpy's default is to use the "reduced" form of Q, R.  R is
 upper-right triangular.
+# </QR-decomposition Notes>
+
 
 This is cute:
 https://stackoverflow.com/questions/26932461/conjugate-transpose-operator-h-in-numpy
 
-THe Matlab mldivide flowchart can be found here:
+The Matlab mldivide flowchart can be found here:
 https://stackoverflow.com/questions/18553210/how-to-implement-matlabs-mldivide-a-k-a-the-backslash-operator
 And the matlab documentation here
 http://matlab.izmiran.ru/help/techdoc/ref/mldivide.html
@@ -134,9 +148,9 @@ class TRME(RegressionEstimator):
     def sigma(self, QHY, Y_or_Yc, correction_factor=1.0):
         """
         These are the error variances.
-        TODO: Move this method to the base class
+        TODO: Move this method to the base class, or a QR decorator.
         Computes the squared norms difference of the output channels from the
-        "output channels inner-product with Q"
+        "output channels inner-product with QQH"
 
         ToDo: Rename this to sigma_squared, or residual_variance rather than sigma.
         It is a variance.  Especially in the context or the redecnd using
@@ -153,19 +167,6 @@ class TRME(RegressionEstimator):
             The output channels (self.Y) or the cleaned output channels self.Yc
         correction_factor : float
             See doc in IterControl.correction_factor
-
-        #<PUT THIS SOMEWHERE RELEVANT>
-        Y2 is the norm sqaured of the data, and
-        QQHY is the projected (and predicted) data...
-        The predicted data has to lie in span of the columns in the
-        design matrix X.
-        The predicted data has to be a linear combination of the
-        columns of b.
-        Q is an orthoganal basis for the columns of X
-        So the predicted data is Q*QH*X
-        Write it out by hand and you'll see it.
-        The norms of QQHY  and the length of QHY are the same
-        #</PUT THIS SOMEWHERE RELEVANT>
 
         Returns
         -------
