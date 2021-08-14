@@ -23,7 +23,7 @@ def test_create_run_configs():
     create_run_config_for_test_case("test12rr")
 
 
-def process_synthetic_1_standard(assert_compare_result=True):
+def process_synthetic_1_standard(assert_compare_result=True, show_rho_phi_plot=False):
     """
     Just like the normal test runs, but this uses a previously committed json
     file and has a known result.  The results are plotted and stored and
@@ -50,6 +50,7 @@ def process_synthetic_1_standard(assert_compare_result=True):
         aurora_pxy,
         aurora_pyx,
     ) = merge_tf_collection_to_match_z_file(aux_data, tf_collection)
+
     xy_or_yx = "xy"
     rho_rms_aurora = np.sqrt(np.mean((aurora_rxy - 100) ** 2))
     print(f"rho_rms_aurora {rho_rms_aurora}")
@@ -65,7 +66,10 @@ def process_synthetic_1_standard(assert_compare_result=True):
     ttl_str += f"\n phi rms_aurora {phi_rms_aurora:.1f} rms_emtf" f" {phi_rms_emtf:.1f}"
     print(f"{xy_or_yx} rho_rms_aurora {rho_rms_aurora} rho_rms_emtf" f" {rho_rms_emtf}")
     print(f"{xy_or_yx} phi_rms_aurora {phi_rms_aurora} phi_rms_emtf" f" {phi_rms_emtf}")
-    tf_collection.rho_phi_plot(aux_data=aux_data, xy_or_yx=xy_or_yx, ttl_str=ttl_str)
+    if show_rho_phi_plot:
+        tf_collection.rho_phi_plot(
+            aux_data=aux_data, xy_or_yx=xy_or_yx, ttl_str=ttl_str
+        )
 
     xy_or_yx = "yx"
     rho_rms_aurora = np.sqrt(np.mean((aurora_ryx - 100) ** 2))
@@ -82,7 +86,10 @@ def process_synthetic_1_standard(assert_compare_result=True):
     ttl_str += f"\n phi rms_aurora {phi_rms_aurora:.1f} rms_emtf {phi_rms_emtf:.1f}"
     print(f"{xy_or_yx} rho_rms_aurora {rho_rms_aurora} rho_rms_emtf " f"{rho_rms_emtf}")
     print(f"{xy_or_yx} phi_rms_aurora {phi_rms_aurora} phi_rms_emtf " f"{phi_rms_emtf}")
-    tf_collection.rho_phi_plot(aux_data=aux_data, xy_or_yx=xy_or_yx, ttl_str=ttl_str)
+    if show_rho_phi_plot:
+        tf_collection.rho_phi_plot(
+            aux_data=aux_data, xy_or_yx=xy_or_yx, ttl_str=ttl_str
+        )
     print("OK")
     return
 
@@ -136,11 +143,11 @@ def test_process_mth5():
     # create_mth5_synthetic_file(STATION_01_CFG, plot=False)
     # process_synthetic_1_underdetermined()
     # process_synthetic_1_with_nans()
-    process_synthetic_1_standard()
+    process_synthetic_1_standard(show_rho_phi_plot=False)
     # create_run_config_for_test_case("test1")
     # process_synthetic_1()
     # process_synthetic_2()
-    process_synthetic_rr12()
+    # process_synthetic_rr12()
 
 
 def main():
