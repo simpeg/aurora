@@ -1,9 +1,9 @@
-import functools
-import xarray as xr
+import numpy as np
 import scipy.signal as ssig
 from aurora.time_series.decorators import can_use_xr_dataarray
 
-def schur_product_windowed_data(windowed_data, multiplier):
+
+def schur_product_windowed_data(ensemblized_data, taper):
     """
     The axes are set up so that each window is tapered
 
@@ -22,7 +22,7 @@ def schur_product_windowed_data(windowed_data, multiplier):
     -------
 
     """
-    tapered_windowed_data = windowed_array * taper  # seems to do sparse diag mult
+    tapered_windowed_data = ensemblized_data * taper  # seems to do sparse diag mult
     # time trial it against a few other methods
     return tapered_windowed_data
 
@@ -43,11 +43,12 @@ def validate_coordinate_ordering_time_domain(dataset):
     coordinate_labels = list(dataset.coords.keys())
     cond1 = coordinate_labels[0] == "within-window time"
     cond2 = coordinate_labels[1] == "time"
-    if (cond1 & cond2):
+    if cond1 & cond2:
         return True
     else:
         print("Uncertain that xarray coordinates are correctly ordered")
         raise Exception
+
 
 def get_time_coordinate_axis(dataset):
     """
@@ -66,7 +67,7 @@ def get_time_coordinate_axis(dataset):
 
     if len(coordinate_labels) != 2:
         print("Warning - Expected two distinct coordinates")
-        #raise Exception
+        # raise Exception
 
     return coordinate_labels.index("time")
     # time_coord_indices = [ndx for x, ndx in enumerate(coordinate_labels) if
@@ -76,7 +77,6 @@ def get_time_coordinate_axis(dataset):
     # else:
     #     print("expected only one universal time coordinate")
     #     raise Exception
-
 
 
 class WindowedTimeSeries(object):
@@ -98,6 +98,7 @@ class WindowedTimeSeries(object):
         probably make these @staticmethod s so we import WindowedTimeSeries
         and then call the static methods
     """
+
     def __init__(self):
         pass
 
@@ -105,15 +106,15 @@ class WindowedTimeSeries(object):
     @staticmethod
     def apply_taper(data=None, taper=None, in_place=True):
         """
-        it turns out xarray handles this very cleanly as a direct multiply
-        operation.  Initially I was looping over channels and multiplying
-        each array using
-        tapered_obj = WindowedTimeSeries.apply_taper(data=windowed_obj,
-    #                                           taper=windowing_scheme.taper)
-        but one can simply call:
-        tapered_obj = windowed_obj * windowing_scheme.taper
+            it turns out xarray handles this very cleanly as a direct multiply
+            operation.  Initially I was looping over channels and multiplying
+            each array using
+            tapered_obj = WindowedTimeSeries.apply_taper(data=windowed_obj,
+        #                                           taper=windowing_scheme.taper)
+            but one can simply call:
+            tapered_obj = windowed_obj * windowing_scheme.taper
 
-        Thus this method will be deprecated.
+            Thus this method will be deprecated.
         """
         data = data * taper
         # validate_coordinate_ordering_time_domain(data)
@@ -126,7 +127,6 @@ class WindowedTimeSeries(object):
 
         return data
 
-
     @staticmethod
     def detrend(data=None, detrend_axis=None, detrend_type=None, inplace=True):
         """
@@ -138,8 +138,8 @@ class WindowedTimeSeries(object):
         for now
         Parameters
         ----------
-        data
-        detrend_axis
+        data : xarray Dataset
+        detrend_axis : string
         detrend_type : string
             "linear" or "constant"
             This argument is provided to scipy.signal.detrend
@@ -154,28 +154,43 @@ class WindowedTimeSeries(object):
             print("deep copy dataset and then overwrite")
             raise NotImplementedError
 
-        for key in data.keys():
-            print(f"key {key}")
-            print("By modifying windowed_array below am I modifying data")
+        for channel in data.keys():
+            print(f"channel {channel}")
 
-            windowed_array = data[key].data
-
-            if detrend_type: #neither False nor None
-                windowed_array = ssig.detrend(windowed_array,
-                                              axis=detrend_axis,
-                                              type=detrend_type)
-                                              #overwrite_data=True
+            # windowed_array = data[key].data
+            nanless_data = data[channel].dropna(dim="time")
+            ensembles = nanless_data.data
+            print("Nan Checker goes here")
+            if detrend_type:  # neither False nor None
+                ensembles = ssig.detrend(
+                    ensembles, axis=detrend_axis, type=detrend_type
+                )
+                # overwrite_data=True
 
             if inplace:
-                data[key].data = windowed_array
+                if len(nanless_data.time) < len(data[channel].time):
+                    data[channel].data += np.nan
+                    data[channel].loc[nanless_data.time, :] = ensembles
+                    # there must be a cute way to just assign all nan to just the
+                    # columns that had nan values in some places, rather than
+                    # assigning nan to the whole array and then overwriting the
+                    # ensembles .. something like
+                    # data[channel].loc[~nanless_data.time, :] = np.nan
+                else:
+                    data[channel].data = ensembles
             else:
                 print("deep copy dataset and then overwrite")
                 raise NotImplementedError
         return data
 
     @staticmethod
-    def apply_stft(data=None, sampling_rate=None, detrend_type=None,
-                   spectral_density_calibration=1.0, fft_axis=None):
+    def apply_stft(
+        data=None,
+        sampling_rate=None,
+        detrend_type=None,
+        spectral_density_calibration=1.0,
+        fft_axis=None,
+    ):
         """
         Only supports xr.Dataset at this point
 
@@ -189,9 +204,10 @@ class WindowedTimeSeries(object):
         -------
 
         """
+        from aurora.time_series.windowing_scheme import fft_xr_ds
+
         if fft_axis is None:
             fft_axis = get_time_coordinate_axis(data)
-        spectral_ds = fft_xr_ds(data, sampling_rate,
-                                    detrend_type=detrend_type)
+        spectral_ds = fft_xr_ds(data, sampling_rate, detrend_type=detrend_type)
         spectral_ds *= spectral_density_calibration
         return spectral_ds

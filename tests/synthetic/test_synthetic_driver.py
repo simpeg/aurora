@@ -28,6 +28,8 @@ def process_synthetic_1_standard(assert_compare_result=True, show_rho_phi_plot=F
     Just like the normal test runs, but this uses a previously committed json
     file and has a known result.  The results are plotted and stored and
     checked against a standard result calculated originally in August 2021.
+
+    Could probably factor this into its own module and import it.
     Returns
     -------
 

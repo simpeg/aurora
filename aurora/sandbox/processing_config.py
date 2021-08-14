@@ -8,8 +8,10 @@ A good way to approach the various decimation levels maybe to allow a
 processing config to generate a decimated config.  After all, it is unlikely
 that one will change parameters besides the frequency bands, and even these
 are reusable provided we use an EMTF-style band averaging scheme
+
+Once this is mature, put it into aurora.pipelines
 """
-#from collections.abc import MutableMapping
+# from collections.abc import MutableMapping
 from pathlib import Path
 
 import json
@@ -23,64 +25,65 @@ class ProcessingConfig(BaseDict):
     ToDo: Deprecate mth5_path from this level after addressing strategy in
     issue #13
     """
-    def __init__(self, *args, **kwargs):
-        self.mth5_path = kwargs.get("mth5_path", "") #str or Path()
 
-        #<DECIMATION CONFIG>
+    def __init__(self, *args, **kwargs):
+        self.mth5_path = kwargs.get("mth5_path", "")  # str or Path()
+
+        # <DECIMATION CONFIG>
         # Support None value for DecimationConfig
         self.decimation_level_id = kwargs.get("decimation_level", 0)
         self.decimation_factor = kwargs.get("decimation_factor", 1)
         self.decimation_method = kwargs.get("decimation_method", "default")
         self.anti_alias_filter = kwargs.get("AAF", "default")
-        #<DECIMATION CONFIG>
+        # <DECIMATION CONFIG>
 
         # <FOURIER TRANSFORM CONFIG>
         # self.spectral_transform_config = {}
         # spectral_transform_config["taper_family"] = "hamming"
-        
+
         self.taper_family = "dpss"
-        self.taper_additional_args = {"alpha":3.0}
+        self.taper_additional_args = {"alpha": 3.0}
         self.taper_family = "hamming"
         self.taper_additional_args = {}
         self.num_samples_window = 256
-        self.num_samples_overlap = int(self.num_samples_window*3./4)
+        self.num_samples_overlap = int(self.num_samples_window * 3.0 / 4)
         self.sample_rate = 0.0
         self.prewhitening_type = "first difference"
         self.extra_pre_fft_detrend_type = "linear"
         # </FOURIER TRANSFORM CONFIG>
 
         # <FREQUENCY BANDS>
-            # <EMTF>
+        # <EMTF>
         self.band_setup_style = "EMTF"  # "default"
         self.emtf_band_setup_file = "bs_256.cfg"
-            # </EMTF>
-            # <defualt>
+        # </EMTF>
+        # <defualt>
         self.minimum_number_of_cycles = 10  # not used if emtf_band_setup_file present
-            # </defualt>
+        # </defualt>
         # </FREQUENCY BANDS>
 
         # <TRANSFER FUNCTION CONFIG>
 
-            # <ITERATOR>
+        # <ITERATOR>
         self.max_number_of_iterations = 10
-            # </ITERATOR>
+        # </ITERATOR>
 
-            # <STATIONS>
+        # <STATIONS>
         self.local_station_id = ""
         self.reference_station_id = ""
-            # </STATIONS>
+        # </STATIONS>
 
-            # <ESTIMATION>
-        self.estimation_engine = "OLS" #RME
+        # <ESTIMATION>
+        self.estimation_engine = "OLS"  # RME
         self.input_channels = ["hx", "hy"]  # optional, default ["hx", "hy"]
         self.output_channels = ["ex", "ey"]  # optional, default ["ex", "ey", "hz"]
-        self.reference_channels = [] # optional, default ["hx", "hy"],
-            # </ESTIMATION>
+        self.reference_channels = []  # optional, default ["hx", "hy"],
+        # </ESTIMATION>
 
         # </TRANSFER FUNCTION CONFIG>
 
     def validate(self):
-        if self.sample_rate <=0:
+        if self.sample_rate <= 0:
             print("sample rate not given")
             raise Exception
 
@@ -95,7 +98,6 @@ class ProcessingConfig(BaseDict):
     # @emtf_band_setup_file.setter
     # def emtf_band_setup_file(self, emtf_band_setup_file):
     #     self._emtf_band_setup_file = Path(emtf_band_setup_file)
-
 
     # @property
     # def local_station_id(self, local_station_id):
@@ -120,8 +122,8 @@ class ProcessingConfig(BaseDict):
         json_fn = Path(json_fn)
         if not json_fn.exists():
             msg = f"JSON schema file {json_fn} does not exist"
-            logger.error(msg)
-            MTSchemaError(msg)
+            print(msg)
+            raise Exception
 
         with open(json_fn, "r") as fid:
             json_dict = json.load(fid)
@@ -139,6 +141,7 @@ class RunConfig(BaseDict):
     run_config on the high level
     (such as an ID, or a label) we cannot
     """
+
     def __init__(self, **kwargs):
         self.config_id = kwargs.get("config_id", "run_config")
         self.mth5_path = kwargs.get("mth5_path", "")
@@ -154,8 +157,6 @@ class RunConfig(BaseDict):
     @property
     def decimation_level_ids(self):
         return sorted(self.decimation_level_configs.keys())
-
-
 
     def to_json(self, json_fn=None, indent=" " * 4):
         if json_fn is None:
@@ -191,8 +192,8 @@ class RunConfig(BaseDict):
         json_fn = Path(json_fn)
         if not json_fn.exists():
             msg = f"JSON schema file {json_fn} does not exist"
-            logger.error(msg)
-            MTSchemaError(msg)
+            print(msg)
+            raise Exception
 
         with open(json_fn, "r") as fid:
             json_dict = json.load(fid)
@@ -205,7 +206,9 @@ class RunConfig(BaseDict):
         for decimation_level_id in decimation_level_ids:
             decimation_level_processing_config = ProcessingConfig()
             decimation_level_processing_config.__dict__ = json_dict[decimation_level_id]
-            self.decimation_level_configs[int(decimation_level_id)] = decimation_level_processing_config
+            self.decimation_level_configs[
+                int(decimation_level_id)
+            ] = decimation_level_processing_config
 
 
 def test_create_decimation_level_config():
@@ -214,10 +217,11 @@ def test_create_decimation_level_config():
     cfg.local_station_id = "PKD"
     cfg.validate()
 
+
 def test_create_run_config():
     json_fn = "run_config_00.json"
     run_config = RunConfig()
-    decimation_factors = [1,4,4,4]
+    decimation_factors = [1, 4, 4, 4]
     for i_decimation_level in range(len(decimation_factors)):
         cfg = ProcessingConfig()
         cfg.decimation_level_id = i_decimation_level
@@ -229,9 +233,11 @@ def test_create_run_config():
     run_config_from_file.from_json(json_fn)
     return run_config
 
+
 def main():
     test_create_decimation_level_config()
     test_create_run_config()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
