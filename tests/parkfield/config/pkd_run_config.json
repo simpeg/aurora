@@ -22,6 +22,7 @@
         "local_station_id": "",
         "reference_station_id": "",
         "estimation_engine": "RME",
+        "estimate_per_channel": true,
         "input_channels": [
             "hx",
             "hy"
@@ -51,6 +52,7 @@
         "local_station_id": "",
         "reference_station_id": "",
         "estimation_engine": "RME",
+        "estimate_per_channel": true,
         "input_channels": [
             "hx",
             "hy"
@@ -80,6 +82,7 @@
         "local_station_id": "",
         "reference_station_id": "",
         "estimation_engine": "RME",
+        "estimate_per_channel": true,
         "input_channels": [
             "hx",
             "hy"
@@ -109,6 +112,7 @@
         "local_station_id": "",
         "reference_station_id": "",
         "estimation_engine": "RME",
+        "estimate_per_channel": true,
         "input_channels": [
             "hx",
             "hy"

@@ -209,7 +209,7 @@ REGRESSION_LIBRARY = {"OLS": RegressionEstimator, "RME": TRME, "TRME_RR": TRME_R
 def get_regression_class(config):
     try:
         regression_class = REGRESSION_LIBRARY[config.estimation_engine]
-    except:
+    except KeyError:
         print(f"processing_scheme {config.estimation_engine} not supported")
         print(f"processing_scheme must be one of OLS, RME ")
         raise Exception
@@ -253,6 +253,34 @@ def transfer_function_header_from_config(config):
     return transfer_function_header
 
 
+def check_time_axes_synched(X, Y):
+    """
+    Utility function for checking that time axes agree
+
+    Parameters
+    ----------
+    X : xarray
+    Y : xarray
+
+    Returns
+    -------
+
+    """
+    """
+    It is critical that X, Y, RR have the same time axes here
+
+    Returns
+    -------
+
+    """
+    if (X.time == Y.time).all():
+        pass
+    else:
+        print("WARNING - NAN Handling could fail if X,Y dont share time axes")
+        raise Exception
+    return
+
+
 def get_band_for_tf_estimate(band, config, local_stft_obj, remote_stft_obj):
     """
     Get data for TF estimation for a particular band.
@@ -283,12 +311,57 @@ def get_band_for_tf_estimate(band, config, local_stft_obj, remote_stft_obj):
     band_dataset = extract_band(band, local_stft_obj)
     X = band_dataset[config.input_channels]
     Y = band_dataset[config.output_channels]
-    print("TODO: Handle nan of input channels HERE!")
+    check_time_axes_synched(X, Y)
     if config.reference_station_id:
         band_dataset = extract_band(band, remote_stft_obj)
         RR = band_dataset[config.reference_channels]
+        check_time_axes_synched(Y, RR)
     else:
         RR = None
+
+    return X, Y, RR
+
+
+def handle_nan(X, Y, RR, config, output_channels=None):
+    """
+    Drops Nan from series of Fourier coefficients.
+
+    Parameters
+    ----------
+    X : xr.Dataset
+    Y : xr.Dataset
+    RR : xr.Dataset or None
+    config : ProcessingConfig
+
+    Returns
+    -------
+    X : xr.Dataset
+    Y : xr.Dataset
+    RR : xr.Dataset or None
+
+    """
+    data_var_add_label_mapper = {}
+    data_var_rm_label_mapper = {}
+    for ch in config.reference_channels:
+        data_var_add_label_mapper[ch] = f"remote_{ch}"
+        data_var_rm_label_mapper[f"remote_{ch}"] = ch
+    # if needed we could add local to local channels as well, or station label
+    merged_xr = X.merge(Y, join="exact")
+    if RR is not None:
+        RR = RR.assign(data_var_add_label_mapper)
+        merged_xr = merged_xr.merge(RR, join="exact")
+
+    merged_xr = merged_xr.dropna(dim="time")
+    merged_xr = merged_xr.to_array(dim="channel")
+    X = merged_xr.sel(channel=config.input_channels)
+    X = X.to_dataset(dim="channel")
+    if output_channels is None:
+        output_channels = config.output_channels
+    Y = merged_xr.sel(channel=output_channels)
+    Y = Y.to_dataset(dim="channel")
+    if RR is not None:
+        RR = merged_xr.sel(channel=data_var_rm_label_mapper.keys())
+        RR = RR.assign(data_var_rm_label_mapper)
 
     return X, Y, RR
 
@@ -298,7 +371,6 @@ def process_transfer_functions(
     local_stft_obj,
     remote_stft_obj,
     transfer_function_obj,
-    estimate_per_channel=False,
 ):
     """
     This method is very similar to TTFestBand.
@@ -324,17 +396,36 @@ def process_transfer_functions(
         X, Y, RR = get_band_for_tf_estimate(
             band, config, local_stft_obj, remote_stft_obj
         )
-        if not estimate_per_channel:
+        if config.estimate_per_channel:
+            Y = Y.to_array(dim="channel")
+            for ch in config.output_channels:
+                Y_ch = Y.sel(
+                    channel=[
+                        ch,
+                    ]
+                )
+                Y_ch = Y_ch.to_dataset(dim="channel")
+                X_tmp, Y_tmp, RR_tmp = handle_nan(
+                    X,
+                    Y_ch,
+                    RR,
+                    config,
+                    output_channels=[
+                        ch,
+                    ],
+                )
+                regression_estimator = regression_class(
+                    X=X_tmp, Y=Y_tmp, Z=RR_tmp, iter_control=iter_control
+                )
+                regression_estimator.estimate()
+                transfer_function_obj.set_tf(regression_estimator, band.center_period)
+        else:
+            X, Y, RR = handle_nan(X, Y, RR, config)
             regression_estimator = regression_class(
                 X=X, Y=Y, Z=RR, iter_control=iter_control
             )
-
-            Z = regression_estimator.estimate()
-
+            regression_estimator.estimate()
             transfer_function_obj.set_tf(regression_estimator, band.center_period)
-        else:
-            print("NOT YET IMPLEMENTED")
-            raise Exception
 
     return transfer_function_obj
 

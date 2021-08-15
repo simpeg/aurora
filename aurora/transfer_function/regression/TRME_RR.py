@@ -276,7 +276,17 @@ class TRME_RR(RegressionEstimator):
         SSR = np.conj(res.conj().T @ res)
         Yc2 = np.abs(self.Yc) ** 2
         SSYC = np.sum(Yc2, axis=0)
-        self.R2 = 1 - np.diag(np.real(SSR)).T / SSYC
-        self.R2[self.R2 < 0] = 0
-        # array([ 0.97713185,  0.97552176,  0.97480946])
+        R2 = 1 - np.diag(np.real(SSR)).T / SSYC
+        R2[R2 < 0] = 0
+
+        self.R2 = xr.DataArray(
+            R2,
+            dims=[
+                "output_channel",
+            ],
+            coords={
+                "output_channel": list(self._Y.data_vars),
+            },
+        )
+
         return

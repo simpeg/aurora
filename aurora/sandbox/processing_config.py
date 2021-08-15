@@ -75,6 +75,9 @@ class ProcessingConfig(BaseDict):
 
         # <ESTIMATION>
         self.estimation_engine = "OLS"  # RME
+        self.estimate_per_channel = (
+            True  # all channels at once or one channel at a time
+        )
         self.input_channels = ["hx", "hy"]  # optional, default ["hx", "hy"]
         self.output_channels = ["ex", "ey"]  # optional, default ["ex", "ey", "hz"]
         self.reference_channels = []  # optional, default ["hx", "hy"],

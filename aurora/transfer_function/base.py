@@ -237,13 +237,15 @@ class TransferFunction(object):
         index = self.period_index(period)
 
         tf = regression_estimator.b_to_xarray()
-        for out_ch in self.tf_header.output_channels:
+        output_channels = list(regression_estimator._Y.data_vars)
+        # for out_ch in self.tf_header.output_channels:
+        for out_ch in output_channels:
             for inp_ch in self.tf_header.input_channels:
                 self.tf[:, :, index].loc[out_ch, inp_ch] = tf.loc[out_ch, inp_ch]
 
         if regression_estimator.noise_covariance is not None:
-            for out_ch_1 in self.tf_header.output_channels:
-                for out_ch_2 in self.tf_header.output_channels:
+            for out_ch_1 in output_channels:
+                for out_ch_2 in output_channels:
                     tmp = regression_estimator.cov_nn.loc[out_ch_1, out_ch_2]
                     self.cov_nn[:, :, index].loc[out_ch_1, out_ch_2] = tmp
 
@@ -254,7 +256,9 @@ class TransferFunction(object):
                     self.cov_ss_inv[:, :, index].loc[inp_ch_1, inp_ch_2] = tmp
 
         if regression_estimator.R2 is not None:
-            self.R2[:, index] = regression_estimator.R2
+            for out_ch in output_channels:
+                tmp = regression_estimator.R2.loc[out_ch]
+                self.R2[:, index].loc[out_ch] = tmp
             # TODO: make channel explcit here? e.g.
             # for i,out_ch in enumerate(self.tf_header.output_channels):
             #     self.R2[:,index].loc[out_ch] =  regression_estimator.R2[i]

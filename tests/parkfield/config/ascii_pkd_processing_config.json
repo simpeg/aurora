@@ -17,6 +17,7 @@
     "local_station_id": "PKD",
     "reference_station_id": "",
     "estimation_engine": "RME",
+    "estimate_per_channel": true,
     "input_channels": [
         "hx",
         "hy"

@@ -49,6 +49,8 @@ for col in STATION_01_CFG["columns"]:
     if col == "hy":
         STATION_01_CFG["nan_indices"][col].append([11, 100])
         STATION_01_CFG["nan_indices"][col].append([20000, 444])
+    # if col == "ex":
+    #     STATION_01_CFG["nan_indices"][col].append([10000, 100])
 
 STATION_01_CFG["filters"] = {}
 # for col in STATION_01_CFG["columns"]:
