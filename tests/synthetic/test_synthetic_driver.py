@@ -144,7 +144,7 @@ def process_synthetic_rr12():
 def test_process_mth5():
     # create_mth5_synthetic_file(STATION_01_CFG, plot=False)
     # process_synthetic_1_underdetermined()
-    process_synthetic_1_with_nans()
+    # process_synthetic_1_with_nans()
     process_synthetic_1_standard(assert_compare_result=True, show_rho_phi_plot=False)
     # create_run_config_for_test_case("test1")
     # process_synthetic_1()
