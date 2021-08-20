@@ -217,7 +217,19 @@ class TransferFunctionCollection(object):
 
         return
 
-    def rho_phi_plot(self, show=True, aux_data=None, xy_or_yx="xy", ttl_str=""):
+    def rho_phi_plot(
+        self,
+        show=True,
+        aux_data=None,
+        xy_or_yx="xy",
+        ttl_str="",
+        x_axis_fontsize=25,
+        y_axis_fontsize=25,
+        ttl_fontsize=16,
+        markersize=10,
+        rho_ylims=[10, 1000],
+        phi_ylims=[0, 90],
+    ):
         """
         One-off plotting method intended only for the synthetic test data for aurora dev
         Parameters
@@ -253,7 +265,10 @@ class TransferFunctionCollection(object):
                 color=color_cyc[i_dec],
                 linestyle="None",
                 label=f"aurora {i_dec}",
+                markersize=markersize,
             )
+            axs[0].tick_params(axis="both", which="major", labelsize=16)
+            # ax.tick_params(axis='both', which='minor', labelsize=8)
 
             if xy_or_yx == "xy":
                 aurora_phi = tf.phi[:, 0]
@@ -268,7 +283,11 @@ class TransferFunctionCollection(object):
                 marker="o",
                 color=color_cyc[i_dec],
                 linestyle="None",
+                label=f"aurora {i_dec}",
+                markersize=markersize,
             )
+            axs[1].tick_params(axis="both", which="major", labelsize=16)
+
         if aux_data:
             #            try:
             decimation_levels = list(set(aux_data.decimation_levels))
@@ -292,6 +311,7 @@ class TransferFunctionCollection(object):
                     color="k",
                     linestyle="None",
                     label=f"emtf " f"{int(i_dec-1)}",
+                    markersize=markersize,
                 )
                 axs[1].semilogx(
                     aux_data.periods[ndx],
@@ -299,6 +319,8 @@ class TransferFunctionCollection(object):
                     marker=shape_cyc[i_dec - 1],
                     color="k",
                     linestyle="None",
+                    markersize=markersize,
+                    label=f"emtf " f"{int(i_dec-1)}",
                 )
         # except:
         #     # for i_dec in aux_data.decimation_levels
@@ -317,14 +339,18 @@ class TransferFunctionCollection(object):
         #         linestyle="None",
         #     )
         axs[0].legend(ncol=2)
-        axs[1].legend()
+        axs[1].legend(ncol=2)
 
-        axs[1].set_xlabel("Period (s)")
-        axs[0].set_ylabel(r"$\Omega$-m")
-        axs[1].set_ylabel("Degrees")
+        axs[1].set_xlabel("Period (s)", fontsize=x_axis_fontsize)
+        axs[0].set_ylabel(r"$\Omega$-m", fontsize=y_axis_fontsize)
+        axs[1].set_ylabel("Degrees", fontsize=y_axis_fontsize)
 
         ttl_str = f"{tf.tf_header.local_station_id} {xy_or_yx} \n{ttl_str}"
-        axs[0].set_title(ttl_str)
+        axs[0].set_title(ttl_str, fontsize=ttl_fontsize)
+        if rho_ylims is not None:
+            axs[0].set_ylim(rho_ylims)
+        if phi_ylims is not None:
+            axs[1].set_ylim(phi_ylims)
         from aurora.general_helper_functions import FIGURES_PATH
 
         figure_basename = f"synthetic_{tf.tf_header.local_station_id}_{xy_or_yx}.png"

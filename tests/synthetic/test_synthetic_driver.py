@@ -23,7 +23,12 @@ def test_create_run_configs():
     create_run_config_for_test_case("test12rr")
 
 
-def process_synthetic_1_standard(assert_compare_result=True, show_rho_phi_plot=False):
+def process_synthetic_1_standard(
+    assert_compare_result=True,
+    make_rho_phi_plot=True,
+    show_rho_phi_plot=False,
+    use_subtitle=True,
+):
     """
     Just like the normal test runs, but this uses a previously committed json
     file and has a known result.  The results are plotted and stored and
@@ -64,13 +69,19 @@ def process_synthetic_1_standard(assert_compare_result=True, show_rho_phi_plot=F
     rho_rms_emtf = np.sqrt(np.mean((aux_data.rxy - 100) ** 2))
     phi_rms_emtf = np.sqrt(np.mean((aux_data.pxy - 45) ** 2))
     ttl_str = ""
-    ttl_str += f"\n rho rms_aurora {rho_rms_aurora:.1f} rms_emtf {rho_rms_emtf:.1f}"
-    ttl_str += f"\n phi rms_aurora {phi_rms_aurora:.1f} rms_emtf" f" {phi_rms_emtf:.1f}"
+    if use_subtitle:
+        ttl_str += f"\n rho rms_aurora {rho_rms_aurora:.1f} rms_emtf {rho_rms_emtf:.1f}"
+        ttl_str += (
+            f"\n phi rms_aurora {phi_rms_aurora:.1f} rms_emtf" f" {phi_rms_emtf:.1f}"
+        )
     print(f"{xy_or_yx} rho_rms_aurora {rho_rms_aurora} rho_rms_emtf" f" {rho_rms_emtf}")
     print(f"{xy_or_yx} phi_rms_aurora {phi_rms_aurora} phi_rms_emtf" f" {phi_rms_emtf}")
-    if show_rho_phi_plot:
+    if make_rho_phi_plot:
         tf_collection.rho_phi_plot(
-            aux_data=aux_data, xy_or_yx=xy_or_yx, ttl_str=ttl_str
+            aux_data=aux_data,
+            xy_or_yx=xy_or_yx,
+            ttl_str=ttl_str,
+            show=show_rho_phi_plot,
         )
 
     xy_or_yx = "yx"
@@ -84,13 +95,17 @@ def process_synthetic_1_standard(assert_compare_result=True, show_rho_phi_plot=F
     rho_rms_emtf = np.sqrt(np.mean((aux_data.ryx - 100) ** 2))
     phi_rms_emtf = np.sqrt(np.mean((aux_data.pyx - 45) ** 2))
     ttl_str = ""
-    ttl_str += f"\n rho rms_aurora {rho_rms_aurora:.1f} rms_emtf {rho_rms_emtf:.1f}"
-    ttl_str += f"\n phi rms_aurora {phi_rms_aurora:.1f} rms_emtf {phi_rms_emtf:.1f}"
+    if use_subtitle:
+        ttl_str += f"\n rho rms_aurora {rho_rms_aurora:.1f} rms_emtf {rho_rms_emtf:.1f}"
+        ttl_str += f"\n phi rms_aurora {phi_rms_aurora:.1f} rms_emtf {phi_rms_emtf:.1f}"
     print(f"{xy_or_yx} rho_rms_aurora {rho_rms_aurora} rho_rms_emtf " f"{rho_rms_emtf}")
     print(f"{xy_or_yx} phi_rms_aurora {phi_rms_aurora} phi_rms_emtf " f"{phi_rms_emtf}")
-    if show_rho_phi_plot:
+    if make_rho_phi_plot:
         tf_collection.rho_phi_plot(
-            aux_data=aux_data, xy_or_yx=xy_or_yx, ttl_str=ttl_str
+            aux_data=aux_data,
+            xy_or_yx=xy_or_yx,
+            ttl_str=ttl_str,
+            show=show_rho_phi_plot,
         )
     print("OK")
     return
@@ -145,7 +160,12 @@ def test_process_mth5():
     # create_mth5_synthetic_file(STATION_01_CFG, plot=False)
     # process_synthetic_1_underdetermined()
     # process_synthetic_1_with_nans()
-    process_synthetic_1_standard(assert_compare_result=True, show_rho_phi_plot=False)
+    process_synthetic_1_standard(
+        assert_compare_result=True,
+        make_rho_phi_plot=True,
+        show_rho_phi_plot=False,
+        use_subtitle=False,
+    )
     # create_run_config_for_test_case("test1")
     # process_synthetic_1()
     # process_synthetic_2()

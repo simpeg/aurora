@@ -1,4 +1,5 @@
 import inspect
+import os
 import subprocess
 import xarray as xr
 
@@ -39,20 +40,53 @@ def execute_subprocess(cmd, **kwargs):
     return
 
 
+def execute_command(cmd, **kwargs):
+    """
+    Executes command in terminal from script.
+
+    Parameters:
+        cmd (str): command to exectute from a terminal
+        kwargs: exec_dir (str): the directory from which to execute
+        kwargs: no_exception: suppress output if exception
+
+    Other Parameters:
+        exit_status: :code:`0` is good, otherwise there is some problem
+
+    .. note:: When executing :code:`rm *` this crashes if the directory we are removing
+        from is empty
+
+    .. note:: if you can you should probably use execute_subprocess() instead
+    """
+    exec_dir = kwargs.get("exec_dir", os.path.expanduser("~/"))
+    allow_exception = kwargs.get("allow_exception", True)
+    print("executing from {}".format(exec_dir))
+    cwd = os.getcwd()
+    os.chdir(exec_dir)
+    exit_status = os.system(cmd)
+    if exit_status != 0:
+        print(f"exit_status of {cmd} = {exit_status}")
+        if allow_exception:
+            raise Exception(f"Failed to successfully execute \n {cmd}")
+    os.chdir(cwd)
+
+
 # <NETCDF DOESN'T HANDLE COMPLEX>
-#https://stackoverflow.com/questions/47162983/how-to-save-xarray-dataarray
+# https://stackoverflow.com/questions/47162983/how-to-save-xarray-dataarray
 # -with-complex128-data-to-netcdf
 
+
 def save_complex(data_array, *args, **kwargs):
-    ds = xr.Dataset({'real': data_array.real, 'imag': data_array.imag})
+    ds = xr.Dataset({"real": data_array.real, "imag": data_array.imag})
     return ds.to_netcdf(*args, **kwargs)
+
 
 def read_complex(*args, **kwargs):
     ds = xr.open_dataset(*args, **kwargs)
-    return ds['real'] + ds['imag'] * 1j
+    return ds["real"] + ds["imag"] * 1j
 
-#Usage:
-#band_da is an xarray
-#save_complex(band_da, TEST_BAND_FILE)
-#band_da = read_complex(TEST_BAND_FILE)
+
+# Usage:
+# band_da is an xarray
+# save_complex(band_da, TEST_BAND_FILE)
+# band_da = read_complex(TEST_BAND_FILE)
 # </NETCDF DOESN'T HANDLE COMPLEX>
