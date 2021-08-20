@@ -1,0 +1,30 @@
+In the data/ folder is an h5 file here is made from two dataframes.
+One is keyed as "pkd" and the other as "sao".
+Each of these dataframes were created from raw 
+ascii time series of integer counts.
+They each have columns named
+hx      hy      ex     ey
+
+Compression was used as per the following when the file was created:
+df.to_hdf(h5_fn, key, complib='zlib', complevel=5)
+
+20210714:
+We will probably deprecate the data file as well as the 
+set_up_raw_data.py.  I wasn't able to get an mth5 created
+from the raw data and the inventory.  The primary issue seemed
+linked to the time_interval associated with the run (which was
+around 2 years for the long term station) vs the time
+interval for the run_ts which was 2h.  Although I was able to save
+the mth5, I was not able to read it into a run_ts and got an error
+having to do with incompatibel sampling rates.
+
+I didn't trace the error all the way down but I speculate it could 
+be becuase the run duration should have yielded a time series with
+many samples more than the run_ts actually had.
+
+Moreover, I am no longer able to reproduce this error.  
+This could be because of the workaround I added in mth5 for "e1"<-->"ex" nomenclature
+
+
+
+

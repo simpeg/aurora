@@ -6,7 +6,7 @@ iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_1
 import matplotlib.pyplot as plt
 import numpy as np
 
-from aurora.transfer_function.error_bar_helpers import err_log
+from aurora.transfer_function.plot.error_bar_helpers import err_log
 
 plt.ioff()
 class RhoPlot(object):
@@ -127,7 +127,7 @@ class RhoPlot(object):
                 hax = self.rho_sub_plots(hfig, inds);
         #grid on
 
-    def phase_sub_plot(self, ax, axRect=None, pred=None):
+    def phase_sub_plot(self, ax, ttl_str="", axRect=None, pred=None):
         """
         place a phase subplot on a figure, given figure handle and axis
         postion
@@ -179,15 +179,16 @@ class RhoPlot(object):
                                                        axis_limits[0]));
         title_pos_x = np.ceil(np.exp(title_pos_x));
         title_pos_y = axis_limits[2] + .8 * (axis_limits[3] - axis_limits[2]);
-        c_title = "$\phi$ :" + "PKD"#self.tf.Header.LocalSite.SiteID
-        ax.text(title_pos_x, title_pos_y, c_title, fontsize=14,
+        #ttl_str = f"$\phi$ : {self.tf.header.local_station_id}"\
+                  #+ \"PKD"#self.tf.Header.LocalSite.SiteID
+        ax.text(title_pos_x, title_pos_y, ttl_str, fontsize=14,
                 fontweight="demi")
         #set(gca, 'FontWeight', 'bold', 'FontSize', 11, 'Xtick', xticks);
         ax.set_xlabel('Period (s)');
         ax.set_ylabel('Degrees');
 
 
-    def rho_sub_plot(self, ax, axRect=None, pred=None):
+    def rho_sub_plot(self, ax, ttl_str = '', axRect=None, pred=None):
         """
         Calls plotrhom, standard plotting routine; uses some other routines in
         EMTF/matlab/Zplt; this version is for putting multiple curves on the
@@ -237,8 +238,9 @@ class RhoPlot(object):
                                                             axis_limits[0]));
         title_pos_x = np.ceil(np.exp(title_pos_x));
         title_pos_y = axis_limits[2] + .8 * (axis_limits[3] - axis_limits[2]);
-        c_title = "$rho_a$ :" + "PKD"  # obj.tf.Header.LocalSite.SiteID
-        ax.text(title_pos_x, title_pos_y, c_title, fontsize=14,
+        ttl_str = "\u03C1_a : " + ttl_str
+        #c_title = "$\rho_a$ :" + "PKD"  # obj.tf.Header.LocalSite.SiteID
+        ax.text(title_pos_x, title_pos_y, ttl_str, fontsize=14,
                 fontweight="demi")
         # set(gca, 'FontWeight', 'bold', 'FontSize', 11, 'Xtick', xticks);
         ax.set_xlabel('Period (s)');

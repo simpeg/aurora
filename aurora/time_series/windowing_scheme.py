@@ -53,9 +53,6 @@ different for every row, so it would be best to use something like
 
 </20210510>
 
-There is an open trade here about whether to embed the data length as an ivar
-or a variable we pass. i.e. whether the same windowing scheme is independent
-of the data length or not.
 
 TODO: Regarding the optional time_vector input to self.apply_sliding_window()
 ... this current implementation takes as input numpy array data.  We need to
@@ -75,25 +72,17 @@ import xarray as xr
 
 from aurora.time_series.apodization_window import ApodizationWindow
 
-from aurora.time_series.window_helpers import apply_taper_to_windowed_array
 from aurora.time_series.window_helpers import available_number_of_windows_in_array
 from aurora.time_series.window_helpers import SLIDING_WINDOW_FUNCTIONS
+from aurora.time_series.windowed_time_series import WindowedTimeSeries
 
-def cast_numpy_array_to_xarray_dataset():
-    """
-
-    Returns
-    -------
-
-    """
-    pass
 
 class WindowingScheme(ApodizationWindow):
     """
-    20210415: Casting everything in terms of number of samples or "points" as
-    this is the nomenclature of the signal processing cadre.  We can provide
-    functions to define things like overlap in terms of percent, duration in
-    seconds etc in another module.
+    20210415: Casting window length, overlap, advance, etc. in terms of number
+    of samples or "points" here as this is common signal processing the
+    nomenclature.  We may provide an interface to define these things in terms
+    of percent, duration in seconds etc. in a supporting module.
 
     Note that sampling_rate is actually a property of the data and not of the
     window ... still not sure if we want to make sampling_rate an attr here
@@ -122,9 +111,9 @@ class WindowingScheme(ApodizationWindow):
     @property
     def num_samples_advance(self):
         """
-        Attributes derived property that actually could be fundamental .. if we
-        defined this we would wind up deriving the overlap.  Overlap is more
-        conventional than advance in the literature however so we choose this as
+        A derived property.  If we made this a fundamental defined property
+        then overlap would become a derived property.  Overlap is more
+        conventional than advance in the literature however so we choose it as
         our property label.
         """
         return self.num_samples_window - self.num_samples_overlap
@@ -132,16 +121,19 @@ class WindowingScheme(ApodizationWindow):
 
     def available_number_of_windows(self, num_samples_data):
         """
-        dont walk over the cliff.  Only take as many windows as available
-        without wrapping.  Start with one window for free.
 
         Parameters
         ----------
-        num_samples_data
+        num_samples_data : int
+            The number of samples in the time series to be windowed by self.
 
         Returns
         -------
-
+        number_of_windows : int
+           Count of the number of windows returned from time series of
+           num_samples_data.  Only take as many windows as available without
+           wrapping.  Start with one window for free, move forward by
+           num_samples_advance and don't walk over the cliff.
         """
         return available_number_of_windows_in_array(num_samples_data,
                                                     self.num_samples_window,
@@ -183,7 +175,6 @@ class WindowingScheme(ApodizationWindow):
             windowed_obj = windowed_obj.to_array("channel")
 
         elif isinstance(data, xr.Dataset):
-            #return_xarray = True #only going to handle return xarray=T
             ds = xr.Dataset()
             for key in data.keys():
                 print(f"key {key}")
@@ -236,7 +227,7 @@ class WindowingScheme(ApodizationWindow):
 
     def cast_windowed_data_to_xarray(self, windowed_array, time_vector, dt=None):
         """
-        TODO: FACTOR guts of this method out of class and place in window_helpers...
+        TODO?: Factor this method to a standalone function in window_helpers?
         Parameters
         ----------
         windowed_array
@@ -247,22 +238,18 @@ class WindowingScheme(ApodizationWindow):
         -------
 
         """
-        # <Get within-window_time_axis coordinate>
+        #Get within-window_time_axis coordinate
         if dt is None:
             print("Warning dt not defined, using dt=1")
             dt = 1.0
         within_window_time_axis = dt * np.arange(self.num_samples_window)
-        # <Get within-window_time_axis coordinate>
 
-        # <Cast to xarray>
+        #cast to xr.DataArray
         xrd = xr.DataArray(windowed_array, dims=["time", "within-window time"],
                            coords={"within-window time": within_window_time_axis,
                                    "time": time_vector})
-        # </Cast to xarray>
         return xrd
 
-    def xarray_sliding_window(self, data, time_vector=None, dt=None):
-        pass
 
     def compute_window_edge_indices(self, num_samples_data):
         """This has been useful in the past but maybe not needed here"""
@@ -277,50 +264,36 @@ class WindowingScheme(ApodizationWindow):
         return self._left_hand_window_edge_indices
 
     def downsample_time_axis(self, time_axis):
-        lhwe = self.left_hand_window_edge_indices(len(time_axis))
-        multiple_window_time_axis = time_axis[lhwe]
-        return multiple_window_time_axis
-
-    def apply_taper(self, data):
-        if isinstance(data, np.ndarray):
-            tapered_windowed_data = self._apply_taper_numpy(data)
-            return tapered_windowed_data
-        elif isinstance(data, xr.DataArray):
-            xrds = data.to_dataset("channel")
-            tapered_obj = self.apply_taper(xrds)
-            tapered_obj= tapered_obj.to_array("channel")
-
-            print("not yet SOLVED")
-            return tapered_obj
-            #raise Exception
-        elif isinstance(data, xr.Dataset):
-            #overwriting
-            #output_ds = xr.Dataset()
-            for key in data.keys():
-                print(f"key {key}")
-                data[key].data = self._apply_taper_numpy(data[key].data)
-                #tapered_obj = xr.DataArray()
-                #output_ds.update({key: tapered_obj})
-            return data
-        else:
-            print(f"Unexpected Data type {type(data)}")
-            raise Exception
-
-
-
-    def _apply_taper_numpy(self, data):
         """
-        The axes are set up so that each rc? is tapered
         Parameters
         ----------
-        data
+        time_axis : arraylike
+            This is the time axis associated with the time-series prior to
+            the windowing operation.
 
         Returns
         -------
+        window_time_axis : array-like
+            This is a time axis for the windowed data.  Say that we had 1Hz
+            data starting at t=0 and 100 samples.  Then we window,
+            with window length 10, and advance 10, the window time axis is
+             [0, 10, 20 , ... 90].  Say the same window length, but now
+             advance is 5.  Then [0, 5, 10, 15, ... 90] is the result.
+
 
         """
-        tapered_windowed_data = apply_taper_to_windowed_array(self.taper, data)
-        return tapered_windowed_data
+        lhwe = self.left_hand_window_edge_indices(len(time_axis))
+        window_time_axis = time_axis[lhwe]
+        return window_time_axis
+
+    def apply_taper(self, data):
+        """
+        modifies the data in place by applying a taper to each window
+        TODO: consider adding an option to return a copy of the data without
+        the taper applied
+        """
+        data = WindowedTimeSeries.apply_taper(data=data, taper=self.taper)
+        return data
 
     def frequency_axis(self, dt):
         df = 1./(self.num_samples_window*dt)
@@ -348,11 +321,7 @@ class WindowingScheme(ApodizationWindow):
             xrds = data.to_dataset("channel")
             spectral_ds = fft_xr_ds(xrds, self.sampling_rate,
                                     detrend_type=detrend_type)
-            if spectral_density_correction:
-                spectral_ds = self.apply_spectral_density_calibration(spectral_ds)
             spectral_ds = spectral_ds.to_array("channel")
-
-            print("not yet SOLVED spectral")
             return spectral_ds
 
         else:
@@ -363,26 +332,19 @@ class WindowingScheme(ApodizationWindow):
 
     def apply_spectral_density_calibration(self, dataset):
         """
-
         Parameters
         ----------
         dataset
-        sample_rate
 
         Returns
         -------
 
 
         """
-        scale_factor = self.spectral_density_calibration_factor
-        if isinstance(dataset, xr.Dataset):
-            for key in dataset.keys():
-                print(f"applying spectral density calibration to {key}")
-                dataset[key].data *= scale_factor
-        else:
-            print(f"scaling of {type(data)} not yet supported")
-            raise Exception
+        scale_factor = self.linear_spectral_density_calibration_factor
+        dataset *= scale_factor
         return dataset
+
 #<PROPERTIES THAT NEED SAMPLING RATE>
 #these may be moved elsewhere later
     @property
@@ -405,39 +367,36 @@ class WindowingScheme(ApodizationWindow):
         """
         return self.num_samples_advance*self.dt
 
+
     @property
-    def spectral_density_calibration_factor(self):
-        factor = spectral_density_calibration_factor(self.coherent_gain, self.nenbw, self.dt, self.num_samples_window)
-        return factor
+    def linear_spectral_density_calibration_factor(self):
+        """
+        Returns
+        -------
+        calibration_factor : float
+            Following Hienzel et al 2002, Equations 24 and 25 for Linear
+            Spectral Density correction for a single sided spectrum.
+        """
+        return np.sqrt(2/(self.sampling_rate*self.S2))
 
 #</PROPERTIES THAT NEED SAMPLING RATE>
 
 
-def spectral_density_calibration_factor(coherent_gain, enbw, dt, N):
+
+
+def fft_xr_ds(dataset, sample_rate, detrend_type=None, prewhitening=None):
     """
-    scales the spectra for the effects of the windowing, and converts to spectral density
-    spectral_calibration = (1/0.54)*np.sqrt((2*0.025)/(1.36*288000)) #hamming
-    Parameters
-    ----------
-    coherent_gain
-    enbw
-    dt
-    N
-
-    Returns
-    -------
-
-    """
-    spectral_density_calibration_factor = (1./coherent_gain)*np.sqrt((2*dt)/(enbw*N))
-    return spectral_density_calibration_factor
-
-
-
-def fft_xr_ds(dataset, sample_rate, one_sided=True, detrend_type="linear"):
-    """
+    TODO: Add support for "first difference" prewhitening
     assume you have an xr.dataset or xr.DataArray.  It is 2D.
     This should call window_helpers.apply_fft_to_windowed_array
     or get moved to window_helpers.py
+
+    The returned harmonics do not include the Nyquist frequency. To modify this
+    add +1 to n_fft_harmonics.  Also, only 1-sided ffts are returned.
+
+    For each channel within the Dataset, fft is applied along the
+    within-window-time axis of the associated numpy array
+
     Parameters
     ----------
     ds
@@ -445,49 +404,37 @@ def fft_xr_ds(dataset, sample_rate, one_sided=True, detrend_type="linear"):
     Returns
     -------
 
-    TODO: Review nf_sjvk
     """
-    import numpy as np
-    #for each DataArray in the Dataset, we will apply fft along the within-window-time axis.
-    #SET AXIS:
-    operation_axis = 1
+    #TODO:
+    from aurora.time_series.frequency_domain_helpers import get_fft_harmonics
+    print("Modify this so that demeaning and detrending is happening before "
+          "the application of the tapering window.  Add a second demean right "
+          "before the FFT")
+
+    samples_per_window = len(dataset.coords["within-window time"])
+    n_fft_harmonics = int(samples_per_window / 2) #no bin at Nyquist,
+    harmonic_frequencies = get_fft_harmonics(samples_per_window, sample_rate)
+    # works for odd and even
+    # harmonic_frequencies = np.fft.fftfreq(samples_per_window, d=1./sample_rate)
+    # harmonic_frequencies = harmonic_frequencies[0:n_fft_harmonics]
+
+    #<CORE METHOD>
     output_ds = xr.Dataset()
-    key0 = list(dataset.keys())[0]
-    n_windows, samples_per_window = dataset[key0].data.shape
-
-    dt = 1. / sample_rate
-    if np.mod(samples_per_window,2)==0:
-        n_fft_harmonics = int(samples_per_window / 2) + 1 #DC and Nyquist
-    else:
-        n_fft_harmonics = int(samples_per_window / 2) #No bin at Nyquist
-    harmonic_frequencies = np.fft.fftfreq(samples_per_window, d=dt)
-    if one_sided:
-        harmonic_frequencies = harmonic_frequencies[0:n_fft_harmonics]
-        harmonic_frequencies = np.abs(harmonic_frequencies)
-        #if np.mod(samples_per_window, 2) == 0:
-        #    harmonic_frequencies[-1] *= -1
-        ##Nyquist is negative
-    for key in dataset.keys():
-        print(f"key {key}")
-        data = dataset[key].data
-        window_means = data.mean(axis=operation_axis)
-        demeaned_data = (data.T - window_means).T
-        if detrend_type: #neither False nor None
-            #axis=1 should be changed to be xarray aware of the time axis
-            #overwrite data=True probably best for most applications but
-            #be careful with that.  Do we want to avoid this in general?
-            #could we be possibly overwriting stuff on MTH5 in future?
-            import scipy.signal as ssig
-            ssig.detrend(demeaned_data, axis=1, overwrite_data=True,
-                         type=detrend_type)
-
+    operation_axis = 1 #make this pick the "time" axis from xarray
+    if detrend_type:  # neither False nor None
+        dataset = WindowedTimeSeries.detrend(data=dataset,
+                                             detrend_axis=operation_axis,
+                                             detrend_type="linear")
+    for channel_id in dataset.keys():
+        print(f"channel_id {channel_id}")
+        data = dataset[channel_id].data
         print("MAY NEED TO ADD DETRENDING OR PREWHITENING HERE AS PREP FOR FFT")
-        fspec_array = np.fft.fft(demeaned_data, axis=1)
-        if one_sided:
-            fspec_array = fspec_array[:,0:n_fft_harmonics]
+        fspec_array = np.fft.fft(data, axis=1)
+        fspec_array = fspec_array[:,0:n_fft_harmonics]#1-sided
 
         xrd = xr.DataArray(fspec_array, dims=["time", "frequency"],
                            coords={"frequency": harmonic_frequencies,
                                    "time": dataset.time.data})
-        output_ds.update({key:xrd})
+        output_ds.update({channel_id:xrd})
+    # <CORE METHOD>
     return output_ds

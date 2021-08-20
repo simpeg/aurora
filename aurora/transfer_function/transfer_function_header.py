@@ -6,12 +6,20 @@ iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_1
 class TransferFunctionHeader(object):
     """
     class for storing metadata for a TF estimate
+
+    This class should inherit the metadata from the remote and reference
+    stations. As of 2021-07-20 the class functions with only the station_id
+    and channel_id values.
+
+    <See Issue #41>
+    </See Issue #41>
+
     """
 
     def __init__(self, **kwargs):
         """
         Parameters
-        local_site : mt_metadata.station object ?@jared is this correct class?
+        local_station : mt_metadata.transfer_functions.tf.station.Station()
             Station metadata object for the station to be estimated (
             location, channel_azimuths, etc.)
         remote_site: same object type as local site
@@ -25,19 +33,43 @@ class TransferFunctionHeader(object):
             These are the channels being used from the RR station. This is a
             channel list -- usually [?, ?]
         processing_scheme: str
-            One of "single station" or "remote reference".  Future versions
-            will include , "multivariate array", "multiple remote",
+            Denotes the regression engine used to estimate the transfer
+            function.  One of "OLS" or "RME", "RME_RR.  Future
+            versions could include , "multivariate array", "multiple remote",
             etc.
 
         """
-        self.processing_scheme = kwargs.get("processing_scheme",
-                                            "single_station")
-        self.local_site = kwargs.get("local_site", None)
-        self.remote_site = kwargs.get("remote_site", None)
+        self.processing_scheme = kwargs.get("processing_scheme", None)
+        self._local_station = kwargs.get("local_station", None)
+        self._reference_station = kwargs.get("reference_station", None)
         self.input_channels = kwargs.get("input_channels", ["hx", "hy"])
         self.output_channels = kwargs.get("output_channels", ["ex", "ey"])
         self.reference_channels = kwargs.get("reference_channels", [])
         self.user_meta_data = None #placeholder for anything
+
+        # <ByPass mt_metadata classes>
+        self._local_station_id = kwargs.get("local_station_id", None)
+        self._reference_station_id = kwargs.get("local_station_id", None)
+        # </ByPass mt_metadata classes>
+    @property
+    def local_station_id(self):
+        try:
+            station_id = self.local_station.id
+        except:
+            station_id = self._local_station_id
+        return station_id
+
+    @property
+    def reference_station_id(self):
+        try:
+            station_id = self.reference_station.id
+        except:
+            station_id = self._reference_station_id
+        return station_id
+
+    @property
+    def local_station(self):
+        return self._local_station
 
     @property
     def num_input_channels(self):
@@ -47,7 +79,11 @@ class TransferFunctionHeader(object):
     def num_output_channels(self):
         return len(self.output_channels)
 
-    #TO BE DEPRECATED
+    @property
+    def local_channels(self):
+        return self.input_channels + self.output_channels
+
+    #<TO BE DEPRECATED>
     def array_header_to_tf_header(self, array_header, sites):
         """
         This will likely be made from MTH5.  The overarching point of this
@@ -152,3 +188,4 @@ class TransferFunctionHeader(object):
                 #?raise Exception?
         else:
             self.processing_scheme = 'SS';
+        #<TO BE DEPRECATED>

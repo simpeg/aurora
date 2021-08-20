@@ -1,0 +1,13 @@
+
+Each file test1.asc and test2.asc are integer valued data. There are 40000 5-channel observations in each file, 
+organized as [hx, hy, hz, ex, ey]
+
+These files came from Gary's EMTF Fortran package and represent synthetic data from a 100 Ohm-m halfspace.  
+Processng should reveal flat apparent resistivity and constant 45 degrees phase.
+
+The units of these data are nT and mV/km.
+ 
+
+
+
+

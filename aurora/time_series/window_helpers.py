@@ -131,29 +131,6 @@ SLIDING_WINDOW_FUNCTIONS = {
 # SLIDING_WINDOW_FUNCTIONS["numba"] = sliding_window_numba
 # SLIDING_WINDOW_FUNCTIONS["stride"] = striding_window
 
-#<TAPER HELPERS>
-def apply_taper_to_windowed_array(taper, windowed_array):
-    """
-    This method will eventually become a class method but leaving the pure linear algebra call as a
-    separate routine for easier future dev.  Will make assumptions here about the shape and dimensions
-    of windowed array that can be handled in class method.
-
-    In particular, each "window" is a row of windowed_array.  Thus taper operates by
-    multiplying, point-by-point (Schur) each row or windowed_array
-
-    Parameters
-    ----------
-    taper
-    windowed_array
-
-    Returns
-    -------
-
-    """
-    tapered_array = windowed_array.data * taper #this seems to do spare diag mult
-    #time trial it against a few other methods
-    return tapered_array
-#</TAPER HELPERS>
 
 #<FFT HELPERS>
 def apply_fft_to_windowed_array(windowed_array):
@@ -248,7 +225,7 @@ def test_apply_taper():
     num_windows = 100
     windowed_data =  np.abs(np.random.randn(num_windows,num_samples_window))
     taper = ssig.hanning(num_samples_window)
-    tapered_windowed_data = apply_taper_to_windowed_array(taper, windowed_data)
+    tapered_windowed_data = windowed_array.data * taper
     plt.plot(windowed_data[0], 'r', label='data');
     plt.plot(tapered_windowed_data[0], 'g', label='tapered data')
     plt.legend()

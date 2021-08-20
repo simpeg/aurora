@@ -11,6 +11,7 @@ import numpy as np
 import xarray as xr
 from aurora.transfer_function.iter_control import IterControl
 
+
 class RegressionEstimator(object):
     """
     Abstract base class for solving Y = X*b + epsilon for b, complex-valued
@@ -25,8 +26,10 @@ class RegressionEstimator(object):
     When we "regress Y on X", we use the values of variable X to predict
     those of Y.
 
-    Typically operates on single "frequency_band"s one-at-a-time/
-    Allows multiple columns of Y, but estimates b for each column separately
+    Typically operates on single "frequency_band".
+    Allows multiple columns of Y, but estimates b for each column separately.
+
+
     Estimated signal and noise covariance matrices can be used to compute error
     together to compute covariance for the matrix of regression coefficients b
 
@@ -38,30 +41,35 @@ class RegressionEstimator(object):
     Properties created with the ``@property`` decorator should be documented
     in the property's getter method.
 
+
+
     Attributes
     ----------
-    _X : xarray.Dataset or xarray.DataArray ... still trying to decide
-        numpy array (normally 2-dimensional)
-        These are the independent variables.  In the matlab codes each
-        observation was a row and each parameter (channel) is a column
+    _X : xarray.Dataset
+        X.data is numpy array (normally 2-dimensional)
+        These are the independent variables.  Like the matlab codes each observation
+        corresponds to a row and each parameter (channel) is a column.
     X :  numpy array (normally 2-dimensional)
         This is a "pure array" representation of _X used to emulate Gary
         Egbert's matlab codes. It may or may not be deprecated.
-    _Y : xarray.Dataset or xarray.DataArray
-        These are the dependent variables.
+    _Y : xarray.Dataset
+        These are the dependent variables, aranged same as X above.
     Y : numpy array (normally 2-dimensional)
-        These are the dependent variables.  In the matlab codes each
-        observation was a row and each parameter (channel) is a column
+        This is a "pure array" representation of _X used to emulate Gary
+        Egbert's matlab codes. It may or may not be deprecated.
     b : numpy array (normally 2-dimensional)
         Matrix of regression coefficients, i.e. the solution to the regression
         problem.  In our context they are the "Transfer Function"
-    inverse_signal_covariance: numpy array (????-Dimensional)
-        This was Cov_SS in Gary's matlab codes
-        Formula? Reference?
-    noise_covariance : numpy array (????-Dimensional)
+        The dimension of b, to match X and Y is [n_input_ch, n_output_ch]
+        When we are solving "channel-by-channel", b is usually [2,1].
+
+    inverse_signal_covariance: numpy array (n_input_ch, n_input_ch)
+        This was Cov_SS in Gary's matlab codes.  It is basically inv(X.H @ X)
+        Reference needed
+    noise_covariance : numpy array (n_output_ch, n_output_ch)
         This was Cov_NN in Gary's matlab codes
-        Formula?  Reference?
-    squared_coherence: numpy array (????-Dimensional)
+        Reference needed
+    squared_coherence: numpy array (n_output_ch)
         This was R2 in Gary's matlab codes
         Formula?  Reference?
         Squared coherence (top row is using raw data, bottom cleaned, with crude
@@ -85,8 +93,8 @@ class RegressionEstimator(object):
         self._X = kwargs.get("X", None)
         self._Y = kwargs.get("Y", None)
         self.b = None
-        self.inverse_signal_covariance = None
-        self.noise_covariance = None
+        self.cov_nn = None
+        self.cov_ss_inv = None
         self.squared_coherence = None
         self.iter_control = kwargs.get("iter_control", IterControl())
 
@@ -98,23 +106,47 @@ class RegressionEstimator(object):
 
         self._Q = None
         self._R = None
-        self._QH = None #conjugate transpose of Q (Hermitian operator)
+        self._QH = None  # conjugate transpose of Q (Hermitian operator)
+        self._QHY = None  #
+
+    @property
+    def inverse_signal_covariance(self):
+        return self.cov_ss_inv
+
+    @property
+    def noise_covariance(self):
+        return self.cov_nn
+
+    def b_to_xarray(self):
+        print("TEST IMPLEMENTATION")
+        xra = xr.DataArray(
+            np.transpose(self.b),
+            dims=["output_channel", "input_channel"],
+            coords={
+                "output_channel": list(self._Y.data_vars),
+                "input_channel": list(self._X.data_vars),
+            },
+        )
+        return xra
 
     def cast_data_to_2d_for_regression(self, XY):
         """
-        When the data are "harvested" from frequency bands they have a
-        typical STFT structure, which means one axis is time (the time of the
-        window that was FFT-ed) and the other is frequency.  However we make
-        no distinction between Fourier coefficients (or bins) within a band,
-        so we need to gather all the FCs for each channel into a 1D array.
-        This performs that reshaping (ravelling) operation
+        When the data for a frequency band are extracted from the STFT and
+        passed to RegressionEstimator they have a typical STFT structure:
+        One axis is time (the time of the window that was FFT-ed) and the
+        other axis is frequency.  However we make no distinction between the
+        harmonics (or bins) within a band.  We need to gather all the FCs for
+        each channel into a 1D array.
+        This method performs that reshaping (ravelling) operation.  This
+        ravelling makes xarray less natural to use because the frequency and
+        time axes are now mixed.
 
-        It is not important how we unravel the FCs but it is important that
+        *It is not important how we unravel the FCs but it is important that
         we use the same scheme for X and Y.
 
         Parameters
         ----------
-        XY: either X or Y of the regression nomenclature.  Should be an 
+        XY: either X or Y of the regression nomenclature.  Should be an
         xarray.Dataset already splitted on channel
 
         Returns
@@ -126,27 +158,75 @@ class RegressionEstimator(object):
             XY = XY.to_dataset("channel")
         n_channels = len(XY)
         n_frequency = len(XY.frequency)
+
         try:
             n_segments = len(XY.time)
         except TypeError:
+            # Could occur because time is not iterable if only one element
+            # This case corresponds to an underdetermined problem
             n_segments = 1
-            #overdetermined problem
+
         n_fc_per_channel = n_frequency * n_segments
 
-        output_array = np.full((n_fc_per_channel, n_channels),
-                               np.nan+1.j*np.nan, dtype=np.complex128)
+        output_array = np.full(
+            (n_fc_per_channel, n_channels), np.nan + 1.0j * np.nan, dtype=np.complex128
+        )
 
         channel_keys = list(XY.keys())
         for i_ch, key in enumerate(channel_keys):
             output_array[:, i_ch] = XY[key].data.ravel()
         return output_array
-    
 
+    def solve_underdetermined(self):
+        """
+        20210806
+        This method was originally in TRME.m, but it does not depend in
+        general on using RME method so I am putting it in the base class.
+
+        We basically never get here and when we do we dont trust the results
+        https://docs.scipy.org/doc/numpy-1.9.2/reference/generated/numpy.linalg.svd.html
+        https://www.mathworks.com/help/matlab/ref/double.svd.html
+
+        <ORIGINAL MATLAB>
+            <COMMENT>
+        Overdetermined problem...use svd to invert, return
+        NOTE: the solution IS non - unique... and by itself RME is not setup
+        to do anything sensible to resolve the non - uniqueness(no prior info
+        is passed!).  This is stop-gap, to prevent errors when using RME as
+        part of some other estimation scheme!
+            </COMMENT>
+            <CODE>
+        [u,s,v] = svd(obj.X,'econ');
+        sInv = 1./diag(s);
+        obj.b = v*diag(sInv)*u'*obj.Y;
+        if ITER.returnCovariance
+           obj.Cov_NN = zeros(K,K);
+           obj.Cov_SS = zeros(nParam,nParam);
+        end
+        result = obj.b
+            </CODE>
+        </ORIGINAL MATLAB>
+
+
+        -------
+
+        """
+        U, s, V = np.linalg.svd(self.X, full_matrices=False)
+        S_inv = np.diag(1.0 / s)
+        self.b = (V.T @ S_inv @ U.T) * self.Y
+        if self.iter_control.return_covariance:
+            print("Warning covariances are not xarray, may break things downstream")
+            self.cov_nn = np.zeros((self.n_channels_out, self.n_channels_out))
+            self.cov_ss_inv = np.zeros((self.n_param, self.n_param))
+
+        return self.b
 
     def check_number_of_observations_xy_consistent(self):
         if self.Y.shape[0] != self.X.shape[0]:
-            print(f"Design matrix (X) has {self.X.shape[0]} rows but data (Y) "
-                  f"has {self.Y.shape[0]}")
+            print(
+                f"Design matrix (X) has {self.X.shape[0]} rows but data (Y) "
+                f"has {self.Y.shape[0]}"
+            )
             raise Exception
 
     @property
@@ -160,7 +240,7 @@ class RegressionEstimator(object):
         """
         return self.X.shape[0]
 
-    #REPLACE WITH n_channels_in
+    # REPLACE WITH n_channels_in
     @property
     def n_param(self):
         return self.X.shape[1]
@@ -171,13 +251,18 @@ class RegressionEstimator(object):
         return self.Y.shape[1]
 
     @property
-    def is_overdetermined(self):
+    def is_underdetermined(self):
         return self.n_param > self.n_data
 
-    # ADD NAN MANAGEMENT HERE
+    def mask_input_channels(self):
+        """
+        ADD NAN MANAGEMENT HERE
+        Returns
+        -------
 
+        """
+        pass
 
-    # <MAY SUPERCLASS REGRESSION ESTIMATOR LEAVING THIS AN ABSTRACT BASE CLASS>
     def qr_decomposition(self, X, sanity_check=False):
         Q, R = np.linalg.qr(X)
         self._Q = Q
@@ -201,8 +286,23 @@ class RegressionEstimator(object):
     @property
     def QH(self):
         if self._QH is None:
-            self._QH = Q.conj().T
+            self._QH = self.Q.conj().T
         return self._QH
+
+    @property
+    def QHY(self):
+        if self._QHY is None:
+            self._QHY = self.QH @ self.Y
+        return self._QHY
+
+    @property
+    def QHYc(self):
+        if self._QHYc is None:
+            self.update_QHYc()
+        return self._QHYc
+
+    def update_QHYc(self):
+        self._QHYc = self.QH @ self.Yc
 
     def estimate_ols(self, mode="solve"):
         """
@@ -227,8 +327,9 @@ class RegressionEstimator(object):
         -------
 
         """
-        if mode.lower()=="qr":
+        if mode.lower() == "qr":
             from scipy.linalg import solve_triangular
+
             self.qr_decomposition(self.X)
             b = solve_triangular(self.R, self.QH @ self.Y)
         else:
@@ -237,10 +338,10 @@ class RegressionEstimator(object):
             XH = np.conj(X.T)
             XHX = XH @ X
             XHY = XH @ Y
-            if mode.lower()=="brute_force":
+            if mode.lower() == "brute_force":
                 XHX_inv = np.linalg.inv(XHX)
                 b = np.matmul(XHX_inv, XHY)
-            elif mode.lower()=="solve":
+            elif mode.lower() == "solve":
                 b = np.linalg.solve(XHX, XHY)
             else:
                 print(f"mode {mode} not recognized")
@@ -248,13 +349,8 @@ class RegressionEstimator(object):
         self.b = b
         return b
 
-
     def estimate(self):
         print("this method is not defined for the abstract base class")
         print("But we put OLS in here for dev")
         Z = self.estimate_ols(mode="qr")
         return Z
-    # </MAY SUPERCLASS REGRESSION ESTIMATOR LEAVING THIS AN ABSTRACT BASE CLASS>
-
-
-

@@ -5,9 +5,9 @@ or maybe make an fft test module?
 import numpy as np
 import xarray as xr
 
-from aurora.signal.time_axis_helpers import make_time_axis
-from aurora.signal.windowing_scheme import WindowingScheme
-from aurora.signal.windowing_scheme import fft_xr_ds
+from aurora.time_series.time_axis_helpers import make_time_axis
+from aurora.time_series.windowing_scheme import WindowingScheme
+from aurora.time_series.windowing_scheme import fft_xr_ds
 
 
 def get_test_windowing_scheme(num_samples_window=32, num_samples_overlap=8, sampling_rate=None):

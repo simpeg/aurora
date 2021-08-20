@@ -1,7 +1,8 @@
 """
-Based loosely on TaperModule() concept developed by kkappler in 2012, this is
-a leaner version intended to support most apodization windows available via
-scipy.signal.get_window()
+@author: kkappler
+
+Module to manage windowing prior to FFT.  Intended to support most
+apodization  windows available via scipy.signal.get_window()
 
 
     Supported Window types = ['boxcar', 'triang', 'blackman', 'hamming', 'hann',
@@ -18,22 +19,24 @@ scipy.signal.get_window()
     }
 
 The Taper Config has 2 possible forms:
-1. Standard form: ["taper_family", "num_samples_window", "additional_args"]
+1. Standard form for accessing scipy.signal:
+["taper_family", "num_samples_window", "additional_args"]
+2. User-defined : for defining custom tapers
 
-Example 1
+Example 1 : Standard form
 "taper_family" = "hamming"
 "num_samples_window" = 128
 "additional_args" = {}
 
-Example 2
+Example 2 : Standard form
 "taper_family" = "kaiser"
 "num_samples_window" = 64
 "additional_args" = {"beta":8}
 
+Examples 3 : User Defined
 2. user-defined: ["array"]
 In this case num_samples_window is defined by the array.
 "array" = [1, 2, 3, 4, 5, 4, 3, 2, 1]
-
 If "array" is non-empty then assume the user-defined case.
 
 It is a little bit unsatisfying that the args need to be ordered for
@@ -52,29 +55,10 @@ import scipy.signal as ssig
 
 class ApodizationWindow(object):
     """
-    #<FROM HEINZEL>
-    ENBW: Eective Noise BandWidth, see Equation (22)
-    NENBW Normalized Equivalent Noise BandWidth, see Equation (21)
-    #</FROM HEINZEL>
-    usage: apod_window = ApodizationWindow()
-    @type taper_family: string
-    @ivar taper_family: Specify the taper type - boxcar, kaiser, hanning, etc
-    @type num_samples_window: Integer
-    @ivar num_samples_window: The number of samples in the taper
-    @type taper: numpy array
-    @ivar taper: The actual taper window itself
-    @type coherentGain: float
-    @ivar coherentGain:
-    @type NENBW: float
-    @ivar NENBW: normalized equivalent noise bandwidth
-    @type S1: float
-    @ivar S1: window sum
-    @type S2: float
-    @ivar S2: sum of squares of taper elements
+    Instantiate an apodization window object.  Example usages:
+    apod_window = ApodizationWindow()
+    taper=ApodizationWindow(taper_family='hanning', num_samples_window=55 )
 
-    @author: kkappler
-    @note: example usage:
-        tpr=ApodizationWindow(taper_family='hanning', num_samples_window=55 )
 
     Window factors S1, S2, CG, ENBW are modelled after Heinzel et al. p12-14
     [1] Spectrum and spectral density estimation by the Discrete Fourier transform
@@ -86,17 +70,26 @@ class ApodizationWindow(object):
     [2] Harris FJ. On the use of windows for harmonic analysis with the discrete
     Fourier transform. Proceedings of the IEEE. 1978 Jan;66(1):51-83.
 
+    <Nomenclature from Heinzel et al.>
+    ENBW: Eective Noise BandWidth, see Equation (22)
+    NENBW Normalized Equivalent Noise BandWidth, see Equation (21)
+    </Nomenclature from Heinzel et al.>
 
-    Instantiate an apodization window object.
 
 
         Parameters
         ----------
         kwargs:
-        taper_family
-        num_samples_window
-        taper
-        additional_args
+        taper_family : string
+            Specify the taper type - boxcar, kaiser, hanning, etc
+        num_samples_window : int
+            The number of samples in the taper
+        taper : numpy array
+            The actual window coefficients themselves.  This can be passed if a
+            particular custom window is desired.
+        additional_args: dictionary
+            These are any additional requirements scipy needs in order to
+            generate the window.
     """
     def __init__(self, **kwargs):
         """
@@ -112,7 +105,7 @@ class ApodizationWindow(object):
         self.taper_family = kwargs.get('taper_family', 'boxcar')
         self._num_samples_window = kwargs.get('num_samples_window', 0)
         self._taper = kwargs.get('taper', np.empty(0))
-        self.additional_args = kwargs.get('additional_args', {})
+        self.additional_args = kwargs.get('taper_additional_args', {})
 
         self._coherent_gain = None
         self._nenbw = None
@@ -133,10 +126,11 @@ class ApodizationWindow(object):
         -------
 
         """
+        self.test_linear_spectral_density_factor()
         string1 = f"{self.taper_family} {self.num_samples_window}"
-        string1 += f" taper_exists={bool(self.taper.any())}"
-        string2 = f"NENBW:{self.nenbw:.3f}, CG:{self.coherent_gain:.3f}"
-        string2 += f"window factor={self.apodization_factor:.3f}"
+        string1 += f" taper_exists = {bool(self.taper.any())}"
+        string2 = f"NENBW = {self.nenbw:.3f}, CG = {self.coherent_gain:.3f},  "
+        string2 += f"window factor = {self.apodization_factor:.3f}"
         return "\n".join([string1, string2])
 
     def __str__(self):
@@ -150,6 +144,7 @@ class ApodizationWindow(object):
         if self._num_samples_window==0:
             self._num_samples_window = len(self.taper)
         return self._num_samples_window
+
 
     def make(self):
         """
@@ -172,23 +167,73 @@ class ApodizationWindow(object):
 
     @property
     def S1(self):
+        """sum of the window coefficients"""
         if getattr(self, "_S1", None) is None:
             self._S1 = sum(self.taper)
         return self._S1
 
     @property
     def S2(self):
+        """sum of squares of the window coefficients"""
         if getattr(self, "_S2", None) is None:
             self._S2 = sum(self.taper**2)
         return self._S2
 
     @property
     def coherent_gain(self):
+        """ DC gain of the window normalized by window length"""
         return self.S1 / self.num_samples_window
 
     @property
     def nenbw(self):
+        """NENBW Normalized Equivalent Noise BandWidth, see Equation (21) in
+        Heinzel et al 2002"""
         return self.num_samples_window * self.S2 / (self.S1 ** 2)
+
+    def enbw(self, fs):
+        """
+        Notes that unlike NENBW, CG, S1, S2, this is not a pure property of the
+        window -- but instead this is a property of the window combined with
+        the sample rate.
+        Parameters
+        ----------
+        fs : sampling frequency (1/dt)
+
+        Returns
+        -------
+
+        """
+        """Effective Noise BandWidth = fs*NENBW/N = fs S2/(S1**2)"""
+
+        return fs * self.S2 / (self.S1**2)
+
+    def test_linear_spectral_density_factor(self):
+        """
+        This is just a test to verify some algebra
+        Claim:
+        The lsd_calibration factors
+        A      (1./coherent_gain)*np.sqrt((2*dt)/(nenbw*N))
+        and
+        B      np.sqrt(2/(sample_rate*self.S2))
+        are identical.
+
+        Note sqrt(2*dt)==sqrt(2*sample_rate) so we can cancel these terms and
+        A=B IFF
+        (1./coherent_gain) * np.sqrt(1/(nenbw*N)) == 1/np.sqrt(S2)
+        which I show in githib aurora issue #3 via .
+        (CG**2) * NENBW *N   =  S2
+
+        Returns
+        -------
+
+        """
+        lsd_factor1 = (1./self.coherent_gain)*np.sqrt(1./(self.nenbw*self.num_samples_window))
+        lsd_factor2 = 1. / np.sqrt(self.S2)
+        if not np.isclose(lsd_factor1, lsd_factor2):
+            print(f"factor1 {lsd_factor1} vs factor2 {lsd_factor2}")
+            print("Incompatible spectral density factors")
+            raise Exception
+
 
     @property
     def taper(self):
@@ -219,9 +264,13 @@ def test_can_inititalize_apodization_window():
     print(apodization_window.summary)
     apodization_window = ApodizationWindow(taper_family='blackmanharris', num_samples_window=256)
     print(apodization_window.summary)
-    apodization_window = ApodizationWindow(taper_family='kaiser', num_samples_window=128, additional_args={"beta":8})
+    apodization_window = ApodizationWindow(taper_family='kaiser',
+                                           num_samples_window=128,
+                                           taper_additional_args={"beta":8})
     print(apodization_window.summary)
-    apodization_window = ApodizationWindow(taper_family='slepian', num_samples_window=64, additional_args={"width":0.3})
+    apodization_window = ApodizationWindow(taper_family='dpss',
+                                           num_samples_window=64,
+                                           taper_additional_args={"alpha":3})
     print(apodization_window.summary)
     apodization_window = ApodizationWindow(taper_family='custom', num_samples_window=64,
                                            taper=np.abs(np.random.randn(64)))

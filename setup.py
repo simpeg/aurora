@@ -10,7 +10,7 @@ with open("README.md") as readme_file:
 #with open("HISTORY.rst") as history_file:
 #    history = history_file.read()
 
-requirements = ["matplotlib", "numpy", "numba", "obspy", "pandas", "scipy", "xarray"]
+requirements = ["matplotlib", "mth5", "mt_metadata", "numpy", "numba", "obspy", "pandas", "scipy", "xarray", "fortranformat"]
 
 setup_requirements = [
     "pytest-runner",
