@@ -24,7 +24,7 @@ def get_regression_class(config):
         regression_class = REGRESSION_LIBRARY[config.estimation_engine]
     except KeyError:
         print(f"processing_scheme {config.estimation_engine} not supported")
-        print(f"processing_scheme must be one of OLS, RME ")
+        print(f"processing_scheme must be one of {list(REGRESSION_LIBRARY.keys())}")
         raise Exception
     return regression_class
 
@@ -179,6 +179,15 @@ def handle_nan(X, Y, RR, config, output_channels=None):
     return X, Y, RR
 
 
+def select_channel(xrds, channel_label):
+    ch = xrds.sel(
+        channel=[
+            channel_label,
+        ]
+    )
+    return ch
+
+
 def process_transfer_functions(
     config,
     local_stft_obj,
@@ -211,15 +220,11 @@ def process_transfer_functions(
         X, Y, RR = get_band_for_tf_estimate(
             band, config, local_stft_obj, remote_stft_obj
         )
-
         if config.estimate_per_channel:
             Y = Y.to_array(dim="channel")
             for ch in config.output_channels:
-                Y_ch = Y.sel(
-                    channel=[
-                        ch,
-                    ]
-                )
+                # Y_ch = Y.sel(channel=[ch,])
+                Y_ch = select_channel(Y, ch)
                 Y_ch = Y_ch.to_dataset(dim="channel")
                 X_tmp, Y_tmp, RR_tmp = handle_nan(
                     X,
@@ -235,6 +240,7 @@ def process_transfer_functions(
                 )
                 regression_estimator.estimate()
                 transfer_function_obj.set_tf(regression_estimator, band.center_period)
+
         else:
             X, Y, RR = handle_nan(X, Y, RR, config)
             regression_estimator = regression_class(
