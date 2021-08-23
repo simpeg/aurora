@@ -1,4 +1,5 @@
 name: "Build Documentation"
+
 on:
   push:
     branches:
