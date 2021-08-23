@@ -37,7 +37,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: html
-          path: docs/build/html/
+          path: docs/_build/html/
   deploy:
     runs-on: ubuntu-latest
     needs: docs
@@ -57,5 +57,5 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: docs/build/html # The folder the action should deploy.
+          FOLDER: docs/_build/html # The folder the action should deploy.
           CLEAN: true # Automatically remove deleted files from the deploy branch
