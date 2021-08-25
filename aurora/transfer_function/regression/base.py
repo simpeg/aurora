@@ -154,27 +154,12 @@ class RegressionEstimator(object):
         output_array: numpy array of two dimensions (observations, channel)
 
         """
-        if isinstance(XY, xr.DataArray):
-            XY = XY.to_dataset("channel")
-        n_channels = len(XY)
-        n_frequency = len(XY.frequency)
 
-        try:
-            n_segments = len(XY.time)
-        except TypeError:
-            # Could occur because time is not iterable if only one element
-            # This case corresponds to an underdetermined problem
-            n_segments = 1
+        if isinstance(XY, xr.Dataset):
+            tmp = XY.to_array("channel")
 
-        n_fc_per_channel = n_frequency * n_segments
-
-        output_array = np.full(
-            (n_fc_per_channel, n_channels), np.nan + 1.0j * np.nan, dtype=np.complex128
-        )
-
-        channel_keys = list(XY.keys())
-        for i_ch, key in enumerate(channel_keys):
-            output_array[:, i_ch] = XY[key].data.ravel()
+        tmp = tmp.stack(observation=("frequency", "time"))
+        output_array = tmp.data.T
         return output_array
 
     def solve_underdetermined(self):
@@ -247,7 +232,7 @@ class RegressionEstimator(object):
 
     @property
     def n_channels_out(self):
-        """ number of dependent variables"""
+        """number of dependent variables"""
         return self.Y.shape[1]
 
     @property

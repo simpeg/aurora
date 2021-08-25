@@ -155,9 +155,11 @@ def get_data_from_decimation_level_from_mth5(config, mth5_obj, run_id):
     Returns
     -------
 
-    Somewhat complicated function -- see issue #13.
+    Somewhat complicated function -- see issue #13.  Ultimately this method could be
+    embedded in mth5, where the specific attributes of the config needed for this
+    method are passed as explicit arguments.
 
-    SHould be able to
+    Should be able to
     1. accept a config and an mth5_obj and return decimation_level_0,
     2. Accept data from a given decimation level, and decimation
     instrucntions and return it

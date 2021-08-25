@@ -179,8 +179,20 @@ def handle_nan(X, Y, RR, config, output_channels=None):
     return X, Y, RR
 
 
-def select_channel(xrds, channel_label):
-    ch = xrds.sel(
+def select_channel(xrda, channel_label):
+    """
+    Extra helper function to make process_transfer_functions more readable without
+    black forcing multiline
+    Parameters
+    ----------
+    xrda
+    channel_label
+
+    Returns
+    -------
+
+    """
+    ch = xrda.sel(
         channel=[
             channel_label,
         ]
@@ -210,6 +222,13 @@ def process_transfer_functions(
         If these weights are zero anywhere, we drop all that segment across all channels
     channel_weights : numpy array or None
 
+
+    TODO: Review the advantages of excuting the regression all at once vs
+    channel-by-channel.  If there is not disadvantage to always
+    using a channel-by-channel approach we can modify this to only support that
+    method.  We also may want to push the nan-handling into the band extraction as a
+    kwarg.  Finally, the reindexing of the band may be done in the extraction as
+    well.  This would result in an "edf-weighting-scheme-ready" format.
     Returns
     -------
 

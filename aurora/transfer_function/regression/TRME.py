@@ -58,29 +58,15 @@ YP.H @ YP = QQHY.H @ QQHY = QHY.H @ Q.H @ Q @ QHY = QHY.H @ QHY.
 The predicted data has to lie in span of the columns in the design matrix X.
 The predicted data has to be a linear combination of the columns of Y.
 Q is an orthoganal basis for the columns of X.
-So the predicted data is Q*QH*Y
-Write it out by hand and you'll see it.
 The norms of QQHY and QHY are the same
 
     < MATLAB Documentation >
-[Q,R] = qr(A) performs a QR decomposition on m-by-n matrix A such that A = Q*R.
-The factor R is an m-by-n upper-triangular matrix, and the factor Q is an
-m-by-m orthogonal matrix.
-[___] = qr(A,0) produces an economy-size decomposition using any of the
-previous output argument combinations. The size of the outputs depends on the
-size of m-by-n matrix A:
-
-If m > n, then qr computes only the first n columns of Q and the first n rows of R.
-
-If m <= n, then the economy-size decomposition is the same as the regular decomposition.
-
-If you specify a third output with the economy-size decomposition, then it is
-returned as a permutation vector such that A(:,P) = Q*R.
-    < /MATLAB Documentation >
+    https://www.mathworks.com/help/matlab/ref/qr.html
 
 Matlab's reference to the "economy" rerpresentation is what Trefethen and Bau
 call the "reduced QR factorization".  Golub & Van Loan (1996, §5.2) call Q1R1
 the thin QR factorization of A;
+    < /MATLAB Documentation >
 
 There are several discussions online about the differences in
 numpy, scipy, sklearn, skcuda etc.
@@ -385,6 +371,8 @@ class TRME(RegressionEstimator):
         """
         res: Residuals: The original data minus the predicted data.
         #SSR : Sum of squares of the residuals.  Diagonal is real
+        This method could use some cleanup for readability
+        see aurora issue #78.
         Parameters
         ----------
         YP
