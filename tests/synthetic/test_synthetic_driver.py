@@ -163,8 +163,8 @@ def test_process_mth5():
     process_synthetic_1_standard(
         assert_compare_result=True,
         make_rho_phi_plot=True,
-        show_rho_phi_plot=False,
-        use_subtitle=False,
+        show_rho_phi_plot=True,
+        use_subtitle=True,
     )
     # create_run_config_for_test_case("test1")
     # process_synthetic_1()

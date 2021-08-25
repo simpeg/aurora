@@ -20,11 +20,13 @@ def scan_inventory_for_nonconformity(inventory):
             print(channel_codes)
             # <ELECTRIC CHANNEL REMAP {Q2, Q3}-->{Q1, Q2}>
             if ("Q2" in channel_codes) & ("Q3" in channel_codes):
-                print("Detected a likely non-FDSN conformant convnetion "
-                      "unless there is a vertical electric dipole")
+                print(
+                    "Detected a likely non-FDSN conformant convnetion "
+                    "unless there is a vertical electric dipole"
+                )
                 print("Fixing Electric channel codes")
-                # run the loop twice so we don't accidentally 
-                # map Q3 to Q2 and Q2 to 
+                # run the loop twice so we don't accidentally
+                # map Q3 to Q2 and Q2 to
                 for channel in station.channels:
                     if channel.code[1:3] == "Q2":
                         channel._code = f"{channel.code[0]}Q1"
@@ -38,9 +40,11 @@ def scan_inventory_for_nonconformity(inventory):
             cond1 = "T1" in channel_codes
             cond2 = "T2" in channel_codes
             cond3 = "T3" in channel_codes
-            if (cond1 or cond2 or cond3):
-                print("Detected a likely non-FDSN conformant convnetion "
-                      "unless there are Tidal data in this study")
+            if cond1 or cond2 or cond3:
+                print(
+                    "Detected a likely non-FDSN conformant convnetion "
+                    "unless there are Tidal data in this study"
+                )
                 print("Fixing Magnetic channel codes")
                 for channel in station.channels:
                     if channel.code[1] == "T":
@@ -52,8 +56,9 @@ def scan_inventory_for_nonconformity(inventory):
             for channel in station:
                 response = channel.response
                 for stage in response.response_stages:
-                    print(
-                        f"{channel.code} {stage.stage_sequence_number} {stage.input_units}")
+                    msg = f"{channel.code} {stage.stage_sequence_number}"
+                    msg = f"{msg} {stage.input_units}"
+                    print(msg)
                     if stage.input_units == "T":
                         stage.input_units == "nT"
                         stage.stage_gain *= 1e-9

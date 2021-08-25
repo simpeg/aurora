@@ -5,9 +5,8 @@ We will start by using the built in scipy.signal.decimate function as a default
 but in general we want to allow the user to select their Anti-alias filter
 
 #<Snippet>
-this snippet was being used to test prefiltering the TimeSeries before TF
-processing - it seemed to improve the output TFs but its not clear how it 
-compares against prewhiteing.
+This snippet was used to test prefiltering TimeSeries before TF processing.  It seemed
+to improve the output TFs but its not clear how it compares against prewhiteing.
 # import scipy.signal as ssig
 # from aurora.time_series.frequency_domain_helpers import get_fft_harmonics
 # num_samples_window = 128 #config.num_samples_window
@@ -20,9 +19,9 @@ compares against prewhiteing.
 #</Snippet>
 """
 
-class AntiAliasFilter():
-    """
-    """
+
+class AntiAliasFilter:
+    """ """
 
     def __init__(self):
         """
@@ -31,11 +30,8 @@ class AntiAliasFilter():
         self.filter_type = "default"
 
 
-
-
 class DecimationConfig(object):
-    """
+    """ """
 
-    """
     def __init__(self):
         self.decimation_factors = []

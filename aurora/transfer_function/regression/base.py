@@ -137,12 +137,11 @@ class RegressionEstimator(object):
         other axis is frequency.  However we make no distinction between the
         harmonics (or bins) within a band.  We need to gather all the FCs for
         each channel into a 1D array.
-        This method performs that reshaping (ravelling) operation.  This
-        ravelling makes xarray less natural to use because the frequency and
-        time axes are now mixed.
-
+        This method performs that reshaping (ravelling) operation.
         *It is not important how we unravel the FCs but it is important that
         we use the same scheme for X and Y.
+
+        2021-08-25: Modified this method to use xarray's stack() method.
 
         Parameters
         ----------

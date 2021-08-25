@@ -145,7 +145,6 @@ def handle_nan(X, Y, RR, config, output_channels=None):
     Y : xr.Dataset
     RR : xr.Dataset or None
     config : ProcessingConfig
-
     Returns
     -------
     X : xr.Dataset
@@ -169,7 +168,7 @@ def handle_nan(X, Y, RR, config, output_channels=None):
     X = merged_xr.sel(channel=config.input_channels)
     X = X.to_dataset(dim="channel")
     if output_channels is None:
-        output_channels = config.output_channels
+        output_channels = list(Y.data_vars)
     Y = merged_xr.sel(channel=output_channels)
     Y = Y.to_dataset(dim="channel")
     if RR is not None:
@@ -239,21 +238,16 @@ def process_transfer_functions(
         X, Y, RR = get_band_for_tf_estimate(
             band, config, local_stft_obj, remote_stft_obj
         )
+        # if there are segment weights apply them here
+        # if there are channel weights apply them here
+        # Reshape to 2d
+        # dropna (per channel)
+        # edfwt (per channel)
         if config.estimate_per_channel:
-            Y = Y.to_array(dim="channel")
             for ch in config.output_channels:
-                # Y_ch = Y.sel(channel=[ch,])
-                Y_ch = select_channel(Y, ch)
-                Y_ch = Y_ch.to_dataset(dim="channel")
-                X_tmp, Y_tmp, RR_tmp = handle_nan(
-                    X,
-                    Y_ch,
-                    RR,
-                    config,
-                    output_channels=[
-                        ch,
-                    ],
-                )
+                Y_ch = Y[ch].to_dataset()  # keep as a dataset, maybe not needed
+                X_tmp, Y_tmp, RR_tmp = handle_nan(X, Y_ch, RR, config)
+                # X_tmp, Y_tmp, RR_tmp = apply_edf_weights(X_tmp, Y_tmp, RR_tmp)
                 regression_estimator = regression_class(
                     X=X_tmp, Y=Y_tmp, Z=RR_tmp, iter_control=iter_control
                 )

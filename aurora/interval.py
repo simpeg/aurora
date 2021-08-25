@@ -50,165 +50,168 @@ True
 
 import copy
 import datetime
+
 start_time_format = "%Y%m%d_%H%M%S"
 
+
 class Smallest:
-  """Represents the smallest value
+    """Represents the smallest value
 
-  This type doesn't do much; it implements a pseudo-value that's smaller
-  than everything but itself.
+    This type doesn't do much; it implements a pseudo-value that's smaller
+    than everything but itself.
 
-  >>> negInf = Smallest()
-  >>> smallest = Smallest()
-  >>> -264 < negInf
-  False
-  >>> -264 == negInf
-  False
-  >>> -264 > negInf
-  True
-  >>> negInf < negInf
-  False
-  >>> negInf == smallest
-  True
-  """
-
-  def __neg__(self):
-    """Returns the largest value
-
-    The opposite of negative infinity is infinity, the largest value.
-
-    >>> print -Smallest()
-    ~
-    """
-    return Largest()
-
-  def __cmp__(self, other):
-    """Compares this with another object
-
-    Always indicates that self is less than other, unless both are of
-    type Smallest, in which case they are equal.
-
-    >>> 0 < Smallest()
+    >>> negInf = Smallest()
+    >>> smallest = Smallest()
+    >>> -264 < negInf
     False
-    >>> -9999999 < Smallest()
+    >>> -264 == negInf
     False
-    >>> Smallest() < -9999999
+    >>> -264 > negInf
     True
-    >>> Smallest() < Smallest()
+    >>> negInf < negInf
     False
-    >>> Smallest() == Smallest()
+    >>> negInf == smallest
     True
     """
-    if other.__class__ == self.__class__:
-        retval = 0
-    else:
-        retval = -1
-    return retval
 
-  def __str__(self):
-      """Returns a printable representation of this value
+    def __neg__(self):
+        """Returns the largest value
 
-      The string for the smallest number is -~, which means negative infinity.
+        The opposite of negative infinity is infinity, the largest value.
 
-      >>> print Smallest()
-      -~
-      """
-      return "-~"
+        >>> print -Smallest()
+        ~
+        """
+        return Largest()
 
-  def __repr__(self):
-    """Returns an evaluable representation of the object
+    def __cmp__(self, other):
+        """Compares this with another object
 
-    The representation of the smallest number is -Inf, which means
-    negative infinity.
+        Always indicates that self is less than other, unless both are of
+        type Smallest, in which case they are equal.
 
-    >>> Smallest()
-    -Inf
-    """
-    return "-Inf"
+        >>> 0 < Smallest()
+        False
+        >>> -9999999 < Smallest()
+        False
+        >>> Smallest() < -9999999
+        True
+        >>> Smallest() < Smallest()
+        False
+        >>> Smallest() == Smallest()
+        True
+        """
+        if other.__class__ == self.__class__:
+            retval = 0
+        else:
+            retval = -1
+        return retval
 
-  def __hash__(self):
-    "Returns a value that can be used for generating hashes"
-    return 0x55555555
+    def __str__(self):
+        """Returns a printable representation of this value
+
+        The string for the smallest number is -~, which means negative infinity.
+
+        >>> print Smallest()
+        -~
+        """
+        return "-~"
+
+    def __repr__(self):
+        """Returns an evaluable representation of the object
+
+        The representation of the smallest number is -Inf, which means
+        negative infinity.
+
+        >>> Smallest()
+        -Inf
+        """
+        return "-Inf"
+
+    def __hash__(self):
+        "Returns a value that can be used for generating hashes"
+        return 0x55555555
 
 
 class Largest:
-  """Class representing the universal largest value
+    """Class representing the universal largest value
 
-  This type doesn't do much; it implements a pseudo-value that's larger
-  than everything but itself.
+    This type doesn't do much; it implements a pseudo-value that's larger
+    than everything but itself.
 
-  >>> infinity = Largest()
-  >>> greatest = Largest()
-  >>> 6234 < infinity
-  True
-  >>> 6234 == infinity
-  False
-  >>> 6234 > infinity
-  False
-  >>> infinity > infinity
-  False
-  >>> infinity == greatest
-  True
-  """
-
-  def __neg__(self):
-    """Returns the smallest universal value
-
-    The opposite of infinity is negative infinity, the smallest value.
-
-    >>> print -Largest()
-    -~
-    """
-    return Smallest()
-
-  def __cmp__(self, other):
-    """Compares object with another object
-
-    Always indicates that self is greater than other, unless both are of
-    type Largest, in which case they are equal.
-
-    >>> 0 > Largest()
-    False
-    >>> Largest() < 9999999
-    False
-    >>> Largest() > 9999999
+    >>> infinity = Largest()
+    >>> greatest = Largest()
+    >>> 6234 < infinity
     True
-    >>> Largest() < Largest()
+    >>> 6234 == infinity
     False
-    >>> Largest() == Largest()
+    >>> 6234 > infinity
+    False
+    >>> infinity > infinity
+    False
+    >>> infinity == greatest
     True
     """
-    if other.__class__ == self.__class__:
-        retval = 0
-    else:
-        retval = 1
-    return retval
 
-  def __str__(self):
-      """Returns a string representation of the object
+    def __neg__(self):
+        """Returns the smallest universal value
 
-      The largest number is displayed as ~ (it sort of looks like infinity...)
+        The opposite of infinity is negative infinity, the smallest value.
 
-      >>> print Largest()
-      ~
-      """
-      return "~"
+        >>> print -Largest()
+        -~
+        """
+        return Smallest()
 
-  def __repr__(self):
-    """Returns an evaluable expression representing this object
+    def __cmp__(self, other):
+        """Compares object with another object
 
-    >>> Largest()
-    Inf
-    """
-    return "Inf"
+        Always indicates that self is greater than other, unless both are of
+        type Largest, in which case they are equal.
 
-  def __hash__(self):
-    "Returns a value that can be used for generating hashes"
-    return -0x55555555
+        >>> 0 > Largest()
+        False
+        >>> Largest() < 9999999
+        False
+        >>> Largest() > 9999999
+        True
+        >>> Largest() < Largest()
+        False
+        >>> Largest() == Largest()
+        True
+        """
+        if other.__class__ == self.__class__:
+            retval = 0
+        else:
+            retval = 1
+        return retval
+
+    def __str__(self):
+        """Returns a string representation of the object
+
+        The largest number is displayed as ~ (it sort of looks like infinity...)
+
+        >>> print Largest()
+        ~
+        """
+        return "~"
+
+    def __repr__(self):
+        """Returns an evaluable expression representing this object
+
+        >>> Largest()
+        Inf
+        """
+        return "Inf"
+
+    def __hash__(self):
+        "Returns a value that can be used for generating hashes"
+        return -0x55555555
 
 
 Inf = Largest()
 # Use -Inf for the smallest value
+
 
 class Interval(object):
     """Represents a continuous range of values
@@ -281,35 +284,37 @@ class Interval(object):
         TypeError: upper_bound is not hashable.
         """
         try:
-            h = hash(lower_bound)
+            hash(lower_bound)
         except TypeError:
             raise TypeError("lower_bound is not hashable.")
 
         try:
-            h = hash(upper_bound)
+            hash(upper_bound)
         except TypeError:
             raise TypeError("upper_bound is not hashable.")
 
         lower_closed = not (
-            isinstance(lower_bound, Smallest)
-            or isinstance(lower_bound, Largest)) \
-          and kwargs.get("lower_closed", kwargs.get("closed", True))
+            isinstance(lower_bound, Smallest) or isinstance(lower_bound, Largest)
+        ) and kwargs.get("lower_closed", kwargs.get("closed", True))
         upper_closed = not (
-            isinstance(upper_bound, Smallest)
-            or isinstance(upper_bound, Largest)) \
-          and kwargs.get("upper_closed", kwargs.get("closed", True))
+            isinstance(upper_bound, Smallest) or isinstance(upper_bound, Largest)
+        ) and kwargs.get("upper_closed", kwargs.get("closed", True))
 
         if upper_bound < lower_bound:
-            lower_bound, lower_closed, upper_bound, upper_closed = \
-            upper_bound, upper_closed, lower_bound, lower_closed
-        if ((lower_bound == -Inf) and lower_closed) \
-          or ((upper_bound == Inf) and upper_closed):
-            raise ValueError(
-                "Unbound ends cannot be included in an interval.")
+            lower_bound, lower_closed, upper_bound, upper_closed = (
+                upper_bound,
+                upper_closed,
+                lower_bound,
+                lower_closed,
+            )
+        if ((lower_bound == -Inf) and lower_closed) or (
+            (upper_bound == Inf) and upper_closed
+        ):
+            raise ValueError("Unbound ends cannot be included in an interval.")
 
-        self.lower_bound  = lower_bound
+        self.lower_bound = lower_bound
         self.lower_closed = lower_closed
-        self.upper_bound  = upper_bound
+        self.upper_bound = upper_bound
         self.upper_closed = upper_closed
 
     def __hash__(self):
@@ -320,9 +325,9 @@ class Interval(object):
 
         >>> h = hash(Interval.less_than(5))
         """
-        return hash((
-            self.lower_bound, self.lower_closed,
-            self.upper_bound, self.upper_closed))
+        return hash(
+            (self.lower_bound, self.lower_closed, self.upper_bound, self.upper_closed)
+        )
 
     def __repr__(self):
         """Returns an evaluable expression that can reproduce the object
@@ -337,8 +342,11 @@ class Interval(object):
         Interval(-Inf, Inf, lower_closed=False, upper_closed=False)
         """
         return "Interval(%s, %s, lower_closed=%s, upper_closed=%s)" % (
-            repr(self.lower_bound), repr(self.upper_bound),
-            self.lower_closed, self.upper_closed)
+            repr(self.lower_bound),
+            repr(self.upper_bound),
+            self.lower_closed,
+            self.upper_closed,
+        )
 
     def __str__(self):
         """Returns a string representation of the object
@@ -382,9 +390,9 @@ class Interval(object):
             between = ".."
 
             if self.lower_closed:
-                lbchar = '['
+                lbchar = "["
             else:
-                lbchar = '('
+                lbchar = "("
 
             if self.lower_bound == -Inf:
                 lstr = ""
@@ -393,9 +401,9 @@ class Interval(object):
                 lstr = repr(self.lower_bound)
 
             if self.upper_closed:
-                ubchar = ']'
+                ubchar = "]"
             else:
-                ubchar = ')'
+                ubchar = ")"
 
             if self.upper_bound == Inf:
                 ustr = ""
@@ -419,7 +427,10 @@ class Interval(object):
         @change 20170509: for some reason this was choking on numpy.bool_ being
         returned so I'm forcing cast as straight bool
         """
-        result = bool((self.lower_bound != self.upper_bound) or (self.upper_closed and self.lower_closed))
+        result = bool(
+            (self.lower_bound != self.upper_bound)
+            or (self.upper_closed and self.lower_closed)
+        )
         return result
 
     def __cmp__(self, other):
@@ -491,8 +502,8 @@ class Interval(object):
                     upper_closed = other.upper_closed
 
                 result = Interval(
-                    lower, upper,
-                    lower_closed=lower_closed, upper_closed=upper_closed)
+                    lower, upper, lower_closed=lower_closed, upper_closed=upper_closed
+                )
             else:
                 result = Interval.none()
         else:
@@ -504,10 +515,10 @@ class Interval(object):
         Custom add for QF project. Normally return YMD_HMS but in this case
         must also return ms
         """
-        ms = kwargs.get('ms', False)
-        if isinstance(self.lower_bound,datetime.datetime):
+        ms = kwargs.get("ms", False)
+        if isinstance(self.lower_bound, datetime.datetime):
             if ms:
-                time_format = start_time_format+'_%f'
+                time_format = start_time_format + "_%f"
             else:
                 time_format = start_time_format
 
@@ -515,14 +526,14 @@ class Interval(object):
             if ms:
                 starttime = starttime[:-3]
         else:
-            print("This interval does not appear to relate to  time\
-            so start time is not well defined")
+            print(
+                "This interval does not appear to relate to  time\
+            so start time is not well defined"
+            )
             starttime = None
 
         starttime_string = starttime
         return starttime_string
-
-
 
     @classmethod
     def none(cls):
@@ -535,50 +546,50 @@ class Interval(object):
 
     @classmethod
     def all(cls):
-      """Returns an interval encompassing all values
+        """Returns an interval encompassing all values
 
-      >>> print Interval.all()
-      (...)
-      """
-      return cls()
+        >>> print Interval.all()
+        (...)
+        """
+        return cls()
 
     @classmethod
     def between(cls, a, b, closed=True):
-      """Returns an interval between two values
+        """Returns an interval between two values
 
-      Returns an interval between values a and b.  If closed is True,
-      then the endpoints are included.  Otherwise, the endpoints are
-      excluded.
+        Returns an interval between values a and b.  If closed is True,
+        then the endpoints are included.  Otherwise, the endpoints are
+        excluded.
 
-      >>> print Interval.between(2, 4)
-      [2..4]
-      >>> print Interval.between(2, 4, False)
-      (2..4)
-      """
-      return cls(a, b, closed=closed)
+        >>> print Interval.between(2, 4)
+        [2..4]
+        >>> print Interval.between(2, 4, False)
+        (2..4)
+        """
+        return cls(a, b, closed=closed)
 
     @classmethod
     def equal_to(cls, a):
-      """Returns an point interval
+        """Returns an point interval
 
-      Returns an interval containing only a.
+        Returns an interval containing only a.
 
-      >>> print Interval.equal_to(32)
-      32
-      """
-      return cls(a, a)
+        >>> print Interval.equal_to(32)
+        32
+        """
+        return cls(a, a)
 
     @classmethod
     def less_than(cls, a):
-      """Returns interval of all values less than the given value
+        """Returns interval of all values less than the given value
 
-      Returns an interval containing all values less than a.  If closed
-      is True, then all values less than or equal to a are returned.
+        Returns an interval containing all values less than a.  If closed
+        is True, then all values less than or equal to a are returned.
 
-      >>> print Interval.less_than(32)
-      (...32)
-      """
-      return cls(upper_bound=a, upper_closed=False)
+        >>> print Interval.less_than(32)
+        (...32)
+        """
+        return cls(upper_bound=a, upper_closed=False)
 
     @classmethod
     def less_than_or_equal_to(cls, a):
@@ -591,21 +602,21 @@ class Interval(object):
 
     @classmethod
     def greater_than(cls, a):
-      """Returns interval of all values greater than the given value
+        """Returns interval of all values greater than the given value
 
-      >>> print Interval.greater_than(32)
-      (32...)
-      """
-      return cls(lower_bound=a, lower_closed=False)
+        >>> print Interval.greater_than(32)
+        (32...)
+        """
+        return cls(lower_bound=a, lower_closed=False)
 
     @classmethod
     def greater_than_or_equal_to(cls, a):
-      """Returns interval of all values greater than or equal to the given value
+        """Returns interval of all values greater than or equal to the given value
 
-      >>> print Interval.greater_than_or_equal_to(32)
-      [32...)
-      """
-      return cls(lower_bound=a, lower_closed=True)
+        >>> print Interval.greater_than_or_equal_to(32)
+        [32...)
+        """
+        return cls(lower_bound=a, lower_closed=True)
 
     def comes_before(self, other):
         """Tells whether an interval lies before the object
@@ -637,9 +648,11 @@ class Interval(object):
         elif self.lower_closed == other.lower_closed:
             if self.upper_bound < other.upper_bound:
                 result = True
-            elif self.upper_bound > other.upper_bound \
-              or self.upper_closed == other.upper_closed \
-              or self.upper_closed:
+            elif (
+                self.upper_bound > other.upper_bound
+                or self.upper_closed == other.upper_closed
+                or self.upper_closed
+            ):
                 result = False
             else:
                 result = True
@@ -718,8 +731,7 @@ class Interval(object):
             else:
                 ubound = other.upper_bound
                 uinc = other.upper_closed
-            return Interval(
-                lbound, ubound, upper_closed=uinc, lower_closed=linc)
+            return Interval(lbound, ubound, upper_closed=uinc, lower_closed=linc)
         else:
             raise ArithmeticError("The Intervals are disjoint.")
 
@@ -765,14 +777,14 @@ class Interval(object):
             if obj.lower_bound < self.lower_bound:
                 insideLower = False
             elif obj.lower_bound == self.lower_bound:
-                insideLower = (obj.lower_closed <= self.lower_closed)
+                insideLower = obj.lower_closed <= self.lower_closed
             else:
                 insideLower = True
 
             if obj.upper_bound > self.upper_bound:
                 insideUpper = False
             elif obj.upper_bound == self.upper_bound:
-                insideUpper = (obj.upper_closed <= self.upper_closed)
+                insideUpper = obj.upper_closed <= self.upper_closed
             else:
                 insideUpper = True
 
@@ -831,7 +843,7 @@ class Interval(object):
         elif other.lower_bound < self.upper_bound:
             result = True
         elif other.lower_bound == self.upper_bound:
-            result = (other.lower_closed and self.upper_closed)
+            result = other.lower_closed and self.upper_closed
         else:
             result = False
         return result
@@ -883,7 +895,7 @@ class Interval(object):
         """
         if self.comes_before(other):
             if self.upper_bound == other.lower_bound:
-                result = (self.upper_closed != other.lower_closed)
+                result = self.upper_closed != other.lower_closed
             else:
                 result = False
         elif self == other:
@@ -902,16 +914,17 @@ class Interval(object):
         >>> Interval(2, 2, closed=False) == Interval(0, 0, closed=False)
         True
         """
-        return (\
-            self.lower_bound == self.upper_bound and (\
-                not self.lower_closed or not self.upper_closed)\
-            and other.lower_bound == other.upper_bound and (\
-                not other.lower_closed or not other.upper_closed))\
-            or (\
-                self.lower_bound == other.lower_bound \
-                and self.upper_bound == other.upper_bound \
-                and self.lower_closed == other.lower_closed \
-                and self.upper_closed == other.upper_closed)
+        return (
+            self.lower_bound == self.upper_bound
+            and (not self.lower_closed or not self.upper_closed)
+            and other.lower_bound == other.upper_bound
+            and (not other.lower_closed or not other.upper_closed)
+        ) or (
+            self.lower_bound == other.lower_bound
+            and self.upper_bound == other.upper_bound
+            and self.lower_closed == other.lower_closed
+            and self.upper_closed == other.upper_closed
+        )
 
     def duration(self):
         """
@@ -920,7 +933,7 @@ class Interval(object):
 
         """
         duration = self.upper_bound - self.lower_bound
-        if isinstance(self.upper_bound,datetime.datetime):
+        if isinstance(self.upper_bound, datetime.datetime):
             duration = duration.total_seconds()
         return duration
 
@@ -932,13 +945,14 @@ class Interval(object):
         intervals would easily make an interval set
 
         """
-        if isinstance(self.upper_bound,datetime.datetime):
+        if isinstance(self.upper_bound, datetime.datetime):
             pad = datetime.timedelta(seconds=pad_width)
         else:
             pass
 
-        IV = Interval(self.lower_bound-pad, self.upper_bound+pad)
+        IV = Interval(self.lower_bound - pad, self.upper_bound + pad)
         return IV
+
 
 class BaseIntervalSet(object):
     "Base class for IntervalSet and FrozenIntervalSet."
@@ -1024,6 +1038,7 @@ class BaseIntervalSet(object):
         if len(self.intervals) == 0:
             rangeStr = "<Empty>"
         else:
+
             def sortFn(x, y):
                 if x.comes_before(y):
                     retval = -1
@@ -1032,6 +1047,7 @@ class BaseIntervalSet(object):
                 else:
                     retval = 0
                 return retval
+
             rangeStr = ",".join([str(r) for r in self.intervals])
         return rangeStr
 
@@ -1069,29 +1085,6 @@ class BaseIntervalSet(object):
             return self.intervals[index]
         except IndexError:
             raise IndexError("Index is out of range")
-
-    def __iter__(self):
-        """Returns an iterator to iterate through the intervals
-
-        Unlike sets, which do not have ordering, BaseIntervalSets do.  Therefore,
-        iterating was implemented.  Intervals are stored in order, starting with
-        that with the left-most lower bound to that with the right-most.
-
-        >>> for i in IntervalSet():
-        ...     print i
-        ...
-        >>> for i in IntervalSet.between(3, 5):
-        ...     print i
-        ...
-        [3..5]
-        >>> for i in IntervalSet([2, 5, 3]):
-        ...     print i
-        ...
-        2
-        3
-        5
-        """
-        return self.intervals.__iter__()
 
     def lower_bound(self):
         """Returns the lower boundary of the BaseIntervalSet
@@ -1174,10 +1167,12 @@ class BaseIntervalSet(object):
         if len(self.intervals) == 0:
             result = Interval.none()
         else:
-            result =  Interval(
-                self.lower_bound(), self.upper_bound(),
+            result = Interval(
+                self.lower_bound(),
+                self.upper_bound(),
                 lower_closed=self.lower_closed(),
-                upper_closed=self.upper_closed())
+                upper_closed=self.upper_closed(),
+            )
         return result
 
     def issubset(self, other):
@@ -1290,6 +1285,29 @@ class BaseIntervalSet(object):
                 break
         return result
 
+    # def __iter__(self):
+    #     """Returns an iterator to iterate through the intervals
+    #
+    #     Unlike sets, which do not have ordering, BaseIntervalSets do.  Therefore,
+    #     iterating was implemented.  Intervals are stored in order, starting with
+    #     that with the left-most lower bound to that with the right-most.
+    #
+    #     >>> for i in IntervalSet():
+    #     ...     print i
+    #     ...
+    #     >>> for i in IntervalSet.between(3, 5):
+    #     ...     print i
+    #     ...
+    #     [3..5]
+    #     >>> for i in IntervalSet([2, 5, 3]):
+    #     ...     print i
+    #     ...
+    #     2
+    #     3
+    #     5
+    #     """
+    #     return self.intervals.__iter__()
+
     def __iter__(self):
         """Returns an iterator over the intervals in the set
 
@@ -1397,32 +1415,49 @@ class BaseIntervalSet(object):
                         if i in j:
                             pass
                         elif j in i:
-                            if j.lower_bound != None:
-                                temp.add(Interval(
-                                    i.lower_bound, j.lower_bound,
-                                    lower_closed=i.lower_closed,
-                                    upper_closed=not j.lower_closed))
-                            if j.upper_bound != None:
-                                temp.add(Interval(
-                                    j.upper_bound, i.upper_bound,
-                                    lower_closed=not j.upper_closed,
-                                    upper_closed=i.upper_closed))
+                            if j.lower_bound is not None:
+                                temp.add(
+                                    Interval(
+                                        i.lower_bound,
+                                        j.lower_bound,
+                                        lower_closed=i.lower_closed,
+                                        upper_closed=not j.lower_closed,
+                                    )
+                                )
+                            if j.upper_bound is not None:
+                                temp.add(
+                                    Interval(
+                                        j.upper_bound,
+                                        i.upper_bound,
+                                        lower_closed=not j.upper_closed,
+                                        upper_closed=i.upper_closed,
+                                    )
+                                )
                         elif j.comes_before(i):
-                            temp.add(Interval(
-                                j.upper_bound, i.upper_bound,
-                                lower_closed=not j.upper_closed,
-                                upper_closed=i.upper_closed))
+                            temp.add(
+                                Interval(
+                                    j.upper_bound,
+                                    i.upper_bound,
+                                    lower_closed=not j.upper_closed,
+                                    upper_closed=i.upper_closed,
+                                )
+                            )
                         else:
-                            temp.add(Interval(
-                                i.lower_bound, j.lower_bound,
-                                lower_closed=i.lower_closed,
-                                upper_closed=not j.lower_closed))
+                            temp.add(
+                                Interval(
+                                    i.lower_bound,
+                                    j.lower_bound,
+                                    lower_closed=i.lower_closed,
+                                    upper_closed=not j.lower_closed,
+                                )
+                            )
                     else:
                         temp.add(copy.deepcopy(i))
                 result = temp
         else:
             raise TypeError(
-                "unsupported operand type(s) for -: expected BaseIntervalSet")
+                "unsupported operand type(s) for -: expected BaseIntervalSet"
+            )
         return self.__class__(result)
 
     def difference(self, other):
@@ -1498,20 +1533,29 @@ class BaseIntervalSet(object):
                         elif j in i:
                             result.add(copy.deepcopy(j))
                         elif j.comes_before(i):
-                            result.add(Interval(
-                                i.lower_bound, j.upper_bound,
-                                lower_closed=i.lower_closed,
-                                upper_closed=j.upper_closed))
+                            result.add(
+                                Interval(
+                                    i.lower_bound,
+                                    j.upper_bound,
+                                    lower_closed=i.lower_closed,
+                                    upper_closed=j.upper_closed,
+                                )
+                            )
                         else:
-                            result.add(Interval(
-                                j.lower_bound, i.upper_bound,
-                                lower_closed=j.lower_closed,
-                                upper_closed=i.upper_closed))
+                            result.add(
+                                Interval(
+                                    j.lower_bound,
+                                    i.upper_bound,
+                                    lower_closed=j.lower_closed,
+                                    upper_closed=i.upper_closed,
+                                )
+                            )
             # Convert IntervalSet to correct type
             result = self.__class__(result)
         else:
             raise TypeError(
-                "unsupported operand type(s) for &: expected BaseIntervalSet")
+                "unsupported operand type(s) for &: expected BaseIntervalSet"
+            )
         return result
 
     def intersection(self, other):
@@ -1578,7 +1622,8 @@ class BaseIntervalSet(object):
                 union.add(r)
         else:
             raise TypeError(
-                "unsupported operand type(s) for |: expected BaseIntervalSet")
+                "unsupported operand type(s) for |: expected BaseIntervalSet"
+            )
         return self.__class__(union)
 
     def union(self, other):
@@ -1611,7 +1656,7 @@ class BaseIntervalSet(object):
         (...0],1,2,3,4
         """
         if isinstance(other, BaseIntervalSet):
-           operand = other
+            operand = other
         else:
             operand = self.__class__(other)
         return self | operand
@@ -1643,7 +1688,8 @@ class BaseIntervalSet(object):
             return (self | other) - (self & other)
         else:
             raise TypeError(
-                "unsupported operand type(s) for ^: expected BaseIntervalSet")
+                "unsupported operand type(s) for ^: expected BaseIntervalSet"
+            )
 
     def symmetric_difference(self, other):
         """Returns the exclusive or of the given value with the object
@@ -1827,10 +1873,11 @@ class BaseIntervalSet(object):
         False
         """
         if isinstance(other, BaseIntervalSet):
-            return (self <= other and not self == other)
+            return self <= other and not self == other
         else:
             raise TypeError(
-                "unsupported operand type(s) for <: expected BaseIntervalSet")
+                "unsupported operand type(s) for <: expected BaseIntervalSet"
+            )
 
     def __le__(self, other):
         """Tests if the given operand is a subset or is equal to the object
@@ -1879,7 +1926,8 @@ class BaseIntervalSet(object):
                     break
         else:
             raise TypeError(
-                "unsupported operand type(s) for <=: expected BaseIntervalSet")
+                "unsupported operand type(s) for <=: expected BaseIntervalSet"
+            )
         return result
 
     def __ge__(self, other):
@@ -1927,7 +1975,8 @@ class BaseIntervalSet(object):
                     break
         else:
             raise TypeError(
-                "unsupported operand type(s) for >=: expected BaseIntervalSet")
+                "unsupported operand type(s) for >=: expected BaseIntervalSet"
+            )
         return result
 
     def __gt__(self, other):
@@ -1973,7 +2022,8 @@ class BaseIntervalSet(object):
             return self >= other and not self == other
         else:
             raise TypeError(
-                "unsupported operand type(s) for >: expected BaseIntervalSet")
+                "unsupported operand type(s) for >: expected BaseIntervalSet"
+            )
 
     def _add(self, obj):
         "Appends an Interval or BaseIntervalSet to the object"
@@ -1982,7 +2032,7 @@ class BaseIntervalSet(object):
         else:
             r = Interval.equal_to(obj)
 
-        if r:   # Don't bother appending an empty Interval
+        if r:  # Don't bother appending an empty Interval
             # If r continuously joins with any of the other
             newIntervals = []
             for i in self.intervals:
@@ -2099,6 +2149,7 @@ class BaseIntervalSet(object):
         """
         return cls()
 
+
 class IntervalSet(BaseIntervalSet):
     """The mutable version of BaseIntervalSet
 
@@ -2120,6 +2171,7 @@ class IntervalSet(BaseIntervalSet):
         ...
     TypeError: unhashable instance
     """
+
     def __init__(self, items=[]):
         "Initializes the IntervalSet"
         BaseIntervalSet.__init__(self, items)
@@ -2132,10 +2184,10 @@ class IntervalSet(BaseIntervalSet):
         >>> IntervalSet()
         IntervalSet([])
         >>> IntervalSet([2, 4])
-        IntervalSet([Interval(2, 2, lower_closed=True, upper_closed=True), Interval(4, 4, lower_closed=True, upper_closed=True)])
+        IntervalSet([Interval(2, 2, lower_closed=True, upper_closed=True),
+                     Interval(4, 4, lower_closed=True, upper_closed=True)])
         """
-        return "IntervalSet([%s])" % (
-            ", ".join(repr(i) for i in self.intervals),)
+        return "IntervalSet([%s])" % (", ".join(repr(i) for i in self.intervals),)
 
     def __delitem__(self, index):
         """Removes the interval at the given index from the IntervalSet
@@ -2373,6 +2425,7 @@ class IntervalSet(BaseIntervalSet):
         "Raises an error since IntervalSets are mutable"
         raise TypeError("unhashable instance")
 
+
 class FrozenIntervalSet(BaseIntervalSet):
     """An immutable version of BaseIntervalSet
 
@@ -2434,10 +2487,10 @@ class FrozenIntervalSet(BaseIntervalSet):
         >>> FrozenIntervalSet()
         FrozenIntervalSet([])
         >>> FrozenIntervalSet([2, 4])
-        FrozenIntervalSet([Interval(2, 2, lower_closed=True, upper_closed=True), Interval(4, 4, lower_closed=True, upper_closed=True)])
+        FrozenIntervalSet([Interval(2, 2, lower_closed=True, upper_closed=True),
+                           Interval(4, 4, lower_closed=True, upper_closed=True)])
         """
-        return "FrozenIntervalSet([%s])" % (
-            ", ".join(repr(i) for i in self.intervals),)
+        return "FrozenIntervalSet([%s])" % (", ".join(repr(i) for i in self.intervals),)
 
     def __hash__(self):
         """Generates a 32-bit hash key
@@ -2469,19 +2522,19 @@ class FrozenIntervalSet(BaseIntervalSet):
         else:
             copy.copy(self)
 
+
 class TimePeriod(Interval):
-    """
-    """
+    """ """
+
     def __init__(self, **kwargs):
-        """
-        """
-        Interval.__init__(self,**kwargs);
+        """ """
+        Interval.__init__(self, **kwargs)
 
     def duration(self):
-        """
-        """
+        """ """
         duration = self.upper_bound - self.lower_bound
         return duration.total_seconds()
+
 
 def generate_interval_list(startTime, endTime, delta):
     """
@@ -2493,15 +2546,22 @@ def generate_interval_list(startTime, endTime, delta):
     """
     interval_list = []
     while startTime < endTime:
-        interval_list.append(Interval(lower_bound=startTime,\
-        upper_bound=startTime+delta, lower_closed=False, upper_closed=False))
-        startTime = startTime+delta
+        interval_list.append(
+            Interval(
+                lower_bound=startTime,
+                upper_bound=startTime + delta,
+                lower_closed=False,
+                upper_closed=False,
+            )
+        )
+        startTime = startTime + delta
     return interval_list
+
 
 if __name__ == "__main__":
     import doctest
-    doctest.testmod()
 
+    doctest.testmod()
 
 
 def merge_interval_list(interval_list):

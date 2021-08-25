@@ -9,13 +9,16 @@ seems to be because it wants maximum_number_of_iterations and tolerance
 """
 import numpy as np
 
+
 class IterControl(object):
-    """
+    """ """
 
-    """
-
-    def __init__(self, max_number_of_iterations=10,
-                 max_number_of_redescending_iterations=1, **kwargs):
+    def __init__(
+        self,
+        max_number_of_iterations=10,
+        max_number_of_redescending_iterations=1,
+        **kwargs,
+    ):
         """
 
         Parameters
@@ -35,34 +38,33 @@ class IterControl(object):
         print("TEST")
         qq = kwargs.get("test")
         print(f"qq {qq}")
-        self._number_of_iterations = 0; #private variable, wont show up in
-                                        #tab completion.
-                                        #Internal to codebase and should not
-                                        #be relied upon in functons by users.
+        self._number_of_iterations = 0
+        # private variable, wont show up in
+        # tab completion.
+        # Internal to codebase and should not
+        # be relied upon in functons by users.
         self.max_number_of_iterations = max_number_of_iterations
         self.tolerance = 0.005
         self.epsilon = 1000
         self._number_of_redescending_iterations = 0
         self.max_number_of_redescending_iterations = 2  # 1,2 at most is fine
 
-        #<regression-M estimator params>
-        self.r0 = 1.5   #infinty for OLS
+        # <regression-M estimator params>
+        self.r0 = 1.5  # infinty for OLS
         self.u0 = 2.8  # what is it?
         # u0 is a parameter for the redescending
-        #some double exponential formula and u0 controlls it
+        # some double exponential formula and u0 controlls it
         # it makes for severe downweigthing about u0
         # its a continuous function so its "math friendly"
-        #and you can prove theroems about it etc.
+        # and you can prove theroems about it etc.
         # </regression-M estimator params>
 
-
-        #<Additional properties>
+        # <Additional properties>
         # #sed sometimes to control one or another of the iterative algorithms
         self.return_covariance = True
         self.save_cleaned = False
         self.robust_diagonalize = False
         # </Additional properties>
-
 
     def converged(self, b, b0):
         """
@@ -82,19 +84,23 @@ class IterControl(object):
         """
 
         converged = False
-        maximum_change = np.max(np.abs(1 - b/b0))
-        #maximum_change = np.max(1 - np.abs(b / b0))
+        maximum_change = np.max(np.abs(1 - b / b0))
+        # maximum_change = np.max(1 - np.abs(b / b0))
         tolerance_cond = maximum_change <= self.tolerance
         iteration_cond = self.number_of_iterations >= self.max_number_of_iterations
         if tolerance_cond or iteration_cond:
             converged = True
             if tolerance_cond:
-                print(f"Converged Due to MaxChange < Tolerance after "
-                      f" {self.number_of_iterations} of "
-                      f" {self.max_number_of_iterations} iterations")
+                print(
+                    f"Converged Due to MaxChange < Tolerance after "
+                    f" {self.number_of_iterations} of "
+                    f" {self.max_number_of_iterations} iterations"
+                )
             elif iteration_cond:
-                print(f"Converged Due to maximum number_of_iterations "
-                      f" {self.max_number_of_iterations}")
+                print(
+                    f"Converged Due to maximum number_of_iterations "
+                    f" {self.max_number_of_iterations}"
+                )
         else:
             converged = False
 
@@ -102,13 +108,14 @@ class IterControl(object):
 
     @property
     def continue_redescending(self):
-        maxxed_out = self._number_of_redescending_iterations <=  \
-               self.max_number_of_redescending_iterations
+        maxxed_out = (
+            self._number_of_redescending_iterations
+            <= self.max_number_of_redescending_iterations
+        )
         if maxxed_out:
             return False
         else:
             return True
-
 
     @property
     def correction_factor(self):
@@ -136,6 +143,6 @@ class IterControl(object):
         cfac : float
             correction factor used when
         """
-        cfac = 1. / (2 * (1. - (1. + self.r0) * np.exp(-self.r0)))
-        #cfac = 1. / (1. - np.exp(-self.r0));
+        cfac = 1.0 / (2 * (1.0 - (1.0 + self.r0) * np.exp(-self.r0)))
+        # cfac = 1. / (1. - np.exp(-self.r0));
         return cfac
