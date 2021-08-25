@@ -247,6 +247,8 @@ def process_transfer_functions(
             for ch in config.output_channels:
                 Y_ch = Y[ch].to_dataset()  # keep as a dataset, maybe not needed
                 X_tmp, Y_tmp, RR_tmp = handle_nan(X, Y_ch, RR, config)
+                # from aurora.sandbox.edf_weights import
+                # W =
                 # X_tmp, Y_tmp, RR_tmp = apply_edf_weights(X_tmp, Y_tmp, RR_tmp)
                 regression_estimator = regression_class(
                     X=X_tmp, Y=Y_tmp, Z=RR_tmp, iter_control=iter_control
