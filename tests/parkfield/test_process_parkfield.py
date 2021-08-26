@@ -54,8 +54,11 @@ def process_mth5_decimation_level(config, run_id, units="MT"):
 
 
 def main():
-    processing_cfg = Path("config", "pkd_processing_config.json")
-    processing_cfg = Path("config", "ascii_pkd_processing_config.json")
+    import os
+
+    cwd = os.getcwd()
+    processing_cfg = Path(cwd, "config", "pkd_processing_config.json")
+    processing_cfg = Path(cwd, "config", "ascii_pkd_processing_config.json")
     config = ProcessingConfig()
     config.from_json(processing_cfg)
     tf_obj = process_mth5_decimation_level(config, "001", units="SI")
