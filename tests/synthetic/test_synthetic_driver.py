@@ -169,7 +169,7 @@ def test_process_mth5():
     # create_run_config_for_test_case("test1")
     # process_synthetic_1()
     # process_synthetic_2()
-    # process_synthetic_rr12()
+    process_synthetic_rr12()
 
 
 def main():

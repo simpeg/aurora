@@ -4,8 +4,11 @@ and transfer_function_processing helpers.
 
 
 """
-
+# from aurora.sandbox.edf_weights import effective_degrees_of_freedom_weights
 from aurora.time_series.frequency_band_helpers import extract_band
+
+# from aurora.time_series.xarray_helpers import cast_3d_stft_to_2d_observations
+from aurora.time_series.xarray_helpers import handle_nan
 from aurora.transfer_function.iter_control import IterControl
 from aurora.transfer_function.transfer_function_header import TransferFunctionHeader
 from aurora.transfer_function.regression.TRME import TRME
@@ -135,49 +138,6 @@ def get_band_for_tf_estimate(band, config, local_stft_obj, remote_stft_obj):
     return X, Y, RR
 
 
-def handle_nan(X, Y, RR, config, output_channels=None):
-    """
-    Drops Nan from series of Fourier coefficients.
-
-    Parameters
-    ----------
-    X : xr.Dataset
-    Y : xr.Dataset
-    RR : xr.Dataset or None
-    config : ProcessingConfig
-    Returns
-    -------
-    X : xr.Dataset
-    Y : xr.Dataset
-    RR : xr.Dataset or None
-
-    """
-    data_var_add_label_mapper = {}
-    data_var_rm_label_mapper = {}
-    for ch in config.reference_channels:
-        data_var_add_label_mapper[ch] = f"remote_{ch}"
-        data_var_rm_label_mapper[f"remote_{ch}"] = ch
-    # if needed we could add local to local channels as well, or station label
-    merged_xr = X.merge(Y, join="exact")
-    if RR is not None:
-        RR = RR.assign(data_var_add_label_mapper)
-        merged_xr = merged_xr.merge(RR, join="exact")
-
-    merged_xr = merged_xr.dropna(dim="time")
-    merged_xr = merged_xr.to_array(dim="channel")
-    X = merged_xr.sel(channel=config.input_channels)
-    X = X.to_dataset(dim="channel")
-    if output_channels is None:
-        output_channels = list(Y.data_vars)
-    Y = merged_xr.sel(channel=output_channels)
-    Y = Y.to_dataset(dim="channel")
-    if RR is not None:
-        RR = merged_xr.sel(channel=data_var_rm_label_mapper.keys())
-        RR = RR.assign(data_var_rm_label_mapper)
-
-    return X, Y, RR
-
-
 def select_channel(xrda, channel_label):
     """
     Extra helper function to make process_transfer_functions more readable without
@@ -240,16 +200,26 @@ def process_transfer_functions(
         )
         # if there are segment weights apply them here
         # if there are channel weights apply them here
-        # Reshape to 2d
-        # dropna (per channel)
-        # edfwt (per channel)
+        # Reshape to 2d - maybe push this into extract band method
+        X = X.stack(observation=("frequency", "time"))
+        Y = Y.stack(observation=("frequency", "time"))
+        if RR is not None:
+            RR = RR.stack(observation=("frequency", "time"))
+
+        # W = effective_degrees_of_freedom_weights(X, RR, edf_obj=None)
+        # #apply weights
+        # X *= W
+        # Y *= W
+        # if RR is not None:
+        #     RR *= W
+
         if config.estimate_per_channel:
             for ch in config.output_channels:
                 Y_ch = Y[ch].to_dataset()  # keep as a dataset, maybe not needed
-                X_tmp, Y_tmp, RR_tmp = handle_nan(X, Y_ch, RR, config)
-                # from aurora.sandbox.edf_weights import
-                # W =
-                # X_tmp, Y_tmp, RR_tmp = apply_edf_weights(X_tmp, Y_tmp, RR_tmp)
+                # dropna (per channel)
+                X_tmp, Y_tmp, RR_tmp = handle_nan(
+                    X, Y_ch, RR, config, drop_dim="observation"
+                )
                 regression_estimator = regression_class(
                     X=X_tmp, Y=Y_tmp, Z=RR_tmp, iter_control=iter_control
                 )
@@ -257,7 +227,7 @@ def process_transfer_functions(
                 transfer_function_obj.set_tf(regression_estimator, band.center_period)
 
         else:
-            X, Y, RR = handle_nan(X, Y, RR, config)
+            X, Y, RR = handle_nan(X, Y, RR, config, drop_dim="observation")
             regression_estimator = regression_class(
                 X=X, Y=Y, Z=RR, iter_control=iter_control
             )
