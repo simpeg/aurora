@@ -5,21 +5,28 @@ Placeholder module for methods manipulating xarray time series
 import xarray as xr
 
 
-def handle_nan(X, Y, RR, config, drop_dim=""):
+def handle_nan(X, Y, RR, drop_dim=""):
     """
-    !!! PROBABLY TO BE DEPRECATED
-    !!! THis method works with 3D STFT arrays, but as of 26AUg2021 we are using
-    xarray.stack() to cast FCs are 2D arrays merging time/frequency axes.
-
     Drops Nan from multiple channel series'.
     Initial use case is for Fourier coefficients, but could be more general.
 
-    Idea is to merge X,Y,RR together, and then call dropna
+    Idea is to merge X,Y,RR together, and then call dropna.  We have to be careful
+    with merging becuase there can be namespace clashes in the channel labels.
+    Currently handling this by relabelling the remote reference channels from for
+    example "hx"--> "remote_hx", "hy"-->"remote_hy".  If needed we could add "local" to
+    local the other channels in X, Y.
+
+    It would be nice to maintain an index of what was dropped.
+
+    TODO: We can probably eliminate the config argument by replacing
+    config.reference_channels with list(R.data_vars) and setting a variable
+    input_channels to X.data_vars.  In general, this method could be robustified by
+    renaming all the data_vars with a prefix, not just the reference channels
 
     Parameters
     ----------
     X : xr.Dataset
-    Y : xr.Dataset
+    Y : xr.Dataset or None
     RR : xr.Dataset or None
     config : ProcessingConfig
     drop_dim: string
@@ -32,29 +39,34 @@ def handle_nan(X, Y, RR, config, drop_dim=""):
     RR : xr.Dataset or None
 
     """
+    if Y is None:
+        Y = xr.Dataset()
+    if RR is None:
+        RR = xr.Dataset()
+
+    input_channels = list(X.data_vars)
+    output_channels = list(Y.data_vars)
+    reference_channels = list(RR.data_vars)
     data_var_add_label_mapper = {}
     data_var_rm_label_mapper = {}
-    for ch in config.reference_channels:
+    for ch in reference_channels:
         data_var_add_label_mapper[ch] = f"remote_{ch}"
         data_var_rm_label_mapper[f"remote_{ch}"] = ch
-    # if needed we could add local to local channels as well, or station label
-    merged_xr = X.merge(Y, join="exact")
-    if RR is not None:
-        RR = RR.rename(data_var_add_label_mapper)
-        merged_xr = merged_xr.merge(RR, join="exact")
+    RR = RR.rename(data_var_add_label_mapper)
 
+    merged_xr = X.merge(Y, join="exact")
+    merged_xr = merged_xr.merge(RR, join="exact")
     merged_xr = merged_xr.dropna(dim=drop_dim)
     merged_xr = merged_xr.to_array(dim="channel")
-    X = merged_xr.sel(channel=config.input_channels)
+    X = merged_xr.sel(channel=input_channels)
     X = X.to_dataset(dim="channel")
-    output_channels = list(Y.data_vars)
     Y = merged_xr.sel(channel=output_channels)
     Y = Y.to_dataset(dim="channel")
-    if RR is not None:
-        remote_channels = list(data_var_rm_label_mapper.keys())
-        RR = merged_xr.sel(channel=remote_channels)
-        RR = RR.to_dataset(dim="channel")
-        RR = RR.rename(data_var_rm_label_mapper)
+
+    remote_channels = list(data_var_rm_label_mapper.keys())
+    RR = merged_xr.sel(channel=remote_channels)
+    RR = RR.to_dataset(dim="channel")
+    RR = RR.rename(data_var_rm_label_mapper)
 
     return X, Y, RR
 

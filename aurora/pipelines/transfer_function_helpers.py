@@ -4,7 +4,6 @@ and transfer_function_processing helpers.
 
 
 """
-# from aurora.sandbox.edf_weights import effective_degrees_of_freedom_weights
 from aurora.time_series.frequency_band_helpers import extract_band
 
 # from aurora.time_series.xarray_helpers import cast_3d_stft_to_2d_observations
@@ -18,6 +17,9 @@ from aurora.transfer_function.regression.TRME_RR import TRME_RR
 # TODO: Make all these regression methods accept kwargs on init so that
 # none of them choke if we pass them Z=None or iter_control=None
 from aurora.transfer_function.regression.base import RegressionEstimator
+from aurora.transfer_function.weights.edf_weights import (
+    effective_degrees_of_freedom_weights,
+)
 
 REGRESSION_LIBRARY = {"OLS": RegressionEstimator, "RME": TRME, "TRME_RR": TRME_RR}
 
@@ -205,29 +207,29 @@ def process_transfer_functions(
         Y = Y.stack(observation=("frequency", "time"))
         if RR is not None:
             RR = RR.stack(observation=("frequency", "time"))
-
-        # W = effective_degrees_of_freedom_weights(X, RR, edf_obj=None)
-        # #apply weights
-        # X *= W
-        # Y *= W
-        # if RR is not None:
-        #     RR *= W
+        # from aurora.general_helper_functions import save_to_mat
+        # x = X.to_array(dim="channel")
+        # save_to_mat(x, "x", "xx.mat")
+        W = effective_degrees_of_freedom_weights(X, RR, edf_obj=None)
+        # apply weights
+        X *= W
+        Y *= W
+        if RR is not None:
+            RR *= W
 
         if config.estimate_per_channel:
             for ch in config.output_channels:
                 Y_ch = Y[ch].to_dataset()  # keep as a dataset, maybe not needed
-                # dropna (per channel)
-                X_tmp, Y_tmp, RR_tmp = handle_nan(
-                    X, Y_ch, RR, config, drop_dim="observation"
-                )
+
+                X_, Y_, RR_ = handle_nan(X, Y_ch, RR, drop_dim="observation")
                 regression_estimator = regression_class(
-                    X=X_tmp, Y=Y_tmp, Z=RR_tmp, iter_control=iter_control
+                    X=X_, Y=Y_, Z=RR_, iter_control=iter_control
                 )
                 regression_estimator.estimate()
                 transfer_function_obj.set_tf(regression_estimator, band.center_period)
 
         else:
-            X, Y, RR = handle_nan(X, Y, RR, config, drop_dim="observation")
+            X, Y, RR = handle_nan(X, Y, RR, drop_dim="observation")
             regression_estimator = regression_class(
                 X=X, Y=Y, Z=RR, iter_control=iter_control
             )
