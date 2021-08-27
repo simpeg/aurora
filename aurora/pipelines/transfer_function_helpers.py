@@ -207,9 +207,7 @@ def process_transfer_functions(
         Y = Y.stack(observation=("frequency", "time"))
         if RR is not None:
             RR = RR.stack(observation=("frequency", "time"))
-        # from aurora.general_helper_functions import save_to_mat
-        # x = X.to_array(dim="channel")
-        # save_to_mat(x, "x", "xx.mat")
+
         W = effective_degrees_of_freedom_weights(X, RR, edf_obj=None)
         # apply weights
         X *= W
