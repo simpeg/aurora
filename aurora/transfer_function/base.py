@@ -126,7 +126,7 @@ class TransferFunction(object):
             print("header needed to allocate transfer function arrays")
             raise Exception
 
-        # <Make TF xarray>
+        # <transfer function xarray>
         tf_array_dims = (self.num_channels_out, self.num_channels_in, self.num_bands)
         tf_array = np.zeros(tf_array_dims, dtype=np.complex128)
         self.transfer_function = xr.DataArray(
@@ -138,9 +138,9 @@ class TransferFunction(object):
                 "input_channel": self.tf_header.input_channels,
             },
         )
-        # </Make TF xarray>
+        # </transfer function xarray>
 
-        # <Make num_segments xarray>
+        # <num_segments xarray>
         num_segments = np.zeros((self.num_channels_out, self.num_bands), dtype=np.int32)
         num_segments_xr = xr.DataArray(
             num_segments,
@@ -151,9 +151,9 @@ class TransferFunction(object):
             },
         )
         self.num_segments = num_segments_xr
-        # </Make num_segments xarray>
+        # <num_segments xarray>
 
-        # <Make inverse signal covariance>
+        # <Inverse signal covariance>
         cov_ss_dims = (self.num_channels_in, self.num_channels_in, self.num_bands)
         cov_ss_inv = np.zeros(cov_ss_dims, dtype=np.complex128)
         self.cov_ss_inv = xr.DataArray(
@@ -165,9 +165,9 @@ class TransferFunction(object):
                 "period": self.periods,
             },
         )
-        # </Make inverse signal covariance>
+        # </Inverse signal covariance>
 
-        # <Make noise covariance>
+        # <Noise covariance>
         cov_nn_dims = (self.num_channels_out, self.num_channels_out, self.num_bands)
         cov_nn = np.zeros(cov_nn_dims, dtype=np.complex128)
         self.cov_nn = xr.DataArray(
@@ -179,8 +179,9 @@ class TransferFunction(object):
                 "period": self.periods,
             },
         )
-        # </Make inverse signal covariance>
-        # self.R2 = np.zeros((self.num_channels_out, self.num_bands))
+        # </Noise covariance>
+
+        # <Coefficient of determination>
         self.R2 = xr.DataArray(
             np.zeros((self.num_channels_out, self.num_bands)),
             dims=["output_channel", "period"],
@@ -189,6 +190,7 @@ class TransferFunction(object):
                 "period": self.periods,
             },
         )
+        # </Coefficient of determination>
         self.initialized = True
 
     @property
@@ -258,9 +260,6 @@ class TransferFunction(object):
             for out_ch in output_channels:
                 tmp = regression_estimator.R2.loc[out_ch]
                 self.R2[:, index].loc[out_ch] = tmp
-            # TODO: make channel explcit here? e.g.
-            # for i,out_ch in enumerate(self.tf_header.output_channels):
-            #     self.R2[:,index].loc[out_ch] =  regression_estimator.R2[i]
 
         self.num_segments.data[:, index] = regression_estimator.n_data
 

@@ -14,6 +14,7 @@ from mth5.timeseries import RunTS
 from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 
 DATA_PATH = TEST_PATH.joinpath("parkfield", "data")
+DATA_PATH.mkdir(exist_ok=True)
 
 
 def create_from_iris(dataset_id):
