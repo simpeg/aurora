@@ -15,14 +15,12 @@ from aurora.sandbox.xml_sandbox import describe_inventory_stages
 from aurora.sandbox.processing_config import ProcessingConfig
 from mt_metadata.timeseries import Experiment
 from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
-from mt_metadata.utils import STATIONXML_02
 from mth5.mth5 import MTH5
 
 HEXY = ["hx", "hy", "ex", "ey"]  # default components list
 xml_path = Path("/home/kkappler/software/irismt/mt_metadata/data/xml")
 magnetic_xml_template = xml_path.joinpath("mtml_magnetometer_example.xml")
 electric_xml_template = xml_path.joinpath("mtml_electrode_example.xml")
-single_station_xml_template = STATIONXML_02  # Fails for "no survey key"
 fap_xml_example = ""
 
 
@@ -146,7 +144,6 @@ def test_runts_from_xml(dataset_id, runts_obj=False):
 
     experiment.surveys[0].filters["fir_fs2d5_2000.0"]
     experiment.surveys[0].filters["fir_fs2d5_200.0"].decimation_input_sample_rate
-    test_dataset_config.save_xml(experiment)
     h5_path = Path("PKD.h5")
     run_obj = mth5_run_from_experiment("PKD", experiment, h5_path=h5_path)
 
@@ -313,9 +310,9 @@ def filter_control_example(xml_path=None):
 
     """
     if xml_path is None:
-        print("Not working with STATIONXML_02-- FDSN Tide hack")
-        xml_path = Path("single_station_mt.xml")
-        # xml_path = STATIONXML_02
+        from aurora.general_helper_functions import MT_METADATA_DATA
+
+        xml_path = MT_METADATA_DATA.joinpath("stationxml", "mtml_single_station.xml")
     experiment = get_experiment_from_xml_path(xml_path)
     filter_dict = get_filters_dict_from_experiment(experiment)
     frq = np.arange(5) + 1.2
@@ -341,10 +338,10 @@ def test_filter_control():
 def set_driver_parameters():
     driver_parameters = {}
     driver_parameters["create_xml"] = True
-    driver_parameters["test_filter_control"] = True
+    driver_parameters["test_filter_control"] = False  # failing because cannot
+    # find/read xml
     driver_parameters["run_ts_from_xml_01"] = True
-    driver_parameters["run_ts_from_xml_02"] = True
-    driver_parameters["run_ts_from_xml_03"] = True
+    driver_parameters["run_ts_from_xml_02"] = False  # Fail: no access to pkd.xml
     driver_parameters["initialize_data"] = True
     return driver_parameters
 
@@ -392,13 +389,13 @@ def main():
                 ensure_inventory_stages_are_named=False
             )
             experiment = get_experiment_from_obspy_inventory(inventory)
-            test_dataset_config.save_xml(experiment)  # , tag="20210522")
+            print(experiment)
 
     # </CREATE METADATA XML>
 
     # <TEST FILTER CONTROL>
     if driver_parameters["test_filter_control"]:
-        filter_control_example()
+        filter_control_example()  # KeyError: 'survey' -20210828
         dataset_id = "pkd_test_00"
         test_dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
         xml_path = test_dataset_config.get_station_xml_filename()
@@ -406,8 +403,6 @@ def main():
     # </TEST FILTER CONTROL>
 
     # <TEST RunTS FROM XML>
-    # method 1 is in aurora driver
-    # <METHOD2>
     if driver_parameters["run_ts_from_xml_02"]:
         dataset_id = "pkd_test_00"
         test_dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
@@ -415,18 +410,7 @@ def main():
         experiment = get_experiment_from_xml_path(pkd_xml)
         run_obj = mth5_run_from_experiment("PKD", experiment)
         runts_obj = cast_run_to_run_ts(run_obj, station_id="PKD")
-        # </METHOD2>
-
-        # <METHOD3>
-    if driver_parameters["run_ts_from_xml_03"]:
-        try:
-            experiment = get_experiment_from_xml_path(single_station_xml_template)
-            run_obj = mth5_run_from_experiment("REW09", experiment)
-            runts_obj = cast_run_to_run_ts(run_obj)
-            print(runts_obj)
-        except KeyError:
-            print("FDSN TIDE HACK CAUSING EXCEPTION")
-        # </METHOD3>
+        print(runts_obj)
     # </TEST RunTS FROM XML>
 
     # <INITIALIZE DATA>

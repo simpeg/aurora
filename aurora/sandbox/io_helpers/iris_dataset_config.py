@@ -43,8 +43,7 @@ class IRISDatasetConfig(object):
 
     def get_data_via_rover(self):
         """
-        Need
-        1. Where does the rover-ed file end up?
+        Need to know where does the rover-ed file end up?
         that path needs to be accessible to load the data after it is generated.
         See example in ipython notebook in ulf_geoE repo
         Returns
@@ -54,24 +53,9 @@ class IRISDatasetConfig(object):
 
         pass
 
-    def save_xml(self, experiment, tag=""):
+    def get_station_xml_filename(self, tag=""):
         """
-        could probably use inventory or experiement
-        Maybe even add a type-checker here
-        if isinstance(xml_obj, inventory):
-            tag="inventory"
-        elif  isinstance(xml_obj, Experiment()):
-            tag="experiment"
-
-        Parameters
-        ----------
-        experiement
-
-        Returns
-        -------
-
+        DEPRECATED
         """
-        output_xml_path = self.get_station_xml_filename(tag=tag)
-        experiment.to_xml(output_xml_path)
-        print(f"saved experiement to {output_xml_path}")
-        return
+        print("get_station_xml_filename DEPRECATED")
+        raise Exception

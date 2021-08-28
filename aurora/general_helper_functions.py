@@ -7,6 +7,7 @@ import xarray as xr
 from pathlib import Path
 
 import aurora
+import mt_metadata
 
 init_file = inspect.getfile(aurora)
 AURORA_PATH = Path(init_file).parent.parent
@@ -17,6 +18,8 @@ DATA_PATH.mkdir(exist_ok=True, parents=True)
 FIGURES_PATH = DATA_PATH.joinpath("figures")
 FIGURES_PATH.mkdir(exist_ok=True, parents=True)
 TEST_BAND_FILE = DATA_PATH.joinpath("bandtest.nc")
+mt_metadata_init = inspect.getfile(mt_metadata)
+MT_METADATA_DATA = Path(mt_metadata_init).parent.parent.joinpath("data")
 
 
 def execute_subprocess(cmd, **kwargs):
