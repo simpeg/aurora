@@ -21,7 +21,23 @@ from aurora.transfer_function.TTFZ import TTFZ
 from mth5.mth5 import MTH5
 
 
-def initialize_pipeline(run_config):
+def initialize_pipeline(run_config, mth5_path=None):
+    """
+    A place to organize args and kwargs.
+
+    Parameters
+    ----------
+    run_config : str, pathlib.Path, or a RunConfig object
+        If str or Path is provided, this will read in the config and return it as a
+        RunConfig object.
+    mth5_path : string or pathlib.Path
+        optional argument.  If it is provided, it overrides the path in the RunConfig
+        object
+
+    Returns
+    -------
+
+    """
     if isinstance(run_config, Path) or isinstance(run_config, str):
         config = RunConfig()
         config.from_json(run_config)
@@ -31,6 +47,16 @@ def initialize_pipeline(run_config):
         print(f"Unrecognized config of type {type(run_config)}")
         raise Exception
 
+    # 20210828: add logic to support optional mth5_path argument (issue #75)
+    if mth5_path:
+        mth5_path = str(mth5_path)
+        if config["mth5_path"] != str(mth5_path):
+            print(
+                "Warning - the mth5 path supplied to initialize pipeline differs"
+                "from the one in the config file"
+            )
+            print(f"config path changing from \n{config['mth5_path']} to \n{mth5_path}")
+            config.mth5_path = mth5_path
     mth5_obj = MTH5()
     mth5_obj.open_mth5(config["mth5_path"], mode="r")
     return config, mth5_obj
@@ -213,7 +239,8 @@ def process_mth5_run(
     -------
 
     """
-    run_config, mth5_obj = initialize_pipeline(run_cfg)
+    mth5_path = kwargs.get("mth5_path", None)
+    run_config, mth5_obj = initialize_pipeline(run_cfg, mth5_path)
     print(
         f"config indicates {run_config.number_of_decimation_levels} "
         f"decimation levels to process: {run_config.decimation_level_ids}"

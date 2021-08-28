@@ -68,6 +68,34 @@ def initialize_mth5(h5_path, mode="w"):
     return mth5_obj
 
 
+def test_can_read_back_data(mth5_path, station_id, run_id):
+    """
+
+    Parameters
+    ----------
+    mth5_path : string or pathlib.Path
+        the full path the the mth5 that this method is going to try to read
+    station_id : string
+        the label for the station, e.g. "PKD"
+    run_id : string
+        The label for the run to read.  e.g. "001"
+
+    Returns
+    -------
+
+    """
+    processing_config = {}
+    processing_config["mth5_path"] = str(mth5_path)
+    processing_config["local_station_id"] = station_id
+    config = processing_config
+    m = MTH5()
+    m.open_mth5(config["mth5_path"], mode="r")
+    local_run_obj = m.get_run(config["local_station_id"], run_id)
+    local_run_ts = local_run_obj.to_runts()
+    print("success")
+    return local_run_obj, local_run_ts
+
+
 def mth5_from_iris_database(dataset_config, load_data=True, target_folder=Path()):
     """
     This can work in a way that uses data, or just initializes the mth5
