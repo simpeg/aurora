@@ -53,16 +53,16 @@ class TTFZ(TransferFunction):
         # rxy = self.T * (abs(Zxy) ** 2) / 5.
         # ryx = self.T * (abs(Zyx) ** 2) / 5.
         if units == "SI":
-            rxy = 2e-7 * self.T * (abs(Zxy) ** 2)
-            ryx = 2e-7 * self.T * (abs(Zyx) ** 2)
+            rxy = 2e-7 * self.periods * (abs(Zxy) ** 2)
+            ryx = 2e-7 * self.periods * (abs(Zyx) ** 2)
             print("STANDARD ERRORS NOT CORRECT FOR SI")
-            rxy_se = 2 * np.sqrt(self.T * rxy / 5) * Zxy_se
-            ryx_se = 2 * np.sqrt(self.T * ryx / 5) * Zyx_se
+            rxy_se = 2 * np.sqrt(self.periods * rxy / 5) * Zxy_se
+            ryx_se = 2 * np.sqrt(self.periods * ryx / 5) * Zyx_se
         elif units == "MT":
-            rxy = self.T * (abs(Zxy) ** 2) / 5.0
-            ryx = self.T * (abs(Zyx) ** 2) / 5.0
-            rxy_se = 2 * np.sqrt(self.T * rxy / 5) * Zxy_se
-            ryx_se = 2 * np.sqrt(self.T * ryx / 5) * Zyx_se
+            rxy = self.periods * (abs(Zxy) ** 2) / 5.0
+            ryx = self.periods * (abs(Zyx) ** 2) / 5.0
+            rxy_se = 2 * np.sqrt(self.periods * rxy / 5) * Zxy_se
+            ryx_se = 2 * np.sqrt(self.periods * ryx / 5) * Zyx_se
         else:
             print("ERROR: only SI and MT units supported")
             raise Exception

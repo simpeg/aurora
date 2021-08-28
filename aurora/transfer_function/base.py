@@ -13,7 +13,7 @@ continue to use integer indices to assign and access tf values if needed.
 However, one concern I have is that if we use floating point numbers for the
 frequencies (or periods) we run the risk of machine roundoff error giving
 problems down stream.  One way around this is to add a .band_centers()
-methdd to FrequencyBands() which will provide is a list of band centers and
+method to FrequencyBands() which will provide is a list of band centers and
 then rather than access by the band center, we can use an access method that
 gets us the frequencies between the band_egdes, which will be a unique frequency
 ... however, if we use overlapping bands this will in general get complicated.
@@ -162,7 +162,7 @@ class TransferFunction(object):
             coords={
                 "input_channel_1": self.tf_header.input_channels,
                 "input_channel_2": self.tf_header.input_channels,
-                "period": self.T,
+                "period": self.periods,
             },
         )
         # </Make inverse signal covariance>
@@ -176,7 +176,7 @@ class TransferFunction(object):
             coords={
                 "output_channel_1": self.tf_header.output_channels,
                 "output_channel_2": self.tf_header.output_channels,
-                "period": self.T,
+                "period": self.periods,
             },
         )
         # </Make inverse signal covariance>
@@ -184,17 +184,16 @@ class TransferFunction(object):
         self.R2 = xr.DataArray(
             np.zeros((self.num_channels_out, self.num_bands)),
             dims=["output_channel", "period"],
-            coords={"output_channel": self.tf_header.output_channels, "period": self.T},
+            coords={
+                "output_channel": self.tf_header.output_channels,
+                "period": self.periods,
+            },
         )
         self.initialized = True
 
     @property
-    def T(self):
-        return self.frequency_bands.band_centers(frequency_or_period="period")
-
-    @property
     def periods(self):
-        return self.T
+        return self.frequency_bands.band_centers(frequency_or_period="period")
 
     @property
     def minimum_period(self):
@@ -275,12 +274,12 @@ class TransferFunction(object):
             coords={
                 "output_channel": self.tf_header.output_channels,
                 "input_channel": self.tf_header.input_channels,
-                "period": self.T,
+                "period": self.periods,
             },
         )
         for out_ch in self.tf_header.output_channels:
             for inp_ch in self.tf_header.input_channels:
-                for T in self.T:
+                for T in self.periods:
                     cov_ss = self.cov_ss_inv.loc[inp_ch, inp_ch, T]
                     cov_nn = self.cov_nn.loc[out_ch, out_ch, T]
                     standard_error.loc[out_ch, inp_ch, T] = np.sqrt(cov_ss * cov_nn)
