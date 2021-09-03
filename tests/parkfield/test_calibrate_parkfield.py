@@ -34,6 +34,10 @@ def main():
     run_id = "001"
     station_id = "PKD"
     parkfield_h5_path = TEST_PATH.joinpath("parkfield", "data", "pkd_test_00.h5")
+    if not parkfield_h5_path.exists():
+        from make_parkfield_mth5 import test_make_parkfield_mth5
+
+        test_make_parkfield_mth5()
     m = MTH5()
     m.open_mth5(parkfield_h5_path, mode="r")
     run_obj = m.get_run(station_id, run_id)
