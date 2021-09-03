@@ -263,6 +263,8 @@ def process_mth5_run(
             local, remote = get_data_from_decimation_level_from_mth5(
                 processing_config, mth5_obj, run_id
             )
+
+            print("APPLY TIMING CORRECTIONS HERE")
         else:
             local = prototype_decimate(processing_config, local)
             if processing_config.reference_station_id:

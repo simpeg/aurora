@@ -13,10 +13,23 @@ class EffectiveDegreesOfFreedom(object):
         Parameters
         ----------
         kwargs
-        n_observations : integer
+        n_data : integer
         Notes number of "numeric" observations in the input and remote reference
         data.  Any time-frequency index having nan value in any channel is subtracted
-        from the total number of observations before computation of p1
+        from the total number of observations before computation of p1, p2
+
+        edfl1 : int or float
+             the effective number of degrees of freedom at which a datapoint should be
+              removed from the total energy calculation in the iterative loop
+        alpha : float
+            The exponent on n_data in formulae for thresholds p1 and p2
+        c1 : float
+            ad hoc parameter for scaling the p1 threshold
+        c2 : float
+            ad hoc parameter for scaling the p2 threshold
+        p3 : float
+            parameter controling the threshold at which the ratio of a data weighting
+        associated with remote and input channel is unaccepatble.
         """
 
         self.edfl1 = kwargs.get("edf_l1", 20.0)
@@ -29,14 +42,16 @@ class EffectiveDegreesOfFreedom(object):
     @property
     def p1(self):
         """
-        Adhoc parameter - needs documenation describing it
+        Threshold applied to edf.  All edf below  this value
+        are set to weight=0
         """
         return self.c1 * (self.n_data ** self.alpha)
 
     @property
     def p2(self):
         """
-        Adhoc parameter - needs documenation describing it
+        Threshold applied to edf.  All edf above th  this value
+        are set to weight=0
         """
         return self.c2 * (self.n_data ** self.alpha)
 
@@ -48,8 +63,10 @@ class EffectiveDegreesOfFreedom(object):
         Thus the edf weights change as use drops, EVEN FOR INDICES that were
         previously computed... this seems like it could be an error.
 
-        Let's assume its correct for now and program it.  We need a boolean (use) to
-        select the data.
+        Discussing this with Gary:
+        "... becuase you are downweighting (omitting) more and more highpower events
+        the total signal is going down.  The signal power goes down with every call
+        to this method"
 
         Parameters
         ----------
@@ -70,22 +87,18 @@ class EffectiveDegreesOfFreedom(object):
         If there are n data points contributing equally, each datapoint
         #should contribute ~1/n to its prediction
 
-        Note: If using h[2,1] feels unbalanced because it feels like there should be an
-        h(1,2) term in there,  the inverse of s does in general have h(2,1) = h(1,2).
-         ...An interesting property of covariance matrices., or at a minimum, 2x2
-         matirces with matching off-diagonal terms have an inverse with the same
-        property it seems.
-
+        Note: H = inv(S) in general has equal H[0,1] = H[1,0];  2x2 matrices with
+        matching off-diagonal terms have inverses with the same property.
 
         """
-        s = X[:, use] @ np.conj(X[:, use]).T  # covariance matrix, 2x2
-        s /= sum(use)
-        # covariance matrix, 2x2
-        h = np.linalg.inv(s)
-        # invert the 2x2
-        xx_term = np.real(X[0, :] * np.conj(X[0, :]) * h[0, 0])
-        yy_term = np.real(X[1, :] * np.conj(X[1, :]) * h[1, 1])
-        xy_term = 2 * np.real(np.conj(X[1, :]) * X[0, :] * h[1, 0])
+        S = X[:, use] @ np.conj(X[:, use]).T  # covariance matrix, 2x2
+        S /= sum(use)
+        H = np.linalg.inv(S)  # invert the 2x2
+
+        xx_term = np.real(X[0, :] * np.conj(X[0, :]) * H[0, 0])
+        yy_term = np.real(X[1, :] * np.conj(X[1, :]) * H[1, 1])
+        xy_term = 2 * np.real(np.conj(X[1, :]) * X[0, :] * H[1, 0])
+        # ?real or abs?
         edf = xx_term + yy_term + xy_term
         return edf
 
@@ -105,7 +118,7 @@ def effective_degrees_of_freedom_weights(X, R, edf_obj=None, test=True):
 
     This follows the matlab code by using a boolean index vector.  An xarray
     implementaiton which uses the observation dimension of X, R was started but never
-    finished.  Here are the breadcrumbs for that method:
+    finished.  Here are the breadcrumbs for the xarray method:
     0. Create weights:
     import xarray as xr
     X = X.assign(weights=lambda x: X.frequency*0+1.0)
@@ -123,8 +136,8 @@ def effective_degrees_of_freedom_weights(X, R, edf_obj=None, test=True):
     as dataarray for the assignement step.
 
     Things to review:
-    -Why is the Remote reference weighting not done with a while
-    loop like the input channels are??
+    -Why is the Remote reference weighting not done with a while loop?  This maybe
+    just an oversight in the matlab codes.
     - since we assign zero-weights to Nan, we could probably remove the keep_indices
     methods and simply assign nan or zero weights to those data up front. Since the
     "use" boolean selects data before computiation are performed on X, R we should
@@ -190,7 +203,12 @@ def effective_degrees_of_freedom_weights(X, R, edf_obj=None, test=True):
     use = np.ones(n_observations_numeric, dtype=bool)
     # initialize use as a boolean of True, as large as XX
     n_valid_observations = n_observations_numeric
-    # use never changes length, it only flips its bit
+    # "use" never changes length, it only flips its bit
+    # The while loop exits when n_valid_observations == sum(use)
+    # i.e.the effective dof are all below threshold
+    # Estimate dof.  Then we "use" only points whose dof are smaller than the
+    # threshold.  Then we recompute dof.  This time the covariance matrix diagonals
+    # are smaller, there is less energy in the time series for the S, H calculation.
     while nOmit > 0:
         eff_deg_of_freedom = edf_obj.compute_weights(XX, use)
         use = eff_deg_of_freedom <= edf_obj.edfl1  # update "use" boolean selector
@@ -202,6 +220,7 @@ def effective_degrees_of_freedom_weights(X, R, edf_obj=None, test=True):
     cond = (eff_deg_of_freedom <= edf_obj.p2) & (eff_deg_of_freedom > edf_obj.p1)
     wt[cond] = np.sqrt(edf_obj.p1 / eff_deg_of_freedom[cond])
 
+    # May want to add a loop in the RR
     if R is not None:
         # now find additional segments with crazy remotes
         wtRef = np.ones(n_observations_numeric)

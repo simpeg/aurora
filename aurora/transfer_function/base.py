@@ -239,9 +239,10 @@ class TransferFunction(object):
 
         tf = regression_estimator.b_to_xarray()
         output_channels = list(regression_estimator._Y.data_vars)
-        # for out_ch in self.tf_header.output_channels:
+        input_channels = list(regression_estimator._X.data_vars)
+
         for out_ch in output_channels:
-            for inp_ch in self.tf_header.input_channels:
+            for inp_ch in input_channels:
                 self.tf[:, :, index].loc[out_ch, inp_ch] = tf.loc[out_ch, inp_ch]
 
         if regression_estimator.noise_covariance is not None:
@@ -251,8 +252,8 @@ class TransferFunction(object):
                     self.cov_nn[:, :, index].loc[out_ch_1, out_ch_2] = tmp
 
         if regression_estimator.inverse_signal_covariance is not None:
-            for inp_ch_1 in self.tf_header.input_channels:
-                for inp_ch_2 in self.tf_header.input_channels:
+            for inp_ch_1 in input_channels:
+                for inp_ch_2 in input_channels:
                     tmp = regression_estimator.cov_ss_inv.loc[inp_ch_1, inp_ch_2]
                     self.cov_ss_inv[:, :, index].loc[inp_ch_1, inp_ch_2] = tmp
 
@@ -266,6 +267,13 @@ class TransferFunction(object):
         return
 
     def standard_error(self):
+        """
+        TODO: make this a property that returns self._standard_error so it doesn't
+        compute every time you call it.
+        Returns
+        -------
+
+        """
         stderr = np.zeros(self.tf.data.shape)
         standard_error = xr.DataArray(
             stderr,

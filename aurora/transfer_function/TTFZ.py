@@ -4,7 +4,6 @@ iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_1
 """
 import numpy as np
 
-# from aurora.transfer_function.TTF import TTF
 from aurora.transfer_function.base import TransferFunction
 
 
@@ -49,18 +48,18 @@ class TTFZ(TransferFunction):
         # standard deviation of real and imaginary parts of impedance
         Zxy_se = self.standard_error().loc["ex", "hy", :].data / np.sqrt(2)
         Zyx_se = self.standard_error().loc["ey", "hx", :].data / np.sqrt(2)
-        # apparent resistivities
-        # rxy = self.T * (abs(Zxy) ** 2) / 5.
-        # ryx = self.T * (abs(Zyx) ** 2) / 5.
+
         if units == "SI":
             rxy = 2e-7 * self.periods * (abs(Zxy) ** 2)
             ryx = 2e-7 * self.periods * (abs(Zyx) ** 2)
-            print("STANDARD ERRORS NOT CORRECT FOR SI")
+            # print("Correct the standard errors for SI units")
+            Zxy_se *= 1e-3
+            Zyx_se *= 1e-3
             rxy_se = 2 * np.sqrt(self.periods * rxy / 5) * Zxy_se
             ryx_se = 2 * np.sqrt(self.periods * ryx / 5) * Zyx_se
         elif units == "MT":
-            rxy = self.periods * (abs(Zxy) ** 2) / 5.0
-            ryx = self.periods * (abs(Zyx) ** 2) / 5.0
+            rxy = 2e-1 * self.periods * (abs(Zxy) ** 2)
+            ryx = 2e-1 * self.periods * (abs(Zyx) ** 2)
             rxy_se = 2 * np.sqrt(self.periods * rxy / 5) * Zxy_se
             ryx_se = 2 * np.sqrt(self.periods * ryx / 5) * Zyx_se
         else:

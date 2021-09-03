@@ -182,7 +182,7 @@ class WindowingScheme(ApodizationWindow):
         elif isinstance(data, xr.Dataset):
             ds = xr.Dataset()
             for key in data.keys():
-                print(f"key {key}")
+                # print(f"key {key}")
                 windowed_obj = self._apply_sliding_window_numpy(
                     data[key].data,
                     time_vector=data.time.data,
@@ -402,7 +402,7 @@ def fft_xr_ds(dataset, sample_rate, detrend_type=None, prewhitening=None):
 
     Parameters
     ----------
-    ds
+    dataset : xr.Dataset
 
     Returns
     -------
@@ -426,16 +426,17 @@ def fft_xr_ds(dataset, sample_rate, detrend_type=None, prewhitening=None):
 
     # <CORE METHOD>
     output_ds = xr.Dataset()
-    operation_axis = 1  # make this pick the "time" axis from xarray
+    # operation_axis = 1  # make this pick the "time" axis from xarray
+    time_coordinate_index = list(dataset.coords.keys()).index("time")
     if detrend_type:  # neither False nor None
         dataset = WindowedTimeSeries.detrend(
-            data=dataset, detrend_axis=operation_axis, detrend_type="linear"
+            data=dataset, detrend_axis=time_coordinate_index, detrend_type="linear"
         )
     for channel_id in dataset.keys():
         print(f"channel_id {channel_id}")
         data = dataset[channel_id].data
-        print("MAY NEED TO ADD DETRENDING OR PREWHITENING HERE AS PREP FOR FFT")
-        fspec_array = np.fft.fft(data, axis=1)
+        # Here is where you would add segment-by-segment prewhitening
+        fspec_array = np.fft.fft(data, axis=time_coordinate_index)
         fspec_array = fspec_array[:, 0:n_fft_harmonics]  # 1-sided
 
         xrd = xr.DataArray(

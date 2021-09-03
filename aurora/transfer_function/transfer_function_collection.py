@@ -46,9 +46,6 @@ class TransferFunctionCollection(object):
         This seems to insist that channels be ordered:
         Hx, Hy, Hz, Ex, Ey
 
-        # 120   format('period : ',f12.5,3x,' decimation level ',i3,3x,+       '
-        freq. band from ',i4,' to ',i4)
-
         Sample output for a band:
         period :      4.65455    decimation level   1    freq. band from   25 to   30
         number of data point   2489 sampling freq.   1.000 Hz
@@ -87,10 +84,12 @@ class TransferFunctionCollection(object):
         f.writelines(line)
         # </processing scheme>
 
+        # <station>
         # format('station    :', a20)
         station_line = f"station    :{self.header.local_station_id}"
         station_line += (32 - len(station_line)) * " " + "\n"
         f.writelines(station_line)
+        # </station>
 
         # <location>
         # 105   format('coordinate ',f9.3,1x,f9.3,1x,' declination ',f8.2)
@@ -134,7 +133,9 @@ class TransferFunctionCollection(object):
         # Given that the channel ordering is fixed (hxhyhzexey) and that hxhy
         # are always the input channels, the TF is ordered hzexey or exey
         # depending on 2 or 3 channels.
-        # Uses fortran style 120 here (see comments at top of function)
+        # 120   format('period : ',f12.5,3x,' decimation level ',i3,3x,+       '
+        # freq. band from ',i4,' to ',i4)
+
         data_format = ff.FortranRecordWriter("(16E12.4)")
         for i_dec in self.tf_dict.keys():
             tf = self.tf_dict[i_dec]
@@ -161,10 +162,10 @@ class TransferFunctionCollection(object):
                 line2 += f"sampling freq.   {tf.processing_config.sample_rate} Hz\n"
                 f.writelines(line2)
 
-                f.writelines(f"  Transfer Functions\n")
+                f.writelines("  Transfer Functions\n")
                 # write the tf:
-                # rows are output channels (hz, ex, ey), cols are input
-                # channels (hx, hy)
+                # rows are output channels (hz, ex, ey),
+                # columns are input channels (hx, hy)
                 period_index = tf.period_index(band.center_period)
                 line = ""
                 for out_ch in tf.tf_header.output_channels:
@@ -178,7 +179,7 @@ class TransferFunctionCollection(object):
                     line += "\n"
                 f.writelines(line)
 
-                f.writelines(f"    Inverse Coherent Signal Power Matrix\n")
+                f.writelines("    Inverse Coherent Signal Power Matrix\n")
                 line = ""
                 for i, inp_ch1 in enumerate(tf.tf_header.input_channels):
                     for inp_ch2 in tf.tf_header.input_channels[: i + 1]:
@@ -190,12 +191,10 @@ class TransferFunctionCollection(object):
                         imag_part = np.imag(chchss[period_index])
                         line += f"{data_format.write([real_part])}"
                         line += f"{data_format.write([imag_part])}"
-                        # line += f"{data_format.write([chchss_float])}"
-                        # line += f"{chchss.data[period_index]:.5f}  "
                     line += "\n"
                 f.writelines(line)
 
-                f.writelines(f"  Residual Covariance\n")
+                f.writelines("  Residual Covariance\n")
                 line = ""
                 for i, out_ch1 in enumerate(tf.tf_header.output_channels):
                     for out_ch2 in tf.tf_header.output_channels[: i + 1]:
@@ -207,9 +206,6 @@ class TransferFunctionCollection(object):
                         imag_part = np.imag(chchnn[period_index])
                         line += f"{data_format.write([real_part])}"
                         line += f"{data_format.write([imag_part])}"
-                        # chchnn_float = chchnn.data[period_index]
-                        # line += f"{data_format.write([chchnn_float])}"
-                        # line += f"{chchnn.data[period_index]:.5f}  "
                     line += "\n"
                 f.writelines(line)
 

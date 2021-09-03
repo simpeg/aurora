@@ -117,7 +117,9 @@ def run_ts_to_stft(config, run_xrts_orig):
 
     run_xrts = apply_prewhitening(config, run_xrts_orig)
 
-    windowed_obj = windowing_scheme.apply_sliding_window(run_xrts)
+    windowed_obj = windowing_scheme.apply_sliding_window(
+        run_xrts, dt=1.0 / config.sample_rate
+    )
     windowed_obj = WindowedTimeSeries.detrend(data=windowed_obj, detrend_type="linear")
 
     tapered_obj = windowed_obj * windowing_scheme.taper

@@ -225,7 +225,7 @@ def process_transfer_functions(
                 )
                 regression_estimator.estimate()
                 transfer_function_obj.set_tf(regression_estimator, band.center_period)
-
+            print("Add method for compute residuals and noise covariance")
         else:
             X, Y, RR = handle_nan(X, Y, RR, drop_dim="observation")
             regression_estimator = regression_class(

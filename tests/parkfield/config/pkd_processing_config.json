@@ -1,5 +1,5 @@
 {
-    "mth5_path": "/home/kkappler/software/irismt/aurora/tests/parkfield/pkd_test_00.h5",
+    "mth5_path": "/home/kkappler/software/irismt/aurora/tests/parkfield/data/pkd_test_00.h5",
     "decimation_level_id": 0,
     "decimation_factor": 1,
     "decimation_method": "default",
