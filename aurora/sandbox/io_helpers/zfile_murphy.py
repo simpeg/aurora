@@ -136,9 +136,6 @@ class ZFile:
 
             splitted_line1 = line.split("level")
             splitted_line2 = splitted_line1[1].split("freq")
-            match = re.match(
-                r"\s*period\s*:\s+(\d+\.?\d*)\s+" r"decimation\s+level", line
-            )
             self.decimation_levels[i] = int(splitted_line2[0].strip())
             splitted_line1 = line.split("from")
             splitted_line2 = splitted_line1[1].split("to")
@@ -351,11 +348,13 @@ class ZFile:
         return
 
 
-def test_reader():
+def test_reader(z_path=None):
     # import matplotlib.pyplot as plt
     from aurora.general_helper_functions import TEST_PATH
 
-    z_path = TEST_PATH.joinpath("synthetic", "emtf_output", "test1.zss")
+    if z_path is None:
+        print("DEFAULT ZFILE FROM SYNTHETIC TEST BEING LOADED")
+        z_path = TEST_PATH.joinpath("synthetic", "emtf_output", "test1.zss")
     z_obj = ZFile(z_path)
     z_obj.load()
     print(z_obj)

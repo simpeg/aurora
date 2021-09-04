@@ -13,6 +13,7 @@ import numpy as np
 from aurora.transfer_function.emtf_z_file_helpers import (
     make_orientation_block_of_z_file,
 )
+from aurora.transfer_function.plot.rho_phi_helpers import plot_rho
 
 EMTF_REGRESSION_ENGINE_LABELS = {}
 EMTF_REGRESSION_ENGINE_LABELS["RME"] = "Robust Single station"
@@ -146,7 +147,7 @@ class TransferFunctionCollection(object):
             periods = np.flip(periods)  # EMTF works in increasing period
             for band in tf.frequency_bands.bands(direction="increasing_period"):
                 line1 = f"period :      {band.center_period:.5f}    "
-                line1 += f"decimation level   {i_dec+1}:    "
+                line1 += f"decimation level   {i_dec+1}     "
                 # <Make a method of processing config?>
                 sample_rate = tf.processing_config.sample_rate
                 num_samples_window = tf.processing_config.num_samples_window
@@ -254,7 +255,8 @@ class TransferFunctionCollection(object):
                 aurora_rho = tf.rho[:, 0]
             else:
                 aurora_rho = tf.rho[:, 1]
-            axs[0].loglog(
+            plot_rho(
+                axs[0],
                 tf.periods,
                 aurora_rho,
                 marker="o",
@@ -263,7 +265,7 @@ class TransferFunctionCollection(object):
                 label=f"aurora {i_dec}",
                 markersize=markersize,
             )
-            axs[0].tick_params(axis="both", which="major", labelsize=16)
+
             # ax.tick_params(axis='both', which='minor', labelsize=8)
 
             if xy_or_yx == "xy":
@@ -291,7 +293,7 @@ class TransferFunctionCollection(object):
             if xy_or_yx == "xy":
                 emtf_rho = aux_data.rxy
                 emtf_phi = aux_data.pxy
-            else:
+            elif xy_or_yx == "yx":
                 emtf_rho = aux_data.ryx
                 emtf_phi = aux_data.pyx
 
