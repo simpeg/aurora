@@ -72,6 +72,13 @@ def test_process_mth5():
     # process_synthetic_1_underdetermined()
     # process_synthetic_1_with_nans()
     test_process_synthetic_1_standard(
+        assert_compare_result=False,
+        make_rho_phi_plot=True,
+        show_rho_phi_plot=False,
+        use_subtitle=True,
+        compare_against="matlab",
+    )
+    test_process_synthetic_1_standard(
         assert_compare_result=True,
         make_rho_phi_plot=True,
         show_rho_phi_plot=False,

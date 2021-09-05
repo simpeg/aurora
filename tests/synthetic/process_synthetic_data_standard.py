@@ -38,10 +38,14 @@ def test_process_synthetic_1_standard(
     if compare_against == "fortran":
         test_config = Path("config", "test1_run_config_standard.json")
         auxilliary_z_file = TEST_PATH.joinpath("synthetic", "emtf_output", "test1.zss")
+        expected_rms_rho_xy = 4.357440
+        expected_rms_phi_xy = 0.884601
     elif compare_against == "matlab":
         from aurora.general_helper_functions import SANDBOX
 
-        auxilliary_z_file = SANDBOX.joinpath("io_helpers", "from_matlab_clip.zss")
+        auxilliary_z_file = TEST_PATH.joinpath(
+            "synthetic", "emtf_output", "from_matlab_256_26.zss"
+        )
         test_config = Path("config", "test1_run_config_standard.json")
         config = RunConfig()
         config.from_json(test_config)
@@ -51,6 +55,7 @@ def test_process_synthetic_1_standard(
             config.decimation_level_configs[0].num_samples_overlap = 64
             config.decimation_level_configs[0].emtf_band_setup_file = band_setup_file
         print("overwrite")
+        test_config = config
     # </MATLAB>
 
     z_file_path = Path("test1_aurora.zss")
@@ -74,9 +79,10 @@ def test_process_synthetic_1_standard(
     print(f"rho_rms_aurora {rho_rms_aurora}")
     phi_rms_aurora = np.sqrt(np.mean((aurora_pxy - 45) ** 2))
     print(f"phi_rms_aurora {phi_rms_aurora}")
+
     if assert_compare_result:
-        assert np.isclose(rho_rms_aurora - 4.357440, 0, atol=1e-4)
-        assert np.isclose(phi_rms_aurora - 0.884601, 0, atol=1e-4)
+        assert np.isclose(rho_rms_aurora - expected_rms_rho_xy, 0, atol=1e-4)
+        assert np.isclose(phi_rms_aurora - expected_rms_phi_xy, 0, atol=1e-4)
     rho_rms_emtf = np.sqrt(np.mean((aux_data.rxy - 100) ** 2))
     phi_rms_emtf = np.sqrt(np.mean((aux_data.pxy - 45) ** 2))
     ttl_str = ""
@@ -124,7 +130,12 @@ def test_process_synthetic_1_standard(
 
 def main():
     create_config_file()
-    test_process_synthetic_1_standard()
+    test_process_synthetic_1_standard(
+        assert_compare_result=True, compare_against="fortran"
+    )
+    test_process_synthetic_1_standard(
+        assert_compare_result=False, compare_against="matlab"
+    )
     print("success")
 
 
