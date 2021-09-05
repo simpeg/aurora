@@ -1,3 +1,4 @@
+import numpy as np
 import scipy.io as sio
 
 from aurora.general_helper_functions import SANDBOX
@@ -87,6 +88,9 @@ tf_dict[3].cov_nn.data = cov_nn[:, :, 23:]
 tf_dict[3].cov_ss_inv.data = cov_ss[:, :, 23:]
 tf_dict[3].num_segments.data = n_data[:, 23:]
 tf_dict[3].R2.data = R2[:, 23:]
+
+for i_dec in range(4):
+    tf_dict[i_dec].tf.data = np.flip(tf_dict[i_dec].tf.data, axis=2)
 
 tfc = TransferFunctionCollection(header=tf_obj.tf_header, tf_dict=tf_dict)
 z_file_path = "from_matlab.zss"
