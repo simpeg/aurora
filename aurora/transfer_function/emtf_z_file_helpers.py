@@ -41,8 +41,6 @@ def make_orientation_block_of_z_file(run_obj):
                 [i_ch + 1, azimuth, tilt, station_id, emtf_channel_id]
             )
             out_str = f"{fortran_str}\n"
-            # out_str = f"{i_ch + 1}     {azimuth}     {tilt} " \
-            #     f"{station_id[0:3]} {emtf_channel_id}\n"
             output_strings.append(out_str)
         except:
             print(f"No channel {channel_id} in run")
