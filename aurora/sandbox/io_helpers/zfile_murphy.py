@@ -127,11 +127,6 @@ class ZFile:
             match = re.match(
                 r"\s*period\s*:\s+(\d+\.?\d*)\s+" r"decimation\s+level", line
             )
-            # self.periods[i] = float(
-            #     re.match(
-            #         r"\s*period\s*:\s+(\d+\.?\d*)\s+" r"decimation\s+level", line
-            #     ).group(1)
-            # )
             self.periods[i] = float(match.group(1))
 
             splitted_line1 = line.split("level")
@@ -336,8 +331,8 @@ class ZFile:
 
         return tipper, error
 
-    def apparent_resistivity(self):
-        z_tensor, error = self.impedance()
+    def apparent_resistivity(self, angle=0.0):
+        z_tensor, error = self.impedance(angle=angle)
         Zxy = z_tensor[:, 0, 1]
         Zyx = z_tensor[:, 1, 0]
         T = self.periods
@@ -348,29 +343,22 @@ class ZFile:
         return
 
 
-def test_reader(z_path=None):
-    # import matplotlib.pyplot as plt
-    from aurora.general_helper_functions import TEST_PATH
-
-    if z_path is None:
-        print("DEFAULT ZFILE FROM SYNTHETIC TEST BEING LOADED")
-        z_path = TEST_PATH.joinpath("synthetic", "emtf_output", "test1.zss")
-    z_obj = ZFile(z_path)
+def read_z_file(z_file_path):
+    z_obj = ZFile(z_file_path)
     z_obj.load()
     print(z_obj)
     print(z_obj.impedance())
     z_obj.apparent_resistivity()
+    return z_obj
 
-    # Zxy = z_tensor[:,0,1]
-    # Zyx = z_tensor[:, 1, 0]
-    # T = z_obj.periods
-    # rxy = T * (abs(Zxy) ** 2) / 5.
-    # ryx = T * (abs(Zyx) ** 2) / 5.
-    # pxy = np.rad2deg(np.arctan(np.imag(Zxy) / np.real(Zxy)))
-    # pyx = np.rad2deg(np.arctan(np.imag(Zyx) / np.real(Zyx)))
-    # aux_data = {"rxy": rxy, "ryz": ryx, "T": T, "pxy":pxy, "pyx":pyx}
-    # print(T)
-    # print(z_obj.decimation_levels)
+
+def test_reader(z_file_path=None):
+    from aurora.general_helper_functions import TEST_PATH
+
+    if z_file_path is None:
+        print("DEFAULT ZFILE FROM SYNTHETIC TEST BEING LOADED")
+        z_file_path = TEST_PATH.joinpath("synthetic", "emtf_output", "test1.zss")
+    z_obj = read_z_file(z_file_path)
     return z_obj
 
 

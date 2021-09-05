@@ -13,7 +13,9 @@ import numpy as np
 from aurora.transfer_function.emtf_z_file_helpers import (
     make_orientation_block_of_z_file,
 )
+from aurora.transfer_function.plot.rho_phi_helpers import plot_phi
 from aurora.transfer_function.plot.rho_phi_helpers import plot_rho
+
 
 EMTF_REGRESSION_ENGINE_LABELS = {}
 EMTF_REGRESSION_ENGINE_LABELS["RME"] = "Robust Single station"
@@ -266,8 +268,6 @@ class TransferFunctionCollection(object):
                 markersize=markersize,
             )
 
-            # ax.tick_params(axis='both', which='minor', labelsize=8)
-
             if xy_or_yx == "xy":
                 aurora_phi = tf.phi[:, 0]
             else:
@@ -275,7 +275,8 @@ class TransferFunctionCollection(object):
             # rotate phases so all are positive:
             negative_phi_indices = np.where(aurora_phi < 0)[0]
             aurora_phi[negative_phi_indices] += 180.0
-            axs[1].semilogx(
+            plot_phi(
+                axs[1],
                 tf.periods,
                 aurora_phi,
                 marker="o",
@@ -284,7 +285,6 @@ class TransferFunctionCollection(object):
                 label=f"aurora {i_dec}",
                 markersize=markersize,
             )
-            axs[1].tick_params(axis="both", which="major", labelsize=16)
 
         if aux_data:
             #            try:
@@ -320,22 +320,7 @@ class TransferFunctionCollection(object):
                     markersize=markersize,
                     label=f"emtf " f"{int(i_dec-1)}",
                 )
-        # except:
-        #     # for i_dec in aux_data.decimation_levels
-        #     axs[0].loglog(
-        #         aux_data.periods,
-        #         aux_data.rxy,
-        #         marker="s",
-        #         color="k",
-        #         linestyle="None",
-        #     )
-        #     axs[1].semilogx(
-        #         aux_data.periods,
-        #         aux_data.pxy,
-        #         marker="s",
-        #         color="k",
-        #         linestyle="None",
-        #     )
+
         axs[0].legend(ncol=2)
         axs[1].legend(ncol=2)
 

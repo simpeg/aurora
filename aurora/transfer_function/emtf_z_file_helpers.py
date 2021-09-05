@@ -19,6 +19,7 @@ def make_orientation_block_of_z_file(run_obj):
 
     based on this fortran snippet:
             write(3, 115) k, orient(1, k), orient(2, k), stname(1: 3), chid(k)
+    format(i5, 1x, f8.2, 1x, f8.2, 1x, a3, 2x, a6) #Fortran Format
     Parameters
     ----------
     run_obj
@@ -28,6 +29,7 @@ def make_orientation_block_of_z_file(run_obj):
 
     """
     output_strings = []
+    ff_format = ff.FortranRecordWriter("(i5, 1x, f8.2, 1x, f8.2, 1x, " "a3, 1x, a3)")
     for i_ch, channel_id in enumerate(EMTF_CHANNEL_ORDER):
         try:
             channel = run_obj.get_channel(channel_id)
@@ -35,10 +37,6 @@ def make_orientation_block_of_z_file(run_obj):
             tilt = channel.metadata.measurement_tilt
             station_id = run_obj.station_group.name
             emtf_channel_id = channel_id.capitalize()
-            # format(i5, 1x, f8.2, 1x, f8.2, 1x, a3, 2x, a6) #Fortran Format
-            ff_format = ff.FortranRecordWriter(
-                "(i5, 1x, f8.2, 1x, f8.2, 1x, " "a3, 1x, a3)"
-            )
             fortran_str = ff_format.write(
                 [i_ch + 1, azimuth, tilt, station_id, emtf_channel_id]
             )
@@ -49,6 +47,16 @@ def make_orientation_block_of_z_file(run_obj):
         except:
             print(f"No channel {channel_id} in run")
             pass
+        if not output_strings:
+            print("No channels found in run_object")
+            raise Exception
+            # print("Warning!!! This only works in case of synthetic test")
+            # output_strings.append("    1     0.00     0.00 tes  Hx\n")
+            # output_strings.append("    2    90.00     0.00 tes  Hy\n")
+            # output_strings.append("    3     0.00     0.00 tes  Hz\n")
+            # output_strings.append("    4     0.00     0.00 tes  Ex\n")
+            # output_strings.append("    5    90.00     0.00 tes  Ey\n")
+
     return output_strings
 
 

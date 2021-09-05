@@ -46,10 +46,10 @@ def process_synthetic_1_standard(
     tf_collection = process_mth5_run(
         test_config, run_id, units="MT", show_plot=False, z_file_path=z_file_path
     )
-    from aurora.sandbox.io_helpers.zfile_murphy import test_reader
+    from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
     import numpy as np
 
-    aux_data = test_reader()
+    aux_data = read_z_file(z_file_path)
 
     (
         aurora_rxy,
