@@ -18,6 +18,13 @@ def test_stft_methods_agree():
     )
     run_id = "001"
     mth5_path = TEST_PATH.joinpath("synthetic", "data", "test1.h5")
+
+    # ensure h5 exists
+    if not mth5_path.exists():
+        from make_mth5_from_asc import create_test1_h5
+
+        create_test1_h5()
+
     run_config, mth5_obj = initialize_pipeline(run_config, mth5_path=mth5_path)
 
     for dec_level_id in run_config.decimation_level_ids:
