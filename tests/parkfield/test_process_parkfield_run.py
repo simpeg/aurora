@@ -22,7 +22,7 @@ config = RunConfig()
 config.from_json(processing_run_cfg)
 band_setup_file = SANDBOX.joinpath("bs_256.cfg")
 for i_dec in config.decimation_level_ids:
-    config.decimation_level_configs[0].emtf_band_setup_file = band_setup_file
+    config.decimation_level_configs[i_dec].emtf_band_setup_file = band_setup_file
 processing_run_cfg = config
 
 tf_collection = process_mth5_run(

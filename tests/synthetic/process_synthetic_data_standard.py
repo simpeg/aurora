@@ -51,9 +51,11 @@ def test_process_synthetic_1_standard(
         config.from_json(test_config)
         band_setup_file = SANDBOX.joinpath("bs_256_26.cfg")
         for i_dec in config.decimation_level_ids:
-            config.decimation_level_configs[0].num_samples_window = 256
-            config.decimation_level_configs[0].num_samples_overlap = 64
-            config.decimation_level_configs[0].emtf_band_setup_file = band_setup_file
+            config.decimation_level_configs[i_dec].num_samples_window = 256
+            config.decimation_level_configs[i_dec].num_samples_overlap = 64
+            config.decimation_level_configs[
+                i_dec
+            ].emtf_band_setup_file = band_setup_file
         print("overwrite")
         test_config = config
     # </MATLAB>
