@@ -1,12 +1,11 @@
 from aurora.general_helper_functions import FIGURES_PATH
 from aurora.general_helper_functions import TEST_PATH
+from aurora.time_series.windowing_scheme import WindowingScheme
 from mth5.mth5 import MTH5
 from calibration_helpers import parkfield_sanity_check
 
 
-def test_bulk_spectra_have_correct_units(run_obj, run_ts_obj):
-    from aurora.time_series.windowing_scheme import WindowingScheme
-
+def validate_bulk_spectra_have_correct_units(run_obj, run_ts_obj):
     windowing_scheme = WindowingScheme(
         taper_family="hamming",
         num_samples_window=288000,
@@ -30,7 +29,7 @@ def test_bulk_spectra_have_correct_units(run_obj, run_ts_obj):
     )
 
 
-def main():
+def test():
     run_id = "001"
     station_id = "PKD"
     parkfield_h5_path = TEST_PATH.joinpath("parkfield", "data", "pkd_test_00.h5")
@@ -42,9 +41,11 @@ def main():
     m.open_mth5(parkfield_h5_path, mode="r")
     run_obj = m.get_run(station_id, run_id)
     run_ts_obj = run_obj.to_runts()
-    test_bulk_spectra_have_correct_units(run_obj, run_ts_obj)
+    validate_bulk_spectra_have_correct_units(run_obj, run_ts_obj)
 
-    return
+
+def main():
+    test()
 
 
 if __name__ == "__main__":
