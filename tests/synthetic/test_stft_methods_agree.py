@@ -16,9 +16,9 @@ def test_stft_methods_agree():
     run_config = TEST_PATH.joinpath(
         "synthetic", "config", "test1_run_config_standard.json"
     )
-    # run_config = Path("config", "test1_run_config_standard.json")
     run_id = "001"
-    run_config, mth5_obj = initialize_pipeline(run_config)
+    mth5_path = TEST_PATH.joinpath("synthetic", "data", "test1.h5")
+    run_config, mth5_obj = initialize_pipeline(run_config, mth5_path=mth5_path)
 
     for dec_level_id in run_config.decimation_level_ids:
         processing_config = run_config.decimation_level_configs[dec_level_id]

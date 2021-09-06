@@ -15,6 +15,13 @@ from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 
 DATA_PATH = TEST_PATH.joinpath("parkfield", "data")
 DATA_PATH.mkdir(exist_ok=True)
+FDSN_CHANNEL_MAP = {}
+FDSN_CHANNEL_MAP["BQ2"] = "BQ1"
+FDSN_CHANNEL_MAP["BQ3"] = "BQ2"
+FDSN_CHANNEL_MAP["BT1"] = "BF1"
+FDSN_CHANNEL_MAP["BT2"] = "BF2"
+FDSN_CHANNEL_MAP["BT3"] = "BF3"
+# def make_channels_fdsn_compliant(streams):
 
 
 def create_from_iris(dataset_id):
@@ -24,34 +31,38 @@ def create_from_iris(dataset_id):
     )
     translator = XMLInventoryMTExperiment()
     experiment = translator.xml_to_mt(inventory_object=inventory)
-    # experiment = get_experiment_from_obspy_inventory(inventory)
     run_metadata = experiment.surveys[0].stations[0].runs[0]
     target_folder = DATA_PATH
     h5_path = target_folder.joinpath(f"{dataset_config.dataset_id}.h5")
     mth5_obj = initialize_mth5(h5_path)
     mth5_obj.from_experiment(experiment)
+    print(
+        f"station_id = {dataset_config.station}"
+    )  # station_id in mth5_obj.station_list
+    print(f"network_id = {dataset_config.network}")
+    print(f"channel_ids = {dataset_config.channel_codes}")
 
-    start_time = UTCDateTime("2004-09-28T00:00:00.000000Z")
-    end_time = UTCDateTime("2004-09-28T01:59:59.975000Z")
-    station_id = "PKD"  # station_id in mth5_obj.station_list
-    network_id = "BK"
-    channel_ids = "BT1,BT2,BQ2,BQ3"
-    station_group = mth5_obj.get_station(station_id)
+    station_group = mth5_obj.get_station(dataset_config.station)
 
     client = fdsn.Client("IRIS")
     streams = client.get_waveforms(
-        network_id, station_id, None, channel_ids, start_time, end_time
+        dataset_config.network,
+        dataset_config.station,
+        None,
+        dataset_config.channel_codes,
+        dataset_config.starttime,
+        dataset_config.endtime,
     )
     # <REASSIGN NON-CONVENTIONAL CHANNEL LABELS (Q2, Q3, T1, T2)>
-    streams[0].stats["channel"] = "BQ1"
-    streams[1].stats["channel"] = "BQ2"
-    streams[2].stats["channel"] = "BF1"
-    streams[3].stats["channel"] = "BF2"
+    for stream in streams:
+        stream.stats["channel"] = FDSN_CHANNEL_MAP[stream.stats["channel"]]
     # </REASSIGN NON-CONVENTIONAL CHANNEL LABELS (Q2, Q3, T1, T2)>
 
+    # <This block is called often - should be a method>
     start_times = sorted(list(set([tr.stats.starttime.isoformat() for tr in streams])))
     end_times = sorted(list(set([tr.stats.endtime.isoformat() for tr in streams])))
     run_stream = streams.slice(UTCDateTime(start_times[0]), UTCDateTime(end_times[-1]))
+    # </This block is called often - should be a method>
     run_ts_obj = RunTS()
     run_ts_obj.from_obspy_stream(run_stream, run_metadata)
     run_id = "001"
@@ -70,8 +81,18 @@ def test_make_parkfield_mth5():
     test_can_read_back_data(h5_path, "PKD", "001")
 
 
+# <TEST FAILS BECAUSE DATA NOT AVAILABLE FROM IRIS -- NEED TO REQUEST FROM NCEDC>
+# def test_make_hollister_mth5():
+#     dataset_id = "sao_test_00"
+#     create_from_iris(dataset_id)
+#     h5_path = DATA_PATH.joinpath(f"{dataset_id}.h5")
+#     test_can_read_back_data(h5_path, "SAO", "001")
+# </TEST FAILS BECAUSE DATA NOT AVAILABLE FROM IRIS -- NEED TO REQUEST FROM NCEDC>
+
+
 def main():
     test_make_parkfield_mth5()
+    # test_make_hollister_mth5()
 
 
 if __name__ == "__main__":
