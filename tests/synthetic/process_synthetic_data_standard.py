@@ -9,6 +9,9 @@ from aurora.transfer_function.emtf_z_file_helpers import (
     merge_tf_collection_to_match_z_file,
 )
 
+SYNTHETIC_PATH = TEST_PATH.joinpath("synthetic")
+CONFIG_PATH = SYNTHETIC_PATH.joinpath("config")
+
 
 def create_config_file():
     pass
@@ -36,7 +39,8 @@ def test_process_synthetic_1_standard(
 
     """
     if compare_against == "fortran":
-        test_config = Path("config", "test1_run_config_standard.json")
+        test_config = CONFIG_PATH.joinpath("test1_run_config_standard.json")
+        # test_config = Path("config", "test1_run_config_standard.json")
         auxilliary_z_file = TEST_PATH.joinpath("synthetic", "emtf_output", "test1.zss")
         expected_rms_rho_xy = 4.357440
         expected_rms_phi_xy = 0.884601
@@ -46,7 +50,7 @@ def test_process_synthetic_1_standard(
         auxilliary_z_file = TEST_PATH.joinpath(
             "synthetic", "emtf_output", "from_matlab_256_26.zss"
         )
-        test_config = Path("config", "test1_run_config_standard.json")
+        test_config = CONFIG_PATH.joinpath("test1_run_config_standard.json")
         config = RunConfig()
         config.from_json(test_config)
         band_setup_file = SANDBOX.joinpath("bs_256_26.cfg")
