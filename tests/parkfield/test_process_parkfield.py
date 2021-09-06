@@ -1,6 +1,7 @@
 from pathlib import Path
+
+from aurora.config.processing_config import ProcessingConfig
 from aurora.sandbox.plot_helpers import plot_tf_obj
-from aurora.sandbox.processing_config import ProcessingConfig
 from aurora.time_series.frequency_band_helpers import configure_frequency_bands
 
 

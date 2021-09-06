@@ -1,8 +1,8 @@
 from pathlib import Path
 
+from aurora.config.processing_config import ProcessingConfig
+from aurora.config.processing_config import RunConfig
 from aurora.general_helper_functions import SANDBOX
-from aurora.sandbox.processing_config import ProcessingConfig
-from aurora.sandbox.processing_config import RunConfig
 
 
 # pass an mth5, it has: station_id, run_id, mth5_path, sample_rate

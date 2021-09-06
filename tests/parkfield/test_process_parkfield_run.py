@@ -1,8 +1,9 @@
 from pathlib import Path
+
+from aurora.config.processing_config import RunConfig
 from aurora.general_helper_functions import TEST_PATH
 from aurora.general_helper_functions import SANDBOX
 from aurora.pipelines.process_mth5 import process_mth5_run
-from aurora.sandbox.processing_config import RunConfig
 
 processing_run_cfg = Path(TEST_PATH, "parkfield", "config", "pkd_run_config.json")
 mth5_path = Path(TEST_PATH, "parkfield", "data", "pkd_test_00.h5")

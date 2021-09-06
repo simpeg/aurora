@@ -21,6 +21,9 @@ FDSN_CHANNEL_MAP["BQ3"] = "BQ2"
 FDSN_CHANNEL_MAP["BT1"] = "BF1"
 FDSN_CHANNEL_MAP["BT2"] = "BF2"
 FDSN_CHANNEL_MAP["BT3"] = "BF3"
+
+DATA_SOURCE = "IRIS"
+# DATA_SOURCE = "NCEDC"
 # def make_channels_fdsn_compliant(streams):
 
 
@@ -44,7 +47,7 @@ def create_from_iris(dataset_id):
 
     station_group = mth5_obj.get_station(dataset_config.station)
 
-    client = fdsn.Client("IRIS")
+    client = fdsn.Client(DATA_SOURCE)
     streams = client.get_waveforms(
         dataset_config.network,
         dataset_config.station,

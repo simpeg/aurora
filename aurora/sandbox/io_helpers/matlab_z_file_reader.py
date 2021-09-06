@@ -1,9 +1,9 @@
 import numpy as np
 import scipy.io as sio
 
+from aurora.config.processing_config import ProcessingConfig
 from aurora.general_helper_functions import SANDBOX
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
-from aurora.sandbox.processing_config import ProcessingConfig
 from aurora.time_series.frequency_band import FrequencyBands
 from aurora.transfer_function.plot.rho_phi_helpers import plot_phi
 from aurora.transfer_function.plot.rho_phi_helpers import plot_rho

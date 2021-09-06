@@ -8,11 +8,11 @@ to mth5_helpers.py for now.  Needs a clean up.
 import numpy as np
 from pathlib import Path
 
+from aurora.config.processing_config import ProcessingConfig
 from aurora.sandbox.io_helpers.make_dataset_configs import TEST_DATA_SET_CONFIGS
 from aurora.sandbox.io_helpers.test_data import get_example_array_list
 from aurora.sandbox.io_helpers.test_data import get_example_data
 from aurora.sandbox.xml_sandbox import describe_inventory_stages
-from aurora.sandbox.processing_config import ProcessingConfig
 from mt_metadata.timeseries import Experiment
 from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 from mth5.mth5 import MTH5

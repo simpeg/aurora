@@ -1,10 +1,10 @@
 import numpy as np
 from pathlib import Path
 
-from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
+from aurora.config.processing_config import RunConfig
 from aurora.general_helper_functions import TEST_PATH
 from aurora.pipelines.process_mth5 import process_mth5_run
-from aurora.sandbox.processing_config import RunConfig
+from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.transfer_function.emtf_z_file_helpers import (
     merge_tf_collection_to_match_z_file,
 )

@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from aurora.config.processing_config import RunConfig
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import run_ts_to_calibrated_stft
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
@@ -10,7 +11,6 @@ from aurora.pipelines.transfer_function_helpers import (
 )
 
 # from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
-from aurora.sandbox.processing_config import RunConfig
 from aurora.time_series.frequency_band_helpers import configure_frequency_bands
 from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
