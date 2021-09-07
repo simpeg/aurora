@@ -1,8 +1,10 @@
 from pathlib import Path
 
+# from aurora.config.config_creator_dev import ConfigCreator
 from aurora.config.decimation_level_config import DecimationLevelConfig
 from aurora.config.processing_config import RunConfig
-from aurora.general_helper_functions import SANDBOX
+
+from aurora.general_helper_functions import BAND_SETUP_PATH
 from aurora.general_helper_functions import TEST_PATH
 
 
@@ -29,8 +31,8 @@ def create_run_config_for_test_case(test_case_id):
             cfg.num_samples_window = 128
             cfg.num_samples_overlap = 32
             cfg.sample_rate = run_config.initial_sample_rate * downsample_factor
-            # cfg.emtf_band_setup_file = str(SANDBOX.joinpath("bs_256.cfg"))
-            cfg.emtf_band_setup_file = str(SANDBOX.joinpath("bs_test.cfg"))
+            # cfg.emtf_band_setup_file = str(BAND_SETUP_PATH.joinpath("bs_256.cfg"))
+            cfg.emtf_band_setup_file = str(BAND_SETUP_PATH.joinpath("bs_test.cfg"))
             cfg.estimation_engine = "RME"
             cfg.output_channels = ["hz", "ex", "ey"]
             if test_case_id == "test12rr":

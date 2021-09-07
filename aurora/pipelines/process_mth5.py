@@ -217,7 +217,7 @@ def get_data_from_decimation_level_from_mth5(config, mth5_obj, run_id):
 
 
 def process_mth5_run(
-    run_cfg, run_id, units="MT", show_plot=True, z_file_path=None, **kwargs
+    run_cfg, run_id, units="MT", show_plot=False, z_file_path=None, **kwargs
 ):
     """
     Stages here:

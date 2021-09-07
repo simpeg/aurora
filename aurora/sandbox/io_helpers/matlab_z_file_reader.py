@@ -2,7 +2,7 @@ import numpy as np
 import scipy.io as sio
 
 from aurora.config.decimation_level_config import DecimationLevelConfig
-from aurora.general_helper_functions import SANDBOX
+from aurora.general_helper_functions import BAND_SETUP_PATH
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.time_series.frequency_band import FrequencyBands
 from aurora.transfer_function.plot.rho_phi_helpers import plot_phi
@@ -13,7 +13,7 @@ from aurora.transfer_function.transfer_function_collection import (
 )
 from aurora.transfer_function.TTFZ import TTFZ
 
-bs_file = SANDBOX.joinpath("bs_256.cfg")
+bs_file = BAND_SETUP_PATH.joinpath("bs_256.cfg")
 z_mat = "TS1zss20210831.mat"
 frequency_bands = FrequencyBands()
 sample_rate = 1.0

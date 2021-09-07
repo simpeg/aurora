@@ -3,6 +3,7 @@ from pathlib import Path
 
 from aurora.config.processing_config import RunConfig
 from aurora.general_helper_functions import TEST_PATH
+from aurora.general_helper_functions import BAND_SETUP_PATH
 from aurora.pipelines.process_mth5 import process_mth5_run
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.transfer_function.emtf_z_file_helpers import (
@@ -45,15 +46,13 @@ def test_process_synthetic_1_standard(
         expected_rms_rho_xy = 4.357440
         expected_rms_phi_xy = 0.884601
     elif compare_against == "matlab":
-        from aurora.general_helper_functions import SANDBOX
-
         auxilliary_z_file = TEST_PATH.joinpath(
             "synthetic", "emtf_output", "from_matlab_256_26.zss"
         )
         test_config = CONFIG_PATH.joinpath("test1_run_config_standard.json")
         config = RunConfig()
         config.from_json(test_config)
-        band_setup_file = SANDBOX.joinpath("bs_256_26.cfg")
+        band_setup_file = BAND_SETUP_PATH.joinpath("bs_256_26.cfg")
         for i_dec in config.decimation_level_ids:
             config.decimation_level_configs[i_dec].num_samples_window = 256
             config.decimation_level_configs[i_dec].num_samples_overlap = 64
