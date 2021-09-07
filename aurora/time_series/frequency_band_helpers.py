@@ -95,7 +95,7 @@ def configure_frequency_bands(config):
 
     Parameters
     ----------
-    config : aurora.sandbox.processing_config.ProcessingConfig
+    config : aurora.config.decimation_level_config.DecimationLevelConfig
         The configuration parameters for setting up the frequency bands.
 
         If config["band_setup_style"] is "EMTF" this will look for one of

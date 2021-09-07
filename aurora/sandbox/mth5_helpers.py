@@ -8,7 +8,6 @@ to mth5_helpers.py for now.  Needs a clean up.
 import numpy as np
 from pathlib import Path
 
-from aurora.config.processing_config import ProcessingConfig
 from aurora.sandbox.io_helpers.make_dataset_configs import TEST_DATA_SET_CONFIGS
 from aurora.sandbox.io_helpers.test_data import get_example_array_list
 from aurora.sandbox.io_helpers.test_data import get_example_data
@@ -23,29 +22,30 @@ magnetic_xml_template = xml_path.joinpath("mtml_magnetometer_example.xml")
 electric_xml_template = xml_path.joinpath("mtml_electrode_example.xml")
 fap_xml_example = ""
 
-
-def ingest_config(processing_cfg):
-    """
-
-    Parameters
-    ----------
-    processing_cfg: path or str
-
-    Returns :
-    -------
-
-    """
-    if isinstance(processing_cfg, Path) or isinstance(processing_cfg, str):
-        config = ProcessingConfig()
-        config.from_json(processing_cfg)
-    else:
-        config = processing_cfg
-    return config
+#
+# from aurora.config.processing_config import RunConfig
+# def ingest_config(processing_cfg):
+#     """
+#
+#     Parameters
+#     ----------
+#     processing_cfg: path or str
+#
+#     Returns :
+#     -------
+#
+#     """
+#     if isinstance(processing_cfg, Path) or isinstance(processing_cfg, str):
+#         config = RunConfig()
+#         config.from_json(processing_cfg)
+#     else:
+#         config = processing_cfg
+#     return config
+#
 
 
 def initialize_mth5(h5_path, mode="w"):
     """
-
     Parameters
     ----------
     h5_path

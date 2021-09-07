@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.io as sio
 
-from aurora.config.processing_config import ProcessingConfig
+from aurora.config.decimation_level_config import DecimationLevelConfig
 from aurora.general_helper_functions import SANDBOX
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.time_series.frequency_band import FrequencyBands
@@ -39,7 +39,7 @@ for i_dec in range(4):
         reference_channels=[],
     )
     tf_obj = TTFZ(transfer_function_header, frequency_bands)
-    config = ProcessingConfig()
+    config = DecimationLevelConfig()
     config.sample_rate = sample_rate
     config.num_samples_window = 256
     tf_obj.processing_config = config

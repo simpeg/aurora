@@ -24,6 +24,7 @@ from mth5.mth5 import MTH5
 def initialize_pipeline(run_config, mth5_path=None):
     """
     A place to organize args and kwargs.
+    This could be split into initialize_config() and initialize_mth5()
 
     Parameters
     ----------
@@ -129,7 +130,7 @@ def process_mth5_decimation_level(config, local, remote, units="MT"):
     :return:
     Parameters
     ----------
-    config : ProcessingConfig (for a decimation level)
+    config : aurora.config.decimation_level_config.DecimationLevelConfig
     units
 
     Returns

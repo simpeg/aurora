@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from aurora.config.processing_config import ProcessingConfig
+from aurora.config.decimation_level_config import DecimationLevelConfig
 from aurora.sandbox.plot_helpers import plot_tf_obj
 from aurora.time_series.frequency_band_helpers import configure_frequency_bands
 
@@ -60,7 +60,7 @@ def main():
     cwd = os.getcwd()
     processing_cfg = Path(cwd, "config", "pkd_processing_config.json")
     # processing_cfg = Path(cwd, "config", "ascii_pkd_processing_config.json")
-    config = ProcessingConfig()
+    config = DecimationLevelConfig()
     config.from_json(processing_cfg)
     tf_obj = process_mth5_decimation_level(config, "001", units="SI")
     plot_tf_obj(tf_obj)

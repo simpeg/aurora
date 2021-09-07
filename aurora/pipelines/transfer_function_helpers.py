@@ -108,7 +108,7 @@ def get_band_for_tf_estimate(band, config, local_stft_obj, remote_stft_obj):
     band : aurora.time_series.frequency_band.FrequencyBand
         object with lower_bound and upper_bound to tell stft object which
         subarray to return
-    config : aurora.sandbox.processing_config.ProcessingConfig
+    config : aurora.config.decimation_level_config.DecimationLevelConfig
         information about the input and output channels needed for TF
         estimation problem setup
     local_stft_obj : xarray.core.dataset.Dataset or None

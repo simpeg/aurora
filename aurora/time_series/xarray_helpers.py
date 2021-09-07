@@ -28,7 +28,7 @@ def handle_nan(X, Y, RR, drop_dim=""):
     X : xr.Dataset
     Y : xr.Dataset or None
     RR : xr.Dataset or None
-    config : ProcessingConfig
+    config : aurora.config.decimation_level_config.DecimationLevelConfig
     drop_dim: string
         specifies the dimension on which dropna is happening.  For 3D STFT arrays
         this is "time", for 2D stacked STFT this is "observation"

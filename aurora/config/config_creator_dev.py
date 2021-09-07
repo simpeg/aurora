@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from aurora.config.processing_config import ProcessingConfig
+from aurora.config.decimation_level_config import DecimationLevelConfig
 from aurora.config.processing_config import RunConfig
 from aurora.general_helper_functions import SANDBOX
 
@@ -23,7 +23,7 @@ def create_run_config(station_id, run_id, mth5_path, sample_rate, **kwargs):
     for i_decimation_level in range(len(decimation_factors)):
         decimation_factor = decimation_factors[i_decimation_level]
         downsample_factor /= decimation_factor
-        cfg = ProcessingConfig()
+        cfg = DecimationLevelConfig()
         cfg.decimation_level_id = i_decimation_level
         cfg.decimation_factor = decimation_factor
         cfg.num_samples_window = num_samples_window
