@@ -5,8 +5,8 @@ from obspy.core import Trace
 from aurora.general_helper_functions import TEST_PATH
 from aurora.sandbox.io_helpers.make_dataset_configs import TEST_DATA_SET_CONFIGS
 from aurora.sandbox.mth5_helpers import get_experiment_from_obspy_inventory
-from aurora.sandbox.mth5_helpers import initialize_mth5
-from aurora.sandbox.mth5_helpers import test_can_read_back_data
+from aurora.pipelines.helpers import initialize_mth5
+from aurora.pipelines.helpers import read_back_data
 from mth5.timeseries import RunTS
 
 DATA_PATH = TEST_PATH.joinpath("parkfield", "data")
@@ -81,7 +81,7 @@ def test_make_parkfield_mth5_from_local():
     run_id = "001"
     create_from_local_data(dataset_id, run_id)
     h5_path = DATA_PATH.joinpath(f"{dataset_id}_from_local.h5")
-    test_can_read_back_data(h5_path, "PKD", run_id)
+    read_back_data(h5_path, "PKD", run_id)
 
 
 def main():

@@ -1,6 +1,4 @@
-from pathlib import Path
-
-from aurora.config.processing_config import RunConfig
+from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import run_ts_to_calibrated_stft
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
@@ -37,29 +35,23 @@ def initialize_pipeline(run_config, mth5_path=None):
 
     Returns
     -------
-
+    config : aurora.config.processing_config import RunConfig
+    mth5_obj :
     """
-    if isinstance(run_config, Path) or isinstance(run_config, str):
-        config = RunConfig()
-        config.from_json(run_config)
-    elif isinstance(run_config, RunConfig):
-        config = run_config
-    else:
-        print(f"Unrecognized config of type {type(run_config)}")
-        raise Exception
+    config = initialize_config(run_config)
 
-    # 20210828: add logic to support optional mth5_path argument (issue #75)
+    # <Initialize mth5 for reading>
     if mth5_path:
-        mth5_path = str(mth5_path)
         if config["mth5_path"] != str(mth5_path):
             print(
                 "Warning - the mth5 path supplied to initialize pipeline differs"
                 "from the one in the config file"
             )
             print(f"config path changing from \n{config['mth5_path']} to \n{mth5_path}")
-            config.mth5_path = mth5_path
+            config.mth5_path = str(mth5_path)
     mth5_obj = MTH5()
     mth5_obj.open_mth5(config["mth5_path"], mode="r")
+    # </Initialize mth5 for reading>
     return config, mth5_obj
 
 

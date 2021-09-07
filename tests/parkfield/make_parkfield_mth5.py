@@ -8,8 +8,8 @@ from obspy.clients import fdsn
 
 from aurora.general_helper_functions import TEST_PATH
 from aurora.sandbox.io_helpers.make_dataset_configs import TEST_DATA_SET_CONFIGS
-from aurora.sandbox.mth5_helpers import initialize_mth5
-from aurora.sandbox.mth5_helpers import test_can_read_back_data
+from aurora.pipelines.helpers import initialize_mth5
+from aurora.pipelines.helpers import read_back_data
 from mth5.timeseries import RunTS
 from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 
@@ -81,7 +81,7 @@ def test_make_parkfield_mth5():
     dataset_id = "pkd_test_00"
     create_from_iris(dataset_id)
     h5_path = DATA_PATH.joinpath(f"{dataset_id}.h5")
-    test_can_read_back_data(h5_path, "PKD", "001")
+    read_back_data(h5_path, "PKD", "001")
 
 
 # <TEST FAILS BECAUSE DATA NOT AVAILABLE FROM IRIS -- NEED TO REQUEST FROM NCEDC>
@@ -89,7 +89,7 @@ def test_make_parkfield_mth5():
 #     dataset_id = "sao_test_00"
 #     create_from_iris(dataset_id)
 #     h5_path = DATA_PATH.joinpath(f"{dataset_id}.h5")
-#     test_can_read_back_data(h5_path, "SAO", "001")
+#     read_back_data(h5_path, "SAO", "001")
 # </TEST FAILS BECAUSE DATA NOT AVAILABLE FROM IRIS -- NEED TO REQUEST FROM NCEDC>
 
 

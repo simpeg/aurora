@@ -8,90 +8,19 @@ to mth5_helpers.py for now.  Needs a clean up.
 import numpy as np
 from pathlib import Path
 
+from aurora.pipelines.helpers import initialize_mth5
 from aurora.sandbox.io_helpers.make_dataset_configs import TEST_DATA_SET_CONFIGS
 from aurora.sandbox.io_helpers.test_data import get_example_array_list
 from aurora.sandbox.io_helpers.test_data import get_example_data
 from aurora.sandbox.xml_sandbox import describe_inventory_stages
 from mt_metadata.timeseries import Experiment
 from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
-from mth5.mth5 import MTH5
 
 HEXY = ["hx", "hy", "ex", "ey"]  # default components list
 xml_path = Path("/home/kkappler/software/irismt/mt_metadata/data/xml")
 magnetic_xml_template = xml_path.joinpath("mtml_magnetometer_example.xml")
 electric_xml_template = xml_path.joinpath("mtml_electrode_example.xml")
 fap_xml_example = ""
-
-#
-# from aurora.config.processing_config import RunConfig
-# def ingest_config(processing_cfg):
-#     """
-#
-#     Parameters
-#     ----------
-#     processing_cfg: path or str
-#
-#     Returns :
-#     -------
-#
-#     """
-#     if isinstance(processing_cfg, Path) or isinstance(processing_cfg, str):
-#         config = RunConfig()
-#         config.from_json(processing_cfg)
-#     else:
-#         config = processing_cfg
-#     return config
-#
-
-
-def initialize_mth5(h5_path, mode="w"):
-    """
-    Parameters
-    ----------
-    h5_path
-    mode
-
-    Returns
-    -------
-
-    """
-    if h5_path is None:
-        h5_path = Path("test.h5")
-    else:
-        h5_path = Path(h5_path)
-    if h5_path.exists():
-        h5_path.unlink()
-    mth5_obj = MTH5()
-    mth5_obj.open_mth5(str(h5_path), "w")
-    return mth5_obj
-
-
-def test_can_read_back_data(mth5_path, station_id, run_id):
-    """
-
-    Parameters
-    ----------
-    mth5_path : string or pathlib.Path
-        the full path the the mth5 that this method is going to try to read
-    station_id : string
-        the label for the station, e.g. "PKD"
-    run_id : string
-        The label for the run to read.  e.g. "001"
-
-    Returns
-    -------
-
-    """
-    processing_config = {}
-    processing_config["mth5_path"] = str(mth5_path)
-    processing_config["local_station_id"] = station_id
-    config = processing_config
-    m = MTH5()
-    m.open_mth5(config["mth5_path"], mode="r")
-    local_run_obj = m.get_run(config["local_station_id"], run_id)
-    local_run_ts = local_run_obj.to_runts()
-    print("success")
-    return local_run_obj, local_run_ts
 
 
 def mth5_from_iris_database(dataset_config, load_data=True, target_folder=Path()):
