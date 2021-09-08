@@ -153,9 +153,9 @@ def create_mth5_synthetic_file(station_cfg, plot=False, add_nan_values=False):
     return
 
 
-def create_mth5_synthetic_file_for_array(
-    station_cfgs, h5_name=Path("data", "test12rr.h5"), plot=False
-):
+def create_mth5_synthetic_file_for_array(station_cfgs, h5_name="", plot=False):
+    # set name for output h5 file
+    h5_name = station_cfgs[0]["mth5_path"].__str__().replace("test1.h5", "test12rr.h5")
     # open an MTH5
     m = MTH5()
     m.open_mth5(h5_name, mode="w")
@@ -191,9 +191,13 @@ def create_test1_h5():
     create_mth5_synthetic_file(STATION_01_CFG, plot=False)
 
 
-def main():
+def create_test1_h5_with_nan():
     create_mth5_synthetic_file(STATION_01_CFG, plot=False, add_nan_values=True)
+
+
+def main():
     create_test1_h5()
+    create_test1_h5_with_nan()
     create_mth5_synthetic_file(STATION_02_CFG)
     create_mth5_synthetic_file_for_array([STATION_01_CFG, STATION_02_CFG])
 
