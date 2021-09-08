@@ -8,9 +8,17 @@ class DecimationLevelConfig(BaseDict):
     """
     ToDo: Deprecate mth5_path from this level after addressing strategy in
     issue #13
+
     """
 
     def __init__(self, *args, **kwargs):
+        """
+
+        Parameters
+        ----------
+        arg
+        kwargs
+        """
         self.mth5_path = kwargs.get("mth5_path", "")  # str or Path()
 
         # <DECIMATION CONFIG>
@@ -58,7 +66,7 @@ class DecimationLevelConfig(BaseDict):
         # </STATIONS>
 
         # <ESTIMATION>
-        self.estimation_engine = "OLS"  # RME
+        self.estimation_engine = kwargs.get("estimation_engine", "OLS")  # RME
         self.estimate_per_channel = (
             True  # all channels at once or one channel at a time
         )

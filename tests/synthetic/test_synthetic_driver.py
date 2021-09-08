@@ -1,5 +1,4 @@
-from pathlib import Path
-
+from aurora.general_helper_functions import TEST_PATH
 from aurora.pipelines.process_mth5 import process_mth5_run
 
 from make_mth5_from_asc import create_test1_h5
@@ -7,6 +6,9 @@ from make_mth5_from_asc import create_test2_h5
 from make_mth5_from_asc import create_test12rr_h5
 from make_synthetic_processing_configs import create_run_config_for_test_case
 from synthetic_station_config import STATION_01_CFG
+
+
+CONFIG_PATH = TEST_PATH.joinpath("synthetic", "config")
 
 
 def test_create_mth5():
@@ -31,7 +33,8 @@ def process_synthetic_1_underdetermined():
     -------
 
     """
-    test_config = Path("config", "test1_run_config_underdetermined.json")
+    test_config = CONFIG_PATH.joinpath("test1_run_config_underdetermined.json")
+    # test_config = Path("config", "test1_run_config_underdetermined.json")
     run_id = "001"
     process_mth5_run(test_config, run_id, units="MT")
 
@@ -43,25 +46,29 @@ def process_synthetic_1_with_nans():
     -------
 
     """
-    test_config = Path("config", "test1_run_config_nan.json")
+    test_config = CONFIG_PATH.joinpath("test1_run_config_nan.json")
+    #    test_config = Path("config", "test1_run_config_nan.json")
     run_id = "001"
     process_mth5_run(test_config, run_id, units="MT")
 
 
 def process_synthetic_1():
-    test_config = Path("config", "test1_run_config.json")
+    test_config = CONFIG_PATH.joinpath("test1_run_config.json")
+    # test_config = Path("config", "test1_run_config.json")
     run_id = "001"
     process_mth5_run(test_config, run_id, units="MT")
 
 
 def process_synthetic_2():
-    test_config = Path("config", "test2_run_config.json")
+    test_config = CONFIG_PATH.joinpath("test2_run_config.json")
+    # test_config = Path("config", "test2_run_config.json")
     run_id = "001"
     process_mth5_run(test_config, run_id, units="MT")
 
 
 def process_synthetic_rr12():
-    test_config = Path("config", "test12rr_run_config.json")
+    test_config = CONFIG_PATH.joinpath("test12rr-RR_test2_run_config.json")
+    # test_config = Path("config", "test12rr_run_config.json")
     run_id = STATION_01_CFG["run_id"]
     process_mth5_run(test_config, run_id, units="MT")
 
@@ -77,7 +84,7 @@ def test_process_mth5():
 
 def main():
     test_create_mth5()
-    # test_create_run_configs()
+    test_create_run_configs()
     test_process_mth5()
 
 

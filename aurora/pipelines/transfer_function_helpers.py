@@ -21,7 +21,7 @@ from aurora.transfer_function.weights.edf_weights import (
     effective_degrees_of_freedom_weights,
 )
 
-REGRESSION_LIBRARY = {"OLS": RegressionEstimator, "RME": TRME, "TRME_RR": TRME_RR}
+REGRESSION_LIBRARY = {"OLS": RegressionEstimator, "RME": TRME, "RME_RR": TRME_RR}
 
 
 def get_regression_class(config):
@@ -48,7 +48,7 @@ def set_up_iter_control(config):
     -------
 
     """
-    if config.estimation_engine in ["RME", "TRME_RR"]:
+    if config.estimation_engine in ["RME", "RME_RR"]:
         iter_control = IterControl(
             max_number_of_iterations=config.max_number_of_iterations
         )

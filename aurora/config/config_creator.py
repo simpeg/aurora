@@ -37,6 +37,8 @@ class ConfigCreator(object):
         output_channels = kwargs.get("output_channels", ["hz", "ex", "ey"])
         band_setup_file = kwargs.get("band_setup_file", default_band_setup)
         reference_station_id = kwargs.get("reference_station_id", "")
+        reference_channels = kwargs.get("reference_channels", [])
+        estimation_engine = kwargs.get("estimation_engine", "RME")
 
         if reference_station_id:
             reference_mth5_path = kwargs.get("reference_mth5_path", mth5_path)
@@ -67,8 +69,9 @@ class ConfigCreator(object):
             cfg.sample_rate = run_config.initial_sample_rate * downsample_factor
             cfg.band_setup_style = "EMTF"
             cfg.emtf_band_setup_file = band_setup_file
-            cfg.estimation_engine = "RME"
+            cfg.estimation_engine = estimation_engine
             cfg.output_channels = output_channels
+            cfg.reference_channels = reference_channels
             run_config.decimation_level_configs[i_decimation_level] = cfg
 
         json_fn = run_config.config_id + "_run_config.json"

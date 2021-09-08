@@ -23,9 +23,7 @@ def create_decimation_level_test_config():
 
 
 def create_run_test_config():
-    # cfg = RunConfig()
     mth5_path = DATA_PATH.joinpath("pkd_test_00.h5")
-    # output_json = CONFIG_PATH.joinpath("test_parkfield_run.cfg")
     cc = ConfigCreator(config_path=CONFIG_PATH)
     run_config_path = cc.create_run_config(
         station_id="PKD",
