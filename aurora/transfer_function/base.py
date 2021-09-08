@@ -96,13 +96,22 @@ class TransferFunction(object):
 
     @property
     def num_bands(self):
-        # temporary function to allow access to old property num_bands used in
-        # the matlab codes for initialization
+        """
+        temporary function to allow access to old property num_bands used in
+        the matlab codes for initialization
+        Returns num_bands : int
+            a count of the frequency bands associated with the TF
+        -------
+
+        """
         return self.frequency_bands.number_of_bands
 
     @property
     def periods(self):
-        return self.frequency_bands.band_centers(frequency_or_period="period")
+        periods = self.frequency_bands.band_centers(frequency_or_period="period")
+        periods = np.flipud(periods)
+        return periods
+        # return self.frequency_bands.band_centers(frequency_or_period="period")
 
     def _initialize_arrays(self):
         """
@@ -216,10 +225,10 @@ class TransferFunction(object):
         return self.tf_header.num_output_channels
 
     def frequency_index(self, frequency):
-        print("BUG HERE")
-        frequency_index = np.isclose(self.num_segments.frequency, frequency)
-        frequency_index = np.where(frequency_index)[0][0]
-        return frequency_index
+        return self.period_index(1.0 / frequency)
+        # frequency_index = np.isclose(self.num_segments.frequency, frequency)
+        # frequency_index = np.where(frequency_index)[0][0]
+        # return frequency_index
 
     def period_index(self, period):
         period_index = np.isclose(self.num_segments.period, period)

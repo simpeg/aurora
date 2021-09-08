@@ -74,6 +74,36 @@ class TransferFunctionCollection(object):
         merged = merged.to_array(dim="period")
         merged_output["tf"] = merged
 
+        # <MAKE XARRAY WITH tzx, tzy, zxx, zxy, zyx, zyy NOMENCLATURE>
+        tmp_tipper = merged.sel(output_channel="hz")
+        tmp_tipper = tmp_tipper.reset_coords(drop="output_channel")
+        # tmp_tipper = tmp_tipper.rename({"input_channel":"component"})
+        # tmp_tipper = tmp_tipper.to_dataset("component")
+        tmp_tipper = tmp_tipper.to_dataset("input_channel")
+        tf_xarray = tmp_tipper.rename({"hx": "tzx", "hy": "tzy"})
+
+        zxx = merged.sel(output_channel="ex", input_channel="hx")
+        zxx = zxx.reset_coords(drop=["input_channel", "output_channel"])
+        zxx = zxx.to_dataset(name="zxx")
+        tf_xarray = tf_xarray.merge(zxx)
+
+        zxy = merged.sel(output_channel="ex", input_channel="hy")
+        zxy = zxy.reset_coords(drop=["input_channel", "output_channel"])
+        zxy = zxy.to_dataset(name="zxy")
+        tf_xarray = tf_xarray.merge(zxy)
+
+        zyx = merged.sel(output_channel="ey", input_channel="hx")
+        zyx = zyx.reset_coords(drop=["input_channel", "output_channel"])
+        zyx = zyx.to_dataset(name="zyx")
+        tf_xarray = tf_xarray.merge(zyx)
+
+        zyy = merged.sel(output_channel="ey", input_channel="hy")
+        zyy = zyy.reset_coords(drop=["input_channel", "output_channel"])
+        zyy = zyy.to_dataset(name="zyy")
+        tf_xarray = tf_xarray.merge(zyy)
+        merged_output["tf_xarray"] = tf_xarray
+        # </MAKE XARRAY WITH tzx, tzy, zxx, zxy, zyx, zyy NOMENCLATURE>
+
         tmp = [self.tf_dict[i].cov_ss_inv.to_dataset("period") for i in range(n_dec)]
         merged = xr.combine_by_coords(tmp)
         merged = merged.to_array("period")
@@ -84,7 +114,7 @@ class TransferFunctionCollection(object):
         merged = merged.to_array("period")
         merged_output["cov_nn"] = merged
 
-        print("OK")
+        return merged_output
 
     def write_emtf_z_file(self, z_file_path, run_obj=None):
         """
