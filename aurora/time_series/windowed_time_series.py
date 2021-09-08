@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.interpolate import interp1d
 import scipy.signal as ssig
 from aurora.time_series.decorators import can_use_xr_dataarray
 
@@ -211,3 +212,28 @@ class WindowedTimeSeries(object):
         spectral_ds = fft_xr_ds(data, sampling_rate, detrend_type=detrend_type)
         spectral_ds *= spectral_density_calibration
         return spectral_ds
+
+    def delay_correction(self, dataset, run_obj):
+        """
+
+        Parameters
+        ----------
+        dataset : xr.Dataset
+        run_obj :
+
+        Returns
+        -------
+
+        """
+        print("NOT TESTED - PSEUDOCODE ONLY")
+        for channel_id in dataset.keys():
+            mth5_channel = run_obj.get_channel(channel_id)
+            channel_filter = mth5_channel.channel_response_filter
+            delay_in_seconds = channel_filter.total_delay
+            true_time_axis = dataset.time + delay_in_seconds
+            interpolator = interp1d(
+                true_time_axis, dataset[channel_id].data, assume_sorted=True
+            )
+            corrected_data = interpolator(dataset.time)
+            dataset[channel_id].data = corrected_data
+        return dataset

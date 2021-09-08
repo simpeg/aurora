@@ -17,20 +17,7 @@ Filter application info: they always have either "value" or "poles_zeros"
 
 
 import datetime
-import lxml
-import matplotlib.pyplot as plt
-import numpy as np
-import obspy
-import os
-import pandas as pd
-import pdb
-#import xmltodict as xd
 
-from pathlib import Path
-
-from aurora.general_helper_functions import FIGURES_PATH
-
-from mt_metadata.base.helpers import element_to_dict
 from mt_metadata.timeseries import Station
 
 from obspy.clients.fdsn import Client
@@ -49,21 +36,27 @@ def test_instantiate_and_export_mth5_metadata_example():
     print("test_instantiate_and_export_mth5_metadata_example")
     mt_station = Station()
     json_string = mt_station.to_json(required=False, nested=True)
-    f = open('meta.json', 'w')
+    f = open("meta.json", "w")
     f.write(json_string)
     f.close()
     return
 
 
-def get_response_inventory_from_iris(network=None, station=None, channel=None,
-                            starttime=None, endtime=None, level="response"):
+def get_response_inventory_from_iris(
+    network=None,
+    station=None,
+    channel=None,
+    starttime=None,
+    endtime=None,
+    level="response",
+):
     """
 
     Parameters
     ----------
     network     network = "BK"
     station
-    channel     channel = "LQ2,LQ3,LT1,LT2".  If you leave it as None it will get all channels
+    channel     channel = "LQ2,LQ3,LT1,LT2".  If None it will get all channels
     starttime
     endtime
     station_id
@@ -73,12 +66,14 @@ def get_response_inventory_from_iris(network=None, station=None, channel=None,
 
     """
     client = Client(base_url="IRIS", force_redirect=True)
-    inventory = client.get_stations(network=network,
-                                    station=station,
-                                    channel=channel,
-                                    starttime=starttime,
-                                    endtime=endtime,
-                                    level=level)
+    inventory = client.get_stations(
+        network=network,
+        station=station,
+        channel=channel,
+        starttime=starttime,
+        endtime=endtime,
+        level=level,
+    )
     return inventory
 
 
@@ -87,11 +82,11 @@ def test_get_example_em_xml_from_iris_via_web():
     client = Client(base_url="IRIS", force_redirect=True)
     starttime = UTCDateTime("2015-01-09")
     endtime = UTCDateTime("2015-01-20")
-    inventory = client.get_stations(network="XX", station="EMXXX",
-    starttime=starttime,
-    endtime=endtime)
-    network  = inventory[0] #obspy.core.inventory.network.Network
-    print('ok')
+    inventory = client.get_stations(
+        network="XX", station="EMXXX", starttime=starttime, endtime=endtime
+    )
+    network = inventory[0]  # obspy.core.inventory.network.Network
+    print(f"network {network}")
 
 
 def test_get_example_xml_inventory():
@@ -99,7 +94,7 @@ def test_get_example_xml_inventory():
     test_file_name = "fdsn-station_2021-03-09T04_44_51.xml"
     inventory = read_inventory(test_file_name)
     iterate_through_mtml(inventory)
-    print('ok')
+    print("ok")
 
 
 def describe_inventory_stages(inventory, assign_names=False):
@@ -121,12 +116,14 @@ def describe_inventory_stages(inventory, assign_names=False):
     for network in networks:
         for station in network:
             for channel in station:
-                response =  channel.response
+                response = channel.response
                 stages = response.response_stages
-                info = f"{network.code}-{station.code}-{channel.code}" \
+                info = (
+                    f"{network.code}-{station.code}-{channel.code}"
                     f" {len(stages)}-stage response"
+                )
                 print(info)
-                for i,stage in enumerate(stages):
+                for i, stage in enumerate(stages):
                     print(f"stagename {stage.name}")
                     if stage.name is None:
                         if assign_names:
@@ -146,20 +143,18 @@ def describe_inventory_stages(inventory, assign_names=False):
                         # plt.title(f"{stage.name}; symmetry: {stage.symmetry}")
                         # plt.savefig(FIGURES_BUCKET.joinpath(f
                         # "{stage.name}.png"))
-                        #plt.show()
+                        # plt.show()
     if new_names_were_assigned:
         inventory.networks = networks
         print("Inventory Networks Reassigned")
     return
 
 
-
-
 def iterate_through_mtml(networks):
     """
     Starting from pseudocode recommended by Tim
     20210203: So far all obspy XML encountered have had only a single network.
-    
+
     Returns
     -------
     type networks: obspy.core.inventory.inventory.Inventory
@@ -167,26 +162,25 @@ def iterate_through_mtml(networks):
     for network in networks:
         for station in network:
             for channel in station:
-                response =  channel.response
+                response = channel.response
                 stages = response.response_stages
-                info = '{}-{}-{} {}-stage response'.format(network.code, station.code, channel.code, len(stages))
+                info = "{}-{}-{} {}-stage response".format(
+                    network.code, station.code, channel.code, len(stages)
+                )
                 print(info)
 
                 for stage in stages:
-                    #pass
-                    print('stage {}'.format(stage))
-
-
-
+                    # pass
+                    print("stage {}".format(stage))
 
 
 def main():
-    """
-    """
+    """ """
     test_instantiate_and_export_mth5_metadata_example()
     test_get_example_xml_inventory()
     test_get_example_em_xml_from_iris_via_web()
     print("finito {}".format(datetime.datetime.now()))
+
 
 if __name__ == "__main__":
     main()

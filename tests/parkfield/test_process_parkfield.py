@@ -1,12 +1,10 @@
-from pathlib import Path
 from aurora.sandbox.plot_helpers import plot_tf_obj
 from aurora.time_series.frequency_band_helpers import configure_frequency_bands
 
-processing_cfg = Path("config", "pkd_processing_config.json")
-processing_cfg = Path("config", "ascii_pkd_processing_config.json")
+from make_processing_configs import create_decimation_level_test_config
 
 
-def process_mth5_decimation_level(processing_cfg, run_id, units="MT"):
+def process_mth5_decimation_level(config, run_id, units="MT"):
     """
     20210718: Moved this code out of process_mth5 to keep this test passing.
     This will be replaced with process_mth5_run as soon as the configs have
@@ -19,26 +17,14 @@ def process_mth5_decimation_level(processing_cfg, run_id, units="MT"):
     :param processing_cfg:
     :return:
     """
-    from pathlib import Path
-    from aurora.sandbox.processing_config import ProcessingConfig
-    from mth5.mth5 import MTH5
-    from aurora.pipelines.processing_helpers import process_transfer_functions
-
-    # from aurora.pipelines.processing_helpers import run_ts_to_stft
-    # from aurora.pipelines.processing_helpers import calibrate_stft_obj
-    from aurora.pipelines.processing_helpers import run_ts_to_calibrated_stft
-    from aurora.pipelines.processing_helpers import transfer_function_header_from_config
-    from aurora.pipelines.processing_helpers import validate_sample_rate
+    from aurora.pipelines.time_series_helpers import run_ts_to_calibrated_stft
+    from aurora.pipelines.time_series_helpers import validate_sample_rate
+    from aurora.pipelines.transfer_function_helpers import process_transfer_functions
+    from aurora.pipelines.transfer_function_helpers import (
+        transfer_function_header_from_config,
+    )
     from aurora.transfer_function.TTFZ import TTFZ
-
-    if isinstance(processing_cfg, Path) or isinstance(processing_cfg, str):
-        config = ProcessingConfig()
-        config.from_json(processing_cfg)
-    elif isinstance(processing_cfg, ProcessingConfig):
-        config = processing_cfg
-    else:
-        print(f"Unrecognized config of type {type(ProcessingConfig)}")
-        raise Exception
+    from mth5.mth5 import MTH5
 
     mth5_obj = MTH5()
     mth5_obj.open_mth5(config["mth5_path"], mode="r")
@@ -67,5 +53,19 @@ def process_mth5_decimation_level(processing_cfg, run_id, units="MT"):
     return transfer_function_obj
 
 
-tf_obj = process_mth5_decimation_level(processing_cfg, "001", units="SI")
-plot_tf_obj(tf_obj)
+def test(plot=False):
+    config = create_decimation_level_test_config()
+    # processing_cfg = Path(cwd, "config", "ascii_pkd_processing_config.json")
+    # config = DecimationLevelConfig()
+    # config.from_json(processing_cfg)
+    tf_obj = process_mth5_decimation_level(config, "001", units="SI")
+    if plot:
+        plot_tf_obj(tf_obj)
+
+
+def main():
+    test()
+
+
+if __name__ == "__main__":
+    main()

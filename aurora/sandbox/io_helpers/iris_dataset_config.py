@@ -2,6 +2,7 @@ from aurora.sandbox.io_helpers.inventory_review import scan_inventory_for_noncon
 from aurora.sandbox.xml_sandbox import describe_inventory_stages
 from aurora.sandbox.xml_sandbox import get_response_inventory_from_iris
 
+
 class IRISDatasetConfig(object):
     """
     This class contains the information needed to uniquely specify a
@@ -14,6 +15,7 @@ class IRISDatasetConfig(object):
     -a way to specify station-channel, this config will only work for single stations.
 
     """
+
     def __init__(self):
         self.network = None
         self.station = None
@@ -22,29 +24,28 @@ class IRISDatasetConfig(object):
         self.endtime = None
         self.description = None
         self.dataset_id = None
-        self.components_list = None #
-
+        self.components_list = None  #
 
     def get_inventory_from_iris(self, ensure_inventory_stages_are_named=True):
 
-        inventory = get_response_inventory_from_iris(network=self.network,
-                                                     station=self.station,
-                                                     channel=self.channel_codes,
-                                                     starttime=self.starttime,
-                                                     endtime=self.endtime,
-                                                     )
+        inventory = get_response_inventory_from_iris(
+            network=self.network,
+            station=self.station,
+            channel=self.channel_codes,
+            starttime=self.starttime,
+            endtime=self.endtime,
+        )
         inventory = scan_inventory_for_nonconformity(inventory)
         if ensure_inventory_stages_are_named:
             describe_inventory_stages(inventory, assign_names=True)
 
         return inventory
 
-
     def get_data_via_rover(self):
         """
-        Need
-        1. Where does the rover-ed file end up?  that path needs to be accessible to load the data
-        after it is generated
+        Need to know where does the rover-ed file end up?
+        that path needs to be accessible to load the data after it is generated.
+        See example in ipython notebook in ulf_geoE repo
         Returns
         -------
 
@@ -52,25 +53,9 @@ class IRISDatasetConfig(object):
 
         pass
 
-
-    def save_xml(self, experiment, tag=""):
+    def get_station_xml_filename(self, tag=""):
         """
-        could probably use inventory or experiement
-        Maybe even add a type-checker here
-        if isinstance(xml_obj, inventory):
-            tag="inventory"
-        elif  isinstance(xml_obj, Experiment()):
-            tag="experiment"
-
-        Parameters
-        ----------
-        experiement
-
-        Returns
-        -------
-
+        DEPRECATED
         """
-        output_xml_path = self.get_station_xml_filename(tag=tag)
-        experiment.to_xml(output_xml_path)
-        print(f"saved experiement to {output_xml_path}")
-        return
+        print("get_station_xml_filename DEPRECATED")
+        raise Exception

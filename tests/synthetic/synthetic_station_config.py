@@ -1,6 +1,6 @@
 import random
-from pathlib import Path
 
+from aurora.general_helper_functions import TEST_PATH
 from aurora.time_series.filters.filter_helpers import make_coefficient_filter
 
 random.seed(0)
@@ -30,8 +30,8 @@ ACTIVE_FILTERS = [unity_coeff_filter, cf_multipy_10, cf_divide_10]
 # make this an object? or leave as dict?
 
 STATION_01_CFG = {}
-STATION_01_CFG["raw_data_path"] = Path("data", "test1.asc")
-STATION_01_CFG["mth5_path"] = Path("data", "test1.h5")
+STATION_01_CFG["raw_data_path"] = TEST_PATH.joinpath("synthetic", "data", "test1.asc")
+STATION_01_CFG["mth5_path"] = TEST_PATH.joinpath("synthetic", "data", "test1.h5")
 
 STATION_01_CFG["columns"] = ["hx", "hy", "hz", "ex", "ey"]
 
@@ -69,8 +69,8 @@ STATION_01_CFG["sample_rate"] = 1.0
 STATION_01_CFG["latitude"] = 17.996
 
 STATION_02_CFG = STATION_01_CFG.copy()
-STATION_02_CFG["raw_data_path"] = Path("data", "test2.asc")
-STATION_02_CFG["mth5_path"] = Path("data", "test2.h5")
+STATION_02_CFG["raw_data_path"] = TEST_PATH.joinpath("synthetic", "data", "test2.asc")
+STATION_02_CFG["mth5_path"] = TEST_PATH.joinpath("synthetic", "data", "test2.h5")
 STATION_02_CFG["station_id"] = "test2"
 STATION_02_CFG["nan_indices"] = {}
 for col in STATION_02_CFG["columns"]:

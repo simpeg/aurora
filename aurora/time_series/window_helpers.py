@@ -2,10 +2,6 @@
 Notes in google doc:
 https://docs.google.com/document/d/1CsRhSLXsRG8HQxM4lKNqVj-V9KA9iUQAvCOtouVzFs0/edit?usp=sharing
 
-This is setup to use 1D numpy arrays.  If we wanted to use an xarray, how would we do the indexing?
-ToDo: Review what happens when we pass a column vector (dimension =Nx1, rather than 1d N)
-
-
 
 """
 
@@ -15,7 +11,7 @@ import time
 from numba import jit
 
 
-#<WINDOW - TIME SERIES RELATIONSHIP>
+# <WINDOW - TIME SERIES RELATIONSHIP>
 def available_number_of_windows_in_array(n_samples_array, n_samples_window, n_advance):
     """
 
@@ -35,11 +31,15 @@ def available_number_of_windows_in_array(n_samples_array, n_samples_window, n_ad
         raise Exception
     available_number_of_strides = int(np.floor(stridable_samples / n_advance))
     return available_number_of_strides + 1
-#</WINDOW - TIME SERIES RELATIONSHIP>
 
 
-#<SLIDING WINDOW OPERATORS>
-def sliding_window_crude(data, num_samples_window, num_samples_advance, num_windows=None):
+# </WINDOW - TIME SERIES RELATIONSHIP>
+
+
+# <SLIDING WINDOW OPERATORS>
+def sliding_window_crude(
+    data, num_samples_window, num_samples_advance, num_windows=None
+):
     """
 
     Parameters
@@ -54,10 +54,14 @@ def sliding_window_crude(data, num_samples_window, num_samples_advance, num_wind
 
     """
     if num_windows is None:
-        num_windows = available_number_of_windows_in_array(len(data), num_samples_window, num_samples_advance)
+        num_windows = available_number_of_windows_in_array(
+            len(data), num_samples_window, num_samples_advance
+        )
     output_array = np.full((num_windows, num_samples_window), np.nan)
     for i in range(num_windows):
-        output_array[i, :] = data[i*num_samples_advance:i*num_samples_advance+num_samples_window]
+        output_array[i, :] = data[
+            i * num_samples_advance : i * num_samples_advance + num_samples_window
+        ]
 
     return output_array
 
@@ -79,22 +83,26 @@ def sliding_window_numba(data, num_samples_window, num_samples_advance, num_wind
     """
     output_array = np.full((num_windows, num_samples_window), np.nan)
     for i in range(num_windows):
-        output_array[i, :] = data[i*num_samples_advance:i*num_samples_advance+num_samples_window]
+        output_array[i, :] = data[
+            i * num_samples_advance : i * num_samples_advance + num_samples_window
+        ]
 
     return output_array
 
+
 def striding_window(data, num_samples_window, num_samples_advance, num_windows=None):
-    """ applies a striding window to an array.  We use 1D arrays here.
+    """applies a striding window to an array.  We use 1D arrays here.
     Note that this method is extendable to N-dimensional arrays as was once shown
     at  http://www.johnvinyard.com/blog/?p=268
 
-    Karl has an implementation of this code but chose to restict to 1D here. This is becuase of several
-    Warnings encountered, on the notes of stride_tricks.py, as well as for example here:
+    Karl has an implementation of this code but chose to restict to 1D here.
+    This is becuase of several warnings encountered, on the notes of stride_tricks.py,
+    as well as for example here:
     https://stackoverflow.com/questions/4936620/using-strides-for-an-efficient-moving-average-filter
 
-    While we can possible setup Aurora so that no copies of the strided windoe are made downstream,
-    we cannot guarantee that another user may not add methods that do require copies.  For robustness
-    we will use 1d implementation only for now.  Adding 2d is experimental.
+    While we can possibly setup Aurora so that no copies of the strided window are made
+    downstream, we cannot guarantee that another user may not add methods that require
+    copies.  For robustness we will use 1d implementation only for now.
 
     Another clean example of this method can be found in the razorback codes from brgm.
 
@@ -109,30 +117,35 @@ def striding_window(data, num_samples_window, num_samples_advance, num_windows=N
     """
     print("num_samples_advance", num_samples_advance)
     if num_windows is None:
-        num_windows = available_number_of_windows_in_array(len(data), num_samples_window, num_samples_advance)
-    min_ = (num_windows - 1) * num_samples_advance + num_samples_window
+        num_windows = available_number_of_windows_in_array(
+            len(data), num_samples_window, num_samples_advance
+        )
+    # min_ = (num_windows - 1) * num_samples_advance + num_samples_window
     bytes_per_element = data.itemsize
     output_shape = (num_windows, num_samples_window)
     print("output_shape", output_shape)
-    strides_shape = (num_samples_advance*bytes_per_element, bytes_per_element)
-    #strides_shape = None
+    strides_shape = (num_samples_advance * bytes_per_element, bytes_per_element)
+    # strides_shape = None
     print("strides_shape", strides_shape)
-    strided_window = as_strided(data, shape=output_shape,
-                                strides=strides_shape)#, writeable=False)
+    strided_window = as_strided(
+        data, shape=output_shape, strides=strides_shape
+    )  # , writeable=False)
     return strided_window
-#</SLIDING WINDOW OPERATORS>>
+
+
+# </SLIDING WINDOW OPERATORS>>
 
 SLIDING_WINDOW_FUNCTIONS = {
-    "crude" : sliding_window_crude, 
-    "numba" : sliding_window_numba,
-    "stride": striding_window
+    "crude": sliding_window_crude,
+    "numba": sliding_window_numba,
+    "stride": striding_window,
 }
 # SLIDING_WINDOW_FUNCTIONS["crude"] = sliding_window_crude
 # SLIDING_WINDOW_FUNCTIONS["numba"] = sliding_window_numba
 # SLIDING_WINDOW_FUNCTIONS["stride"] = striding_window
 
 
-#<FFT HELPERS>
+# <FFT HELPERS>
 def apply_fft_to_windowed_array(windowed_array):
     """
     This will operate row-wise as well
@@ -147,11 +160,10 @@ def apply_fft_to_windowed_array(windowed_array):
     pass
 
 
-
 def check_that_all_sliding_window_functions_return_equivalent_arrays():
     """
-    simple sanity check that runs each sliding window function on a small array and confirms the results
-    are numerically identical.
+    simple sanity check that runs each sliding window function on a small array and
+    confirms the results are numerically identical.
     Note that striding window will return int types where others return float.
     Returns
     -------
@@ -161,12 +173,12 @@ def check_that_all_sliding_window_functions_return_equivalent_arrays():
     N = 15
     L = 3
     V = 1
-    O = L-V
+    A = L - V
     data = np.arange(N)
-    n_win = available_number_of_windows_in_array(N,L,O)
+    n_win = available_number_of_windows_in_array(N, L, A)
     results = {}
     for function_label, function in SLIDING_WINDOW_FUNCTIONS.items():
-        results[function_label] = function(data, L, O, n_win)
+        results[function_label] = function(data, L, A, n_win)
         print(results[function_label])
 
     for i, function_label in enumerate(results.keys()):
@@ -176,62 +188,66 @@ def check_that_all_sliding_window_functions_return_equivalent_arrays():
             difference = reference_result - results[function_label]
             if np.sum(np.abs(difference)) == 0:
                 print(f"OK {i}")
-                #put an assert here instead of OK
-
-
+                # put an assert here instead of OK
 
 
 def do_some_tests():
     N = 10000000
-    n_samples_window = 128; n_overlap = 96; n_advance = n_samples_window-n_overlap;
-    #qq = np.random.random(N)
-    qq = np.arange(N)
+    n_samples_window = 128
+    n_overlap = 96
+    n_advance = n_samples_window - n_overlap
 
     sw = striding_window(np.arange(15), 3, 2, num_windows=4)
     print(sw)
 
     t0 = time.time()
-    strided_window = striding_window(1.*np.arange(N), n_samples_window, n_advance)#, num_windows=4)
-    strided_window+=1
-    print("stride {}".format(time.time()-t0))
+    strided_window = striding_window(
+        1.0 * np.arange(N), n_samples_window, n_advance
+    )  # , num_windows=4)
+    strided_window += 1
+    print("stride {}".format(time.time() - t0))
 
     print(strided_window)
 
     t0 = time.time()
-    slid_window = sliding_window_crude(1.*np.arange(N),n_samples_window, n_advance)#, num_windows=4)
-    slid_window+=1
-    print("crude  {}".format(time.time()-t0))
+    slid_window = sliding_window_crude(
+        1.0 * np.arange(N), n_samples_window, n_advance
+    )  # , num_windows=4)
+    slid_window += 1
+    print("crude  {}".format(time.time() - t0))
 
     print(slid_window)
 
     num_windows = available_number_of_windows_in_array(N, n_samples_window, n_advance)
     print(num_windows)
     t0 = time.time()
-    numba_slid_window = sliding_window_numba(1.*np.arange(N),n_samples_window, n_advance,
-                               num_windows)#, num_windows=4)
-    numba_slid_window+=1
-    print("numba  {}".format(time.time()-t0))
+    numba_slid_window = sliding_window_numba(
+        1.0 * np.arange(N), n_samples_window, n_advance, num_windows
+    )  # , num_windows=4)
+    numba_slid_window += 1
+    print("numba  {}".format(time.time() - t0))
 
     t0 = time.time()
-    numba_slid_window = sliding_window_numba(1.*np.arange(N),n_samples_window, n_advance,
-                               num_windows)#, num_windows=4)
-    print("numba  {}".format(time.time()-t0))
+    numba_slid_window = sliding_window_numba(
+        1.0 * np.arange(N), n_samples_window, n_advance, num_windows
+    )  # , num_windows=4)
+    print("numba  {}".format(time.time() - t0))
 
 
 def test_apply_taper():
     import matplotlib.pyplot as plt
     import scipy.signal as ssig
+
     num_samples_window = 64
     num_windows = 100
-    windowed_data =  np.abs(np.random.randn(num_windows,num_samples_window))
-    taper = ssig.hanning(num_samples_window)
-    tapered_windowed_data = windowed_array.data * taper
-    plt.plot(windowed_data[0], 'r', label='data');
-    plt.plot(tapered_windowed_data[0], 'g', label='tapered data')
+    windowed_data = np.abs(np.random.randn(num_windows, num_samples_window))
+    taper = ssig.windows.hann(num_samples_window)
+    tapered_windowed_data = windowed_data * taper
+    plt.plot(windowed_data[0], "r", label="data")
+    plt.plot(tapered_windowed_data[0], "g", label="tapered data")
     plt.legend()
     plt.show()
     return
-
 
 
 def main():
@@ -245,12 +261,11 @@ if __name__ == "__main__":
     main()
 
 
-
 # """
 #     This function was originally copied from:
 #         http://www.johnvinyard.com/blog/?p=268
 # """
-# 
+#
 # def norm_shape(shape):
 #     '''
 #     Normalize numpy array shapes so they're always expressed as a tuple,

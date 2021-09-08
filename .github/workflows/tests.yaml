@@ -30,25 +30,21 @@ jobs:
       shell: bash
       run: |
         python --version
-        conda create -n aurora-test
-        source activate aurora-test
-        conda config --add channels conda-forge
         conda install pytest
         conda install pytest-cov
         pip install git+https://github.com/kujaku11/mt_metadata.git
+        pip install git+https://github.com/kujaku11/mth5.git@channel_nomenclature_38
         #pip install -e git+https://github.com/kujaku11/mth5_test_data.git#egg=mth5_test_data
         
     - name: Install Our Package
       shell: bash
       run: |
-        source activate aurora-test
         pip install -e .
         conda list
 
     - name: Run Tests
       shell: bash
       run: |
-        source activate aurora-test
         pytest -v --cov=./ --cov-report=xml --cov=aurora
         
     - name: "Upload coverage to Codecov"

@@ -1,14 +1,14 @@
-from pathlib import Path
+from aurora.pipelines.helpers import initialize_config
+from aurora.pipelines.time_series_helpers import calibrate_stft_obj
+from aurora.pipelines.time_series_helpers import run_ts_to_calibrated_stft
+from aurora.pipelines.time_series_helpers import run_ts_to_stft
+from aurora.pipelines.time_series_helpers import validate_sample_rate
+from aurora.pipelines.transfer_function_helpers import process_transfer_functions
+from aurora.pipelines.transfer_function_helpers import (
+    transfer_function_header_from_config,
+)
 
-from aurora.pipelines.processing_helpers import calibrate_stft_obj
-from aurora.pipelines.processing_helpers import process_transfer_functions
-from aurora.pipelines.processing_helpers import run_ts_to_calibrated_stft
-from aurora.pipelines.processing_helpers import run_ts_to_stft
-
-# from aurora.pipelines.processing_helpers import run_ts_to_stft_scipy
-from aurora.pipelines.processing_helpers import transfer_function_header_from_config
-from aurora.pipelines.processing_helpers import validate_sample_rate
-from aurora.sandbox.processing_config import RunConfig
+# from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
 from aurora.time_series.frequency_band_helpers import configure_frequency_bands
 from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
@@ -19,18 +19,39 @@ from aurora.transfer_function.TTFZ import TTFZ
 from mth5.mth5 import MTH5
 
 
-def initialize_pipeline(run_config):
-    if isinstance(run_config, Path) or isinstance(run_config, str):
-        config = RunConfig()
-        config.from_json(run_config)
-    elif isinstance(run_config, RunConfig):
-        config = run_config
-    else:
-        print(f"Unrecognized config of type {type(run_config)}")
-        raise Exception
+def initialize_pipeline(run_config, mth5_path=None):
+    """
+    A place to organize args and kwargs.
+    This could be split into initialize_config() and initialize_mth5()
 
+    Parameters
+    ----------
+    run_config : str, pathlib.Path, or a RunConfig object
+        If str or Path is provided, this will read in the config and return it as a
+        RunConfig object.
+    mth5_path : string or pathlib.Path
+        optional argument.  If it is provided, it overrides the path in the RunConfig
+        object
+
+    Returns
+    -------
+    config : aurora.config.processing_config import RunConfig
+    mth5_obj :
+    """
+    config = initialize_config(run_config)
+
+    # <Initialize mth5 for reading>
+    if mth5_path:
+        if config["mth5_path"] != str(mth5_path):
+            print(
+                "Warning - the mth5 path supplied to initialize pipeline differs"
+                "from the one in the config file"
+            )
+            print(f"config path changing from \n{config['mth5_path']} to \n{mth5_path}")
+            config.mth5_path = str(mth5_path)
     mth5_obj = MTH5()
     mth5_obj.open_mth5(config["mth5_path"], mode="r")
+    # </Initialize mth5 for reading>
     return config, mth5_obj
 
 
@@ -101,7 +122,7 @@ def process_mth5_decimation_level(config, local, remote, units="MT"):
     :return:
     Parameters
     ----------
-    config : ProcessingConfig (for a decimation level)
+    config : aurora.config.decimation_level_config.DecimationLevelConfig
     units
 
     Returns
@@ -153,9 +174,11 @@ def get_data_from_decimation_level_from_mth5(config, mth5_obj, run_id):
     Returns
     -------
 
-    Somewhat complicated function -- see issue #13.
+    Somewhat complicated function -- see issue #13.  Ultimately this method could be
+    embedded in mth5, where the specific attributes of the config needed for this
+    method are passed as explicit arguments.
 
-    SHould be able to
+    Should be able to
     1. accept a config and an mth5_obj and return decimation_level_0,
     2. Accept data from a given decimation level, and decimation
     instrucntions and return it
@@ -193,7 +216,9 @@ def get_data_from_decimation_level_from_mth5(config, mth5_obj, run_id):
     return local, remote
 
 
-def process_mth5_run(run_cfg, run_id, units="MT", show_plot=True, z_file_path=None):
+def process_mth5_run(
+    run_cfg, run_id, units="MT", show_plot=False, z_file_path=None, **kwargs
+):
     """
     Stages here:
     1. Read in the config and figure out how many decimation levels there are
@@ -207,7 +232,8 @@ def process_mth5_run(run_cfg, run_id, units="MT", show_plot=True, z_file_path=No
     -------
 
     """
-    run_config, mth5_obj = initialize_pipeline(run_cfg)
+    mth5_path = kwargs.get("mth5_path", None)
+    run_config, mth5_obj = initialize_pipeline(run_cfg, mth5_path)
     print(
         f"config indicates {run_config.number_of_decimation_levels} "
         f"decimation levels to process: {run_config.decimation_level_ids}"
@@ -230,6 +256,8 @@ def process_mth5_run(run_cfg, run_id, units="MT", show_plot=True, z_file_path=No
             local, remote = get_data_from_decimation_level_from_mth5(
                 processing_config, mth5_obj, run_id
             )
+
+            print("APPLY TIMING CORRECTIONS HERE")
         else:
             local = prototype_decimate(processing_config, local)
             if processing_config.reference_station_id:
@@ -240,6 +268,8 @@ def process_mth5_run(run_cfg, run_id, units="MT", show_plot=True, z_file_path=No
         tf_obj = process_mth5_decimation_level(
             processing_config, local, remote, units=units
         )
+        # z_correction = kwargs.get("z_correction", 1.0)
+        # tf_obj.rho *= z_correction
         tf_dict[dec_level_id] = tf_obj
 
         if show_plot:
@@ -247,7 +277,9 @@ def process_mth5_run(run_cfg, run_id, units="MT", show_plot=True, z_file_path=No
 
             plot_tf_obj(tf_obj, out_filename="out")
 
+    # TODO: Add run_obj to TransferFunctionCollection
     tf_collection = TransferFunctionCollection(header=tf_obj.tf_header, tf_dict=tf_dict)
+
     if z_file_path:
         tf_collection.write_emtf_z_file(z_file_path, run_obj=local_run_obj)
     return tf_collection

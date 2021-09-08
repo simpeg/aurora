@@ -49,7 +49,7 @@ class TRME_RR(RegressionEstimator):
         """
         super(TRME_RR, self).__init__(**kwargs)
         self._Z = kwargs.get("Z", None)
-        self.Z = self.cast_data_to_2d_for_regression(self._Z)
+        self.Z = self._Z.to_array().data.T
         self.expectation_psi_prime = np.ones(self.n_channels_out)
         self.sigma_squared = np.zeros(self.n_channels_out)
         self.check_for_nan()

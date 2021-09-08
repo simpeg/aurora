@@ -5,88 +5,25 @@ Most of the tests and tools are associated with MTH5 helper stuffs so moved
 to mth5_helpers.py for now.  Needs a clean up.
 """
 
-import datetime
 import numpy as np
-import pandas as pd
 from pathlib import Path
-import xarray as xr
 
+from aurora.pipelines.helpers import initialize_mth5
 from aurora.sandbox.io_helpers.make_dataset_configs import TEST_DATA_SET_CONFIGS
 from aurora.sandbox.io_helpers.test_data import get_example_array_list
 from aurora.sandbox.io_helpers.test_data import get_example_data
 from aurora.sandbox.xml_sandbox import describe_inventory_stages
-from aurora.sandbox.processing_config import ProcessingConfig
 from mt_metadata.timeseries import Experiment
 from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
-from mt_metadata.utils import STATIONXML_02
-from mth5.mth5 import MTH5
-from mth5.timeseries.channel_ts import ChannelTS
-from mth5.timeseries.run_ts import RunTS
 
-HEXY = ['hx','hy','ex','ey'] #default components list
+HEXY = ["hx", "hy", "ex", "ey"]  # default components list
 xml_path = Path("/home/kkappler/software/irismt/mt_metadata/data/xml")
 magnetic_xml_template = xml_path.joinpath("mtml_magnetometer_example.xml")
 electric_xml_template = xml_path.joinpath("mtml_electrode_example.xml")
-single_station_xml_template = STATIONXML_02 # Fails for "no survey key"
 fap_xml_example = ""
 
 
-def test_can_read_back_data(mth5_path, station_id, run_id):
-    processing_config = {}
-    processing_config["mth5_path"] = "pkd_test_00.h5"
-    processing_config["local_station_id"] = "PKD"
-    config = processing_config
-    m = MTH5()
-    m.open_mth5(config["mth5_path"], mode="r")
-    local_run_obj = m.get_run(config["local_station_id"], run_id)
-    local_run_ts = local_run_obj.to_runts()
-    print("success")
-    return
-
-def ingest_config(processing_cfg):
-    """
-
-    Parameters
-    ----------
-    processing_cfg: path or str
-
-    Returns :
-    -------
-
-    """
-    if isinstance(processing_cfg, Path) or isinstance(processing_cfg, str):
-        config = ProcessingConfig()
-        config.from_json(processing_cfg)
-    else:
-        config = processing_cfg
-    return config
-
-
-def initialize_mth5(h5_path, mode="w"):
-    """
-
-    Parameters
-    ----------
-    h5_path
-    mode
-
-    Returns
-    -------
-
-    """
-    if h5_path is None:
-        h5_path = Path("test.h5")
-    else:
-        h5_path = Path(h5_path)
-    if h5_path.exists():
-        h5_path.unlink()
-    mth5_obj = MTH5()
-    mth5_obj.open_mth5(str(h5_path), "w")
-    return mth5_obj
-
-
-def mth5_from_iris_database(dataset_config, load_data=True,
-                            target_folder=Path()):
+def mth5_from_iris_database(dataset_config, load_data=True, target_folder=Path()):
     """
     This can work in a way that uses data, or just initializes the mth5
 
@@ -98,7 +35,9 @@ def mth5_from_iris_database(dataset_config, load_data=True,
     -------
 
     """
-    inventory = dataset_config.get_inventory_from_iris(ensure_inventory_stages_are_named=True)
+    inventory = dataset_config.get_inventory_from_iris(
+        ensure_inventory_stages_are_named=True
+    )
     experiment = get_experiment_from_obspy_inventory(inventory)
 
     # make an MTH5
@@ -127,24 +66,25 @@ def test_runts_from_xml(dataset_id, runts_obj=False):
     dataset_id = "pkd_test_00"
     #
     test_dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
-    inventory = test_dataset_config.get_inventory_from_iris(ensure_inventory_stages_are_named=True)
+    inventory = test_dataset_config.get_inventory_from_iris(
+        ensure_inventory_stages_are_named=True
+    )
     experiment = get_experiment_from_obspy_inventory(inventory)
 
     experiment.surveys[0].filters["fir_fs2d5_2000.0"]
-    experiment.surveys[0].filters[
-        "fir_fs2d5_200.0"].decimation_input_sample_rate
-    test_dataset_config.save_xml(experiment)
+    experiment.surveys[0].filters["fir_fs2d5_200.0"].decimation_input_sample_rate
     h5_path = Path("PKD.h5")
     run_obj = mth5_run_from_experiment("PKD", experiment, h5_path=h5_path)
 
     if runts_obj:
-        array_list = get_example_array_list(components_list=HEXY,
-                                            load_actual=True,
-                                            station_id="PKD")
+        array_list = get_example_array_list(
+            components_list=HEXY, load_actual=True, station_id="PKD"
+        )
         runts_obj = cast_run_to_run_ts(run_obj, array_list=array_list)
     return experiment, run_obj, runts_obj
 
-#<GET EXPERIMENT>
+
+# <GET EXPERIMENT>
 def get_experiment_from_xml_path(xml):
     xml_path = Path(xml)
     experiment = Experiment()
@@ -152,12 +92,14 @@ def get_experiment_from_xml_path(xml):
     print(experiment, type(experiment))
     return experiment
 
+
 def get_experiment_from_obspy_inventory(inventory):
     translator = XMLInventoryMTExperiment()
     experiment = translator.xml_to_mt(inventory_object=inventory)
     return experiment
-#</GET EXPERIMENT>
 
+
+# </GET EXPERIMENT>
 
 
 def get_filters_dict_from_experiment(experiment, verbose=False):
@@ -186,10 +128,6 @@ def get_filters_dict_from_experiment(experiment, verbose=False):
     return survey_filters
 
 
-
-
-
-
 def check_run_channels_have_expected_properties(run):
     """
     Just some sanity check that we can access filters
@@ -202,30 +140,14 @@ def check_run_channels_have_expected_properties(run):
 
     """
     print(run.channel_summary)
-    hx = run.get_channel('hx')
+    hx = run.get_channel("hx")
     print(hx.channel_response_filter)
     print(hx.channel_response_filter.filters_list)
     print(hx.channel_response_filter.complex_response(np.arange(3) + 1))
-    ex = run.get_channel('ex')
+    ex = run.get_channel("ex")
     print(ex.channel_response_filter)
     print(ex.channel_response_filter.filters_list)
     print(ex.channel_response_filter.complex_response(np.arange(3) + 1))
-    return
-
-def test_experiment_from_station_xml():
-    """
-    TODO: Move this test into mt_metadata.  This is not an aurora test.
-    This test passes but when we use the hack of setting magnetic to "T" instead of "F" in
-    fdsn_tools.py it fails for no code "F"
-    Returns
-    -------
-
-    """
-    from mt_metadata.utils import STATIONXML_02
-    single_station_xml_template = STATIONXML_02  # Fails for "no survey key"
-    #single_station_xml_template = Path("single_station_mt.xml")
-    translator = XMLInventoryMTExperiment()
-    mt_experiment = translator.xml_to_mt(stationxml_fn=STATIONXML_02)
     return
 
 
@@ -241,16 +163,17 @@ def run_obj_from_mth5(mth5_obj):
     -------
 
     """
-    if "REW09" in mth5_obj.station_list: #old test
+    if "REW09" in mth5_obj.station_list:  # old test
         run_obj = mth5_obj.get_run("REW09", "a")
-    elif "PKD" in mth5_obj.station_list: #pkd test
-        run_obj = mth5_obj.get_run("PKD", "001") #this run is created here
+    elif "PKD" in mth5_obj.station_list:  # pkd test
+        run_obj = mth5_obj.get_run("PKD", "001")  # this run is created here
         check_run_channels_have_expected_properties(run_obj)
     else:
         print("skipping creation of run ")
         raise Exception
 
     return run_obj
+
 
 def mth5_run_from_experiment(station_id, experiment, h5_path=None):
     """
@@ -269,8 +192,6 @@ def mth5_run_from_experiment(station_id, experiment, h5_path=None):
     mth5_obj.from_experiment(experiment)
     run_obj = run_obj_from_mth5(mth5_obj)
     return run_obj
-
-
 
 
 def cast_run_to_run_ts(run, array_list=None, station_id=None):
@@ -297,8 +218,6 @@ def cast_run_to_run_ts(run, array_list=None, station_id=None):
     return runts_object
 
 
-
-
 def filter_control_example(xml_path=None):
     """
     This has two stages:
@@ -320,9 +239,9 @@ def filter_control_example(xml_path=None):
 
     """
     if xml_path is None:
-        print("Not working with STATIONXML_02-- FDSN Tide hack")
-        xml_path = Path("single_station_mt.xml")
-        #xml_path = STATIONXML_02
+        from aurora.general_helper_functions import MT_METADATA_DATA
+
+        xml_path = MT_METADATA_DATA.joinpath("stationxml", "mtml_single_station.xml")
     experiment = get_experiment_from_xml_path(xml_path)
     filter_dict = get_filters_dict_from_experiment(experiment)
     frq = np.arange(5) + 1.2
@@ -337,33 +256,24 @@ def filter_control_example(xml_path=None):
     print("OK")
 
 
-
-def test_filter_stages():
-    """
-    Sanity check to look at each stage of the filters.  Just want to look at their spectra for now,
-    input/output units should be added also, but the belongs in MTH5 or mt_metadata
-    Returns
-    -------
-
-    """
-    pass
-
-
 def test_filter_control():
     print("move this from driver")
     pass
 
-#</LOAD SOME DATA FROM A SINGLE STATION>
+
+# </LOAD SOME DATA FROM A SINGLE STATION>
+
 
 def set_driver_parameters():
     driver_parameters = {}
     driver_parameters["create_xml"] = True
-    driver_parameters["test_filter_control"] = True
+    driver_parameters["test_filter_control"] = False  # failing because cannot
+    # find/read xml
     driver_parameters["run_ts_from_xml_01"] = True
-    driver_parameters["run_ts_from_xml_02"] = True
-    driver_parameters["run_ts_from_xml_03"] = True
+    driver_parameters["run_ts_from_xml_02"] = False  # Fail: no access to pkd.xml
     driver_parameters["initialize_data"] = True
     return driver_parameters
+
 
 def test_can_access_fap_filters():
     from aurora.sandbox.io_helpers.iris_dataset_config import IRISDatasetConfig
@@ -377,49 +287,51 @@ def test_can_access_fap_filters():
     test_data_set.channel_codes = "MFN"
     test_data_set.description = "test of a fap xml"
 
-    fap_inventory = test_dataset_config.get_inventory_from_iris(
-        ensure_inventory_stages_are_named=True)
+    fap_inventory = test_data_set.get_inventory_from_iris(
+        ensure_inventory_stages_are_named=True
+    )
     describe_inventory_stages(fap_inventory)
-    #<HERE IS THE SPOT TO DROP TRACE TO REVIEW INGEST OF FAP>
+    # <HERE IS THE SPOT TO DROP TRACE TO REVIEW INGEST OF FAP>
     experiment = get_experiment_from_obspy_inventory(fap_inventory)
     filters_dict = experiment.surveys[0].filters
     print(filters_dict)
-    fap = filters_dict['mfn_0']
+    fap = filters_dict["mfn_0"]
+    print(fap)
     num_filters = len(experiment.surveys[0].filters)
-    # if num_filters ==2:
-    #     print("probably not correct yet")
+    print(f"num_filters {num_filters}")
+    return
 
 
 def main():
-    #test_experiment_from_station_xml()
-    #test_can_access_fap_filters()
+    # test_can_access_fap_filters()
 
     driver_parameters = set_driver_parameters()
-    #<CREATE METADATA XML>
+    # <CREATE METADATA XML>
     if driver_parameters["create_xml"]:
-        dataset_ids = ["pkd_test_00", "sao_test_00",]
+        dataset_ids = [
+            "pkd_test_00",
+            "sao_test_00",
+        ]
         for dataset_id in dataset_ids:
             test_dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
-            inventory = test_dataset_config.get_inventory_from_iris(ensure_inventory_stages_are_named=False)
+            inventory = test_dataset_config.get_inventory_from_iris(
+                ensure_inventory_stages_are_named=False
+            )
             experiment = get_experiment_from_obspy_inventory(inventory)
-            test_dataset_config.save_xml(experiment)#, tag="20210522")
+            print(experiment)
 
-    #</CREATE METADATA XML>
+    # </CREATE METADATA XML>
 
-    #<TEST FILTER CONTROL>
+    # <TEST FILTER CONTROL>
     if driver_parameters["test_filter_control"]:
-        filter_control_example()
+        filter_control_example()  # KeyError: 'survey' -20210828
         dataset_id = "pkd_test_00"
         test_dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
         xml_path = test_dataset_config.get_station_xml_filename()
         filter_control_example(xml_path=xml_path)
-    #</TEST FILTER CONTROL>
+    # </TEST FILTER CONTROL>
 
-
-
-    #<TEST RunTS FROM XML>
-    #method 1 is in aurora driver
-        # <METHOD2>
+    # <TEST RunTS FROM XML>
     if driver_parameters["run_ts_from_xml_02"]:
         dataset_id = "pkd_test_00"
         test_dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
@@ -427,27 +339,17 @@ def main():
         experiment = get_experiment_from_xml_path(pkd_xml)
         run_obj = mth5_run_from_experiment("PKD", experiment)
         runts_obj = cast_run_to_run_ts(run_obj, station_id="PKD")
-        # </METHOD2>
+        print(runts_obj)
+    # </TEST RunTS FROM XML>
 
-        # <METHOD3>
-    if driver_parameters["run_ts_from_xml_03"]:
-        try:
-            experiment = get_experiment_from_xml_path(single_station_xml_template)
-            run_obj = mth5_run_from_experiment("REW09", experiment)
-            runts_obj = cast_run_to_run_ts(run_obj)
-        except KeyError:
-            print("FDSN TIDE HACK CAUSING EXCEPTION")
-        # </METHOD3>
-    #</TEST RunTS FROM XML>
-
-    #<INITIALIZE DATA>
+    # <INITIALIZE DATA>
     if driver_parameters["initialize_data"]:
         pkd_mvts = get_example_data(station_id="PKD", component_station_label=True)
         sao_mvts = get_example_data(station_id="SAO", component_station_label=True)
         pkd = pkd_mvts.dataset
         sao = sao_mvts.dataset
         pkd.update(sao)
-    #</INITIALIZE DATA>
+    # </INITIALIZE DATA>
     print("try to combine these runs")
 
 
