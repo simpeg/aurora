@@ -1,7 +1,7 @@
 import numpy as np
 from pathlib import Path
 
-from aurora.config.config_creator_dev import ConfigCreator
+from aurora.config.config_creator import ConfigCreator
 from aurora.general_helper_functions import TEST_PATH
 from aurora.general_helper_functions import BAND_SETUP_PATH
 from aurora.pipelines.process_mth5 import process_mth5_run

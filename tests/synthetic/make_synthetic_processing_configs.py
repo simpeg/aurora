@@ -1,11 +1,14 @@
 from pathlib import Path
 
-# from aurora.config.config_creator_dev import ConfigCreator
+# from aurora.config.config_creator import ConfigCreator
 from aurora.config.decimation_level_config import DecimationLevelConfig
 from aurora.config.processing_config import RunConfig
 
 from aurora.general_helper_functions import BAND_SETUP_PATH
 from aurora.general_helper_functions import TEST_PATH
+
+
+# CONFIG_PATH = TEST_PATH.joinpath("synthetic", "config")
 
 
 def create_run_config_for_test_case(test_case_id):

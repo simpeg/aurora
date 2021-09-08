@@ -3,7 +3,7 @@ Creates configs for process one decimation level and one run
 """
 
 from aurora.general_helper_functions import BAND_SETUP_PATH
-from aurora.config.config_creator_dev import ConfigCreator
+from aurora.config.config_creator import ConfigCreator
 from aurora.config.decimation_level_config import DecimationLevelConfig
 
 from helpers import DATA_PATH
