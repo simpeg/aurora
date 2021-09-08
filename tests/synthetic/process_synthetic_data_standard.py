@@ -1,7 +1,7 @@
 import numpy as np
 from pathlib import Path
 
-from aurora.config.processing_config import RunConfig
+from aurora.config.config_creator_dev import ConfigCreator
 from aurora.general_helper_functions import TEST_PATH
 from aurora.general_helper_functions import BAND_SETUP_PATH
 from aurora.pipelines.process_mth5 import process_mth5_run
@@ -15,8 +15,30 @@ CONFIG_PATH = SYNTHETIC_PATH.joinpath("config")
 DATA_PATH = SYNTHETIC_PATH.joinpath("data")
 
 
-def create_config_file():
-    pass
+def create_config_file(matlab_or_fortran):
+    cc = ConfigCreator(config_path=CONFIG_PATH)
+    mth5_path = DATA_PATH.joinpath("test1.h5")
+    config_id = f"test1-{matlab_or_fortran}"
+    if matlab_or_fortran == "matlab":
+        band_setup_file = BAND_SETUP_PATH.joinpath("bs_256_26.cfg")
+        num_samples_window = 256
+        num_samples_overlap = 64
+    elif matlab_or_fortran == "fortran":
+        band_setup_file = BAND_SETUP_PATH.joinpath("bs_test.cfg")
+        num_samples_window = 128
+        num_samples_overlap = 32
+
+    run_config_path = cc.create_run_config(
+        station_id="test1",
+        mth5_path=mth5_path,
+        sample_rate=1.0,
+        num_samples_window=num_samples_window,
+        num_samples_overlap=num_samples_overlap,
+        band_setup_file=band_setup_file,
+        config_id=config_id,
+        output_channels=["hz", "ex", "ey"],
+    )
+    return run_config_path
 
 
 def test_process_synthetic_1_standard(
@@ -40,11 +62,9 @@ def test_process_synthetic_1_standard(
     -------
 
     """
+    test_config = CONFIG_PATH.joinpath(f"test1-{compare_against}_run_config.json")
     if compare_against == "fortran":
-        test_config = CONFIG_PATH.joinpath("test1_run_config_standard.json")
-        config = RunConfig()
-        config.from_json(test_config)
-        config.mth5_path = str(DATA_PATH.joinpath("test1.h5"))
+        # test_config = CONFIG_PATH.joinpath(f"test1-{compare_against}_run_config.json")
         auxilliary_z_file = TEST_PATH.joinpath("synthetic", "emtf_output", "test1.zss")
         expected_rms_rho_xy = 4.357440
         expected_rms_phi_xy = 0.884601
@@ -52,19 +72,8 @@ def test_process_synthetic_1_standard(
         auxilliary_z_file = TEST_PATH.joinpath(
             "synthetic", "emtf_output", "from_matlab_256_26.zss"
         )
-        test_config = CONFIG_PATH.joinpath("test1_run_config_standard.json")
-        config = RunConfig()
-        config.from_json(test_config)
-        config.mth5_path = str(DATA_PATH.joinpath("test1.h5"))
-        band_setup_file = BAND_SETUP_PATH.joinpath("bs_256_26.cfg")
-        for i_dec in config.decimation_level_ids:
-            config.decimation_level_configs[i_dec].num_samples_window = 256
-            config.decimation_level_configs[i_dec].num_samples_overlap = 64
-            config.decimation_level_configs[
-                i_dec
-            ].emtf_band_setup_file = band_setup_file
-        print("overwrite")
-    test_config = config
+        # test_config = CONFIG_PATH.joinpath("test1_run_config.json")
+    # test_config = config
     # </MATLAB>
 
     z_file_path = Path("test1_aurora.zss")
@@ -137,14 +146,33 @@ def test_process_synthetic_1_standard(
     return
 
 
+def compare_vs_fortran_output():
+    compare_against = "fortran"
+    create_config_file(compare_against)
+    test_process_synthetic_1_standard(
+        assert_compare_result=True,
+        compare_against=compare_against,
+        make_rho_phi_plot=True,
+        show_rho_phi_plot=False,
+        use_subtitle=True,
+    )
+
+
+def compare_vs_matlab_output():
+    compare_against = "matlab"
+    create_config_file(compare_against)
+    test_process_synthetic_1_standard(
+        assert_compare_result=False,
+        compare_against=compare_against,
+        make_rho_phi_plot=True,
+        show_rho_phi_plot=False,
+        use_subtitle=True,
+    )
+
+
 def main():
-    create_config_file()
-    test_process_synthetic_1_standard(
-        assert_compare_result=True, compare_against="fortran"
-    )
-    test_process_synthetic_1_standard(
-        assert_compare_result=False, compare_against="matlab"
-    )
+    compare_vs_fortran_output()
+    compare_vs_matlab_output()
     print("success")
 
 
