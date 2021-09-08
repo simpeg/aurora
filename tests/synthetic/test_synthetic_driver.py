@@ -2,19 +2,17 @@ from pathlib import Path
 
 from aurora.pipelines.process_mth5 import process_mth5_run
 
-from make_mth5_from_asc import create_mth5_synthetic_file
-from make_mth5_from_asc import create_mth5_synthetic_file_for_array
+from make_mth5_from_asc import create_test1_h5
+from make_mth5_from_asc import create_test2_h5
+from make_mth5_from_asc import create_test12rr_h5
 from make_synthetic_processing_configs import create_run_config_for_test_case
-from process_synthetic_data_standard import compare_vs_fortran_output
-from process_synthetic_data_standard import compare_vs_matlab_output
 from synthetic_station_config import STATION_01_CFG
-from synthetic_station_config import STATION_02_CFG
 
 
 def test_create_mth5():
-    create_mth5_synthetic_file(STATION_01_CFG, plot=False)
-    create_mth5_synthetic_file(STATION_02_CFG)
-    create_mth5_synthetic_file_for_array([STATION_01_CFG, STATION_02_CFG])
+    create_test1_h5()
+    create_test2_h5()
+    create_test12rr_h5()
 
 
 def test_create_run_configs():
@@ -69,11 +67,8 @@ def process_synthetic_rr12():
 
 
 def test_process_mth5():
-    # create_mth5_synthetic_file(STATION_01_CFG, plot=False)
     # process_synthetic_1_underdetermined()
     # process_synthetic_1_with_nans()
-    compare_vs_fortran_output()
-    compare_vs_matlab_output()
     # test_process_synthetic_1_standard(
     #     assert_compare_result=False,
     #     make_rho_phi_plot=True,
@@ -91,7 +86,7 @@ def test_process_mth5():
     # create_run_config_for_test_case("test1")
     # process_synthetic_1()
     # process_synthetic_2()
-    # process_synthetic_rr12()
+    process_synthetic_rr12()
 
 
 def main():

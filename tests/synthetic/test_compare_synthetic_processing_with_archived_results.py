@@ -64,7 +64,6 @@ def process_synthetic_1_standard(
     """
     test_config = CONFIG_PATH.joinpath(f"test1-{compare_against}_run_config.json")
     if compare_against == "fortran":
-        # test_config = CONFIG_PATH.joinpath(f"test1-{compare_against}_run_config.json")
         auxilliary_z_file = TEST_PATH.joinpath("synthetic", "emtf_output", "test1.zss")
         expected_rms_rho_xy = 4.357440
         expected_rms_phi_xy = 0.884601
@@ -73,8 +72,6 @@ def process_synthetic_1_standard(
             "synthetic", "emtf_output", "from_matlab_256_26.zss"
         )
 
-        # test_config = CONFIG_PATH.joinpath("test1_run_config.json")
-    # test_config = config
     # </MATLAB>
     z_file_path = Path(f"test1_aurora_{compare_against}.zss")
     # z_file_path = Path("test1_aurora.zss")

@@ -191,15 +191,23 @@ def create_test1_h5():
     create_mth5_synthetic_file(STATION_01_CFG, plot=False)
 
 
+def create_test2_h5():
+    create_mth5_synthetic_file(STATION_02_CFG, plot=False)
+
+
 def create_test1_h5_with_nan():
     create_mth5_synthetic_file(STATION_01_CFG, plot=False, add_nan_values=True)
+
+
+def create_test12rr_h5():
+    create_mth5_synthetic_file_for_array([STATION_01_CFG, STATION_02_CFG])
 
 
 def main():
     create_test1_h5()
     create_test1_h5_with_nan()
-    create_mth5_synthetic_file(STATION_02_CFG)
-    create_mth5_synthetic_file_for_array([STATION_01_CFG, STATION_02_CFG])
+    create_test2_h5()
+    create_test12rr_h5()
 
 
 if __name__ == "__main__":

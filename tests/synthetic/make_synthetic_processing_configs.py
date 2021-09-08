@@ -9,6 +9,17 @@ from aurora.general_helper_functions import TEST_PATH
 
 
 def create_run_config_for_test_case(test_case_id):
+    """
+    2021-09-08: configs for test1 are now made in process_synthetic_data_standard
+
+    Parameters
+    ----------
+    test_case_id
+
+    Returns
+    -------
+
+    """
     if test_case_id in ["test1", "test2", "test12rr"]:
         decimation_factors = [1, 4, 4, 4]
         run_config = RunConfig()
