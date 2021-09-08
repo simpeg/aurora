@@ -44,6 +44,7 @@ class RunConfig(BaseDict):
         self.mth5_path = kwargs.get("mth5_path", "")
         self.local_station_id = ""
         self.reference_station_id = ""
+        self.reference_mth5_path = ""
         self.initial_sample_rate = kwargs.get("initial_sample_rate", 0.0)
         self.decimation_level_configs = {}
 

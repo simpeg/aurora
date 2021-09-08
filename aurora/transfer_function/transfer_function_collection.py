@@ -10,6 +10,8 @@ for local_station and one for reference station.
 """
 import fortranformat as ff
 import numpy as np
+import xarray as xr
+
 from aurora.transfer_function.emtf_z_file_helpers import (
     make_orientation_block_of_z_file,
 )
@@ -39,6 +41,49 @@ class TransferFunctionCollection(object):
         num_channels += self.header.num_input_channels
         num_channels += self.header.num_output_channels
         return num_channels
+
+    @property
+    def number_of_decimation_levels(self):
+        return len(self.tf_dict)
+
+    def merge_decimation_levels(self):
+        """
+        Addressing Aurora Issue #93
+        Will merge all decimation levels into a single 3D xarray for output.
+
+        One concern here is that the same period can be estiamted at more then one
+        decimation level, making the frequency or period axis not of the same order
+        as the number of estimates.  Ways around this:
+         1. We can stack that axis with decimation level
+         2. Make sure that the processing config does not dupliacate periods
+         3. Take the average estimate over all periods heving the same value
+         4. Drop all but one estimate accoring to a rule (keep most observations say)
+
+        Does TFXML support multiple estiamtes? How is it dealt with there?
+        There is an issue here -
+        Returns xarray.dataset
+        -------
+
+        """
+        merged_output = {}
+        n_dec = self.number_of_decimation_levels
+
+        tmp = [self.tf_dict[i].tf.to_dataset("period") for i in range(n_dec)]
+        merged = xr.combine_by_coords(tmp)
+        merged = merged.to_array(dim="period")
+        merged_output["tf"] = merged
+
+        tmp = [self.tf_dict[i].cov_ss_inv.to_dataset("period") for i in range(n_dec)]
+        merged = xr.combine_by_coords(tmp)
+        merged = merged.to_array("period")
+        merged_output["cov_ss_inv"] = merged
+
+        tmp = [self.tf_dict[i].cov_nn.to_dataset("period") for i in range(n_dec)]
+        merged = xr.combine_by_coords(tmp)
+        merged = merged.to_array("period")
+        merged_output["cov_nn"] = merged
+
+        print("OK")
 
     def write_emtf_z_file(self, z_file_path, run_obj=None):
         """
@@ -159,8 +204,11 @@ class TransferFunctionCollection(object):
                 fc_indices_str = f"{fc_indices[0]} to   {fc_indices[-1]}"
                 line1 += f"freq. band from   {fc_indices_str}\n"
                 f.writelines(line1)
-                freq_index = tf.frequency_index(band.center_frequency)
-                num_segments = tf.num_segments.data[0, freq_index]
+
+                # freq_index = tf.frequency_index(band.center_frequency)
+                # num_segments = tf.num_segments.data[0, freq_index]
+                period_index = tf.period_index(band.center_period)
+                num_segments = tf.num_segments.data[0, period_index]
                 line2 = f"number of data point    {int(num_segments)} "
                 line2 += f"sampling freq.   {tf.processing_config.sample_rate} Hz\n"
                 f.writelines(line2)

@@ -100,6 +100,10 @@ class TransferFunction(object):
         # the matlab codes for initialization
         return self.frequency_bands.number_of_bands
 
+    @property
+    def periods(self):
+        return self.frequency_bands.band_centers(frequency_or_period="period")
+
     def _initialize_arrays(self):
         """
         There are four separate data strucutres, indexed by period here:
@@ -131,9 +135,10 @@ class TransferFunction(object):
         tf_array = np.zeros(tf_array_dims, dtype=np.complex128)
         self.transfer_function = xr.DataArray(
             tf_array,
-            dims=["output_channel", "input_channel", "frequency"],
+            dims=["output_channel", "input_channel", "period"],  # frequency"],
             coords={
-                "frequency": self.frequency_bands.band_centers(),
+                # "frequency": self.frequency_bands.band_centers(),
+                "period": self.periods,
                 "output_channel": self.tf_header.output_channels,
                 "input_channel": self.tf_header.input_channels,
             },
@@ -144,9 +149,10 @@ class TransferFunction(object):
         num_segments = np.zeros((self.num_channels_out, self.num_bands), dtype=np.int32)
         num_segments_xr = xr.DataArray(
             num_segments,
-            dims=["channel", "frequency"],
+            dims=["channel", "period"],  # "frequency"],
             coords={
-                "frequency": self.frequency_bands.band_centers(),
+                # "frequency": self.frequency_bands.band_centers(),
+                "period": self.periods,
                 "channel": self.tf_header.output_channels,
             },
         )
@@ -194,10 +200,6 @@ class TransferFunction(object):
         self.initialized = True
 
     @property
-    def periods(self):
-        return self.frequency_bands.band_centers(frequency_or_period="period")
-
-    @property
     def minimum_period(self):
         return np.min(self.periods)
 
@@ -214,12 +216,16 @@ class TransferFunction(object):
         return self.tf_header.num_output_channels
 
     def frequency_index(self, frequency):
+        print("BUG HERE")
         frequency_index = np.isclose(self.num_segments.frequency, frequency)
         frequency_index = np.where(frequency_index)[0][0]
         return frequency_index
 
     def period_index(self, period):
-        return self.frequency_index(1.0 / period)
+        period_index = np.isclose(self.num_segments.period, period)
+        period_index = np.where(period_index)[0][0]
+        return period_index
+        # return self.frequency_index(1.0 / period)
 
     def tf_to_df(self):
         pass

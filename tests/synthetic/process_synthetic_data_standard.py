@@ -41,7 +41,7 @@ def create_config_file(matlab_or_fortran):
     return run_config_path
 
 
-def test_process_synthetic_1_standard(
+def process_synthetic_1_standard(
     assert_compare_result=True,
     make_rho_phi_plot=True,
     show_rho_phi_plot=False,
@@ -82,7 +82,7 @@ def test_process_synthetic_1_standard(
     tf_collection = process_mth5_run(
         test_config, run_id, units="MT", show_plot=False, z_file_path=z_file_path
     )
-
+    tf_collection.merge_decimation_levels()
     aux_data = read_z_file(auxilliary_z_file)
 
     (
@@ -149,7 +149,7 @@ def test_process_synthetic_1_standard(
 def compare_vs_fortran_output():
     compare_against = "fortran"
     create_config_file(compare_against)
-    test_process_synthetic_1_standard(
+    process_synthetic_1_standard(
         assert_compare_result=True,
         compare_against=compare_against,
         make_rho_phi_plot=True,
@@ -161,7 +161,7 @@ def compare_vs_fortran_output():
 def compare_vs_matlab_output():
     compare_against = "matlab"
     create_config_file(compare_against)
-    test_process_synthetic_1_standard(
+    process_synthetic_1_standard(
         assert_compare_result=False,
         compare_against=compare_against,
         make_rho_phi_plot=True,
