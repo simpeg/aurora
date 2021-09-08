@@ -12,6 +12,7 @@ from aurora.transfer_function.emtf_z_file_helpers import (
 
 SYNTHETIC_PATH = TEST_PATH.joinpath("synthetic")
 CONFIG_PATH = SYNTHETIC_PATH.joinpath("config")
+DATA_PATH = SYNTHETIC_PATH.joinpath("data")
 
 
 def create_config_file():
@@ -41,7 +42,9 @@ def test_process_synthetic_1_standard(
     """
     if compare_against == "fortran":
         test_config = CONFIG_PATH.joinpath("test1_run_config_standard.json")
-        # test_config = Path("config", "test1_run_config_standard.json")
+        config = RunConfig()
+        config.from_json(test_config)
+        config.mth5_path = str(DATA_PATH.joinpath("test1.h5"))
         auxilliary_z_file = TEST_PATH.joinpath("synthetic", "emtf_output", "test1.zss")
         expected_rms_rho_xy = 4.357440
         expected_rms_phi_xy = 0.884601
@@ -52,6 +55,7 @@ def test_process_synthetic_1_standard(
         test_config = CONFIG_PATH.joinpath("test1_run_config_standard.json")
         config = RunConfig()
         config.from_json(test_config)
+        config.mth5_path = str(DATA_PATH.joinpath("test1.h5"))
         band_setup_file = BAND_SETUP_PATH.joinpath("bs_256_26.cfg")
         for i_dec in config.decimation_level_ids:
             config.decimation_level_configs[i_dec].num_samples_window = 256
@@ -60,7 +64,7 @@ def test_process_synthetic_1_standard(
                 i_dec
             ].emtf_band_setup_file = band_setup_file
         print("overwrite")
-        test_config = config
+    test_config = config
     # </MATLAB>
 
     z_file_path = Path("test1_aurora.zss")
