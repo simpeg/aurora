@@ -69,20 +69,6 @@ def process_synthetic_rr12():
 def test_process_mth5():
     # process_synthetic_1_underdetermined()
     # process_synthetic_1_with_nans()
-    # test_process_synthetic_1_standard(
-    #     assert_compare_result=False,
-    #     make_rho_phi_plot=True,
-    #     show_rho_phi_plot=False,
-    #     use_subtitle=True,
-    #     compare_against="matlab",
-    # )
-    # test_process_synthetic_1_standard(
-    #     assert_compare_result=True,
-    #     make_rho_phi_plot=True,
-    #     show_rho_phi_plot=False,
-    #     use_subtitle=True,
-    #     compare_against="fortran",
-    # )
     # create_run_config_for_test_case("test1")
     # process_synthetic_1()
     # process_synthetic_2()
