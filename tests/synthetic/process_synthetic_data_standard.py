@@ -34,7 +34,7 @@ def create_config_file(matlab_or_fortran):
         sample_rate=1.0,
         num_samples_window=num_samples_window,
         num_samples_overlap=num_samples_overlap,
-        band_setup_file=band_setup_file,
+        band_setup_file=str(band_setup_file),
         config_id=config_id,
         output_channels=["hz", "ex", "ey"],
     )
@@ -72,11 +72,12 @@ def test_process_synthetic_1_standard(
         auxilliary_z_file = TEST_PATH.joinpath(
             "synthetic", "emtf_output", "from_matlab_256_26.zss"
         )
+
         # test_config = CONFIG_PATH.joinpath("test1_run_config.json")
     # test_config = config
     # </MATLAB>
-
-    z_file_path = Path("test1_aurora.zss")
+    z_file_path = Path(f"test1_aurora_{compare_against}.zss")
+    # z_file_path = Path("test1_aurora.zss")
     z_file_path = z_file_path.absolute()
     run_id = "001"
     tf_collection = process_mth5_run(

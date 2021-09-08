@@ -29,12 +29,14 @@ class ConfigCreator(object):
     def create_run_config(
         self, station_id="", run_id="", mth5_path="", sample_rate=-1.0, **kwargs
     ):
+        default_band_setup = str(BAND_SETUP_PATH.joinpath("bs_test.cfg"))
         config_id = kwargs.get("config_id", f"{station_id}-{run_id}")
         decimation_factors = kwargs.get("decimation_factors", [1, 4, 4, 4])
         num_samples_window = kwargs.get("num_samples_window", 128)
         num_samples_overlap = kwargs.get("num_samples_overlap", 32)
         output_channels = kwargs.get("output_channels", ["hz", "ex", "ey"])
         reference_station_id = kwargs.get("reference_station_id", "")
+        band_setup_file = kwargs.get("band_setup_file", default_band_setup)
 
         run_config = RunConfig()
         run_config.config_id = config_id
@@ -58,7 +60,7 @@ class ConfigCreator(object):
             cfg.num_samples_overlap = num_samples_overlap
             cfg.sample_rate = run_config.initial_sample_rate * downsample_factor
             cfg.band_setup_style = "EMTF"
-            cfg.emtf_band_setup_file = str(BAND_SETUP_PATH.joinpath("bs_test.cfg"))
+            cfg.emtf_band_setup_file = band_setup_file
             cfg.estimation_engine = "RME"
             cfg.output_channels = output_channels
             run_config.decimation_level_configs[i_decimation_level] = cfg
