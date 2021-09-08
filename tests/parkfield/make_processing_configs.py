@@ -39,6 +39,23 @@ def create_run_test_config():
     return run_config_path
 
 
+#
+# def create_run_test_config_remote_reference():
+#     mth5_path = DATA_PATH.joinpath("pkd_test_00.h5")
+#     cc = ConfigCreator(config_path=CONFIG_PATH)
+#     run_config_path = cc.create_run_config(
+#         station_id="PKD",
+#         reference_station_id="SAO"
+#         mth5_path=mth5_path,
+#         sample_rate=40.0,
+#         num_samples_window=256,
+#         num_samples_overlap=192,
+#         config_id="pkd_test",
+#         output_channels=["ex", "ey"],
+#     )
+#     return run_config_path
+
+
 def main():
     create_decimation_level_test_config()
     create_run_test_config()

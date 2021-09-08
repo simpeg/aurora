@@ -33,15 +33,19 @@ class ConfigCreator(object):
         decimation_factors = kwargs.get("decimation_factors", [1, 4, 4, 4])
         num_samples_window = kwargs.get("num_samples_window", 128)
         num_samples_overlap = kwargs.get("num_samples_overlap", 32)
-        output_channels = kwargs.get(
-            "output_channels", ["hz", "ex", "ey"]
-        )  # ["ex", "ey"]
+        output_channels = kwargs.get("output_channels", ["hz", "ex", "ey"])
+        reference_station_id = kwargs.get("reference_station_id", "")
 
         run_config = RunConfig()
         run_config.config_id = config_id
         run_config.mth5_path = str(mth5_path)
         run_config.local_station_id = f"{station_id}"
+        run_config.reference_station_id = f"{reference_station_id}"
         run_config.initial_sample_rate = sample_rate
+
+        if run_config.reference_station_id:
+            config_id = f"{config_id}-RR_{run_config.reference_station_id}"
+            run_config.config_id = config_id
 
         downsample_factor = 1.0
         for i_decimation_level in range(len(decimation_factors)):
