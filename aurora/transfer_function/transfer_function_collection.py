@@ -50,6 +50,7 @@ class TransferFunctionCollection(object):
         """
         Addressing Aurora Issue #93
         Will merge all decimation levels into a single 3D xarray for output.
+        The output of this may become its own class, MergedTransferFunction
 
         One concern here is that the same period can be estiamted at more then one
         decimation level, making the frequency or period axis not of the same order
