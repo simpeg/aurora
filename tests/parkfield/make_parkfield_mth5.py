@@ -23,7 +23,7 @@ FDSN_CHANNEL_MAP["BT2"] = "BF2"
 FDSN_CHANNEL_MAP["BT3"] = "BF3"
 
 DATA_SOURCE = "IRIS"
-# DATA_SOURCE = "NCEDC"
+DATA_SOURCE = "NCEDC"
 # def make_channels_fdsn_compliant(streams):
 
 
@@ -77,11 +77,95 @@ def create_from_iris(dataset_id):
     return
 
 
+def create_from_iris_multistation(dataset_id):
+    dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
+    inventory = dataset_config.get_inventory_from_iris(
+        ensure_inventory_stages_are_named=True
+    )
+    translator = XMLInventoryMTExperiment()
+    experiment = translator.xml_to_mt(inventory_object=inventory)
+
+    target_folder = DATA_PATH
+    h5_path = target_folder.joinpath(f"{dataset_config.dataset_id}.h5")
+    mth5_obj = initialize_mth5(h5_path)
+    mth5_obj.from_experiment(experiment)
+    print(
+        f"station_id = {dataset_config.station}"
+    )  # station_id in mth5_obj.station_list
+    print(f"network_id = {dataset_config.network}")
+    print(f"channel_ids = {dataset_config.channel_codes}")
+
+    client = fdsn.Client(DATA_SOURCE)
+    streams = client.get_waveforms(
+        dataset_config.network,
+        dataset_config.station,
+        None,
+        dataset_config.channel_codes,
+        dataset_config.starttime,
+        dataset_config.endtime,
+    )
+    # <REASSIGN NON-CONVENTIONAL CHANNEL LABELS (Q2, Q3, T1, T2)>
+    # <TIME ALIGN WORKAROUND>
+    import datetime
+
+    for stream in streams:
+        stream.stats["channel"] = FDSN_CHANNEL_MAP[stream.stats["channel"]]
+        print(
+            f"CH {stream.stats['channel']} N={len(stream.data)}  startime"
+            f" {stream.stats.starttime}"
+        )
+        dt_seconds = stream.stats.starttime - dataset_config.starttime
+        print(f"dt_seconds {dt_seconds}")
+        dt = datetime.timedelta(seconds=dt_seconds)
+        print(f"dt = {dt}")
+        stream.stats.starttime = stream.stats.starttime - dt
+
+        # stream.stats.endtime =- dt
+    # </TIME ALIGN WORKAROUND>
+    # </REASSIGN NON-CONVENTIONAL CHANNEL LABELS (Q2, Q3, T1, T2)>
+
+    # BREAK STREAMS UP BY STATION?
+
+    # <This block is called often - should be a method>
+    start_times = sorted(list(set([tr.stats.starttime.isoformat() for tr in streams])))
+    end_times = sorted(list(set([tr.stats.endtime.isoformat() for tr in streams])))
+    run_stream = streams.slice(UTCDateTime(start_times[0]), UTCDateTime(end_times[-1]))
+    import obspy
+
+    streams_dict = {}
+    streams_dict["PKD"] = obspy.core.Stream(run_stream.traces[:4])
+    streams_dict["SAO"] = obspy.core.Stream(run_stream.traces[4:])
+    # pkd_stream = obspy.core.Stream(streams.traces[:4])
+    # sao_stream = obspy.core.Stream(streams.traces[4:])
+    # BREAK STREAMS UP BY STATION?
+    # </This block is called often - should be a method>
+    for i_station, station in enumerate(mth5_obj.station_list):
+        station_group = mth5_obj.get_station(station)
+        run_metadata = experiment.surveys[0].stations[i_station].runs[0]
+        run_ts_obj = RunTS()
+        run_ts_obj.from_obspy_stream(streams_dict[station], run_metadata)
+        run_id = "001"
+        run_ts_obj.run_metadata.id = run_id
+        run_group = station_group.add_run(run_id)
+        run_group.from_runts(run_ts_obj)
+    mth5_obj.close_mth5()
+
+    return
+
+
 def test_make_parkfield_mth5():
     dataset_id = "pkd_test_00"
     create_from_iris(dataset_id)
     h5_path = DATA_PATH.joinpath(f"{dataset_id}.h5")
     read_back_data(h5_path, "PKD", "001")
+
+
+def test_make_parkfield_hollister_mth5():
+    dataset_id = "pkd_sao_test_00"
+    create_from_iris_multistation(dataset_id)
+    h5_path = DATA_PATH.joinpath(f"{dataset_id}.h5")
+    read_back_data(h5_path, "PKD", "001")
+    read_back_data(h5_path, "SAO", "001")
 
 
 # <TEST FAILS BECAUSE DATA NOT AVAILABLE FROM IRIS -- NEED TO REQUEST FROM NCEDC>
@@ -94,8 +178,11 @@ def test_make_parkfield_mth5():
 
 
 def main():
-    test_make_parkfield_mth5()
-    # test_make_hollister_mth5()
+    test_make_parkfield_hollister_mth5()
+
+
+#    test_make_parkfield_mth5()
+# test_make_hollister_mth5()
 
 
 if __name__ == "__main__":
