@@ -253,7 +253,7 @@ class RegressionEstimator(object):
         self._Q = Q
         self._R = R
         if sanity_check:
-            if np.isclose(np.matmul(Q, R) - self.X, 0).all():
+            if np.isclose(np.matmul(Q, R) - X, 0).all():
                 pass
             else:
                 print("Failed QR decompostion sanity check")
