@@ -151,7 +151,8 @@ class TRME_RR(RegressionEstimator):
 
         else:
             converged = True
-            self.expectation_psi_prime = 1
+            # not needed - its defined in the init
+            # self.expectation_psi_prime = np.ones(self.n_channels_out)
             Yhat = self.X @ b0
             self.b = b0
             self.Yc = self.Y
