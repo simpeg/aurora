@@ -1,6 +1,6 @@
 from aurora.sandbox.io_helpers.inventory_review import scan_inventory_for_nonconformity
 from aurora.sandbox.xml_sandbox import describe_inventory_stages
-from aurora.sandbox.xml_sandbox import get_response_inventory_from_iris
+from aurora.sandbox.xml_sandbox import get_response_inventory_from_server
 
 
 class IRISDatasetConfig(object):
@@ -26,14 +26,17 @@ class IRISDatasetConfig(object):
         self.dataset_id = None
         self.components_list = None  #
 
-    def get_inventory_from_iris(self, ensure_inventory_stages_are_named=True):
+    def get_inventory_from_iris(
+        self, base_url="IRIS", ensure_inventory_stages_are_named=True
+    ):
 
-        inventory = get_response_inventory_from_iris(
+        inventory = get_response_inventory_from_server(
             network=self.network,
             station=self.station,
             channel=self.channel_codes,
             starttime=self.starttime,
             endtime=self.endtime,
+            base_url=base_url,
         )
         inventory = scan_inventory_for_nonconformity(inventory)
         if ensure_inventory_stages_are_named:

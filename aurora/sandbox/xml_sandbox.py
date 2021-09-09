@@ -42,13 +42,14 @@ def test_instantiate_and_export_mth5_metadata_example():
     return
 
 
-def get_response_inventory_from_iris(
+def get_response_inventory_from_server(
     network=None,
     station=None,
     channel=None,
     starttime=None,
     endtime=None,
     level="response",
+    base_url="IRIS",
 ):
     """
 
@@ -65,7 +66,7 @@ def get_response_inventory_from_iris(
     -------
 
     """
-    client = Client(base_url="IRIS", force_redirect=True)
+    client = Client(base_url=base_url, force_redirect=True)
     inventory = client.get_stations(
         network=network,
         station=station,
