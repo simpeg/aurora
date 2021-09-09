@@ -12,6 +12,8 @@ import fortranformat as ff
 import numpy as np
 import xarray as xr
 
+from pathlib import Path
+
 from aurora.transfer_function.emtf_z_file_helpers import (
     make_orientation_block_of_z_file,
 )
@@ -125,6 +127,8 @@ class TransferFunctionCollection(object):
         This seems to insist that channels be ordered:
         Hx, Hy, Hz, Ex, Ey
 
+        z_file_path : Path or str
+
         Sample output for a band:
         period :      4.65455    decimation level   1    freq. band from   25 to   30
         number of data point   2489 sampling freq.   1.000 Hz
@@ -144,6 +148,9 @@ class TransferFunctionCollection(object):
         -------
 
         """
+        if isinstance(z_file_path, Path):
+            parent = z_file_path.parent
+            parent.mkdir(exist_ok=True)
         f = open(z_file_path, "w")
         f.writelines(" **** IMPEDANCE IN MEASUREMENT COORDINATES ****\n")
         f.writelines(" ********** WITH FULL ERROR COVARINCE**********\n")
