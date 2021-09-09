@@ -22,12 +22,12 @@ FDSN_CHANNEL_MAP["BT1"] = "BF1"
 FDSN_CHANNEL_MAP["BT2"] = "BF2"
 FDSN_CHANNEL_MAP["BT3"] = "BF3"
 
-DATA_SOURCE = "IRIS"
-DATA_SOURCE = "NCEDC"
+# DATA_SOURCE = "IRIS"
+# DATA_SOURCE = "NCEDC"
 # def make_channels_fdsn_compliant(streams):
 
 
-def create_from_iris(dataset_id):
+def create_from_server(dataset_id, data_source="IRIS"):
     dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
     inventory = dataset_config.get_inventory_from_iris(
         ensure_inventory_stages_are_named=True
@@ -47,7 +47,7 @@ def create_from_iris(dataset_id):
 
     station_group = mth5_obj.get_station(dataset_config.station)
 
-    client = fdsn.Client(DATA_SOURCE)
+    client = fdsn.Client(data_source)
     streams = client.get_waveforms(
         dataset_config.network,
         dataset_config.station,
@@ -77,7 +77,7 @@ def create_from_iris(dataset_id):
     return
 
 
-def create_from_iris_multistation(dataset_id):
+def create_from_server_multistation(dataset_id, data_source="IRIS"):
     dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
     inventory = dataset_config.get_inventory_from_iris(
         ensure_inventory_stages_are_named=True
@@ -95,7 +95,7 @@ def create_from_iris_multistation(dataset_id):
     print(f"network_id = {dataset_config.network}")
     print(f"channel_ids = {dataset_config.channel_codes}")
 
-    client = fdsn.Client(DATA_SOURCE)
+    client = fdsn.Client(data_source)
     streams = client.get_waveforms(
         dataset_config.network,
         dataset_config.station,
@@ -155,14 +155,14 @@ def create_from_iris_multistation(dataset_id):
 
 def test_make_parkfield_mth5():
     dataset_id = "pkd_test_00"
-    create_from_iris(dataset_id)
+    create_from_server(dataset_id, data_source="IRIS")
     h5_path = DATA_PATH.joinpath(f"{dataset_id}.h5")
     read_back_data(h5_path, "PKD", "001")
 
 
 def test_make_parkfield_hollister_mth5():
     dataset_id = "pkd_sao_test_00"
-    create_from_iris_multistation(dataset_id)
+    create_from_server_multistation(dataset_id, data_source="NCEDC")
     h5_path = DATA_PATH.joinpath(f"{dataset_id}.h5")
     read_back_data(h5_path, "PKD", "001")
     read_back_data(h5_path, "SAO", "001")
@@ -178,7 +178,10 @@ def test_make_parkfield_hollister_mth5():
 
 
 def main():
-    test_make_parkfield_hollister_mth5()
+    test_make_parkfield_mth5()
+
+
+#    test_make_parkfield_hollister_mth5()
 
 
 #    test_make_parkfield_mth5()

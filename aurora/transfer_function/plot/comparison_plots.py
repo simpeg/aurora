@@ -73,7 +73,7 @@ def compare_two_z_files(
     )
     axs[0].legend(prop={"size": 6})
     # axs[0].set_ylabel("$\rho_a$")
-    axs[0].set_ylabel("$\Omega$-m")
+    axs[0].set_ylabel("Apprarent Resistivity $\Omega$-m")
     axs[0].set_ylim(1, 1e3)
     axs[0].set_xlim(0.05, 500)
 
@@ -112,6 +112,7 @@ def compare_two_z_files(
         color="black",
     )
     axs[1].set_xlabel("Period (s)")
+    axs[1].set_ylabel("Phase (degrees)")
     axs[1].set_ylim(0, 90)
     if out_file:
         # if out_file[-3:] != ".png":
