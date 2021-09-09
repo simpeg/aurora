@@ -14,6 +14,7 @@ def compare_two_z_files(
     scale_factor2=1.0,
     out_file="",
     show_plot=True,
+    **kwargs,
 ):
     """
     TODO: Put this in plot_helpers
@@ -35,7 +36,7 @@ def compare_two_z_files(
     zfile2 = read_z_file(z_path2)
 
     fig, axs = plt.subplots(nrows=2, dpi=300, sharex=True)  # figsize=(8, 6.),
-    markersize = 1.5
+    markersize = kwargs.get("markersize", 3)
 
     plot_rho(
         axs[0],
