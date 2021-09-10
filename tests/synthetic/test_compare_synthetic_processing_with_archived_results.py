@@ -13,6 +13,8 @@ from aurora.transfer_function.emtf_z_file_helpers import (
 SYNTHETIC_PATH = TEST_PATH.joinpath("synthetic")
 CONFIG_PATH = SYNTHETIC_PATH.joinpath("config")
 DATA_PATH = SYNTHETIC_PATH.joinpath("data")
+AURORA_RESULTS_PATH = SYNTHETIC_PATH.joinpath("aurora_results")
+AURORA_RESULTS_PATH.mkdir(exist_ok=True)
 
 
 def create_config_file(matlab_or_fortran):
@@ -103,18 +105,34 @@ def process_synthetic_1_standard(
     phi_rms_emtf = np.sqrt(np.mean((aux_data.pxy - 45) ** 2))
     ttl_str = ""
     if use_subtitle:
-        ttl_str += f"\n rho rms_aurora {rho_rms_aurora:.1f} rms_emtf {rho_rms_emtf:.1f}"
         ttl_str += (
-            f"\n phi rms_aurora {phi_rms_aurora:.1f} rms_emtf" f" {phi_rms_emtf:.1f}"
+            f"\n rho rms_aurora {rho_rms_aurora:.1f} rms_{compare_against}"
+            f" {rho_rms_emtf:.1f}"
         )
-    print(f"{xy_or_yx} rho_rms_aurora {rho_rms_aurora} rho_rms_emtf" f" {rho_rms_emtf}")
-    print(f"{xy_or_yx} phi_rms_aurora {phi_rms_aurora} phi_rms_emtf" f" {phi_rms_emtf}")
+        ttl_str += (
+            f"\n phi rms_aurora {phi_rms_aurora:.1f} rms_{compare_against}"
+            f" {phi_rms_emtf:.1f}"
+        )
+    print(
+        f"{xy_or_yx} rho_rms_aurora {rho_rms_aurora} rho_rms_{compare_against}"
+        f" {rho_rms_emtf}"
+    )
+    print(
+        f"{xy_or_yx} phi_rms_aurora {phi_rms_aurora} phi_rms_{compare_against}"
+        f" {phi_rms_emtf}"
+    )
+
+    figure_basename = (
+        f"synthetic_{tf_collection.local_station_id}_{xy_or_yx}_{compare_against}.png"
+    )
     if make_rho_phi_plot:
         tf_collection.rho_phi_plot(
             aux_data=aux_data,
             xy_or_yx=xy_or_yx,
             ttl_str=ttl_str,
             show=show_rho_phi_plot,
+            figure_basename=figure_basename,
+            figure_path=AURORA_RESULTS_PATH,
         )
 
     xy_or_yx = "yx"
@@ -129,16 +147,34 @@ def process_synthetic_1_standard(
     phi_rms_emtf = np.sqrt(np.mean((aux_data.pyx - 45) ** 2))
     ttl_str = ""
     if use_subtitle:
-        ttl_str += f"\n rho rms_aurora {rho_rms_aurora:.1f} rms_emtf {rho_rms_emtf:.1f}"
-        ttl_str += f"\n phi rms_aurora {phi_rms_aurora:.1f} rms_emtf {phi_rms_emtf:.1f}"
-    print(f"{xy_or_yx} rho_rms_aurora {rho_rms_aurora} rho_rms_emtf " f"{rho_rms_emtf}")
-    print(f"{xy_or_yx} phi_rms_aurora {phi_rms_aurora} phi_rms_emtf " f"{phi_rms_emtf}")
+        rho_rms_aurora_str = f"rho rms_aurora {rho_rms_aurora:.1f}"
+        rho_rms_emtf_str = f"rms_{compare_against} {rho_rms_emtf:.1f}"
+        ttl_str += f"\n {rho_rms_aurora_str} {rho_rms_emtf_str}"
+
+        phi_rms_aurora_str = f"phi rms_aurora {phi_rms_aurora:.1f}"
+        phi_rms_emtf_str = f"rms_{compare_against} {phi_rms_emtf:.1f}"
+        ttl_str += f"\n {phi_rms_aurora_str} {phi_rms_emtf_str}"
+
+    print(
+        f"{xy_or_yx} rho_rms_aurora {rho_rms_aurora} rho_rms_{compare_against} "
+        f"{rho_rms_emtf}"
+    )
+    print(
+        f"{xy_or_yx} phi_rms_aurora {phi_rms_aurora} phi_rms_{compare_against} "
+        f"{phi_rms_emtf}"
+    )
+
+    figure_basename = (
+        f"synthetic_{tf_collection.local_station_id}_{xy_or_yx}_{compare_against}.png"
+    )
     if make_rho_phi_plot:
         tf_collection.rho_phi_plot(
             aux_data=aux_data,
             xy_or_yx=xy_or_yx,
             ttl_str=ttl_str,
             show=show_rho_phi_plot,
+            figure_basename=figure_basename,
+            figure_path=AURORA_RESULTS_PATH,
         )
 
     return

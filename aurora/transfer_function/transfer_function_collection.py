@@ -31,6 +31,16 @@ class TransferFunctionCollection(object):
         self.tf_dict = kwargs.get("tf_dict", None)
 
     @property
+    def local_station_id(self):
+        """
+        TODO: make this take the station_id directly from the header
+        Returns
+        -------
+
+        """
+        return self.tf_dict[0].tf_header.local_station_id
+
+    @property
     def total_number_of_frequencies(self):
         num_frequecies = 0
         for dec_level in self.tf_dict.keys():
@@ -314,6 +324,7 @@ class TransferFunctionCollection(object):
         markersize=10,
         rho_ylims=[10, 1000],
         phi_ylims=[0, 90],
+        **kwargs,
     ):
         """
         One-off plotting method intended only for the synthetic test data for aurora dev
@@ -420,10 +431,14 @@ class TransferFunctionCollection(object):
             axs[0].set_ylim(rho_ylims)
         if phi_ylims is not None:
             axs[1].set_ylim(phi_ylims)
+
         from aurora.general_helper_functions import FIGURES_PATH
 
-        figure_basename = f"synthetic_{tf.tf_header.local_station_id}_{xy_or_yx}.png"
-        out_file = FIGURES_PATH.joinpath(figure_basename)
+        default_figure_basename = f"{self.local_station_id}_{xy_or_yx}.png"
+        figure_basename = kwargs.get("figure_basename", default_figure_basename)
+        figure_path = kwargs.get("figure_path", FIGURES_PATH)
+        # figure_basename = f"synthetic_{tf.tf_header.local_station_id}_{xy_or_yx}.png"
+        out_file = figure_path.joinpath(figure_basename)
         plt.savefig(out_file)
         if show:
             plt.show()
