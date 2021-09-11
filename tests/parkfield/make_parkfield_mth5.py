@@ -30,7 +30,7 @@ FDSN_CHANNEL_MAP["BT3"] = "BF3"
 def create_from_server(dataset_id, data_source="IRIS"):
     dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
     inventory = dataset_config.get_inventory_from_iris(
-        ensure_inventory_stages_are_named=True
+        base_url=data_source, ensure_inventory_stages_are_named=True
     )
     translator = XMLInventoryMTExperiment()
     experiment = translator.xml_to_mt(inventory_object=inventory)
@@ -79,8 +79,10 @@ def create_from_server(dataset_id, data_source="IRIS"):
 
 def create_from_server_multistation(dataset_id, data_source="IRIS"):
     dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
+    # dataset_config.station="PKD"#debuging
     inventory = dataset_config.get_inventory_from_iris(
-        ensure_inventory_stages_are_named=True
+        ensure_inventory_stages_are_named=True,
+        base_url=data_source,
     )
     translator = XMLInventoryMTExperiment()
     experiment = translator.xml_to_mt(inventory_object=inventory)
@@ -108,11 +110,15 @@ def create_from_server_multistation(dataset_id, data_source="IRIS"):
     # <TIME ALIGN WORKAROUND>
     import datetime
 
+    # CLOCK_ZERO = UTCDateTime(2004, 9, 28, 0, 0, 0.021467)
+    # CLOCK_ZERO = dataset_config.starttime
     for stream in streams:
         stream.stats["channel"] = FDSN_CHANNEL_MAP[stream.stats["channel"]]
+        # station_channel = f"STA:{stream.stats['station']} CH
+        # {stream.stats['channel']}"
         print(
-            f"CH {stream.stats['channel']} N={len(stream.data)}  startime"
-            f" {stream.stats.starttime}"
+            f"{stream.stats['station']}  {stream.stats['channel']} N="
+            f"{len(stream.data)}  startime {stream.stats.starttime}"
         )
         dt_seconds = stream.stats.starttime - dataset_config.starttime
         print(f"dt_seconds {dt_seconds}")
@@ -135,18 +141,18 @@ def create_from_server_multistation(dataset_id, data_source="IRIS"):
     streams_dict = {}
     streams_dict["PKD"] = obspy.core.Stream(run_stream.traces[:4])
     streams_dict["SAO"] = obspy.core.Stream(run_stream.traces[4:])
-    # pkd_stream = obspy.core.Stream(streams.traces[:4])
-    # sao_stream = obspy.core.Stream(streams.traces[4:])
     # BREAK STREAMS UP BY STATION?
     # </This block is called often - should be a method>
+    station_groups = {}
+    station_groups["PKD"] = mth5_obj.get_station("PKD")
+    station_groups["SAO"] = mth5_obj.get_station("SAO")
+    run_id = "001"
     for i_station, station in enumerate(mth5_obj.station_list):
-        station_group = mth5_obj.get_station(station)
         run_metadata = experiment.surveys[0].stations[i_station].runs[0]
         run_ts_obj = RunTS()
         run_ts_obj.from_obspy_stream(streams_dict[station], run_metadata)
-        run_id = "001"
         run_ts_obj.run_metadata.id = run_id
-        run_group = station_group.add_run(run_id)
+        run_group = station_groups[station].add_run(run_id)
         run_group.from_runts(run_ts_obj)
     mth5_obj.close_mth5()
 
@@ -160,12 +166,23 @@ def test_make_parkfield_mth5():
     read_back_data(h5_path, "PKD", "001")
 
 
+def test_make_hollister_mth5():
+    dataset_id = "sao_test_00"
+    create_from_server(dataset_id, data_source="NCEDC")
+    h5_path = DATA_PATH.joinpath(f"{dataset_id}.h5")
+    run, runts = read_back_data(h5_path, "SAO", "001")
+    print("hello")
+
+
 def test_make_parkfield_hollister_mth5():
     dataset_id = "pkd_sao_test_00"
     create_from_server_multistation(dataset_id, data_source="NCEDC")
     h5_path = DATA_PATH.joinpath(f"{dataset_id}.h5")
-    read_back_data(h5_path, "PKD", "001")
-    read_back_data(h5_path, "SAO", "001")
+    pkd_run_obj, pkd_run_ts = read_back_data(h5_path, "PKD", "001")
+    sao_run_obj, sao_run_ts = read_back_data(h5_path, "SAO", "001")
+    print(pkd_run_obj)
+    print(sao_run_obj)
+    print("OK")
 
 
 # <TEST FAILS BECAUSE DATA NOT AVAILABLE FROM IRIS -- NEED TO REQUEST FROM NCEDC>
@@ -178,10 +195,9 @@ def test_make_parkfield_hollister_mth5():
 
 
 def main():
-    test_make_parkfield_mth5()
-
-
-#    test_make_parkfield_hollister_mth5()
+    # test_make_parkfield_mth5()
+    # test_make_hollister_mth5()
+    test_make_parkfield_hollister_mth5()
 
 
 #    test_make_parkfield_mth5()
