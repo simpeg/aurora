@@ -129,7 +129,7 @@ def describe_inventory_stages(inventory, assign_names=False):
                     if stage.name is None:
                         if assign_names:
                             new_names_were_assigned = True
-                            new_name = f"{channel.code}_{i}"
+                            new_name = f"{station}_{channel.code}_{i}"
                             stage.name = new_name
                             print(f"ASSIGNING stage {stage}, name {stage.name}")
                     if hasattr(stage, "symmetry"):
