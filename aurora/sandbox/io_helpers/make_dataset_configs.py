@@ -58,6 +58,27 @@ def make_test_configs():
     test_data_set_configs[test_data_set.dataset_id] = test_data_set
     # </sao_test_00 Single station>
 
+    # <cas_nvr_test_00 Remote Reference>
+    test_data_set = IRISDatasetConfig()
+    test_data_set.dataset_id = "cas_nvr_test_00"
+    test_data_set.network = "ZU"
+    test_data_set.station = "CAS04,NVR08"
+    # <ORIGINAL>
+    # test_data_set.starttime = UTCDateTime("2020-06-02T18:41:43.000000Z")
+    # test_data_set.endtime = UTCDateTime("2020-07-13T21:46:12.000000Z")
+    # </ORIGINAL>
+    test_data_set.starttime = UTCDateTime("2020-06-04T00:00:00.000000Z")
+    test_data_set.endtime = UTCDateTime("2020-06-05T00:00:00.000000Z")  # minitest
+    # test_data_set.endtime = UTCDateTime("2020-06-24T15:55:46.000000Z")
+
+    # test_data_set.starttime = UTCDateTime("2004-09-28T00:00:00.000000Z")
+    # test_data_set.endtime = UTCDateTime("2004-09-28T01:59:59.975000Z")
+    # test_data_set.endtime = UTCDateTime("2004-09-28T00:01:59.999000Z") #small test
+    test_data_set.channel_codes = None
+    test_data_set.description = "earthscope example dataset"
+    test_data_set.components_list = HEXY
+    test_data_set_configs[test_data_set.dataset_id] = test_data_set
+    # </cas_nvr_test_00 Remote Reference>
     return test_data_set_configs
 
 
