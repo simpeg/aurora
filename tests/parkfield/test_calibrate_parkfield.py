@@ -1,8 +1,8 @@
-from aurora.general_helper_functions import FIGURES_PATH
 from aurora.general_helper_functions import TEST_PATH
 from aurora.time_series.windowing_scheme import WindowingScheme
 from mth5.mth5 import MTH5
 from calibration_helpers import parkfield_sanity_check
+from helpers import AURORA_RESULTS_PATH
 
 
 def validate_bulk_spectra_have_correct_units(run_obj, run_ts_obj):
@@ -22,7 +22,7 @@ def validate_bulk_spectra_have_correct_units(run_obj, run_ts_obj):
     parkfield_sanity_check(
         fft_obj,
         run_obj,
-        figures_path=FIGURES_PATH,
+        figures_path=AURORA_RESULTS_PATH,
         show_response_curves=show_response_curves,
         show_spectra=show_spectra,
         include_decimation=True,
