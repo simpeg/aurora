@@ -63,6 +63,7 @@ class DecimationLevelConfig(BaseDict):
         # <STATIONS>
         self.local_station_id = ""
         self.reference_station_id = ""
+        self.channel_scale_factors = {}
         # </STATIONS>
 
         # <ESTIMATION>
@@ -101,6 +102,31 @@ class DecimationLevelConfig(BaseDict):
     # @local_station_id.setter
     # def local_station_id(self, local_station_id):
     #     self._local_station_id = local_station_id
+
+    def station_scale_factors(self, station_id):
+        """
+        Returns the scale factors dictionary keyed by channel.  If there isn't one then
+        return None.
+
+        Parameters
+        ----------
+        station_id
+
+        Returns
+        -------
+
+        """
+        try:
+            scale_factor_dict = self.channel_scale_factors[station_id]
+            return scale_factor_dict
+        except KeyError:
+            return None
+
+        # def local_channel_scale_factors(self):
+        #     return self.channel_scale_factors(self.local_station_id)
+        #
+        # def reference_channel_scale_factors(self):
+        #     return self.channel_scale_factors(self.reference_station_id)
 
     def from_json(self, json_fn):
         """

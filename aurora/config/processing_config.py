@@ -37,6 +37,11 @@ class RunConfig(BaseDict):
         Points at an mth5 file to process.  This is an optional argument, pipeline
         can take an mth5 file as an argument and apply any processing config
 
+    2021-09-15:
+    adding local and reference scale factors.  These are intended as a workaround for
+    errors in configs.  However, if we want to generalize them for multiple station
+    processing, the way to do it is to make one master dictionary keyed by station_id.
+    Under the station_id level we place another dictionary keyed by channel name.
     """
 
     def __init__(self, **kwargs):
@@ -46,6 +51,7 @@ class RunConfig(BaseDict):
         self.reference_station_id = ""
         self.reference_mth5_path = ""
         self.initial_sample_rate = kwargs.get("initial_sample_rate", 0.0)
+        self.channel_scale_factors = {}
         self.decimation_level_configs = {}
 
     @property
@@ -66,6 +72,7 @@ class RunConfig(BaseDict):
         json_dict["mth5_path"] = self.mth5_path
         json_dict["local_station_id"] = self.local_station_id
         json_dict["reference_station_id"] = self.reference_station_id
+        json_dict["channel_scale_factors"] = self.channel_scale_factors
         print(self.decimation_level_ids)
         for dec_level_id in self.decimation_level_ids:
             json_dict[dec_level_id] = self_dict[dec_level_id].__dict__
@@ -100,6 +107,7 @@ class RunConfig(BaseDict):
         self.mth5_path = json_dict.pop("mth5_path")
         self.local_station_id = json_dict.pop("local_station_id")
         self.reference_station_id = json_dict.pop("reference_station_id")
+        self.channel_scale_factors = json_dict.pop("channel_scale_factors")
         decimation_level_ids = sorted(json_dict.keys())
         for decimation_level_id in decimation_level_ids:
             decimation_level_processing_config = DecimationLevelConfig()

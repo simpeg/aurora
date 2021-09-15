@@ -38,6 +38,7 @@ class ConfigCreator(object):
         band_setup_file = kwargs.get("band_setup_file", default_band_setup)
         reference_station_id = kwargs.get("reference_station_id", "")
         reference_channels = kwargs.get("reference_channels", [])
+        channel_scale_factors = kwargs.get("channel_scale_factors", {})
         estimation_engine = kwargs.get("estimation_engine", "RME")
         max_number_of_iterations = kwargs.get("max_number_of_iterations", 10)
         if reference_station_id:
@@ -52,6 +53,7 @@ class ConfigCreator(object):
         run_config.initial_sample_rate = sample_rate
         run_config.reference_station_id = f"{reference_station_id}"
         run_config.reference_mth5 = str(reference_mth5_path)
+        run_config.channel_scale_factors = channel_scale_factors
 
         if run_config.reference_station_id:
             config_id = f"{config_id}-RR_{run_config.reference_station_id}"

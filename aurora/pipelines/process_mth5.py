@@ -134,14 +134,24 @@ def process_mth5_decimation_level(config, local, remote, units="MT"):
     local_run_xrts = local["mvts"]
     local_stft_obj = run_ts_to_stft(config, local_run_xrts)
     # local_stft_obj = run_ts_to_stft_scipy(config, local_run_xrts)
-    local_stft_obj = calibrate_stft_obj(local_stft_obj, local_run_obj, units=units)
+    local_scale_factors = config.station_scale_factors(config.local_station_id)
+    local_stft_obj = calibrate_stft_obj(
+        local_stft_obj,
+        local_run_obj,
+        units=units,
+        channel_scale_factors=local_scale_factors,
+    )
 
     remote_run_obj = remote["run"]
     remote_run_xrts = remote["mvts"]
     if config.reference_station_id:
         remote_stft_obj = run_ts_to_stft(config, remote_run_xrts)
+        remote_scale_factors = config.station_scale_factors(config.reference_station_id)
         remote_stft_obj = calibrate_stft_obj(
-            remote_stft_obj, remote_run_obj, units=units
+            remote_stft_obj,
+            remote_run_obj,
+            units=units,
+            channel_scale_factors=remote_scale_factors,
         )
     else:
         remote_stft_obj = None
@@ -246,6 +256,7 @@ def process_mth5_run(
         processing_config = run_config.decimation_level_configs[dec_level_id]
         processing_config.local_station_id = run_config.local_station_id
         processing_config.reference_station_id = run_config.reference_station_id
+        processing_config.channel_scale_factors = run_config.channel_scale_factors
 
         # <GET DATA>
         # Careful here -- for multiple station processing we will need to load

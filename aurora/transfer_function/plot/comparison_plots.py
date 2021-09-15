@@ -28,13 +28,17 @@ def compare_two_z_files(
     scale_factor1
     scale_factor2
 
+    **kwargs
+    rho_ylims
+    xlims
+
     Returns
     -------
 
     """
     zfile1 = read_z_file(z_path1)
     zfile2 = read_z_file(z_path2)
-
+    print(f"scale_factor1: {scale_factor1}")
     fig, axs = plt.subplots(nrows=2, dpi=300, sharex=True)  # figsize=(8, 6.),
     markersize = kwargs.get("markersize", 3)
 
@@ -75,8 +79,10 @@ def compare_two_z_files(
     axs[0].legend(prop={"size": 6})
     # axs[0].set_ylabel("$\rho_a$")
     axs[0].set_ylabel("Apprarent Resistivity $\Omega$-m")
-    axs[0].set_ylim(1, 1e3)
-    axs[0].set_xlim(0.05, 500)
+    rho_ylims = kwargs.get("rho_ylims", [1, 1e3])
+    axs[0].set_ylim(rho_ylims[0], rho_ylims[1])
+    xlims = kwargs.get("xlims", [1e-3, 1e3])
+    axs[0].set_xlim(xlims[0], xlims[1])
 
     plot_phi(
         axs[1],
@@ -114,7 +120,8 @@ def compare_two_z_files(
     )
     axs[1].set_xlabel("Period (s)")
     axs[1].set_ylabel("Phase (degrees)")
-    axs[1].set_ylim(0, 90)
+    phi_ylims = kwargs.get("phi_ylims", [0, 90])
+    axs[1].set_ylim(phi_ylims[0], phi_ylims[1])
     if out_file:
         # if out_file[-3:] != ".png":
         #     out_file+=".png"

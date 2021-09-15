@@ -9,6 +9,14 @@ from aurora.config.decimation_level_config import DecimationLevelConfig
 from helpers import DATA_PATH
 from helpers import CONFIG_PATH
 
+CHANNEL_SCALE_FACTORS = {}
+CHANNEL_SCALE_FACTORS["PKD"] = {}
+CHANNEL_SCALE_FACTORS["PKD"]["ex"] = 1e6
+CHANNEL_SCALE_FACTORS["PKD"]["ey"] = 1e6
+CHANNEL_SCALE_FACTORS["SAO"] = {}
+CHANNEL_SCALE_FACTORS["SAO"]["ex"] = 1e6
+CHANNEL_SCALE_FACTORS["SAO"]["ey"] = 1e6
+
 
 def create_decimation_level_test_config():
     cfg = DecimationLevelConfig()
@@ -33,6 +41,7 @@ def create_run_test_config():
         num_samples_overlap=32,
         config_id="pkd_test",
         output_channels=["ex", "ey"],
+        channel_scale_factors=CHANNEL_SCALE_FACTORS,
     )
     return run_config_path
 
@@ -52,6 +61,7 @@ def create_run_test_config_remote_reference():
         estimation_engine="RME_RR",
         reference_channels=["hx", "hy"],
         max_number_of_iterations=10,
+        scale_factors=CHANNEL_SCALE_FACTORS,
     )
     return run_config_path
 

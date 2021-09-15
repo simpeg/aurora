@@ -28,7 +28,7 @@ def test_processing(z_file_path=None):
         processing_run_cfg,
         run_id,
         mth5_path=mth5_path,
-        units="SI",
+        units="MT",
         show_plot=show_plot,
         z_file_path=z_file_path,
     )
@@ -47,9 +47,11 @@ def main():
         auxilliary_z_file,
         label1="aurora",
         label2="emtf",
-        scale_factor1=1e-6,
+        scale_factor1=1,
         out_file="SS.png",
         markersize=3,
+        rho_ylims=[1e0, 1e3],
+        xlims=[0.05, 500],
     )
 
 

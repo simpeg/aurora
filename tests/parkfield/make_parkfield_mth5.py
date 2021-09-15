@@ -12,6 +12,7 @@ from aurora.pipelines.helpers import initialize_mth5
 from aurora.pipelines.helpers import read_back_data
 from mth5.timeseries import RunTS
 from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
+from aurora.time_series.filters.filter_helpers import MT2SI_ELECTRIC_FIELD_FILTER
 
 DATA_PATH = TEST_PATH.joinpath("parkfield", "data")
 DATA_PATH.mkdir(exist_ok=True)
@@ -34,6 +35,16 @@ def create_from_server(dataset_id, data_source="IRIS"):
     )
     translator = XMLInventoryMTExperiment()
     experiment = translator.xml_to_mt(inventory_object=inventory)
+    print(
+        f"ADD MT2SI_ELECTRIC_FIELD_FILTER to electric channels for parkfield here"
+        f" {MT2SI_ELECTRIC_FIELD_FILTER} "
+    )
+    # survey = experiment.surveys[0]
+    # survey.filters["MT2SI Electric Field"] = MT2SI_ELECTRIC_FIELD_FILTER
+    # survey.stations[0].runs[0].channels[0].filter.update(
+    #    MT2SI_ELECTRIC_FIELD_FILTER)
+    # survey.stations[0].runs[0].channels[1].filter.update(
+    # MT2SI_ELECTRIC_FIELD_FILTER)
     run_metadata = experiment.surveys[0].stations[0].runs[0]
     target_folder = DATA_PATH
     h5_path = target_folder.joinpath(f"{dataset_config.dataset_id}.h5")
@@ -59,6 +70,11 @@ def create_from_server(dataset_id, data_source="IRIS"):
     # <REASSIGN NON-CONVENTIONAL CHANNEL LABELS (Q2, Q3, T1, T2)>
     for stream in streams:
         stream.stats["channel"] = FDSN_CHANNEL_MAP[stream.stats["channel"]]
+        # #<UNITS HACK>
+        # if stream.stats["channel"][1] == "Q":
+        #     print("WARNING - HANDLE INCORRECT UNITS TRANSLATE V/m to mV/km")
+        #     stream.data *= 1000000
+        # #</UNITS HACK>
     # </REASSIGN NON-CONVENTIONAL CHANNEL LABELS (Q2, Q3, T1, T2)>
 
     # <This block is called often - should be a method>
@@ -195,7 +211,7 @@ def test_make_parkfield_hollister_mth5():
 
 
 def main():
-    # test_make_parkfield_mth5()
+    test_make_parkfield_mth5()
     # test_make_hollister_mth5()
     test_make_parkfield_hollister_mth5()
 

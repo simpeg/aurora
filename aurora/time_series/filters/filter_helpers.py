@@ -5,15 +5,31 @@ from mt_metadata.timeseries.filters.frequency_response_table_filter import (
 from aurora.general_helper_functions import TEST_PATH
 
 
-def make_coefficient_filter(gain=1.0, name="unit_conversion"):
-    # in general, you need to add all required fields from the
-    # standards.json
-    # coeff_filter = CoefficientFilter()
+def make_coefficient_filter(gain=1.0, name="unit_conversion", **kwargs):
+    """
+
+    Parameters
+    ----------
+    gain
+    name
+    units_in : string
+        one of "digital counts", "millivolts", etc.
+        TODO: Add a refernce here to the list of units supported in mt_metadata
+
+    Returns
+    -------
+
+    """
+    # in general, you need to add all required fields from the standards.json
+    default_units_in = "units in"
+    default_units_out = "units out"
+    default_name = "generic coefficient filter"
     cf = CoefficientFilter()
-    cf.units_in = "digital counts"
-    cf.units_out = "millivolts"
+    cf.name = kwargs.get("name", default_name)
+    cf.units_in = kwargs.get("units_in", default_units_in)
+    cf.units_out = kwargs.get("units_out", default_units_out)
     cf.gain = gain
-    cf.name = name
+
     return cf
 
 
@@ -37,3 +53,11 @@ def make_frequency_response_table_filter(case="bf4"):
     else:
         print(f"case {case} not supported for FAP Table")
         raise Exception
+
+
+MT2SI_ELECTRIC_FIELD_FILTER = make_coefficient_filter(
+    gain=1e6,
+    units_in="millivolts per kilometer",
+    units_out="volts per meter",
+    name="MT to SI electric field " "conversion",
+)
