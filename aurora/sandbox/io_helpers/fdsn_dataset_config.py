@@ -3,14 +3,14 @@ from aurora.sandbox.xml_sandbox import describe_inventory_stages
 from aurora.sandbox.xml_sandbox import get_response_inventory_from_server
 
 
-class IRISDatasetConfig(object):
+class FDSNDatasetConfig(object):
     """
     This class contains the information needed to uniquely specify a
-    dataset that will be accessed from IRIS.
+    dataset that will be accessed from IRIS, NCEDC, or other FDSN client.
     This config will only work for single stations.
 
     Need:
-    -iris_metadata_parameters
+    -fdsn_metadata_parameters
     -data_parameters (how to rover, or load from local)
     -a way to specify station-channel, this config will only work for single stations.
 

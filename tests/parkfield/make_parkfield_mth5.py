@@ -23,8 +23,6 @@ FDSN_CHANNEL_MAP["BT1"] = "BF1"
 FDSN_CHANNEL_MAP["BT2"] = "BF2"
 FDSN_CHANNEL_MAP["BT3"] = "BF3"
 
-# DATA_SOURCE = "IRIS"
-# DATA_SOURCE = "NCEDC"
 # def make_channels_fdsn_compliant(streams):
 
 

@@ -1,6 +1,6 @@
 # TODO: Move this into tests/parkfield after factoring out FAP test
 from obspy import UTCDateTime
-from aurora.sandbox.io_helpers.iris_dataset_config import IRISDatasetConfig
+from aurora.sandbox.io_helpers.fdsn_dataset_config import FDSNDatasetConfig
 
 HEXY = ["hx", "hy", "ex", "ey"]  # default components list
 # <CREATE TEST CONFIGS>
@@ -10,7 +10,7 @@ def make_test_configs():
     test_data_set_configs = {}
 
     # <pkd_test_00 Single station>
-    test_data_set = IRISDatasetConfig()
+    test_data_set = FDSNDatasetConfig()
     test_data_set.dataset_id = "pkd_test_00"
     test_data_set.network = "BK"
     test_data_set.station = "PKD"
@@ -27,7 +27,7 @@ def make_test_configs():
     # </pkd_test_00 Single station>
 
     # <sao_test_00 Single station>
-    test_data_set = IRISDatasetConfig()
+    test_data_set = FDSNDatasetConfig()
     test_data_set.dataset_id = "sao_test_00"
     test_data_set.network = "BK"
     test_data_set.station = "SAO"
@@ -43,7 +43,7 @@ def make_test_configs():
     # </sao_test_00 Single station>
 
     # <pkd_sao_test_00 Remote Reference>
-    test_data_set = IRISDatasetConfig()
+    test_data_set = FDSNDatasetConfig()
     test_data_set.dataset_id = "pkd_sao_test_00"
     test_data_set.network = "BK"
     test_data_set.station = "PKD,SAO"
@@ -59,7 +59,7 @@ def make_test_configs():
     # </sao_test_00 Single station>
 
     # <cas_nvr_test_00 Remote Reference>
-    test_data_set = IRISDatasetConfig()
+    test_data_set = FDSNDatasetConfig()
     test_data_set.dataset_id = "cas_nvr_test_00"
     test_data_set.network = "ZU"
     test_data_set.station = "CAS04,NVR08"

@@ -276,9 +276,9 @@ def set_driver_parameters():
 
 
 def test_can_access_fap_filters():
-    from aurora.sandbox.io_helpers.iris_dataset_config import IRISDatasetConfig
+    from aurora.sandbox.io_helpers.fdsn_dataset_config import FDSNDatasetConfig
 
-    test_data_set = IRISDatasetConfig()
+    test_data_set = FDSNDatasetConfig()
     test_data_set.dataset_id = "fap_test"
     test_data_set.network = "EM"
     test_data_set.station = "FL001"
