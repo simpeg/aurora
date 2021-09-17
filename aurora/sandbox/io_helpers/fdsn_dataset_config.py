@@ -1,3 +1,5 @@
+from obspy.clients import fdsn
+
 from aurora.sandbox.io_helpers.inventory_review import scan_inventory_for_nonconformity
 from aurora.sandbox.xml_sandbox import describe_inventory_stages
 from aurora.sandbox.xml_sandbox import get_response_inventory_from_server
@@ -56,9 +58,32 @@ class FDSNDatasetConfig(object):
 
         pass
 
+    def get_data_via_fdsn_client(self, data_source="IRIS"):
+        client = fdsn.Client(data_source)
+
+        streams = client.get_waveforms(
+            self.network,
+            self.station,
+            None,
+            self.channel_codes,
+            self.starttime,
+            self.endtime,
+        )
+        return streams
+
     def get_station_xml_filename(self, tag=""):
         """
         DEPRECATED
         """
         print("get_station_xml_filename DEPRECATED")
         raise Exception
+
+    def describe(self):
+        print(f"station_id = {self.station}")  # station_id in mth5_obj.station_list
+        print(f"network_id = {self.network}")
+        print(f"channel_ids = {self.channel_codes}")
+
+    @property
+    def h5_filebase(self):
+        filebase = f"{self.dataset_id}.h5"
+        return filebase

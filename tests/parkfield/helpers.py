@@ -10,4 +10,4 @@ EMTF_RESULTS_PATH = PARKFIELD_PATH.joinpath("emtf_results")
 
 # May want to create results and data dir on init
 # AURORA_RESULTS_PATH.mkdir(exist_ok=True)
-# DATA_PATH.mkdir(exist_ok=True)
+DATA_PATH.mkdir(exist_ok=True)
