@@ -61,7 +61,7 @@ def create_run_test_config_remote_reference():
         estimation_engine="RME_RR",
         reference_channels=["hx", "hy"],
         max_number_of_iterations=10,
-        scale_factors=CHANNEL_SCALE_FACTORS,
+        channel_scale_factors=CHANNEL_SCALE_FACTORS,
     )
     return run_config_path
 

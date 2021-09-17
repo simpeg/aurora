@@ -2,12 +2,12 @@
 Relates to github aurora issue #17
 Ingest the Parkfield data make mth5 to use as the interface for tests
 """
-
 from obspy import UTCDateTime
 from obspy.clients import fdsn
 
 from aurora.general_helper_functions import TEST_PATH
 from aurora.sandbox.io_helpers.make_dataset_configs import TEST_DATA_SET_CONFIGS
+from aurora.sandbox.mth5_helpers import align_streams
 from aurora.pipelines.helpers import initialize_mth5
 from aurora.pipelines.helpers import read_back_data
 from mth5.timeseries import RunTS
@@ -68,11 +68,6 @@ def create_from_server(dataset_id, data_source="IRIS"):
     # <REASSIGN NON-CONVENTIONAL CHANNEL LABELS (Q2, Q3, T1, T2)>
     for stream in streams:
         stream.stats["channel"] = FDSN_CHANNEL_MAP[stream.stats["channel"]]
-        # #<UNITS HACK>
-        # if stream.stats["channel"][1] == "Q":
-        #     print("WARNING - HANDLE INCORRECT UNITS TRANSLATE V/m to mV/km")
-        #     stream.data *= 1000000
-        # #</UNITS HACK>
     # </REASSIGN NON-CONVENTIONAL CHANNEL LABELS (Q2, Q3, T1, T2)>
 
     # <This block is called often - should be a method>
@@ -121,30 +116,13 @@ def create_from_server_multistation(dataset_id, data_source="IRIS"):
         dataset_config.endtime,
     )
     # <REASSIGN NON-CONVENTIONAL CHANNEL LABELS (Q2, Q3, T1, T2)>
-    # <TIME ALIGN WORKAROUND>
-    import datetime
-
-    # CLOCK_ZERO = UTCDateTime(2004, 9, 28, 0, 0, 0.021467)
-    # CLOCK_ZERO = dataset_config.starttime
     for stream in streams:
         stream.stats["channel"] = FDSN_CHANNEL_MAP[stream.stats["channel"]]
-        # station_channel = f"STA:{stream.stats['station']} CH
-        # {stream.stats['channel']}"
-        print(
-            f"{stream.stats['station']}  {stream.stats['channel']} N="
-            f"{len(stream.data)}  startime {stream.stats.starttime}"
-        )
-        dt_seconds = stream.stats.starttime - dataset_config.starttime
-        print(f"dt_seconds {dt_seconds}")
-        dt = datetime.timedelta(seconds=dt_seconds)
-        print(f"dt = {dt}")
-        stream.stats.starttime = stream.stats.starttime - dt
-
-        # stream.stats.endtime =- dt
-    # </TIME ALIGN WORKAROUND>
     # </REASSIGN NON-CONVENTIONAL CHANNEL LABELS (Q2, Q3, T1, T2)>
 
-    # BREAK STREAMS UP BY STATION?
+    # <TIME ALIGN WORKAROUND>
+    streams = align_streams(streams, dataset_config.starttime)
+    # </TIME ALIGN WORKAROUND>
 
     # <This block is called often - should be a method>
     start_times = sorted(list(set([tr.stats.starttime.isoformat() for tr in streams])))

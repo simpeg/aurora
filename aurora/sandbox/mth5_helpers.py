@@ -4,7 +4,7 @@
 Most of the tests and tools are associated with MTH5 helper stuffs so moved
 to mth5_helpers.py for now.  Needs a clean up.
 """
-
+import datetime
 import numpy as np
 from pathlib import Path
 
@@ -21,6 +21,36 @@ xml_path = Path("/home/kkappler/software/irismt/mt_metadata/data/xml")
 magnetic_xml_template = xml_path.joinpath("mtml_magnetometer_example.xml")
 electric_xml_template = xml_path.joinpath("mtml_electrode_example.xml")
 fap_xml_example = ""
+
+
+def align_streams(streams, clock_start):
+    """
+    This is a hack around to handle data that are asynchronously sampled.
+    It should not be used in general.  It is only appropriate for datasets that have
+    been tested with it.
+    PKD, SAO only at this point.
+
+    Parameters
+    ----------
+    streams : iterable of types obspy.core.stream.Stream
+    clock_start : obspy UTCDateTime
+        this is a reference time that we set the first sample to be
+
+    Returns
+    -------
+
+    """
+    for stream in streams:
+        print(
+            f"{stream.stats['station']}  {stream.stats['channel']} N="
+            f"{len(stream.data)}  startime {stream.stats.starttime}"
+        )
+        dt_seconds = stream.stats.starttime - clock_start
+        print(f"dt_seconds {dt_seconds}")
+        dt = datetime.timedelta(seconds=dt_seconds)
+        print(f"dt = {dt}")
+        stream.stats.starttime = stream.stats.starttime - dt
+    return streams
 
 
 def mth5_from_iris_database(dataset_config, load_data=True, target_folder=Path()):

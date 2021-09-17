@@ -6,10 +6,7 @@ HEXY = ["hx", "hy", "ex", "ey"]  # default components list
 # <CREATE TEST CONFIGS>
 
 
-def make_test_configs():
-    test_data_set_configs = {}
-
-    # <pkd_test_00 Single station>
+def make_pkd_test_00_config():
     test_data_set = FDSNDatasetConfig()
     test_data_set.dataset_id = "pkd_test_00"
     test_data_set.network = "BK"
@@ -22,7 +19,14 @@ def make_test_configs():
     test_data_set.channel_codes = "BQ2,BQ3,BT1,BT2"
     test_data_set.description = "2h of PKD data for 2004-09-28 midnight UTC until 0200"
     test_data_set.components_list = ["ex", "ey", "hx", "hy"]
+    return test_data_set
 
+
+def make_test_configs():
+    test_data_set_configs = {}
+
+    # <pkd_test_00 Single station>
+    test_data_set = make_pkd_test_00_config()
     test_data_set_configs[test_data_set.dataset_id] = test_data_set
     # </pkd_test_00 Single station>
 
