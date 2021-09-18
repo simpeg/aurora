@@ -14,6 +14,7 @@ from aurora.sandbox.obspy_helpers import align_streams
 from aurora.sandbox.obspy_helpers import trim_streams_to_acquisition_run
 from aurora.pipelines.helpers import initialize_mth5
 from aurora.pipelines.helpers import read_back_data
+from aurora.time_series.filters.filter_helpers import triage_mt_units_electric_field
 from mth5.timeseries import RunTS
 from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 
@@ -46,16 +47,7 @@ def create_from_server(dataset_config, data_source="IRIS", target_folder=Path())
     # </GET EXPERIMENT>
 
     # <TRIAGE ONE-OFF ISSUE WITH UNITS>
-    # from aurora.time_series.filters.filter_helpers import MT2SI_ELECTRIC_FIELD_FILTER
-    # print(
-    #     f"Add MT2SI_ELECTRIC_FIELD_FILTER to electric channels for parkfield here"
-    #     f" {MT2SI_ELECTRIC_FIELD_FILTER} "
-    # )
-    # filter_name = MT2SI_ELECTRIC_FIELD_FILTER.name
-    # survey = experiment.surveys[0]
-    # survey.filters["MT2SI Electric Field"] = MT2SI_ELECTRIC_FIELD_FILTER
-    # survey.stations[0].runs[0].channels[0].filter.name.append(filter_name)
-    # survey.stations[0].runs[0].channels[0].filter.applied.append(False)
+    experiment = triage_mt_units_electric_field(experiment)
     # </TRIAGE ONE-OFF ISSUE WITH UNITS>
 
     # <INITIALIZE MTH5>
@@ -87,8 +79,23 @@ def create_from_server(dataset_config, data_source="IRIS", target_folder=Path())
 
 
 def create_from_server_multistation(
-    dataset_config, data_source="IRIS", target_folder=Path()
+    dataset_config, data_source="IRIS", target_folder=Path(), run_id="001"
 ):
+    """
+
+    Parameters
+    ----------
+    dataset_config
+    data_source
+    target_folder
+    run_id : string
+        This is a temporary workaround. A more robust program that assigns run
+        numbers, and/or gets run labels from StationXML is needed
+
+    Returns
+    -------
+
+    """
 
     # <GET EXPERIMENT>
     inventory = dataset_config.get_inventory_from_client(
@@ -98,6 +105,10 @@ def create_from_server_multistation(
     translator = XMLInventoryMTExperiment()
     experiment = translator.xml_to_mt(inventory_object=inventory)
     # </GET EXPERIMENT>
+
+    # <TRIAGE ONE-OFF ISSUE WITH UNITS>
+    experiment = triage_mt_units_electric_field(experiment)
+    # </TRIAGE ONE-OFF ISSUE WITH UNITS>
 
     # <INITIALIZE MTH5>
     h5_path = target_folder.joinpath(dataset_config.h5_filebase)
@@ -118,7 +129,7 @@ def create_from_server_multistation(
 
     streams_dict = {}
     station_groups = {}
-    run_id = "001"
+    # NEED TO ITERATE OVER RUNS HERE - THIS IS NOT ROBUST
     for i_station, station_id in enumerate(mth5_obj.station_list):
         station_traces = [tr for tr in streams.traces if tr.stats.station == station_id]
         streams_dict[station_id] = obspy.core.Stream(station_traces)
@@ -178,7 +189,7 @@ def test_make_parkfield_hollister_mth5():
 def main():
     test_make_parkfield_mth5()
     # test_make_hollister_mth5()
-    # test_make_parkfield_hollister_mth5()
+    test_make_parkfield_hollister_mth5()
 
 
 if __name__ == "__main__":

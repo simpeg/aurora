@@ -57,8 +57,17 @@ def make_frequency_response_table_filter(case="bf4"):
 
 
 def make_volt_per_meter_to_millivolt_per_km_converter():
+    """
+    This represents a filter that HAS ALREADY converted from mV/km to V/m.
+    This means it is as if the data were multiplied by 1e-6.  To correct for this
+    in the data we will want to multiply by 1e6 which is what will happen when we
+    divide by the filter gain.
+    Returns
+    -------
+
+    """
     coeff_filter = make_coefficient_filter(
-        gain=1e6,
+        gain=1e-6,
         units_in="millivolts per kilometer",
         units_out="volts per meter",
         name="MT to SI electric field conversion",
@@ -67,6 +76,35 @@ def make_volt_per_meter_to_millivolt_per_km_converter():
 
 
 MT2SI_ELECTRIC_FIELD_FILTER = make_volt_per_meter_to_millivolt_per_km_converter()
+
+
+def triage_mt_units_electric_field(experiment):
+    """
+    One-off example of adding a filter to an mth5 in the case where the electric
+    field data are given in V/m, but they were expected in mV/km.  This adds the
+    correct filter to the metadata so that the calibrated data have units of
+    mV/km.
+     Parameters
+    ----------
+    experiment ;
+
+    Returns
+    -------
+
+    """
+    print(
+        f"Add MT2SI_ELECTRIC_FIELD_FILTER to electric channels for parkfield here"
+        f" {MT2SI_ELECTRIC_FIELD_FILTER} "
+    )
+    filter_name = MT2SI_ELECTRIC_FIELD_FILTER.name
+    survey = experiment.surveys[0]
+    survey.filters[filter_name] = MT2SI_ELECTRIC_FIELD_FILTER
+    channels = survey.stations[0].runs[0].channels
+    for channel in channels:
+        if channel.component[0] == "e":
+            channel.filter.name.append(filter_name)
+            channel.filter.applied.append(False)
+    return experiment
 
 
 def main():
