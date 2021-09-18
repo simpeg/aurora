@@ -50,3 +50,34 @@ def align_streams(streams, clock_start):
         print(f"dt = {dt}")
         stream.stats.starttime = stream.stats.starttime - dt
     return streams
+
+
+FDSN_CHANNEL_MAP = {}
+FDSN_CHANNEL_MAP["BQ2"] = "BQ1"
+FDSN_CHANNEL_MAP["BQ3"] = "BQ2"
+FDSN_CHANNEL_MAP["BT1"] = "BF1"
+FDSN_CHANNEL_MAP["BT2"] = "BF2"
+FDSN_CHANNEL_MAP["BT3"] = "BF3"
+FDSN_CHANNEL_MAP["LQ2"] = "LQ1"
+FDSN_CHANNEL_MAP["LQ3"] = "LQ2"
+FDSN_CHANNEL_MAP["LT1"] = "LF1"
+FDSN_CHANNEL_MAP["LT2"] = "LF2"
+FDSN_CHANNEL_MAP["LT3"] = "LF3"
+
+
+def make_channel_labels_fdsn_compliant(streams):
+    """
+    Workaround because NCEDC channel nomenclature is not FDSN Compliant for PKD, SAO
+    Parameters
+    ----------
+    streams : iterable of types obspy.core.stream.Stream
+
+    Returns
+    -------
+
+    """
+    # <REASSIGN NON-CONVENTIONAL CHANNEL LABELS (Q2, Q3, T1, T2)>
+    for stream in streams:
+        stream.stats["channel"] = FDSN_CHANNEL_MAP[stream.stats["channel"]]
+    # </REASSIGN NON-CONVENTIONAL CHANNEL LABELS (Q2, Q3, T1, T2)>
+    return streams
