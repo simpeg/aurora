@@ -24,11 +24,19 @@ class FDSNDatasetConfig(object):
         self.channels = None
         self.starttime = None
         self.endtime = None
+
         self.description = None
         self.dataset_id = None
         self.components_list = None  #
 
-    def get_inventory_from_iris(
+    # @classmethod
+    # def from_df_row(cls, row):
+    #     qq = cls.__init__()
+    #     qq.station = row.station
+    #     qq.startime = row.startime
+    #     etc...
+
+    def get_inventory_from_client(
         self, base_url="IRIS", ensure_inventory_stages_are_named=True
     ):
 

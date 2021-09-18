@@ -31,7 +31,7 @@ def create_from_local_data(dataset_id, run_id):
     from aurora.sandbox.io_helpers.test_data import get_example_array_list
 
     dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
-    inventory = dataset_config.get_inventory_from_iris(
+    inventory = dataset_config.get_inventory_from_client(
         ensure_inventory_stages_are_named=True
     )
     experiment = get_experiment_from_obspy_inventory(inventory)

@@ -14,7 +14,6 @@ from aurora.sandbox.obspy_helpers import align_streams
 from aurora.sandbox.obspy_helpers import trim_streams_to_acquisition_run
 from aurora.pipelines.helpers import initialize_mth5
 from aurora.pipelines.helpers import read_back_data
-from aurora.time_series.filters.filter_helpers import MT2SI_ELECTRIC_FIELD_FILTER
 from mth5.timeseries import RunTS
 from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 
@@ -39,7 +38,7 @@ def make_channel_labels_fdsn_compliant(streams):
 def create_from_server(dataset_config, data_source="IRIS", target_folder=Path()):
 
     # <GET EXPERIMENT>
-    inventory = dataset_config.get_inventory_from_iris(
+    inventory = dataset_config.get_inventory_from_client(
         base_url=data_source, ensure_inventory_stages_are_named=True
     )
     translator = XMLInventoryMTExperiment()
@@ -47,16 +46,16 @@ def create_from_server(dataset_config, data_source="IRIS", target_folder=Path())
     # </GET EXPERIMENT>
 
     # <TRIAGE ONE-OFF ISSUE WITH UNITS>
-    print(
-        f"ADD MT2SI_ELECTRIC_FIELD_FILTER to electric channels for parkfield here"
-        f" {MT2SI_ELECTRIC_FIELD_FILTER} "
-    )
+    # from aurora.time_series.filters.filter_helpers import MT2SI_ELECTRIC_FIELD_FILTER
+    # print(
+    #     f"Add MT2SI_ELECTRIC_FIELD_FILTER to electric channels for parkfield here"
+    #     f" {MT2SI_ELECTRIC_FIELD_FILTER} "
+    # )
+    # filter_name = MT2SI_ELECTRIC_FIELD_FILTER.name
     # survey = experiment.surveys[0]
     # survey.filters["MT2SI Electric Field"] = MT2SI_ELECTRIC_FIELD_FILTER
-    # survey.stations[0].runs[0].channels[0].filter.update(
-    #    MT2SI_ELECTRIC_FIELD_FILTER)
-    # survey.stations[0].runs[0].channels[1].filter.update(
-    # MT2SI_ELECTRIC_FIELD_FILTER)
+    # survey.stations[0].runs[0].channels[0].filter.name.append(filter_name)
+    # survey.stations[0].runs[0].channels[0].filter.applied.append(False)
     # </TRIAGE ONE-OFF ISSUE WITH UNITS>
 
     # <INITIALIZE MTH5>
@@ -92,7 +91,7 @@ def create_from_server_multistation(
 ):
 
     # <GET EXPERIMENT>
-    inventory = dataset_config.get_inventory_from_iris(
+    inventory = dataset_config.get_inventory_from_client(
         ensure_inventory_stages_are_named=True,
         base_url=data_source,
     )
@@ -179,7 +178,7 @@ def test_make_parkfield_hollister_mth5():
 def main():
     test_make_parkfield_mth5()
     # test_make_hollister_mth5()
-    test_make_parkfield_hollister_mth5()
+    # test_make_parkfield_hollister_mth5()
 
 
 if __name__ == "__main__":

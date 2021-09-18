@@ -43,7 +43,7 @@ def mth5_from_iris_database(dataset_config, load_data=True, target_folder=Path()
     -------
 
     """
-    inventory = dataset_config.get_inventory_from_iris(
+    inventory = dataset_config.get_inventory_from_client(
         ensure_inventory_stages_are_named=True
     )
     experiment = get_experiment_from_obspy_inventory(inventory)
@@ -74,7 +74,7 @@ def mth5_from_iris_database(dataset_config, load_data=True, target_folder=Path()
 #     dataset_id = "pkd_test_00"
 #     #
 #     test_dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
-#     inventory = test_dataset_config.get_inventory_from_iris(
+#     inventory = test_dataset_config.get_inventory_from_client(
 #         ensure_inventory_stages_are_named=True
 #     )
 #     experiment = get_experiment_from_obspy_inventory(inventory)
@@ -304,7 +304,7 @@ def test_can_access_fap_filters():
     test_data_set.channel_codes = "MFN"
     test_data_set.description = "test of a fap xml"
 
-    fap_inventory = test_data_set.get_inventory_from_iris(
+    fap_inventory = test_data_set.get_inventory_from_client(
         ensure_inventory_stages_are_named=True
     )
     describe_inventory_stages(fap_inventory)
@@ -331,7 +331,7 @@ def main():
         ]
         for dataset_id in dataset_ids:
             test_dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
-            inventory = test_dataset_config.get_inventory_from_iris(
+            inventory = test_dataset_config.get_inventory_from_client(
                 ensure_inventory_stages_are_named=False
             )
             experiment = get_experiment_from_obspy_inventory(inventory)

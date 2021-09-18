@@ -5,7 +5,7 @@ from mt_metadata.timeseries.filters.frequency_response_table_filter import (
 from aurora.general_helper_functions import TEST_PATH
 
 
-def make_coefficient_filter(gain=1.0, name="unit_conversion", **kwargs):
+def make_coefficient_filter(gain=1.0, name="generic coefficient filter", **kwargs):
     """
 
     Parameters
@@ -21,14 +21,15 @@ def make_coefficient_filter(gain=1.0, name="unit_conversion", **kwargs):
 
     """
     # in general, you need to add all required fields from the standards.json
-    default_units_in = "units in"
-    default_units_out = "units out"
-    default_name = "generic coefficient filter"
+    default_units_in = "unknown"
+    default_units_out = "unknown"
+
     cf = CoefficientFilter()
-    cf.name = kwargs.get("name", default_name)
+    cf.gain = gain
+    cf.name = name
+
     cf.units_in = kwargs.get("units_in", default_units_in)
     cf.units_out = kwargs.get("units_out", default_units_out)
-    cf.gain = gain
 
     return cf
 
@@ -55,9 +56,18 @@ def make_frequency_response_table_filter(case="bf4"):
         raise Exception
 
 
-MT2SI_ELECTRIC_FIELD_FILTER = make_coefficient_filter(
-    gain=1e6,
-    units_in="millivolts per kilometer",
-    units_out="volts per meter",
-    name="MT to SI electric field " "conversion",
-)
+def make_volt_per_meter_to_millivolt_per_km_converter():
+    coeff_filter = make_coefficient_filter(
+        gain=1e6,
+        units_in="millivolts per kilometer",
+        units_out="volts per meter",
+        name="MT to SI electric field conversion",
+    )
+    return coeff_filter
+
+
+MT2SI_ELECTRIC_FIELD_FILTER = make_volt_per_meter_to_millivolt_per_km_converter()
+
+
+def main():
+    make_volt_per_meter_to_millivolt_per_km_converter()
