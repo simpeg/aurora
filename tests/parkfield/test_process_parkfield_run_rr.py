@@ -4,23 +4,27 @@ from aurora.config.processing_config import RunConfig
 from aurora.pipelines.process_mth5 import process_mth5_run
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 
+from make_parkfield_mth5 import test_make_parkfield_hollister_mth5
+from make_processing_configs import create_run_test_config_remote_reference
+
 from helpers import AURORA_RESULTS_PATH
 from helpers import EMTF_RESULTS_PATH
-from make_parkfield_mth5 import test_make_parkfield_mth5
-from make_processing_configs import create_run_test_config
 
 
 def test_processing(z_file_path=None):
-    processing_run_cfg = create_run_test_config()
-    print(f"CONFIG {processing_run_cfg.name}")
+    # processing_run_cfg = create_run_test_config()
 
+    # processing_run_cfg = create_run_test_config()
+    # processing_run_cfg = Path("config", "PKD-RR_SAO_run_config.json")
+    # processing_run_cfg = Path("config", "pkd_test-RR_SAO_run_config.json")
+    processing_run_cfg = create_run_test_config_remote_reference()
     config = RunConfig()
     config.from_json(processing_run_cfg)
     mth5_path = Path(config.mth5_path)
 
     # Ensure there is an mth5 to process
     if not mth5_path.exists():
-        test_make_parkfield_mth5()
+        test_make_parkfield_hollister_mth5()
 
     run_id = "001"
     show_plot = False
@@ -32,12 +36,11 @@ def test_processing(z_file_path=None):
         show_plot=show_plot,
         z_file_path=z_file_path,
     )
-
     return tf_collection
 
 
 def main():
-    z_file_path = AURORA_RESULTS_PATH.joinpath("pkd.zss")
+    z_file_path = AURORA_RESULTS_PATH.joinpath("pkd.zrr")
     test_processing(z_file_path)
 
     # COMPARE WITH ARCHIVED Z-FILE
@@ -48,7 +51,7 @@ def main():
         label1="aurora",
         label2="emtf",
         scale_factor1=1,
-        out_file="SS.png",
+        out_file="RR.png",
         markersize=3,
         rho_ylims=[1e0, 1e3],
         xlims=[0.05, 500],

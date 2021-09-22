@@ -37,7 +37,10 @@ class ConfigCreator(object):
         output_channels = kwargs.get("output_channels", ["hz", "ex", "ey"])
         band_setup_file = kwargs.get("band_setup_file", default_band_setup)
         reference_station_id = kwargs.get("reference_station_id", "")
-
+        reference_channels = kwargs.get("reference_channels", [])
+        channel_scale_factors = kwargs.get("channel_scale_factors", {})
+        estimation_engine = kwargs.get("estimation_engine", "RME")
+        max_number_of_iterations = kwargs.get("max_number_of_iterations", 10)
         if reference_station_id:
             reference_mth5_path = kwargs.get("reference_mth5_path", mth5_path)
         else:
@@ -50,6 +53,7 @@ class ConfigCreator(object):
         run_config.initial_sample_rate = sample_rate
         run_config.reference_station_id = f"{reference_station_id}"
         run_config.reference_mth5 = str(reference_mth5_path)
+        run_config.channel_scale_factors = channel_scale_factors
 
         if run_config.reference_station_id:
             config_id = f"{config_id}-RR_{run_config.reference_station_id}"
@@ -67,8 +71,10 @@ class ConfigCreator(object):
             cfg.sample_rate = run_config.initial_sample_rate * downsample_factor
             cfg.band_setup_style = "EMTF"
             cfg.emtf_band_setup_file = band_setup_file
-            cfg.estimation_engine = "RME"
+            cfg.estimation_engine = estimation_engine
             cfg.output_channels = output_channels
+            cfg.reference_channels = reference_channels
+            cfg.max_number_of_iterations = max_number_of_iterations
             run_config.decimation_level_configs[i_decimation_level] = cfg
 
         json_fn = run_config.config_id + "_run_config.json"

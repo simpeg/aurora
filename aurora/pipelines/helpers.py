@@ -44,6 +44,7 @@ def initialize_mth5(h5_path, mode="w"):
         h5_path = Path("test.h5")
 
     if h5_path.exists():
+        print("WARN: file exists")
         h5_path.unlink()
     mth5_obj = MTH5()
     mth5_obj.open_mth5(str(h5_path), mode)

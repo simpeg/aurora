@@ -12,6 +12,8 @@ import fortranformat as ff
 import numpy as np
 import xarray as xr
 
+from pathlib import Path
+
 from aurora.transfer_function.emtf_z_file_helpers import (
     make_orientation_block_of_z_file,
 )
@@ -27,6 +29,16 @@ class TransferFunctionCollection(object):
     def __init__(self, **kwargs):
         self.header = kwargs.get("header", None)
         self.tf_dict = kwargs.get("tf_dict", None)
+
+    @property
+    def local_station_id(self):
+        """
+        TODO: make this take the station_id directly from the header
+        Returns
+        -------
+
+        """
+        return self.tf_dict[0].tf_header.local_station_id
 
     @property
     def total_number_of_frequencies(self):
@@ -125,6 +137,8 @@ class TransferFunctionCollection(object):
         This seems to insist that channels be ordered:
         Hx, Hy, Hz, Ex, Ey
 
+        z_file_path : Path or str
+
         Sample output for a band:
         period :      4.65455    decimation level   1    freq. band from   25 to   30
         number of data point   2489 sampling freq.   1.000 Hz
@@ -144,6 +158,9 @@ class TransferFunctionCollection(object):
         -------
 
         """
+        if isinstance(z_file_path, Path):
+            parent = z_file_path.parent
+            parent.mkdir(exist_ok=True)
         f = open(z_file_path, "w")
         f.writelines(" **** IMPEDANCE IN MEASUREMENT COORDINATES ****\n")
         f.writelines(" ********** WITH FULL ERROR COVARINCE**********\n")
@@ -307,6 +324,7 @@ class TransferFunctionCollection(object):
         markersize=10,
         rho_ylims=[10, 1000],
         phi_ylims=[0, 90],
+        **kwargs,
     ):
         """
         One-off plotting method intended only for the synthetic test data for aurora dev
@@ -413,10 +431,14 @@ class TransferFunctionCollection(object):
             axs[0].set_ylim(rho_ylims)
         if phi_ylims is not None:
             axs[1].set_ylim(phi_ylims)
+
         from aurora.general_helper_functions import FIGURES_PATH
 
-        figure_basename = f"synthetic_{tf.tf_header.local_station_id}_{xy_or_yx}.png"
-        out_file = FIGURES_PATH.joinpath(figure_basename)
+        default_figure_basename = f"{self.local_station_id}_{xy_or_yx}.png"
+        figure_basename = kwargs.get("figure_basename", default_figure_basename)
+        figure_path = kwargs.get("figure_path", FIGURES_PATH)
+        # figure_basename = f"synthetic_{tf.tf_header.local_station_id}_{xy_or_yx}.png"
+        out_file = figure_path.joinpath(figure_basename)
         plt.savefig(out_file)
         if show:
             plt.show()

@@ -3,6 +3,7 @@
     "mth5_path": "data/test1.h5",
     "local_station_id": "test1",
     "reference_station_id": "",
+    "channel_scale_factors": {},
     "0": {
         "mth5_path": "",
         "decimation_level_id": 0,

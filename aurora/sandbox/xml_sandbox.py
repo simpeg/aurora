@@ -42,13 +42,14 @@ def test_instantiate_and_export_mth5_metadata_example():
     return
 
 
-def get_response_inventory_from_iris(
+def get_response_inventory_from_server(
     network=None,
     station=None,
     channel=None,
     starttime=None,
     endtime=None,
     level="response",
+    base_url="IRIS",
 ):
     """
 
@@ -65,7 +66,7 @@ def get_response_inventory_from_iris(
     -------
 
     """
-    client = Client(base_url="IRIS", force_redirect=True)
+    client = Client(base_url=base_url, force_redirect=True)
     inventory = client.get_stations(
         network=network,
         station=station,
@@ -128,7 +129,7 @@ def describe_inventory_stages(inventory, assign_names=False):
                     if stage.name is None:
                         if assign_names:
                             new_names_were_assigned = True
-                            new_name = f"{channel.code}_{i}"
+                            new_name = f"{station.code}_{channel.code}_{i}"
                             stage.name = new_name
                             print(f"ASSIGNING stage {stage}, name {stage.name}")
                     if hasattr(stage, "symmetry"):
