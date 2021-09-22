@@ -299,7 +299,7 @@ class TRME(RegressionEstimator):
             print(b0)
             # self.iter_control.number_of_redescending_iterations = 0;
             while self.iter_control.continue_redescending:
-                self.iter_control._number_of_redescending_iterations += 1
+                self.iter_control.number_of_redescending_iterations += 1
                 # add setter here
                 YP = self.Q @ self.QHYc  # predict from cleaned data
                 self.redescend(YP, sigma)  # update cleaned data, and expectation

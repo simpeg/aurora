@@ -178,7 +178,7 @@ class TRME_RR(RegressionEstimator):
         # <REDESCENDING STUFF>
         while self.iter_control.continue_redescending:
             # one iteration with redescending influence curve cleaned data
-            self.iter_control._number_of_redescending_iterations += 1
+            self.iter_control.number_of_redescending_iterations += 1
             # [obj.Yc, E_psiPrime] = RedescendWt(obj.Y, Yhat, sigma, ITER.u0) # #TRME_RR
             self.redescend(Yhat, sigma)  # update cleaned data, and expectation
             # updated error variance estimates, computed using cleaned data
@@ -205,9 +205,9 @@ class TRME_RR(RegressionEstimator):
     def compute_inverse_signal_covariance(self):
         """
         Matlab code was :
-        # Cov_SS = (self.ZH @self.X) \ (self.XH @ self.X) / (self.XH @self.Z)"
-        # I broke the above line into B/A where
-        # B = (self.ZH @self.X) \ (self.XH @ self.X), and A = (self.XH @self.Z)
+        Cov_SS = (self.ZH @self.X) \ (self.XH @ self.X) / (self.XH @self.Z)
+        I broke the above line into B/A where
+        B = (self.ZH @self.X) \ (self.XH @ self.X), and A = (self.XH @self.Z)
         Then follow matlab cookbok, B/A for matrices = (A'\B')
         """
         ZH = self.Z.conj().T
