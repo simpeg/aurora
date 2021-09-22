@@ -78,34 +78,5 @@ def make_volt_per_meter_to_millivolt_per_km_converter():
 MT2SI_ELECTRIC_FIELD_FILTER = make_volt_per_meter_to_millivolt_per_km_converter()
 
 
-def triage_mt_units_electric_field(experiment):
-    """
-    One-off example of adding a filter to an mth5 in the case where the electric
-    field data are given in V/m, but they were expected in mV/km.  This adds the
-    correct filter to the metadata so that the calibrated data have units of
-    mV/km.
-     Parameters
-    ----------
-    experiment ;
-
-    Returns
-    -------
-
-    """
-    print(
-        f"Add MT2SI_ELECTRIC_FIELD_FILTER to electric channels for parkfield here"
-        f" {MT2SI_ELECTRIC_FIELD_FILTER} "
-    )
-    filter_name = MT2SI_ELECTRIC_FIELD_FILTER.name
-    survey = experiment.surveys[0]
-    survey.filters[filter_name] = MT2SI_ELECTRIC_FIELD_FILTER
-    channels = survey.stations[0].runs[0].channels
-    for channel in channels:
-        if channel.component[0] == "e":
-            channel.filter.name.append(filter_name)
-            channel.filter.applied.append(False)
-    return experiment
-
-
 def main():
     make_volt_per_meter_to_millivolt_per_km_converter()
