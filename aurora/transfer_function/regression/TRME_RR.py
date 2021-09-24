@@ -147,8 +147,6 @@ class TRME_RR(RegressionEstimator):
         cfac = self.iter_control.correction_factor
         if self.iter_control.max_number_of_iterations > 0:
             converged = False
-            cfac = 1.0 / (1.0 - np.exp(-self.iter_control.r0))
-
         else:
             converged = True
             # not needed - its defined in the init

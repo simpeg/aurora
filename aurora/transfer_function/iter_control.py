@@ -4,6 +4,8 @@ iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_1
 """
 import numpy as np
 
+from aurora.transfer_function.regression.helper_functions import rme_beta
+
 
 class IterControl(object):
     """ """
@@ -128,27 +130,13 @@ class IterControl(object):
         """
         TODO: This is an RME specific property.  Suggest move r0, u0 and this method
         into an RME-config class.
-        TODO: Note that IterControl itself should probably be factored.
-        A base class can be responsible for iteration_watcher and convergence checks
-        etc.  But u0, and r0 are specific to the Robust methods.
 
-        In the regression esimtate you downweight things with large errors, but
-        you need to define what's large.  You estimate the standard devation
-        (sigma) of the errors from the residuals BUT with this cleaned data
-        approach (Yc) sigma is smaller than it should be, you need to
-        compensate for this by using a correction_factor. It's basically the
-        expectation, if the data really were Gaussian, and you estimated from
-        the corrected data. This is how much too small the estimate would be.
-
-        If you change the penalty functional you may need a pencil, paper and
-        some calculus.  The relationship between the corrected-data-residuals
-        and the gaussin residauls could change if you change the penalty
+        See notes on usage in
+        transfer_function.regression.helper_functions.rme_beta
 
         Returns
         -------
         cfac : float
-            correction factor used when
+            correction factor used for scaling sigma_squared
         """
-        cfac = 1.0 / (2 * (1.0 - (1.0 + self.r0) * np.exp(-self.r0)))
-        # cfac = 1. / (1. - np.exp(-self.r0));
-        return cfac
+        return 1.0 / rme_beta(self.r0)

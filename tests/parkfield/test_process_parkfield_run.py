@@ -4,6 +4,8 @@ from aurora.config.processing_config import RunConfig
 from aurora.pipelines.process_mth5 import process_mth5_run
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 
+# from mt_metadata.transfer_functions.core import TF
+
 from helpers import AURORA_RESULTS_PATH
 from helpers import EMTF_RESULTS_PATH
 from make_parkfield_mth5 import test_make_parkfield_mth5
@@ -32,7 +34,10 @@ def test_processing(z_file_path=None):
         show_plot=show_plot,
         z_file_path=z_file_path,
     )
-
+    # print("MERGE TF COLLECITON TO A DICT")
+    # mad = tf_collection.merge_decimation_levels()
+    # tf_cls = TF()
+    # tf_cls.from_merged_aurora_dict()
     return tf_collection
 
 
