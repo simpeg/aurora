@@ -254,7 +254,7 @@ class TRME_RR(RegressionEstimator):
         )
         return
 
-    def compute_squared_coherence(self, Yhat):
+    def compute_squared_coherence(self, Y_hat):
         """
         TODO: Compare this method with compute_squared_coherence in TRME.  I think
         they are identical, in which case we can merge them, and maybe even put into
@@ -273,7 +273,7 @@ class TRME_RR(RegressionEstimator):
         -------
 
         """
-        res = self.Y - Yhat
+        res = self.Y - Y_hat
         SSR = np.conj(res.conj().T @ res)
         Yc2 = np.abs(self.Yc) ** 2
         SSYC = np.sum(Yc2, axis=0)
