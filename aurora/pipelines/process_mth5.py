@@ -15,7 +15,7 @@ from aurora.transfer_function.transfer_function_collection import (
 )
 from aurora.transfer_function.TTFZ import TTFZ
 
-
+from mt_metadata.transfer_functions.core import TF
 from mth5.mth5 import MTH5
 
 
@@ -226,8 +226,45 @@ def get_data_from_decimation_level_from_mth5(config, mth5_obj, run_id):
     return local, remote
 
 
+def export_tf(tf_collection, run_metadata_dict={}, survey_dict={}):
+    """
+    This method may wind up being embedded in the TF class
+    Assign transfer_function, residual_covariance, inverse_signal_power, station, survey
+
+    Returns
+    -------
+
+    """
+    merged_tf_dict = tf_collection.get_merged_dict()
+    tf_cls = TF()
+    # Transfer Function
+    renamer_dict = {"output_channel": "output", "input_channel": "input"}
+    tmp = merged_tf_dict["tf"].rename(renamer_dict)
+    tf_cls.transfer_function = tmp
+
+    isp = merged_tf_dict["cov_ss_inv"]
+    renamer_dict = {"input_channel_1": "input", "input_channel_2": "output"}
+    isp = isp.rename(renamer_dict)
+    tf_cls.inverse_signal_power = isp
+
+    res_cov = merged_tf_dict["cov_nn"]
+    renamer_dict = {"output_channel_1": "input", "output_channel_2": "output"}
+    res_cov = res_cov.rename(renamer_dict)
+    tf_cls.residual_covariance = res_cov
+
+    tf_cls.station_metadata.from_dict(run_metadata_dict)
+    tf_cls.survey_metadata.from_dict(survey_dict)
+    return tf_cls
+
+
 def process_mth5_run(
-    run_cfg, run_id, units="MT", show_plot=False, z_file_path=None, **kwargs
+    run_cfg,
+    run_id,
+    units="MT",
+    show_plot=False,
+    z_file_path=None,
+    return_collection=True,
+    **kwargs,
 ):
     """
     Stages here:
@@ -293,4 +330,14 @@ def process_mth5_run(
 
     if z_file_path:
         tf_collection.write_emtf_z_file(z_file_path, run_obj=local_run_obj)
-    return tf_collection
+
+    if return_collection:
+        return tf_collection
+    else:
+        # intended to be the default in future
+        run_metdata_dict = local_run_obj.station_group.metadata.to_dict()
+        survey_dict = mth5_obj.survey_group.metadata.to_dict()
+        tf_cls = export_tf(
+            tf_collection, run_metdata_dict=run_metdata_dict, survey_dict=survey_dict
+        )
+        return tf_cls

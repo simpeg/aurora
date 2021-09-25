@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from aurora.config.processing_config import RunConfig
+from aurora.pipelines.process_mth5 import export_tf
 from aurora.pipelines.process_mth5 import process_mth5_run
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 
@@ -34,10 +35,9 @@ def test_processing(z_file_path=None):
         show_plot=show_plot,
         z_file_path=z_file_path,
     )
-    # print("MERGE TF COLLECITON TO A DICT")
-    # mad = tf_collection.merge_decimation_levels()
-    # tf_cls = TF()
-    # tf_cls.from_merged_aurora_dict()
+    print("MERGE TF COLLECITON TO A DICT")
+    tf_cls = export_tf(tf_collection, {}, {})
+    print(tf_cls)
     return tf_collection
 
 

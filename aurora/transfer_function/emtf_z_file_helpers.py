@@ -8,7 +8,7 @@ import fortranformat as ff
 EMTF_CHANNEL_ORDER = ["hx", "hy", "hz", "ex", "ey"]
 
 
-def make_orientation_block_of_z_file(run_obj):
+def make_orientation_block_of_z_file(run_obj, channel_list=None):
     """
     Replicates emtz z-file metadata about orientation like this:
     1     0.00     0.00 tes  Hx
@@ -30,30 +30,28 @@ def make_orientation_block_of_z_file(run_obj):
     """
     output_strings = []
     ff_format = ff.FortranRecordWriter("(i5, 1x, f8.2, 1x, f8.2, 1x, " "a3, 1x, a3)")
-    for i_ch, channel_id in enumerate(EMTF_CHANNEL_ORDER):
-        try:
-            channel = run_obj.get_channel(channel_id)
-            azimuth = channel.metadata.measurement_azimuth
-            tilt = channel.metadata.measurement_tilt
-            station_id = run_obj.station_group.name
-            emtf_channel_id = channel_id.capitalize()
-            fortran_str = ff_format.write(
-                [i_ch + 1, azimuth, tilt, station_id, emtf_channel_id]
-            )
-            out_str = f"{fortran_str}\n"
-            output_strings.append(out_str)
-        except:
-            print(f"No channel {channel_id} in run")
-            pass
-        if not output_strings:
-            print("No channels found in run_object")
-            raise Exception
-            # print("Warning!!! This only works in case of synthetic test")
-            # output_strings.append("    1     0.00     0.00 tes  Hx\n")
-            # output_strings.append("    2    90.00     0.00 tes  Hy\n")
-            # output_strings.append("    3     0.00     0.00 tes  Hz\n")
-            # output_strings.append("    4     0.00     0.00 tes  Ex\n")
-            # output_strings.append("    5    90.00     0.00 tes  Ey\n")
+    if channel_list is None:
+        channel_ids = EMTF_CHANNEL_ORDER
+    else:
+        channel_ids = channel_list
+    for i_ch, channel_id in enumerate(channel_ids):
+        # try:
+        channel = run_obj.get_channel(channel_id)
+        azimuth = channel.metadata.measurement_azimuth
+        tilt = channel.metadata.measurement_tilt
+        station_id = run_obj.station_group.name
+        emtf_channel_id = channel_id.capitalize()
+        fortran_str = ff_format.write(
+            [i_ch + 1, azimuth, tilt, station_id, emtf_channel_id]
+        )
+        out_str = f"{fortran_str}\n"
+        output_strings.append(out_str)
+        # except:
+        #     print(f"No channel {channel_id} in run")
+        #     pass
+    if not output_strings:
+        print("No channels found in run_object")
+        raise Exception
 
     return output_strings
 

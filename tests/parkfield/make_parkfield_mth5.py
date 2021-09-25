@@ -59,7 +59,7 @@ def test_make_parkfield_mth5():
     dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
     create_from_server_multistation(
         dataset_config,
-        data_source="IRIS",
+        data_source="NCEDC",
         target_folder=DATA_PATH,
         triage_units="V/m to mV/km",
     )

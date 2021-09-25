@@ -15,9 +15,9 @@ def make_pkd_test_00_config():
     test_data_set.endtime = UTCDateTime("2004-09-28T01:59:59.975000Z")
     # test_data_set.endtime = UTCDateTime("2004-09-28T00:01:00")
     # test_data_set.channel_codes = "LQ2,LQ3,LT1,LT2"
-    test_data_set.channel_codes = "BQ2,BQ3,BT1,BT2"
+    test_data_set.channel_codes = "BQ2,BQ3,BT1,BT2,BT3"
     test_data_set.description = "2h of PKD data for 2004-09-28 midnight UTC until 0200"
-    test_data_set.components_list = ["ex", "ey", "hx", "hy"]
+    test_data_set.components_list = ["ex", "ey", "hx", "hy", "hz"]
     return test_data_set
 
 
