@@ -27,8 +27,23 @@ EMTF_REGRESSION_ENGINE_LABELS["RME"] = "Robust Single station"
 
 class TransferFunctionCollection(object):
     def __init__(self, **kwargs):
+        """
+
+        Parameters
+        ----------
+        kwargs
+
+        tf_dict: dict
+            This is a dictionary of TTFZ objects, one per decimation level.  They are
+            keyed by the decimation_level_id, usually integers 0, 1, 2... n_dec
+
+        """
         self.header = kwargs.get("header", None)
         self.tf_dict = kwargs.get("tf_dict", None)
+        self.labelled_tf = None
+        self.merged_tf = None
+        self.merged_cov_nn = None
+        self.merged_cov_ss_inv = None
 
     @property
     def local_station_id(self):
@@ -48,6 +63,13 @@ class TransferFunctionCollection(object):
         return num_frequecies
 
     @property
+    def channel_list(self):
+        tf_input_chs = self.tf_dict[0].transfer_function.input_channel.data.tolist()
+        tf_output_chs = self.tf_dict[0].transfer_function.output_channel.data.tolist()
+        all_channels = tf_input_chs + tf_output_chs
+        return all_channels
+
+    @property
     def total_number_of_channels(self):
         num_channels = 0
         num_channels += self.header.num_input_channels
@@ -58,7 +80,18 @@ class TransferFunctionCollection(object):
     def number_of_decimation_levels(self):
         return len(self.tf_dict)
 
-    def merge_decimation_levels(self):
+    def get_merged_dict(self):
+        output = {}
+        self._merge_decimation_levels()
+        self.check_all_channels_present()
+        # self.relabel_merged_decimation_levels_for_export()
+        output["tf"] = self.merged_tf
+        output["tf_xarray"] = self.labelled_tf
+        output["cov_ss_inv"] = self.merged_cov_ss_inv
+        output["cov_nn"] = self.merged_cov_nn
+        return output
+
+    def _merge_decimation_levels(self):
         """
         Addressing Aurora Issue #93
         Will merge all decimation levels into a single 3D xarray for output.
@@ -72,61 +105,132 @@ class TransferFunctionCollection(object):
          3. Take the average estimate over all periods heving the same value
          4. Drop all but one estimate accoring to a rule (keep most observations say)
 
-        Does TFXML support multiple estiamtes? How is it dealt with there?
+        Does TFXML support multiple estimates? How is it dealt with there?
         There is an issue here -
+
+        Flow:
+        starting from self.tf_dict, we cast each decimation level's tf, which is
+        nativley an xr.DataArray to xr.Dataset, forming a list of datasets.
+        This dataset list is then combined over all periods forming a representation
+        of the TTFZ which is merged over all the decimation levels.
+
+        2021-09-25: probably break this into two methods
+        The first will crate the merged object, and the second will
+
         Returns xarray.dataset
         -------
 
         """
-        merged_output = {}
+
+        # <MERGE DECIMATION LEVELS>
         n_dec = self.number_of_decimation_levels
 
         tmp = [self.tf_dict[i].tf.to_dataset("period") for i in range(n_dec)]
-        merged = xr.combine_by_coords(tmp)
-        merged = merged.to_array(dim="period")
-        merged_output["tf"] = merged
+        merged_tf = xr.combine_by_coords(tmp)
+        merged_tf = merged_tf.to_array(dim="period")
+        self.merged_tf = merged_tf
+
+        tmp = [self.tf_dict[i].cov_ss_inv.to_dataset("period") for i in range(n_dec)]
+        merged_cov_ss_inv = xr.combine_by_coords(tmp)
+        merged_cov_ss_inv = merged_cov_ss_inv.to_array("period")
+        self.merged_cov_ss_inv = merged_cov_ss_inv
+
+        tmp = [self.tf_dict[i].cov_nn.to_dataset("period") for i in range(n_dec)]
+        merged_cov_nn = xr.combine_by_coords(tmp)
+        merged_cov_nn = merged_cov_nn.to_array("period")
+        self.merged_cov_nn = merged_cov_nn
+        # </MERGE DECIMATION LEVELS>
+
+        return
+
+    def check_all_channels_present(self):
+        if "hz" not in self.merged_tf.output_channel.data.tolist():
+            output_channels_original = self.merged_tf.output_channel.data.tolist()
+            output_channels = [f"tmp___{x}" for x in output_channels_original]
+            output_channels[0] = "hz"
+            tmp = self.merged_tf.copy(deep=True)
+            tmp = tmp.assign_coords({"output_channel": output_channels})
+            tmp.data *= np.nan
+            tmp = tmp.to_dataset("period")
+            tmp = tmp.merge(self.merged_tf.to_dataset("period"))
+            tmp = tmp.to_array("period")
+            output_channels = tmp.output_channel.data.tolist()
+            output_channels = [x for x in output_channels if x[0:6] != "tmp___"]
+            tmp = tmp.sel(output_channel=output_channels)
+            self.merged_tf = tmp
+
+            print("NOW ADD Hz to cov_nn")
+            n_output_ch = len(self.merged_tf.output_channel)  # 3
+            n_periods = len(self.merged_tf.period)
+            cov_nn_dims = (n_output_ch, n_output_ch, n_periods)
+            cov_nn_data = np.zeros(cov_nn_dims, dtype=np.complex128)
+            import xarray as xr
+
+            cov_nn = xr.DataArray(
+                cov_nn_data,
+                dims=["output_channel_1", "output_channel_2", "period"],
+                coords={
+                    "output_channel_1": self.merged_tf.output_channel.data,
+                    "output_channel_2": self.merged_tf.output_channel.data,
+                    "period": self.merged_tf.period,
+                },
+            )
+
+            # to dataset and back makes the coords line up -- this does not seem robust
+            cov_nn = cov_nn.to_dataset("period").to_array("period")
+
+            for out_ch_1 in cov_nn.output_channel_1.data.tolist():
+                for out_ch_2 in cov_nn.output_channel_1.data.tolist():
+                    try:
+                        values = self.merged_cov_nn.loc[:, out_ch_1, out_ch_2]
+                        cov_nn.loc[:, out_ch_1, out_ch_2] = values
+                    except KeyError:
+                        pass
+            self.merged_cov_nn = cov_nn
+
+    def relabel_merged_decimation_levels_for_export(self):
+        """
+        This method was specifcally related to issue #93, but may not be needed afterall
+        Returns
+        -------
+
+        """
+
+        if self.merged_tf is None:
+            self._merge_decimation_levels()
 
         # <MAKE XARRAY WITH tzx, tzy, zxx, zxy, zyx, zyy NOMENCLATURE>
-        tmp_tipper = merged.sel(output_channel="hz")
+        tmp_tipper = self.merged_tf.sel(output_channel="hz")
         tmp_tipper = tmp_tipper.reset_coords(drop="output_channel")
-        # tmp_tipper = tmp_tipper.rename({"input_channel":"component"})
-        # tmp_tipper = tmp_tipper.to_dataset("component")
         tmp_tipper = tmp_tipper.to_dataset("input_channel")
         tf_xarray = tmp_tipper.rename({"hx": "tzx", "hy": "tzy"})
 
-        zxx = merged.sel(output_channel="ex", input_channel="hx")
+        zxx = self.merged_tf.sel(output_channel="ex", input_channel="hx")
         zxx = zxx.reset_coords(drop=["input_channel", "output_channel"])
         zxx = zxx.to_dataset(name="zxx")
-        tf_xarray = tf_xarray.merge(zxx)
-
-        zxy = merged.sel(output_channel="ex", input_channel="hy")
+        if tf_xarray:
+            tf_xarray = tf_xarray.merge(zxx)
+        else:
+            tf_xarray = zxx
+        zxy = self.merged_tf.sel(output_channel="ex", input_channel="hy")
         zxy = zxy.reset_coords(drop=["input_channel", "output_channel"])
         zxy = zxy.to_dataset(name="zxy")
         tf_xarray = tf_xarray.merge(zxy)
 
-        zyx = merged.sel(output_channel="ey", input_channel="hx")
+        zyx = self.merged_tf.sel(output_channel="ey", input_channel="hx")
         zyx = zyx.reset_coords(drop=["input_channel", "output_channel"])
         zyx = zyx.to_dataset(name="zyx")
         tf_xarray = tf_xarray.merge(zyx)
 
-        zyy = merged.sel(output_channel="ey", input_channel="hy")
+        zyy = self.merged_tf.sel(output_channel="ey", input_channel="hy")
         zyy = zyy.reset_coords(drop=["input_channel", "output_channel"])
         zyy = zyy.to_dataset(name="zyy")
         tf_xarray = tf_xarray.merge(zyy)
-        merged_output["tf_xarray"] = tf_xarray
+        self.labelled_tf = tf_xarray
+
         # </MAKE XARRAY WITH tzx, tzy, zxx, zxy, zyx, zyy NOMENCLATURE>
 
-        tmp = [self.tf_dict[i].cov_ss_inv.to_dataset("period") for i in range(n_dec)]
-        merged = xr.combine_by_coords(tmp)
-        merged = merged.to_array("period")
-        merged_output["cov_ss_inv"] = merged
-
-        tmp = [self.tf_dict[i].cov_nn.to_dataset("period") for i in range(n_dec)]
-        merged = xr.combine_by_coords(tmp)
-        merged = merged.to_array("period")
-        merged_output["cov_nn"] = merged
-
-        return merged_output
+        return
 
     def write_emtf_z_file(self, z_file_path, run_obj=None):
         """
@@ -218,8 +322,13 @@ class TransferFunctionCollection(object):
 
         # <Orientations and tilts>
         print("CHANNEL ORIENTATION METADATA NEEDED")
+        print("Make the channel list be only the active channels for a z-file")
+        assert self.total_number_of_channels == len(self.channel_list)
+        ch_list = self.channel_list
         f.writelines(" orientations and tilts of each channel \n")
-        orientation_strs = make_orientation_block_of_z_file(run_obj)
+        orientation_strs = make_orientation_block_of_z_file(
+            run_obj, channel_list=ch_list
+        )
         f.writelines(orientation_strs)
         # </Orientations and tilts>
 

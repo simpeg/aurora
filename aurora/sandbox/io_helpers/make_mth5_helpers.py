@@ -6,7 +6,8 @@ from aurora.pipelines.helpers import initialize_mth5
 from aurora.sandbox.obspy_helpers import align_streams
 from aurora.sandbox.obspy_helpers import make_channel_labels_fdsn_compliant
 from aurora.sandbox.obspy_helpers import trim_streams_to_acquisition_run
-from aurora.time_series.filters.filter_helpers import triage_mt_units_electric_field
+from aurora.sandbox.triage_metadata import triage_missing_coil_hollister
+from aurora.sandbox.triage_metadata import triage_mt_units_electric_field
 from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 from mth5.timeseries import RunTS
 
@@ -18,6 +19,8 @@ def create_from_server_multistation(
     run_id="001",
     force_align_streams=True,
     triage_units=None,
+    triage_missing_coil=False,
+    **kwargs
 ):
     """
 
@@ -48,6 +51,9 @@ def create_from_server_multistation(
     if triage_units:
         if triage_units == "V/m to mV/km":
             experiment = triage_mt_units_electric_field(experiment)
+    if triage_missing_coil:
+        experiment = triage_missing_coil_hollister(experiment)
+
     # </TRIAGE ONE-OFF ISSUE WITH UNITS>
 
     # <INITIALIZE MTH5>

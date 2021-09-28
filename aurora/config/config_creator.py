@@ -41,6 +41,9 @@ class ConfigCreator(object):
         channel_scale_factors = kwargs.get("channel_scale_factors", {})
         estimation_engine = kwargs.get("estimation_engine", "RME")
         max_number_of_iterations = kwargs.get("max_number_of_iterations", 10)
+        max_number_of_redescending_iterations = kwargs.get(
+            "max_number_of_redescending_iterations", 2
+        )
         if reference_station_id:
             reference_mth5_path = kwargs.get("reference_mth5_path", mth5_path)
         else:
@@ -75,6 +78,9 @@ class ConfigCreator(object):
             cfg.output_channels = output_channels
             cfg.reference_channels = reference_channels
             cfg.max_number_of_iterations = max_number_of_iterations
+            cfg.max_number_of_redescending_iterations = (
+                max_number_of_redescending_iterations
+            )
             run_config.decimation_level_configs[i_decimation_level] = cfg
 
         json_fn = run_config.config_id + "_run_config.json"

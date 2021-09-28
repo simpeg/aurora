@@ -40,7 +40,8 @@ def create_run_test_config():
         num_samples_window=128,
         num_samples_overlap=32,
         config_id="pkd_test",
-        output_channels=["ex", "ey"],
+        output_channels=["hz", "ex", "ey"],
+        # output_channels=["ex", "ey"],
         channel_scale_factors=CHANNEL_SCALE_FACTORS,
     )
     return run_config_path

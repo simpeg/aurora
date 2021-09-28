@@ -147,8 +147,6 @@ class TRME_RR(RegressionEstimator):
         cfac = self.iter_control.correction_factor
         if self.iter_control.max_number_of_iterations > 0:
             converged = False
-            cfac = 1.0 / (1.0 - np.exp(-self.iter_control.r0))
-
         else:
             converged = True
             # not needed - its defined in the init
@@ -178,7 +176,7 @@ class TRME_RR(RegressionEstimator):
         # <REDESCENDING STUFF>
         while self.iter_control.continue_redescending:
             # one iteration with redescending influence curve cleaned data
-            self.iter_control._number_of_redescending_iterations += 1
+            self.iter_control.number_of_redescending_iterations += 1
             # [obj.Yc, E_psiPrime] = RedescendWt(obj.Y, Yhat, sigma, ITER.u0) # #TRME_RR
             self.redescend(Yhat, sigma)  # update cleaned data, and expectation
             # updated error variance estimates, computed using cleaned data
@@ -205,9 +203,9 @@ class TRME_RR(RegressionEstimator):
     def compute_inverse_signal_covariance(self):
         """
         Matlab code was :
-        # Cov_SS = (self.ZH @self.X) \ (self.XH @ self.X) / (self.XH @self.Z)"
-        # I broke the above line into B/A where
-        # B = (self.ZH @self.X) \ (self.XH @ self.X), and A = (self.XH @self.Z)
+        Cov_SS = (self.ZH @self.X) \ (self.XH @ self.X) / (self.XH @self.Z)
+        I broke the above line into B/A where
+        B = (self.ZH @self.X) \ (self.XH @ self.X), and A = (self.XH @self.Z)
         Then follow matlab cookbok, B/A for matrices = (A'\B')
         """
         ZH = self.Z.conj().T
@@ -254,7 +252,7 @@ class TRME_RR(RegressionEstimator):
         )
         return
 
-    def compute_squared_coherence(self, Yhat):
+    def compute_squared_coherence(self, Y_hat):
         """
         TODO: Compare this method with compute_squared_coherence in TRME.  I think
         they are identical, in which case we can merge them, and maybe even put into
@@ -273,7 +271,7 @@ class TRME_RR(RegressionEstimator):
         -------
 
         """
-        res = self.Y - Yhat
+        res = self.Y - Y_hat
         SSR = np.conj(res.conj().T @ res)
         Yc2 = np.abs(self.Yc) ** 2
         SSYC = np.sum(Yc2, axis=0)

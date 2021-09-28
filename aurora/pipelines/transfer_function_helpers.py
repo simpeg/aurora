@@ -50,7 +50,8 @@ def set_up_iter_control(config):
     """
     if config.estimation_engine in ["RME", "RME_RR"]:
         iter_control = IterControl(
-            max_number_of_iterations=config.max_number_of_iterations
+            max_number_of_iterations=config.max_number_of_iterations,
+            max_number_of_redescending_iterations=config.max_number_of_redescending_iterations,
         )
     elif config.estimation_engine in [
         "OLS",
@@ -194,9 +195,9 @@ def process_transfer_functions(
     -------
 
     """
-    iter_control = set_up_iter_control(config)
     regression_class = get_regression_class(config)
     for band in transfer_function_obj.frequency_bands.bands():
+        iter_control = set_up_iter_control(config)
         X, Y, RR = get_band_for_tf_estimate(
             band, config, local_stft_obj, remote_stft_obj
         )

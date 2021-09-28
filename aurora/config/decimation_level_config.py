@@ -58,6 +58,7 @@ class DecimationLevelConfig(BaseDict):
 
         # <ITERATOR>
         self.max_number_of_iterations = 10
+        self.max_number_of_redescending_iterations = 2
         # </ITERATOR>
 
         # <STATIONS>

@@ -299,7 +299,7 @@ class TRME(RegressionEstimator):
             print(b0)
             # self.iter_control.number_of_redescending_iterations = 0;
             while self.iter_control.continue_redescending:
-                self.iter_control._number_of_redescending_iterations += 1
+                self.iter_control.number_of_redescending_iterations += 1
                 # add setter here
                 YP = self.Q @ self.QHYc  # predict from cleaned data
                 self.redescend(YP, sigma)  # update cleaned data, and expectation
@@ -367,7 +367,7 @@ class TRME(RegressionEstimator):
         )
         return
 
-    def compute_squared_coherence(self, YP):
+    def compute_squared_coherence(self, Y_hat):
         """
         res: Residuals: The original data minus the predicted data.
         #SSR : Sum of squares of the residuals.  Diagonal is real
@@ -381,12 +381,13 @@ class TRME(RegressionEstimator):
         -------
 
         """
-        res = self.Y - YP
+        res = self.Y - Y_hat
         SSR = np.conj(res.conj().T @ res)
         Yc2 = np.abs(self.Yc) ** 2
         SSYC = np.sum(Yc2, axis=0)
         R2 = 1 - np.diag(np.real(SSR)).T / SSYC
         R2[R2 < 0] = 0
+
         self.R2 = xr.DataArray(
             R2,
             dims=[
@@ -396,5 +397,6 @@ class TRME(RegressionEstimator):
                 "output_channel": list(self._Y.data_vars),
             },
         )
+
         return
         # array([ 0.97713185,  0.97552176,  0.97480946])
