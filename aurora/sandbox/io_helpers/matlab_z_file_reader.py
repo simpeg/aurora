@@ -1,3 +1,9 @@
+"""
+One off method to help read in transfer function dumps provided by Gary from some of
+the matlab tests.
+
+"""
+import matplotlib.pyplot as plt
 import numpy as np
 import scipy.io as sio
 
@@ -98,7 +104,6 @@ tfc.write_emtf_z_file(z_file_path)
 zfile = read_z_file(z_file_path)
 
 zfile.apparent_resistivity(angle=0)
-import matplotlib.pyplot as plt
 
 scl = 1.0
 fig, axs = plt.subplots(nrows=2, figsize=(11, 8.5), dpi=300, sharex=True)

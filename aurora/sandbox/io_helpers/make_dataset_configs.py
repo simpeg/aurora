@@ -78,7 +78,7 @@ def make_cas04_nvr08_test_00_config():
 def make_iak34_test_00_config():
     test_data_set = FDSNDatasetConfig()
     test_data_set.dataset_id = "iak34_test_00"
-    test_data_set.network = "ZU"
+    test_data_set.network = "EM"
     test_data_set.station = "IAK34"
     # <ORIGINAL>
     # test_data_set.starttime = UTCDateTime("2013-04-25T20:10:08.000000Z")
