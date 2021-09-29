@@ -10,6 +10,8 @@ from aurora.transfer_function.emtf_z_file_helpers import (
     merge_tf_collection_to_match_z_file,
 )
 
+from make_mth5_from_asc import create_test1_h5
+
 SYNTHETIC_PATH = TEST_PATH.joinpath("synthetic")
 CONFIG_PATH = SYNTHETIC_PATH.joinpath("config")
 DATA_PATH = SYNTHETIC_PATH.joinpath("data")
@@ -211,6 +213,7 @@ def compare_vs_matlab_output():
 
 
 def test():
+    create_test1_h5()
     compare_vs_fortran_output()
     compare_vs_matlab_output()
     print("success")
