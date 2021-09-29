@@ -12,6 +12,8 @@ from aurora.transfer_function.emtf_z_file_helpers import (
 
 from make_mth5_from_asc import create_test1_h5
 
+# from make_mth5_from_asc import create_test12rr_h5
+
 SYNTHETIC_PATH = TEST_PATH.joinpath("synthetic")
 CONFIG_PATH = SYNTHETIC_PATH.joinpath("config")
 DATA_PATH = SYNTHETIC_PATH.joinpath("data")
