@@ -136,7 +136,8 @@ class IterControl(object):
 
         Returns
         -------
-        cfac : float
+        correction_factor : float
             correction factor used for scaling sigma_squared
         """
-        return 1.0 / rme_beta(self.r0)
+        correction_factor = 1.0 / rme_beta(self.r0)
+        return correction_factor

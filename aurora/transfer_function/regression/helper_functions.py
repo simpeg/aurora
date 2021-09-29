@@ -33,7 +33,7 @@ def rme_beta(r0):
 
     Returns
     -------
-    cfac : float
+    beta : float
         correction factor = 1/beta
     """
     beta = 1.0 - np.exp(-r0)
