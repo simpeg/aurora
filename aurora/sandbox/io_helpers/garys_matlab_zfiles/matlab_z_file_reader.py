@@ -11,6 +11,7 @@ from aurora.general_helper_functions import BAND_SETUP_PATH
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.time_series.frequency_band import FrequencyBands
 from aurora.transfer_function.emtf_z_file_helpers import clip_bands_from_z_file
+from aurora.transfer_function.emtf_z_file_helpers import get_default_orientation_block
 from aurora.transfer_function.plot.rho_phi_helpers import plot_phi
 from aurora.transfer_function.plot.rho_phi_helpers import plot_rho
 from aurora.transfer_function.transfer_function_header import TransferFunctionHeader
@@ -23,13 +24,10 @@ from aurora.transfer_function.TTFZ import TTFZ
 bs_file = BAND_SETUP_PATH.joinpath("bs_256.cfg")
 n_periods_clip = 3  # for synthetic case
 z_mat = "TS1zss20210831.mat"
+n_periods_clip = 3
+# z_mat = "IAK34_struct_zss.mat"; n_periods_clip = 0
 
-orientation_strs = []
-orientation_strs.append("    1     0.00     0.00 tes  Hx\n")
-orientation_strs.append("    2    90.00     0.00 tes  Hy\n")
-orientation_strs.append("    3     0.00     0.00 tes  Hz\n")
-orientation_strs.append("    4     0.00     0.00 tes  Ex\n")
-orientation_strs.append("    5    90.00     0.00 tes  Ey\n")
+orientation_strs = get_default_orientation_block()
 
 frequency_bands = FrequencyBands()
 sample_rate = 1.0

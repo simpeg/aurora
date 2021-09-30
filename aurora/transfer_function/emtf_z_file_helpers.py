@@ -56,6 +56,24 @@ def make_orientation_block_of_z_file(run_obj, channel_list=None):
     return output_strings
 
 
+def get_default_orientation_block(n_ch=5):
+    """
+    Helper function used when working with matlab structs which do not have enough
+    info to make headers
+    Returns
+    -------
+
+    """
+    orientation_strs = []
+    orientation_strs.append("    1     0.00     0.00 tes  Hx\n")
+    orientation_strs.append("    2    90.00     0.00 tes  Hy\n")
+    if n_ch == 5:
+        orientation_strs.append("    3     0.00     0.00 tes  Hz\n")
+    orientation_strs.append("    4     0.00     0.00 tes  Ex\n")
+    orientation_strs.append("    5    90.00     0.00 tes  Ey\n")
+    return orientation_strs
+
+
 def merge_tf_collection_to_match_z_file(aux_data, tf_collection):
     """
     Currently this is only used for the synthtetic test, but maybe useful for
