@@ -1,0 +1,20 @@
+-These are mat files made from the matlab outputs in the original codes Gary shared.
+-TS1zss20210831.mat: This is synthetic data from station "test1"
+
+These files:
+-IAK34_NEN34_zrr.mat
+-IAK34_zss.mat
+-PAL59_PAM57_zrr.mat
+-PAL59_zss.mat
+
+were shared by Gary on the email exchange 21 Sept 2021.
+They are struct dumps of the TF Class that can be read more easily.
+They are from the committed results in iris_mt_scratch repository from the following folder
+
+iris-mt-scratch/iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/test/MT
+IAK34_NEN34_zrr.mat  
+IAK34_zss.mat  
+PAL59_PAM57_zrr.mat  
+PAL59_zss.mat
+
+

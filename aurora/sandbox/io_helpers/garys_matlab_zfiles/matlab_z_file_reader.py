@@ -18,8 +18,51 @@ from aurora.transfer_function.transfer_function_collection import (
 )
 from aurora.transfer_function.TTFZ import TTFZ
 
+
+def clip_bands_from_z_file(z_path, n_bands_clip, output_z_file_path=None, n_sensors=5):
+    """
+
+    Parameters
+    ----------
+    z_path: Path or str
+        path to the z_file to read in and clip periods from
+    n_periods_clip: integer
+        how many periods to clip from the end of the zfile
+    overwrite: bool
+        whether to overwrite the zfile or rename it
+    n_sensors
+
+    Returns
+    -------
+
+    """
+    if not output_z_file_path:
+        output_z_file_path = z_path
+
+    if n_sensors == 5:
+        n_lines_per_period = 13
+    elif n_sensors == 4:
+        n_lines_per_period = 11
+        print("WARNING n_sensors==4 NOT TESTED")
+
+    f = open(z_file_path, "r")
+    lines = f.readlines()
+    f.close()
+    for i in range(n_bands_clip):
+        lines = lines[:-n_lines_per_period]
+    n_bands_str = lines[5].split()[-1]
+    n_bands = int(n_bands_str)
+    new_n_bands = n_bands - n_bands_clip
+    new_n_bands_str = str(new_n_bands)
+    lines[5] = lines[5].replace(n_bands_str, new_n_bands_str)
+    f = open(output_z_file_path, "w")
+    f.writelines(lines)
+    f.close()
+    return
+
+
 bs_file = BAND_SETUP_PATH.joinpath("bs_256.cfg")
-N_PERIODS_CLIP = 3  # for synthetic case
+n_periods_clip = 3  # for synthetic case
 z_mat = "TS1zss20210831.mat"
 
 orientation_strs = []
@@ -109,21 +152,8 @@ tfc = TransferFunctionCollection(header=tf_obj.tf_header, tf_dict=tf_dict)
 z_file_path = "from_matlab.zss"
 tfc.write_emtf_z_file(z_file_path, orientation_strs=orientation_strs)
 
-# <CLIP BANDS FROM BACK OF A Z-FILE>
-f = open(z_file_path, "r")
-lines = f.readlines()
-f.close()
-for i in range(N_PERIODS_CLIP):
-    lines = lines[:-13]
-n_freq_str = lines[5].split()[-1]
-n_freq = int(n_freq_str)
-new_n_freq = n_freq - N_PERIODS_CLIP
-new_n_freq_str = str(new_n_freq)
-lines[5] = lines[5].replace(n_freq_str, new_n_freq_str)
-f = open(z_file_path, "w")
-f.writelines(lines)
-f.close()
-# <CLIP BANDS FROM BACK OF A Z-FILE>
+if n_periods_clip:
+    clip_bands_from_z_file(z_file_path, n_periods_clip, n_sensors=5)
 
 zfile = read_z_file(z_file_path)
 
