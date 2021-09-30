@@ -4,6 +4,7 @@ the matlab tests.
 
 """
 import matplotlib.pyplot as plt
+import numpy as np
 import scipy.io as sio
 
 from aurora.config.decimation_level_config import DecimationLevelConfig
@@ -20,12 +21,14 @@ from aurora.transfer_function.transfer_function_collection import (
 )
 from aurora.transfer_function.TTFZ import TTFZ
 
-
+CASE = "IAK34ss"  # synthetic"
 bs_file = BAND_SETUP_PATH.joinpath("bs_256.cfg")
-n_periods_clip = 3  # for synthetic case
-z_mat = "TS1zss20210831.mat"
-n_periods_clip = 3
-# z_mat = "IAK34_struct_zss.mat"; n_periods_clip = 0
+if CASE == "synthetic":
+    n_periods_clip = 3  # for synthetic case
+    z_mat = "TS1zss20210831.mat"
+elif CASE == "IAK34ss":
+    n_periods_clip = 3
+    z_mat = "IAK34_struct_zss.mat"
 
 orientation_strs = get_default_orientation_block()
 
@@ -62,9 +65,11 @@ for i_dec in range(4):
 
     sample_rate /= 4.0
 
-
 tmp = sio.loadmat(z_mat)
-stuff = tmp["temp"][0][0].tolist()
+if CASE == "synthetic":
+    stuff = tmp["temp"][0][0].tolist()
+elif CASE == "IAK34ss":
+    stuff = tmp["TFstruct"][0][0].tolist()
 TF = stuff[4]
 periods = stuff[5]
 cov_ss = stuff[7]
@@ -74,7 +79,19 @@ R2 = stuff[10]
 stderr = stuff[12]
 freq = stuff[14]
 
-cov_nn[:, :, 28] = cov_nn[:, :, 27]
+nan_cov_nn = []
+for i in range(len(periods)):
+    if np.isnan(cov_nn[:, :, i]).any():
+        nan_cov_nn.append(i)
+        print(f"NAN {i}")
+
+
+if CASE == "synthetic":
+    cov_nn[:, :, 28] = cov_nn[:, :, 27]
+elif CASE == "IAK34ss":
+    for i in range(12):
+        cov_nn[:, :, i] = cov_nn[:, :, 12]
+
 # FIX NAN / INF
 
 tf_dict[0].tf.data = TF[:, :, :11]
