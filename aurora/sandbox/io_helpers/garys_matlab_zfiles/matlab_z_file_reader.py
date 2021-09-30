@@ -4,7 +4,6 @@ the matlab tests.
 
 """
 import matplotlib.pyplot as plt
-import numpy as np
 import scipy.io as sio
 
 from aurora.config.decimation_level_config import DecimationLevelConfig
@@ -20,10 +19,20 @@ from aurora.transfer_function.transfer_function_collection import (
 from aurora.transfer_function.TTFZ import TTFZ
 
 bs_file = BAND_SETUP_PATH.joinpath("bs_256.cfg")
+N_PERIODS_CLIP = 3  # for synthetic case
 z_mat = "TS1zss20210831.mat"
+
+orientation_strs = []
+orientation_strs.append("    1     0.00     0.00 tes  Hx\n")
+orientation_strs.append("    2    90.00     0.00 tes  Hy\n")
+orientation_strs.append("    3     0.00     0.00 tes  Hz\n")
+orientation_strs.append("    4     0.00     0.00 tes  Ex\n")
+orientation_strs.append("    5    90.00     0.00 tes  Ey\n")
+
 frequency_bands = FrequencyBands()
 sample_rate = 1.0
 tf_dict = {}
+
 for i_dec in range(4):
     frequency_bands = FrequencyBands()
     frequency_bands.from_emtf_band_setup(
@@ -53,10 +62,7 @@ for i_dec in range(4):
 
     sample_rate /= 4.0
 
-# df = pd.read_csv("../bs_256.cfg", skiprows=1,
-#                  names=["i_dec", "f0_index", "fn_index"], sep="\s+")
-#     print("ok")
-#     tf = TTFZ()
+
 tmp = sio.loadmat(z_mat)
 stuff = tmp["temp"][0][0].tolist()
 TF = stuff[4]
@@ -95,12 +101,30 @@ tf_dict[3].cov_ss_inv.data = cov_ss[:, :, 23:]
 tf_dict[3].num_segments.data = n_data[:, 23:]
 tf_dict[3].R2.data = R2[:, 23:]
 
+
 for i_dec in range(4):
-    tf_dict[i_dec].tf.data = np.flip(tf_dict[i_dec].tf.data, axis=2)
+    tf_dict[i_dec].tf.data = tf_dict[i_dec].tf.data
 
 tfc = TransferFunctionCollection(header=tf_obj.tf_header, tf_dict=tf_dict)
 z_file_path = "from_matlab.zss"
-tfc.write_emtf_z_file(z_file_path)
+tfc.write_emtf_z_file(z_file_path, orientation_strs=orientation_strs)
+
+# <CLIP BANDS FROM BACK OF A Z-FILE>
+f = open(z_file_path, "r")
+lines = f.readlines()
+f.close()
+for i in range(N_PERIODS_CLIP):
+    lines = lines[:-13]
+n_freq_str = lines[5].split()[-1]
+n_freq = int(n_freq_str)
+new_n_freq = n_freq - N_PERIODS_CLIP
+new_n_freq_str = str(new_n_freq)
+lines[5] = lines[5].replace(n_freq_str, new_n_freq_str)
+f = open(z_file_path, "w")
+f.writelines(lines)
+f.close()
+# <CLIP BANDS FROM BACK OF A Z-FILE>
+
 zfile = read_z_file(z_file_path)
 
 zfile.apparent_resistivity(angle=0)

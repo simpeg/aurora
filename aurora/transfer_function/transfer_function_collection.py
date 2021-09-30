@@ -232,7 +232,7 @@ class TransferFunctionCollection(object):
 
         return
 
-    def write_emtf_z_file(self, z_file_path, run_obj=None):
+    def write_emtf_z_file(self, z_file_path, run_obj=None, orientation_strs=None):
         """
         Could probably move this into EMTFUtils() class
         Based on EMTF/T/wrt_z.f
@@ -326,9 +326,10 @@ class TransferFunctionCollection(object):
         assert self.total_number_of_channels == len(self.channel_list)
         ch_list = self.channel_list
         f.writelines(" orientations and tilts of each channel \n")
-        orientation_strs = make_orientation_block_of_z_file(
-            run_obj, channel_list=ch_list
-        )
+        if orientation_strs is None:
+            orientation_strs = make_orientation_block_of_z_file(
+                run_obj, channel_list=ch_list
+            )
         f.writelines(orientation_strs)
         # </Orientations and tilts>
 
