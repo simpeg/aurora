@@ -94,3 +94,50 @@ def merge_tf_collection_to_match_z_file(aux_data, tf_collection):
             pyx[ndx] = aurora_tf.phi[aurora_ndx, 1]
 
     return rxy, ryx, pxy, pyx
+
+
+def clip_bands_from_z_file(z_path, n_bands_clip, output_z_path=None, n_sensors=5):
+    """
+    This function takes a z_file and clips periods off the end of it.
+    It can come in handy sometimes -- specifically for manipulating matlab
+    results of synthetic data.
+
+    Parameters
+    ----------
+    z_path: Path or str
+        path to the z_file to read in and clip periods from
+    n_periods_clip: integer
+        how many periods to clip from the end of the zfile
+    overwrite: bool
+        whether to overwrite the zfile or rename it
+    n_sensors
+
+    Returns
+    -------
+
+    """
+    if not output_z_path:
+        output_z_path = z_path
+
+    if n_sensors == 5:
+        n_lines_per_period = 13
+    elif n_sensors == 4:
+        n_lines_per_period = 11
+        print("WARNING n_sensors==4 NOT TESTED")
+
+    f = open(z_path, "r")
+    lines = f.readlines()
+    f.close()
+
+    for i in range(n_bands_clip):
+        lines = lines[:-n_lines_per_period]
+    n_bands_str = lines[5].split()[-1]
+    n_bands = int(n_bands_str)
+    new_n_bands = n_bands - n_bands_clip
+    new_n_bands_str = str(new_n_bands)
+    lines[5] = lines[5].replace(n_bands_str, new_n_bands_str)
+
+    f = open(output_z_path, "w")
+    f.writelines(lines)
+    f.close()
+    return
