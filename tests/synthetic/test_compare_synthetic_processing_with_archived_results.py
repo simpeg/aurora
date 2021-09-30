@@ -63,6 +63,9 @@ def process_synthetic_1_standard(
     the committed .zss file in the EMTF repository, and in the other case we compare
     against a committed .mat file created by the matlab codes.
 
+    Note that the comparison values got slightly worse since the original commit.
+    It turns out that we can recover the original values by setting beta to the old
+    formula, where beta is .8843, not .7769.
 
     Returns
     -------

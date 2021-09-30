@@ -3,7 +3,7 @@ from obspy.core import Stream
 from obspy.core import Trace
 
 from aurora.general_helper_functions import TEST_PATH
-from aurora.sandbox.io_helpers.make_dataset_configs import TEST_DATA_SET_CONFIGS
+from aurora.test_utils.dataset_definitions import TEST_DATA_SET_CONFIGS
 from aurora.sandbox.mth5_helpers import get_experiment_from_obspy_inventory
 from aurora.pipelines.helpers import initialize_mth5
 from aurora.pipelines.helpers import read_back_data

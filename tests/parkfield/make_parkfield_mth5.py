@@ -5,9 +5,9 @@ Ingest the Parkfield data make mth5 to use as the interface for tests
 2021-09-17: Modifying create methods to use FDSNDatasetConfig as input rather than
 dataset_id
 """
-from aurora.sandbox.io_helpers.make_dataset_configs import TEST_DATA_SET_CONFIGS
-from aurora.sandbox.io_helpers.make_mth5_helpers import create_from_server_multistation
+from aurora.test_utils.dataset_definitions import TEST_DATA_SET_CONFIGS
 from aurora.pipelines.helpers import read_back_data
+from aurora.sandbox.io_helpers.make_mth5_helpers import create_from_server_multistation
 
 from helpers import DATA_PATH
 

@@ -17,7 +17,7 @@ import numpy as np
 from pathlib import Path
 
 from aurora.pipelines.helpers import initialize_mth5
-from aurora.sandbox.io_helpers.make_dataset_configs import TEST_DATA_SET_CONFIGS
+from aurora.test_utils.dataset_definitions import TEST_DATA_SET_CONFIGS
 
 # from aurora.sandbox.io_helpers.test_data import get_example_array_list
 from aurora.sandbox.io_helpers.test_data import get_example_data
