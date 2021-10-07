@@ -10,7 +10,7 @@ def validate_bulk_spectra_have_correct_units(run_obj, run_ts_obj):
         taper_family="hamming",
         num_samples_window=run_ts_obj.dataset.time.shape[0],  # 288000
         num_samples_overlap=0,
-        sampling_rate=run_ts_obj.sample_rate,  # 40.0 sps
+        sample_rate=run_ts_obj.sample_rate,  # 40.0 sps
     )
     windowed_obj = windowing_scheme.apply_sliding_window(run_ts_obj.dataset)
     tapered_obj = windowing_scheme.apply_taper(windowed_obj)

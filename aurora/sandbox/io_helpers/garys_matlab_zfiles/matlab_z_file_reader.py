@@ -40,7 +40,7 @@ for i_dec in range(4):
     frequency_bands = FrequencyBands()
     frequency_bands.from_emtf_band_setup(
         filepath=bs_file,
-        sampling_rate=sample_rate,
+        sample_rate=sample_rate,
         decimation_level=i_dec + 1,
         num_samples_window=256,
     )

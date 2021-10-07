@@ -270,7 +270,7 @@ class FrequencyBands(object):
         return band_centers
 
     def from_emtf_band_setup(
-        self, filepath, decimation_level, sampling_rate, num_samples_window
+        self, filepath, decimation_level, sample_rate, num_samples_window
     ):
         """
         This converts between EMTF band_setup files to a frequency_bands object.
@@ -311,7 +311,7 @@ class FrequencyBands(object):
         """
         emtf_band_setup = EMTFBandSetupFile(filepath=filepath)
         emtf_band_df = emtf_band_setup.get_decimation_level(decimation_level)
-        df = sampling_rate / (num_samples_window)
+        df = sample_rate / (num_samples_window)
         half_df = df / 2.0
         # half_df /=100
         lower_edges = (emtf_band_df.lower_bound_index * df) - half_df

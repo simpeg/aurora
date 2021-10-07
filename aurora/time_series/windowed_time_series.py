@@ -187,7 +187,7 @@ class WindowedTimeSeries(object):
     @staticmethod
     def apply_stft(
         data=None,
-        sampling_rate=None,
+        sample_rate=None,
         detrend_type=None,
         spectral_density_calibration=1.0,
         fft_axis=None,
@@ -198,7 +198,7 @@ class WindowedTimeSeries(object):
         Parameters
         ----------
         data
-        sampling_rate
+        sample_rate
         detrend_type
 
         Returns
@@ -209,7 +209,7 @@ class WindowedTimeSeries(object):
 
         if fft_axis is None:
             fft_axis = get_time_coordinate_axis(data)
-        spectral_ds = fft_xr_ds(data, sampling_rate, detrend_type=detrend_type)
+        spectral_ds = fft_xr_ds(data, sample_rate, detrend_type=detrend_type)
         spectral_ds *= spectral_density_calibration
         return spectral_ds
 

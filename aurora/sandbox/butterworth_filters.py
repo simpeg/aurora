@@ -1,11 +1,11 @@
 import scipy.signal as ssig
 
 
-def butter_bandpass(low_cut, high_cut, sampling_rate, order=5):
+def butter_bandpass(low_cut, high_cut, sample_rate, order=5):
     """
     https://scipy.github.io/old-wiki/pages/Cookbook/ButterworthBandpass
     """
-    nyquist_frequency = 0.5 * sampling_rate
+    nyquist_frequency = 0.5 * sample_rate
     low = low_cut / nyquist_frequency
     high = high_cut / nyquist_frequency
     b, a = ssig.butter(order, [low, high], btype="band", analog=False)
