@@ -84,9 +84,9 @@ def test_apply_sliding_window():
 def test_apply_sliding_window_can_return_xarray():
     qq = np.arange(15)
     windowing_scheme = WindowingScheme(num_samples_window=3, num_samples_overlap=1)
-    ww = windowing_scheme.apply_sliding_window(qq, return_xarray=True)
-    print(ww)
-    return ww
+    windowed_xr = windowing_scheme.apply_sliding_window(qq, return_xarray=True)
+    print(windowed_xr)
+    return windowed_xr
 
 
 def test_apply_sliding_window_to_xarray(return_xarray=False):
@@ -96,7 +96,6 @@ def test_apply_sliding_window_to_xarray(return_xarray=False):
     )
     windowing_scheme = WindowingScheme(num_samples_window=64, num_samples_overlap=50)
     ww = windowing_scheme.apply_sliding_window(xrd, return_xarray=return_xarray)
-    print("Yay!")
     return ww
 
 
@@ -187,13 +186,14 @@ def main():
     test_instantiate_windowing_scheme()
     windowed_array = test_apply_sliding_window()
     print(f"windowed_array shape = {windowed_array.shape}")
-    xr_out = test_apply_sliding_window_can_return_xarray()
+    windowed_xarray = test_apply_sliding_window_can_return_xarray()
+    print(f"Type(windowed_xarray) = {type(windowed_xarray)}")
     windowed_xarray = test_apply_sliding_window_to_xarray(return_xarray=False)
     print(f"Type(windowed_xarray) = {type(windowed_xarray)}")
-    xr_out = test_apply_sliding_window_to_xarray(return_xarray=True)
-    print(f"Type(xr_out) = {type(xr_out)}")
-    qq = test_can_create_xarray_dataset_from_several_sliding_window_xarrays()
-    print(f"Type(qq) = {type(qq)}")
+    windowed_xarray = test_apply_sliding_window_to_xarray(return_xarray=True)
+    print(f"Type(windowed_xarray) = {type(windowed_xarray)}")
+    xr_ds = test_can_create_xarray_dataset_from_several_sliding_window_xarrays()
+    print(f"Type(xr_ds) = {type(xr_ds)}")
     test_can_apply_taper()
     test_taper_dataset(plot=False)
     test_fourier_transform()
