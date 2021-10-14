@@ -132,18 +132,27 @@ def process_mth5_decimation_level(config, local, remote, units="MT"):
     """
     local_run_obj = local["run"]
     local_run_xrts = local["mvts"]
+
+    remote_run_obj = remote["run"]
+    remote_run_xrts = remote["mvts"]
+
+    # <CHECK DATA COVERAGE IS THE SAME IN BOTH LOCAL AND RR>
+    # This should be pushed into a previous validator before pipeline starts
+    # if config.reference_station_id:
+    #    local_run_xrts = local_run_xrts.where(local_run_xrts.time <=
+    #                                          remote_run_xrts.time[-1]).dropna(
+    #                                          dim="time")
+    # </CHECK DATA COVERAGE IS THE SAME IN BOTH LOCAL AND RR>
+
     local_stft_obj = run_ts_to_stft(config, local_run_xrts)
-    # local_stft_obj = run_ts_to_stft_scipy(config, local_run_xrts)
     local_scale_factors = config.station_scale_factors(config.local_station_id)
+    # local_stft_obj = run_ts_to_stft_scipy(config, local_run_xrts)
     local_stft_obj = calibrate_stft_obj(
         local_stft_obj,
         local_run_obj,
         units=units,
         channel_scale_factors=local_scale_factors,
     )
-
-    remote_run_obj = remote["run"]
-    remote_run_xrts = remote["mvts"]
     if config.reference_station_id:
         remote_stft_obj = run_ts_to_stft(config, remote_run_xrts)
         remote_scale_factors = config.station_scale_factors(config.reference_station_id)
@@ -285,7 +294,7 @@ def process_mth5_run(
         f"config indicates {run_config.number_of_decimation_levels} "
         f"decimation levels to process: {run_config.decimation_level_ids}"
     )
-    local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
+
     tf_dict = {}
 
     for dec_level_id in run_config.decimation_level_ids:
@@ -327,6 +336,7 @@ def process_mth5_run(
 
     # TODO: Add run_obj to TransferFunctionCollection
     tf_collection = TransferFunctionCollection(header=tf_obj.tf_header, tf_dict=tf_dict)
+    local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
 
     if z_file_path:
         tf_collection.write_emtf_z_file(z_file_path, run_obj=local_run_obj)
