@@ -345,9 +345,9 @@ def process_mth5_run(
         return tf_collection
     else:
         # intended to be the default in future
-        run_metdata_dict = local_run_obj.station_group.metadata.to_dict()
+        run_metadata_dict = local_run_obj.station_group.metadata.to_dict()
         survey_dict = mth5_obj.survey_group.metadata.to_dict()
         tf_cls = export_tf(
-            tf_collection, run_metdata_dict=run_metdata_dict, survey_dict=survey_dict
+            tf_collection, run_metadata_dict=run_metadata_dict, survey_dict=survey_dict
         )
         return tf_cls
