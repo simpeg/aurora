@@ -7,7 +7,7 @@ class EMTFBandSetupFile:
 
         Parameters
         ----------
-        sampling_rate: float
+        sample_rate: float
             this is the sampling rate of the un-decimated data,
             aka decimation level 1 in EMTF (and probably zero in the
             aurora nomenclature)
@@ -16,7 +16,7 @@ class EMTFBandSetupFile:
         self.filepath = kwargs.get("filepath", None)
         self.df = None
         self.n_bands = None
-        self.sampling_rate = None
+        self.sample_rate = None
 
     def load(self, filepath=None):
         if filepath is None:

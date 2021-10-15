@@ -30,7 +30,7 @@ def get_channel(
     component,
     station_id="",
     start=None,
-    sampling_rate=None,
+    sample_rate=None,
     load_actual=True,
     component_station_label=False,
 ):
@@ -53,10 +53,10 @@ def get_channel(
     elif component[0] == "e":
         ch = ChannelTS("electric")
 
-    if sampling_rate is None:
+    if sample_rate is None:
         print(f"no sampling rate given, using default {DEFAULT_SAMPLING_RATE}")
-        sampling_rate = DEFAULT_SAMPLING_RATE
-    ch.sample_rate = sampling_rate
+        sample_rate = DEFAULT_SAMPLING_RATE
+    ch.sample_rate = sample_rate
 
     if start is None:
         print(f"no start time given, using default {DEFAULT_START_TIME}")

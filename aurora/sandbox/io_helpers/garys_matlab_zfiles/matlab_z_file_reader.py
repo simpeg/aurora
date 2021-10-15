@@ -1,3 +1,9 @@
+"""
+One off method to help read in transfer function dumps provided by Gary from some of
+the matlab tests.
+
+"""
+import matplotlib.pyplot as plt
 import numpy as np
 import scipy.io as sio
 
@@ -5,6 +11,8 @@ from aurora.config.decimation_level_config import DecimationLevelConfig
 from aurora.general_helper_functions import BAND_SETUP_PATH
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.time_series.frequency_band import FrequencyBands
+from aurora.transfer_function.emtf_z_file_helpers import clip_bands_from_z_file
+from aurora.transfer_function.emtf_z_file_helpers import get_default_orientation_block
 from aurora.transfer_function.plot.rho_phi_helpers import plot_phi
 from aurora.transfer_function.plot.rho_phi_helpers import plot_rho
 from aurora.transfer_function.transfer_function_header import TransferFunctionHeader
@@ -13,16 +21,26 @@ from aurora.transfer_function.transfer_function_collection import (
 )
 from aurora.transfer_function.TTFZ import TTFZ
 
+CASE = "IAK34ss"  # synthetic"
 bs_file = BAND_SETUP_PATH.joinpath("bs_256.cfg")
-z_mat = "TS1zss20210831.mat"
+if CASE == "synthetic":
+    n_periods_clip = 3  # for synthetic case
+    z_mat = "TS1zss20210831.mat"
+elif CASE == "IAK34ss":
+    n_periods_clip = 3
+    z_mat = "IAK34_struct_zss.mat"
+
+orientation_strs = get_default_orientation_block()
+
 frequency_bands = FrequencyBands()
 sample_rate = 1.0
 tf_dict = {}
+
 for i_dec in range(4):
     frequency_bands = FrequencyBands()
     frequency_bands.from_emtf_band_setup(
         filepath=bs_file,
-        sampling_rate=sample_rate,
+        sample_rate=sample_rate,
         decimation_level=i_dec + 1,
         num_samples_window=256,
     )
@@ -47,12 +65,11 @@ for i_dec in range(4):
 
     sample_rate /= 4.0
 
-# df = pd.read_csv("../bs_256.cfg", skiprows=1,
-#                  names=["i_dec", "f0_index", "fn_index"], sep="\s+")
-#     print("ok")
-#     tf = TTFZ()
 tmp = sio.loadmat(z_mat)
-stuff = tmp["temp"][0][0].tolist()
+if CASE == "synthetic":
+    stuff = tmp["temp"][0][0].tolist()
+elif CASE == "IAK34ss":
+    stuff = tmp["TFstruct"][0][0].tolist()
 TF = stuff[4]
 periods = stuff[5]
 cov_ss = stuff[7]
@@ -62,7 +79,19 @@ R2 = stuff[10]
 stderr = stuff[12]
 freq = stuff[14]
 
-cov_nn[:, :, 28] = cov_nn[:, :, 27]
+nan_cov_nn = []
+for i in range(len(periods)):
+    if np.isnan(cov_nn[:, :, i]).any():
+        nan_cov_nn.append(i)
+        print(f"NAN {i}")
+
+
+if CASE == "synthetic":
+    cov_nn[:, :, 28] = cov_nn[:, :, 27]
+elif CASE == "IAK34ss":
+    for i in range(12):
+        cov_nn[:, :, i] = cov_nn[:, :, 12]
+
 # FIX NAN / INF
 
 tf_dict[0].tf.data = TF[:, :, :11]
@@ -89,16 +118,20 @@ tf_dict[3].cov_ss_inv.data = cov_ss[:, :, 23:]
 tf_dict[3].num_segments.data = n_data[:, 23:]
 tf_dict[3].R2.data = R2[:, 23:]
 
+
 for i_dec in range(4):
-    tf_dict[i_dec].tf.data = np.flip(tf_dict[i_dec].tf.data, axis=2)
+    tf_dict[i_dec].tf.data = tf_dict[i_dec].tf.data
 
 tfc = TransferFunctionCollection(header=tf_obj.tf_header, tf_dict=tf_dict)
 z_file_path = "from_matlab.zss"
-tfc.write_emtf_z_file(z_file_path)
+tfc.write_emtf_z_file(z_file_path, orientation_strs=orientation_strs)
+
+if n_periods_clip:
+    clip_bands_from_z_file(z_file_path, n_periods_clip, n_sensors=5)
+
 zfile = read_z_file(z_file_path)
 
 zfile.apparent_resistivity(angle=0)
-import matplotlib.pyplot as plt
 
 scl = 1.0
 fig, axs = plt.subplots(nrows=2, figsize=(11, 8.5), dpi=300, sharex=True)

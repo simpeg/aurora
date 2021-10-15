@@ -24,7 +24,7 @@ seed(0)
 
 def create_run_ts_from_station_config(config, df):
     """
-    Loop over stations and make them ChannelTS objects.
+    Loop over stations and make ChannelTS objects.
     Need to add a tag in the channels
     so that when you call a run it will get all the filters with it.
     Parameters

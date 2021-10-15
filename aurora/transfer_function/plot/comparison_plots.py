@@ -64,7 +64,7 @@ def compare_two_z_files(
         axs[0],
         zfile1.periods,
         zfile1.ryx * scale_factor1,
-        label=f"{label1} rxy",
+        label=f"{label1} ryx",
         markersize=markersize,
         color="blue",
     )
@@ -72,13 +72,13 @@ def compare_two_z_files(
         axs[0],
         zfile2.periods,
         zfile2.ryx,
-        label=f"{label2} rxy",
+        label=f"{label2} ryx",
         markersize=markersize,
         color="black",
     )
     axs[0].legend(prop={"size": 6})
     # axs[0].set_ylabel("$\rho_a$")
-    axs[0].set_ylabel("Apprarent Resistivity $\Omega$-m")
+    axs[0].set_ylabel("Apparent Resistivity $\Omega$-m")
     rho_ylims = kwargs.get("rho_ylims", [1, 1e3])
     axs[0].set_ylim(rho_ylims[0], rho_ylims[1])
     xlims = kwargs.get("xlims", [1e-3, 1e3])

@@ -52,7 +52,7 @@ def run_ts_to_stft_scipy(config, run_xrts_orig):
         num_samples_window=config.num_samples_window,
         num_samples_overlap=config.num_samples_overlap,
         taper_additional_args=config.taper_additional_args,
-        sampling_rate=config.sample_rate,
+        sample_rate=config.sample_rate,
     )
     # stft_obj = run_xrts.copy(deep=True)
     stft_obj = xr.Dataset()
@@ -112,7 +112,7 @@ def run_ts_to_stft(config, run_xrts_orig):
         num_samples_window=config.num_samples_window,
         num_samples_overlap=config.num_samples_overlap,
         taper_additional_args=config.taper_additional_args,
-        sampling_rate=config.sample_rate,
+        sample_rate=config.sample_rate,
     )
 
     run_xrts = apply_prewhitening(config, run_xrts_orig)
@@ -124,7 +124,7 @@ def run_ts_to_stft(config, run_xrts_orig):
 
     tapered_obj = windowed_obj * windowing_scheme.taper
     # stft_obj = WindowedTimeSeries.apply_stft(data=tapered_obj,
-    #                                          sampling_rate=windowing_scheme.sampling_rate,
+    #                                          sample_rate=windowing_scheme.sample_rate,
     #                                          detrend_type="linear",
     # scale_factor=windowing_scheme.linear_spectral_density_calibration_factor)
 
@@ -185,7 +185,7 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
         if channel_scale_factors:
             try:
                 channel_scale_factor = channel_scale_factors[channel_id]
-            except:
+            except KeyError:
                 channel_scale_factor = 1.0
             calibration_response /= channel_scale_factor
         if units == "SI":

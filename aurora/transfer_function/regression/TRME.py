@@ -131,7 +131,7 @@ class TRME(RegressionEstimator):
         # MOVE THIS METHOD INTO AN RME-Specific CONFIG
         return self.iter_control.correction_factor
 
-    def sigma(self, QHY, Y_or_Yc, correction_factor=1.0):
+    def sigma(self, QHY_or_QHYc, Y_or_Yc, correction_factor=1.0):
         """
         These are the error variances.
         TODO: Move this method to the base class, or a QR decorator.
@@ -161,7 +161,7 @@ class TRME(RegressionEstimator):
 
         """
         Y2 = np.linalg.norm(Y_or_Yc, axis=0) ** 2  # variance?
-        QHY2 = np.linalg.norm(QHY, axis=0) ** 2
+        QHY2 = np.linalg.norm(QHY_or_QHYc, axis=0) ** 2
         sigma = correction_factor * (Y2 - QHY2) / self.n_data
 
         try:

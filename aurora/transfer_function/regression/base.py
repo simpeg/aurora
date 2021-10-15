@@ -129,39 +129,6 @@ class RegressionEstimator(object):
         )
         return xra
 
-    # ADD NOTES ABOUT STACK TO FTR AND DEPRECATE THIS METHOD
-    # def cast_data_to_2d_for_regression(self, XY):
-    #     """
-    #     When the data for a frequency band are extracted from the STFT and
-    #     passed to RegressionEstimator they have a typical STFT structure:
-    #     One axis is time (the time of the window that was FFT-ed) and the
-    #     other axis is frequency.  However we make no distinction between the
-    #     harmonics (or bins) within a band.  We need to gather all the FCs for
-    #     each channel into a 1D array.
-    #     This method performs that reshaping (ravelling) operation.
-    #     *It is not important how we unravel the FCs but it is important that
-    #     we use the same scheme for X and Y.
-    #
-    #     2021-08-25: Modified this method to use xarray's stack() method.
-    #
-    #     Parameters
-    #     ----------
-    #     XY: either X or Y of the regression nomenclature.  Should be an
-    #     xarray.Dataset already splitted on channel
-    #
-    #     Returns
-    #     -------
-    #     output_array: numpy array of two dimensions (observations, channel)
-    #
-    #     """
-    #
-    #     if isinstance(XY, xr.Dataset):
-    #         tmp = XY.to_array("channel")
-    #
-    #     tmp = tmp.stack(observation=("frequency", "time"))
-    #     output_array = tmp.data.T
-    #     return output_array
-
     def solve_underdetermined(self):
         """
         20210806

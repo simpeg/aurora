@@ -84,8 +84,8 @@ class WindowingScheme(ApodizationWindow):
     nomenclature.  We may provide an interface to define these things in terms
     of percent, duration in seconds etc. in a supporting module.
 
-    Note that sampling_rate is actually a property of the data and not of the
-    window ... still not sure if we want to make sampling_rate an attr here
+    Note that sample_rate is actually a property of the data and not of the
+    window ... still not sure if we want to make sample_rate an attr here
     or if its better to put properties like window_duration() as a method of
     some composition of time series and windowing scheme.
 
@@ -100,7 +100,7 @@ class WindowingScheme(ApodizationWindow):
         )  # make this 75% of num_samples_window by default
         self.striding_function_label = kwargs.get("striding_function_label", "crude")
         self._left_hand_window_edge_indices = None
-        self.sampling_rate = kwargs.get("sampling_rate", None)
+        self.sample_rate = kwargs.get("sample_rate", None)
 
     def clone(cls):
         return copy.deepcopy(cls)
@@ -321,12 +321,12 @@ class WindowingScheme(ApodizationWindow):
         """
         # ONLY SUPPORTS DATASET AT THIS POINT
         if isinstance(data, xr.Dataset):
-            spectral_ds = fft_xr_ds(data, self.sampling_rate, detrend_type=detrend_type)
+            spectral_ds = fft_xr_ds(data, self.sample_rate, detrend_type=detrend_type)
             if spectral_density_correction:
                 spectral_ds = self.apply_spectral_density_calibration(spectral_ds)
         elif isinstance(data, xr.DataArray):
             xrds = data.to_dataset("channel")
-            spectral_ds = fft_xr_ds(xrds, self.sampling_rate, detrend_type=detrend_type)
+            spectral_ds = fft_xr_ds(xrds, self.sample_rate, detrend_type=detrend_type)
             spectral_ds = spectral_ds.to_array("channel")
             return spectral_ds
 
@@ -358,7 +358,7 @@ class WindowingScheme(ApodizationWindow):
         """
         comes from data
         """
-        return 1.0 / self.sampling_rate
+        return 1.0 / self.sample_rate
 
     @property
     def window_duration(self):
@@ -381,7 +381,7 @@ class WindowingScheme(ApodizationWindow):
             Following Hienzel et al 2002, Equations 24 and 25 for Linear
             Spectral Density correction for a single sided spectrum.
         """
-        return np.sqrt(2 / (self.sampling_rate * self.S2))
+        return np.sqrt(2 / (self.sample_rate * self.S2))
 
 
 # </PROPERTIES THAT NEED SAMPLING RATE>

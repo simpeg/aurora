@@ -51,7 +51,7 @@ class TRME_RR(RegressionEstimator):
         self._Z = kwargs.get("Z", None)
         self.Z = self._Z.to_array().data.T
         self.expectation_psi_prime = np.ones(self.n_channels_out)
-        self.sigma_squared = np.zeros(self.n_channels_out)
+        # self.sigma_squared = np.zeros(self.n_channels_out)
         self.check_for_nan()
         self.check_number_of_observations_xy_consistent()
         self.check_for_enough_data_for_rr_estimate()
@@ -144,7 +144,7 @@ class TRME_RR(RegressionEstimator):
         # intial estimate of error variance
         res = self.Y - Yhat
         sigma = np.sum(res * np.conj(res), axis=0) / self.n_data
-        cfac = self.iter_control.correction_factor
+
         if self.iter_control.max_number_of_iterations > 0:
             converged = False
         else:
@@ -164,11 +164,12 @@ class TRME_RR(RegressionEstimator):
             self.apply_huber_weights(sigma, Yhat)
             # TRME_RR
             # updated error variance estimates, computed using cleaned data
-            QHY = Q.conj().T @ self.Yc
-            self.b = np.linalg.solve(QHX, QHY)  # self.b = QTX\QTY
+            QHYc = self.QH @ self.Yc
+            self.b = np.linalg.solve(QHX, QHYc)  # self.b = QTX\QTY
             Yhat = self.X @ self.b
             res = self.Yc - Yhat
-            sigma = cfac * np.sum(res * np.conj(res), axis=0) / self.n_data
+            mean_ssq_residuals = np.sum(res * np.conj(res), axis=0) / self.n_data
+            sigma = self.iter_control.correction_factor * mean_ssq_residuals
             converged = self.iter_control.converged(self.b, b0)
             b0 = self.b
         # </CONVERGENCE STUFF>
