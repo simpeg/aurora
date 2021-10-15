@@ -70,15 +70,15 @@ def process_synthetic_rr12():
     test_config = CONFIG_PATH.joinpath("test12rr-RR_test2_run_config.json")
     # test_config = Path("config", "test12rr_run_config.json")
     run_id = STATION_01_CFG["run_id"]
-    process_mth5_run(test_config, run_id, units="MT")
+    process_mth5_run(test_config, run_id, units="MT", show_plot=False)
 
 
 def test_process_mth5():
     # process_synthetic_1_underdetermined()
     # process_synthetic_1_with_nans()
     # create_run_config_for_test_case("test1")
-    # process_synthetic_1()
-    # process_synthetic_2()
+    process_synthetic_1()
+    process_synthetic_2()
     process_synthetic_rr12()
 
 

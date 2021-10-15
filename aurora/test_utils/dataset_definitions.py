@@ -95,6 +95,74 @@ def make_iak34_test_00_config():
     return test_data_set
 
 
+def make_iak34_test_01_config():
+    test_data_set = FDSNDatasetConfig()
+    test_data_set.dataset_id = "iak34_test_01_long_ss"
+    test_data_set.network = "EM"
+    test_data_set.station = "IAK34"
+    # <ORIGINAL>
+    # test_data_set.starttime = UTCDateTime("2013-04-25T20:10:08.000000Z")
+    # test_data_set.endtime = UTCDateTime("2013-05-13T21:18:53.000000Z")
+    # </ORIGINAL>
+    test_data_set.starttime = UTCDateTime("2013-04-26T00:00:00.000000Z")
+    test_data_set.endtime = UTCDateTime("2013-05-11T00:00:00.000000Z")
+    test_data_set.channel_codes = None
+    test_data_set.description = "earthscope example dataset IAK34"
+    test_data_set.components_list = ["hx", "hy", "ex", "ey"]
+    return test_data_set
+
+
+def make_iak34_test_02_config():
+    test_data_set = FDSNDatasetConfig()
+    test_data_set.dataset_id = "iak34_test_02_long_rr"
+    test_data_set.network = "EM"
+    test_data_set.station = "IAK34,NEK33"
+    # <ORIGINAL>
+    # test_data_set.starttime = UTCDateTime("2013-04-25T20:10:08.000000Z")
+    # test_data_set.endtime = UTCDateTime("2013-05-13T21:18:53.000000Z")
+    # </ORIGINAL>
+    test_data_set.starttime = UTCDateTime("2013-04-26T00:00:00.000000Z")
+    test_data_set.endtime = UTCDateTime("2013-05-10T00:00:00.000000Z")
+    test_data_set.channel_codes = None
+    test_data_set.description = "earthscope example dataset IAK34"
+    test_data_set.components_list = ["hx", "hy", "ex", "ey"]
+    return test_data_set
+
+
+def make_iak34_test_03_config():
+    test_data_set = FDSNDatasetConfig()
+    test_data_set.dataset_id = "iak34_test_03_long_rr"
+    test_data_set.network = "EM"
+    test_data_set.station = "IAK34,NEK33"
+    # <ORIGINAL>
+    # test_data_set.starttime = UTCDateTime("2013-04-25T20:10:08.000000Z")
+    # test_data_set.endtime = UTCDateTime("2013-05-13T21:18:53.000000Z")
+    # </ORIGINAL>
+    test_data_set.starttime = UTCDateTime("2013-05-15T00:00:00.000000Z")
+    test_data_set.endtime = UTCDateTime("2013-05-26T00:00:00.000000Z")
+    test_data_set.channel_codes = None
+    test_data_set.description = "earthscope example dataset IAK34"
+    test_data_set.components_list = ["hx", "hy", "ex", "ey"]
+    return test_data_set
+
+
+def make_iak34_test_04_config():
+    test_data_set = FDSNDatasetConfig()
+    test_data_set.dataset_id = "iak34_test_04_rr"
+    test_data_set.network = "EM"
+    test_data_set.station = "IAK34,NEN34"  # NEK33
+    # <ORIGINAL>
+    # test_data_set.starttime = UTCDateTime("2013-04-25T20:10:08.000000Z")
+    # test_data_set.endtime = UTCDateTime("2013-05-13T21:18:53.000000Z")
+    # </ORIGINAL>
+    test_data_set.starttime = UTCDateTime("2013-04-28T00:00:00.000000Z")
+    test_data_set.endtime = UTCDateTime("2013-04-29T00:00:00.000000Z")
+    test_data_set.channel_codes = None
+    test_data_set.description = "earthscope example dataset IAK34"
+    test_data_set.components_list = ["hx", "hy", "ex", "ey"]
+    return test_data_set
+
+
 # def make_iak34_nen34_test_00_config():
 #     test_data_set = FDSNDatasetConfig()
 #     test_data_set.dataset_id = "iak34_nen34_test_00"
@@ -142,6 +210,14 @@ def make_test_configs():
 
     # <IAK34SS>
     test_data_set = make_iak34_test_00_config()
+    test_data_set_configs[test_data_set.dataset_id] = test_data_set
+    test_data_set = make_iak34_test_01_config()
+    test_data_set_configs[test_data_set.dataset_id] = test_data_set
+    test_data_set = make_iak34_test_02_config()
+    test_data_set_configs[test_data_set.dataset_id] = test_data_set
+    test_data_set = make_iak34_test_03_config()
+    test_data_set_configs[test_data_set.dataset_id] = test_data_set
+    test_data_set = make_iak34_test_04_config()
     test_data_set_configs[test_data_set.dataset_id] = test_data_set
     # </IAK34SS>
 

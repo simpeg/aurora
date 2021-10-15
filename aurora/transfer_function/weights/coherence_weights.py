@@ -43,7 +43,7 @@ def coherence_from_fc_series(c_xy, c_xx, c_yy):
     return coh
 
 
-def coherence_weights_v00(x, y, threshold=0.92):  # 975):#0.98
+def coherence_weights_v00(x, y, threshold=0.95):  # 975):#0.98
     """
 
     Parameters
@@ -83,3 +83,70 @@ def coherence_weights_v00(x, y, threshold=0.92):  # 975):#0.98
     keepers = worst_to_best[clip_point:]
     W[keepers] = 1
     return W
+
+
+def compute_coherence_weights(X, Y, RR, coh_type="local"):
+    """
+
+    Parameters
+    ----------
+    X
+    Y
+    RR
+    coh_type: "local" or "remote"
+
+    Returns
+    -------
+
+    """
+    remote_threshold = 0.8
+    local_threshold = 0.95
+
+    X = X.dropna(dim="observation")
+    Y = Y.dropna(dim="observation")
+    if RR is not None:
+        RR = RR.dropna(dim="observation")
+
+    # < INSERT COHERENCE SORTING HERE>    y_type = "remote"
+    null_indices = X["hx"].isnull()  # not robust -- hail mary
+    finite_indices = ~null_indices
+    W = np.zeros(len(X.observation))
+
+    x = X["hx"]  # .dropna(dim="observation").data
+
+    if coh_type == "local":
+        y = Y["ey"]  # .dropna(dim="observation").data
+        threshold = local_threshold
+    elif coh_type == "remote":
+        y = RR["hx"]  # .dropna(dim="observation").data
+        threshold = remote_threshold
+
+    W1 = coherence_weights_v00(x, y, threshold=threshold)
+
+    W[finite_indices] = W1
+
+    W[W == 0] = np.nan
+    X["hx"].data *= W
+    Y["ey"].data *= W
+
+    # x = X["hy"].data
+    # y = Y["ex"].data
+    W = np.zeros(len(finite_indices))
+    x = X["hy"]  # .dropna(dim="observation").data
+    if coh_type == "local":
+        y = Y["ex"]  # .dropna(dim="observation").data
+        threshold = local_threshold
+    elif coh_type == "remote":
+        y = RR["hy"]  # .dropna(dim="observation").data
+        threshold = remote_threshold
+    W2 = coherence_weights_v00(x, y)
+    W[finite_indices] = W2
+    W[W == 0] = np.nan
+    X["hy"].data *= W
+    Y["ex"].data *= W
+    # W = W*W2
+    # X *= W
+    # Y *= W
+    if RR is not None:
+        RR *= W
+    return X, Y, RR

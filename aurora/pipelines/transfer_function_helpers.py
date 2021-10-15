@@ -4,6 +4,7 @@ and transfer_function_processing helpers.
 
 
 """
+import numpy as np
 from aurora.time_series.frequency_band_helpers import extract_band
 
 # from aurora.time_series.xarray_helpers import cast_3d_stft_to_2d_observations
@@ -195,6 +196,7 @@ def process_transfer_functions(
     -------
 
     """
+    # PUT COHERENCE SORTING HERE IF WIDE BAND?
     regression_class = get_regression_class(config)
     for band in transfer_function_obj.frequency_bands.bands():
         iter_control = set_up_iter_control(config)
@@ -210,17 +212,36 @@ def process_transfer_functions(
             RR = RR.stack(observation=("frequency", "time"))
 
         W = effective_degrees_of_freedom_weights(X, RR, edf_obj=None)
+        W[W == 0] = np.nan  # use this to drop values in the handle_nan
         # apply weights
         X *= W
         Y *= W
         if RR is not None:
             RR *= W
+        X = X.dropna(dim="observation")
+        Y = Y.dropna(dim="observation")
+        if RR is not None:
+            RR = RR.dropna(dim="observation")
+
+        # < INSERT COHERENCE SORTING HERE>
+        # coh_type = "local"
+        # if config.decimation_level_id == 0:
+        #     from aurora.transfer_function.weights.coherence_weights import compute_coherence_weights
+        #     X, Y, RR = compute_coherence_weights(X,Y,RR, coh_type=coh_type)
+        # </ INSERT COHERENCE SORTING HERE>
 
         if config.estimate_per_channel:
             for ch in config.output_channels:
                 Y_ch = Y[ch].to_dataset()  # keep as a dataset, maybe not needed
 
                 X_, Y_, RR_ = handle_nan(X, Y_ch, RR, drop_dim="observation")
+
+                # W = effective_degrees_of_freedom_weights(X_, RR_, edf_obj=None)
+                # X_ *= W
+                # Y_ *= W
+                # if RR is not None:
+                #     RR_ *= W
+
                 regression_estimator = regression_class(
                     X=X_, Y=Y_, Z=RR_, iter_control=iter_control
                 )
