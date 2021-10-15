@@ -39,17 +39,17 @@ def test_processing(z_file_path=None):
     tf_cls = export_tf(tf_collection, {}, {})
     print(tf_cls)
 
-    # tf_cls2 = process_mth5_run(
-    #     processing_run_cfg,
-    #     run_id,
-    #     mth5_path=mth5_path,
-    #     units="MT",
-    #     show_plot=show_plot,
-    #     z_file_path=z_file_path,
-    #     return_collection=False,
-    # )
-    # print("OK")
-    # tf_cls2.write_tf_file(fn="emtfxml_test.xml", file_type="extfxml")
+    tf_cls2 = process_mth5_run(
+        processing_run_cfg,
+        run_id,
+        mth5_path=mth5_path,
+        units="MT",
+        show_plot=show_plot,
+        z_file_path=z_file_path,
+        return_collection=False,
+    )
+    print("OK")
+    tf_cls2.write_tf_file(fn="emtfxml_test.xml", file_type="extfxml")
     return tf_collection
 
 
