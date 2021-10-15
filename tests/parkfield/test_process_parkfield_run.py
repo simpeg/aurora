@@ -49,7 +49,7 @@ def test_processing(z_file_path=None):
         return_collection=False,
     )
     print("OK")
-    tf_cls2.write_tf_file(fn="emtfxml_test.xml", file_type="extfxml")
+    tf_cls2.write_tf_file(fn="emtfxml_test.xml", file_type="emtfxml")
     return tf_collection
 
 
