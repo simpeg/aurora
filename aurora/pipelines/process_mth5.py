@@ -261,6 +261,7 @@ def export_tf(tf_collection, station_metadata_dict={}, survey_dict={}):
     res_cov = res_cov.rename(renamer_dict)
     tf_cls.residual_covariance = res_cov
 
+    tf_cls.station_metadata._runs = []
     tf_cls.station_metadata.from_dict(station_metadata_dict)
     tf_cls.survey_metadata.from_dict(survey_dict)
     return tf_cls

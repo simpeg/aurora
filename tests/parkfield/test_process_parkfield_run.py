@@ -49,7 +49,11 @@ def test_processing(z_file_path=None):
         z_file_path=z_file_path,
         return_collection=False,
     )
-    
+
+    # with open(z_file_path.parent.joinpath("tf_cls.pkl"), "wb") as fid:
+    #     pickle.dump(tf_cls2, fid)
+    #     print(f"Pickled tf_cls2 to {z_file_path.parent.joinpath('tf_cls.pkl')}")
+        
     tf_cls2.write_tf_file(fn="emtfxml_test.xml", file_type="emtfxml")
     print("OK")
     #return tf_collection
