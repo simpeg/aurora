@@ -1,4 +1,5 @@
 from pathlib import Path
+import pickle
 
 from aurora.config.processing_config import RunConfig
 from aurora.pipelines.process_mth5 import export_tf
@@ -27,17 +28,17 @@ def test_processing(z_file_path=None):
 
     run_id = "001"
     show_plot = False
-    tf_collection = process_mth5_run(
-        processing_run_cfg,
-        run_id,
-        mth5_path=mth5_path,
-        units="MT",
-        show_plot=show_plot,
-        z_file_path=z_file_path,
-    )
-    print("MERGE TF COLLECITON TO A DICT")
-    tf_cls = export_tf(tf_collection, {}, {})
-    print(tf_cls)
+    # tf_collection = process_mth5_run(
+    #     processing_run_cfg,
+    #     run_id,
+    #     mth5_path=mth5_path,
+    #     units="MT",
+    #     show_plot=show_plot,
+    #     z_file_path=z_file_path,
+    # )
+    # print("MERGE TF COLLECITON TO A DICT")
+    # tf_cls = export_tf(tf_collection, {}, {})
+    # print(tf_cls)
 
     tf_cls2 = process_mth5_run(
         processing_run_cfg,
@@ -49,8 +50,12 @@ def test_processing(z_file_path=None):
         return_collection=False,
     )
     print("OK")
+    with open(z_file_path.parent.joinpath("tf_cls.pkl"), "wb") as fid:
+        pickle.dump(tf_cls2, fid)
+        print(f"Pickled tf_cls2 to {z_file_path.parent.joinpath('tf_cls.pkl')}")
+        
     tf_cls2.write_tf_file(fn="emtfxml_test.xml", file_type="emtfxml")
-    return tf_collection
+    #return tf_collection
 
 
 def main():
