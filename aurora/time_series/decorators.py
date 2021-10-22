@@ -2,7 +2,7 @@ import functools
 import xarray as xr
 
 
-#<PATTERN>
+# <PATTERN>
 def decorator(func):
     @functools.wraps(func)
     def wrapper_decorator(*args, **kwargs):
@@ -10,8 +10,11 @@ def decorator(func):
         value = func(*args, **kwargs)
         # Do something after
         return value
+
     return wrapper_decorator
-#</PATTERN>
+
+
+# </PATTERN>
 
 
 def can_use_xr_dataarray(func):
@@ -30,6 +33,7 @@ def can_use_xr_dataarray(func):
     -------
 
     """
+
     @functools.wraps(func)
     def wrapper_decorator(*args, **kwargs):
 
@@ -50,4 +54,3 @@ def can_use_xr_dataarray(func):
         return processed_obj
 
     return wrapper_decorator
-

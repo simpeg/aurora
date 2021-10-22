@@ -2,7 +2,6 @@ import numpy as np
 from aurora.time_series.frequency_band import FrequencyBands
 
 
-
 def extract_band(frequency_band, fft_obj, epsilon=1e-7):
     """
     TODO: THis may want to be a method of fft_obj, or it may want to be a
@@ -25,8 +24,10 @@ def extract_band(frequency_band, fft_obj, epsilon=1e-7):
     band = fft_obj.where(cond1 & cond2, drop=True)
     return band
 
-def frequency_band_edges(f_lower_bound, f_upper_bound,
-                                  num_bands_per_decade=None, num_bands=None):
+
+def frequency_band_edges(
+    f_lower_bound, f_upper_bound, num_bands_per_decade=None, num_bands=None
+):
     """
     Provides logarithmically spaced fenceposts acoss lowest and highest
     frequencies. This is a lot like calling logspace.  The resultant gates
@@ -62,24 +63,23 @@ def frequency_band_edges(f_lower_bound, f_upper_bound,
         raise Exception
 
     if num_bands is None:
-        number_of_decades = np.log10(f_upper_bound/ f_lower_bound)
+        number_of_decades = np.log10(f_upper_bound / f_lower_bound)
         # The number of decades spanned (use log8 for octaves)
-        num_bands = round(number_of_decades * num_bands_per_decade) #floor or ceiling here?
-
+        num_bands = round(
+            number_of_decades * num_bands_per_decade
+        )  # floor or ceiling here?
 
     base = np.exp((1.0 / num_bands) * np.log(f_upper_bound / f_lower_bound))
     # log - NOT log10!
 
     print(f"base = {base}")
-    bases = base * np.ones(num_bands + 1);
+    bases = base * np.ones(num_bands + 1)
     print(f"bases = {bases}")
     exponents = np.linspace(0, num_bands, num_bands + 1)
     print(f"exponents = {exponents}")
     fence_posts = f_lower_bound * (bases ** exponents)
     print(f"fence posts = {fence_posts}")
     return fence_posts
-
-
 
 
 def configure_frequency_bands(config):
@@ -95,7 +95,7 @@ def configure_frequency_bands(config):
 
     Parameters
     ----------
-    config : aurora.sandbox.processing_config.ProcessingConfig
+    config : aurora.config.decimation_level_config.DecimationLevelConfig
         The configuration parameters for setting up the frequency bands.
 
         If config["band_setup_style"] is "EMTF" this will look for one of
@@ -121,9 +121,10 @@ def configure_frequency_bands(config):
     if config["band_setup_style"] == "EMTF":
         frequency_bands.from_emtf_band_setup(
             filepath=config.emtf_band_setup_file,
-            sampling_rate=config.sample_rate,
-            decimation_level=config.decimation_level_id+1,
-            num_samples_window=config.num_samples_window)
+            sample_rate=config.sample_rate,
+            decimation_level=config.decimation_level_id + 1,
+            num_samples_window=config.num_samples_window,
+        )
     elif config["band_setup_style"] == "band edges":
         frequency_bands.band_edges = config["band_edges"]
         print("Not Yet Supported")
@@ -134,14 +135,14 @@ def configure_frequency_bands(config):
         num_bands = config["num_frequency_bands"]
         if lower_bound is None:
             pass
-            #suggest lower_bound from a rule
+            # suggest lower_bound from a rule
         if upper_bound is None:
             pass
-            #suggest upper_bound from a rule
+            # suggest upper_bound from a rule
         if num_bands is None:
             pass
-            #suggest based on num_bands per octave or decade
-        #now call logspace(lower, upper, num_bands)
+            # suggest based on num_bands per octave or decade
+        # now call logspace(lower, upper, num_bands)
         raise NotImplementedError
 
     return frequency_bands

@@ -1,0 +1,351 @@
+ **** IMPEDANCE IN MEASUREMENT COORDINATES ****
+ ********** WITH FULL ERROR COVARINCE**********
+Robust Single station                                                           
+station    :test1               
+coordinate  1007.996  0.0  declination  0.0
+number of channels   5   number of frequencies   26
+ orientations and tilts of each channel 
+    1     0.00     0.00 tes  Hx
+    2    90.00     0.00 tes  Hy
+    3     0.00     0.00 tes  Hz
+    4     0.00     0.00 tes  Ex
+    5    90.00     0.00 tes  Ey
+
+period :      5.03926    decimation level   1     freq. band from   47 to   55
+number of data point    1863 sampling freq.   1.0 Hz
+  Transfer Functions
+  0.2465E+00  0.7601E-03  0.6746E-03  0.2497E+00
+ -0.1401E-01 -0.6007E-01 -0.6904E+01 -0.6900E+01
+  0.6865E+01  0.6915E+01 -0.2722E-01  0.5791E-02
+    Inverse Coherent Signal Power Matrix
+  0.1918E-09  0.0000E+00
+  0.9106E-12  0.4621E-12  0.1861E-09  0.0000E+00
+  Residual Covariance
+  0.8789E+04  0.0000E+00
+ -0.5858E+05  0.6395E+05  0.6961E+07  0.0000E+00
+  0.6348E+05  0.6417E+05  0.1089E+06 -0.1549E+06  0.7355E+07  0.0000E+00
+period :      6.05039    decimation level   1     freq. band from   39 to   46
+number of data point    1656 sampling freq.   1.0 Hz
+  Transfer Functions
+  0.2478E+00  0.1061E-02  0.2662E-03  0.2471E+00
+  0.7130E-01 -0.3474E-01 -0.6267E+01 -0.6272E+01
+  0.6355E+01  0.6277E+01 -0.5780E-03  0.2619E-01
+    Inverse Coherent Signal Power Matrix
+  0.1406E-09  0.0000E+00
+ -0.2416E-12 -0.3914E-11  0.1434E-09  0.0000E+00
+  Residual Covariance
+  0.1266E+05  0.0000E+00
+ -0.8301E+05  0.8093E+05  0.8693E+07  0.0000E+00
+  0.7403E+05  0.7536E+05  0.8832E+05  0.5065E+05  0.8514E+07  0.0000E+00
+period :      7.56963    decimation level   1     freq. band from   31 to   37
+number of data point    1449 sampling freq.   1.0 Hz
+  Transfer Functions
+  0.2475E+00  0.1720E-02 -0.1347E-02  0.2457E+00
+ -0.2155E-01 -0.2614E-01 -0.5542E+01 -0.5591E+01
+  0.5561E+01  0.5603E+01  0.3479E-01  0.1789E-02
+    Inverse Coherent Signal Power Matrix
+  0.1054E-09  0.0000E+00
+  0.8934E-13  0.1731E-12  0.1019E-09  0.0000E+00
+  Residual Covariance
+  0.2098E+05  0.0000E+00
+ -0.1159E+06  0.1164E+06  0.1104E+08  0.0000E+00
+  0.1211E+06  0.1358E+06  0.2901E+06 -0.6022E+05  0.1145E+08  0.0000E+00
+period :      9.36498    decimation level   1     freq. band from   25 to   30
+number of data point    1242 sampling freq.   1.0 Hz
+  Transfer Functions
+  0.2486E+00  0.5800E-03  0.1460E-02  0.2482E+00
+  0.7575E-02 -0.3151E-01 -0.5008E+01 -0.4985E+01
+  0.5042E+01  0.5014E+01 -0.1631E-01  0.1989E-01
+    Inverse Coherent Signal Power Matrix
+  0.7577E-10  0.0000E+00
+ -0.2267E-11 -0.3671E-12  0.7509E-10  0.0000E+00
+  Residual Covariance
+  0.3067E+05  0.0000E+00
+ -0.1385E+06  0.1708E+06  0.1359E+08  0.0000E+00
+  0.1447E+06  0.1710E+06  0.3468E+06 -0.3820E+06  0.1372E+08  0.0000E+00
+period :      11.71223    decimation level   1     freq. band from   20 to   24
+number of data point    1035 sampling freq.   1.0 Hz
+  Transfer Functions
+  0.2458E+00 -0.9771E-04 -0.4754E-04  0.2448E+00
+  0.2581E-01  0.6371E-03 -0.4417E+01 -0.4436E+01
+  0.4446E+01  0.4430E+01  0.6937E-02 -0.3468E-02
+    Inverse Coherent Signal Power Matrix
+  0.5542E-10  0.0000E+00
+  0.3113E-12 -0.4958E-12  0.5860E-10  0.0000E+00
+  Residual Covariance
+  0.4721E+05  0.0000E+00
+ -0.2035E+06  0.2064E+06  0.1864E+08  0.0000E+00
+  0.1782E+06  0.2168E+06  0.1107E+07  0.8763E+06  0.1695E+08  0.0000E+00
+period :      14.72505    decimation level   1     freq. band from   16 to   19
+number of data point    828 sampling freq.   1.0 Hz
+  Transfer Functions
+  0.2459E+00 -0.1474E-04 -0.2412E-02  0.2487E+00
+  0.3128E-01 -0.4633E-02 -0.3937E+01 -0.3956E+01
+  0.3979E+01  0.3948E+01  0.1717E-01 -0.1483E-01
+    Inverse Coherent Signal Power Matrix
+  0.4307E-10  0.0000E+00
+ -0.1276E-11 -0.1497E-11  0.4473E-10  0.0000E+00
+  Residual Covariance
+  0.8492E+05  0.0000E+00
+ -0.2772E+06  0.2842E+06  0.2137E+08  0.0000E+00
+  0.4073E+06  0.3892E+06  0.2001E+06 -0.8484E+06  0.2340E+08  0.0000E+00
+period :      18.39158    decimation level   1     freq. band from   13 to   15
+number of data point    621 sampling freq.   1.0 Hz
+  Transfer Functions
+  0.2466E+00  0.7113E-03 -0.3564E-02  0.2482E+00
+  0.1689E-01  0.5859E-02 -0.3521E+01 -0.3526E+01
+  0.3495E+01  0.3534E+01 -0.2117E-01  0.2453E-01
+    Inverse Coherent Signal Power Matrix
+  0.3679E-10  0.0000E+00
+ -0.8479E-12  0.5303E-12  0.3719E-10  0.0000E+00
+  Residual Covariance
+  0.1262E+06  0.0000E+00
+ -0.5261E+06  0.4552E+06  0.2757E+08  0.0000E+00
+  0.4582E+06  0.3979E+06 -0.7010E+05 -0.8559E+05  0.2853E+08  0.0000E+00
+period :      23.49217    decimation level   1     freq. band from   10 to   12
+number of data point    621 sampling freq.   1.0 Hz
+  Transfer Functions
+  0.2507E+00 -0.1449E-03 -0.6621E-03  0.2466E+00
+ -0.9026E-02  0.4787E-02 -0.3021E+01 -0.3063E+01
+  0.3073E+01  0.3082E+01  0.6926E-02  0.1041E-01
+    Inverse Coherent Signal Power Matrix
+  0.2267E-10  0.0000E+00
+ -0.3676E-12  0.1396E-11  0.2072E-10  0.0000E+00
+  Residual Covariance
+  0.2306E+06  0.0000E+00
+ -0.3513E+06  0.6502E+06  0.3826E+08  0.0000E+00
+  0.7157E+06  0.6477E+06  0.5022E+06 -0.3538E+06  0.3650E+08  0.0000E+00
+period :      30.32826    decimation level   1     freq. band from   8 to   9
+number of data point    414 sampling freq.   1.0 Hz
+  Transfer Functions
+  0.2483E+00  0.1545E-02  0.1964E-02  0.2456E+00
+ -0.3713E-01  0.3192E-01 -0.2655E+01 -0.2624E+01
+  0.2651E+01  0.2669E+01  0.4663E-01  0.4529E-02
+    Inverse Coherent Signal Power Matrix
+  0.1885E-10  0.0000E+00
+ -0.7958E-12 -0.1172E-11  0.1851E-10  0.0000E+00
+  Residual Covariance
+  0.3701E+06  0.0000E+00
+ -0.8957E+06  0.9200E+06  0.5384E+08  0.0000E+00
+  0.1192E+07  0.8018E+06 -0.1008E+07  0.1693E+07  0.5379E+08  0.0000E+00
+period :      39.85915    decimation level   1     freq. band from   6 to   7
+number of data point    414 sampling freq.   1.0 Hz
+  Transfer Functions
+  0.2471E+00 -0.1045E-02  0.1882E-02  0.2467E+00
+ -0.8679E-03  0.8990E-02 -0.2241E+01 -0.2240E+01
+  0.2255E+01  0.2260E+01  0.1067E-01 -0.6354E-02
+    Inverse Coherent Signal Power Matrix
+  0.1024E-10  0.0000E+00
+ -0.5164E-12  0.8333E-12  0.9656E-11  0.0000E+00
+  Residual Covariance
+  0.7014E+06  0.0000E+00
+ -0.1331E+07  0.1530E+07  0.8194E+08  0.0000E+00
+  0.1777E+07  0.1698E+07  0.2638E+07  0.3905E+06  0.7736E+08  0.0000E+00
+period :      51.45794    decimation level   1     freq. band from   5 to   5
+number of data point    207 sampling freq.   1.0 Hz
+  Transfer Functions
+  0.2488E+00 -0.3641E-02  0.4303E-03  0.2429E+00
+  0.2284E-01  0.1536E-01 -0.1945E+01 -0.1967E+01
+  0.1958E+01  0.1989E+01 -0.1578E-01 -0.5147E-01
+    Inverse Coherent Signal Power Matrix
+  0.1246E-10  0.0000E+00
+ -0.5808E-12  0.1718E-12  0.1341E-10  0.0000E+00
+  Residual Covariance
+  0.1165E+07  0.0000E+00
+ -0.2580E+07  0.2142E+07  0.8826E+08  0.0000E+00
+  0.1864E+07  0.2255E+07  0.1930E+07  0.3581E+07  0.7049E+08  0.0000E+00
+period :      66.62144    decimation level   2     freq. band from   14 to   17
+number of data point    204 sampling freq.   0.25 Hz
+  Transfer Functions
+  0.2500E+00 -0.9342E-03  0.2493E-02  0.2485E+00
+  0.2130E-02  0.3505E-01 -0.1735E+01 -0.1760E+01
+  0.1733E+01  0.1771E+01 -0.9506E-02 -0.2426E-01
+    Inverse Coherent Signal Power Matrix
+  0.2299E-10  0.0000E+00
+ -0.1058E-12 -0.2873E-12  0.1985E-10  0.0000E+00
+  Residual Covariance
+  0.4898E+06  0.0000E+00
+ -0.3331E+06  0.4036E+06  0.2664E+08  0.0000E+00
+  0.6716E+06  0.1034E+07  0.1233E+07  0.2551E+07  0.3254E+08  0.0000E+00
+period :      86.00792    decimation level   2     freq. band from   11 to   13
+number of data point    153 sampling freq.   0.25 Hz
+  Transfer Functions
+  0.2493E+00  0.4720E-04  0.5561E-02  0.2502E+00
+  0.3868E-01  0.1061E-02 -0.1570E+01 -0.1563E+01
+  0.1594E+01  0.1590E+01 -0.2614E-01  0.6507E-02
+    Inverse Coherent Signal Power Matrix
+  0.2102E-11  0.0000E+00
+ -0.3478E-13 -0.1245E-12  0.2318E-11  0.0000E+00
+  Residual Covariance
+  0.7579E+07  0.0000E+00
+ -0.1643E+08  0.2283E+07  0.4115E+09  0.0000E+00
+  0.1162E+08  0.1386E+08 -0.2459E+08  0.3066E+08  0.4652E+09  0.0000E+00
+period :      108.39165    decimation level   2     freq. band from   9 to   10
+number of data point    102 sampling freq.   0.25 Hz
+  Transfer Functions
+  0.2468E+00 -0.7058E-03 -0.4055E-02  0.2497E+00
+ -0.1448E-01  0.2881E-01 -0.1446E+01 -0.1412E+01
+  0.1389E+01  0.1399E+01 -0.5590E-02 -0.7131E-02
+    Inverse Coherent Signal Power Matrix
+  0.1622E-11  0.0000E+00
+  0.2839E-12  0.2600E-13  0.1615E-11  0.0000E+00
+  Residual Covariance
+  0.2016E+08  0.0000E+00
+ -0.2406E+08  0.2964E+08  0.6544E+09  0.0000E+00
+  0.1881E+08  0.8386E+07  0.4493E+08  0.7469E+08  0.6324E+09  0.0000E+00
+period :      137.76339    decimation level   2     freq. band from   7 to   8
+number of data point    102 sampling freq.   0.25 Hz
+  Transfer Functions
+  0.2529E+00 -0.5959E-03 -0.6555E-02  0.2479E+00
+  0.7636E-02  0.2055E-01 -0.1225E+01 -0.1249E+01
+  0.1197E+01  0.1224E+01  0.1369E-01 -0.4620E-01
+    Inverse Coherent Signal Power Matrix
+  0.9677E-12  0.0000E+00
+  0.5212E-13 -0.1646E-14  0.8664E-12  0.0000E+00
+  Residual Covariance
+  0.3765E+08  0.0000E+00
+ -0.3437E+08  0.4341E+08  0.9030E+09  0.0000E+00
+  0.4184E+08  0.3486E+08 -0.4743E+08 -0.2686E+08  0.9990E+09  0.0000E+00
+period :      171.26236    decimation level   2     freq. band from   6 to   6
+number of data point    51 sampling freq.   0.25 Hz
+  Transfer Functions
+  0.2414E+00 -0.4164E-02 -0.1477E-02  0.2430E+00
+  0.7493E-02 -0.3131E-02 -0.1081E+01 -0.1050E+01
+  0.1096E+01  0.1080E+01 -0.3057E-02  0.9220E-02
+    Inverse Coherent Signal Power Matrix
+  0.1195E-11  0.0000E+00
+  0.1749E-14 -0.7563E-14  0.1131E-11  0.0000E+00
+  Residual Covariance
+  0.5760E+08  0.0000E+00
+ -0.5222E+08  0.8691E+08  0.1126E+10  0.0000E+00
+  0.4798E+08  0.4079E+08 -0.1308E+09  0.1498E+09  0.1278E+10  0.0000E+00
+period :      205.83174    decimation level   2     freq. band from   5 to   5
+number of data point    51 sampling freq.   0.25 Hz
+  Transfer Functions
+  0.2437E+00 -0.4891E-02  0.5319E-03  0.2521E+00
+  0.2266E-01 -0.1831E-01 -0.9848E+00 -0.9887E+00
+  0.9903E+00  0.9471E+00  0.9989E-02  0.1976E-01
+    Inverse Coherent Signal Power Matrix
+  0.8744E-12  0.0000E+00
+  0.1282E-12 -0.1312E-13  0.8868E-12  0.0000E+00
+  Residual Covariance
+  0.6926E+08  0.0000E+00
+ -0.1014E+09  0.7563E+08  0.1196E+10  0.0000E+00
+  0.3862E+08  0.6424E+08 -0.2072E+08 -0.4748E+08  0.1029E+10  0.0000E+00
+period :      266.48578    decimation level   3     freq. band from   14 to   17
+number of data point    44 sampling freq.   0.0625 Hz
+  Transfer Functions
+  0.2344E+00 -0.8615E-02 -0.7460E-02  0.2489E+00
+  0.7310E-02  0.3602E-01 -0.8893E+00 -0.9054E+00
+  0.9101E+00  0.9332E+00  0.3598E-01 -0.3132E-02
+    Inverse Coherent Signal Power Matrix
+  0.1826E-11  0.0000E+00
+  0.2964E-12 -0.6905E-13  0.1364E-11  0.0000E+00
+  Residual Covariance
+  0.2548E+08  0.0000E+00
+ -0.3228E+08  0.3166E+08  0.4252E+09  0.0000E+00
+  0.3937E+08  0.4876E+08  0.1550E+08 -0.7468E+07  0.8817E+09  0.0000E+00
+period :      344.03166    decimation level   3     freq. band from   11 to   13
+number of data point    33 sampling freq.   0.0625 Hz
+  Transfer Functions
+  0.2436E+00 -0.4016E-03 -0.3428E-02  0.2549E+00
+  0.1845E-01 -0.5414E-02 -0.7846E+00 -0.8186E+00
+  0.8406E+00  0.8181E+00 -0.2149E-01  0.1001E-01
+    Inverse Coherent Signal Power Matrix
+  0.1324E-12  0.0000E+00
+  0.3191E-13  0.7739E-14  0.1714E-12  0.0000E+00
+  Residual Covariance
+  0.5441E+09  0.0000E+00
+ -0.6828E+09  0.4036E+09  0.6127E+10  0.0000E+00
+  0.7868E+09  0.2676E+09  0.3321E+09 -0.6873E+08  0.7183E+10  0.0000E+00
+period :      433.56662    decimation level   3     freq. band from   9 to   10
+number of data point    22 sampling freq.   0.0625 Hz
+  Transfer Functions
+  0.2337E+00  0.1414E-01 -0.1764E-01  0.2532E+00
+  0.1027E-02 -0.2511E-01 -0.6599E+00 -0.6918E+00
+  0.6865E+00  0.7123E+00 -0.2030E-01  0.1949E-01
+    Inverse Coherent Signal Power Matrix
+  0.9832E-13  0.0000E+00
+  0.1315E-13 -0.4036E-14  0.1258E-12  0.0000E+00
+  Residual Covariance
+  0.1114E+10  0.0000E+00
+ -0.2521E+10  0.1158E+10  0.1890E+11  0.0000E+00
+  0.1196E+10  0.2176E+09 -0.2705E+10  0.2867E+09  0.8716E+10  0.0000E+00
+period :      551.05355    decimation level   3     freq. band from   7 to   8
+number of data point    22 sampling freq.   0.0625 Hz
+  Transfer Functions
+  0.2431E+00  0.6010E-04 -0.3893E-02  0.2355E+00
+ -0.1578E-01 -0.8063E-02 -0.5951E+00 -0.6220E+00
+  0.6041E+00  0.6241E+00  0.9374E-02  0.2880E-01
+    Inverse Coherent Signal Power Matrix
+  0.9730E-13  0.0000E+00
+  0.2144E-14  0.1529E-13  0.7366E-13  0.0000E+00
+  Residual Covariance
+  0.3323E+10  0.0000E+00
+ -0.2078E+10  0.1562E+10  0.1821E+11  0.0000E+00
+  0.1757E+10  0.2170E+10  0.1910E+09  0.1492E+10  0.1436E+11  0.0000E+00
+period :      685.04945    decimation level   3     freq. band from   6 to   6
+number of data point    11 sampling freq.   0.0625 Hz
+  Transfer Functions
+  0.2361E+00 -0.3663E-01  0.3815E-03  0.2539E+00
+  0.8508E-01  0.5316E-01 -0.5610E+00 -0.5835E+00
+  0.5458E+00  0.5536E+00  0.9840E-02 -0.2154E-01
+    Inverse Coherent Signal Power Matrix
+  0.2068E-12  0.0000E+00
+ -0.4537E-13 -0.7648E-14  0.7412E-13  0.0000E+00
+  Residual Covariance
+  0.3739E+10  0.0000E+00
+ -0.4762E+10  0.2361E+10  0.2984E+11  0.0000E+00
+  0.2444E+10  0.3604E+10 -0.4579E+10 -0.1652E+10  0.1490E+11  0.0000E+00
+period :      823.32698    decimation level   3     freq. band from   5 to   5
+number of data point    11 sampling freq.   0.0625 Hz
+  Transfer Functions
+  0.2441E+00 -0.9193E-02 -0.3783E-02  0.2327E+00
+  0.1450E-01  0.2091E-01 -0.4923E+00 -0.5242E+00
+  0.5273E+00  0.5050E+00  0.1021E-01 -0.3388E-01
+    Inverse Coherent Signal Power Matrix
+  0.7062E-13  0.0000E+00
+ -0.6514E-14 -0.1396E-14  0.7973E-13  0.0000E+00
+  Residual Covariance
+  0.1838E+10  0.0000E+00
+ -0.1177E+10  0.1887E+10  0.1861E+11  0.0000E+00
+  0.1037E+10  0.3670E+10  0.1877E+10  0.1645E+09  0.1834E+11  0.0000E+00
+period :      825.67599    decimation level   4     freq. band from   18 to   22
+number of data point    10 sampling freq.   0.015625 Hz
+  Transfer Functions
+  0.2575E+00 -0.3294E-01 -0.8970E-02  0.2406E+00
+ -0.2338E-01  0.7041E-02 -0.5118E+00 -0.4726E+00
+  0.6023E+00  0.4997E+00 -0.6599E-01 -0.2046E-01
+    Inverse Coherent Signal Power Matrix
+  0.1914E-10  0.0000E+00
+  0.6319E-11 -0.1300E-11  0.1275E-10  0.0000E+00
+  Residual Covariance
+  0.6963E+07  0.0000E+00
+ -0.1827E+08 -0.3522E+07  0.1187E+09  0.0000E+00
+  0.1284E+08 -0.1554E+07 -0.3763E+08  0.2662E+08  0.5188E+08  0.0000E+00
+period :      1065.94312    decimation level   4     freq. band from   14 to   17
+number of data point    8 sampling freq.   0.015625 Hz
+  Transfer Functions
+  0.2318E+00  0.3344E-01 -0.1773E-01  0.2382E+00
+  0.1660E-01 -0.3194E-01 -0.4353E+00 -0.4806E+00
+  0.4026E+00  0.4751E+00 -0.1385E-01 -0.6593E-01
+    Inverse Coherent Signal Power Matrix
+  0.1823E-12  0.0000E+00
+ -0.8552E-13  0.3972E-14  0.1254E-12  0.0000E+00
+  Residual Covariance
+  0.3238E+10  0.0000E+00
+ -0.2773E+09  0.1432E+10  0.4245E+10  0.0000E+00
+ -0.2325E+09  0.2553E+10  0.1773E+10 -0.3412E+09  0.3882E+10  0.0000E+00
+period :      1446.74254    decimation level   4     freq. band from   10 to   13
+number of data point    8 sampling freq.   0.015625 Hz
+  Transfer Functions
+  0.2624E+00 -0.3342E-02  0.1120E-01  0.2548E+00
+ -0.4671E-01  0.3127E-02 -0.4069E+00 -0.4186E+00
+  0.3649E+00  0.3523E+00  0.1004E-01 -0.4406E-01
+    Inverse Coherent Signal Power Matrix
+  0.1002E-13  0.0000E+00
+  0.2516E-14  0.5391E-14  0.2152E-13  0.0000E+00
+  Residual Covariance
+  0.3629E+11  0.0000E+00
+ -0.1302E+10  0.3707E+11  0.8511E+11  0.0000E+00
+  0.1110E+11 -0.1031E+11  0.2730E+10 -0.2663E+10  0.5813E+11  0.0000E+00

@@ -45,7 +45,6 @@ jobs:
         source activate aurora-test
         pip install -e .
         conda list
-
     - name: Run Tests
       shell: bash
       run: |

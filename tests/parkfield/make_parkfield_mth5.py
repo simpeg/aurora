@@ -1,71 +1,112 @@
 """
 Relates to github aurora issue #17
 Ingest the Parkfield data make mth5 to use as the interface for tests
+
+2021-09-17: Modifying create methods to use FDSNDatasetConfig as input rather than
+dataset_id
 """
+from aurora.test_utils.dataset_definitions import TEST_DATA_SET_CONFIGS
+from aurora.pipelines.helpers import read_back_data
+from aurora.sandbox.io_helpers.make_mth5_helpers import create_from_server_multistation
 
-from pathlib import Path
+from helpers import DATA_PATH
 
-from obspy import UTCDateTime
-from obspy.clients import fdsn
-from obspy.core import Stream
-from obspy.core import Trace
+# create_from_server DEPRECATED 2021-09-18
+# def create_from_server(dataset_config, data_source="IRIS", target_folder=Path()):
+#
+#     # <GET EXPERIMENT>
+#     inventory = dataset_config.get_inventory_from_client(
+#         base_url=data_source, ensure_inventory_stages_are_named=True
+#     )
+#     translator = XMLInventoryMTExperiment()
+#     experiment = translator.xml_to_mt(inventory_object=inventory)
+#     # </GET EXPERIMENT>
+#
+#     # <TRIAGE ONE-OFF ISSUE WITH UNITS>
+#     experiment = triage_mt_units_electric_field(experiment)
+#     # </TRIAGE ONE-OFF ISSUE WITH UNITS>
+#
+#     # <INITIALIZE MTH5>
+#     h5_path = target_folder.joinpath(dataset_config.h5_filebase)
+#     mth5_obj = initialize_mth5(h5_path)
+#     mth5_obj.from_experiment(experiment)
+#     # </INITIALIZE MTH5>
+#     dataset_config.describe()
+#
+#     # <GET DATA STREAMS>
+#     streams = dataset_config.get_data_via_fdsn_client(data_source=data_source)
+#     streams = make_channel_labels_fdsn_compliant(streams)
+#     run_stream = trim_streams_to_acquisition_run(streams)
+#     # </GET DATA STREAMS>
+#
+#     # <THIS NEEDS TO BE WRAPPED IN MULTI STATION /MULTI RUN LOGIC>
+#     station_group = mth5_obj.get_station(dataset_config.station)
+#     run_metadata = experiment.surveys[0].stations[0].runs[0]
+#     run_ts_obj = RunTS()
+#     run_ts_obj.from_obspy_stream(run_stream, run_metadata)
+#     run_id = "001"
+#     run_ts_obj.run_metadata.id = run_id
+#     run_group = station_group.add_run(run_id)
+#     run_group.from_runts(run_ts_obj)
+#     # </THIS NEEDS TO BE WRAPPED IN MULTI STATION /MULTI RUN LOGIC>
+#     mth5_obj.close_mth5()
+#
+#     return
 
-from aurora.sandbox.io_helpers.make_dataset_configs import TEST_DATA_SET_CONFIGS
-from aurora.sandbox.mth5_helpers import get_experiment_from_obspy_inventory
-from aurora.sandbox.mth5_helpers import initialize_mth5
-from aurora.sandbox.mth5_helpers import test_can_read_back_data
-from mth5.timeseries import RunTS
-from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 
-
-def create_from_iris(dataset_id):
+def test_make_parkfield_mth5():
+    dataset_id = "pkd_test_00"
     dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
-    inventory = dataset_config.get_inventory_from_iris(ensure_inventory_stages_are_named=True)
-    translator = XMLInventoryMTExperiment()
-    experiment = translator.xml_to_mt(inventory_object=inventory)
-    #experiment = get_experiment_from_obspy_inventory(inventory)
-    run_metadata = experiment.surveys[0].stations[0].runs[0]
-    target_folder = Path()
-    h5_path = target_folder.joinpath(f"{dataset_config.dataset_id}.h5")
-    mth5_obj = initialize_mth5(h5_path)
-    mth5_obj.from_experiment(experiment)
+    create_from_server_multistation(
+        dataset_config,
+        data_source="NCEDC",
+        target_folder=DATA_PATH,
+        triage_units="V/m to mV/km",
+    )
+    h5_path = DATA_PATH.joinpath(dataset_config.h5_filebase)
+    read_back_data(h5_path, "PKD", "001")
 
-    start_time = UTCDateTime("2004-09-28T00:00:00.000000Z")
-    end_time = UTCDateTime("2004-09-28T01:59:59.975000Z")
-    station_id = "PKD" #station_id in mth5_obj.station_list
-    network_id = "BK"
-    channel_ids = "BT1,BT2,BQ2,BQ3"
-    station_group = mth5_obj.get_station(station_id)
 
-    client = fdsn.Client("IRIS")
-    streams = client.get_waveforms(network_id, station_id, None, channel_ids,
-                                   start_time, end_time)
-    #<REASSIGN NON-CONVENTIONAL CHANNEL LABELS (Q2, Q3, T1, T2)>
-    streams[0].stats["channel"] = "BQ1"
-    streams[1].stats["channel"] = "BQ2"
-    streams[2].stats["channel"] = "BF1"
-    streams[3].stats["channel"] = "BF2"
-    #</REASSIGN NON-CONVENTIONAL CHANNEL LABELS (Q2, Q3, T1, T2)>
+def test_make_parkfield_hollister_mth5():
+    dataset_id = "pkd_sao_test_00"
+    dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
+    create_from_server_multistation(
+        dataset_config,
+        data_source="NCEDC",
+        target_folder=DATA_PATH,
+        triage_units="V/m to mV/km",
+    )
+    h5_path = DATA_PATH.joinpath(dataset_config.h5_filebase)
+    pkd_run_obj, pkd_run_ts = read_back_data(h5_path, "PKD", "001")
+    sao_run_obj, sao_run_ts = read_back_data(h5_path, "SAO", "001")
+    print(pkd_run_obj)
+    print(sao_run_obj)
+    print("OK")
 
-    start_times = sorted(list(set([tr.stats.starttime.isoformat() for tr in streams])))
-    end_times = sorted(list(set([tr.stats.endtime.isoformat() for tr in streams])))
-    run_stream = streams.slice(UTCDateTime(start_times[0]), UTCDateTime(end_times[-1]))
-    run_ts_obj = RunTS()
-    run_ts_obj.from_obspy_stream(run_stream, run_metadata)
-    run_id = "001"
-    run_ts_obj.run_metadata.id = run_id
-    run_group = station_group.add_run(run_id)
-    run_group.from_runts(run_ts_obj)
-    mth5_obj.close_mth5()
 
-    return
+# def test_make_hollister_mth5():
+#     dataset_id = "sao_test_00"
+#     create_from_server(dataset_id, data_source="NCEDC")
+#     h5_path = DATA_PATH.joinpath(f"{dataset_id}.h5")
+#     run, runts = read_back_data(h5_path, "SAO", "001")
+#     print("hello")
+#
+#
 
+# <TEST FAILS BECAUSE DATA NOT AVAILABLE FROM IRIS -- NEED TO REQUEST FROM NCEDC>
+# def test_make_hollister_mth5():
+#     dataset_id = "sao_test_00"
+#     create_from_iris(dataset_id)
+#     h5_path = DATA_PATH.joinpath(f"{dataset_id}.h5")
+#     read_back_data(h5_path, "SAO", "001")
+# </TEST FAILS BECAUSE DATA NOT AVAILABLE FROM IRIS -- NEED TO REQUEST FROM NCEDC>
 
 
 def main():
-    dataset_id = "pkd_test_00"
-    create_from_iris(dataset_id)
-    test_can_read_back_data("pkd_test_00.h5", "PKD", "001")
+    test_make_parkfield_mth5()
+    # test_make_hollister_mth5()
+    test_make_parkfield_hollister_mth5()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

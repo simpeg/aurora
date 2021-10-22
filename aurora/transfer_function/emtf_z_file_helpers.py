@@ -4,8 +4,11 @@ These methods can possibly be moved under mt_metadata, or mth5
 They extract info needed to setup emtf_z files.
 """
 import fortranformat as ff
+
 EMTF_CHANNEL_ORDER = ["hx", "hy", "hz", "ex", "ey"]
-def make_orientation_block_of_z_file(run_obj):
+
+
+def make_orientation_block_of_z_file(run_obj, channel_list=None):
     """
     Replicates emtz z-file metadata about orientation like this:
     1     0.00     0.00 tes  Hx
@@ -16,6 +19,7 @@ def make_orientation_block_of_z_file(run_obj):
 
     based on this fortran snippet:
             write(3, 115) k, orient(1, k), orient(2, k), stname(1: 3), chid(k)
+    format(i5, 1x, f8.2, 1x, f8.2, 1x, a3, 2x, a6) #Fortran Format
     Parameters
     ----------
     run_obj
@@ -25,27 +29,49 @@ def make_orientation_block_of_z_file(run_obj):
 
     """
     output_strings = []
-    for i_ch, channel_id in enumerate(EMTF_CHANNEL_ORDER):
-        try:
-            channel = run_obj.get_channel(channel_id)
-            azimuth = channel.metadata.measurement_azimuth
-            tilt = channel.metadata.measurement_tilt
-            station_id = run_obj.station_group.name
-            emtf_channel_id = channel_id.capitalize()
-            #format(i5, 1x, f8.2, 1x, f8.2, 1x, a3, 2x, a6) #Fortran Format
-            ff_format = ff.FortranRecordWriter("(i5, 1x, f8.2, 1x, f8.2, 1x, "
-                                               "a3, 1x, a3)")
-            fortran_str = ff_format.write([i_ch+1, azimuth, tilt, station_id,
-                                           emtf_channel_id])
-            out_str = f"{fortran_str}\n"
-            # out_str = f"{i_ch + 1}     {azimuth}     {tilt} " \
-            #     f"{station_id[0:3]} {emtf_channel_id}\n"
-            output_strings.append(out_str)
-        except:
-            print(f"No channel {channel_id} in run")
-            pass
+    ff_format = ff.FortranRecordWriter("(i5, 1x, f8.2, 1x, f8.2, 1x, " "a3, 1x, a3)")
+    if channel_list is None:
+        channel_ids = EMTF_CHANNEL_ORDER
+    else:
+        channel_ids = channel_list
+    for i_ch, channel_id in enumerate(channel_ids):
+        # try:
+        channel = run_obj.get_channel(channel_id)
+        azimuth = channel.metadata.measurement_azimuth
+        tilt = channel.metadata.measurement_tilt
+        station_id = run_obj.station_group.name
+        emtf_channel_id = channel_id.capitalize()
+        fortran_str = ff_format.write(
+            [i_ch + 1, azimuth, tilt, station_id, emtf_channel_id]
+        )
+        out_str = f"{fortran_str}\n"
+        output_strings.append(out_str)
+        # except:
+        #     print(f"No channel {channel_id} in run")
+        #     pass
+    if not output_strings:
+        print("No channels found in run_object")
+        raise Exception
+
     return output_strings
 
+
+def get_default_orientation_block(n_ch=5):
+    """
+    Helper function used when working with matlab structs which do not have enough
+    info to make headers
+    Returns
+    -------
+
+    """
+    orientation_strs = []
+    orientation_strs.append("    1     0.00     0.00 tes  Hx\n")
+    orientation_strs.append("    2    90.00     0.00 tes  Hy\n")
+    if n_ch == 5:
+        orientation_strs.append("    3     0.00     0.00 tes  Hz\n")
+    orientation_strs.append("    4     0.00     0.00 tes  Ex\n")
+    orientation_strs.append("    5    90.00     0.00 tes  Ey\n")
+    return orientation_strs
 
 
 def merge_tf_collection_to_match_z_file(aux_data, tf_collection):
@@ -65,6 +91,7 @@ def merge_tf_collection_to_match_z_file(aux_data, tf_collection):
 
     """
     import numpy as np
+
     rxy = np.full(len(aux_data.decimation_levels), np.nan)
     ryx = np.full(len(aux_data.decimation_levels), np.nan)
     pxy = np.full(len(aux_data.decimation_levels), np.nan)
@@ -73,15 +100,62 @@ def merge_tf_collection_to_match_z_file(aux_data, tf_collection):
     dec_levels = [int(x) for x in dec_levels]
     dec_levels.sort()
     for dec_level in dec_levels:
-        aurora_tf = tf_collection.tf_dict[ dec_level-1 ]
-        indices = np.where(aux_data.decimation_levels==dec_level)[0]
+        aurora_tf = tf_collection.tf_dict[dec_level - 1]
+        indices = np.where(aux_data.decimation_levels == dec_level)[0]
         for ndx in indices:
             period = aux_data.periods[ndx]
-            #find the nearest period in aurora_tf
-            aurora_ndx = np.argmin(np.abs(aurora_tf.periods-period))
+            # find the nearest period in aurora_tf
+            aurora_ndx = np.argmin(np.abs(aurora_tf.periods - period))
             rxy[ndx] = aurora_tf.rho[aurora_ndx, 0]
             ryx[ndx] = aurora_tf.rho[aurora_ndx, 1]
             pxy[ndx] = aurora_tf.phi[aurora_ndx, 0]
             pyx[ndx] = aurora_tf.phi[aurora_ndx, 1]
 
     return rxy, ryx, pxy, pyx
+
+
+def clip_bands_from_z_file(z_path, n_bands_clip, output_z_path=None, n_sensors=5):
+    """
+    This function takes a z_file and clips periods off the end of it.
+    It can come in handy sometimes -- specifically for manipulating matlab
+    results of synthetic data.
+
+    Parameters
+    ----------
+    z_path: Path or str
+        path to the z_file to read in and clip periods from
+    n_periods_clip: integer
+        how many periods to clip from the end of the zfile
+    overwrite: bool
+        whether to overwrite the zfile or rename it
+    n_sensors
+
+    Returns
+    -------
+
+    """
+    if not output_z_path:
+        output_z_path = z_path
+
+    if n_sensors == 5:
+        n_lines_per_period = 13
+    elif n_sensors == 4:
+        n_lines_per_period = 11
+        print("WARNING n_sensors==4 NOT TESTED")
+
+    f = open(z_path, "r")
+    lines = f.readlines()
+    f.close()
+
+    for i in range(n_bands_clip):
+        lines = lines[:-n_lines_per_period]
+    n_bands_str = lines[5].split()[-1]
+    n_bands = int(n_bands_str)
+    new_n_bands = n_bands - n_bands_clip
+    new_n_bands_str = str(new_n_bands)
+    lines[5] = lines[5].replace(n_bands_str, new_n_bands_str)
+
+    f = open(output_z_path, "w")
+    f.writelines(lines)
+    f.close()
+    return

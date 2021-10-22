@@ -98,8 +98,8 @@ class RegressionEstimator(object):
         self.squared_coherence = None
         self.iter_control = kwargs.get("iter_control", IterControl())
 
-        self.X = self.cast_data_to_2d_for_regression(self._X)
-        self.Y = self.cast_data_to_2d_for_regression(self._Y)
+        self.X = self._X.to_array().data.T
+        self.Y = self._Y.to_array().data.T
         self.Yc = np.zeros(self.Y.shape, dtype=np.complex128)
         self.check_number_of_observations_xy_consistent()
         self.R2 = None
@@ -128,54 +128,6 @@ class RegressionEstimator(object):
             },
         )
         return xra
-
-    def cast_data_to_2d_for_regression(self, XY):
-        """
-        When the data for a frequency band are extracted from the STFT and
-        passed to RegressionEstimator they have a typical STFT structure:
-        One axis is time (the time of the window that was FFT-ed) and the
-        other axis is frequency.  However we make no distinction between the
-        harmonics (or bins) within a band.  We need to gather all the FCs for
-        each channel into a 1D array.
-        This method performs that reshaping (ravelling) operation.  This
-        ravelling makes xarray less natural to use because the frequency and
-        time axes are now mixed.
-
-        *It is not important how we unravel the FCs but it is important that
-        we use the same scheme for X and Y.
-
-        Parameters
-        ----------
-        XY: either X or Y of the regression nomenclature.  Should be an
-        xarray.Dataset already splitted on channel
-
-        Returns
-        -------
-        output_array: numpy array of two dimensions (observations, channel)
-
-        """
-        if isinstance(XY, xr.DataArray):
-            XY = XY.to_dataset("channel")
-        n_channels = len(XY)
-        n_frequency = len(XY.frequency)
-
-        try:
-            n_segments = len(XY.time)
-        except TypeError:
-            # Could occur because time is not iterable if only one element
-            # This case corresponds to an underdetermined problem
-            n_segments = 1
-
-        n_fc_per_channel = n_frequency * n_segments
-
-        output_array = np.full(
-            (n_fc_per_channel, n_channels), np.nan + 1.0j * np.nan, dtype=np.complex128
-        )
-
-        channel_keys = list(XY.keys())
-        for i_ch, key in enumerate(channel_keys):
-            output_array[:, i_ch] = XY[key].data.ravel()
-        return output_array
 
     def solve_underdetermined(self):
         """
@@ -247,7 +199,7 @@ class RegressionEstimator(object):
 
     @property
     def n_channels_out(self):
-        """ number of dependent variables"""
+        """number of dependent variables"""
         return self.Y.shape[1]
 
     @property
@@ -268,7 +220,7 @@ class RegressionEstimator(object):
         self._Q = Q
         self._R = R
         if sanity_check:
-            if np.isclose(np.matmul(Q, R) - self.X, 0).all():
+            if np.isclose(np.matmul(Q, R) - X, 0).all():
                 pass
             else:
                 print("Failed QR decompostion sanity check")

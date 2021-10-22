@@ -58,29 +58,15 @@ YP.H @ YP = QQHY.H @ QQHY = QHY.H @ Q.H @ Q @ QHY = QHY.H @ QHY.
 The predicted data has to lie in span of the columns in the design matrix X.
 The predicted data has to be a linear combination of the columns of Y.
 Q is an orthoganal basis for the columns of X.
-So the predicted data is Q*QH*Y
-Write it out by hand and you'll see it.
 The norms of QQHY and QHY are the same
 
     < MATLAB Documentation >
-[Q,R] = qr(A) performs a QR decomposition on m-by-n matrix A such that A = Q*R.
-The factor R is an m-by-n upper-triangular matrix, and the factor Q is an
-m-by-m orthogonal matrix.
-[___] = qr(A,0) produces an economy-size decomposition using any of the
-previous output argument combinations. The size of the outputs depends on the
-size of m-by-n matrix A:
-
-If m > n, then qr computes only the first n columns of Q and the first n rows of R.
-
-If m <= n, then the economy-size decomposition is the same as the regular decomposition.
-
-If you specify a third output with the economy-size decomposition, then it is
-returned as a permutation vector such that A(:,P) = Q*R.
-    < /MATLAB Documentation >
+    https://www.mathworks.com/help/matlab/ref/qr.html
 
 Matlab's reference to the "economy" rerpresentation is what Trefethen and Bau
 call the "reduced QR factorization".  Golub & Van Loan (1996, §5.2) call Q1R1
 the thin QR factorization of A;
+    < /MATLAB Documentation >
 
 There are several discussions online about the differences in
 numpy, scipy, sklearn, skcuda etc.
@@ -145,7 +131,7 @@ class TRME(RegressionEstimator):
         # MOVE THIS METHOD INTO AN RME-Specific CONFIG
         return self.iter_control.correction_factor
 
-    def sigma(self, QHY, Y_or_Yc, correction_factor=1.0):
+    def sigma(self, QHY_or_QHYc, Y_or_Yc, correction_factor=1.0):
         """
         These are the error variances.
         TODO: Move this method to the base class, or a QR decorator.
@@ -175,7 +161,7 @@ class TRME(RegressionEstimator):
 
         """
         Y2 = np.linalg.norm(Y_or_Yc, axis=0) ** 2  # variance?
-        QHY2 = np.linalg.norm(QHY, axis=0) ** 2
+        QHY2 = np.linalg.norm(QHY_or_QHYc, axis=0) ** 2
         sigma = correction_factor * (Y2 - QHY2) / self.n_data
 
         try:
@@ -313,7 +299,7 @@ class TRME(RegressionEstimator):
             print(b0)
             # self.iter_control.number_of_redescending_iterations = 0;
             while self.iter_control.continue_redescending:
-                self.iter_control._number_of_redescending_iterations += 1
+                self.iter_control.number_of_redescending_iterations += 1
                 # add setter here
                 YP = self.Q @ self.QHYc  # predict from cleaned data
                 self.redescend(YP, sigma)  # update cleaned data, and expectation
@@ -381,10 +367,12 @@ class TRME(RegressionEstimator):
         )
         return
 
-    def compute_squared_coherence(self, YP):
+    def compute_squared_coherence(self, Y_hat):
         """
         res: Residuals: The original data minus the predicted data.
         #SSR : Sum of squares of the residuals.  Diagonal is real
+        This method could use some cleanup for readability
+        see aurora issue #78.
         Parameters
         ----------
         YP
@@ -393,12 +381,13 @@ class TRME(RegressionEstimator):
         -------
 
         """
-        res = self.Y - YP
+        res = self.Y - Y_hat
         SSR = np.conj(res.conj().T @ res)
         Yc2 = np.abs(self.Yc) ** 2
         SSYC = np.sum(Yc2, axis=0)
         R2 = 1 - np.diag(np.real(SSR)).T / SSYC
         R2[R2 < 0] = 0
+
         self.R2 = xr.DataArray(
             R2,
             dims=[
@@ -408,5 +397,6 @@ class TRME(RegressionEstimator):
                 "output_channel": list(self._Y.data_vars),
             },
         )
+
         return
         # array([ 0.97713185,  0.97552176,  0.97480946])

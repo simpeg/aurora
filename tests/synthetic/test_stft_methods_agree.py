@@ -4,26 +4,32 @@ method returns the same array as scipy.signal.spectrogram
 """
 import numpy as np
 
-from pathlib import Path
-
+from aurora.general_helper_functions import TEST_PATH
 from aurora.pipelines.process_mth5 import get_data_from_decimation_level_from_mth5
 from aurora.pipelines.process_mth5 import initialize_pipeline
-
-# from aurora.pipelines.process_mth5 import process_mth5_decimation_level
 from aurora.pipelines.process_mth5 import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
 
 
 def test_stft_methods_agree():
-    run_config = Path("config", "test1_run_config_standard.json")
+    run_config = TEST_PATH.joinpath(
+        "synthetic", "config", "test1_run_config_standard.json"
+    )
     run_id = "001"
-    run_config, mth5_obj = initialize_pipeline(run_config)
+    mth5_path = TEST_PATH.joinpath("synthetic", "data", "test1.h5")
+
+    # ensure h5 exists
+    if not mth5_path.exists():
+        from make_mth5_from_asc import create_test1_h5
+
+        create_test1_h5()
+
+    run_config, mth5_obj = initialize_pipeline(run_config, mth5_path=mth5_path)
 
     for dec_level_id in run_config.decimation_level_ids:
         processing_config = run_config.decimation_level_configs[dec_level_id]
         processing_config.local_station_id = run_config.local_station_id
-        # processing_config.reference_station_id = run_config.reference_station_id
 
         if dec_level_id == 0:
             local, remote = get_data_from_decimation_level_from_mth5(

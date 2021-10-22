@@ -49,9 +49,9 @@ class TRME_RR(RegressionEstimator):
         """
         super(TRME_RR, self).__init__(**kwargs)
         self._Z = kwargs.get("Z", None)
-        self.Z = self.cast_data_to_2d_for_regression(self._Z)
+        self.Z = self._Z.to_array().data.T
         self.expectation_psi_prime = np.ones(self.n_channels_out)
-        self.sigma_squared = np.zeros(self.n_channels_out)
+        # self.sigma_squared = np.zeros(self.n_channels_out)
         self.check_for_nan()
         self.check_number_of_observations_xy_consistent()
         self.check_for_enough_data_for_rr_estimate()
@@ -144,14 +144,13 @@ class TRME_RR(RegressionEstimator):
         # intial estimate of error variance
         res = self.Y - Yhat
         sigma = np.sum(res * np.conj(res), axis=0) / self.n_data
-        cfac = self.iter_control.correction_factor
+
         if self.iter_control.max_number_of_iterations > 0:
             converged = False
-            cfac = 1.0 / (1.0 - np.exp(-self.iter_control.r0))
-
         else:
             converged = True
-            self.expectation_psi_prime = 1
+            # not needed - its defined in the init
+            # self.expectation_psi_prime = np.ones(self.n_channels_out)
             Yhat = self.X @ b0
             self.b = b0
             self.Yc = self.Y
@@ -165,11 +164,12 @@ class TRME_RR(RegressionEstimator):
             self.apply_huber_weights(sigma, Yhat)
             # TRME_RR
             # updated error variance estimates, computed using cleaned data
-            QHY = Q.conj().T @ self.Yc
-            self.b = np.linalg.solve(QHX, QHY)  # self.b = QTX\QTY
+            QHYc = self.QH @ self.Yc
+            self.b = np.linalg.solve(QHX, QHYc)  # self.b = QTX\QTY
             Yhat = self.X @ self.b
             res = self.Yc - Yhat
-            sigma = cfac * np.sum(res * np.conj(res), axis=0) / self.n_data
+            mean_ssq_residuals = np.sum(res * np.conj(res), axis=0) / self.n_data
+            sigma = self.iter_control.correction_factor * mean_ssq_residuals
             converged = self.iter_control.converged(self.b, b0)
             b0 = self.b
         # </CONVERGENCE STUFF>
@@ -177,7 +177,7 @@ class TRME_RR(RegressionEstimator):
         # <REDESCENDING STUFF>
         while self.iter_control.continue_redescending:
             # one iteration with redescending influence curve cleaned data
-            self.iter_control._number_of_redescending_iterations += 1
+            self.iter_control.number_of_redescending_iterations += 1
             # [obj.Yc, E_psiPrime] = RedescendWt(obj.Y, Yhat, sigma, ITER.u0) # #TRME_RR
             self.redescend(Yhat, sigma)  # update cleaned data, and expectation
             # updated error variance estimates, computed using cleaned data
@@ -204,9 +204,9 @@ class TRME_RR(RegressionEstimator):
     def compute_inverse_signal_covariance(self):
         """
         Matlab code was :
-        # Cov_SS = (self.ZH @self.X) \ (self.XH @ self.X) / (self.XH @self.Z)"
-        # I broke the above line into B/A where
-        # B = (self.ZH @self.X) \ (self.XH @ self.X), and A = (self.XH @self.Z)
+        Cov_SS = (self.ZH @self.X) \ (self.XH @ self.X) / (self.XH @self.Z)
+        I broke the above line into B/A where
+        B = (self.ZH @self.X) \ (self.XH @ self.X), and A = (self.XH @self.Z)
         Then follow matlab cookbok, B/A for matrices = (A'\B')
         """
         ZH = self.Z.conj().T
@@ -253,7 +253,7 @@ class TRME_RR(RegressionEstimator):
         )
         return
 
-    def compute_squared_coherence(self, Yhat):
+    def compute_squared_coherence(self, Y_hat):
         """
         TODO: Compare this method with compute_squared_coherence in TRME.  I think
         they are identical, in which case we can merge them, and maybe even put into
@@ -272,7 +272,7 @@ class TRME_RR(RegressionEstimator):
         -------
 
         """
-        res = self.Y - Yhat
+        res = self.Y - Y_hat
         SSR = np.conj(res.conj().T @ res)
         Yc2 = np.abs(self.Yc) ** 2
         SSYC = np.sum(Yc2, axis=0)

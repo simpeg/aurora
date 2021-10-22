@@ -16,122 +16,9 @@ from pathlib import Path
 
 import json
 
+from aurora.config.decimation_level_config import DecimationLevelConfig
 from mt_metadata.base import BaseDict
 from mt_metadata.base.helpers import NumpyEncoder
-
-
-class ProcessingConfig(BaseDict):
-    """
-    ToDo: Deprecate mth5_path from this level after addressing strategy in
-    issue #13
-    """
-
-    def __init__(self, *args, **kwargs):
-        self.mth5_path = kwargs.get("mth5_path", "")  # str or Path()
-
-        # <DECIMATION CONFIG>
-        # Support None value for DecimationConfig
-        self.decimation_level_id = kwargs.get("decimation_level", 0)
-        self.decimation_factor = kwargs.get("decimation_factor", 1)
-        self.decimation_method = kwargs.get("decimation_method", "default")
-        self.anti_alias_filter = kwargs.get("AAF", "default")
-        # <DECIMATION CONFIG>
-
-        # <FOURIER TRANSFORM CONFIG>
-        # self.spectral_transform_config = {}
-        # spectral_transform_config["taper_family"] = "hamming"
-
-        self.taper_family = "dpss"
-        self.taper_additional_args = {"alpha": 3.0}
-        self.taper_family = "hamming"
-        self.taper_additional_args = {}
-        self.num_samples_window = 256
-        self.num_samples_overlap = int(self.num_samples_window * 3.0 / 4)
-        self.sample_rate = 0.0
-        self.prewhitening_type = "first difference"
-        self.extra_pre_fft_detrend_type = "linear"
-        # </FOURIER TRANSFORM CONFIG>
-
-        # <FREQUENCY BANDS>
-        # <EMTF>
-        self.band_setup_style = "EMTF"  # "default"
-        self.emtf_band_setup_file = "bs_256.cfg"
-        # </EMTF>
-        # <defualt>
-        self.minimum_number_of_cycles = 10  # not used if emtf_band_setup_file present
-        # </defualt>
-        # </FREQUENCY BANDS>
-
-        # <TRANSFER FUNCTION CONFIG>
-
-        # <ITERATOR>
-        self.max_number_of_iterations = 10
-        # </ITERATOR>
-
-        # <STATIONS>
-        self.local_station_id = ""
-        self.reference_station_id = ""
-        # </STATIONS>
-
-        # <ESTIMATION>
-        self.estimation_engine = "OLS"  # RME
-        self.estimate_per_channel = (
-            True  # all channels at once or one channel at a time
-        )
-        self.input_channels = ["hx", "hy"]  # optional, default ["hx", "hy"]
-        self.output_channels = ["ex", "ey"]  # optional, default ["ex", "ey", "hz"]
-        self.reference_channels = []  # optional, default ["hx", "hy"],
-        # </ESTIMATION>
-
-        # </TRANSFER FUNCTION CONFIG>
-
-    def validate(self):
-        if self.sample_rate <= 0:
-            print("sample rate not given")
-            raise Exception
-
-    # def __setitem__(self, key, value):
-    #     #self.__dict__[key] = validators.validate_value_dict(value)
-    #     self.__dict__[key] = value
-
-    # @property
-    # def emtf_band_setup_file(self):
-    #     return str(self._emtf_band_setup_file)
-    #
-    # @emtf_band_setup_file.setter
-    # def emtf_band_setup_file(self, emtf_band_setup_file):
-    #     self._emtf_band_setup_file = Path(emtf_band_setup_file)
-
-    # @property
-    # def local_station_id(self, local_station_id):
-    #     return self._local_station_id
-    #
-    # @local_station_id.setter
-    # def local_station_id(self, local_station_id):
-    #     self._local_station_id = local_station_id
-
-    def from_json(self, json_fn):
-        """
-
-        Read schema standards from json
-
-        :param json_fn: full path to json file
-        :type json_fn: string or Path
-        :return: full path to json file
-        :rtype: Path
-
-        """
-
-        json_fn = Path(json_fn)
-        if not json_fn.exists():
-            msg = f"JSON schema file {json_fn} does not exist"
-            print(msg)
-            raise Exception
-
-        with open(json_fn, "r") as fid:
-            json_dict = json.load(fid)
-        print("SKIPPING VALIDATION FOR NOW")
-        self.__dict__ = json_dict
 
 
 class RunConfig(BaseDict):
@@ -140,9 +27,21 @@ class RunConfig(BaseDict):
     This will need some attention; the to/from json methods are not robust in
     the sense that we need to overwrite BaseDict's method.
 
-    If we add attributes to the
-    run_config on the high level
-    (such as an ID, or a label) we cannot
+    If we add attributes to the run_config on the high level
+    (such as an ID, or a label) we cannot we cannot in general access these values at
+    the level of the processing_config (decimation_level)
+
+    config_id : string
+        Used for labelling the config file.  Intended to be unique
+    mth5_path : string
+        Points at an mth5 file to process.  This is an optional argument, pipeline
+        can take an mth5 file as an argument and apply any processing config
+
+    2021-09-15:
+    adding local and reference scale factors.  These are intended as a workaround for
+    errors in configs.  However, if we want to generalize them for multiple station
+    processing, the way to do it is to make one master dictionary keyed by station_id.
+    Under the station_id level we place another dictionary keyed by channel name.
     """
 
     def __init__(self, **kwargs):
@@ -150,7 +49,9 @@ class RunConfig(BaseDict):
         self.mth5_path = kwargs.get("mth5_path", "")
         self.local_station_id = ""
         self.reference_station_id = ""
+        self.reference_mth5_path = ""
         self.initial_sample_rate = kwargs.get("initial_sample_rate", 0.0)
+        self.channel_scale_factors = {}
         self.decimation_level_configs = {}
 
     @property
@@ -171,6 +72,7 @@ class RunConfig(BaseDict):
         json_dict["mth5_path"] = self.mth5_path
         json_dict["local_station_id"] = self.local_station_id
         json_dict["reference_station_id"] = self.reference_station_id
+        json_dict["channel_scale_factors"] = self.channel_scale_factors
         print(self.decimation_level_ids)
         for dec_level_id in self.decimation_level_ids:
             json_dict[dec_level_id] = self_dict[dec_level_id].__dict__
@@ -205,9 +107,10 @@ class RunConfig(BaseDict):
         self.mth5_path = json_dict.pop("mth5_path")
         self.local_station_id = json_dict.pop("local_station_id")
         self.reference_station_id = json_dict.pop("reference_station_id")
+        self.channel_scale_factors = json_dict.pop("channel_scale_factors")
         decimation_level_ids = sorted(json_dict.keys())
         for decimation_level_id in decimation_level_ids:
-            decimation_level_processing_config = ProcessingConfig()
+            decimation_level_processing_config = DecimationLevelConfig()
             decimation_level_processing_config.__dict__ = json_dict[decimation_level_id]
             self.decimation_level_configs[
                 int(decimation_level_id)
@@ -215,7 +118,7 @@ class RunConfig(BaseDict):
 
 
 def test_create_decimation_level_config():
-    cfg = ProcessingConfig()
+    cfg = DecimationLevelConfig()
     cfg.sample_rate = 1.0
     cfg.local_station_id = "PKD"
     cfg.validate()
@@ -226,7 +129,7 @@ def test_create_run_config():
     run_config = RunConfig()
     decimation_factors = [1, 4, 4, 4]
     for i_decimation_level in range(len(decimation_factors)):
-        cfg = ProcessingConfig()
+        cfg = DecimationLevelConfig()
         cfg.decimation_level_id = i_decimation_level
         cfg.decimation_factor = decimation_factors[i_decimation_level]
         run_config.decimation_level_configs[i_decimation_level] = cfg

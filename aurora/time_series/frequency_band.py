@@ -1,4 +1,3 @@
-from collections import OrderedDict
 import numpy as np
 
 from aurora.interval import Interval
@@ -90,7 +89,6 @@ class FrequencyBand(Interval):
         if kwargs.get("upper_closed") is None:
             self.upper_closed = False
 
-
     def fourier_coefficient_indices(self, frequencies):
         """
 
@@ -123,15 +121,12 @@ class FrequencyBand(Interval):
 
     @property
     def center_frequency(self):
-        #return (self.lower_bound + self.upper_bound)/2
+        # return (self.lower_bound + self.upper_bound)/2
         return np.sqrt(self.lower_bound * self.upper_bound)
 
     @property
     def center_period(self):
-        return 1./self.center_frequency
-
-
-
+        return 1.0 / self.center_frequency
 
 
 class FrequencyBands(object):
@@ -184,8 +179,8 @@ class FrequencyBands(object):
         """
         self.gates = None
         self.band_edges = kwargs.get("band_edges", None)
-        #self.bands = OrderedDict()
-        #frequencies ... can repeat (log spacing)
+        # self.bands = OrderedDict()
+        # frequencies ... can repeat (log spacing)
 
     @property
     def number_of_bands(self):
@@ -203,23 +198,23 @@ class FrequencyBands(object):
         """
         band_centers = self.band_centers()
 
-        #check band centers are monotonically increasing
+        # check band centers are monotonically increasing
         monotone_condition = np.all(band_centers[1:] > band_centers[:-1])
         if monotone_condition:
             pass
         else:
-            print("Band Centers are Not Monotonic.  This probably means that "
-                  "the bands are being defined in an adhoc / on the fly way")
+            print(
+                "Band Centers are Not Monotonic.  This probably means that "
+                "the bands are being defined in an adhoc / on the fly way"
+            )
             print("This condition untested 20210720")
             print("Attempting to reorganize bands")
-            #use np.argsort to rorganize the bands
-            self.band_edges = self.band_edges[np.argsort(band_centers),:]
+            # use np.argsort to rorganize the bands
+            self.band_edges = self.band_edges[np.argsort(band_centers), :]
 
-        #check other conditions?:
+        # check other conditions?:
 
         return
-
-
 
     def bands(self, direction="increasing_frequency"):
         """
@@ -229,10 +224,10 @@ class FrequencyBands(object):
 
         """
         band_indices = range(self.number_of_bands)
-        if direction=="increasing_period":
+        if direction == "increasing_period":
             band_indices = np.flip(band_indices)
         return (self.band(i_band) for i_band in band_indices)
-        #raise NotImplementedError
+        # raise NotImplementedError
 
     def band(self, i_band):
         """
@@ -245,9 +240,10 @@ class FrequencyBands(object):
         -------
 
         """
-        frequency_band = FrequencyBand(lower_bound=self.band_edges[i_band,0],
-                                       upper_bound=self.band_edges[i_band,1]
-                                       )
+        frequency_band = FrequencyBand(
+            lower_bound=self.band_edges[i_band, 0],
+            upper_bound=self.band_edges[i_band, 1],
+        )
 
         return frequency_band
 
@@ -270,11 +266,12 @@ class FrequencyBands(object):
             frequency_band = self.band(i_band)
             band_centers[i_band] = frequency_band.center_frequency
         if frequency_or_period == "period":
-            band_centers = 1./band_centers
+            band_centers = 1.0 / band_centers
         return band_centers
 
-    def from_emtf_band_setup(self, filepath, decimation_level, sampling_rate,
-                             num_samples_window):
+    def from_emtf_band_setup(
+        self, filepath, decimation_level, sample_rate, num_samples_window
+    ):
         """
         This converts between EMTF band_setup files to a frequency_bands object.
         The band_setup file is represented as a dataframe with
@@ -314,13 +311,12 @@ class FrequencyBands(object):
         """
         emtf_band_setup = EMTFBandSetupFile(filepath=filepath)
         emtf_band_df = emtf_band_setup.get_decimation_level(decimation_level)
-        df = sampling_rate / (num_samples_window)
+        df = sample_rate / (num_samples_window)
         half_df = df / 2.0
-        #half_df /=100
+        # half_df /=100
         lower_edges = (emtf_band_df.lower_bound_index * df) - half_df
         upper_edges = (emtf_band_df.upper_bound_index * df) + half_df
         band_edges = np.vstack((lower_edges.values, upper_edges.values)).T
         self.band_edges = band_edges
 
         return
-

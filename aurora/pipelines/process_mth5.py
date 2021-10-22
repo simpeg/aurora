@@ -1,5 +1,4 @@
-from pathlib import Path
-
+from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import run_ts_to_calibrated_stft
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
@@ -10,29 +9,49 @@ from aurora.pipelines.transfer_function_helpers import (
 )
 
 # from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
-from aurora.sandbox.processing_config import RunConfig
 from aurora.time_series.frequency_band_helpers import configure_frequency_bands
 from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
 )
 from aurora.transfer_function.TTFZ import TTFZ
 
-
+from mt_metadata.transfer_functions.core import TF
 from mth5.mth5 import MTH5
 
 
-def initialize_pipeline(run_config):
-    if isinstance(run_config, Path) or isinstance(run_config, str):
-        config = RunConfig()
-        config.from_json(run_config)
-    elif isinstance(run_config, RunConfig):
-        config = run_config
-    else:
-        print(f"Unrecognized config of type {type(run_config)}")
-        raise Exception
+def initialize_pipeline(run_config, mth5_path=None):
+    """
+    A place to organize args and kwargs.
+    This could be split into initialize_config() and initialize_mth5()
 
+    Parameters
+    ----------
+    run_config : str, pathlib.Path, or a RunConfig object
+        If str or Path is provided, this will read in the config and return it as a
+        RunConfig object.
+    mth5_path : string or pathlib.Path
+        optional argument.  If it is provided, it overrides the path in the RunConfig
+        object
+
+    Returns
+    -------
+    config : aurora.config.processing_config import RunConfig
+    mth5_obj :
+    """
+    config = initialize_config(run_config)
+
+    # <Initialize mth5 for reading>
+    if mth5_path:
+        if config["mth5_path"] != str(mth5_path):
+            print(
+                "Warning - the mth5 path supplied to initialize pipeline differs"
+                "from the one in the config file"
+            )
+            print(f"config path changing from \n{config['mth5_path']} to \n{mth5_path}")
+            config.mth5_path = str(mth5_path)
     mth5_obj = MTH5()
     mth5_obj.open_mth5(config["mth5_path"], mode="r")
+    # </Initialize mth5 for reading>
     return config, mth5_obj
 
 
@@ -103,7 +122,7 @@ def process_mth5_decimation_level(config, local, remote, units="MT"):
     :return:
     Parameters
     ----------
-    config : ProcessingConfig (for a decimation level)
+    config : aurora.config.decimation_level_config.DecimationLevelConfig
     units
 
     Returns
@@ -113,16 +132,35 @@ def process_mth5_decimation_level(config, local, remote, units="MT"):
     """
     local_run_obj = local["run"]
     local_run_xrts = local["mvts"]
-    local_stft_obj = run_ts_to_stft(config, local_run_xrts)
-    # local_stft_obj = run_ts_to_stft_scipy(config, local_run_xrts)
-    local_stft_obj = calibrate_stft_obj(local_stft_obj, local_run_obj, units=units)
 
     remote_run_obj = remote["run"]
     remote_run_xrts = remote["mvts"]
+
+    # <CHECK DATA COVERAGE IS THE SAME IN BOTH LOCAL AND RR>
+    # This should be pushed into a previous validator before pipeline starts
+    # if config.reference_station_id:
+    #    local_run_xrts = local_run_xrts.where(local_run_xrts.time <=
+    #                                          remote_run_xrts.time[-1]).dropna(
+    #                                          dim="time")
+    # </CHECK DATA COVERAGE IS THE SAME IN BOTH LOCAL AND RR>
+
+    local_stft_obj = run_ts_to_stft(config, local_run_xrts)
+    local_scale_factors = config.station_scale_factors(config.local_station_id)
+    # local_stft_obj = run_ts_to_stft_scipy(config, local_run_xrts)
+    local_stft_obj = calibrate_stft_obj(
+        local_stft_obj,
+        local_run_obj,
+        units=units,
+        channel_scale_factors=local_scale_factors,
+    )
     if config.reference_station_id:
         remote_stft_obj = run_ts_to_stft(config, remote_run_xrts)
+        remote_scale_factors = config.station_scale_factors(config.reference_station_id)
         remote_stft_obj = calibrate_stft_obj(
-            remote_stft_obj, remote_run_obj, units=units
+            remote_stft_obj,
+            remote_run_obj,
+            units=units,
+            channel_scale_factors=remote_scale_factors,
         )
     else:
         remote_stft_obj = None
@@ -155,9 +193,11 @@ def get_data_from_decimation_level_from_mth5(config, mth5_obj, run_id):
     Returns
     -------
 
-    Somewhat complicated function -- see issue #13.
+    Somewhat complicated function -- see issue #13.  Ultimately this method could be
+    embedded in mth5, where the specific attributes of the config needed for this
+    method are passed as explicit arguments.
 
-    SHould be able to
+    Should be able to
     1. accept a config and an mth5_obj and return decimation_level_0,
     2. Accept data from a given decimation level, and decimation
     instrucntions and return it
@@ -195,7 +235,46 @@ def get_data_from_decimation_level_from_mth5(config, mth5_obj, run_id):
     return local, remote
 
 
-def process_mth5_run(run_cfg, run_id, units="MT", show_plot=True, z_file_path=None):
+def export_tf(tf_collection, run_metadata_dict={}, survey_dict={}):
+    """
+    This method may wind up being embedded in the TF class
+    Assign transfer_function, residual_covariance, inverse_signal_power, station, survey
+
+    Returns
+    -------
+
+    """
+    merged_tf_dict = tf_collection.get_merged_dict()
+    tf_cls = TF()
+    # Transfer Function
+    renamer_dict = {"output_channel": "output", "input_channel": "input"}
+    tmp = merged_tf_dict["tf"].rename(renamer_dict)
+    tf_cls.transfer_function = tmp
+
+    isp = merged_tf_dict["cov_ss_inv"]
+    renamer_dict = {"input_channel_1": "input", "input_channel_2": "output"}
+    isp = isp.rename(renamer_dict)
+    tf_cls.inverse_signal_power = isp
+
+    res_cov = merged_tf_dict["cov_nn"]
+    renamer_dict = {"output_channel_1": "input", "output_channel_2": "output"}
+    res_cov = res_cov.rename(renamer_dict)
+    tf_cls.residual_covariance = res_cov
+
+    tf_cls.station_metadata.from_dict(run_metadata_dict)
+    tf_cls.survey_metadata.from_dict(survey_dict)
+    return tf_cls
+
+
+def process_mth5_run(
+    run_cfg,
+    run_id,
+    units="MT",
+    show_plot=False,
+    z_file_path=None,
+    return_collection=True,
+    **kwargs,
+):
     """
     Stages here:
     1. Read in the config and figure out how many decimation levels there are
@@ -209,12 +288,13 @@ def process_mth5_run(run_cfg, run_id, units="MT", show_plot=True, z_file_path=No
     -------
 
     """
-    run_config, mth5_obj = initialize_pipeline(run_cfg)
+    mth5_path = kwargs.get("mth5_path", None)
+    run_config, mth5_obj = initialize_pipeline(run_cfg, mth5_path)
     print(
         f"config indicates {run_config.number_of_decimation_levels} "
         f"decimation levels to process: {run_config.decimation_level_ids}"
     )
-    local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
+
     tf_dict = {}
 
     for dec_level_id in run_config.decimation_level_ids:
@@ -222,6 +302,7 @@ def process_mth5_run(run_cfg, run_id, units="MT", show_plot=True, z_file_path=No
         processing_config = run_config.decimation_level_configs[dec_level_id]
         processing_config.local_station_id = run_config.local_station_id
         processing_config.reference_station_id = run_config.reference_station_id
+        processing_config.channel_scale_factors = run_config.channel_scale_factors
 
         # <GET DATA>
         # Careful here -- for multiple station processing we will need to load
@@ -232,6 +313,8 @@ def process_mth5_run(run_cfg, run_id, units="MT", show_plot=True, z_file_path=No
             local, remote = get_data_from_decimation_level_from_mth5(
                 processing_config, mth5_obj, run_id
             )
+
+            print("APPLY TIMING CORRECTIONS HERE")
         else:
             local = prototype_decimate(processing_config, local)
             if processing_config.reference_station_id:
@@ -242,6 +325,8 @@ def process_mth5_run(run_cfg, run_id, units="MT", show_plot=True, z_file_path=No
         tf_obj = process_mth5_decimation_level(
             processing_config, local, remote, units=units
         )
+        # z_correction = kwargs.get("z_correction", 1.0)
+        # tf_obj.rho *= z_correction
         tf_dict[dec_level_id] = tf_obj
 
         if show_plot:
@@ -249,7 +334,20 @@ def process_mth5_run(run_cfg, run_id, units="MT", show_plot=True, z_file_path=No
 
             plot_tf_obj(tf_obj, out_filename="out")
 
+    # TODO: Add run_obj to TransferFunctionCollection
     tf_collection = TransferFunctionCollection(header=tf_obj.tf_header, tf_dict=tf_dict)
+    local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
+
     if z_file_path:
         tf_collection.write_emtf_z_file(z_file_path, run_obj=local_run_obj)
-    return tf_collection
+
+    if return_collection:
+        return tf_collection
+    else:
+        # intended to be the default in future
+        run_metadata_dict = local_run_obj.station_group.metadata.to_dict()
+        survey_dict = mth5_obj.survey_group.metadata.to_dict()
+        tf_cls = export_tf(
+            tf_collection, run_metadata_dict=run_metadata_dict, survey_dict=survey_dict
+        )
+        return tf_cls

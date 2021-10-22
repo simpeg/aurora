@@ -52,7 +52,7 @@ def run_ts_to_stft_scipy(config, run_xrts_orig):
         num_samples_window=config.num_samples_window,
         num_samples_overlap=config.num_samples_overlap,
         taper_additional_args=config.taper_additional_args,
-        sampling_rate=config.sample_rate,
+        sample_rate=config.sample_rate,
     )
     # stft_obj = run_xrts.copy(deep=True)
     stft_obj = xr.Dataset()
@@ -112,17 +112,19 @@ def run_ts_to_stft(config, run_xrts_orig):
         num_samples_window=config.num_samples_window,
         num_samples_overlap=config.num_samples_overlap,
         taper_additional_args=config.taper_additional_args,
-        sampling_rate=config.sample_rate,
+        sample_rate=config.sample_rate,
     )
 
     run_xrts = apply_prewhitening(config, run_xrts_orig)
 
-    windowed_obj = windowing_scheme.apply_sliding_window(run_xrts)
+    windowed_obj = windowing_scheme.apply_sliding_window(
+        run_xrts, dt=1.0 / config.sample_rate
+    )
     windowed_obj = WindowedTimeSeries.detrend(data=windowed_obj, detrend_type="linear")
 
     tapered_obj = windowed_obj * windowing_scheme.taper
     # stft_obj = WindowedTimeSeries.apply_stft(data=tapered_obj,
-    #                                          sampling_rate=windowing_scheme.sampling_rate,
+    #                                          sample_rate=windowing_scheme.sample_rate,
     #                                          detrend_type="linear",
     # scale_factor=windowing_scheme.linear_spectral_density_calibration_factor)
 
@@ -153,7 +155,7 @@ def run_ts_to_calibrated_stft(run_ts, run_obj, config, units="MT"):
     return stft_obj
 
 
-def calibrate_stft_obj(stft_obj, run_obj, units="MT"):
+def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None):
     """
 
     Parameters
@@ -161,6 +163,10 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT"):
     stft_obj
     run_obj
     units
+    scale_factors : dict
+        keyed by channel, supports a single scalar to apply to that channels data
+        Useful for debugging.  Should not be used in production and should throw a
+        warning if it is not None
 
     Returns
     -------
@@ -169,14 +175,21 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT"):
     for channel_id in stft_obj.keys():
         mth5_channel = run_obj.get_channel(channel_id)
         channel_filter = mth5_channel.channel_response_filter
+        if not channel_filter.filters_list:
+            print("WARNING UNEXPECTED CHANNEL WITH NO FILTERS")
+            # ONE OFF HACK FOR SAO missing data
+            if channel_id == "hy":
+                print("WARNING ONE-OFF PKD SAO RR")
+                channel_filter = run_obj.get_channel("hx").channel_response_filter
         calibration_response = channel_filter.complex_response(stft_obj.frequency.data)
-
+        if channel_scale_factors:
+            try:
+                channel_scale_factor = channel_scale_factors[channel_id]
+            except KeyError:
+                channel_scale_factor = 1.0
+            calibration_response /= channel_scale_factor
         if units == "SI":
             print("Warning: SI Units are not robustly supported issue #36")
-            # This is not robust, and is really only here for the parkfield test
-            # We should add units support as a general fix and handle the
-            # parkfield case by converting to "MT" units in calibration filters
-            if channel_id[0].lower() == "h":
-                calibration_response /= 1e-9  # SI Units
+
         stft_obj[channel_id].data /= calibration_response
     return stft_obj
