@@ -14,7 +14,7 @@ from make_parkfield_mth5 import test_make_parkfield_mth5
 from make_processing_configs import create_run_test_config
 
 
-def test_processing(z_file_path=None):
+def test_process_to_tf_collection(z_file_path=None):
     processing_run_cfg = create_run_test_config()
     print(f"CONFIG {processing_run_cfg.name}")
 
@@ -28,17 +28,41 @@ def test_processing(z_file_path=None):
 
     run_id = "001"
     show_plot = False
-    # tf_collection = process_mth5_run(
-    #     processing_run_cfg,
-    #     run_id,
-    #     mth5_path=mth5_path,
-    #     units="MT",
-    #     show_plot=show_plot,
-    #     z_file_path=z_file_path,
-    # )
-    # print("MERGE TF COLLECITON TO A DICT")
-    # tf_cls = export_tf(tf_collection, {}, {})
-    # print(tf_cls)
+    tf_collection = process_mth5_run(
+        processing_run_cfg,
+        run_id,
+        mth5_path=mth5_path,
+        units="MT",
+        show_plot=show_plot,
+        z_file_path=z_file_path,
+    )
+    return tf_collection
+
+
+def test_processing(z_file_path=None):
+    """
+
+    Parameters
+    ----------
+    z_file_path
+
+    Returns
+    -------
+    tf_cls: mt_metadata.transfer_functions.core.TF
+    """
+    processing_run_cfg = create_run_test_config()
+    print(f"CONFIG {processing_run_cfg.name}")
+
+    config = RunConfig()
+    config.from_json(processing_run_cfg)
+    mth5_path = Path(config.mth5_path)
+
+    # Ensure there is an mth5 to process
+    if not mth5_path.exists():
+        test_make_parkfield_mth5()
+
+    run_id = "001"
+    show_plot = False
 
     tf_cls = process_mth5_run(
         processing_run_cfg,
@@ -55,6 +79,7 @@ def test_processing(z_file_path=None):
 
 def main():
     z_file_path = AURORA_RESULTS_PATH.joinpath("pkd.zss")
+    test_process_to_tf_collection(z_file_path)
     test_processing(z_file_path)
 
     # COMPARE WITH ARCHIVED Z-FILE
