@@ -134,3 +134,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+#docs
+docs/_build/
+docs/warnings.txt
+docs/examples/*
+docs/api/generated/*
