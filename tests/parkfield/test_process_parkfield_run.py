@@ -1,7 +1,8 @@
 from pathlib import Path
 
 from aurora.config.processing_config import RunConfig
-from aurora.pipelines.process_mth5 import export_tf
+
+# from aurora.pipelines.process_mth5 import export_tf
 from aurora.pipelines.process_mth5 import process_mth5_run
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 
@@ -27,19 +28,19 @@ def test_processing(z_file_path=None):
 
     run_id = "001"
     show_plot = False
-    tf_collection = process_mth5_run(
-        processing_run_cfg,
-        run_id,
-        mth5_path=mth5_path,
-        units="MT",
-        show_plot=show_plot,
-        z_file_path=z_file_path,
-    )
-    print("MERGE TF COLLECITON TO A DICT")
-    tf_cls = export_tf(tf_collection, {}, {})
-    print(tf_cls)
+    # tf_collection = process_mth5_run(
+    #     processing_run_cfg,
+    #     run_id,
+    #     mth5_path=mth5_path,
+    #     units="MT",
+    #     show_plot=show_plot,
+    #     z_file_path=z_file_path,
+    # )
+    # print("MERGE TF COLLECITON TO A DICT")
+    # tf_cls = export_tf(tf_collection, {}, {})
+    # print(tf_cls)
 
-    tf_cls2 = process_mth5_run(
+    tf_cls = process_mth5_run(
         processing_run_cfg,
         run_id,
         mth5_path=mth5_path,
@@ -48,9 +49,8 @@ def test_processing(z_file_path=None):
         z_file_path=z_file_path,
         return_collection=False,
     )
-    print("OK")
-    tf_cls2.write_tf_file(fn="emtfxml_test.xml", file_type="emtfxml")
-    return tf_collection
+    tf_cls.write_tf_file(fn="emtfxml_test.xml", file_type="emtfxml")
+    return tf_cls
 
 
 def main():
