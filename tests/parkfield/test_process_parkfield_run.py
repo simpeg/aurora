@@ -2,7 +2,8 @@ from pathlib import Path
 import pickle
 
 from aurora.config.processing_config import RunConfig
-from aurora.pipelines.process_mth5 import export_tf
+
+# from aurora.pipelines.process_mth5 import export_tf
 from aurora.pipelines.process_mth5 import process_mth5_run
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 
@@ -40,7 +41,7 @@ def test_processing(z_file_path=None):
     # tf_cls = export_tf(tf_collection, {}, {})
     # print(tf_cls)
 
-    tf_cls2 = process_mth5_run(
+    tf_cls = process_mth5_run(
         processing_run_cfg,
         run_id,
         mth5_path=mth5_path,
@@ -54,9 +55,8 @@ def test_processing(z_file_path=None):
     #     pickle.dump(tf_cls2, fid)
     #     print(f"Pickled tf_cls2 to {z_file_path.parent.joinpath('tf_cls.pkl')}")
         
-    tf_cls2.write_tf_file(fn="emtfxml_test.xml", file_type="emtfxml")
-    print("OK")
-    #return tf_collection
+    tf_cls.write_tf_file(fn="emtfxml_test.xml", file_type="emtfxml")
+    return tf_cls
 
 
 def main():
