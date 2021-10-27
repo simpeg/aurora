@@ -11,7 +11,6 @@ info required to process a contiguous time series block at fixed samppling rate.
 RunConfig: This is a collection of processing configs, together with specifications for
 decimation.
 """
-import os
 from pathlib import Path
 
 from aurora.config.decimation_level_config import DecimationLevelConfig
@@ -21,7 +20,8 @@ from aurora.general_helper_functions import BAND_SETUP_PATH
 
 class ConfigCreator(object):
     def __init__(self, **kwargs):
-        self.config_path = kwargs.get("config_path", Path(os.getcwd()).joinpath("cfg"))
+        default_config_path = Path("config")
+        self.config_path = kwargs.get("config_path", default_config_path)
 
     # def to_json(self):
 
@@ -91,15 +91,12 @@ class ConfigCreator(object):
 
 
 def test_cas04():
-    example_sta = "CAS04"
-    example_run = "003"
+    station_id = "CAS04"
+    run_id = "003"
     h5_path = "/home/kkappler/.cache/iris_mt/from_iris_dmc.h5"
-    example_samplerate = 1.0
+    sample_rate = 1.0
     config_maker = ConfigCreator()
-    config_maker.create_run_config(
-        example_sta, example_run, h5_path, example_samplerate
-    )  # ,
-    # **kwargs):
+    config_maker.create_run_config(station_id, run_id, h5_path, sample_rate)
 
 
 def main():
