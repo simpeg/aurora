@@ -53,14 +53,14 @@ jobs:
         fail_ci_if_error: true
 
     - name: Build Doc
-      if: (github.ref == 'refs/heads/main') & (${{ matrix.python-version }} == '3.8')
+      if: (github.ref == 'refs/heads/main') && (${{ matrix.python-version }} == '3.8')
       run: |
         cd docs
         make html
         cd ..
 
     - name: GitHub Pages
-      if: (github.ref == 'refs/heads/main') & (${{ matrix.python-version }} == '3.8')
+      if: (github.ref == 'refs/heads/main') && (${{ matrix.python-version }} == '3.8')
       uses: crazy-max/ghaction-github-pages@v2.5.0
       with:
         build_dir: docs/_build/html
