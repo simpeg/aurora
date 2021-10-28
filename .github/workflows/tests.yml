@@ -27,13 +27,13 @@ jobs:
       uses: conda-incubator/setup-miniconda@v2.1.1
       with:
         activate-environment: aurora-test
-        channels: conda-forge
         python-version: ${{ matrix.python-version }}
 
     - name: Install Env
       run: |
         python --version
-        conda install pytest pytest-cov
+        conda install -c conda-forge pytest pytest-cov
+        pip install -r requirements-dev.txt
         pip install git+https://github.com/kujaku11/mt_metadata.git
         pip install git+https://github.com/kujaku11/mth5.git
         #pip install -e git+https://github.com/kujaku11/mth5_test_data.git#egg=mth5_test_data
