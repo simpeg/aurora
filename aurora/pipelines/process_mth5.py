@@ -127,6 +127,8 @@ def process_mth5_decimation_level(config, local, remote, units="MT"):
 
     Returns
     -------
+    transfer_function_obj : aurora.transfer_function.TTFZ.TTFZ
+
 
 
     """
