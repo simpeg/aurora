@@ -11,6 +11,7 @@
 
    user-docs/installing
    examples/index
+   notebooks/operate_aurora.ipynb
 
 .. toctree::
    :maxdepth: 2

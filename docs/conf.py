@@ -20,8 +20,8 @@ from sphinx_gallery.sorting import FileNameSortKey
 # -- Project information -----------------------------------------------------
 
 project = 'aurora'
-copyright = '2021, Karl Kappler, Jared Peacock, Lindsey Heagy, Douglas Oldenburg'
-author = 'Karl Kappler, Jared Peacock, Lindsey Heagy, Douglas Oldenburg'
+copyright = '2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg'
+author = '2021, Karl Kappler, Jared Peacock, Tim Ronan, Andy Frassetto, Lindsey Heagy, Douglas Oldenburg'
 
 # The full version, including alpha/beta/rc tags
 release = '0.0.1'
@@ -44,7 +44,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "matplotlib.sphinxext.plot_directive",
     "numpydoc",
-    # "nbsphinx",
+    "nbsphinx",
     "sphinx_gallery.gen_gallery"
 ]
 
