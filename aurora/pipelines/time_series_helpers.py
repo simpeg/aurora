@@ -99,7 +99,7 @@ def run_ts_to_stft(config, run_xrts_orig):
     Parameters
     ----------
     config : ShortTimeFourierTransformConfig object
-    run_ts ; mth5.RunTS (but could be replaced by the xr.dataset....)
+    run_ts ; xarray.core.dataset.Dataset, normally extracted from mth5.RunTS
 
     Returns
     -------

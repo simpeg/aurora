@@ -311,12 +311,21 @@ class WindowingScheme(ApodizationWindow):
 
     def apply_fft(self, data, spectral_density_correction=True, detrend_type="linear"):
         """
-        lets assume we have already applied sliding window and taper.
-        Things to think about:
-        We want to assign the frequency axis during this method
-        Maybe we should have
+
+        Parameters
+        ----------
+        data: xarray.core.dataset.Dataset
+        spectral_density_correction: boolean
+        detrend_type: string
+
         Returns
         -------
+        spectral_ds:
+
+
+        Assume we have already applied sliding window and taper.
+        Things to think about:
+        We want to assign the frequency axis during this method
 
         """
         # ONLY SUPPORTS DATASET AT THIS POINT
@@ -445,5 +454,5 @@ def fft_xr_ds(dataset, sample_rate, detrend_type=None, prewhitening=None):
             coords={"frequency": harmonic_frequencies, "time": dataset.time.data},
         )
         output_ds.update({channel_id: xrd})
-    # <CORE METHOD>
+    # </CORE METHOD>
     return output_ds

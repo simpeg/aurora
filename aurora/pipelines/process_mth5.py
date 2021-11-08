@@ -69,6 +69,7 @@ def get_remote_stft(config, mth5_obj, run_id):
 
 def prototype_decimate(config, run_run_ts):
     """
+    TODO: Move this function into time_series/decimate.py
 
     Parameters
     ----------
@@ -280,11 +281,20 @@ def process_mth5_run(
     """
     Stages here:
     1. Read in the config and figure out how many decimation levels there are
+
     Parameters
     ----------
-    run_cfg
-    run_id
-    units
+    run_cfg: config object or path to config
+    run_id: string
+    units: string
+        "MT" or "SI".  To be deprecated once data have units embedded
+    show_plot: boolean
+        Only used for dev
+    z_file_path: string or pathlib.Path
+        Target path for a z_file output if desired
+    return_collection : boolean
+        return_collection=False will return an mt_metadata TF object
+    kwargs
 
     Returns
     -------
