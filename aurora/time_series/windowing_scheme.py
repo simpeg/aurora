@@ -150,19 +150,21 @@ class WindowingScheme(ApodizationWindow):
         I would like this method to support numpy arrays as well as xarrays.
         Parameters
         ----------
-        data
-        time_vector
-        dt
-        return_xarray
+        data: 1D numpy array, xr.DataArray, xr.Dataset
+            The data to break into ensembles.
+        time_vector: 1D numpy array
+            The time axis of the data.
+        dt: float
+            The sample interval of the data (reciprocal of sample_rate)
+        return_xarray: boolean
+            If True will return an xarray object, even if the input object was a
+            numpy array
 
         Returns windowed_obj
         -------
 
         """
         if isinstance(data, np.ndarray):
-            print(
-                "this will only work for a 1D array, cast to dataset for " "generality"
-            )
             windowed_obj = self._apply_sliding_window_numpy(
                 data, time_vector=time_vector, dt=dt, return_xarray=return_xarray
             )
@@ -182,7 +184,6 @@ class WindowingScheme(ApodizationWindow):
         elif isinstance(data, xr.Dataset):
             ds = xr.Dataset()
             for key in data.keys():
-                # print(f"key {key}")
                 windowed_obj = self._apply_sliding_window_numpy(
                     data[key].data,
                     time_vector=data.time.data,
