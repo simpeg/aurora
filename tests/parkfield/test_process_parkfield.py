@@ -26,7 +26,7 @@ def process_mth5_decimation_level(config, run_id, units="MT"):
     from aurora.transfer_function.TTFZ import TTFZ
     from mth5.mth5 import MTH5
 
-    mth5_obj = MTH5()
+    mth5_obj = MTH5(file_version="0.1.0")
     mth5_obj.open_mth5(config["mth5_path"], mode="r")
 
     local_run_obj = mth5_obj.get_run(config["local_station_id"], run_id)

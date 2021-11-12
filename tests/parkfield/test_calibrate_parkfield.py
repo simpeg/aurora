@@ -37,7 +37,7 @@ def test():
         from make_parkfield_mth5 import test_make_parkfield_mth5
 
         test_make_parkfield_mth5()
-    m = MTH5()
+    m = MTH5(file_version="0.1.0")
     m.open_mth5(parkfield_h5_path, mode="r")
     run_obj = m.get_run(station_id, run_id)
     run_ts_obj = run_obj.to_runts()

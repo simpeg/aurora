@@ -173,7 +173,6 @@ class WindowingScheme(ApodizationWindow):
             """
             Cast DataArray to DataSet, iterate and then Dataset back to
             DataArray
-
             """
             xrds = data.to_dataset("channel")
             windowed_obj = self.apply_sliding_window(

@@ -7,10 +7,23 @@ from setuptools import setup, find_packages
 with open("README.rst") as readme_file:
     readme = readme_file.read()
 
-#with open("HISTORY.rst") as history_file:
+# with open("HISTORY.rst") as history_file:
 #    history = history_file.read()
 
-requirements = ["matplotlib", "mth5", "mt_metadata", "numpy", "numba", "obspy", "pandas", "scipy", "xarray", "fortranformat", "nbsphinx>=0.8.6", "sphinx==4.0.2"]
+requirements = [
+    "matplotlib",
+    "mth5",
+    "mt_metadata",
+    "numpy",
+    "numba",
+    "obspy",
+    "pandas",
+    "scipy",
+    "xarray",
+    "fortranformat",
+    "nbsphinx>=0.8.6",
+    "sphinx==4.0.2",
+]
 
 setup_requirements = [
     "pytest-runner",

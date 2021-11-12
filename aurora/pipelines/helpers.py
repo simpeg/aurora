@@ -52,7 +52,7 @@ def initialize_mth5(h5_path, mode="w"):
         if h5_path.exists():
             print("WARN: file exists")
             h5_path.unlink()
-        mth5_obj = MTH5()
+        mth5_obj = MTH5(file_version="0.1.0")
         mth5_obj.open_mth5(str(h5_path), mode)
 
     elif mode in ["a", "r"]:
@@ -84,8 +84,6 @@ def read_back_data(mth5_path, station_id, run_id):
     processing_config["local_station_id"] = station_id
     config = processing_config
     m = initialize_mth5(config["mth5_path"], mode="r")
-    # m = MTH5()
-    # m.open_mth5(config["mth5_path"], mode="r")
     local_run_obj = m.get_run(config["local_station_id"], run_id)
     local_run_ts = local_run_obj.to_runts()
     print("success")

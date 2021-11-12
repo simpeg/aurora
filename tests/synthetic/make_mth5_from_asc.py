@@ -122,7 +122,7 @@ def create_mth5_synthetic_file(station_cfg, plot=False, add_nan_values=False):
     # survey = Survey()
 
     # make an MTH5
-    m = MTH5()
+    m = MTH5(file_version="0.1.0")
     m.open_mth5(mth5_path, mode="w")
     station_group = m.add_station(station_cfg["station_id"])
 
@@ -157,7 +157,7 @@ def create_mth5_synthetic_file_for_array(station_cfgs, h5_name="", plot=False):
     # set name for output h5 file
     h5_name = station_cfgs[0]["mth5_path"].__str__().replace("test1.h5", "test12rr.h5")
     # open an MTH5
-    m = MTH5()
+    m = MTH5(file_version="0.1.0")
     m.open_mth5(h5_name, mode="w")
 
     for station_cfg in station_cfgs:

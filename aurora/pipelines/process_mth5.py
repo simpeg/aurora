@@ -49,7 +49,7 @@ def initialize_pipeline(run_config, mth5_path=None):
             )
             print(f"config path changing from \n{config['mth5_path']} to \n{mth5_path}")
             config.mth5_path = str(mth5_path)
-    mth5_obj = MTH5()
+    mth5_obj = MTH5(file_version="0.1.0")
     mth5_obj.open_mth5(config["mth5_path"], mode="r")
     # </Initialize mth5 for reading>
     return config, mth5_obj
