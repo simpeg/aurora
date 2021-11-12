@@ -57,7 +57,7 @@ def initialize_mth5(h5_path, mode="w"):
 
     elif mode in ["a", "r"]:
         h5_path = Path(h5_path)
-        mth5_obj = MTH5()
+        mth5_obj = MTH5(file_version="0.1.0")
         mth5_obj.open_mth5(h5_path, mode=mode)
 
     return mth5_obj
