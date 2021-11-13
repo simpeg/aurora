@@ -23,7 +23,6 @@ requirements = [
     "fortranformat",
     "nbsphinx>=0.8.6",
     "sphinx==4.0.2",
-    "pandoc",
 ]
 
 setup_requirements = [
