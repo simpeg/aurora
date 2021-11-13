@@ -45,7 +45,6 @@ extensions = [
     "matplotlib.sphinxext.plot_directive",
     "numpydoc",
     "nbsphinx",
-    "pandoc",
     "sphinx_gallery.gen_gallery",
 ]
 
