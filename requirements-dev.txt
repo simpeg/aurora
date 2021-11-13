@@ -1,5 +1,6 @@
 black
 flake8
+nbsphinx
 numpydoc
 pre-commit
 sphinx_gallery
