@@ -21,8 +21,6 @@ requirements = [
     "scipy",
     "xarray",
     "fortranformat",
-    "nbsphinx>=0.8.6",
-    "sphinx==4.0.2",
 ]
 
 setup_requirements = [
