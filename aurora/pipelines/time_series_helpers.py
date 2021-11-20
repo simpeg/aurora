@@ -177,9 +177,7 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
         channel_filter = mth5_channel.channel_response_filter
         if not channel_filter.filters_list:
             print("WARNING UNEXPECTED CHANNEL WITH NO FILTERS")
-            # ONE OFF HACK FOR SAO missing data
             if channel_id == "hy":
-                print("WARNING ONE-OFF PKD SAO RR")
                 channel_filter = run_obj.get_channel("hx").channel_response_filter
         calibration_response = channel_filter.complex_response(stft_obj.frequency.data)
         if channel_scale_factors:

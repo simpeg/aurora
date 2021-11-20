@@ -168,7 +168,6 @@ class TRME(RegressionEstimator):
             assert (sigma > 0).all()
         except AssertionError:
             print("WARNING - Negative error variances observed")
-            print(sigma)
             print("Setting sigma to zero - Negative sigma_squared observed")
             sigma *= 0
             # raise Exception
@@ -296,7 +295,6 @@ class TRME(RegressionEstimator):
             b0 = self.b
 
         if self.iter_control.max_number_of_redescending_iterations:
-            print(b0)
             # self.iter_control.number_of_redescending_iterations = 0;
             while self.iter_control.continue_redescending:
                 self.iter_control.number_of_redescending_iterations += 1

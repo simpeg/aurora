@@ -420,11 +420,10 @@ def fft_xr_ds(dataset, sample_rate, detrend_type=None, prewhitening=None):
     # TODO:
     from aurora.time_series.frequency_domain_helpers import get_fft_harmonics
 
-    print(
-        "Modify this so that demeaning and detrending is happening before "
-        "the application of the tapering window.  Add a second demean right "
-        "before the FFT"
-    )
+    # TODO: Modify this so that demeaning and detrending
+    # is happening before the application of the tapering
+    # window.  Add a second demean right "
+    # before the FFT
 
     samples_per_window = len(dataset.coords["within-window time"])
     n_fft_harmonics = int(samples_per_window / 2)  # no bin at Nyquist,
@@ -442,7 +441,6 @@ def fft_xr_ds(dataset, sample_rate, detrend_type=None, prewhitening=None):
             data=dataset, detrend_axis=time_coordinate_index, detrend_type="linear"
         )
     for channel_id in dataset.keys():
-        print(f"channel_id {channel_id}")
         data = dataset[channel_id].data
         # Here is where you would add segment-by-segment prewhitening
         fspec_array = np.fft.fft(data, axis=time_coordinate_index)

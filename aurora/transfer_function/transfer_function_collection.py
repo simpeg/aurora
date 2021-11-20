@@ -159,7 +159,6 @@ class TransferFunctionCollection(object):
             tmp = tmp.sel(output_channel=output_channels)
             self.merged_tf = tmp
 
-            print("NOW ADD Hz to cov_nn")
             n_output_ch = len(self.merged_tf.output_channel)  # 3
             n_periods = len(self.merged_tf.period)
             cov_nn_dims = (n_output_ch, n_output_ch, n_periods)
@@ -379,7 +378,6 @@ class TransferFunctionCollection(object):
                 line = ""
                 for out_ch in tf.tf_header.output_channels:
                     for inp_ch in tf.tf_header.input_channels:
-                        print(out_ch, inp_ch)
                         chchtf = tf_xr.loc[out_ch, inp_ch, :]
                         real_part = np.real(chchtf.data[period_index])
                         imag_part = np.imag(chchtf.data[period_index])

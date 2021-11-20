@@ -76,7 +76,6 @@ class TransferFunction(object):
         tf_header
         frequency_bands
         """
-        print("TODO: change self.T to self.period")
         self.tf_header = tf_header
         self.frequency_bands = frequency_bands
         self.num_segments = None

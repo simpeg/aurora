@@ -152,16 +152,13 @@ class WindowedTimeSeries(object):
         if detrend_axis is None:
             detrend_axis = get_time_coordinate_axis(data)
         if not inplace:
-            print("deep copy dataset and then overwrite")
             raise NotImplementedError
 
         for channel in data.keys():
-            print(f"channel {channel}")
 
             # windowed_array = data[key].data
             nanless_data = data[channel].dropna(dim="time")
             ensembles = nanless_data.data
-            print("Nan Checker goes here")
             if detrend_type:  # neither False nor None
                 ensembles = ssig.detrend(
                     ensembles, axis=detrend_axis, type=detrend_type
@@ -180,7 +177,6 @@ class WindowedTimeSeries(object):
                 else:
                     data[channel].data = ensembles
             else:
-                print("deep copy dataset and then overwrite")
                 raise NotImplementedError
         return data
 
@@ -225,7 +221,7 @@ class WindowedTimeSeries(object):
         -------
 
         """
-        print("NOT TESTED - PSEUDOCODE ONLY")
+        # "NOT TESTED - PSEUDOCODE ONLY"
         for channel_id in dataset.keys():
             mth5_channel = run_obj.get_channel(channel_id)
             channel_filter = mth5_channel.channel_response_filter

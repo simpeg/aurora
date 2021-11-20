@@ -179,9 +179,6 @@ def process_mth5_decimation_level(config, local, remote, units="MT"):
     )
 
     transfer_function_obj.apparent_resistivity(units=units)
-    print(transfer_function_obj.rho.shape)
-    print(transfer_function_obj.rho[0])
-    print(transfer_function_obj.rho[-1])
     return transfer_function_obj
 
 
@@ -326,7 +323,7 @@ def process_mth5_run(
                 processing_config, mth5_obj, run_id
             )
 
-            print("APPLY TIMING CORRECTIONS HERE")
+            # APPLY TIMING CORRECTIONS HERE
         else:
             local = prototype_decimate(processing_config, local)
             if processing_config.reference_station_id:
