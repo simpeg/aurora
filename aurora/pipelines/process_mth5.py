@@ -235,7 +235,7 @@ def get_data_from_decimation_level_from_mth5(config, mth5_obj, run_id):
     return local, remote
 
 
-def export_tf(tf_collection, run_metadata_dict={}, survey_dict={}):
+def export_tf(tf_collection, station_metadata_dict={}, survey_dict={}):
     """
     This method may wind up being embedded in the TF class
     Assign transfer_function, residual_covariance, inverse_signal_power, station, survey
@@ -261,7 +261,8 @@ def export_tf(tf_collection, run_metadata_dict={}, survey_dict={}):
     res_cov = res_cov.rename(renamer_dict)
     tf_cls.residual_covariance = res_cov
 
-    tf_cls.station_metadata.from_dict(run_metadata_dict)
+    tf_cls.station_metadata._runs = []
+    tf_cls.station_metadata.from_dict(station_metadata_dict)
     tf_cls.survey_metadata.from_dict(survey_dict)
     return tf_cls
 
@@ -354,9 +355,16 @@ def process_mth5_run(
         return tf_collection
     else:
         # intended to be the default in future
-        run_metadata_dict = local_run_obj.station_group.metadata.to_dict()
+        station_metadata = local_run_obj.station_group.metadata
+        station_metadata._runs = []
+        run_metadata = local_run_obj.metadata
+        station_metadata.add_run(run_metadata)
         survey_dict = mth5_obj.survey_group.metadata.to_dict()
+        
+        print(station_metadata.run_list)
         tf_cls = export_tf(
-            tf_collection, run_metadata_dict=run_metadata_dict, survey_dict=survey_dict
+            tf_collection, 
+            station_metadata_dict=station_metadata.to_dict(),
+            survey_dict=survey_dict
         )
         return tf_cls
