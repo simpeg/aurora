@@ -73,7 +73,6 @@ class RunConfig(BaseDict):
         json_dict["local_station_id"] = self.local_station_id
         json_dict["reference_station_id"] = self.reference_station_id
         json_dict["channel_scale_factors"] = self.channel_scale_factors
-        print(self.decimation_level_ids)
         for dec_level_id in self.decimation_level_ids:
             json_dict[dec_level_id] = self_dict[dec_level_id].__dict__
 

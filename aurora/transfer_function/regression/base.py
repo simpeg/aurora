@@ -118,7 +118,6 @@ class RegressionEstimator(object):
         return self.cov_nn
 
     def b_to_xarray(self):
-        print("TEST IMPLEMENTATION")
         xra = xr.DataArray(
             np.transpose(self.b),
             dims=["output_channel", "input_channel"],
@@ -302,7 +301,5 @@ class RegressionEstimator(object):
         return b
 
     def estimate(self):
-        print("this method is not defined for the abstract base class")
-        print("But we put OLS in here for dev")
         Z = self.estimate_ols(mode="qr")
         return Z

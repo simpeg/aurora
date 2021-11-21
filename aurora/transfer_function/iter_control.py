@@ -98,17 +98,19 @@ class IterControl(object):
         iteration_cond = self.number_of_iterations >= self.max_number_of_iterations
         if tolerance_cond or iteration_cond:
             converged = True
-            if tolerance_cond:
-                print(
-                    f"Converged Due to MaxChange < Tolerance after "
-                    f" {self.number_of_iterations} of "
-                    f" {self.max_number_of_iterations} iterations"
-                )
-            elif iteration_cond:
-                print(
-                    f"Converged Due to maximum number_of_iterations "
-                    f" {self.max_number_of_iterations}"
-                )
+            # These print statments are not very clear and
+            # Should be reworded.
+            # if tolerance_cond:
+            #    print(
+            #        f"Converged Due to MaxChange < Tolerance after "
+            #        f" {self.number_of_iterations} of "
+            #        f" {self.max_number_of_iterations} iterations"
+            #    )
+            # elif iteration_cond:
+            #    print(
+            #        f"Converged Due to maximum number_of_iterations "
+            #        f" {self.max_number_of_iterations}"
+            #    )
         else:
             converged = False
 

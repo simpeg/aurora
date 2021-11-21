@@ -127,7 +127,7 @@ def configure_frequency_bands(config):
         )
     elif config["band_setup_style"] == "band edges":
         frequency_bands.band_edges = config["band_edges"]
-        print("Not Yet Supported")
+        # "Not Yet Supported"
         raise NotImplementedError
     elif config["band_setup_style"] == "logarithmic range":
         lower_bound = config["frequency_bands_lower_bound"]
