@@ -89,8 +89,8 @@ import numpy as np
 from scipy.linalg import solve_triangular
 import xarray as xr
 
-from aurora.transfer_function.regression.base import RegressionEstimator
-from aurora.transfer_function.m_estimator import MEstimator
+# from aurora.transfer_function.regression.base import RegressionEstimator
+from aurora.transfer_function.regression.m_estimator import MEstimator
 
 
 class TRME(MEstimator):
