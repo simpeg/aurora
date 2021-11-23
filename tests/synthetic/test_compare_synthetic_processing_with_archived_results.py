@@ -3,6 +3,13 @@ Working Notes:
 1. Need to create a processing config for the remote reference case (done but not
 tested)
 2. need to run the rr processing
+3. Check if the previously committed json config is being used by the single station
+tests, it looks like maybe it is not anymore.
+It is being used in the stft test, but maybe that can be made to depend on the
+FORTRAN config file
+4. create_run_config_for_test_case() is in make_synthetic_processing_configs.
+Why are there two places?  Can we replace
+create_config_file(matlab_or_fortran, SS_or_RR="SS") here with that version?
 """
 import numpy as np
 from pathlib import Path
@@ -18,6 +25,7 @@ from aurora.transfer_function.emtf_z_file_helpers import (
 
 from make_mth5_from_asc import create_test1_h5
 from make_mth5_from_asc import create_test12rr_h5
+from make_synthetic_processing_configs import create_run_config_for_test_case
 
 SYNTHETIC_PATH = TEST_PATH.joinpath("synthetic")
 CONFIG_PATH = SYNTHETIC_PATH.joinpath("config")
@@ -25,68 +33,6 @@ DATA_PATH = SYNTHETIC_PATH.joinpath("data")
 AURORA_RESULTS_PATH = SYNTHETIC_PATH.joinpath("aurora_results")
 AURORA_RESULTS_PATH.mkdir(exist_ok=True)
 
-
-def create_rr_config_file():
-    cc = ConfigCreator(config_path=CONFIG_PATH)
-    mth5_path = DATA_PATH.joinpath("test12rr.h5")
-    config_id = f"test12rr-fortran"
-    
-    band_setup_file = BAND_SETUP_PATH.joinpath("bs_test.cfg")
-    num_samples_window = 128
-    num_samples_overlap = 32
-
-    run_config_path = cc.create_run_config(
-        station_id="test1",
-        reference_station_id="test2",
-        mth5_path=mth5_path,
-        sample_rate=1.0,
-        num_samples_window=num_samples_window,
-        num_samples_overlap=num_samples_overlap,
-        band_setup_file=str(band_setup_file),
-        config_id=config_id,
-        output_channels=["hz", "ex", "ey"],
-    )
-    return run_config_path
-
-
-def create_config_file(matlab_or_fortran, SS_or_RR="SS"):
-    """
-
-    Parameters
-    ----------
-    matlab_or_fortran: string
-        Either "matlab" or "fortran".  This string is basically a case-switch on the
-        processing config parameters.  The fortran and matlab results used different
-        windowing schemes so we need to know which we are going to compare against to
-        set the processing config.
-
-    Returns
-    -------
-
-    """
-    cc = ConfigCreator(config_path=CONFIG_PATH)
-    mth5_path = DATA_PATH.joinpath("test1.h5")
-    config_id = f"test1-{matlab_or_fortran}"
-    if matlab_or_fortran == "matlab":
-        band_setup_file = BAND_SETUP_PATH.joinpath("bs_256_26.cfg")
-        num_samples_window = 256
-        num_samples_overlap = 64
-    elif matlab_or_fortran == "fortran":
-        band_setup_file = BAND_SETUP_PATH.joinpath("bs_test.cfg")
-        num_samples_window = 128
-        num_samples_overlap = 32
-
-    run_config_path = cc.create_run_config(
-        station_id="test1",
-        mth5_path=mth5_path,
-        sample_rate=1.0,
-        num_samples_window=num_samples_window,
-        num_samples_overlap=num_samples_overlap,
-        band_setup_file=str(band_setup_file),
-        config_id=config_id,
-        output_channels=["hz", "ex", "ey"],
-    )
-    return run_config_path
 
 
 def compute_rms(rho, phi, model_rho_a=100.0, model_phi=45.0):
@@ -271,11 +217,11 @@ def process_synthetic_1_standard(
     return
 
 
-def aurora_vs_emtf(compare_against, assert_compare=False):
-    create_config_file(compare_against)
+def aurora_vs_emtf(test_case_id, matlab_or_fortran, assert_compare=False):
+    create_run_config_for_test_case(test_case_id, matlab_or_fortran=matlab_or_fortran)
     process_synthetic_1_standard(
         assert_compare_result=assert_compare,
-        compare_against=compare_against,
+        compare_against=matlab_or_fortran,
         make_rho_phi_plot=True,
         show_rho_phi_plot=False,
         use_subtitle=True,
@@ -287,8 +233,8 @@ def aurora_vs_emtf(compare_against, assert_compare=False):
 def test():
     create_test1_h5()
     create_test12rr_h5()
-    aurora_vs_emtf("fortran", assert_compare=True)
-    aurora_vs_emtf("matlab", assert_compare=False)
+    aurora_vs_emtf("test1", "fortran", assert_compare=True)
+    aurora_vs_emtf("test1", "matlab", assert_compare=False)
     print("success")
 
 
