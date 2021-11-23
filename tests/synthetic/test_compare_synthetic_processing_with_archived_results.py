@@ -21,7 +21,21 @@ AURORA_RESULTS_PATH = SYNTHETIC_PATH.joinpath("aurora_results")
 AURORA_RESULTS_PATH.mkdir(exist_ok=True)
 
 
-def create_config_file(matlab_or_fortran):
+def create_config_file(matlab_or_fortran, SS_or_RR="SS"):
+    """
+
+    Parameters
+    ----------
+    matlab_or_fortran: string
+        Either "matlab" or "fortran".  This string is basically a case-switch on the
+        processing config parameters.  The fortran and matlab results used different
+        windowing schemes so we need to know which we are going to compare against to
+        set the processing config.
+
+    Returns
+    -------
+
+    """
     cc = ConfigCreator(config_path=CONFIG_PATH)
     mth5_path = DATA_PATH.joinpath("test1.h5")
     config_id = f"test1-{matlab_or_fortran}"
@@ -83,10 +97,9 @@ def process_synthetic_1_standard(
             "synthetic", "emtf_output", "from_matlab_256_26.zss"
         )
 
-    # </MATLAB>
-    z_file_path = Path(f"test1_aurora_{compare_against}.zss")
-    # z_file_path = Path("test1_aurora.zss")
-    z_file_path = z_file_path.absolute()
+    z_file_base = f"test1_aurora_{compare_against}.zss"
+    z_file_path = AURORA_RESULTS_PATH.joinpath(z_file_base)
+
     run_id = "001"
     tf_collection = process_mth5_run(
         test_config, run_id, units="MT", show_plot=False, z_file_path=z_file_path
@@ -193,11 +206,10 @@ def process_synthetic_1_standard(
     return
 
 
-def compare_vs_fortran_output():
-    compare_against = "fortran"
+def aurora_vs_emtf(compare_against, assert_compare=False):
     create_config_file(compare_against)
     process_synthetic_1_standard(
-        assert_compare_result=True,
+        assert_compare_result=assert_compare,
         compare_against=compare_against,
         make_rho_phi_plot=True,
         show_rho_phi_plot=False,
@@ -205,22 +217,12 @@ def compare_vs_fortran_output():
     )
 
 
-def compare_vs_matlab_output():
-    compare_against = "matlab"
-    create_config_file(compare_against)
-    process_synthetic_1_standard(
-        assert_compare_result=False,
-        compare_against=compare_against,
-        make_rho_phi_plot=True,
-        show_rho_phi_plot=False,
-        use_subtitle=True,
-    )
 
 
 def test():
     create_test1_h5()
-    compare_vs_fortran_output()
-    compare_vs_matlab_output()
+    aurora_vs_emtf("fortran", assert_compare=True)
+    aurora_vs_emtf("matlab", assert_compare=False)
     print("success")
 
 

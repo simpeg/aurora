@@ -3,6 +3,8 @@ aurora/sandbox/data
 tests/parkfield/*.png
 tests/parkfield/config/*backup.json
 tests/parkfield/data/*backup.json
+tests/synthetic/aurora_results/*
+tests/synthetic/config/*
 tests/synthetic/data/*h5
 tests/synthetic/out.png
 # Byte-compiled / optimized / DLL files
