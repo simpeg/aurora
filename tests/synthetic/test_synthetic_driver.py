@@ -5,7 +5,6 @@ from make_mth5_from_asc import create_test1_h5
 from make_mth5_from_asc import create_test2_h5
 from make_mth5_from_asc import create_test12rr_h5
 from make_synthetic_processing_configs import create_run_config_for_test_case
-from synthetic_station_config import STATION_01_CFG
 
 
 CONFIG_PATH = TEST_PATH.joinpath("synthetic", "config")
@@ -69,7 +68,9 @@ def process_synthetic_2():
 def process_synthetic_rr12():
     test_config = CONFIG_PATH.joinpath("test12rr-RR_test2_run_config.json")
     # test_config = Path("config", "test12rr_run_config.json")
-    run_id = STATION_01_CFG["run_id"]
+    from synthetic_station_config import make_station_01_config_dict
+    station_01_params = make_station_01_config_dict()
+    run_id = station_01_params["run_id"]
     process_mth5_run(test_config, run_id, units="MT", show_plot=False)
 
 
