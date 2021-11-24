@@ -62,9 +62,13 @@ class RunConfig(BaseDict):
     def decimation_level_ids(self):
         return sorted(self.decimation_level_configs.keys())
 
+    def json_fn(self):
+        json_fn = self.config_id + "_run_config.json"
+        return json_fn
+
     def to_json(self, json_fn=None, indent=" " * 4):
         if json_fn is None:
-            json_fn = self.config_id
+            json_fn = self.json_fn()#config_id
         json_fn = Path(json_fn)
         self_dict = self.__dict__["decimation_level_configs"]
         json_dict = {}
