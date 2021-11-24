@@ -39,10 +39,15 @@ EXPECTED_RMS_MISFIT["test1"]["rho"]["xy"] = 4.380757  # 4.357440
 EXPECTED_RMS_MISFIT["test1"]["phi"]["xy"] = 0.871609  # 0.884601
 EXPECTED_RMS_MISFIT["test1"]["rho"]["yx"] = 3.551043  # 3.501146
 EXPECTED_RMS_MISFIT["test1"]["phi"]["yx"] = 0.812733  # 0.808658
+EXPECTED_RMS_MISFIT["test2r1"] = {}
+EXPECTED_RMS_MISFIT["test2r1"]["rho"] = {}
+EXPECTED_RMS_MISFIT["test2r1"]["phi"] = {}
+EXPECTED_RMS_MISFIT["test2r1"]["rho"]["xy"] = 3.949919
+EXPECTED_RMS_MISFIT["test2r1"]["phi"]["xy"] = 0.957675
+EXPECTED_RMS_MISFIT["test2r1"]["rho"]["yx"] = 4.117700
+EXPECTED_RMS_MISFIT["test2r1"]["phi"]["yx"] = 1.629026
 
-
-
-def compute_rms(rho, phi, model_rho_a=100.0, model_phi=45.0):
+def compute_rms(rho, phi, model_rho_a=100.0, model_phi=45.0, verbose=False):
     """
     This function being used to make comparative plots for synthetic data.  Could be 
     used in general to compare different processing results.  For example by replacing 
@@ -53,7 +58,7 @@ def compute_rms(rho, phi, model_rho_a=100.0, model_phi=45.0):
     ----------
     rho: numpy.ndarray
         1D array of computed apparent resistivities (expected in Ohmm)
-    phi: numpy.ndarray
+    phi: numpy.ndarrayx
         1D array of computed phases (expected in degrees)
     model_rho_a: float or numpy array
         if numpy array must be the same shape as rho
@@ -68,6 +73,9 @@ def compute_rms(rho, phi, model_rho_a=100.0, model_phi=45.0):
     """
     rho_rms = np.sqrt(np.mean((rho - model_rho_a) ** 2))
     phi_rms = np.sqrt(np.mean((phi - model_phi) ** 2))
+    if verbose:
+        print(f"rho_rms = {rho_rms}")
+        print(f"phi_rms = {phi_rms}")
     return rho_rms, phi_rms
 
 def make_subtitle(rho_rms_aurora, rho_rms_emtf,
@@ -278,7 +286,7 @@ def process_synthetic_1_standard(
         aurora_phi = aurora_rho_phi["phi"][xy_or_yx]
         aux_rho = aux_data.rho(xy_or_yx)
         aux_phi = aux_data.phi(xy_or_yx)
-        rho_rms_aurora, phi_rms_aurora = compute_rms(aurora_rho, aurora_phi)
+        rho_rms_aurora, phi_rms_aurora = compute_rms(aurora_rho, aurora_phi, verbose=True)
         rho_rms_emtf, phi_rms_emtf = compute_rms(aux_rho, aux_phi)
 
         if expected_rms_misfit is not None:
@@ -328,7 +336,7 @@ def test():
     auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test1.zss")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zss"
     aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
-                   expected_rms_misfit=EXPECTED_RMS_MISFIT["test1"])
+                   expected_rms_misfit=EXPECTED_RMS_MISFIT[test_case_id])
 
     test_case_id = "test1"
     emtf_version = "matlab"
@@ -336,12 +344,12 @@ def test():
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zss"
     aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base)
 
-    # test_case_id = "test2r1"
-    # emtf_version = "fortran"
-    # auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test2r1.zrr")
-    # z_file_base = f"{test_case_id}_aurora_{emtf_version}.zrr"
-    # aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base)
-    # #                expected_rms_misfit=EXPECTED_RMS_MISFIT["test1"])
+    test_case_id = "test2r1"
+    emtf_version = "fortran"
+    auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test2r1.zrr")
+    z_file_base = f"{test_case_id}_aurora_{emtf_version}.zrr"
+    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
+                   expected_rms_misfit=EXPECTED_RMS_MISFIT[test_case_id])
     print("success")
 
 
