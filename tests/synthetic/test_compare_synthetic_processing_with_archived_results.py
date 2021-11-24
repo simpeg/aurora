@@ -30,6 +30,15 @@ DATA_PATH = SYNTHETIC_PATH.joinpath("data")
 AURORA_RESULTS_PATH = SYNTHETIC_PATH.joinpath("aurora_results")
 AURORA_RESULTS_PATH.mkdir(exist_ok=True)
 
+EXPECTED_RMS_MISFIT = {}
+EXPECTED_RMS_MISFIT["test1"] = {}
+EXPECTED_RMS_MISFIT["test1"]["rho"] = {}
+EXPECTED_RMS_MISFIT["test1"]["phi"] = {}
+EXPECTED_RMS_MISFIT["test1"]["rho"]["xy"] = 4.380757  # 4.357440
+EXPECTED_RMS_MISFIT["test1"]["phi"]["xy"] = 0.871609  # 0.884601
+EXPECTED_RMS_MISFIT["test1"]["rho"]["yx"] = 3.551043  # 3.501146
+EXPECTED_RMS_MISFIT["test1"]["phi"]["yx"] = 0.812733  # 0.808658
+
 
 
 def compute_rms(rho, phi, model_rho_a=100.0, model_phi=45.0):
@@ -178,10 +187,33 @@ def plot_rho_phi(xy_or_yx,
     return
 
 
+def assert_rms_misfit_ok(expected_rms_misfit, xy_or_yx, rho_rms_aurora,
+                         phi_rms_aurora, rho_tol=1e-4, phi_tol=1e-4):
+    """
 
+    Parameters
+    ----------
+    expected_rms_misfit: dictionary
+        precomputed RMS misfits for test data in rho and phi
+    xy_or_yx: str
+        mode
+    rho_rms_aurora: float
+    phi_rms_aurora: float
+
+    Returns
+    -------
+
+    """
+    expected_rms_rho = expected_rms_misfit['rho'][xy_or_yx]
+    expected_rms_phi = expected_rms_misfit['phi'][xy_or_yx]
+    print(f"expected_rms_rho_xy {expected_rms_rho}")
+    print(f"expected_rms_rho_xy {expected_rms_phi}")
+    assert np.isclose(rho_rms_aurora - expected_rms_rho, 0, atol=rho_tol)
+    assert np.isclose(phi_rms_aurora - expected_rms_phi, 0, atol=phi_tol)
+    return
 
 def process_synthetic_1_standard(
-    assert_compare_result=True,
+    expected_rms_misfit=None,
     make_rho_phi_plot=True,
     show_rho_phi_plot=False,
     use_subtitle=True,
@@ -191,7 +223,8 @@ def process_synthetic_1_standard(
 
     Parameters
     ----------
-    assert_compare_result
+    expected_rms_misfit: dict
+        see description in assert_rms_misfit_ok
     make_rho_phi_plot
     show_rho_phi_plot
     use_subtitle
@@ -221,10 +254,6 @@ def process_synthetic_1_standard(
     test_config = CONFIG_PATH.joinpath(f"test1-{compare_against}_run_config.json")
     if compare_against == "fortran":
         auxilliary_z_file = SYNTHETIC_PATH.joinpath("emtf_output", "test1.zss")
-        expected_rms_rho_xy = 4.380757  # 4.357440
-        expected_rms_phi_xy = 0.871609  # 0.884601
-        expected_rms_rho_yx = 3.551043  # 3.501146
-        expected_rms_phi_yx = 0.812733  # 0.808658
     elif compare_against == "matlab":
         auxilliary_z_file = SYNTHETIC_PATH.joinpath("emtf_output",
                                                     "from_matlab_256_26.zss")
@@ -254,11 +283,11 @@ def process_synthetic_1_standard(
     rho_rms_aurora, phi_rms_aurora = compute_rms(aurora_rxy, aurora_pxy)
     rho_rms_emtf, phi_rms_emtf = compute_rms(aux_data.rxy, aux_data.pxy)
 
-    if assert_compare_result:
-        print(f"expected_rms_rho_xy {expected_rms_rho_xy}")
-        print(f"expected_rms_phi_xy {expected_rms_phi_xy}")
-        assert np.isclose(rho_rms_aurora - expected_rms_rho_xy, 0, atol=1e-4)
-        assert np.isclose(phi_rms_aurora - expected_rms_phi_xy, 0, atol=1e-4)
+    if expected_rms_misfit is not None:
+        assert_rms_misfit_ok(expected_rms_misfit,
+                             xy_or_yx,
+                             rho_rms_aurora,
+                             phi_rms_aurora)
 
     if make_rho_phi_plot:
         plot_rho_phi(xy_or_yx,
@@ -276,11 +305,9 @@ def process_synthetic_1_standard(
     rho_rms_aurora, phi_rms_aurora = compute_rms(aurora_ryx, aurora_pyx)
     rho_rms_emtf, phi_rms_emtf = compute_rms(aux_data.ryx, aux_data.pyx)
 
-    if assert_compare_result:
-        print(f"expected_rms_rho_yx {expected_rms_rho_yx}")
-        print(f"expected_rms_phi_yx {expected_rms_phi_yx}")
-        assert np.isclose(rho_rms_aurora - expected_rms_rho_yx, 0, atol=2e-3)
-        assert np.isclose(phi_rms_aurora - expected_rms_phi_yx, 0, atol=1e-3)
+    if expected_rms_misfit is not None:
+        assert_rms_misfit_ok(expected_rms_misfit, xy_or_yx, rho_rms_aurora,
+                             phi_rms_aurora, rho_tol=2e-3, phi_tol=1e-3)
 
     if make_rho_phi_plot:
         plot_rho_phi(xy_or_yx,
@@ -297,10 +324,10 @@ def process_synthetic_1_standard(
     return
 
 
-def aurora_vs_emtf(test_case_id, matlab_or_fortran, assert_compare=False):
+def aurora_vs_emtf(test_case_id, matlab_or_fortran, expected_rms_misfit=None):
     create_run_config_for_test_case(test_case_id, matlab_or_fortran=matlab_or_fortran)
     process_synthetic_1_standard(
-        assert_compare_result=assert_compare,
+        expected_rms_misfit=expected_rms_misfit,
         compare_against=matlab_or_fortran,
         make_rho_phi_plot=True,
         show_rho_phi_plot=False,
@@ -313,8 +340,9 @@ def aurora_vs_emtf(test_case_id, matlab_or_fortran, assert_compare=False):
 def test():
     create_test1_h5()
     create_test12rr_h5()
-    aurora_vs_emtf("test1", "fortran", assert_compare=True)
-    aurora_vs_emtf("test1", "matlab", assert_compare=False)
+    aurora_vs_emtf("test1", "fortran",
+                   expected_rms_misfit=EXPECTED_RMS_MISFIT["test1"])
+    aurora_vs_emtf("test1", "matlab")
     print("success")
 
 
