@@ -54,23 +54,20 @@ def process_synthetic_1_with_nans():
 
 
 def process_synthetic_1():
-    test_config = CONFIG_PATH.joinpath("test1_run_config.json")
-    # test_config = Path("config", "test1_run_config.json")
+    test_config = create_run_config_for_test_case("test1")
     run_id = "001"
     process_mth5_run(test_config, run_id, units="MT")
 
 
 def process_synthetic_2():
-    test_config = CONFIG_PATH.joinpath("test2_run_config.json")
-    # test_config = Path("config", "test2_run_config.json")
+    test_config = create_run_config_for_test_case("test2")
     run_id = "001"
     process_mth5_run(test_config, run_id, units="MT")
 
 
 def process_synthetic_rr12():
-    #test_config = CONFIG_PATH.joinpath("test12rr-RR_test2_run_config.json")
-    #test_config = CONFIG_PATH.joinpath("test12rr_run_config.json")
-    test_config = CONFIG_PATH.joinpath("test1r2-RR_test2_run_config.json")
+    test_config = create_run_config_for_test_case("test1r2")
+    #test_config = CONFIG_PATH.joinpath("test1-RR_test2_run_config.json")
     from synthetic_station_config import make_station_01_config_dict
     station_01_params = make_station_01_config_dict()
     run_id = station_01_params["run_id"]

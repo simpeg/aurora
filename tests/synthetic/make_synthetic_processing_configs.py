@@ -8,8 +8,6 @@ DATA_PATH = TEST_PATH.joinpath("synthetic", "data")
 
 def create_run_config_for_test_case(test_case_id, matlab_or_fortran=""):
     """
-    TODO: Change test_case_id to local_station_id in config_id, or scrap it
-    entirely... what happens when no config_id is provided?
     Use config creator to generate a processing config file for the synthetic data.  
     
     Parameters
@@ -47,17 +45,17 @@ def create_run_config_for_test_case(test_case_id, matlab_or_fortran=""):
         band_setup_file = BAND_SETUP_PATH.joinpath("bs_256_26.cfg")
         num_samples_window = 256
         num_samples_overlap = 64
-        config_id = f"{test_case_id}-{matlab_or_fortran}"
+        config_id = f"{local_station_id}-{matlab_or_fortran}"
     elif matlab_or_fortran == "fortran":
         band_setup_file = BAND_SETUP_PATH.joinpath("bs_test.cfg")
         num_samples_window = 128
         num_samples_overlap = 32
-        config_id = f"{test_case_id}-{matlab_or_fortran}"
+        config_id = f"{local_station_id}-{matlab_or_fortran}"
     else:
         band_setup_file = BAND_SETUP_PATH.joinpath("bs_test.cfg")
         num_samples_window = 128
         num_samples_overlap = 32
-        config_id = f"{test_case_id}"
+        config_id = f"{local_station_id}"
 
     run_config_path = cc.create_run_config(
         station_id=local_station_id,
