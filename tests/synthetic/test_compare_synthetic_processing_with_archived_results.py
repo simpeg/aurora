@@ -27,6 +27,7 @@ from make_synthetic_processing_configs import create_run_config_for_test_case
 SYNTHETIC_PATH = TEST_PATH.joinpath("synthetic")
 CONFIG_PATH = SYNTHETIC_PATH.joinpath("config")
 DATA_PATH = SYNTHETIC_PATH.joinpath("data")
+EMTF_OUTPUT_PATH = SYNTHETIC_PATH.joinpath("emtf_output")
 AURORA_RESULTS_PATH = SYNTHETIC_PATH.joinpath("aurora_results")
 AURORA_RESULTS_PATH.mkdir(exist_ok=True)
 
@@ -214,13 +215,15 @@ def assert_rms_misfit_ok(expected_rms_misfit, xy_or_yx, rho_rms_aurora,
 
 
 def process_synthetic_1_standard(
-    processing_config_path,
-    expected_rms_misfit=None,
-    make_rho_phi_plot=True,
-    show_rho_phi_plot=False,
-    use_subtitle=True,
-    compare_against="matlab",
-):
+        processing_config_path,
+        auxilliary_z_file,
+        z_file_base,
+        expected_rms_misfit=None,
+        make_rho_phi_plot=True,
+        show_rho_phi_plot=False,
+        use_subtitle=True,
+        emtf_version="matlab",
+    ):
     """
 
     Parameters
@@ -232,7 +235,7 @@ def process_synthetic_1_standard(
     make_rho_phi_plot
     show_rho_phi_plot
     use_subtitle
-    compare_against: string
+    emtf_version: string
         "fortran" or "matlab"
 
     Returns
@@ -255,14 +258,6 @@ def process_synthetic_1_standard(
     -------
 
     """
-    if compare_against == "fortran":
-        auxilliary_z_file = SYNTHETIC_PATH.joinpath("emtf_output", "test1.zss")
-    elif compare_against == "matlab":
-        auxilliary_z_file = SYNTHETIC_PATH.joinpath("emtf_output",
-                                                    "from_matlab_256_26.zss")
-
-
-    z_file_base = f"test1_aurora_{compare_against}.zss"
     z_file_path = AURORA_RESULTS_PATH.joinpath(z_file_base)
 
     run_id = "001"
@@ -299,20 +294,23 @@ def process_synthetic_1_standard(
                          rho_rms_emtf,
                          phi_rms_aurora,
                          phi_rms_emtf,
-                         compare_against,
+                         emtf_version,
                          aux_data=aux_data,
                          use_subtitle=use_subtitle,
                          show_plot=show_rho_phi_plot)
     return
 
 
-def aurora_vs_emtf(test_case_id, matlab_or_fortran, expected_rms_misfit=None):
+def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
+                   expected_rms_misfit=None):
     processing_config_path = create_run_config_for_test_case(test_case_id,
-                                                    matlab_or_fortran=matlab_or_fortran)
+                                                    matlab_or_fortran=emtf_version)
     process_synthetic_1_standard(
         processing_config_path,
+        auxilliary_z_file,
+        z_file_base,
         expected_rms_misfit=expected_rms_misfit,
-        compare_against=matlab_or_fortran,
+        emtf_version=emtf_version,
         make_rho_phi_plot=True,
         show_rho_phi_plot=False,
         use_subtitle=True,
@@ -324,9 +322,26 @@ def aurora_vs_emtf(test_case_id, matlab_or_fortran, expected_rms_misfit=None):
 def test():
     create_test1_h5()
     create_test12rr_h5()
-    aurora_vs_emtf("test1", "fortran",
+
+    test_case_id = "test1"
+    emtf_version = "fortran"
+    auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test1.zss")
+    z_file_base = f"{test_case_id}_aurora_{emtf_version}.zss"
+    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
                    expected_rms_misfit=EXPECTED_RMS_MISFIT["test1"])
-    aurora_vs_emtf("test1", "matlab")
+
+    test_case_id = "test1"
+    emtf_version = "matlab"
+    auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("from_matlab_256_26.zss")
+    z_file_base = f"{test_case_id}_aurora_{emtf_version}.zss"
+    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base)
+
+    # test_case_id = "test2r1"
+    # emtf_version = "fortran"
+    # auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test2r1.zrr")
+    # z_file_base = f"{test_case_id}_aurora_{emtf_version}.zrr"
+    # aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base)
+    # #                expected_rms_misfit=EXPECTED_RMS_MISFIT["test1"])
     print("success")
 
 

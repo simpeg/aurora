@@ -28,11 +28,18 @@ def create_run_config_for_test_case(test_case_id, matlab_or_fortran=""):
     local_station_id = test_case_id
     reference_station_id = ""
     reference_channels = []
-    if test_case_id == "test12rr":
+    if test_case_id == "test1r2":
         estimation_engine = "RME_RR"
         reference_channels = ["hx", "hy"]
         local_station_id = "test1"
         reference_station_id = "test2"
+        mth5_path = DATA_PATH.joinpath("test12rr.h5")
+    if test_case_id == "test2r1":
+        estimation_engine = "RME_RR"
+        reference_channels = ["hx", "hy"]
+        local_station_id = "test2"
+        reference_station_id = "test1"
+        mth5_path = DATA_PATH.joinpath("test12rr.h5")
 
     if matlab_or_fortran == "matlab":
         band_setup_file = BAND_SETUP_PATH.joinpath("bs_256_26.cfg")
@@ -71,8 +78,8 @@ def create_run_config_for_test_case(test_case_id, matlab_or_fortran=""):
 def main():
     create_run_config_for_test_case("test1")
     create_run_config_for_test_case("test2")
-    create_run_config_for_test_case("test12rr")
-
+    create_run_config_for_test_case("test1r2")
+    create_run_config_for_test_case("test2r1")
 
 if __name__ == "__main__":
     main()
