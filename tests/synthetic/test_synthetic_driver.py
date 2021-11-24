@@ -19,7 +19,9 @@ def test_create_mth5():
 def test_create_run_configs():
     create_run_config_for_test_case("test1")
     create_run_config_for_test_case("test2")
-    create_run_config_for_test_case("test12rr")
+    #create_run_config_for_test_case("test12rr")
+    create_run_config_for_test_case("test1r2")
+    create_run_config_for_test_case("test2r1")
 
 
 def process_synthetic_1_underdetermined():
