@@ -4,8 +4,6 @@ Working Notes:
 processing.  Use the examples from test_synthetic_driver
 2. Get baseline RR values and use them in an assertion test here
 
-3. --modify process_synthetic_1_standard so that config is an input
-
 3. Check if the previously committed json config is being used by the single station
 tests, it looks like maybe it is not anymore.
 It is being used in the stft test, but maybe that can be made to depend on the
@@ -278,55 +276,33 @@ def process_synthetic_1_standard(
 
     aux_data = read_z_file(auxilliary_z_file)
 
-    (
-        aurora_rxy,
-        aurora_ryx,
-        aurora_pxy,
-        aurora_pyx,
-    ) = merge_tf_collection_to_match_z_file(aux_data, tf_collection)
+    aurora_rho_phi = merge_tf_collection_to_match_z_file(aux_data, tf_collection)
 
-    xy_or_yx = "xy"
-    rho_rms_aurora, phi_rms_aurora = compute_rms(aurora_rxy, aurora_pxy)
-    rho_rms_emtf, phi_rms_emtf = compute_rms(aux_data.rxy, aux_data.pxy)
+    for xy_or_yx in ["xy", "yx"]:
+        aurora_rho = aurora_rho_phi["rho"][xy_or_yx]
+        aurora_phi = aurora_rho_phi["phi"][xy_or_yx]
+        aux_rho = aux_data.rho(xy_or_yx)
+        aux_phi = aux_data.phi(xy_or_yx)
+        rho_rms_aurora, phi_rms_aurora = compute_rms(aurora_rho, aurora_phi)
+        rho_rms_emtf, phi_rms_emtf = compute_rms(aux_rho, aux_phi)
 
-    if expected_rms_misfit is not None:
-        assert_rms_misfit_ok(expected_rms_misfit,
-                             xy_or_yx,
-                             rho_rms_aurora,
-                             phi_rms_aurora)
+        if expected_rms_misfit is not None:
+            assert_rms_misfit_ok(expected_rms_misfit,
+                                 xy_or_yx,
+                                 rho_rms_aurora,
+                                 phi_rms_aurora)
 
-    if make_rho_phi_plot:
-        plot_rho_phi(xy_or_yx,
-                     tf_collection,
-                     rho_rms_aurora,
-                     rho_rms_emtf,
-                     phi_rms_aurora,
-                     phi_rms_emtf,
-                     compare_against,
-                     aux_data=aux_data,
-                     use_subtitle=use_subtitle,
-                     show_plot=show_rho_phi_plot)
-
-    xy_or_yx = "yx"
-    rho_rms_aurora, phi_rms_aurora = compute_rms(aurora_ryx, aurora_pyx)
-    rho_rms_emtf, phi_rms_emtf = compute_rms(aux_data.ryx, aux_data.pyx)
-
-    if expected_rms_misfit is not None:
-        assert_rms_misfit_ok(expected_rms_misfit, xy_or_yx, rho_rms_aurora,
-                             phi_rms_aurora, rho_tol=2e-3, phi_tol=1e-3)
-
-    if make_rho_phi_plot:
-        plot_rho_phi(xy_or_yx,
-                     tf_collection,
-                     rho_rms_aurora,
-                     rho_rms_emtf,
-                     phi_rms_aurora,
-                     phi_rms_emtf,
-                     compare_against,
-                     aux_data=aux_data,
-                     use_subtitle=use_subtitle,
-                     show_plot=show_rho_phi_plot)
-
+        if make_rho_phi_plot:
+            plot_rho_phi(xy_or_yx,
+                         tf_collection,
+                         rho_rms_aurora,
+                         rho_rms_emtf,
+                         phi_rms_aurora,
+                         phi_rms_emtf,
+                         compare_against,
+                         aux_data=aux_data,
+                         use_subtitle=use_subtitle,
+                         show_plot=show_rho_phi_plot)
     return
 
 
