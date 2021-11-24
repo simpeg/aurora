@@ -50,7 +50,7 @@ class TransferFunctionHeader(object):
 
         # <ByPass mt_metadata classes>
         self._local_station_id = kwargs.get("local_station_id", None)
-        self._reference_station_id = kwargs.get("local_station_id", None)
+        self._reference_station_id = kwargs.get("reference_station_id", None)
         # </ByPass mt_metadata classes>
 
     @property

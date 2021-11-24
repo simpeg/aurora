@@ -342,6 +342,41 @@ class ZFile:
         self.pyx = np.rad2deg(np.arctan(np.imag(Zyx) / np.real(Zyx)))
         return
 
+    def rho(self, mode):
+        """
+        Convenience function to help with streamlining synthetic tests - to be
+        eventually replaced by functionality in mt_metadata.tf
+        Parameters
+        ----------
+        mode: str
+            "xy" or "yx"
+
+        Returns
+        -------
+
+        """
+        if mode == "xy":
+            return self.rxy
+        if mode == "yx":
+            return self.ryx
+
+    def phi(self, mode):
+        """
+        Convenience function to help with streamlining synthetic tests - to be
+        eventually replaced by functionality in mt_metadata.tf
+        Parameters
+        ----------
+        mode: str
+            "xy" or "yx"
+
+        Returns
+        -------
+
+        """
+        if mode == "xy":
+            return self.pxy
+        if mode == "yx":
+            return self.pyx
 
 def read_z_file(z_file_path):
     z_obj = ZFile(z_file_path)

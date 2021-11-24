@@ -1,9 +1,19 @@
+"""
+Working Notes:
+1. Need to create a processing config for the remote reference case and run the RR
+processing.  Use the examples from test_synthetic_driver
+2. Get baseline RR values and use them in an assertion test here
+
+3. Check if the previously committed json config is being used by the single station
+tests, it looks like maybe it is not anymore.
+It is being used in the stft test, but maybe that can be made to depend on the
+FORTRAN config file
+
+"""
 import numpy as np
 from pathlib import Path
 
-from aurora.config.config_creator import ConfigCreator
 from aurora.general_helper_functions import TEST_PATH
-from aurora.general_helper_functions import BAND_SETUP_PATH
 from aurora.pipelines.process_mth5 import process_mth5_run
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.transfer_function.emtf_z_file_helpers import (
@@ -11,50 +21,235 @@ from aurora.transfer_function.emtf_z_file_helpers import (
 )
 
 from make_mth5_from_asc import create_test1_h5
-
-# from make_mth5_from_asc import create_test12rr_h5
+from make_mth5_from_asc import create_test12rr_h5
+from make_synthetic_processing_configs import create_run_config_for_test_case
 
 SYNTHETIC_PATH = TEST_PATH.joinpath("synthetic")
 CONFIG_PATH = SYNTHETIC_PATH.joinpath("config")
 DATA_PATH = SYNTHETIC_PATH.joinpath("data")
+EMTF_OUTPUT_PATH = SYNTHETIC_PATH.joinpath("emtf_output")
 AURORA_RESULTS_PATH = SYNTHETIC_PATH.joinpath("aurora_results")
 AURORA_RESULTS_PATH.mkdir(exist_ok=True)
 
+EXPECTED_RMS_MISFIT = {}
+EXPECTED_RMS_MISFIT["test1"] = {}
+EXPECTED_RMS_MISFIT["test1"]["rho"] = {}
+EXPECTED_RMS_MISFIT["test1"]["phi"] = {}
+EXPECTED_RMS_MISFIT["test1"]["rho"]["xy"] = 4.380757  # 4.357440
+EXPECTED_RMS_MISFIT["test1"]["phi"]["xy"] = 0.871609  # 0.884601
+EXPECTED_RMS_MISFIT["test1"]["rho"]["yx"] = 3.551043  # 3.501146
+EXPECTED_RMS_MISFIT["test1"]["phi"]["yx"] = 0.812733  # 0.808658
+EXPECTED_RMS_MISFIT["test2r1"] = {}
+EXPECTED_RMS_MISFIT["test2r1"]["rho"] = {}
+EXPECTED_RMS_MISFIT["test2r1"]["phi"] = {}
+EXPECTED_RMS_MISFIT["test2r1"]["rho"]["xy"] = 3.949919
+EXPECTED_RMS_MISFIT["test2r1"]["phi"]["xy"] = 0.957675
+EXPECTED_RMS_MISFIT["test2r1"]["rho"]["yx"] = 4.117700
+EXPECTED_RMS_MISFIT["test2r1"]["phi"]["yx"] = 1.629026
 
-def create_config_file(matlab_or_fortran):
-    cc = ConfigCreator(config_path=CONFIG_PATH)
-    mth5_path = DATA_PATH.joinpath("test1.h5")
-    config_id = f"test1-{matlab_or_fortran}"
-    if matlab_or_fortran == "matlab":
-        band_setup_file = BAND_SETUP_PATH.joinpath("bs_256_26.cfg")
-        num_samples_window = 256
-        num_samples_overlap = 64
-    elif matlab_or_fortran == "fortran":
-        band_setup_file = BAND_SETUP_PATH.joinpath("bs_test.cfg")
-        num_samples_window = 128
-        num_samples_overlap = 32
+def compute_rms(rho, phi, model_rho_a=100.0, model_phi=45.0, verbose=False):
+    """
+    This function being used to make comparative plots for synthetic data.  Could be 
+    used in general to compare different processing results.  For example by replacing 
+    model_rho_a and model_phi with other processing results, or other (
+    non-uniform) model results. 
+    
+    Parameters
+    ----------
+    rho: numpy.ndarray
+        1D array of computed apparent resistivities (expected in Ohmm)
+    phi: numpy.ndarrayx
+        1D array of computed phases (expected in degrees)
+    model_rho_a: float or numpy array
+        if numpy array must be the same shape as rho
+    model_phi: float or numpy array
+        if numpy array must be the same shape as phi.
+    Returns
+    -------
+    rho_rms: float
+        rms misfit between the model apparent resistivity and the computed resistivity
+    phi_rms: float
+        rms misfit between the model phase (or phases) and the computed phase
+    """
+    rho_rms = np.sqrt(np.mean((rho - model_rho_a) ** 2))
+    phi_rms = np.sqrt(np.mean((phi - model_phi) ** 2))
+    if verbose:
+        print(f"rho_rms = {rho_rms}")
+        print(f"phi_rms = {phi_rms}")
+    return rho_rms, phi_rms
 
-    run_config_path = cc.create_run_config(
-        station_id="test1",
-        mth5_path=mth5_path,
-        sample_rate=1.0,
-        num_samples_window=num_samples_window,
-        num_samples_overlap=num_samples_overlap,
-        band_setup_file=str(band_setup_file),
-        config_id=config_id,
-        output_channels=["hz", "ex", "ey"],
+def make_subtitle(rho_rms_aurora, rho_rms_emtf,
+                  phi_rms_aurora, phi_rms_emtf,
+                  matlab_or_fortran, ttl_str=""):
+    """
+    
+    Parameters
+    ----------
+    rho_rms_aurora: float
+        rho_rms for aurora data differenced against a model. comes from compute_rms
+    rho_rms_emtf:
+        rho_rms for emtf data differenced against a model. comes from compute_rms
+    phi_rms_aurora:
+        phi_rms for aurora data differenced against a model. comes from compute_rms
+    phi_rms_emtf:
+        phi_rms for emtf data differenced against a model. comes from compute_rms
+    matlab_or_fortran: str
+        "matlab" or "fortran".  A specifer for the version of emtf.
+    ttl_str: str
+        string onto which we add the subtitle
+
+    Returns
+    -------
+    ttl_str: str
+        Figure title with subtitle
+
+    """
+    ttl_str += (
+        f"\n rho rms_aurora {rho_rms_aurora:.1f} rms_{matlab_or_fortran}"
+        f" {rho_rms_emtf:.1f}"
     )
-    return run_config_path
+    ttl_str += (
+        f"\n phi rms_aurora {phi_rms_aurora:.1f} rms_{matlab_or_fortran}"
+        f" {phi_rms_emtf:.1f}"
+    )
+    return ttl_str
+
+
+def make_figure_basename(local_station_id,
+                         reference_station_id,
+                         xy_or_yx,
+                         matlab_or_fortran):
+    """
+    
+    Parameters
+    ----------
+    local_station_id: str
+        station label
+    reference_station_id: str
+        remote reference station label
+    xy_or_yx: str
+        mode: "xy" or "yx"
+    matlab_or_fortran: str
+        "matlab" or "fortran".  A specifer for the version of emtf.
+
+    Returns
+    -------
+    figure_basename: str
+        filename for figure
+
+    """
+    station_string = f"{local_station_id}"
+    if reference_station_id:
+        station_string = f"{station_string}_rr{reference_station_id}"
+    figure_basename = (
+        f"synthetic_{station_string}_{xy_or_yx}_{matlab_or_fortran}.png"
+    )
+    return figure_basename
+
+def plot_rho_phi(xy_or_yx,
+                 tf_collection,
+                 rho_rms_aurora,
+                 rho_rms_emtf,
+                 phi_rms_aurora,
+                 phi_rms_emtf,
+                 matlab_or_fortran,
+                 aux_data=None,
+                 use_subtitle=True,
+                 show_plot=False):
+    """
+    Could be made into a method of TF Collection
+    Parameters
+    ----------
+    xy_or_yx
+    tf_collection
+    rho_rms_aurora
+    rho_rms_emtf
+    phi_rms_aurora
+    phi_rms_emtf
+    matlab_or_fortran
+    aux_data
+    use_subtitle
+    show_plot
+
+    Returns
+    -------
+
+    """
+    ttl_str = ""
+    if use_subtitle:
+        ttl_str = make_subtitle(rho_rms_aurora, rho_rms_emtf,
+                                phi_rms_aurora, phi_rms_emtf,
+                                matlab_or_fortran)
+
+    figure_basename = make_figure_basename(tf_collection.local_station_id,
+                                           tf_collection.reference_station_id,
+                                           xy_or_yx,
+                                           matlab_or_fortran)
+    tf_collection.rho_phi_plot(
+        aux_data=aux_data,
+        xy_or_yx=xy_or_yx,
+        ttl_str=ttl_str,
+        show=show_plot,
+        figure_basename=figure_basename,
+        figure_path=AURORA_RESULTS_PATH,
+    )
+    return
+
+
+def assert_rms_misfit_ok(expected_rms_misfit, xy_or_yx, rho_rms_aurora,
+                         phi_rms_aurora, rho_tol=1e-4, phi_tol=1e-4):
+    """
+
+    Parameters
+    ----------
+    expected_rms_misfit: dictionary
+        precomputed RMS misfits for test data in rho and phi
+    xy_or_yx: str
+        mode
+    rho_rms_aurora: float
+    phi_rms_aurora: float
+
+    Returns
+    -------
+
+    """
+    expected_rms_rho = expected_rms_misfit['rho'][xy_or_yx]
+    expected_rms_phi = expected_rms_misfit['phi'][xy_or_yx]
+    print(f"expected_rms_rho_xy {expected_rms_rho}")
+    print(f"expected_rms_rho_xy {expected_rms_phi}")
+    assert np.isclose(rho_rms_aurora - expected_rms_rho, 0, atol=rho_tol)
+    assert np.isclose(phi_rms_aurora - expected_rms_phi, 0, atol=phi_tol)
+    return
 
 
 def process_synthetic_1_standard(
-    assert_compare_result=True,
-    make_rho_phi_plot=True,
-    show_rho_phi_plot=False,
-    use_subtitle=True,
-    compare_against="matlab",  # "fortran" or "matlab"
-):
+        processing_config_path,
+        auxilliary_z_file,
+        z_file_base,
+        expected_rms_misfit=None,
+        make_rho_phi_plot=True,
+        show_rho_phi_plot=False,
+        use_subtitle=True,
+        emtf_version="matlab",
+    ):
     """
+
+    Parameters
+    ----------
+    processing_config_path: str or Path
+        where the processing configuration file is found
+    expected_rms_misfit: dict
+        see description in assert_rms_misfit_ok
+    make_rho_phi_plot
+    show_rho_phi_plot
+    use_subtitle
+    emtf_version: string
+        "fortran" or "matlab"
+
+    Returns
+    -------
+
+
     Just like the normal test runs, but this uses a previously committed json file
     and has a known result.  The results are plotted and stored and checked against a
     standard result calculated originally in August 2021.
@@ -71,156 +266,90 @@ def process_synthetic_1_standard(
     -------
 
     """
-    test_config = CONFIG_PATH.joinpath(f"test1-{compare_against}_run_config.json")
-    if compare_against == "fortran":
-        auxilliary_z_file = TEST_PATH.joinpath("synthetic", "emtf_output", "test1.zss")
-        expected_rms_rho_xy = 4.380757  # 4.357440
-        expected_rms_phi_xy = 0.871609  # 0.884601
-        expected_rms_rho_yx = 3.551043  # 3.501146
-        expected_rms_phi_yx = 0.812733  # 0.808658
-    elif compare_against == "matlab":
-        auxilliary_z_file = TEST_PATH.joinpath(
-            "synthetic", "emtf_output", "from_matlab_256_26.zss"
-        )
+    z_file_path = AURORA_RESULTS_PATH.joinpath(z_file_base)
 
-    # </MATLAB>
-    z_file_path = Path(f"test1_aurora_{compare_against}.zss")
-    # z_file_path = Path("test1_aurora.zss")
-    z_file_path = z_file_path.absolute()
     run_id = "001"
     tf_collection = process_mth5_run(
-        test_config, run_id, units="MT", show_plot=False, z_file_path=z_file_path
+        processing_config_path, run_id, units="MT", show_plot=False,
+        z_file_path=z_file_path
     )
     tf_collection._merge_decimation_levels()
+
+    #END THE NORMAL PROCESSING TEST
+
     aux_data = read_z_file(auxilliary_z_file)
 
-    (
-        aurora_rxy,
-        aurora_ryx,
-        aurora_pxy,
-        aurora_pyx,
-    ) = merge_tf_collection_to_match_z_file(aux_data, tf_collection)
+    aurora_rho_phi = merge_tf_collection_to_match_z_file(aux_data, tf_collection)
 
-    xy_or_yx = "xy"
-    rho_rms_aurora = np.sqrt(np.mean((aurora_rxy - 100) ** 2))
-    print(f"rho_rms_aurora xy {rho_rms_aurora}")
-    phi_rms_aurora = np.sqrt(np.mean((aurora_pxy - 45) ** 2))
-    print(f"phi_rms_aurora {phi_rms_aurora}")
+    for xy_or_yx in ["xy", "yx"]:
+        aurora_rho = aurora_rho_phi["rho"][xy_or_yx]
+        aurora_phi = aurora_rho_phi["phi"][xy_or_yx]
+        aux_rho = aux_data.rho(xy_or_yx)
+        aux_phi = aux_data.phi(xy_or_yx)
+        rho_rms_aurora, phi_rms_aurora = compute_rms(aurora_rho, aurora_phi, verbose=True)
+        rho_rms_emtf, phi_rms_emtf = compute_rms(aux_rho, aux_phi)
 
-    if assert_compare_result:
-        print(f"expected_rms_rho_xy {expected_rms_rho_xy}")
-        print(f"expected_rms_phi_xy {expected_rms_phi_xy}")
-        assert np.isclose(rho_rms_aurora - expected_rms_rho_xy, 0, atol=1e-4)
-        assert np.isclose(phi_rms_aurora - expected_rms_phi_xy, 0, atol=1e-4)
-    rho_rms_emtf = np.sqrt(np.mean((aux_data.rxy - 100) ** 2))
-    phi_rms_emtf = np.sqrt(np.mean((aux_data.pxy - 45) ** 2))
-    ttl_str = ""
-    if use_subtitle:
-        ttl_str += (
-            f"\n rho rms_aurora {rho_rms_aurora:.1f} rms_{compare_against}"
-            f" {rho_rms_emtf:.1f}"
-        )
-        ttl_str += (
-            f"\n phi rms_aurora {phi_rms_aurora:.1f} rms_{compare_against}"
-            f" {phi_rms_emtf:.1f}"
-        )
-    print(
-        f"{xy_or_yx} rho_rms_aurora {rho_rms_aurora} rho_rms_{compare_against}"
-        f" {rho_rms_emtf}"
-    )
-    print(
-        f"{xy_or_yx} phi_rms_aurora {phi_rms_aurora} phi_rms_{compare_against}"
-        f" {phi_rms_emtf}"
-    )
+        if expected_rms_misfit is not None:
+            assert_rms_misfit_ok(expected_rms_misfit,
+                                 xy_or_yx,
+                                 rho_rms_aurora,
+                                 phi_rms_aurora)
 
-    figure_basename = (
-        f"synthetic_{tf_collection.local_station_id}_{xy_or_yx}_{compare_against}.png"
-    )
-    if make_rho_phi_plot:
-        tf_collection.rho_phi_plot(
-            aux_data=aux_data,
-            xy_or_yx=xy_or_yx,
-            ttl_str=ttl_str,
-            show=show_rho_phi_plot,
-            figure_basename=figure_basename,
-            figure_path=AURORA_RESULTS_PATH,
-        )
-
-    xy_or_yx = "yx"
-    rho_rms_aurora = np.sqrt(np.mean((aurora_ryx - 100) ** 2))
-    print(f"rho_rms_aurora yx {rho_rms_aurora}")
-    phi_rms_aurora = np.sqrt(np.mean((aurora_pyx - 45) ** 2))
-    print(f"phi_rms_aurora {phi_rms_aurora}")
-    if assert_compare_result:
-        print(f"expected_rms_rho_yx {expected_rms_rho_yx}")
-        print(f"expected_rms_phi_yx {expected_rms_phi_yx}")
-        assert np.isclose(rho_rms_aurora - expected_rms_rho_yx, 0, atol=2e-3)
-        assert np.isclose(phi_rms_aurora - expected_rms_phi_yx, 0, atol=1e-3)
-    rho_rms_emtf = np.sqrt(np.mean((aux_data.ryx - 100) ** 2))
-    phi_rms_emtf = np.sqrt(np.mean((aux_data.pyx - 45) ** 2))
-    ttl_str = ""
-    if use_subtitle:
-        rho_rms_aurora_str = f"rho rms_aurora {rho_rms_aurora:.1f}"
-        rho_rms_emtf_str = f"rms_{compare_against} {rho_rms_emtf:.1f}"
-        ttl_str += f"\n {rho_rms_aurora_str} {rho_rms_emtf_str}"
-
-        phi_rms_aurora_str = f"phi rms_aurora {phi_rms_aurora:.1f}"
-        phi_rms_emtf_str = f"rms_{compare_against} {phi_rms_emtf:.1f}"
-        ttl_str += f"\n {phi_rms_aurora_str} {phi_rms_emtf_str}"
-
-    print(
-        f"{xy_or_yx} rho_rms_aurora {rho_rms_aurora} rho_rms_{compare_against} "
-        f"{rho_rms_emtf}"
-    )
-    print(
-        f"{xy_or_yx} phi_rms_aurora {phi_rms_aurora} phi_rms_{compare_against} "
-        f"{phi_rms_emtf}"
-    )
-
-    figure_basename = (
-        f"synthetic_{tf_collection.local_station_id}_{xy_or_yx}_{compare_against}.png"
-    )
-    if make_rho_phi_plot:
-        tf_collection.rho_phi_plot(
-            aux_data=aux_data,
-            xy_or_yx=xy_or_yx,
-            ttl_str=ttl_str,
-            show=show_rho_phi_plot,
-            figure_basename=figure_basename,
-            figure_path=AURORA_RESULTS_PATH,
-        )
-
+        if make_rho_phi_plot:
+            plot_rho_phi(xy_or_yx,
+                         tf_collection,
+                         rho_rms_aurora,
+                         rho_rms_emtf,
+                         phi_rms_aurora,
+                         phi_rms_emtf,
+                         emtf_version,
+                         aux_data=aux_data,
+                         use_subtitle=use_subtitle,
+                         show_plot=show_rho_phi_plot)
     return
 
 
-def compare_vs_fortran_output():
-    compare_against = "fortran"
-    create_config_file(compare_against)
+def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
+                   expected_rms_misfit=None):
+    processing_config_path = create_run_config_for_test_case(test_case_id,
+                                                    matlab_or_fortran=emtf_version)
     process_synthetic_1_standard(
-        assert_compare_result=True,
-        compare_against=compare_against,
+        processing_config_path,
+        auxilliary_z_file,
+        z_file_base,
+        expected_rms_misfit=expected_rms_misfit,
+        emtf_version=emtf_version,
         make_rho_phi_plot=True,
         show_rho_phi_plot=False,
         use_subtitle=True,
     )
 
 
-def compare_vs_matlab_output():
-    compare_against = "matlab"
-    create_config_file(compare_against)
-    process_synthetic_1_standard(
-        assert_compare_result=False,
-        compare_against=compare_against,
-        make_rho_phi_plot=True,
-        show_rho_phi_plot=False,
-        use_subtitle=True,
-    )
 
 
 def test():
     create_test1_h5()
-    compare_vs_fortran_output()
-    compare_vs_matlab_output()
+    create_test12rr_h5()
+
+    test_case_id = "test1"
+    emtf_version = "fortran"
+    auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test1.zss")
+    z_file_base = f"{test_case_id}_aurora_{emtf_version}.zss"
+    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
+                   expected_rms_misfit=EXPECTED_RMS_MISFIT[test_case_id])
+
+    test_case_id = "test1"
+    emtf_version = "matlab"
+    auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("from_matlab_256_26.zss")
+    z_file_base = f"{test_case_id}_aurora_{emtf_version}.zss"
+    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base)
+
+    test_case_id = "test2r1"
+    emtf_version = "fortran"
+    auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test2r1.zrr")
+    z_file_base = f"{test_case_id}_aurora_{emtf_version}.zrr"
+    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
+                   expected_rms_misfit=EXPECTED_RMS_MISFIT[test_case_id])
     print("success")
 
 

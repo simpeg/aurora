@@ -11,11 +11,10 @@ from aurora.pipelines.process_mth5 import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
 
+from make_synthetic_processing_configs import create_run_config_for_test_case
 
 def test_stft_methods_agree():
-    run_config = TEST_PATH.joinpath(
-        "synthetic", "config", "test1_run_config_standard.json"
-    )
+    run_config = create_run_config_for_test_case("test1")
     run_id = "001"
     mth5_path = TEST_PATH.joinpath("synthetic", "data", "test1.h5")
 

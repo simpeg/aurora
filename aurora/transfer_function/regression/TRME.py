@@ -89,10 +89,11 @@ import numpy as np
 from scipy.linalg import solve_triangular
 import xarray as xr
 
-from aurora.transfer_function.regression.base import RegressionEstimator
+# from aurora.transfer_function.regression.base import RegressionEstimator
+from aurora.transfer_function.regression.m_estimator import MEstimator
 
 
-class TRME(RegressionEstimator):
+class TRME(MEstimator):
     def __init__(self, **kwargs):
         """
 
@@ -117,14 +118,6 @@ class TRME(RegressionEstimator):
         super(TRME, self).__init__(**kwargs)
         self.expectation_psi_prime = np.ones(self.n_channels_out)
         self.sigma_squared = np.zeros(self.n_channels_out)
-
-    @property
-    def r0(self):
-        return self.iter_control.r0
-
-    @property
-    def u0(self):
-        return self.iter_control.u0
 
     @property
     def correction_factor(self):

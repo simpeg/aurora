@@ -83,7 +83,7 @@ class ConfigCreator(object):
             )
             run_config.decimation_level_configs[i_decimation_level] = cfg
 
-        json_fn = run_config.config_id + "_run_config.json"
+        json_fn = run_config.json_fn()#config_id + "_run_config.json"
         self.config_path.mkdir(exist_ok=True)
         json_path = self.config_path.joinpath(json_fn)
         run_config.to_json(json_fn=json_path)

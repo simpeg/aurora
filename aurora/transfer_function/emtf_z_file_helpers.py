@@ -111,7 +111,14 @@ def merge_tf_collection_to_match_z_file(aux_data, tf_collection):
             pxy[ndx] = aurora_tf.phi[aurora_ndx, 0]
             pyx[ndx] = aurora_tf.phi[aurora_ndx, 1]
 
-    return rxy, ryx, pxy, pyx
+    result = {}
+    result["rho"] = {}
+    result["phi"] = {}
+    result["rho"]["xy"] = rxy
+    result["phi"]["xy"] = pxy
+    result["rho"]["yx"] = ryx
+    result["phi"]["yx"] = pyx
+    return result
 
 
 def clip_bands_from_z_file(z_path, n_bands_clip, output_z_path=None, n_sensors=5):

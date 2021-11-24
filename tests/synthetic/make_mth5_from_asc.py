@@ -4,6 +4,9 @@ Created on Fri Jun 25 16:03:21 2021
 
 @author: jpeacock
 
+This module is concerned with creating mth5 files from the synthetic test data 
+that origianlly came from EMTF.
+
 Want to create a station1.h5, station2.h5 and array.h5
 where array has 2 stations.
 """
@@ -15,9 +18,10 @@ import pandas as pd
 from mth5.timeseries import ChannelTS, RunTS
 from mth5.mth5 import MTH5
 
-from synthetic_station_config import ACTIVE_FILTERS
-from synthetic_station_config import STATION_01_CFG
-from synthetic_station_config import STATION_02_CFG
+from synthetic_station_config import make_filters
+from synthetic_station_config import make_station_01_config_dict
+from synthetic_station_config import make_station_02_config_dict
+
 
 seed(0)
 
@@ -146,7 +150,8 @@ def create_mth5_synthetic_file(station_cfg, plot=False, add_nan_values=False):
     run_group.from_runts(runts)
 
     # add filters
-    for fltr in ACTIVE_FILTERS:
+    active_filters = make_filters(as_list=True)
+    for fltr in active_filters:
         m.filters_group.add_filter(fltr)
 
     m.close_mth5()
@@ -182,25 +187,31 @@ def create_mth5_synthetic_file_for_array(station_cfgs, h5_name="", plot=False):
         run_group.from_runts(runts)
 
     # add filters
-    for fltr in ACTIVE_FILTERS:
+    active_filters = make_filters(as_list=True)
+    for fltr in active_filters:
         m.filters_group.add_filter(fltr)
     m.close_mth5()
 
 
 def create_test1_h5():
-    create_mth5_synthetic_file(STATION_01_CFG, plot=False)
+    station_01_params = make_station_01_config_dict()
+    create_mth5_synthetic_file(station_01_params, plot=False)
 
 
 def create_test2_h5():
-    create_mth5_synthetic_file(STATION_02_CFG, plot=False)
+    station_02_params = make_station_02_config_dict()
+    create_mth5_synthetic_file(station_02_params, plot=False)
 
 
 def create_test1_h5_with_nan():
-    create_mth5_synthetic_file(STATION_01_CFG, plot=False, add_nan_values=True)
+    station_01_params = make_station_01_config_dict()
+    create_mth5_synthetic_file(station_01_params, plot=False, add_nan_values=True)
 
 
 def create_test12rr_h5():
-    create_mth5_synthetic_file_for_array([STATION_01_CFG, STATION_02_CFG])
+    station_01_params = make_station_01_config_dict()
+    station_02_params = make_station_02_config_dict()
+    create_mth5_synthetic_file_for_array([station_01_params, station_02_params])
 
 
 def main():
