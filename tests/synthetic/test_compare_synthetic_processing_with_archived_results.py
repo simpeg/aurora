@@ -1,22 +1,19 @@
 """
 Working Notes:
-1. Need to create a processing config for the remote reference case (done but not
-tested)
-2. need to run the rr processing
+1. Need to create a processing config for the remote reference case and run the RR
+processing.  Use the examples from test_synthetic_driver
+2. Get baseline RR values and use them in an assertion test here
+
 3. Check if the previously committed json config is being used by the single station
 tests, it looks like maybe it is not anymore.
 It is being used in the stft test, but maybe that can be made to depend on the
 FORTRAN config file
-4. create_run_config_for_test_case() is in make_synthetic_processing_configs.
-Why are there two places?  Can we replace
-create_config_file(matlab_or_fortran, SS_or_RR="SS") here with that version?
+
 """
 import numpy as np
 from pathlib import Path
 
-from aurora.config.config_creator import ConfigCreator
 from aurora.general_helper_functions import TEST_PATH
-from aurora.general_helper_functions import BAND_SETUP_PATH
 from aurora.pipelines.process_mth5 import process_mth5_run
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.transfer_function.emtf_z_file_helpers import (
@@ -36,6 +33,29 @@ AURORA_RESULTS_PATH.mkdir(exist_ok=True)
 
 
 def compute_rms(rho, phi, model_rho_a=100.0, model_phi=45.0):
+    """
+    This function being used to make comparative plots for synthetic data.  Could be 
+    used in general to compare different processing results.  For example by replacing 
+    model_rho_a and model_phi with other processing results, or other (
+    non-uniform) model results. 
+    
+    Parameters
+    ----------
+    rho: numpy.ndarray
+        1D array of computed apparent resistivities (expected in Ohmm)
+    phi: numpy.ndarray
+        1D array of computed phases (expected in degrees)
+    model_rho_a: float or numpy array
+        if numpy array must be the same shape as rho
+    model_phi: float or numpy array
+        if numpy array must be the same shape as phi.
+    Returns
+    -------
+    rho_rms: float
+        rms misfit between the model apparent resistivity and the computed resistivity
+    phi_rms: float
+        rms misfit between the model phase (or phases) and the computed phase
+    """
     rho_rms = np.sqrt(np.mean((rho - model_rho_a) ** 2))
     phi_rms = np.sqrt(np.mean((phi - model_phi) ** 2))
     return rho_rms, phi_rms
@@ -43,7 +63,29 @@ def compute_rms(rho, phi, model_rho_a=100.0, model_phi=45.0):
 def make_subtitle(rho_rms_aurora, rho_rms_emtf,
                   phi_rms_aurora, phi_rms_emtf,
                   matlab_or_fortran, ttl_str=""):
+    """
+    
+    Parameters
+    ----------
+    rho_rms_aurora: float
+        rho_rms for aurora data differenced against a model. comes from compute_rms
+    rho_rms_emtf:
+        rho_rms for emtf data differenced against a model. comes from compute_rms
+    phi_rms_aurora:
+        phi_rms for aurora data differenced against a model. comes from compute_rms
+    phi_rms_emtf:
+        phi_rms for emtf data differenced against a model. comes from compute_rms
+    matlab_or_fortran: str
+        "matlab" or "fortran".  A specifer for the version of emtf.
+    ttl_str: str
+        string onto which we add the subtitle
 
+    Returns
+    -------
+    ttl_str: str
+        Figure title with subtitle
+
+    """
     ttl_str += (
         f"\n rho rms_aurora {rho_rms_aurora:.1f} rms_{matlab_or_fortran}"
         f" {rho_rms_emtf:.1f}"
@@ -59,6 +101,25 @@ def make_figure_basename(local_station_id,
                          reference_station_id,
                          xy_or_yx,
                          matlab_or_fortran):
+    """
+    
+    Parameters
+    ----------
+    local_station_id: str
+        station label
+    reference_station_id: str
+        remote reference station label
+    xy_or_yx: str
+        mode: "xy" or "yx"
+    matlab_or_fortran: str
+        "matlab" or "fortran".  A specifer for the version of emtf.
+
+    Returns
+    -------
+    figure_basename: str
+        filename for figure
+
+    """
     station_string = f"{local_station_id}"
     if reference_station_id:
         station_string = f"{station_string}_rr{reference_station_id}"
@@ -77,6 +138,25 @@ def plot_rho_phi(xy_or_yx,
                  aux_data=None,
                  use_subtitle=True,
                  show_plot=False):
+    """
+    Could be made into a method of TF Collection
+    Parameters
+    ----------
+    xy_or_yx
+    tf_collection
+    rho_rms_aurora
+    rho_rms_emtf
+    phi_rms_aurora
+    phi_rms_emtf
+    matlab_or_fortran
+    aux_data
+    use_subtitle
+    show_plot
+
+    Returns
+    -------
+
+    """
     ttl_str = ""
     if use_subtitle:
         ttl_str = make_subtitle(rho_rms_aurora, rho_rms_emtf,
