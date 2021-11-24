@@ -4,6 +4,8 @@ Working Notes:
 processing.  Use the examples from test_synthetic_driver
 2. Get baseline RR values and use them in an assertion test here
 
+3. --modify process_synthetic_1_standard so that config is an input
+
 3. Check if the previously committed json config is being used by the single station
 tests, it looks like maybe it is not anymore.
 It is being used in the stft test, but maybe that can be made to depend on the
@@ -212,7 +214,9 @@ def assert_rms_misfit_ok(expected_rms_misfit, xy_or_yx, rho_rms_aurora,
     assert np.isclose(phi_rms_aurora - expected_rms_phi, 0, atol=phi_tol)
     return
 
+
 def process_synthetic_1_standard(
+    processing_config_path,
     expected_rms_misfit=None,
     make_rho_phi_plot=True,
     show_rho_phi_plot=False,
@@ -223,6 +227,8 @@ def process_synthetic_1_standard(
 
     Parameters
     ----------
+    processing_config_path: str or Path
+        where the processing configuration file is found
     expected_rms_misfit: dict
         see description in assert_rms_misfit_ok
     make_rho_phi_plot
@@ -251,7 +257,6 @@ def process_synthetic_1_standard(
     -------
 
     """
-    test_config = CONFIG_PATH.joinpath(f"test1-{compare_against}_run_config.json")
     if compare_against == "fortran":
         auxilliary_z_file = SYNTHETIC_PATH.joinpath("emtf_output", "test1.zss")
     elif compare_against == "matlab":
@@ -264,7 +269,8 @@ def process_synthetic_1_standard(
 
     run_id = "001"
     tf_collection = process_mth5_run(
-        test_config, run_id, units="MT", show_plot=False, z_file_path=z_file_path
+        processing_config_path, run_id, units="MT", show_plot=False,
+        z_file_path=z_file_path
     )
     tf_collection._merge_decimation_levels()
 
@@ -325,8 +331,10 @@ def process_synthetic_1_standard(
 
 
 def aurora_vs_emtf(test_case_id, matlab_or_fortran, expected_rms_misfit=None):
-    create_run_config_for_test_case(test_case_id, matlab_or_fortran=matlab_or_fortran)
+    processing_config_path = create_run_config_for_test_case(test_case_id,
+                                                    matlab_or_fortran=matlab_or_fortran)
     process_synthetic_1_standard(
+        processing_config_path,
         expected_rms_misfit=expected_rms_misfit,
         compare_against=matlab_or_fortran,
         make_rho_phi_plot=True,
