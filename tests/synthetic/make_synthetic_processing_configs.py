@@ -8,6 +8,8 @@ DATA_PATH = TEST_PATH.joinpath("synthetic", "data")
 
 def create_run_config_for_test_case(test_case_id, matlab_or_fortran=""):
     """
+    TODO: Change test_case_id to local_station_id in config_id, or scrap it
+    entirely... what happens when no config_id is provided?
     Use config creator to generate a processing config file for the synthetic data.  
     
     Parameters
