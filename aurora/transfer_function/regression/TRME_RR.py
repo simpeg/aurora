@@ -132,7 +132,8 @@ class TRME_RR(MEstimator):
             self.b = np.linalg.solve(QHX, QHYc)  # self.b = QTX\QTY
             Yhat = self.X @ self.b
             res = self.Yc - Yhat
-            mean_ssq_residuals = np.sum(res * np.conj(res), axis=0) / self.n_data
+            squared_residuals = np.real(res * np.conj(res))
+            mean_ssq_residuals = np.sum(squared_residuals, axis=0) / self.n_data
             residual_variance = self.correction_factor * mean_ssq_residuals
             converged = self.iter_control.converged(self.b, b0)
             b0 = self.b
@@ -219,40 +220,3 @@ class TRME_RR(MEstimator):
         )
         return
 
-    def compute_squared_coherence(self, Y_hat):
-        """
-        TODO: Compare this method with compute_squared_coherence in TRME.  I think
-        they are identical, in which case we can merge them, and maybe even put into
-        the regression base class.
-
-        TODO: Also, RegressionEstimator may be better as a more abstract base class and
-        we can have a QRRegressionEstimator() class between base and {TRME, TRME_RR}
-
-        res: Residuals: The original data minus the predicted data.
-        SSR : Sum of squares of the residuals.  Diagonal is real
-        Parameters
-        ----------
-        YP
-
-        Returns
-        -------
-
-        """
-        res = self.Y - Y_hat
-        SSR = np.conj(res.conj().T @ res)
-        Yc2 = np.abs(self.Yc) ** 2
-        SSYC = np.sum(Yc2, axis=0)
-        R2 = 1 - np.diag(np.real(SSR)).T / SSYC
-        R2[R2 < 0] = 0
-
-        self.R2 = xr.DataArray(
-            R2,
-            dims=[
-                "output_channel",
-            ],
-            coords={
-                "output_channel": list(self._Y.data_vars),
-            },
-        )
-
-        return

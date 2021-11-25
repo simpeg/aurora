@@ -246,37 +246,3 @@ class TRME(MEstimator):
             },
         )
         return
-
-    def compute_squared_coherence(self, Y_hat):
-        """
-        res: Residuals: The original data minus the predicted data.
-        #SSR : Sum of squares of the residuals.  Diagonal is real
-        This method could use some cleanup for readability
-        see aurora issue #78.
-        Parameters
-        ----------
-        YP
-
-        Returns
-        -------
-
-        """
-        res = self.Y - Y_hat
-        SSR = np.conj(res.conj().T @ res)
-        Yc2 = np.abs(self.Yc) ** 2
-        SSYC = np.sum(Yc2, axis=0)
-        R2 = 1 - np.diag(np.real(SSR)).T / SSYC
-        R2[R2 < 0] = 0
-
-        self.R2 = xr.DataArray(
-            R2,
-            dims=[
-                "output_channel",
-            ],
-            coords={
-                "output_channel": list(self._Y.data_vars),
-            },
-        )
-
-        return
-        # array([ 0.97713185,  0.97552176,  0.97480946])
