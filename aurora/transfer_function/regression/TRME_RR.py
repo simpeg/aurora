@@ -167,7 +167,7 @@ class TRME_RR(MEstimator):
             Yhat = self.X @ self.b
             res = self.Yc - Yhat
             mean_ssq_residuals = np.sum(res * np.conj(res), axis=0) / self.n_data
-            residual_variance = self.iter_control.correction_factor * mean_ssq_residuals
+            residual_variance = self.correction_factor * mean_ssq_residuals
             converged = self.iter_control.converged(self.b, b0)
             b0 = self.b
         # </CONVERGENCE STUFF>

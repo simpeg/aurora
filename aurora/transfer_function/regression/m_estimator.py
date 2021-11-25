@@ -45,6 +45,18 @@ class MEstimator(RegressionEstimator):
     # def beta(self):
     #     return rme_beta(self.r0)
 
+    @property
+    def correction_factor(self):
+        """
+        *May want to move this out of iter_control, it is really only controlled by r0.
+
+        Returns
+        -------
+        correction_factor: float
+            See doc in iter_control.IterControl.correction_factor()
+        """
+        return self.iter_control.correction_factor
+
     def residual_variance_method2(self, QHY_or_QHYc, Y_or_Yc, correction_factor=1.0):
         """
         These are the error variances.

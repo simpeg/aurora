@@ -119,11 +119,6 @@ class TRME(MEstimator):
         self.expectation_psi_prime = np.ones(self.n_channels_out)
         self.sigma_squared = np.zeros(self.n_channels_out)
 
-    @property
-    def correction_factor(self):
-        # MOVE THIS METHOD INTO AN RME-Specific CONFIG
-        return self.iter_control.correction_factor
-
 
     def apply_huber_weights(self, residual_variance, YP):
         """

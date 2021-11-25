@@ -1,8 +1,9 @@
 aurora/sandbox/config
 aurora/sandbox/data
 tests/parkfield/*.png
-tests/parkfield/config/*backup.json
 tests/parkfield/aurora_results/*
+tests/parkfield/config/*backup.json
+tests/parkfield/config/pkd_test-RR_SAO_run_config.json
 tests/parkfield/data/*
 tests/synthetic/aurora_results/*
 tests/synthetic/config/*
