@@ -122,40 +122,6 @@ class TRME(MEstimator):
     def update_predicted_data(self):
         pass
 
-    def redescend(
-        self,
-        Y_predicted,
-        residual_variance,
-    ):
-        """
-        % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
-        function[YC, E_psiPrime] = RedescendWt(Y, YP, sig, u0)
-
-        % inputs
-        are
-        data(Y) and predicted(YP), estiamted
-        % error
-        variances(
-        for each column) and Huber parameter u0
-        % allows
-        for multiple columns of data
-        """
-        # Y_cleaned = np.zeros(self.Y.shape, dtype=np.complex128)
-        for k in range(self.n_channels_out):
-
-            r = np.abs(self.Y[:, k] - Y_predicted[:, k]) / np.sqrt(residual_variance[k])
-            t = -np.exp(self.u0 * (r - self.u0))
-            w = np.exp(t)
-
-            # cleaned data
-            self.Yc[:, k] = w * self.Y[:, k] + (1 - w) * Y_predicted[:, k]
-
-            # computation of E(psi')
-            t = self.u0 * (t * r)
-            t = w * (1 + t)
-            self.expectation_psi_prime[k] = np.sum(t[t > 0]) / self.n_data
-        return
-
     def estimate(self):
         """
         function that does the actual regression - M estimate
