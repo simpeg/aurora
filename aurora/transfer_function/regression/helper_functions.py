@@ -4,7 +4,7 @@ import numpy as np
 def rme_beta(r0):
     """
     This is an RME specific property.
-    It represents a bias in the calculation of sigma_squared
+    It represents a bias in the calculation of residual_variance
     which we correct for in TRME and TRME_RR.
 
     The implemented formula is an approximation.  This is approximately equal to 1/beta

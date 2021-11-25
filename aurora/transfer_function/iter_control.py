@@ -139,7 +139,7 @@ class IterControl(object):
         Returns
         -------
         correction_factor : float
-            correction factor used for scaling sigma_squared
+            correction factor used for scaling the residual error_variance
         """
         correction_factor = 1.0 / rme_beta(self.r0)
         return correction_factor
