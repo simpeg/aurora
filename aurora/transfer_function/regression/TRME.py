@@ -124,45 +124,6 @@ class TRME(MEstimator):
         # MOVE THIS METHOD INTO AN RME-Specific CONFIG
         return self.iter_control.correction_factor
 
-    #<REPLACE WITH METHOD FROM MEstimator>
-    # def residual_variance(self, QHY_or_QHYc, Y_or_Yc, correction_factor=1.0):
-    #     """
-    #     These are the error variances.
-    #     TODO: Move this method to the base class, or a QR decorator.
-    #     Computes the squared norms difference of the output channels from the
-    #     "output channels inner-product with QQH"
-    #
-    #     Parameters
-    #     ----------
-    #     QHY : numpy array
-    #         QHY[i,j] = Q.H * Y[i,j] = <Q[:,i], Y[:,j]>
-    #         So when we sum columns of norm(QHY) we are get in the zeroth position
-    #         <Q[:,0], Y[:,0]> +  <Q[:,1], Y[:,0]>, that is the 0th channel of Y
-    #         projected onto each of the Q-basis vectors
-    #     Y_or_Yc : numpy array
-    #         The output channels (self.Y) or the cleaned output channels self.Yc
-    #     correction_factor : float
-    #         See doc in IterControl.correction_factor
-    #
-    #     Returns
-    #     -------
-    #     residual_variance : numpy array
-    #         One entry per output channel.
-    #
-    #     """
-    #     Y2 = np.linalg.norm(Y_or_Yc, axis=0) ** 2  # variance?
-    #     QHY2 = np.linalg.norm(QHY_or_QHYc, axis=0) ** 2
-    #     residual_variance = correction_factor * (Y2 - QHY2) / self.n_data
-    #
-    #     try:
-    #         assert (residual_variance > 0).all()
-    #     except AssertionError:
-    #         print("WARNING - Negative error variances observed")
-    #         print("Setting residual_variance to zero - Negative values observed")
-    #         residual_variance *= 0
-    #         # raise Exception
-    #     return residual_variance
-    #</REPLACE WITH METHOD FROM MEstimator>
 
     def apply_huber_weights(self, residual_variance, YP):
         """
