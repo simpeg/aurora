@@ -177,7 +177,7 @@ class TRME(MEstimator):
             b0 = self.b
 
         if self.iter_control.max_number_of_redescending_iterations:
-            # self.iter_control.number_of_redescending_iterations = 0;
+            self.iter_control.number_of_redescending_iterations = 0 #reset per channel
             while self.iter_control.continue_redescending:
                 self.iter_control.number_of_redescending_iterations += 1
                 # add setter here

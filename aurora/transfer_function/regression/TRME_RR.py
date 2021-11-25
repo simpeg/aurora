@@ -139,19 +139,21 @@ class TRME_RR(MEstimator):
         # </CONVERGENCE STUFF>
 
         # <REDESCENDING STUFF>
-        while self.iter_control.continue_redescending:
-            # one iteration with redescending influence curve cleaned data
-            self.iter_control.number_of_redescending_iterations += 1
-            # [obj.Yc, E_psiPrime] = RedescendWt(obj.Y, Yhat, residual_variance, ITER.u0) # #TRME_RR
-            self.redescend(Yhat, residual_variance)  # update cleaned data, and expectation
-            # updated error variance estimates, computed using cleaned data
-            QHYc = self.QH @ self.Yc
-            self.b = np.linalg.solve(QHX, QHYc)  # QHX\QHYc
-            Yhat = self.X * self.b
-            res = self.Yc - Yhat  # res_clean!
+        if self.iter_control.max_number_of_redescending_iterations:
+            self.iter_control.number_of_redescending_iterations = 0 #reset per channel
+            while self.iter_control.continue_redescending:
+                # one iteration with redescending influence curve cleaned data
+                self.iter_control.number_of_redescending_iterations += 1
+                # [obj.Yc, E_psiPrime] = RedescendWt(obj.Y, Yhat, residual_variance, ITER.u0) # #TRME_RR
+                self.redescend(Yhat, residual_variance)  # update cleaned data, and expectation
+                # updated error variance estimates, computed using cleaned data
+                QHYc = self.QH @ self.Yc
+                self.b = np.linalg.solve(QHX, QHYc)  # QHX\QHYc
+                Yhat = self.X @ self.b
+                res = self.Yc - Yhat  # res_clean!
 
-        # crude estimate of expectation of psi accounts for redescending influence curve
-        self.expectation_psi_prime = 2 * self.expectation_psi_prime - 1
+            # crude estimate of expectation of psi accounts for redescending influence curve
+            self.expectation_psi_prime = 2 * self.expectation_psi_prime - 1
         # </REDESCENDING STUFF>
 
         # <Covariance and Coherence>

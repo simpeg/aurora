@@ -120,7 +120,7 @@ class IterControl(object):
     def continue_redescending(self):
         maxxed_out = (
             self.number_of_redescending_iterations
-            <= self.max_number_of_redescending_iterations
+            >= self.max_number_of_redescending_iterations
         )
         if maxxed_out:
             return False

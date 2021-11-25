@@ -35,17 +35,17 @@ EXPECTED_RMS_MISFIT = {}
 EXPECTED_RMS_MISFIT["test1"] = {}
 EXPECTED_RMS_MISFIT["test1"]["rho"] = {}
 EXPECTED_RMS_MISFIT["test1"]["phi"] = {}
-EXPECTED_RMS_MISFIT["test1"]["rho"]["xy"] = 4.380757  # 4.357440
-EXPECTED_RMS_MISFIT["test1"]["phi"]["xy"] = 0.871609  # 0.884601
-EXPECTED_RMS_MISFIT["test1"]["rho"]["yx"] = 3.551043  # 3.501146
-EXPECTED_RMS_MISFIT["test1"]["phi"]["yx"] = 0.812733  # 0.808658
+EXPECTED_RMS_MISFIT["test1"]["rho"]["xy"] = 4.406358  #4.380757  # 4.357440
+EXPECTED_RMS_MISFIT["test1"]["phi"]["xy"] = 0.862902  #0.871609  # 0.884601
+EXPECTED_RMS_MISFIT["test1"]["rho"]["yx"] = 3.625859  #3.551043  # 3.501146
+EXPECTED_RMS_MISFIT["test1"]["phi"]["yx"] = 0.840394  #0.812733  # 0.808658
 EXPECTED_RMS_MISFIT["test2r1"] = {}
 EXPECTED_RMS_MISFIT["test2r1"]["rho"] = {}
 EXPECTED_RMS_MISFIT["test2r1"]["phi"] = {}
-EXPECTED_RMS_MISFIT["test2r1"]["rho"]["xy"] = 3.949919
-EXPECTED_RMS_MISFIT["test2r1"]["phi"]["xy"] = 0.957675
-EXPECTED_RMS_MISFIT["test2r1"]["rho"]["yx"] = 4.117700
-EXPECTED_RMS_MISFIT["test2r1"]["phi"]["yx"] = 1.629026
+EXPECTED_RMS_MISFIT["test2r1"]["rho"]["xy"] = 3.949857  #3.949919
+EXPECTED_RMS_MISFIT["test2r1"]["phi"]["xy"] = 0.962837  #0.957675
+EXPECTED_RMS_MISFIT["test2r1"]["rho"]["yx"] = 4.121772  #4.117700
+EXPECTED_RMS_MISFIT["test2r1"]["phi"]["yx"] = 1.637581  #1.629026
 
 def compute_rms(rho, phi, model_rho_a=100.0, model_phi=45.0, verbose=False):
     """
