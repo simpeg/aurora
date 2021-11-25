@@ -50,7 +50,6 @@ class TRME_RR(MEstimator):
         self._Z = kwargs.get("Z", None)
         self.Z = self._Z.to_array().data.T
         self.expectation_psi_prime = np.ones(self.n_channels_out)
-        # self.sigma_squared = np.zeros(self.n_channels_out)
         self.check_for_nan()
         self.check_number_of_observations_xy_consistent()
         self.check_for_enough_data_for_rr_estimate()
@@ -81,14 +80,14 @@ class TRME_RR(MEstimator):
     def r0(self):
         return self.iter_control.r0
 
-    def apply_huber_weights(self, sigma, YP):
+    def apply_huber_weights(self, residual_variance, YP):
         """
 
         Parameters
         ----------
-        sigma : numpy array
+        residual_variance : numpy array
             1D array, the same length as the number of output channels
-            see self.sigma() method for its calculation
+            see self.residual_variance() method for its calculation
         YP : numpy array
             The predicted data, usually from QQHY
 
@@ -107,7 +106,7 @@ class TRME_RR(MEstimator):
 
         """
         for k in range(self.n_channels_out):
-            r0s = self.r0 * np.sqrt(sigma[k])
+            r0s = self.r0 * np.sqrt(residual_variance[k])
             residuals = np.abs(self.Y[:, k] - YP[:, k])
             w = np.minimum(r0s / residuals, 1.0)
             self.Yc[:, k] = w * self.Y[:, k] + (1 - w) * YP[:, k]
@@ -131,7 +130,7 @@ class TRME_RR(MEstimator):
         :return:
         """
         Q, R = self.qr_decomposition(self.Z)
-        # initial LS RR estimate b0, error variances sigma
+        # initial LS RR estimate b0, residual_variance
         # [Q, ~] = qr(obj.Z, 0);#0 means "economy" -- same as np.lnalg default
         QHX = self.Q.conj().T @ self.X
         QHY = self.Q.conj().T @ self.Y
@@ -142,7 +141,7 @@ class TRME_RR(MEstimator):
         Yhat = self.X @ b0
         # intial estimate of error variance
         res = self.Y - Yhat
-        sigma = np.sum(res * np.conj(res), axis=0) / self.n_data
+        residual_variance = np.sum(res * np.conj(res), axis=0) / self.n_data
 
         if self.iter_control.max_number_of_iterations > 0:
             converged = False
@@ -160,7 +159,7 @@ class TRME_RR(MEstimator):
         while not converged:
             self.iter_control.number_of_iterations += 1
             # cleaned data
-            self.apply_huber_weights(sigma, Yhat)
+            self.apply_huber_weights(residual_variance, Yhat)
             # TRME_RR
             # updated error variance estimates, computed using cleaned data
             QHYc = self.QH @ self.Yc
@@ -168,7 +167,7 @@ class TRME_RR(MEstimator):
             Yhat = self.X @ self.b
             res = self.Yc - Yhat
             mean_ssq_residuals = np.sum(res * np.conj(res), axis=0) / self.n_data
-            sigma = self.iter_control.correction_factor * mean_ssq_residuals
+            residual_variance = self.iter_control.correction_factor * mean_ssq_residuals
             converged = self.iter_control.converged(self.b, b0)
             b0 = self.b
         # </CONVERGENCE STUFF>
@@ -177,8 +176,8 @@ class TRME_RR(MEstimator):
         while self.iter_control.continue_redescending:
             # one iteration with redescending influence curve cleaned data
             self.iter_control.number_of_redescending_iterations += 1
-            # [obj.Yc, E_psiPrime] = RedescendWt(obj.Y, Yhat, sigma, ITER.u0) # #TRME_RR
-            self.redescend(Yhat, sigma)  # update cleaned data, and expectation
+            # [obj.Yc, E_psiPrime] = RedescendWt(obj.Y, Yhat, residual_variance, ITER.u0) # #TRME_RR
+            self.redescend(Yhat, residual_variance)  # update cleaned data, and expectation
             # updated error variance estimates, computed using cleaned data
             QHYc = self.QH @ self.Yc
             self.b = np.linalg.solve(QHX, QHYc)  # QHX\QHYc
