@@ -119,37 +119,6 @@ class TRME(MEstimator):
         self.expectation_psi_prime = np.ones(self.n_channels_out)
         self.sigma_squared = np.zeros(self.n_channels_out)
 
-
-    def apply_huber_weights(self, residual_variance, YP):
-        """
-        Updates the values of self.Yc and self.expectation_psi_prime
-
-        Parameters
-        ----------
-        residual_variance : numpy array
-            1D array, the same length as the number of output channels
-            see self.residual_variance() method for its calculation
-        YP : numpy array
-            The predicted data, usually from QQHY
-
-        Returns
-        -------
-
-        function [YC,E_psiPrime] = HuberWt(Y,YP,sig,r0)
-
-        inputs are data (Y) and predicted (YP), estiamted
-        error variances (for each column) and Huber parameter r0
-        allows for multiple columns of data
-        """
-        # Y_cleaned = np.zeros(self.Y.shape, dtype=np.complex128)
-        for k in range(self.n_channels_out):
-            r0s = self.r0 * np.sqrt(residual_variance[k])
-            residuals = np.abs(self.Y[:, k] - YP[:, k])
-            w = np.minimum(r0s / residuals, 1.0)
-            self.Yc[:, k] = w * self.Y[:, k] + (1 - w) * YP[:, k]
-            self.expectation_psi_prime[k] = 1.0 * np.sum(w == 1) / self.n_data
-        return
-
     def update_predicted_data(self):
         pass
 
