@@ -124,57 +124,55 @@ class TRME(MEstimator):
         # MOVE THIS METHOD INTO AN RME-Specific CONFIG
         return self.iter_control.correction_factor
 
-    def sigma(self, QHY_or_QHYc, Y_or_Yc, correction_factor=1.0):
-        """
-        These are the error variances.
-        TODO: Move this method to the base class, or a QR decorator.
-        Computes the squared norms difference of the output channels from the
-        "output channels inner-product with QQH"
+    #<REPLACE WITH METHOD FROM MEstimator>
+    # def residual_variance(self, QHY_or_QHYc, Y_or_Yc, correction_factor=1.0):
+    #     """
+    #     These are the error variances.
+    #     TODO: Move this method to the base class, or a QR decorator.
+    #     Computes the squared norms difference of the output channels from the
+    #     "output channels inner-product with QQH"
+    #
+    #     Parameters
+    #     ----------
+    #     QHY : numpy array
+    #         QHY[i,j] = Q.H * Y[i,j] = <Q[:,i], Y[:,j]>
+    #         So when we sum columns of norm(QHY) we are get in the zeroth position
+    #         <Q[:,0], Y[:,0]> +  <Q[:,1], Y[:,0]>, that is the 0th channel of Y
+    #         projected onto each of the Q-basis vectors
+    #     Y_or_Yc : numpy array
+    #         The output channels (self.Y) or the cleaned output channels self.Yc
+    #     correction_factor : float
+    #         See doc in IterControl.correction_factor
+    #
+    #     Returns
+    #     -------
+    #     residual_variance : numpy array
+    #         One entry per output channel.
+    #
+    #     """
+    #     Y2 = np.linalg.norm(Y_or_Yc, axis=0) ** 2  # variance?
+    #     QHY2 = np.linalg.norm(QHY_or_QHYc, axis=0) ** 2
+    #     residual_variance = correction_factor * (Y2 - QHY2) / self.n_data
+    #
+    #     try:
+    #         assert (residual_variance > 0).all()
+    #     except AssertionError:
+    #         print("WARNING - Negative error variances observed")
+    #         print("Setting residual_variance to zero - Negative values observed")
+    #         residual_variance *= 0
+    #         # raise Exception
+    #     return residual_variance
+    #</REPLACE WITH METHOD FROM MEstimator>
 
-        ToDo: Rename this to sigma_squared, or residual_variance rather than sigma.
-        It is a variance.  Especially in the context or the redecnd using
-        it's sqrt to normalize the residual amplitudes
-
-        Parameters
-        ----------
-        QHY : numpy array
-            QHY[i,j] = Q.H * Y[i,j] = <Q[:,i], Y[:,j]>
-            So when we sum columns of norm(QHY) we are get in the zeroth position
-            <Q[:,0], Y[:,0]> +  <Q[:,1], Y[:,0]>, that is the 0th channel of Y
-            projected onto each of the Q-basis vectors
-        Y_or_Yc : numpy array
-            The output channels (self.Y) or the cleaned output channels self.Yc
-        correction_factor : float
-            See doc in IterControl.correction_factor
-
-        Returns
-        -------
-        sigma : numpy array
-            One entry per output channel.
-
-        """
-        Y2 = np.linalg.norm(Y_or_Yc, axis=0) ** 2  # variance?
-        QHY2 = np.linalg.norm(QHY_or_QHYc, axis=0) ** 2
-        sigma = correction_factor * (Y2 - QHY2) / self.n_data
-
-        try:
-            assert (sigma > 0).all()
-        except AssertionError:
-            print("WARNING - Negative error variances observed")
-            print("Setting sigma to zero - Negative sigma_squared observed")
-            sigma *= 0
-            # raise Exception
-        return sigma
-
-    def apply_huber_weights(self, sigma, YP):
+    def apply_huber_weights(self, residual_variance, YP):
         """
         Updates the values of self.Yc and self.expectation_psi_prime
 
         Parameters
         ----------
-        sigma : numpy array
+        residual_variance : numpy array
             1D array, the same length as the number of output channels
-            see self.sigma() method for its calculation
+            see self.residual_variance() method for its calculation
         YP : numpy array
             The predicted data, usually from QQHY
 
@@ -189,7 +187,7 @@ class TRME(MEstimator):
         """
         # Y_cleaned = np.zeros(self.Y.shape, dtype=np.complex128)
         for k in range(self.n_channels_out):
-            r0s = self.r0 * np.sqrt(sigma[k])
+            r0s = self.r0 * np.sqrt(residual_variance[k])
             residuals = np.abs(self.Y[:, k] - YP[:, k])
             w = np.minimum(r0s / residuals, 1.0)
             self.Yc[:, k] = w * self.Y[:, k] + (1 - w) * YP[:, k]
@@ -202,7 +200,7 @@ class TRME(MEstimator):
     def redescend(
         self,
         Y_predicted,
-        sigma,
+        residual_variance,
     ):
         """
         % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
@@ -220,7 +218,7 @@ class TRME(MEstimator):
         # Y_cleaned = np.zeros(self.Y.shape, dtype=np.complex128)
         for k in range(self.n_channels_out):
 
-            r = np.abs(self.Y[:, k] - Y_predicted[:, k]) / np.sqrt(sigma[k])
+            r = np.abs(self.Y[:, k] - Y_predicted[:, k]) / np.sqrt(residual_variance[k])
             t = -np.exp(self.u0 * (r - self.u0))
             w = np.exp(t)
 
@@ -265,7 +263,7 @@ class TRME(MEstimator):
             self.b = b0
             self.Yc = self.Y
 
-        sigma = self.sigma(self.QHY, self.Y)
+        residual_variance = self.residual_variance_method2(self.QHY, self.Y)
         self.iter_control.number_of_iterations = 0
         # </INITIAL ESTIMATE>
 
@@ -275,13 +273,13 @@ class TRME(MEstimator):
                 YP = self.Q @ self.QHY  # predicted data, initial estimate
             else:
                 YP = self.Q @ self.QHYc
-            self.apply_huber_weights(sigma, YP)
+            self.apply_huber_weights(residual_variance, YP)
             self.update_QHYc()
             # QHYc = self.QH @ self.Yc
             self.b = solve_triangular(self.R, self.QHYc)  # self.b = R\QTY;
 
             # update error variance estimates, computed using cleaned data
-            sigma = self.sigma(
+            residual_variance = self.residual_variance_method2(
                 self.QHYc, self.Yc, correction_factor=self.correction_factor
             )
             converged = self.iter_control.converged(self.b, b0)
@@ -293,11 +291,11 @@ class TRME(MEstimator):
                 self.iter_control.number_of_redescending_iterations += 1
                 # add setter here
                 YP = self.Q @ self.QHYc  # predict from cleaned data
-                self.redescend(YP, sigma)  # update cleaned data, and expectation
+                self.redescend(YP, residual_variance)  # update cleaned data, and expectation
                 # updated error variance estimates, computed using cleaned data
                 self.update_QHYc()  # QHYc = self.QH @ self.Yc
                 self.b = solve_triangular(self.R, self.QHYc)
-                sigma = self.sigma(self.QHYc, self.Yc)
+                residual_variance = self.residual_variance_method2(self.QHYc, self.Yc)
             # crude estimate of expectation of psi ... accounting for
             # redescending influence curve
             self.expectation_psi_prime = 2 * self.expectation_psi_prime - 1

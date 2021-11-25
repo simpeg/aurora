@@ -45,58 +45,55 @@ class MEstimator(RegressionEstimator):
     # def beta(self):
     #     return rme_beta(self.r0)
 
-    # def error_variances(self, Y_or_Yc, correction_factor=1.0):
-    #     """
-    #     These are the error variances.
-    #     TODO: Move this method to the base class, or a QR decorator.
-    #     Computes the squared norms difference of the output channels from the
-    #     "output channels inner-product with QQH"
-    #
-    #     ToDo: Rename this to sigma_squared, or residual_variance rather than sigma.
-    #     It is a variance.  Especially in the context or the redecnd using
-    #     it's sqrt to normalize the residual amplitudes
-    #
-    #     Parameters
-    #     ----------
-    #     QHY : numpy array
-    #         QHY[i,j] = Q.H * Y[i,j] = <Q[:,i], Y[:,j]>
-    #         So when we sum columns of norm(QHY) we are get in the zeroth position
-    #         <Q[:,0], Y[:,0]> +  <Q[:,1], Y[:,0]>, that is the 0th channel of Y
-    #         projected onto each of the Q-basis vectors
-    #     Y_or_Yc : numpy array
-    #         The output channels (self.Y) or the cleaned output channels self.Yc
-    #     correction_factor : float
-    #         See doc in IterControl.correction_factor
-    #
-    #     Returns
-    #     -------
-    #     sigma : numpy array
-    #         One entry per output channel.
-    #
-    #     """
-    #     Y2 = np.linalg.norm(Y_or_Yc, axis=0) ** 2  # variance?
-    #     QHY2 = np.linalg.norm(self.QHY, axis=0) ** 2
-    #     sigma = correction_factor * (Y2 - QHY2) / self.n_data
-    #
-    #     try:
-    #         assert (sigma > 0).all()
-    #     except AssertionError:
-    #         print("WARNING - Negative error variances observed")
-    #         print(sigma)
-    #         print("Setting sigma to zero - Negative sigma_squared observed")
-    #         sigma *= 0
-    #         # raise Exception
-    #     return sigma
+    def residual_variance_method2(self, QHY_or_QHYc, Y_or_Yc, correction_factor=1.0):
+        """
+        These are the error variances.
 
-    # def apply_huber_weights(self, sigma, YP):
+        Computes the squared norms difference of the output channels from the
+        "output channels inner-product with QQH"
+
+        Parameters
+        ----------
+        QHY : numpy array
+            QHY[i,j] = Q.H * Y[i,j] = <Q[:,i], Y[:,j]>
+            So when we sum columns of norm(QHY) we are get in the zeroth position
+            <Q[:,0], Y[:,0]> +  <Q[:,1], Y[:,0]>, that is the 0th channel of Y
+            projected onto each of the Q-basis vectors
+        Y_or_Yc : numpy array
+            The output channels (self.Y) or the cleaned output channels self.Yc
+        correction_factor : float
+            See doc in IterControl.correction_factor
+
+        Returns
+        -------
+        residual_variance : numpy array
+            One entry per output channel.
+
+        """
+        Y2 = np.linalg.norm(Y_or_Yc, axis=0) ** 2  # variance?
+        QHY2 = np.linalg.norm(QHY_or_QHYc, axis=0) ** 2
+        residual_variance = correction_factor * (Y2 - QHY2) / self.n_data
+
+        try:
+            assert (residual_variance > 0).all()
+        except AssertionError:
+            print("WARNING - Negative error variances observed")
+            print(residual_variance)
+            print("Setting residual_variance to zero - Negative values observed")
+            residual_variance *= 0
+
+        return residual_variance
+
+
+# def apply_huber_weights(self, residual_variance, YP):
     #     """
     #     Updates the values of self.Yc and self.expectation_psi_prime
     #
     #     Parameters
     #     ----------
-    #     sigma : numpy array
+    #     residual_variance : numpy array
     #         1D array, the same length as the number of output channels
-    #         see self.sigma() method for its calculation
+    #         see self.residual_variance() method for its calculation
     #     YP : numpy array
     #         The predicted data, usually from QQHY
     #
@@ -111,7 +108,7 @@ class MEstimator(RegressionEstimator):
     #     """
     #     # Y_cleaned = np.zeros(self.Y.shape, dtype=np.complex128)
     #     for k in range(self.n_channels_out):
-    #         r0s = self.r0 * np.sqrt(sigma[k])
+    #         r0s = self.r0 * np.sqrt(residual_variance[k])
     #         residuals = np.abs(self.Y[:, k] - YP[:, k])
     #         w = np.minimum(r0s / residuals, 1.0)
     #         self.Yc[:, k] = w * self.Y[:, k] + (1 - w) * YP[:, k]
@@ -124,7 +121,7 @@ class MEstimator(RegressionEstimator):
     # def redescend(
     #     self,
     #     Y_predicted,
-    #     sigma,
+    #     residual_variance,
     # ):
     #     """
     #     % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
@@ -142,7 +139,7 @@ class MEstimator(RegressionEstimator):
     #     # Y_cleaned = np.zeros(self.Y.shape, dtype=np.complex128)
     #     for k in range(self.n_channels_out):
     #
-    #         r = np.abs(self.Y[:, k] - Y_predicted[:, k]) / np.sqrt(sigma[k])
+    #         r = np.abs(self.Y[:, k] - Y_predicted[:, k]) / np.sqrt(residual_variance[k])
     #         t = -np.exp(self.u0 * (r - self.u0))
     #         w = np.exp(t)
     #
