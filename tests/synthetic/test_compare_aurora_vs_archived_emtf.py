@@ -16,13 +16,13 @@ from pathlib import Path
 from aurora.general_helper_functions import TEST_PATH
 from aurora.pipelines.process_mth5 import process_mth5_run
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
+from aurora.test_utils.synthetic.make_processing_configs import create_test_run_config
 from aurora.transfer_function.emtf_z_file_helpers import (
     merge_tf_collection_to_match_z_file,
 )
 
 from make_mth5_from_asc import create_test1_h5
 from make_mth5_from_asc import create_test12rr_h5
-from make_synthetic_processing_configs import create_run_config_for_test_case
 
 SYNTHETIC_PATH = TEST_PATH.joinpath("synthetic")
 CONFIG_PATH = SYNTHETIC_PATH.joinpath("config")
@@ -311,7 +311,7 @@ def process_synthetic_1_standard(
 
 def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
                    expected_rms_misfit=None):
-    processing_config_path = create_run_config_for_test_case(test_case_id,
+    processing_config_path = create_test_run_config(test_case_id,
                                                     matlab_or_fortran=emtf_version)
     process_synthetic_1_standard(
         processing_config_path,
