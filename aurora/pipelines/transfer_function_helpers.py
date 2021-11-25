@@ -126,7 +126,7 @@ def get_band_for_tf_estimate(band, config, local_stft_obj, remote_stft_obj):
         reference_channels and also the frequency axes are restricted to
         being within the frequency band given as an input argument.
     """
-    print(f"Processing band {band.center_period}s")
+    print(f"Processing band {band.center_period:.6f}s")
     band_dataset = extract_band(band, local_stft_obj)
     X = band_dataset[config.input_channels]
     Y = band_dataset[config.output_channels]
