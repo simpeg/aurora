@@ -303,7 +303,9 @@ class TransferFunction(object):
                 for T in self.periods:
                     cov_ss = self.cov_ss_inv.loc[inp_ch, inp_ch, T]
                     cov_nn = self.cov_nn.loc[out_ch, out_ch, T]
-                    standard_error.loc[out_ch, inp_ch, T] = np.sqrt(cov_ss * cov_nn)
+                    std_err = np.sqrt(np.abs(cov_ss * cov_nn))
+                    standard_error.loc[out_ch, inp_ch, T] = std_err
+
         return standard_error
 
     def from_emtf_zfile(self):
