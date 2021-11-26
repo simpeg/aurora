@@ -113,7 +113,8 @@ class TRME(MEstimator):
 
         """
         super(TRME, self).__init__(**kwargs)
-        
+        self.Yc = self.Y
+
     def update_predicted_data(self):
         pass
 
@@ -152,9 +153,8 @@ class TRME(MEstimator):
             # solution with no huber weights.
             # Y_hat needed here only if want covariance and no redescend
             converged = True
-            Y_hat = self.Q @ self.QHY
+            Y_hat = self.Q @ self.QHYc
             self.b = b0
-            self.Yc = self.Y
 
         residual_variance = self.residual_variance_method2(self.QHY, self.Y)
         self.iter_control.number_of_iterations = 0
@@ -162,10 +162,7 @@ class TRME(MEstimator):
 
         while not converged:
             self.iter_control.number_of_iterations += 1
-            if self.iter_control.number_of_iterations == 1:
-                Y_hat = self.Q @ self.QHY  # predicted data, initial estimate
-            else:
-                Y_hat = self.Q @ self.QHYc
+            Y_hat = self.Q @ self.QHYc
             self.update_y_cleaned_via_huber_weights(residual_variance, Y_hat)
             self.update_QHYc()
             self.b = solve_triangular(self.R, self.QHYc)  # self.b = R\QTY;
