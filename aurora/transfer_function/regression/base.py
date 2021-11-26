@@ -100,7 +100,11 @@ class RegressionEstimator(object):
 
         self.X = self._X.to_array().data.T
         self.Y = self._Y.to_array().data.T
+        #initalize self.Yc to Y
+        #is this valid in TRME and TRME_RR??
+        # Try it in TRME alone first
         self.Yc = np.zeros(self.Y.shape, dtype=np.complex128)
+        #self.Y_hat = None
         self.check_number_of_observations_xy_consistent()
         self.R2 = None
 

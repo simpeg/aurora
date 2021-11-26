@@ -116,7 +116,6 @@ class TRME_RR(MEstimator):
 
         while not converged:
             self.iter_control.number_of_iterations += 1
-            # cleaned data
             self.update_y_cleaned_via_huber_weights(residual_variance, Y_hat)
             # TRME_RR
             # updated error variance estimates, computed using cleaned data

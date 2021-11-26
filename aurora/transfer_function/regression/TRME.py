@@ -119,6 +119,9 @@ class TRME(MEstimator):
 
     def initial_least_squares_estimate(self):
         pass
+    
+    def update_y_hat(self):
+        pass
 
     def estimate(self):
         """
