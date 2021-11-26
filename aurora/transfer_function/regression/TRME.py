@@ -18,27 +18,23 @@ iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_1
 
 %  Parameters that control regression M-estimates are defined in ITER
 
-
-
-TODO: set Q, R to be variables asssociated with this class (actually put Q, R inside
-RegressionEstimator())
-TODO: Move TRME to RME-Regression-Estimator
 TODO: Consider making a QR-Estimator class between RegressionEstimator and RMEEstimator
 
 # <QR-decomposition Notes>
-The QR-decomposition is employed on the matrix of independent variables.
+The QR-decomposition is employed on the matrix of independent variables X.
 X = Q R where Q is unitary/orthogonal and R upper triangular.
-Since X is [n_data x n_channels_in] Q is [n_data x n_data].  Wikipedia has a
-nice description of the QR factorization:
+Since X is [n_data x n_channels_in] Q is [n_data x n_data].
+
+Wikipedia has a nice description of the QR factorization:
 https://en.wikipedia.org/wiki/QR_decomposition
 On a high level, the point of the QR decomposition is to transform the data
 into a domain where the inversion is done with a triangular matrix.
 
-I use the symbol QH to denote the conjugate transpose.
+The symbol QH will denote the conjugate transpose of the matrix Q.
 
-Note that we employ here the "economical" form of the QR decompostion,
-so that Q is not square, and not in fact unitary.  This is because its inverse is not
-defined (as it isn't square). Q does however obey: Q.H @ Q = I.
+We employ here the "economical" form of the QR decompostion, so that Q is not square,
+and not in fact unitary.  This is because its inverse is not defined (as it isn't
+square). Q does however obey: Q.H @ Q = I.
 
 Really Q = [Q1 | Q2] where Q1 has as many columns as there are input variables
 and Q2 is a matrix of zeros.
@@ -50,11 +46,12 @@ The quantity QHY floating around is a convenience matrix that makes computing th
 predicted data less numerically expensive.  The use of QHY is not so much physically
 meaningful as it is a trick to compute more efficiently the predicted data QQHY.
 
-Y_predicted = QQHY (since QQH is proj mtx)
-but, when computing the sums of squares of Y_predicted, such as we do in the error
+The predicted data Y_hat = QQHY (since QQH is proj mtx)
+but, when computing the sums of squares of Y_hat, such as we do in the error
 variances calculation, we can compute  QHY2 = np.linalg.norm(QHY, axis=0) ** 2
-instead of QQHY2 = YP2 = np.linalg.norm(YP, axis=0) ** 2 since
-YP.H @ YP = QQHY.H @ QQHY = QHY.H @ Q.H @ Q @ QHY = QHY.H @ QHY.
+instead of QQHY2 = Y_hat2 = np.linalg.norm(Y_hat, axis=0) ** 2 since
+Y_hat.H @ Y_hat = QQHY.H @ QQHY = QHY.H @ Q.H @ Q @ QHY = QHY.H @ QHY.
+
 The predicted data has to lie in span of the columns in the design matrix X.
 The predicted data has to be a linear combination of the columns of Y.
 Q is an orthoganal basis for the columns of X.
@@ -86,10 +83,10 @@ And the matlab documentation here
 http://matlab.izmiran.ru/help/techdoc/ref/mldivide.html
 """
 import numpy as np
-from scipy.linalg import solve_triangular
 import xarray as xr
 
-# from aurora.transfer_function.regression.base import RegressionEstimator
+from scipy.linalg import solve_triangular
+
 from aurora.transfer_function.regression.m_estimator import MEstimator
 
 
@@ -117,7 +114,6 @@ class TRME(MEstimator):
         """
         super(TRME, self).__init__(**kwargs)
         self.expectation_psi_prime = np.ones(self.n_channels_out)
-        self.sigma_squared = np.zeros(self.n_channels_out)
 
     def update_predicted_data(self):
         pass
@@ -150,7 +146,7 @@ class TRME(MEstimator):
             converged = True
             self.expectation_psi_prime = np.ones(self.n_channels_out)  # defualt
             YP = self.Q @ self.QHY
-            # YP needed only in case we want covariance and no huber and no redescend
+            # YP needed only if want covariance and no huber or redescend
             self.b = b0
             self.Yc = self.Y
 
@@ -164,9 +160,8 @@ class TRME(MEstimator):
                 YP = self.Q @ self.QHY  # predicted data, initial estimate
             else:
                 YP = self.Q @ self.QHYc
-            self.apply_huber_weights(residual_variance, YP)
+            self.update_y_cleaned_via_huber_weights(residual_variance, YP)
             self.update_QHYc()
-            # QHYc = self.QH @ self.Yc
             self.b = solve_triangular(self.R, self.QHYc)  # self.b = R\QTY;
 
             # update error variance estimates, computed using cleaned data
@@ -182,7 +177,7 @@ class TRME(MEstimator):
                 self.iter_control.number_of_redescending_iterations += 1
                 # add setter here
                 YP = self.Q @ self.QHYc  # predict from cleaned data
-                self.redescend(YP, residual_variance)  # update cleaned data, and expectation
+                self.update_y_cleaned_via_redescend_weights(YP, residual_variance)
                 # updated error variance estimates, computed using cleaned data
                 self.update_QHYc()  # QHYc = self.QH @ self.Yc
                 self.b = solve_triangular(self.R, self.QHYc)

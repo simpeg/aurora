@@ -125,7 +125,7 @@ class TRME_RR(MEstimator):
         while not converged:
             self.iter_control.number_of_iterations += 1
             # cleaned data
-            self.apply_huber_weights(residual_variance, Yhat)
+            self.update_y_cleaned_via_huber_weights(residual_variance, Yhat)
             # TRME_RR
             # updated error variance estimates, computed using cleaned data
             QHYc = self.QH @ self.Yc
@@ -145,8 +145,7 @@ class TRME_RR(MEstimator):
             while self.iter_control.continue_redescending:
                 # one iteration with redescending influence curve cleaned data
                 self.iter_control.number_of_redescending_iterations += 1
-                # [obj.Yc, E_psiPrime] = RedescendWt(obj.Y, Yhat, residual_variance, ITER.u0) # #TRME_RR
-                self.redescend(Yhat, residual_variance)  # update cleaned data, and expectation
+                self.update_y_cleaned_via_redescend_weights(Yhat, residual_variance)
                 # updated error variance estimates, computed using cleaned data
                 QHYc = self.QH @ self.Yc
                 self.b = np.linalg.solve(QHX, QHYc)  # QHX\QHYc

@@ -17,9 +17,10 @@ class MEstimator(RegressionEstimator):
         ----------
         kwargs
         expectation_psi_prime : numpy array
+            Same number of entries as there are output channels (columns of Y)
+            Default is a vector of 1.0's
+
             Expectation value of psi' (derivative of psi) -- ?? OR rho'=psi????
-            same number of entries as there are output channels
-            default to 1.0
             Recall start with the loss function rho. The derivative of the
             loss function is the "influence function" psi.
             Think about the Huber loss function (quadratic out to r0,
@@ -97,7 +98,7 @@ class MEstimator(RegressionEstimator):
         return residual_variance
 
 
-    def apply_huber_weights(self, residual_variance, YP):
+    def update_y_cleaned_via_huber_weights(self, residual_variance, YP):
         """
         Updates the values of self.Yc and self.expectation_psi_prime
 
@@ -131,23 +132,29 @@ class MEstimator(RegressionEstimator):
     # def update_predicted_data(self):
     #     pass
     #
-    def redescend(
+    def update_y_cleaned_via_redescend_weights(
         self,
         Y_predicted,
         residual_variance,
     ):
         """
-        % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+        Updates estimate for self.Yc as a match-filtered sum of Y and Y_predicted.
+        
+        
+        Parameters
+        ----------
+        Y_predicted
+        residual_variance
+
+        Returns
+        -------
+
+        
+        Matlab documentation:
         function[YC, E_psiPrime] = RedescendWt(Y, YP, sig, u0)
 
-        % inputs
-        are
-        data(Y) and predicted(YP), estiamted
-        % error
-        variances(
-        for each column) and Huber parameter u0
-        % allows
-        for multiple columns of data
+        inputs are data(Y) and predicted(YP), estimated error variances (for each
+        column) and Huber parameter u0.  Allows for multiple columns of data
         """
         # Y_cleaned = np.zeros(self.Y.shape, dtype=np.complex128)
         for k in range(self.n_channels_out):
