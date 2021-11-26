@@ -85,6 +85,7 @@ http://matlab.izmiran.ru/help/techdoc/ref/mldivide.html
 import numpy as np
 import xarray as xr
 
+from copy import deepcopy
 from scipy.linalg import solve_triangular
 
 from aurora.transfer_function.regression.m_estimator import MEstimator
@@ -113,7 +114,7 @@ class TRME(MEstimator):
 
         """
         super(TRME, self).__init__(**kwargs)
-        self.Yc = self.Y
+        self.Yc = deepcopy(self.Y)
 
     def update_predicted_data(self):
         pass
