@@ -112,6 +112,7 @@ class RegressionEstimator(object):
         self._R = None
         self._QH = None  # conjugate transpose of Q (Hermitian operator)
         self._QHY = None  #
+        self._QHYc = None
 
     @property
     def inverse_signal_covariance(self):

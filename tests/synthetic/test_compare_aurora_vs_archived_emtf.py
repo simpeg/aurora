@@ -325,13 +325,13 @@ def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
     )
 
 
-def run_test1(emtf_version, exexpected_rms_misfit=None):
+def run_test1(emtf_version, expected_rms_misfit=None):
     print(f"Test1 vs {emtf_version}")
     test_case_id = "test1"
     auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test1.zss")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zss"
     aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
-                   expected_rms_misfit=exexpected_rms_misfit)
+                   expected_rms_misfit=expected_rms_misfit)
     return
 
 def run_test2r1():
@@ -348,7 +348,7 @@ def run_test2r1():
 def test():
     create_test1_h5()
     create_test12rr_h5()
-    run_test1("fortran", exexpected_rms_misfit=EXPECTED_RMS_MISFIT["test1"])
+    run_test1("fortran", expected_rms_misfit=EXPECTED_RMS_MISFIT["test1"])
     run_test1("matlab")
     run_test2r1()
     print("success")
