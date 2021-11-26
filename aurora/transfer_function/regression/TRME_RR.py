@@ -74,11 +74,6 @@ class TRME_RR(MEstimator):
             print("sizes of local and remote do not agree in RR estimation routine")
             raise Exception
 
-    # <COMMON RME METHODS>
-    @property
-    def r0(self):
-        return self.iter_control.r0
-    # </COMMON RME METHODS>
 
     def estimate(self):
         """

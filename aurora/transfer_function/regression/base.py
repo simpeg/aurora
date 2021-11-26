@@ -9,7 +9,7 @@ arrays to follow Gary's codes more easily since his are matlab arrays.
 """
 import numpy as np
 import xarray as xr
-from aurora.transfer_function.iter_control import IterControl
+from aurora.transfer_function.regression.iter_control import IterControl
 
 
 class RegressionEstimator(object):

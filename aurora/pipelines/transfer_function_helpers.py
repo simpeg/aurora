@@ -8,7 +8,7 @@ import numpy as np
 
 from aurora.time_series.frequency_band_helpers import extract_band
 from aurora.time_series.xarray_helpers import handle_nan
-from aurora.transfer_function.iter_control import IterControl
+from aurora.transfer_function.regression.iter_control import IterControl
 from aurora.transfer_function.transfer_function_header import TransferFunctionHeader
 from aurora.transfer_function.regression.TRME import TRME
 from aurora.transfer_function.regression.TRME_RR import TRME_RR
