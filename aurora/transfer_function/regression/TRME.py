@@ -85,7 +85,6 @@ http://matlab.izmiran.ru/help/techdoc/ref/mldivide.html
 import numpy as np
 import xarray as xr
 
-from copy import deepcopy
 from scipy.linalg import solve_triangular
 
 from aurora.transfer_function.regression.m_estimator import MEstimator
@@ -114,7 +113,6 @@ class TRME(MEstimator):
 
         """
         super(TRME, self).__init__(**kwargs)
-        self.Yc = deepcopy(self.Y)
 
     def update_predicted_data(self):
         pass
@@ -150,9 +148,6 @@ class TRME(MEstimator):
         if self.iter_control.max_number_of_iterations > 0:
             converged = False
         else:
-            #This pretty much never happens.  It corresponds to a least-squares
-            # solution with no huber weights.
-            # Y_hat needed here only if want covariance and no redescend
             converged = True
             Y_hat = self.Q @ self.QHYc
             self.b = b0
@@ -161,6 +156,7 @@ class TRME(MEstimator):
         self.iter_control.number_of_iterations = 0
         # </INITIAL ESTIMATE>
 
+        # <CONVERGENCE STUFF>
         while not converged:
             self.iter_control.number_of_iterations += 1
             Y_hat = self.Q @ self.QHYc
@@ -174,7 +170,9 @@ class TRME(MEstimator):
             )
             converged = self.iter_control.converged(self.b, b0)
             b0 = self.b
+        # </CONVERGENCE STUFF>
 
+        # <REDESCENDING STUFF>
         if self.iter_control.max_number_of_redescending_iterations:
             self.iter_control.number_of_redescending_iterations = 0 #reset per channel
             while self.iter_control.continue_redescending:
@@ -189,6 +187,7 @@ class TRME(MEstimator):
             # crude estimate of expectation of psi ... accounting for
             # redescending influence curve
             self.expectation_psi_prime = 2 * self.expectation_psi_prime - 1
+        # </REDESCENDING STUFF>
 
         if self.iter_control.return_covariance:
             self.compute_inverse_signal_covariance()

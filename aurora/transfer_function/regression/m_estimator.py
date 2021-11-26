@@ -2,8 +2,10 @@
 An extension of RegressionEstimator with properties common to both TRME and TRME_RR
 """
 import numpy as np
-from scipy.linalg import solve_triangular
 import xarray as xr
+
+from copy import deepcopy
+from scipy.linalg import solve_triangular
 
 from aurora.transfer_function.regression.base import RegressionEstimator
 from aurora.transfer_function.regression.helper_functions import rme_beta
@@ -34,7 +36,8 @@ class MEstimator(RegressionEstimator):
         """
         super(MEstimator, self).__init__(**kwargs)
         self.expectation_psi_prime = np.ones(self.n_channels_out)
-
+        self.Yc = deepcopy(self.Y)
+        
     @property
     def r0(self):
         return self.iter_control.r0
