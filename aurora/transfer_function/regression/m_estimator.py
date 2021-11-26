@@ -33,6 +33,7 @@ class MEstimator(RegressionEstimator):
 
         """
         super(MEstimator, self).__init__(**kwargs)
+        self.expectation_psi_prime = np.ones(self.n_channels_out)
 
     @property
     def r0(self):
@@ -98,7 +99,7 @@ class MEstimator(RegressionEstimator):
         return residual_variance
 
 
-    def update_y_cleaned_via_huber_weights(self, residual_variance, YP):
+    def update_y_cleaned_via_huber_weights(self, residual_variance, Y_hat):
         """
         Updates the values of self.Yc and self.expectation_psi_prime
 
@@ -107,7 +108,7 @@ class MEstimator(RegressionEstimator):
         residual_variance : numpy array
             1D array, the same length as the number of output channels
             see self.residual_variance() method for its calculation
-        YP : numpy array
+        Y_hat : numpy array
             The predicted data, usually from QQHY
 
         Returns
@@ -122,9 +123,9 @@ class MEstimator(RegressionEstimator):
         """
         for k in range(self.n_channels_out):
             r0s = self.r0 * np.sqrt(residual_variance[k])
-            residuals = np.abs(self.Y[:, k] - YP[:, k])
+            residuals = np.abs(self.Y[:, k] - Y_hat[:, k])
             w = np.minimum(r0s / residuals, 1.0)
-            self.Yc[:, k] = w * self.Y[:, k] + (1 - w) * YP[:, k]
+            self.Yc[:, k] = w * self.Y[:, k] + (1 - w) * Y_hat[:, k]
             self.expectation_psi_prime[k] = 1.0 * np.sum(w == 1) / self.n_data
         return
 
@@ -134,37 +135,39 @@ class MEstimator(RegressionEstimator):
     #
     def update_y_cleaned_via_redescend_weights(
         self,
-        Y_predicted,
+        Y_hat,
         residual_variance,
     ):
         """
-        Updates estimate for self.Yc as a match-filtered sum of Y and Y_predicted.
+        Updates estimate for self.Yc as a match-filtered sum of Y and Y_hat.
         
         
         Parameters
         ----------
-        Y_predicted
+        Y_hat: numpy array
+            An estimate of the output data Y obtained by
+            self.Q @ self.QHY
+            or
+            self.Q @ self.QHYc
         residual_variance
 
         Returns
         -------
 
-        
         Matlab documentation:
-        function[YC, E_psiPrime] = RedescendWt(Y, YP, sig, u0)
-
+        function[YC, E_psiPrime] = RedescendWt(Y, YP, sig, u0):
         inputs are data(Y) and predicted(YP), estimated error variances (for each
         column) and Huber parameter u0.  Allows for multiple columns of data
         """
         # Y_cleaned = np.zeros(self.Y.shape, dtype=np.complex128)
         for k in range(self.n_channels_out):
 
-            r = np.abs(self.Y[:, k] - Y_predicted[:, k]) / np.sqrt(residual_variance[k])
+            r = np.abs(self.Y[:, k] - Y_hat[:, k]) / np.sqrt(residual_variance[k])
             t = -np.exp(self.u0 * (r - self.u0))
             w = np.exp(t)
 
             # cleaned data
-            self.Yc[:, k] = w * self.Y[:, k] + (1 - w) * Y_predicted[:, k]
+            self.Yc[:, k] = w * self.Y[:, k] + (1 - w) * Y_hat[:, k]
 
             # computation of E(psi')
             t = self.u0 * (t * r)
@@ -193,7 +196,7 @@ class MEstimator(RegressionEstimator):
         see aurora issue #78.
         Parameters
         ----------
-        YP
+        Y_hat
 
         Returns
         -------

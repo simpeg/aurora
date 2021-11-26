@@ -49,7 +49,6 @@ class TRME_RR(MEstimator):
         super(TRME_RR, self).__init__(**kwargs)
         self._Z = kwargs.get("Z", None)
         self.Z = self._Z.to_array().data.T
-        self.expectation_psi_prime = np.ones(self.n_channels_out)
         self.check_for_nan()
         self.check_number_of_observations_xy_consistent()
         self.check_for_enough_data_for_rr_estimate()
@@ -95,27 +94,25 @@ class TRME_RR(MEstimator):
 
         :return:
         """
+        # <INITIAL ESTIMATE>
         Q, R = self.qr_decomposition(self.Z)
-        # initial LS RR estimate b0, residual_variance
-        # [Q, ~] = qr(obj.Z, 0);#0 means "economy" -- same as np.lnalg default
         QHX = self.Q.conj().T @ self.X
         QHY = self.Q.conj().T @ self.Y
         # We need to get the properties of QHX, QXY to trace the flow of the
         # solution in matlab using mldivide
         b0 = np.linalg.solve(QHX, QHY)  # b0 = QTX\QTY;
         # predicted data
-        Yhat = self.X @ b0
+        Y_hat = self.X @ b0
         # intial estimate of error variance
-        res = self.Y - Yhat
+        res = self.Y - Y_hat
         residual_variance = np.sum(res * np.conj(res), axis=0) / self.n_data
-
+        # </INITIAL ESTIMATE>
+        
         if self.iter_control.max_number_of_iterations > 0:
             converged = False
         else:
             converged = True
-            # not needed - its defined in the init
-            # self.expectation_psi_prime = np.ones(self.n_channels_out)
-            Yhat = self.X @ b0
+            Y_hat = self.X @ b0
             self.b = b0
             self.Yc = self.Y
 
@@ -125,13 +122,13 @@ class TRME_RR(MEstimator):
         while not converged:
             self.iter_control.number_of_iterations += 1
             # cleaned data
-            self.update_y_cleaned_via_huber_weights(residual_variance, Yhat)
+            self.update_y_cleaned_via_huber_weights(residual_variance, Y_hat)
             # TRME_RR
             # updated error variance estimates, computed using cleaned data
             QHYc = self.QH @ self.Yc
             self.b = np.linalg.solve(QHX, QHYc)  # self.b = QTX\QTY
-            Yhat = self.X @ self.b
-            res = self.Yc - Yhat
+            Y_hat = self.X @ self.b
+            res = self.Yc - Y_hat
             squared_residuals = np.real(res * np.conj(res))
             mean_ssq_residuals = np.sum(squared_residuals, axis=0) / self.n_data
             residual_variance = self.correction_factor * mean_ssq_residuals
@@ -145,12 +142,12 @@ class TRME_RR(MEstimator):
             while self.iter_control.continue_redescending:
                 # one iteration with redescending influence curve cleaned data
                 self.iter_control.number_of_redescending_iterations += 1
-                self.update_y_cleaned_via_redescend_weights(Yhat, residual_variance)
+                self.update_y_cleaned_via_redescend_weights(Y_hat, residual_variance)
                 # updated error variance estimates, computed using cleaned data
                 QHYc = self.QH @ self.Yc
                 self.b = np.linalg.solve(QHX, QHYc)  # QHX\QHYc
-                Yhat = self.X @ self.b
-                res = self.Yc - Yhat  # res_clean!
+                Y_hat = self.X @ self.b
+                res = self.Yc - Y_hat  # res_clean!
 
             # crude estimate of expectation of psi accounts for redescending influence curve
             self.expectation_psi_prime = 2 * self.expectation_psi_prime - 1
@@ -162,8 +159,8 @@ class TRME_RR(MEstimator):
         # Below is a comment from the matlab codes:
         # "need to look at how we should compute adjusted residual cov to make
         # consistent with tranmt"
-        self.compute_noise_covariance(Yhat)
-        self.compute_squared_coherence(Yhat)
+        self.compute_noise_covariance(Y_hat)
+        self.compute_squared_coherence(Y_hat)
 
         # </Covariance and Coherence>
 
@@ -191,19 +188,19 @@ class TRME_RR(MEstimator):
         )
         return
 
-    def compute_noise_covariance(self, Yhat):
+    def compute_noise_covariance(self, Y_hat):
         """
         res_clean: The cleaned data minus the predicted data. The residuals
         SSR_clean: Sum of squares of the residuals.  Diagonal is real
         Parameters
         ----------
-        YP
+        Y_hat
 
         Returns
         -------
 
         """
-        res_clean = self.Yc - Yhat
+        res_clean = self.Yc - Y_hat
         SSR_clean = np.conj(res_clean.conj().T @ res_clean)
         degrees_of_freedom = self.n_data - self.n_param
         inv_psi_prime2 = np.diag(1.0 / (self.expectation_psi_prime ** 2))

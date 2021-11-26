@@ -113,8 +113,7 @@ class TRME(MEstimator):
 
         """
         super(TRME, self).__init__(**kwargs)
-        self.expectation_psi_prime = np.ones(self.n_channels_out)
-
+        
     def update_predicted_data(self):
         pass
 
@@ -145,8 +144,8 @@ class TRME(MEstimator):
         else:
             converged = True
             self.expectation_psi_prime = np.ones(self.n_channels_out)  # defualt
-            YP = self.Q @ self.QHY
-            # YP needed only if want covariance and no huber or redescend
+            Y_hat = self.Q @ self.QHY
+            # Y_hat needed only if want covariance and no huber or redescend
             self.b = b0
             self.Yc = self.Y
 
@@ -157,10 +156,10 @@ class TRME(MEstimator):
         while not converged:
             self.iter_control.number_of_iterations += 1
             if self.iter_control.number_of_iterations == 1:
-                YP = self.Q @ self.QHY  # predicted data, initial estimate
+                Y_hat = self.Q @ self.QHY  # predicted data, initial estimate
             else:
-                YP = self.Q @ self.QHYc
-            self.update_y_cleaned_via_huber_weights(residual_variance, YP)
+                Y_hat = self.Q @ self.QHYc
+            self.update_y_cleaned_via_huber_weights(residual_variance, Y_hat)
             self.update_QHYc()
             self.b = solve_triangular(self.R, self.QHYc)  # self.b = R\QTY;
 
@@ -176,8 +175,8 @@ class TRME(MEstimator):
             while self.iter_control.continue_redescending:
                 self.iter_control.number_of_redescending_iterations += 1
                 # add setter here
-                YP = self.Q @ self.QHYc  # predict from cleaned data
-                self.update_y_cleaned_via_redescend_weights(YP, residual_variance)
+                Y_hat = self.Q @ self.QHYc  # predict from cleaned data
+                self.update_y_cleaned_via_redescend_weights(Y_hat, residual_variance)
                 # updated error variance estimates, computed using cleaned data
                 self.update_QHYc()  # QHYc = self.QH @ self.Yc
                 self.b = solve_triangular(self.R, self.QHYc)
@@ -188,24 +187,24 @@ class TRME(MEstimator):
 
         if self.iter_control.return_covariance:
             self.compute_inverse_signal_covariance()
-            self.compute_noise_covariance(YP)
-            self.compute_squared_coherence(YP)
+            self.compute_noise_covariance(Y_hat)
+            self.compute_squared_coherence(Y_hat)
 
         return self.b
 
-    def compute_noise_covariance(self, YP):
+    def compute_noise_covariance(self, Y_hat):
         """
         res_clean: The cleaned data minus the predicted data. The residuals
         SSR_clean: Sum of squares of the residuals.  Diagonal is real
         Parameters
         ----------
-        YP
+        Y_hat
 
         Returns
         -------
 
         """
-        res_clean = self.Yc - YP
+        res_clean = self.Yc - Y_hat
         SSR_clean = np.conj(res_clean.conj().T @ res_clean)
         degrees_of_freedom = self.n_data - self.n_param
         inv_psi_prime2 = np.diag(1.0 / (self.expectation_psi_prime ** 2))
