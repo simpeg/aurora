@@ -117,6 +117,9 @@ class TRME(MEstimator):
     def update_predicted_data(self):
         pass
 
+    def initial_least_squares_estimate(self):
+        pass
+
     def estimate(self):
         """
         function that does the actual regression - M estimate
@@ -142,10 +145,11 @@ class TRME(MEstimator):
         if self.iter_control.max_number_of_iterations > 0:
             converged = False
         else:
+            #This pretty much never happens.  It corresponds to a least-squares
+            # solution with no huber weights.
+            # Y_hat needed here only if want covariance and no redescend
             converged = True
-            self.expectation_psi_prime = np.ones(self.n_channels_out)  # defualt
             Y_hat = self.Q @ self.QHY
-            # Y_hat needed only if want covariance and no huber or redescend
             self.b = b0
             self.Yc = self.Y
 

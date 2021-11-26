@@ -215,6 +215,20 @@ class RegressionEstimator(object):
         pass
 
     def qr_decomposition(self, X, sanity_check=False):
+        """
+
+        Parameters
+        ----------
+        X: numpy array
+            In TRME this is the Input channels X
+            In TRME_RR this is the RR channels Z
+        sanity_check: boolean
+            check QR decomposition is working correctly.  Can probably be deprecated.
+
+        Returns
+        -------
+
+        """
         Q, R = np.linalg.qr(X)
         self._Q = Q
         self._R = R
