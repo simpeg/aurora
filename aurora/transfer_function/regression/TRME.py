@@ -153,8 +153,9 @@ class TRME(MEstimator):
         while not converged:
             b0 = self.b
             self.iter_control.number_of_iterations += 1
-            Y_hat = self.update_y_hat()
+            #Y_hat = self.update_y_hat()
             self.update_y_cleaned_via_huber_weights(residual_variance, Y_hat)
+            Y_hat = self.update_y_hat()
             self.b = solve_triangular(self.R, self.QHYc)  # self.b = R\QTY;
             # update error variance estimates, computed using cleaned data
             residual_variance = self.residual_variance_method2(
