@@ -69,8 +69,8 @@ class TRME_RR(MEstimator):
     def initial_estimate(self):
         pass
     
-    def update_y_hat(self, b):
-        return self.X @ b
+    def update_y_hat(self):
+        return self.X @ self.b
         
 
     def estimate(self):
@@ -95,8 +95,8 @@ class TRME_RR(MEstimator):
         # solution in matlab using mldivide; b0 = QTX\QTY;
         # also, below, what happens if we set self.b=np.linalg.solve(QHX, QHY)?
         #could do that in TRME and in TRME_RR
-        b0 = np.linalg.solve(QHX, QHY)
-        Y_hat = self.update_y_hat(b0)
+        self.b = np.linalg.solve(QHX, QHY)
+        Y_hat = self.update_y_hat()
         res = self.Y - Y_hat  # intial estimate of error variance
         residual_variance = np.sum(res * np.conj(res), axis=0) / self.n_data
         # </INITIAL ESTIMATE>
@@ -105,26 +105,25 @@ class TRME_RR(MEstimator):
             converged = False
         else:
             converged = True
-            Y_hat = self.update_y_hat(b0)
-            self.b = b0
+            Y_hat = self.update_y_hat()
 
         # <CONVERGENCE STUFF>
         self.iter_control.number_of_iterations = 0
 
         while not converged:
+            b0 = self.b
             self.iter_control.number_of_iterations += 1
             self.update_y_cleaned_via_huber_weights(residual_variance, Y_hat)
             # TRME_RR
             # updated error variance estimates, computed using cleaned data
             QHYc = self.QH @ self.Yc
             self.b = np.linalg.solve(QHX, QHYc)  # self.b = QTX\QTY
-            Y_hat = self.update_y_hat(self.b)
+            Y_hat = self.update_y_hat()
             res = self.Yc - Y_hat
             squared_residuals = np.real(res * np.conj(res))
             mean_ssq_residuals = np.sum(squared_residuals, axis=0) / self.n_data
             residual_variance = self.correction_factor * mean_ssq_residuals
             converged = self.iter_control.converged(self.b, b0)
-            b0 = self.b
         # </CONVERGENCE STUFF>
 
         # <REDESCENDING STUFF>
@@ -138,9 +137,8 @@ class TRME_RR(MEstimator):
                 self.update_QHYc()
 #                QHYc = self.QH @ self.Yc
                 self.b = np.linalg.solve(QHX, self.QHYc)  # QHX\QHYc
-                Y_hat = self.update_y_hat(self.b)
-                #res = self.Yc - Y_hat  # res_clean!
-
+                Y_hat = self.update_y_hat()
+                
             # crude estimate of expectation of psi accounts for redescending influence curve
             self.expectation_psi_prime = 2 * self.expectation_psi_prime - 1
         # </REDESCENDING STUFF>

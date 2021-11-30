@@ -137,19 +137,18 @@ class TRME(MEstimator):
 
         """
         if self.is_underdetermined:
-            b0 = self.solve_underdetermined()
-            return b0
+            self.b = self.solve_underdetermined()
+            return
 
         # <INITIAL ESTIMATE>
         self.qr_decomposition(self.X)
-        b0 = solve_triangular(self.R, self.QHY)
+        self.b = solve_triangular(self.R, self.QHY)
 
         if self.iter_control.max_number_of_iterations > 0:
             converged = False
         else:
             converged = True
             Y_hat = self.update_y_hat()
-            self.b = b0
 
         residual_variance = self.residual_variance_method2(self.QHY, self.Y)
         # </INITIAL ESTIMATE>
@@ -158,7 +157,7 @@ class TRME(MEstimator):
         self.iter_control.number_of_iterations = 0
 
         while not converged:
-
+            b0 = self.b
             self.iter_control.number_of_iterations += 1
             Y_hat = self.update_y_hat()
             self.update_y_cleaned_via_huber_weights(residual_variance, Y_hat)
@@ -170,7 +169,7 @@ class TRME(MEstimator):
                 self.QHYc, self.Yc, correction_factor=self.correction_factor
             )
             converged = self.iter_control.converged(self.b, b0)
-            b0 = self.b
+
         # </CONVERGENCE STUFF>
 
         # <REDESCENDING STUFF>
