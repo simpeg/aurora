@@ -138,14 +138,13 @@ class TRME_RR(MEstimator):
 #                QHYc = self.QH @ self.Yc
                 self.b = np.linalg.solve(QHX, self.QHYc)  # QHX\QHYc
                 Y_hat = self.update_y_hat()
-                
+
             # crude estimate of expectation of psi accounts for redescending influence curve
             self.expectation_psi_prime = 2 * self.expectation_psi_prime - 1
         # </REDESCENDING STUFF>
 
         # <Covariance and Coherence>
         self.compute_inverse_signal_covariance()
-
         # Below is a comment from the matlab codes:
         # "need to look at how we should compute adjusted residual cov to make
         # consistent with tranmt"
