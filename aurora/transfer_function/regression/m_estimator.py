@@ -37,6 +37,7 @@ class MEstimator(RegressionEstimator):
         super(MEstimator, self).__init__(**kwargs)
         self.expectation_psi_prime = np.ones(self.n_channels_out)
         self.Yc = deepcopy(self.Y)
+        self._Y_hat = None
 
     @property
     def QHYc(self):
@@ -47,6 +48,17 @@ class MEstimator(RegressionEstimator):
     def update_QHYc(self):
         self._QHYc = self.QH @ self.Yc
 
+    @property
+    def Y_hat(self):
+        if self._Y_hat is None:
+            self.update_y_hat()
+        return self._Y_hat
+
+    def update_y_hat(self):
+        print("Y_hat update method is not defined for abstract MEstimator class")
+        print("Try using RME or RME_RR class instead")
+        raise Exception
+        
     @property
     def r0(self):
         return self.iter_control.r0
