@@ -182,31 +182,3 @@ class TRME_RR(MEstimator):
         )
         return
 
-    def compute_noise_covariance(self, Y_hat):
-        """
-        res_clean: The cleaned data minus the predicted data. The residuals
-        SSR_clean: Sum of squares of the residuals.  Diagonal is real
-        Parameters
-        ----------
-        Y_hat
-
-        Returns
-        -------
-
-        """
-        res_clean = self.Yc - Y_hat
-        SSR_clean = np.conj(res_clean.conj().T @ res_clean)
-        degrees_of_freedom = self.n_data - self.n_param
-        inv_psi_prime2 = np.diag(1.0 / (self.expectation_psi_prime ** 2))
-        cov_nn = inv_psi_prime2 @ SSR_clean / degrees_of_freedom
-
-        self.cov_nn = xr.DataArray(
-            cov_nn,
-            dims=["output_channel_1", "output_channel_2"],
-            coords={
-                "output_channel_1": list(self._Y.data_vars),
-                "output_channel_2": list(self._Y.data_vars),
-            },
-        )
-        return
-
