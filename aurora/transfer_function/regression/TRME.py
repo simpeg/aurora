@@ -21,7 +21,7 @@ iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_1
 TODO: Consider making a QR-Estimator class between RegressionEstimator and RMEEstimator
 
 # <QR-decomposition Notes>
-The QR-decomposition is employed on the matrix of independent variables X.
+The QR-decomposition is employed on the matrix of input variables X.
 X = Q R where Q is unitary/orthogonal and R upper triangular.
 Since X is [n_data x n_channels_in] Q is [n_data x n_data].
 

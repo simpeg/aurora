@@ -33,18 +33,8 @@ from aurora.transfer_function.regression.m_estimator import MEstimator
 class TRME_RR(MEstimator):
     def __init__(self, **kwargs):
         """
-        %    Robust remote reference estimator, for arbitray number of
-        %     input channels (i.e., columns of design matrix).
-        %    X gives the local input, Z is the reference
-        %       (matrices of the same size)
-        %  The model  is Y = X*b, and multiple columns
-        %    of Y (predicted or output variables) are allowed (estimates
-        %    of b for each column are computed separately)
-        %
-        %   Usage: obj = TRME_RR(X,Z,Y,iter);
-
-            needs X, Y, Z, iter
-            :param kwargs:
+        Robust remote reference estimator.  Z is the reference station data,
+        and is the same size as X (see regression.base.RegressionEstimator(
         """
         super(TRME_RR, self).__init__(**kwargs)
         self._Z = kwargs.get("Z", None)
@@ -64,9 +54,11 @@ class TRME_RR(MEstimator):
             raise Exception
 
     def check_for_enough_data_for_rr_estimate(self):
-        if self.n_param > self.n_data:
+        if self.is_underdetermined:
             error_msg = "not enough data for RR estimate:"
-            print(f"{error_msg} # param = {self.n_param} # data = {self.n_data}")
+            error_msg = f"{error_msg} n_channels_in = {self.n_channels_in}"
+            error_msg = f"{error_msg} N_data = {self.n_data}"
+            print(f"{error_msg}")
             raise Exception
 
     def check_reference_data_shape(self):
@@ -74,6 +66,8 @@ class TRME_RR(MEstimator):
             print("sizes of local and remote do not agree in RR estimation routine")
             raise Exception
 
+    def initial_estimate(self):
+        pass
 
     def estimate(self):
         """
@@ -98,8 +92,7 @@ class TRME_RR(MEstimator):
         b0 = np.linalg.solve(QHX, QHY)  # b0 = QTX\QTY;
         # predicted data
         Y_hat = self.X @ b0
-        # intial estimate of error variance
-        res = self.Y - Y_hat
+        res = self.Y - Y_hat  # intial estimate of error variance
         residual_variance = np.sum(res * np.conj(res), axis=0) / self.n_data
         # </INITIAL ESTIMATE>
         
@@ -109,7 +102,6 @@ class TRME_RR(MEstimator):
             converged = True
             Y_hat = self.X @ b0
             self.b = b0
-            self.Yc = self.Y
 
         # <CONVERGENCE STUFF>
         self.iter_control.number_of_iterations = 0
