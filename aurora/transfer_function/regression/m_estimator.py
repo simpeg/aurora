@@ -38,6 +38,7 @@ class MEstimator(RegressionEstimator):
         self.expectation_psi_prime = np.ones(self.n_channels_out)
         self.Yc = deepcopy(self.Y)
         self._Y_hat = None
+        self._residual_variance = None
 
     @property
     def QHYc(self):
@@ -58,7 +59,19 @@ class MEstimator(RegressionEstimator):
         print("Y_hat update method is not defined for abstract MEstimator class")
         print("Try using RME or RME_RR class instead")
         raise Exception
-        
+
+    def update_residual_variance(self, correction_factor=1):
+        print("update_residual_variance method not defined in abstract MEstimator")
+        print("Try using RME or RME_RR class instead")
+        raise Exception
+
+    @property
+    def residual_variance(self):
+        if self._residual_variance is None:
+            self.update_residual_variance()
+        return self._residual_variance
+
+
     @property
     def r0(self):
         return self.iter_control.r0
@@ -83,7 +96,7 @@ class MEstimator(RegressionEstimator):
         """
         return self.iter_control.correction_factor
 
-    def residual_variance_method2(self, correction_factor=1.0):
+    def residual_variance_method2(self):
         """
         These are the error variances.
 
@@ -114,7 +127,7 @@ class MEstimator(RegressionEstimator):
         """
         Y2 = np.linalg.norm(self.Yc, axis=0) ** 2  # variance?
         QHY2 = np.linalg.norm(self.QHYc, axis=0) ** 2
-        residual_variance = correction_factor * (Y2 - QHY2) / self.n_data
+        residual_variance = (Y2 - QHY2) / self.n_data
 
         try:
             assert (residual_variance > 0).all()
@@ -127,7 +140,7 @@ class MEstimator(RegressionEstimator):
         return residual_variance
 
 
-    def update_y_cleaned_via_huber_weights(self, residual_variance):
+    def update_y_cleaned_via_huber_weights(self):
         """
         Updates the values of self.Yc and self.expectation_psi_prime
 
@@ -150,7 +163,7 @@ class MEstimator(RegressionEstimator):
         allows for multiple columns of data
         """
         for k in range(self.n_channels_out):
-            r0s = self.r0 * np.sqrt(residual_variance[k])
+            r0s = self.r0 * np.sqrt(self.residual_variance[k])
             residuals = np.abs(self.Y[:, k] - self.Y_hat[:, k])
             w = np.minimum(r0s / residuals, 1.0)
             self.Yc[:, k] = w * self.Y[:, k] + (1 - w) * self.Y_hat[:, k]
@@ -162,7 +175,7 @@ class MEstimator(RegressionEstimator):
     # def update_predicted_data(self):
     #     pass
     #
-    def update_y_cleaned_via_redescend_weights(self, residual_variance):
+    def update_y_cleaned_via_redescend_weights(self):
         """
         Updates estimate for self.Yc as a match-filtered sum of Y and Y_hat.
         
@@ -186,8 +199,8 @@ class MEstimator(RegressionEstimator):
         """
         # Y_cleaned = np.zeros(self.Y.shape, dtype=np.complex128)
         for k in range(self.n_channels_out):
-
-            r = np.abs(self.Y[:, k] - self.Y_hat[:, k]) / np.sqrt(residual_variance[k])
+            sigma = np.sqrt(self.residual_variance[k])
+            r = np.abs(self.Y[:, k] - self.Y_hat[:, k]) / sigma
             t = -np.exp(self.u0 * (r - self.u0))
             w = np.exp(t)
 

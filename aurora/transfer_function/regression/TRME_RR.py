@@ -90,6 +90,11 @@ class TRME_RR(MEstimator):
         residual_variance = np.sum(np.abs(res * np.conj(res)), axis=0) / self.n_data
         return residual_variance
 
+    def update_residual_variance(self, correction_factor=1):
+        self._residual_variance = self.residual_variance_method1()
+        self._residual_variance *= correction_factor
+        return self._residual_variance
+
     def estimate(self):
         """
         function that does the actual remote reference estimate
@@ -98,7 +103,7 @@ class TRME_RR(MEstimator):
         self.qr_decomposition(self.Z)
         self.update_b()
         self.update_y_hat()
-        residual_variance = self.residual_variance_method1()
+        self.update_residual_variance()
         # </INITIAL ESTIMATE>
 
         # <CONVERGENCE STUFF>
@@ -107,11 +112,10 @@ class TRME_RR(MEstimator):
         while not converged:
             b0 = self.b
             self.iter_control.number_of_iterations += 1
-            self.update_y_cleaned_via_huber_weights(residual_variance)
+            self.update_y_cleaned_via_huber_weights()
             self.update_b()
             self.update_y_hat()
-            residual_variance = self.residual_variance_method1()
-            residual_variance = self.correction_factor * residual_variance
+            self.update_residual_variance(correction_factor=self.correction_factor)
             converged = self.iter_control.converged(self.b, b0)
         # </CONVERGENCE STUFF>
 
@@ -121,10 +125,10 @@ class TRME_RR(MEstimator):
             while self.iter_control.continue_redescending:
                 # one iteration with redescending influence curve cleaned data
                 self.iter_control.number_of_redescending_iterations += 1
-                self.update_y_cleaned_via_redescend_weights(residual_variance)
+                self.update_y_cleaned_via_redescend_weights()
                 self.update_b()
-                Y_hat = self.update_y_hat()
-                residual_variance = self.residual_variance_method1()
+                self.update_y_hat()
+                self.update_residual_variance()
             # crude estimate of expectation of psi accounts for redescending influence curve
             self.expectation_psi_prime = 2 * self.expectation_psi_prime - 1
         # </REDESCENDING STUFF>
