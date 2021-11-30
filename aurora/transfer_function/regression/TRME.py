@@ -120,7 +120,8 @@ class TRME(MEstimator):
     
     def update_y_hat(self):
         """?rename as update_predicted_data?"""
-        return self.Q @ self.QHYc
+        self._Y_hat = self.Q @ self.QHYc
+        return
 
     def update_b(self):
         """
@@ -152,7 +153,7 @@ class TRME(MEstimator):
         # <INITIAL ESTIMATE>
         self.qr_decomposition(self.X)
         self.update_b()
-        Y_hat = self.update_y_hat()
+        self.update_y_hat()
         residual_variance = self.residual_variance_method2()
         # </INITIAL ESTIMATE>
 
@@ -162,9 +163,9 @@ class TRME(MEstimator):
         while not converged:
             b0 = self.b
             self.iter_control.number_of_iterations += 1
-            #Y_hat = self.update_y_hat()
-            self.update_y_cleaned_via_huber_weights(residual_variance, Y_hat)
-            Y_hat = self.update_y_hat()
+            # self.update_y_hat()
+            self.update_y_cleaned_via_huber_weights(residual_variance)
+            self.update_y_hat()
             self.update_b()
             # update error variance estimates, computed using cleaned data
             residual_variance = self.residual_variance_method2(
@@ -179,8 +180,8 @@ class TRME(MEstimator):
             while self.iter_control.continue_redescending:
                 self.iter_control.number_of_redescending_iterations += 1
                 #self.update_y_hat()
-                self.update_y_cleaned_via_redescend_weights(Y_hat, residual_variance)
-                Y_hat = self.update_y_hat()
+                self.update_y_cleaned_via_redescend_weights(residual_variance)
+                self.update_y_hat()
                 self.update_b()
                 # updated error variance estimates, computed using cleaned data
                 residual_variance = self.residual_variance_method2()
@@ -190,8 +191,8 @@ class TRME(MEstimator):
 
         if self.iter_control.return_covariance:
             self.compute_inverse_signal_covariance()
-            self.compute_noise_covariance(Y_hat)
-            self.compute_squared_coherence(Y_hat)
+            self.compute_noise_covariance()
+            self.compute_squared_coherence()
 
         return self.b
 

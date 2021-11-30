@@ -127,7 +127,7 @@ class MEstimator(RegressionEstimator):
         return residual_variance
 
 
-    def update_y_cleaned_via_huber_weights(self, residual_variance, Y_hat):
+    def update_y_cleaned_via_huber_weights(self, residual_variance):
         """
         Updates the values of self.Yc and self.expectation_psi_prime
 
@@ -151,9 +151,9 @@ class MEstimator(RegressionEstimator):
         """
         for k in range(self.n_channels_out):
             r0s = self.r0 * np.sqrt(residual_variance[k])
-            residuals = np.abs(self.Y[:, k] - Y_hat[:, k])
+            residuals = np.abs(self.Y[:, k] - self.Y_hat[:, k])
             w = np.minimum(r0s / residuals, 1.0)
-            self.Yc[:, k] = w * self.Y[:, k] + (1 - w) * Y_hat[:, k]
+            self.Yc[:, k] = w * self.Y[:, k] + (1 - w) * self.Y_hat[:, k]
             self.expectation_psi_prime[k] = 1.0 * np.sum(w == 1) / self.n_data
         self.update_QHYc() #note the QH is different in TRME_RR vs TRME
         return
@@ -162,11 +162,7 @@ class MEstimator(RegressionEstimator):
     # def update_predicted_data(self):
     #     pass
     #
-    def update_y_cleaned_via_redescend_weights(
-        self,
-        Y_hat,
-        residual_variance,
-    ):
+    def update_y_cleaned_via_redescend_weights(self, residual_variance):
         """
         Updates estimate for self.Yc as a match-filtered sum of Y and Y_hat.
         
@@ -191,12 +187,12 @@ class MEstimator(RegressionEstimator):
         # Y_cleaned = np.zeros(self.Y.shape, dtype=np.complex128)
         for k in range(self.n_channels_out):
 
-            r = np.abs(self.Y[:, k] - Y_hat[:, k]) / np.sqrt(residual_variance[k])
+            r = np.abs(self.Y[:, k] - self.Y_hat[:, k]) / np.sqrt(residual_variance[k])
             t = -np.exp(self.u0 * (r - self.u0))
             w = np.exp(t)
 
             # cleaned data
-            self.Yc[:, k] = w * self.Y[:, k] + (1 - w) * Y_hat[:, k]
+            self.Yc[:, k] = w * self.Y[:, k] + (1 - w) * self.Y_hat[:, k]
 
             # computation of E(psi')
             t = self.u0 * (t * r)
@@ -218,7 +214,7 @@ class MEstimator(RegressionEstimator):
         )
         raise Exception
 
-    def compute_squared_coherence(self, Y_hat):
+    def compute_squared_coherence(self):
         """
         res: Residuals: The original data minus the predicted data.
         SSR : Sum of squares of the residuals.  Diagonal is real
@@ -232,7 +228,7 @@ class MEstimator(RegressionEstimator):
         -------
 
         """
-        res = self.Y - Y_hat
+        res = self.Y - self.Y_hat
         SSR = np.conj(res.conj().T @ res)
         Yc2 = np.abs(self.Yc) ** 2
         SSYC = np.sum(Yc2, axis=0)
@@ -252,7 +248,7 @@ class MEstimator(RegressionEstimator):
         return
 
 
-    def compute_noise_covariance(self, Y_hat):
+    def compute_noise_covariance(self):
         """
         res_clean: The cleaned data minus the predicted data. The residuals
         SSR_clean: Sum of squares of the residuals.  Diagonal is real
@@ -264,7 +260,7 @@ class MEstimator(RegressionEstimator):
         -------
 
         """
-        res_clean = self.Yc - Y_hat
+        res_clean = self.Yc - self.Y_hat
         SSR_clean = np.conj(res_clean.conj().T @ res_clean)
         inv_psi_prime2 = np.diag(1.0 / (self.expectation_psi_prime ** 2))
         cov_nn = inv_psi_prime2 @ SSR_clean / self.degrees_of_freedom

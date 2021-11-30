@@ -71,7 +71,8 @@ class TRME_RR(MEstimator):
         pass
     
     def update_y_hat(self):
-        return self.X @ self.b
+        self._Y_hat = self.X @ self.b 
+        return
 
     def update_b(self):
         """matlab was: b = QTX\QTY"""
@@ -84,8 +85,8 @@ class TRME_RR(MEstimator):
             self._QHX = self.QH @ self.X
         return self._QHX
 
-    def residual_variance_method1(self, Y_hat):
-        res = self.Yc - Y_hat  # intial estimate of error variance
+    def residual_variance_method1(self):
+        res = self.Yc - self.Y_hat  # intial estimate of error variance
         residual_variance = np.sum(np.abs(res * np.conj(res)), axis=0) / self.n_data
         return residual_variance
 
@@ -96,8 +97,8 @@ class TRME_RR(MEstimator):
         # <INITIAL ESTIMATE>
         self.qr_decomposition(self.Z)
         self.update_b()
-        Y_hat = self.update_y_hat()
-        residual_variance = self.residual_variance_method1(Y_hat)
+        self.update_y_hat()
+        residual_variance = self.residual_variance_method1()
         # </INITIAL ESTIMATE>
 
         # <CONVERGENCE STUFF>
@@ -106,10 +107,10 @@ class TRME_RR(MEstimator):
         while not converged:
             b0 = self.b
             self.iter_control.number_of_iterations += 1
-            self.update_y_cleaned_via_huber_weights(residual_variance, Y_hat)
+            self.update_y_cleaned_via_huber_weights(residual_variance)
             self.update_b()
-            Y_hat = self.update_y_hat()
-            residual_variance = self.residual_variance_method1(Y_hat)
+            self.update_y_hat()
+            residual_variance = self.residual_variance_method1()
             residual_variance = self.correction_factor * residual_variance
             converged = self.iter_control.converged(self.b, b0)
         # </CONVERGENCE STUFF>
@@ -120,10 +121,10 @@ class TRME_RR(MEstimator):
             while self.iter_control.continue_redescending:
                 # one iteration with redescending influence curve cleaned data
                 self.iter_control.number_of_redescending_iterations += 1
-                self.update_y_cleaned_via_redescend_weights(Y_hat, residual_variance)
+                self.update_y_cleaned_via_redescend_weights(residual_variance)
                 self.update_b()
                 Y_hat = self.update_y_hat()
-                residual_variance = self.residual_variance_method1(Y_hat)
+                residual_variance = self.residual_variance_method1()
             # crude estimate of expectation of psi accounts for redescending influence curve
             self.expectation_psi_prime = 2 * self.expectation_psi_prime - 1
         # </REDESCENDING STUFF>
@@ -133,8 +134,8 @@ class TRME_RR(MEstimator):
         # Below is a comment from the matlab codes:
         # "need to look at how we should compute adjusted residual cov to make
         # consistent with tranmt"
-        self.compute_noise_covariance(Y_hat)
-        self.compute_squared_coherence(Y_hat)
+        self.compute_noise_covariance()
+        self.compute_squared_coherence()
         # </Covariance and Coherence>
 
     def compute_inverse_signal_covariance(self):
