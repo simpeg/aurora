@@ -172,9 +172,8 @@ class TRME(MEstimator):
                 # add setter here
                 Y_hat = self.update_y_hat()
                 self.update_y_cleaned_via_redescend_weights(Y_hat, residual_variance)
-                # updated error variance estimates, computed using cleaned data
-                self.update_QHYc()  # QHYc = self.QH @ self.Yc
                 self.b = solve_triangular(self.R, self.QHYc)
+                # updated error variance estimates, computed using cleaned data
                 residual_variance = self.residual_variance_method2()
             # crude estimate of expectation of psi ... accounting for
             # redescending influence curve

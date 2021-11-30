@@ -128,7 +128,6 @@ class TRME_RR(MEstimator):
                 # updated error variance estimates, computed using cleaned data
                 #N.B. TRME_RR matlab did not have a residual varaince update
                 #but TRME did.  There was a comment but no code
-                self.update_QHYc()
                 self.b = np.linalg.solve(QHX, self.QHYc)  # QHX\QHYc
                 Y_hat = self.update_y_hat()
                 

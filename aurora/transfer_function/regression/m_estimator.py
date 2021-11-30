@@ -190,6 +190,7 @@ class MEstimator(RegressionEstimator):
             t = self.u0 * (t * r)
             t = w * (1 + t)
             self.expectation_psi_prime[k] = np.sum(t[t > 0]) / self.n_data
+        self.update_QHYc()
         return
 
     def estimate(self):
