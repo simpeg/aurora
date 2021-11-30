@@ -266,14 +266,14 @@ class RegressionEstimator(object):
             self._QHY = self.QH @ self.Y
         return self._QHY
 
-    @property
-    def QHYc(self):
-        if self._QHYc is None:
-            self.update_QHYc()
-        return self._QHYc
-
-    def update_QHYc(self):
-        self._QHYc = self.QH @ self.Yc
+    # @property
+    # def QHYc(self):
+    #     if self._QHYc is None:
+    #         self.update_QHYc()
+    #     return self._QHYc
+    #
+    # def update_QHYc(self):
+    #     self._QHYc = self.QH @ self.Yc
 
     def estimate_ols(self, mode="solve"):
         """

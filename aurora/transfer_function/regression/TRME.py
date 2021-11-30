@@ -142,7 +142,7 @@ class TRME(MEstimator):
 
         # <INITIAL ESTIMATE>
         self.qr_decomposition(self.X)
-        self.b = solve_triangular(self.R, self.QHY)
+        self.b = solve_triangular(self.R, self.QHYc)
 
         if self.iter_control.max_number_of_iterations > 0:
             converged = False

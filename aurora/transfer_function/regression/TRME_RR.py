@@ -72,7 +72,7 @@ class TRME_RR(MEstimator):
     def update_y_hat(self):
         return self.X @ self.b
         
-
+    
     def estimate(self):
         """
         %   function that does the actual remote reference estimate
@@ -134,10 +134,12 @@ class TRME_RR(MEstimator):
                 self.iter_control.number_of_redescending_iterations += 1
                 self.update_y_cleaned_via_redescend_weights(Y_hat, residual_variance)
                 # updated error variance estimates, computed using cleaned data
+                #N.B. TRME_RR matlab did not have a residual varaince update
+                #but TRME did.  There was a comment but no code
                 self.update_QHYc()
-#                QHYc = self.QH @ self.Yc
                 self.b = np.linalg.solve(QHX, self.QHYc)  # QHX\QHYc
                 Y_hat = self.update_y_hat()
+                
 
             # crude estimate of expectation of psi accounts for redescending influence curve
             self.expectation_psi_prime = 2 * self.expectation_psi_prime - 1

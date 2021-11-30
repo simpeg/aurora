@@ -39,6 +39,15 @@ class MEstimator(RegressionEstimator):
         self.Yc = deepcopy(self.Y)
 
     @property
+    def QHYc(self):
+        if self._QHYc is None:
+            self.update_QHYc()
+        return self._QHYc
+
+    def update_QHYc(self):
+        self._QHYc = self.QH @ self.Yc
+        
+    @property
     def r0(self):
         return self.iter_control.r0
 
