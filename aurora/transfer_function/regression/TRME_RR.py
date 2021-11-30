@@ -130,6 +130,7 @@ class TRME_RR(MEstimator):
                 #but TRME did.  There was a comment but no code
                 self.b = np.linalg.solve(QHX, self.QHYc)  # QHX\QHYc
                 Y_hat = self.update_y_hat()
+                residual_variance = self.residual_variance_method1(Y_hat)
                 
 
             # crude estimate of expectation of psi accounts for redescending influence curve

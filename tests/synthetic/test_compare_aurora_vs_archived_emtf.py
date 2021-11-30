@@ -42,10 +42,10 @@ EXPECTED_RMS_MISFIT["test1"]["phi"]["yx"] = 0.840394  #0.812733  # 0.808658
 EXPECTED_RMS_MISFIT["test2r1"] = {}
 EXPECTED_RMS_MISFIT["test2r1"]["rho"] = {}
 EXPECTED_RMS_MISFIT["test2r1"]["phi"] = {}
-EXPECTED_RMS_MISFIT["test2r1"]["rho"]["xy"] = 3.949857  #3.949919
-EXPECTED_RMS_MISFIT["test2r1"]["phi"]["xy"] = 0.962837  #0.957675
-EXPECTED_RMS_MISFIT["test2r1"]["rho"]["yx"] = 4.121772  #4.117700
-EXPECTED_RMS_MISFIT["test2r1"]["phi"]["yx"] = 1.637581  #1.629026
+EXPECTED_RMS_MISFIT["test2r1"]["rho"]["xy"] = 3.940519  #3.949857  #3.949919
+EXPECTED_RMS_MISFIT["test2r1"]["phi"]["xy"] = 0.959861  #0.962837  #0.957675
+EXPECTED_RMS_MISFIT["test2r1"]["rho"]["yx"] = 4.136467  #4.121772  #4.117700
+EXPECTED_RMS_MISFIT["test2r1"]["phi"]["yx"] = 1.635570  #1.637581  #1.629026
 
 def compute_rms(rho, phi, model_rho_a=100.0, model_phi=45.0, verbose=False):
     """
