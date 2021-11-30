@@ -184,8 +184,7 @@ class TRME(MEstimator):
                 self.update_b()
                 # updated error variance estimates, computed using cleaned data
                 residual_variance = self.residual_variance_method2()
-            # crude estimate of expectation of psi ... accounting for
-            # redescending influence curve
+            # crude estimate of expectation of psi accounts for redescending influence curve
             self.expectation_psi_prime = 2 * self.expectation_psi_prime - 1
         # </REDESCENDING STUFF>
 

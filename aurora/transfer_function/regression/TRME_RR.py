@@ -74,12 +74,7 @@ class TRME_RR(MEstimator):
         return self.X @ self.b
 
     def update_b(self):
-        """
-        matlab was: b = QTX\QTY
-        Returns
-        -------
-
-        """
+        """matlab was: b = QTX\QTY"""
         self.b = np.linalg.solve(self.QHX, self.QHYc)
         return
 
@@ -96,20 +91,10 @@ class TRME_RR(MEstimator):
 
     def estimate(self):
         """
-        %   function that does the actual remote reference estimate
-        %
-        %   Usage:  [b]  = Estimate(obj);
-        %    (Object has all outputs; estimate of coefficients is also returned
-        %              as function output)
-
-
-        %   note that ITER is a handle object, so mods to ITER properties are
-        %   already made also to obj.ITER!
-
-        :return:
+        function that does the actual remote reference estimate
         """
         # <INITIAL ESTIMATE>
-        Q, R = self.qr_decomposition(self.Z)
+        self.qr_decomposition(self.Z)
         self.update_b()
         Y_hat = self.update_y_hat()
         residual_variance = self.residual_variance_method1(Y_hat)
@@ -139,8 +124,6 @@ class TRME_RR(MEstimator):
                 self.update_b()
                 Y_hat = self.update_y_hat()
                 residual_variance = self.residual_variance_method1(Y_hat)
-                
-
             # crude estimate of expectation of psi accounts for redescending influence curve
             self.expectation_psi_prime = 2 * self.expectation_psi_prime - 1
         # </REDESCENDING STUFF>
