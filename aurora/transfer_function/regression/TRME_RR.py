@@ -68,6 +68,10 @@ class TRME_RR(MEstimator):
 
     def initial_estimate(self):
         pass
+    
+    def update_y_hat(self, b):
+        return self.X @ b
+        
 
     def estimate(self):
         """
@@ -88,10 +92,11 @@ class TRME_RR(MEstimator):
         QHX = self.Q.conj().T @ self.X
         QHY = self.Q.conj().T @ self.Y
         # We need to get the properties of QHX, QXY to trace the flow of the
-        # solution in matlab using mldivide
-        b0 = np.linalg.solve(QHX, QHY)  # b0 = QTX\QTY;
-        # predicted data
-        Y_hat = self.X @ b0
+        # solution in matlab using mldivide; b0 = QTX\QTY;
+        # also, below, what happens if we set self.b=np.linalg.solve(QHX, QHY)?
+        #could do that in TRME and in TRME_RR
+        b0 = np.linalg.solve(QHX, QHY)
+        Y_hat = self.update_y_hat(b0)
         res = self.Y - Y_hat  # intial estimate of error variance
         residual_variance = np.sum(res * np.conj(res), axis=0) / self.n_data
         # </INITIAL ESTIMATE>
@@ -100,7 +105,7 @@ class TRME_RR(MEstimator):
             converged = False
         else:
             converged = True
-            Y_hat = self.X @ b0
+            Y_hat = self.update_y_hat(b0)
             self.b = b0
 
         # <CONVERGENCE STUFF>
@@ -113,7 +118,7 @@ class TRME_RR(MEstimator):
             # updated error variance estimates, computed using cleaned data
             QHYc = self.QH @ self.Yc
             self.b = np.linalg.solve(QHX, QHYc)  # self.b = QTX\QTY
-            Y_hat = self.X @ self.b
+            Y_hat = self.update_y_hat(self.b)
             res = self.Yc - Y_hat
             squared_residuals = np.real(res * np.conj(res))
             mean_ssq_residuals = np.sum(squared_residuals, axis=0) / self.n_data
@@ -130,10 +135,11 @@ class TRME_RR(MEstimator):
                 self.iter_control.number_of_redescending_iterations += 1
                 self.update_y_cleaned_via_redescend_weights(Y_hat, residual_variance)
                 # updated error variance estimates, computed using cleaned data
-                QHYc = self.QH @ self.Yc
-                self.b = np.linalg.solve(QHX, QHYc)  # QHX\QHYc
-                Y_hat = self.X @ self.b
-                res = self.Yc - Y_hat  # res_clean!
+                self.update_QHYc()
+#                QHYc = self.QH @ self.Yc
+                self.b = np.linalg.solve(QHX, self.QHYc)  # QHX\QHYc
+                Y_hat = self.update_y_hat(self.b)
+                #res = self.Yc - Y_hat  # res_clean!
 
             # crude estimate of expectation of psi accounts for redescending influence curve
             self.expectation_psi_prime = 2 * self.expectation_psi_prime - 1

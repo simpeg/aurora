@@ -114,14 +114,13 @@ class TRME(MEstimator):
         """
         super(TRME, self).__init__(**kwargs)
 
-    def update_predicted_data(self):
-        pass
 
     def initial_least_squares_estimate(self):
         pass
     
     def update_y_hat(self):
-        pass
+        """?rename as update_predicted_data?"""
+        return self.Q @ self.QHYc
 
     def estimate(self):
         """
@@ -149,17 +148,19 @@ class TRME(MEstimator):
             converged = False
         else:
             converged = True
-            Y_hat = self.Q @ self.QHYc
+            Y_hat = self.update_y_hat()
             self.b = b0
 
         residual_variance = self.residual_variance_method2(self.QHY, self.Y)
-        self.iter_control.number_of_iterations = 0
         # </INITIAL ESTIMATE>
 
         # <CONVERGENCE STUFF>
+        self.iter_control.number_of_iterations = 0
+
         while not converged:
+
             self.iter_control.number_of_iterations += 1
-            Y_hat = self.Q @ self.QHYc
+            Y_hat = self.update_y_hat()
             self.update_y_cleaned_via_huber_weights(residual_variance, Y_hat)
             self.update_QHYc()
             self.b = solve_triangular(self.R, self.QHYc)  # self.b = R\QTY;
@@ -178,7 +179,7 @@ class TRME(MEstimator):
             while self.iter_control.continue_redescending:
                 self.iter_control.number_of_redescending_iterations += 1
                 # add setter here
-                Y_hat = self.Q @ self.QHYc  # predict from cleaned data
+                Y_hat = self.update_y_hat()
                 self.update_y_cleaned_via_redescend_weights(Y_hat, residual_variance)
                 # updated error variance estimates, computed using cleaned data
                 self.update_QHYc()  # QHYc = self.QH @ self.Yc
