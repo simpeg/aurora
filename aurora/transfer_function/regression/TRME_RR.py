@@ -102,21 +102,11 @@ class TRME_RR(MEstimator):
         self.b = np.linalg.solve(QHX, QHY)
         Y_hat = self.update_y_hat()
         residual_variance = self.residual_variance_method1(Y_hat)
-        #     #<residual variance>
-        # #res = self.Y - Y_hat  # intial estimate of error variance
-        # residual_variance = np.sum(res * np.conj(res), axis=0) / self.n_data
-        #     #</residual variance>
         # </INITIAL ESTIMATE>
-        
-        if self.iter_control.max_number_of_iterations > 0:
-            converged = False
-        else:
-            converged = True
-            Y_hat = self.update_y_hat()
 
         # <CONVERGENCE STUFF>
+        converged = self.iter_control.max_number_of_iterations <= 0
         self.iter_control.number_of_iterations = 0
-
         while not converged:
             b0 = self.b
             self.iter_control.number_of_iterations += 1
@@ -124,13 +114,6 @@ class TRME_RR(MEstimator):
             self.b = np.linalg.solve(QHX, self.QHYc)  # self.b = QTX\QTY
             Y_hat = self.update_y_hat()
             residual_variance = self.residual_variance_method1(Y_hat)
-            # # updated error variance estimates, computed using cleaned data
-            #     #<residual variance>
-            # res = self.Yc - Y_hat
-            # #squared_residuals = np.real(res * np.conj(res))
-            # #mean_ssq_residuals = np.sum(squared_residuals, axis=0) / self.n_data
-            # residual_variance = np.sum(res * np.conj(res), axis=0) / self.n_data
-            #     #</residual variance>
             residual_variance = self.correction_factor * residual_variance
             converged = self.iter_control.converged(self.b, b0)
         # </CONVERGENCE STUFF>

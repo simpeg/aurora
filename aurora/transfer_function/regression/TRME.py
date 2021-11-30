@@ -143,32 +143,24 @@ class TRME(MEstimator):
         # <INITIAL ESTIMATE>
         self.qr_decomposition(self.X)
         self.b = solve_triangular(self.R, self.QHYc)
-
-        if self.iter_control.max_number_of_iterations > 0:
-            converged = False
-        else:
-            converged = True
-            Y_hat = self.update_y_hat()
-
+        Y_hat = self.update_y_hat()
         residual_variance = self.residual_variance_method2()
         # </INITIAL ESTIMATE>
 
         # <CONVERGENCE STUFF>
+        converged = self.iter_control.max_number_of_iterations <= 0
         self.iter_control.number_of_iterations = 0
-
         while not converged:
             b0 = self.b
             self.iter_control.number_of_iterations += 1
             Y_hat = self.update_y_hat()
             self.update_y_cleaned_via_huber_weights(residual_variance, Y_hat)
             self.b = solve_triangular(self.R, self.QHYc)  # self.b = R\QTY;
-
             # update error variance estimates, computed using cleaned data
             residual_variance = self.residual_variance_method2(
                 correction_factor=self.correction_factor
             )
             converged = self.iter_control.converged(self.b, b0)
-
         # </CONVERGENCE STUFF>
 
         # <REDESCENDING STUFF>
