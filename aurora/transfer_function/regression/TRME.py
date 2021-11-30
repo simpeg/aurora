@@ -168,10 +168,9 @@ class TRME(MEstimator):
         while not converged:
             b0 = self.b
             self.iter_control.number_of_iterations += 1
-            # self.update_y_hat()
             self.update_y_cleaned_via_huber_weights()
-            self.update_y_hat()
             self.update_b()
+            self.update_y_hat()
             self.update_residual_variance(correction_factor=self.correction_factor)
             converged = self.iter_control.converged(self.b, b0)
         # </CONVERGENCE STUFF>
