@@ -178,9 +178,9 @@ class TRME(MEstimator):
             self.iter_control.number_of_redescending_iterations = 0 #reset per channel
             while self.iter_control.continue_redescending:
                 self.iter_control.number_of_redescending_iterations += 1
-                # add setter here
-                Y_hat = self.update_y_hat()
+                #self.update_y_hat()
                 self.update_y_cleaned_via_redescend_weights(Y_hat, residual_variance)
+                Y_hat = self.update_y_hat()
                 self.update_b()
                 # updated error variance estimates, computed using cleaned data
                 residual_variance = self.residual_variance_method2()
