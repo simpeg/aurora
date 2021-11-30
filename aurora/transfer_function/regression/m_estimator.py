@@ -46,7 +46,7 @@ class MEstimator(RegressionEstimator):
 
     def update_QHYc(self):
         self._QHYc = self.QH @ self.Yc
-        
+
     @property
     def r0(self):
         return self.iter_control.r0
@@ -71,12 +71,16 @@ class MEstimator(RegressionEstimator):
         """
         return self.iter_control.correction_factor
 
-    def residual_variance_method2(self, QHY_or_QHYc, Y_or_Yc, correction_factor=1.0):
+    def residual_variance_method2(self, correction_factor=1.0):
         """
         These are the error variances.
 
         Computes the squared norms difference of the output channels from the
         "output channels inner-product with QQH"
+
+        This method used to take either QHY, Y as arguments or QHYc, Yc
+        But now that Yc initializes to Y, we can just use with QHYc, Yc always
+        (Note QHYc is updated everytime Yc is updated)
 
         Parameters
         ----------
@@ -96,8 +100,8 @@ class MEstimator(RegressionEstimator):
             One entry per output channel.
 
         """
-        Y2 = np.linalg.norm(Y_or_Yc, axis=0) ** 2  # variance?
-        QHY2 = np.linalg.norm(QHY_or_QHYc, axis=0) ** 2
+        Y2 = np.linalg.norm(self.Yc, axis=0) ** 2  # variance?
+        QHY2 = np.linalg.norm(self.QHYc, axis=0) ** 2
         residual_variance = correction_factor * (Y2 - QHY2) / self.n_data
 
         try:
@@ -139,6 +143,7 @@ class MEstimator(RegressionEstimator):
             w = np.minimum(r0s / residuals, 1.0)
             self.Yc[:, k] = w * self.Y[:, k] + (1 - w) * Y_hat[:, k]
             self.expectation_psi_prime[k] = 1.0 * np.sum(w == 1) / self.n_data
+        self.update_QHYc() #note the QH is different in TRME_RR vs TRME
         return
 
 

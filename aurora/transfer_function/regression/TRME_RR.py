@@ -71,8 +71,10 @@ class TRME_RR(MEstimator):
     
     def update_y_hat(self):
         return self.X @ self.b
-        
-    
+
+    def residual_variance_method1(self):
+        pass
+
     def estimate(self):
         """
         %   function that does the actual remote reference estimate
@@ -97,8 +99,10 @@ class TRME_RR(MEstimator):
         #could do that in TRME and in TRME_RR
         self.b = np.linalg.solve(QHX, QHY)
         Y_hat = self.update_y_hat()
+            #<residual variance>
         res = self.Y - Y_hat  # intial estimate of error variance
         residual_variance = np.sum(res * np.conj(res), axis=0) / self.n_data
+            #</residual variance>
         # </INITIAL ESTIMATE>
         
         if self.iter_control.max_number_of_iterations > 0:
@@ -114,15 +118,16 @@ class TRME_RR(MEstimator):
             b0 = self.b
             self.iter_control.number_of_iterations += 1
             self.update_y_cleaned_via_huber_weights(residual_variance, Y_hat)
-            # TRME_RR
-            # updated error variance estimates, computed using cleaned data
-            QHYc = self.QH @ self.Yc
-            self.b = np.linalg.solve(QHX, QHYc)  # self.b = QTX\QTY
+            self.b = np.linalg.solve(QHX, self.QHYc)  # self.b = QTX\QTY
             Y_hat = self.update_y_hat()
+            # updated error variance estimates, computed using cleaned data
+                #<residual variance>
             res = self.Yc - Y_hat
-            squared_residuals = np.real(res * np.conj(res))
-            mean_ssq_residuals = np.sum(squared_residuals, axis=0) / self.n_data
-            residual_variance = self.correction_factor * mean_ssq_residuals
+            #squared_residuals = np.real(res * np.conj(res))
+            #mean_ssq_residuals = np.sum(squared_residuals, axis=0) / self.n_data
+            residual_variance = np.sum(res * np.conj(res), axis=0) / self.n_data
+                #</residual variance>
+            residual_variance = self.correction_factor * residual_variance
             converged = self.iter_control.converged(self.b, b0)
         # </CONVERGENCE STUFF>
 

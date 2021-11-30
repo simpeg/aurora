@@ -150,7 +150,7 @@ class TRME(MEstimator):
             converged = True
             Y_hat = self.update_y_hat()
 
-        residual_variance = self.residual_variance_method2(self.QHY, self.Y)
+        residual_variance = self.residual_variance_method2()
         # </INITIAL ESTIMATE>
 
         # <CONVERGENCE STUFF>
@@ -161,12 +161,11 @@ class TRME(MEstimator):
             self.iter_control.number_of_iterations += 1
             Y_hat = self.update_y_hat()
             self.update_y_cleaned_via_huber_weights(residual_variance, Y_hat)
-            self.update_QHYc()
             self.b = solve_triangular(self.R, self.QHYc)  # self.b = R\QTY;
 
             # update error variance estimates, computed using cleaned data
             residual_variance = self.residual_variance_method2(
-                self.QHYc, self.Yc, correction_factor=self.correction_factor
+                correction_factor=self.correction_factor
             )
             converged = self.iter_control.converged(self.b, b0)
 
@@ -183,7 +182,7 @@ class TRME(MEstimator):
                 # updated error variance estimates, computed using cleaned data
                 self.update_QHYc()  # QHYc = self.QH @ self.Yc
                 self.b = solve_triangular(self.R, self.QHYc)
-                residual_variance = self.residual_variance_method2(self.QHYc, self.Yc)
+                residual_variance = self.residual_variance_method2()
             # crude estimate of expectation of psi ... accounting for
             # redescending influence curve
             self.expectation_psi_prime = 2 * self.expectation_psi_prime - 1
