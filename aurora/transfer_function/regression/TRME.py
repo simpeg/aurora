@@ -137,6 +137,11 @@ class TRME(MEstimator):
         """
         self.b = solve_triangular(self.R, self.QHYc)
 
+    def initial_estimate(self):
+        """
+        Make first estimate of TF (b), Y_hat, and residual_variance
+        """
+        
     def estimate(self):
         """
         function that does the actual regression - M estimate

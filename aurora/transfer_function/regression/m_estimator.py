@@ -96,6 +96,15 @@ class MEstimator(RegressionEstimator):
         """
         return self.iter_control.correction_factor
 
+    def residual_variance_method1(self):
+        """
+        This is the method that was originally in TRME_RR.m.  It seems more correct 
+        than the one in TRME, but also has more computational overhead.
+        """
+        res = self.Yc - self.Y_hat  # intial estimate of error variance
+        residual_variance = np.sum(np.abs(res * np.conj(res)), axis=0) / self.n_data
+        return residual_variance
+    
     def residual_variance_method2(self):
         """
         These are the error variances.
@@ -139,6 +148,7 @@ class MEstimator(RegressionEstimator):
 
         return residual_variance
 
+    
 
     def update_y_cleaned_via_huber_weights(self):
         """

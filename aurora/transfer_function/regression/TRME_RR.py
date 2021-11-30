@@ -68,6 +68,9 @@ class TRME_RR(MEstimator):
             raise Exception
 
     def initial_estimate(self):
+        """
+        Make first estimate of TF (b), Y_hat, and residual_variance
+        """
         pass
     
     def update_y_hat(self):
@@ -85,10 +88,6 @@ class TRME_RR(MEstimator):
             self._QHX = self.QH @ self.X
         return self._QHX
 
-    def residual_variance_method1(self):
-        res = self.Yc - self.Y_hat  # intial estimate of error variance
-        residual_variance = np.sum(np.abs(res * np.conj(res)), axis=0) / self.n_data
-        return residual_variance
 
     def update_residual_variance(self, correction_factor=1):
         self._residual_variance = self.residual_variance_method1()
@@ -99,12 +98,11 @@ class TRME_RR(MEstimator):
         """
         function that does the actual remote reference estimate
         """
-        # <INITIAL ESTIMATE>
+        #self.initial_estimate()
         self.qr_decomposition(self.Z)
         self.update_b()
         self.update_y_hat()
         self.update_residual_variance()
-        # </INITIAL ESTIMATE>
 
         # <CONVERGENCE STUFF>
         converged = self.iter_control.max_number_of_iterations <= 0
