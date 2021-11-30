@@ -39,6 +39,7 @@ class TRME_RR(MEstimator):
         super(TRME_RR, self).__init__(**kwargs)
         self._Z = kwargs.get("Z", None)
         self.Z = self._Z.to_array().data.T
+        self._QHX = None
         self.check_for_nan()
         self.check_number_of_observations_xy_consistent()
         self.check_for_enough_data_for_rr_estimate()
@@ -72,6 +73,22 @@ class TRME_RR(MEstimator):
     def update_y_hat(self):
         return self.X @ self.b
 
+    def update_b(self):
+        """
+        matlab was: b = QTX\QTY
+        Returns
+        -------
+
+        """
+        self.b = np.linalg.solve(self.QHX, self.QHYc)
+        return
+
+    @property
+    def QHX(self):
+        if self._QHX is None:
+            self._QHX = self.QH @ self.X
+        return self._QHX
+
     def residual_variance_method1(self, Y_hat):
         res = self.Yc - Y_hat  # intial estimate of error variance
         residual_variance = np.sum(np.abs(res * np.conj(res)), axis=0) / self.n_data
@@ -93,13 +110,7 @@ class TRME_RR(MEstimator):
         """
         # <INITIAL ESTIMATE>
         Q, R = self.qr_decomposition(self.Z)
-        QHX = self.Q.conj().T @ self.X
-        QHY = self.Q.conj().T @ self.Y
-        # We need to get the properties of QHX, QXY to trace the flow of the
-        # solution in matlab using mldivide; b0 = QTX\QTY;
-        # also, below, what happens if we set self.b=np.linalg.solve(QHX, QHY)?
-        #could do that in TRME and in TRME_RR
-        self.b = np.linalg.solve(QHX, QHY)
+        self.update_b()
         Y_hat = self.update_y_hat()
         residual_variance = self.residual_variance_method1(Y_hat)
         # </INITIAL ESTIMATE>
@@ -111,7 +122,7 @@ class TRME_RR(MEstimator):
             b0 = self.b
             self.iter_control.number_of_iterations += 1
             self.update_y_cleaned_via_huber_weights(residual_variance, Y_hat)
-            self.b = np.linalg.solve(QHX, self.QHYc)  # self.b = QTX\QTY
+            self.update_b()
             Y_hat = self.update_y_hat()
             residual_variance = self.residual_variance_method1(Y_hat)
             residual_variance = self.correction_factor * residual_variance
@@ -125,10 +136,7 @@ class TRME_RR(MEstimator):
                 # one iteration with redescending influence curve cleaned data
                 self.iter_control.number_of_redescending_iterations += 1
                 self.update_y_cleaned_via_redescend_weights(Y_hat, residual_variance)
-                # updated error variance estimates, computed using cleaned data
-                #N.B. TRME_RR matlab did not have a residual varaince update
-                #but TRME did.  There was a comment but no code
-                self.b = np.linalg.solve(QHX, self.QHYc)  # QHX\QHYc
+                self.update_b()
                 Y_hat = self.update_y_hat()
                 residual_variance = self.residual_variance_method1(Y_hat)
                 
@@ -144,7 +152,6 @@ class TRME_RR(MEstimator):
         # consistent with tranmt"
         self.compute_noise_covariance(Y_hat)
         self.compute_squared_coherence(Y_hat)
-
         # </Covariance and Coherence>
 
     def compute_inverse_signal_covariance(self):

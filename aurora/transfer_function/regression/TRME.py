@@ -122,6 +122,15 @@ class TRME(MEstimator):
         """?rename as update_predicted_data?"""
         return self.Q @ self.QHYc
 
+    def update_b(self):
+        """
+        matlab was: b = R\QTY;
+        Returns
+        -------
+
+        """
+        self.b = solve_triangular(self.R, self.QHYc)
+
     def estimate(self):
         """
         function that does the actual regression - M estimate
@@ -142,7 +151,7 @@ class TRME(MEstimator):
 
         # <INITIAL ESTIMATE>
         self.qr_decomposition(self.X)
-        self.b = solve_triangular(self.R, self.QHYc)
+        self.update_b()
         Y_hat = self.update_y_hat()
         residual_variance = self.residual_variance_method2()
         # </INITIAL ESTIMATE>
@@ -156,7 +165,7 @@ class TRME(MEstimator):
             #Y_hat = self.update_y_hat()
             self.update_y_cleaned_via_huber_weights(residual_variance, Y_hat)
             Y_hat = self.update_y_hat()
-            self.b = solve_triangular(self.R, self.QHYc)  # self.b = R\QTY;
+            self.update_b()
             # update error variance estimates, computed using cleaned data
             residual_variance = self.residual_variance_method2(
                 correction_factor=self.correction_factor
@@ -172,7 +181,7 @@ class TRME(MEstimator):
                 # add setter here
                 Y_hat = self.update_y_hat()
                 self.update_y_cleaned_via_redescend_weights(Y_hat, residual_variance)
-                self.b = solve_triangular(self.R, self.QHYc)
+                self.update_b()
                 # updated error variance estimates, computed using cleaned data
                 residual_variance = self.residual_variance_method2()
             # crude estimate of expectation of psi ... accounting for
