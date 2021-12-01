@@ -2,26 +2,10 @@
 follows Gary's TRME.m in
 iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
 
-    % 2009 Gary Egbert , Maxim Smirnov
-    % Oregon State University
-
-    %  (Complex) Robust remote reference estimator, for arbitray number of
-    %     input channels (i.e., columns of design matrix).
-    %    X gives the local input, Z is the reference
-    %       (matrices of the same size)
-    %  As for TRME the model  is Y = X*b, and multiple columns
-    %    of Y (predicted or output variables) are allowed (estimates
-    %    of b for each column are computed separately)
-    %  Allows multiple columns of Y, but estimates b for each column separately
-    %    no missing data is allowed for the basic RR class
-    %
-    %   S and N are estimated signal and noise covariance
-    %    matrices, which together can be used to compute
-    %    error covariance for the matrix of regression coefficients b
+Note that the matlab code claimed:
     %  R2 is squared coherence (top row is using raw data, bottom
     %    cleaned, with crude correction for amount of downweighted data)
-
-    %  Parameters that control regression M-estimates are defined in ITER
+However, that is not the case. There was only one estimate for R2 in the matlab codes
 
 """
 import numpy as np
@@ -95,7 +79,7 @@ class TRME_RR(MEstimator):
         Cov_SS = (self.ZH @self.X) \ (self.XH @ self.X) / (self.XH @self.Z)
         I broke the above line into B/A where
         B = (self.ZH @self.X) \ (self.XH @ self.X), and A = (self.XH @self.Z)
-        Then follow matlab cookbok, B/A for matrices = (A'\B')
+        Then follow matlab cookbook, B/A for matrices = (A'\B')
         """
         ZH = self.Z.conj().T
         XH = self.X.conj().T

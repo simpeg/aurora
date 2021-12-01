@@ -1,5 +1,6 @@
 """
-An extension of RegressionEstimator with properties common to both TRME and TRME_RR
+An extension of RegressionEstimator with properties common to Gary's TRME and TRME_RR
+see Notes in RME, RME_RR
 """
 import numpy as np
 import xarray as xr

@@ -2,21 +2,8 @@
 follows Gary's TRME.m in
 iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
 
-% 2009 Gary Egbert , Maxim Smirnov
-% Oregon State University
-
-%
-%  (Complex) regression-M estimate for the model  Y = X*b
-%
-%  Allows multiple columns of Y, but estimates b for each column separately
-%
-%   S and N are estimated signal and noise covariance
-%    matrices, which together can be used to compute
-%    error covariance for the matrix of regression coefficients b
-%  R2 is squared coherence (top row is using raw data, bottom
-%    cleaned, with crude correction for amount of downweighted data)
-
-%  Parameters that control regression M-estimates are defined in ITER
+(Complex) regression-M estimate for the model  Y = X*b
+Allows multiple columns of Y, but estimates b for each column separately
 
 TODO: Consider making a QR-Estimator class between RegressionEstimator and RMEEstimator
 
@@ -79,7 +66,7 @@ https://stackoverflow.com/questions/26932461/conjugate-transpose-operator-h-in-n
 
 The Matlab mldivide flowchart can be found here:
 https://stackoverflow.com/questions/18553210/how-to-implement-matlabs-mldivide-a-k-a-the-backslash-operator
-And the matlab documentation here
+And the matlab mldivide documentation here
 http://matlab.izmiran.ru/help/techdoc/ref/mldivide.html
 """
 import numpy as np
