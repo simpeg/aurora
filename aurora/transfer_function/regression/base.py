@@ -172,7 +172,7 @@ class RegressionEstimator(object):
             self.cov_nn = np.zeros((self.n_channels_out, self.n_channels_out))
             self.cov_ss_inv = np.zeros((self.n_channels_in, self.n_channels_in))
 
-        return self.b
+        return
 
     def check_number_of_observations_xy_consistent(self):
         if self.Y.shape[0] != self.X.shape[0]:

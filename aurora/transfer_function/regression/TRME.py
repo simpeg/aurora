@@ -115,9 +115,6 @@ class TRME(MEstimator):
         super(TRME, self).__init__(**kwargs)
         self.qr_input = "X"
 
-
-    def initial_least_squares_estimate(self):
-        pass
     
     def update_y_hat(self):
         """?rename as update_predicted_data?"""
@@ -130,43 +127,8 @@ class TRME(MEstimator):
         return self._residual_variance
 
     def update_b(self):
-        """
-        matlab was: b = R\QTY;
-        Returns
-        -------
-
-        """
+        """matlab was: b = R\QTY; """
         self.b = solve_triangular(self.R, self.QHYc)
-
-        
-    def estimate(self):
-        """
-        function that does the actual regression - M estimate
-
-        Usage: [b] = Estimate(obj);
-        (Object has all outputs; estimate of coefficients is also returned
-        as function output)
-
-        # note that ITER is a handle object, so mods to ITER properties are
-        # already made also to obj.ITER!
-        Returns
-        -------
-
-        """
-        if self.is_underdetermined:
-            self.b = self.solve_underdetermined()
-            return
-
-        self.initial_estimate()
-        self.apply_huber_regression()
-        self.apply_redecending_influence_function()
-
-        if self.iter_control.return_covariance:
-            self.compute_inverse_signal_covariance()
-            self.compute_noise_covariance()
-            self.compute_squared_coherence()
-
-        return self.b
 
 
     def compute_inverse_signal_covariance(self):

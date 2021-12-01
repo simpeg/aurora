@@ -219,6 +219,28 @@ class MEstimator(RegressionEstimator):
             self.expectation_psi_prime = 2 * self.expectation_psi_prime - 1
         return
 
+    def estimate(self):
+        """
+        function that does the actual remote reference estimate
+
+        Here is a comment from the matlab codes:
+        "need to look at how we should compute adjusted residual cov to make
+         consistent with tranmt"
+        See issue#69 aurora github repo addresses this
+        """
+        if self.is_underdetermined:
+            self.solve_underdetermined()
+            return
+
+        self.initial_estimate()
+        self.apply_huber_regression()
+        self.apply_redecending_influence_function()
+
+        if self.iter_control.return_covariance:
+            self.compute_inverse_signal_covariance()
+            self.compute_noise_covariance()
+            self.compute_squared_coherence()
+        return
 
     def update_y_cleaned_via_redescend_weights(self):
         """
@@ -258,19 +280,7 @@ class MEstimator(RegressionEstimator):
         self.update_QHYc()
         return
 
-    def estimate(self):
-        """
-        function that does the actual regression - M estimate
-        Returns
-        -------
-
-        """
-        print(
-            "this method is not defined for RME - you must instantiate either a "
-            "single station or remote reference RME estimator"
-        )
-        raise Exception
-
+    
     def compute_squared_coherence(self):
         """
         res: Residuals: The original data minus the predicted data.

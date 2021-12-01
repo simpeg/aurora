@@ -89,25 +89,6 @@ class TRME_RR(MEstimator):
         self._residual_variance *= correction_factor
         return self._residual_variance
 
-    def estimate(self):
-        """
-        function that does the actual remote reference estimate
-
-        Here is a comment from the matlab codes:
-        "need to look at how we should compute adjusted residual cov to make
-         consistent with tranmt"
-        See issue#69 aurora github repo addresses this
-        """
-        self.initial_estimate()
-        self.apply_huber_regression()
-        self.apply_redecending_influence_function()
-
-        if self.iter_control.return_covariance:
-            self.compute_inverse_signal_covariance()
-            self.compute_noise_covariance()
-            self.compute_squared_coherence()
-        return
-
     def compute_inverse_signal_covariance(self):
         """
         Matlab code was :
