@@ -113,6 +113,7 @@ class TRME(MEstimator):
 
         """
         super(TRME, self).__init__(**kwargs)
+        self.qr_input = "X"
 
 
     def initial_least_squares_estimate(self):
@@ -161,7 +162,7 @@ class TRME(MEstimator):
             return
 
         # <INITIAL ESTIMATE>
-        self.qr_decomposition(self.X)
+        self.qr_decomposition()
         self.update_b()
         self.update_y_hat()
         self.update_residual_variance()

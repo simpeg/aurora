@@ -39,6 +39,7 @@ class TRME_RR(MEstimator):
         super(TRME_RR, self).__init__(**kwargs)
         self._Z = kwargs.get("Z", None)
         self.Z = self._Z.to_array().data.T
+        self.qr_input = "Z"
         self._QHX = None
         self.check_for_nan()
         self.check_number_of_observations_xy_consistent()
@@ -99,7 +100,7 @@ class TRME_RR(MEstimator):
         function that does the actual remote reference estimate
         """
         #self.initial_estimate()
-        self.qr_decomposition(self.Z)
+        self.qr_decomposition()
         self.update_b()
         self.update_y_hat()
         self.update_residual_variance()

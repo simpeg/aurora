@@ -105,7 +105,7 @@ class RegressionEstimator(object):
         #self.Y_hat = None
         self.check_number_of_observations_xy_consistent()
         self.R2 = None
-
+        self.qr_input = "X"
         self._Q = None
         self._R = None
         self._QH = None  # conjugate transpose of Q (Hermitian operator)
@@ -220,9 +220,10 @@ class RegressionEstimator(object):
         """
         pass
 
-    def qr_decomposition(self, X, sanity_check=False):
+    def qr_decomposition(self, X=None, sanity_check=False):
         """
-
+        performs QR decomposition on input matrix X.  If X is not provided as a kwarg
+        then check the value of self.qr_input
         Parameters
         ----------
         X: numpy array
@@ -235,6 +236,15 @@ class RegressionEstimator(object):
         -------
 
         """
+        if X is None:
+            if self.qr_input == "X":
+                X=self.X
+            elif self.qr_input =="Z":
+                X=self.Z
+            else:
+                print("Matrix to perform QR decompostion not specified")
+                raise Exception
+
         Q, R = np.linalg.qr(X)
         self._Q = Q
         self._R = R
