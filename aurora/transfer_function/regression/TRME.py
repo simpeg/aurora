@@ -158,19 +158,7 @@ class TRME(MEstimator):
             return
 
         self.initial_estimate()
-
-        # <CONVERGENCE STUFF>
-        converged = self.iter_control.max_number_of_iterations <= 0
-        self.iter_control.number_of_iterations = 0
-        while not converged:
-            b0 = self.b
-            self.iter_control.number_of_iterations += 1
-            self.update_y_cleaned_via_huber_weights()
-            self.update_b()
-            self.update_y_hat()
-            self.update_residual_variance(correction_factor=self.correction_factor)
-            converged = self.iter_control.converged(self.b, b0)
-        # </CONVERGENCE STUFF>
+        self.apply_huber_regression()
 
         # <REDESCENDING STUFF>
         if self.iter_control.max_number_of_redescending_iterations:

@@ -148,14 +148,6 @@ class MEstimator(RegressionEstimator):
 
         return residual_variance
 
-    def initial_estimate(self):
-        """
-        Make first estimate of TF (b), Y_hat, and residual_variance
-        """
-        self.qr_decomposition()
-        self.update_b()
-        self.update_y_hat()
-        self.update_residual_variance()
 
     def update_y_cleaned_via_huber_weights(self):
         """
@@ -188,7 +180,29 @@ class MEstimator(RegressionEstimator):
         self.update_QHYc() #note the QH is different in TRME_RR vs TRME
         return
 
+    def initial_estimate(self):
+        """
+        Make first estimate of TF (b), Y_hat, and residual_variance
+        """
+        self.qr_decomposition()
+        self.update_b()
+        self.update_y_hat()
+        self.update_residual_variance()
 
+
+    def apply_huber_regression(self):
+        """This is the 'convergence loop' from TRME, TRME_RR"""
+        converged = self.iter_control.max_number_of_iterations <= 0
+        self.iter_control.number_of_iterations = 0
+        while not converged:
+            b0 = self.b
+            self.iter_control.number_of_iterations += 1
+            self.update_y_cleaned_via_huber_weights()
+            self.update_b()
+            self.update_y_hat()
+            self.update_residual_variance(correction_factor=self.correction_factor)
+            converged = self.iter_control.converged(self.b, b0)
+        return
     # def update_predicted_data(self):
     #     pass
     #
