@@ -203,9 +203,23 @@ class MEstimator(RegressionEstimator):
             self.update_residual_variance(correction_factor=self.correction_factor)
             converged = self.iter_control.converged(self.b, b0)
         return
-    # def update_predicted_data(self):
-    #     pass
-    #
+
+
+    def apply_redecending_influence_function(self):
+        """one or two iterations with redescending influence curve cleaned data"""
+        if self.iter_control.max_number_of_redescending_iterations:
+            self.iter_control.number_of_redescending_iterations = 0 #reset per channel
+            while self.iter_control.continue_redescending:
+                self.iter_control.number_of_redescending_iterations += 1
+                self.update_y_cleaned_via_redescend_weights()
+                self.update_b()
+                self.update_y_hat()
+                self.update_residual_variance()
+            # crude estimate of expectation of psi accounts for redescending influence curve
+            self.expectation_psi_prime = 2 * self.expectation_psi_prime - 1
+        return
+
+
     def update_y_cleaned_via_redescend_weights(self):
         """
         Updates estimate for self.Yc as a match-filtered sum of Y and Y_hat.
@@ -228,7 +242,6 @@ class MEstimator(RegressionEstimator):
         inputs are data(Y) and predicted(YP), estimated error variances (for each
         column) and Huber parameter u0.  Allows for multiple columns of data
         """
-        # Y_cleaned = np.zeros(self.Y.shape, dtype=np.complex128)
         for k in range(self.n_channels_out):
             sigma = np.sqrt(self.residual_variance[k])
             r = np.abs(self.Y[:, k] - self.Y_hat[:, k]) / sigma

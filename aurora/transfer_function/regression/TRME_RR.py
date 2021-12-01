@@ -92,32 +92,21 @@ class TRME_RR(MEstimator):
     def estimate(self):
         """
         function that does the actual remote reference estimate
+
+        Here is a comment from the matlab codes:
+        "need to look at how we should compute adjusted residual cov to make
+         consistent with tranmt"
+        See issue#69 aurora github repo addresses this
         """
         self.initial_estimate()
         self.apply_huber_regression()
+        self.apply_redecending_influence_function()
 
-        # <REDESCENDING STUFF>
-        if self.iter_control.max_number_of_redescending_iterations:
-            self.iter_control.number_of_redescending_iterations = 0 #reset per channel
-            while self.iter_control.continue_redescending:
-                # one iteration with redescending influence curve cleaned data
-                self.iter_control.number_of_redescending_iterations += 1
-                self.update_y_cleaned_via_redescend_weights()
-                self.update_b()
-                self.update_y_hat()
-                self.update_residual_variance()
-            # crude estimate of expectation of psi accounts for redescending influence curve
-            self.expectation_psi_prime = 2 * self.expectation_psi_prime - 1
-        # </REDESCENDING STUFF>
-
-        # <Covariance and Coherence>
-        self.compute_inverse_signal_covariance()
-        # Below is a comment from the matlab codes:
-        # "need to look at how we should compute adjusted residual cov to make
-        # consistent with tranmt"
-        self.compute_noise_covariance()
-        self.compute_squared_coherence()
-        # </Covariance and Coherence>
+        if self.iter_control.return_covariance:
+            self.compute_inverse_signal_covariance()
+            self.compute_noise_covariance()
+            self.compute_squared_coherence()
+        return
 
     def compute_inverse_signal_covariance(self):
         """

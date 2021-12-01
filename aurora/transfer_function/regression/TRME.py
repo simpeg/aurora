@@ -159,20 +159,7 @@ class TRME(MEstimator):
 
         self.initial_estimate()
         self.apply_huber_regression()
-
-        # <REDESCENDING STUFF>
-        if self.iter_control.max_number_of_redescending_iterations:
-            self.iter_control.number_of_redescending_iterations = 0 #reset per channel
-            while self.iter_control.continue_redescending:
-                self.iter_control.number_of_redescending_iterations += 1
-                #self.update_y_hat()
-                self.update_y_cleaned_via_redescend_weights()
-                self.update_b()
-                self.update_y_hat()
-                self.update_residual_variance()
-            # crude estimate of expectation of psi accounts for redescending influence curve
-            self.expectation_psi_prime = 2 * self.expectation_psi_prime - 1
-        # </REDESCENDING STUFF>
+        self.apply_redecending_influence_function()
 
         if self.iter_control.return_covariance:
             self.compute_inverse_signal_covariance()
