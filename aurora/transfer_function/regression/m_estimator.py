@@ -148,7 +148,14 @@ class MEstimator(RegressionEstimator):
 
         return residual_variance
 
-    
+    def initial_estimate(self):
+        """
+        Make first estimate of TF (b), Y_hat, and residual_variance
+        """
+        self.qr_decomposition()
+        self.update_b()
+        self.update_y_hat()
+        self.update_residual_variance()
 
     def update_y_cleaned_via_huber_weights(self):
         """

@@ -138,10 +138,6 @@ class TRME(MEstimator):
         """
         self.b = solve_triangular(self.R, self.QHYc)
 
-    def initial_estimate(self):
-        """
-        Make first estimate of TF (b), Y_hat, and residual_variance
-        """
         
     def estimate(self):
         """
@@ -161,12 +157,7 @@ class TRME(MEstimator):
             self.b = self.solve_underdetermined()
             return
 
-        # <INITIAL ESTIMATE>
-        self.qr_decomposition()
-        self.update_b()
-        self.update_y_hat()
-        self.update_residual_variance()
-        # </INITIAL ESTIMATE>
+        self.initial_estimate()
 
         # <CONVERGENCE STUFF>
         converged = self.iter_control.max_number_of_iterations <= 0

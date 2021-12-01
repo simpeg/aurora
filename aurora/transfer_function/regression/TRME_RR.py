@@ -67,12 +67,6 @@ class TRME_RR(MEstimator):
         if self.Z.shape != self.X.shape:
             print("sizes of local and remote do not agree in RR estimation routine")
             raise Exception
-
-    def initial_estimate(self):
-        """
-        Make first estimate of TF (b), Y_hat, and residual_variance
-        """
-        pass
     
     def update_y_hat(self):
         self._Y_hat = self.X @ self.b 
@@ -99,11 +93,7 @@ class TRME_RR(MEstimator):
         """
         function that does the actual remote reference estimate
         """
-        #self.initial_estimate()
-        self.qr_decomposition()
-        self.update_b()
-        self.update_y_hat()
-        self.update_residual_variance()
+        self.initial_estimate()
 
         # <CONVERGENCE STUFF>
         converged = self.iter_control.max_number_of_iterations <= 0
