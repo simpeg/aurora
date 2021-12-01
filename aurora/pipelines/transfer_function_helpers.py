@@ -5,11 +5,10 @@ and transfer_function_processing helpers.
 
 """
 import numpy as np
-from aurora.time_series.frequency_band_helpers import extract_band
 
-# from aurora.time_series.xarray_helpers import cast_3d_stft_to_2d_observations
+from aurora.time_series.frequency_band_helpers import extract_band
 from aurora.time_series.xarray_helpers import handle_nan
-from aurora.transfer_function.iter_control import IterControl
+from aurora.transfer_function.regression.iter_control import IterControl
 from aurora.transfer_function.transfer_function_header import TransferFunctionHeader
 from aurora.transfer_function.regression.TRME import TRME
 from aurora.transfer_function.regression.TRME_RR import TRME_RR
@@ -127,7 +126,7 @@ def get_band_for_tf_estimate(band, config, local_stft_obj, remote_stft_obj):
         reference_channels and also the frequency axes are restricted to
         being within the frequency band given as an input argument.
     """
-    print(f"Processing band {band.center_period}s")
+    print(f"Processing band {band.center_period:.6f}s")
     band_dataset = extract_band(band, local_stft_obj)
     X = band_dataset[config.input_channels]
     Y = band_dataset[config.output_channels]

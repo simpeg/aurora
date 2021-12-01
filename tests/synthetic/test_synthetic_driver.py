@@ -1,10 +1,10 @@
 from aurora.general_helper_functions import TEST_PATH
 from aurora.pipelines.process_mth5 import process_mth5_run
+from aurora.test_utils.synthetic.make_processing_configs import create_test_run_config
 
 from make_mth5_from_asc import create_test1_h5
 from make_mth5_from_asc import create_test2_h5
 from make_mth5_from_asc import create_test12rr_h5
-from make_synthetic_processing_configs import create_run_config_for_test_case
 
 
 CONFIG_PATH = TEST_PATH.joinpath("synthetic", "config")
@@ -17,10 +17,10 @@ def test_create_mth5():
 
 
 def test_create_run_configs():
-    create_run_config_for_test_case("test1")
-    create_run_config_for_test_case("test2")
-    create_run_config_for_test_case("test1r2")
-    create_run_config_for_test_case("test2r1")
+    create_test_run_config("test1")
+    create_test_run_config("test2")
+    create_test_run_config("test1r2")
+    create_test_run_config("test2r1")
 
 
 def process_synthetic_1_underdetermined():
@@ -53,19 +53,27 @@ def process_synthetic_1_with_nans():
 
 
 def process_synthetic_1():
-    test_config = create_run_config_for_test_case("test1")
+    """
+
+    Returns
+    -------
+    tfc: TransferFunctionCollection
+        Should change so that it is mt_metadata.TF (see Issue #143)
+    """
+    test_config = create_test_run_config("test1")
     run_id = "001"
-    process_mth5_run(test_config, run_id, units="MT")
+    tfc = process_mth5_run(test_config, run_id, units="MT")
+    return tfc
 
 
 def process_synthetic_2():
-    test_config = create_run_config_for_test_case("test2")
+    test_config = create_test_run_config("test2")
     run_id = "001"
     process_mth5_run(test_config, run_id, units="MT")
 
 
 def process_synthetic_rr12():
-    test_config = create_run_config_for_test_case("test1r2")
+    test_config = create_test_run_config("test1r2")
     from synthetic_station_config import make_station_01_config_dict
     station_01_params = make_station_01_config_dict()
     run_id = station_01_params["run_id"]
@@ -73,10 +81,16 @@ def process_synthetic_rr12():
 
 
 def test_process_mth5():
+    """
+    Runs several synthetic processing tests from config creation to tf_collection.
+    TODO: Modify these tests so that they output tfs using mt_metadata transfer function
+    Returns
+    -------
+
+    """
     # process_synthetic_1_underdetermined()
     # process_synthetic_1_with_nans()
-    # create_run_config_for_test_case("test1")
-    process_synthetic_1()
+    tfc = process_synthetic_1()
     process_synthetic_2()
     process_synthetic_rr12()
 

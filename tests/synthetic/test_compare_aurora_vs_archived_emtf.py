@@ -16,13 +16,13 @@ from pathlib import Path
 from aurora.general_helper_functions import TEST_PATH
 from aurora.pipelines.process_mth5 import process_mth5_run
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
+from aurora.test_utils.synthetic.make_processing_configs import create_test_run_config
 from aurora.transfer_function.emtf_z_file_helpers import (
     merge_tf_collection_to_match_z_file,
 )
 
 from make_mth5_from_asc import create_test1_h5
 from make_mth5_from_asc import create_test12rr_h5
-from make_synthetic_processing_configs import create_run_config_for_test_case
 
 SYNTHETIC_PATH = TEST_PATH.joinpath("synthetic")
 CONFIG_PATH = SYNTHETIC_PATH.joinpath("config")
@@ -35,17 +35,17 @@ EXPECTED_RMS_MISFIT = {}
 EXPECTED_RMS_MISFIT["test1"] = {}
 EXPECTED_RMS_MISFIT["test1"]["rho"] = {}
 EXPECTED_RMS_MISFIT["test1"]["phi"] = {}
-EXPECTED_RMS_MISFIT["test1"]["rho"]["xy"] = 4.380757  # 4.357440
-EXPECTED_RMS_MISFIT["test1"]["phi"]["xy"] = 0.871609  # 0.884601
-EXPECTED_RMS_MISFIT["test1"]["rho"]["yx"] = 3.551043  # 3.501146
-EXPECTED_RMS_MISFIT["test1"]["phi"]["yx"] = 0.812733  # 0.808658
+EXPECTED_RMS_MISFIT["test1"]["rho"]["xy"] = 4.406358  #4.380757  # 4.357440
+EXPECTED_RMS_MISFIT["test1"]["phi"]["xy"] = 0.862902  #0.871609  # 0.884601
+EXPECTED_RMS_MISFIT["test1"]["rho"]["yx"] = 3.625859  #3.551043  # 3.501146
+EXPECTED_RMS_MISFIT["test1"]["phi"]["yx"] = 0.840394  #0.812733  # 0.808658
 EXPECTED_RMS_MISFIT["test2r1"] = {}
 EXPECTED_RMS_MISFIT["test2r1"]["rho"] = {}
 EXPECTED_RMS_MISFIT["test2r1"]["phi"] = {}
-EXPECTED_RMS_MISFIT["test2r1"]["rho"]["xy"] = 3.949919
-EXPECTED_RMS_MISFIT["test2r1"]["phi"]["xy"] = 0.957675
-EXPECTED_RMS_MISFIT["test2r1"]["rho"]["yx"] = 4.117700
-EXPECTED_RMS_MISFIT["test2r1"]["phi"]["yx"] = 1.629026
+EXPECTED_RMS_MISFIT["test2r1"]["rho"]["xy"] = 3.940519  #3.949857  #3.949919
+EXPECTED_RMS_MISFIT["test2r1"]["phi"]["xy"] = 0.959861  #0.962837  #0.957675
+EXPECTED_RMS_MISFIT["test2r1"]["rho"]["yx"] = 4.136467  #4.121772  #4.117700
+EXPECTED_RMS_MISFIT["test2r1"]["phi"]["yx"] = 1.635570  #1.637581  #1.629026
 
 def compute_rms(rho, phi, model_rho_a=100.0, model_phi=45.0, verbose=False):
     """
@@ -311,7 +311,7 @@ def process_synthetic_1_standard(
 
 def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
                    expected_rms_misfit=None):
-    processing_config_path = create_run_config_for_test_case(test_case_id,
+    processing_config_path = create_test_run_config(test_case_id,
                                                     matlab_or_fortran=emtf_version)
     process_synthetic_1_standard(
         processing_config_path,
@@ -325,31 +325,32 @@ def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
     )
 
 
-
-
-def test():
-    create_test1_h5()
-    create_test12rr_h5()
-
+def run_test1(emtf_version, expected_rms_misfit=None):
+    print(f"Test1 vs {emtf_version}")
     test_case_id = "test1"
-    emtf_version = "fortran"
     auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test1.zss")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zss"
     aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
-                   expected_rms_misfit=EXPECTED_RMS_MISFIT[test_case_id])
+                   expected_rms_misfit=expected_rms_misfit)
+    return
 
-    test_case_id = "test1"
-    emtf_version = "matlab"
-    auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("from_matlab_256_26.zss")
-    z_file_base = f"{test_case_id}_aurora_{emtf_version}.zss"
-    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base)
-
+def run_test2r1():
+    print(f"Test2r1")
     test_case_id = "test2r1"
     emtf_version = "fortran"
     auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test2r1.zrr")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zrr"
     aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
                    expected_rms_misfit=EXPECTED_RMS_MISFIT[test_case_id])
+    return
+
+
+def test():
+    create_test1_h5()
+    create_test12rr_h5()
+    run_test1("fortran", expected_rms_misfit=EXPECTED_RMS_MISFIT["test1"])
+    run_test1("matlab")
+    run_test2r1()
     print("success")
 
 

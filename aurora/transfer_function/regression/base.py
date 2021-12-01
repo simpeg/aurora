@@ -9,7 +9,7 @@ arrays to follow Gary's codes more easily since his are matlab arrays.
 """
 import numpy as np
 import xarray as xr
-from aurora.transfer_function.iter_control import IterControl
+from aurora.transfer_function.regression.iter_control import IterControl
 
 
 class RegressionEstimator(object):
@@ -18,10 +18,11 @@ class RegressionEstimator(object):
 
     Many of the robust transfer estimation methods we will use repeat the
     model of solving Y = X*b +epsilon for b.  X is variously called the "input",
-    "predictor", "explanatory" or "confounding" or "independent" variable(s).
+    "predictor", "explanatory", "confounding", "independent" variable(s) or the
+    "design matrix", "model matrix" or "regressor matrix".
     Y are variously called the the "output", "predicted", "outcome",
-    "response",  or "dependent" variable.  I will try to use independent and
-    dependent.
+    "response",  or "dependent" variable.  I will try to use input and
+    output.
 
     When we "regress Y on X", we use the values of variable X to predict
     those of Y.
@@ -47,13 +48,13 @@ class RegressionEstimator(object):
     ----------
     _X : xarray.Dataset
         X.data is numpy array (normally 2-dimensional)
-        These are the independent variables.  Like the matlab codes each observation
+        These are the input variables.  Like the matlab codes each observation
         corresponds to a row and each parameter (channel) is a column.
     X :  numpy array (normally 2-dimensional)
         This is a "pure array" representation of _X used to emulate Gary
         Egbert's matlab codes. It may or may not be deprecated.
     _Y : xarray.Dataset
-        These are the dependent variables, aranged same as X above.
+        These are the output variables, aranged same as X above.
     Y : numpy array (normally 2-dimensional)
         This is a "pure array" representation of _X used to emulate Gary
         Egbert's matlab codes. It may or may not be deprecated.
@@ -75,7 +76,7 @@ class RegressionEstimator(object):
         Squared coherence (top row is using raw data, bottom cleaned, with crude
         correction for amount of downweighted data)
     Yc : numpy array (normally 2-dimensional)
-        A "cleaned" version of Y the dependent variables.
+        A "cleaned" version of Y the output variables.
     iter_control : transfer_function.iter_control.IterControl()
         is a structure which controls the robust scheme
         Fields: r0, RG.nITmax, tol (rdcndwt ... not coded yet)
@@ -103,11 +104,12 @@ class RegressionEstimator(object):
         self.Yc = np.zeros(self.Y.shape, dtype=np.complex128)
         self.check_number_of_observations_xy_consistent()
         self.R2 = None
-
+        self.qr_input = "X"
         self._Q = None
         self._R = None
         self._QH = None  # conjugate transpose of Q (Hermitian operator)
         self._QHY = None  #
+        self._QHYc = None
 
     @property
     def inverse_signal_covariance(self):
@@ -168,9 +170,9 @@ class RegressionEstimator(object):
         if self.iter_control.return_covariance:
             print("Warning covariances are not xarray, may break things downstream")
             self.cov_nn = np.zeros((self.n_channels_out, self.n_channels_out))
-            self.cov_ss_inv = np.zeros((self.n_param, self.n_param))
+            self.cov_ss_inv = np.zeros((self.n_channels_in, self.n_channels_in))
 
-        return self.b
+        return
 
     def check_number_of_observations_xy_consistent(self):
         if self.Y.shape[0] != self.X.shape[0]:
@@ -191,19 +193,22 @@ class RegressionEstimator(object):
         """
         return self.X.shape[0]
 
-    # REPLACE WITH n_channels_in
     @property
-    def n_param(self):
+    def n_channels_in(self):
         return self.X.shape[1]
 
     @property
     def n_channels_out(self):
-        """number of dependent variables"""
+        """number of output variables"""
         return self.Y.shape[1]
 
     @property
+    def degrees_of_freedom(self):
+        return self.n_data - self.n_channels_in
+
+    @property
     def is_underdetermined(self):
-        return self.n_param > self.n_data
+        return self.degrees_of_freedom < 0
 
     def mask_input_channels(self):
         """
@@ -214,7 +219,31 @@ class RegressionEstimator(object):
         """
         pass
 
-    def qr_decomposition(self, X, sanity_check=False):
+    def qr_decomposition(self, X=None, sanity_check=False):
+        """
+        performs QR decomposition on input matrix X.  If X is not provided as a kwarg
+        then check the value of self.qr_input
+        Parameters
+        ----------
+        X: numpy array
+            In TRME this is the Input channels X
+            In TRME_RR this is the RR channels Z
+        sanity_check: boolean
+            check QR decomposition is working correctly.  Can probably be deprecated.
+
+        Returns
+        -------
+
+        """
+        if X is None:
+            if self.qr_input == "X":
+                X=self.X
+            elif self.qr_input =="Z":
+                X=self.Z
+            else:
+                print("Matrix to perform QR decompostion not specified")
+                raise Exception
+
         Q, R = np.linalg.qr(X)
         self._Q = Q
         self._R = R
@@ -246,14 +275,14 @@ class RegressionEstimator(object):
             self._QHY = self.QH @ self.Y
         return self._QHY
 
-    @property
-    def QHYc(self):
-        if self._QHYc is None:
-            self.update_QHYc()
-        return self._QHYc
-
-    def update_QHYc(self):
-        self._QHYc = self.QH @ self.Yc
+    # @property
+    # def QHYc(self):
+    #     if self._QHYc is None:
+    #         self.update_QHYc()
+    #     return self._QHYc
+    #
+    # def update_QHYc(self):
+    #     self._QHYc = self.QH @ self.Yc
 
     def estimate_ols(self, mode="solve"):
         """
