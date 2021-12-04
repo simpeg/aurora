@@ -1,6 +1,5 @@
 from aurora.general_helper_functions import TEST_PATH
 
-
 PARKFIELD_PATH = TEST_PATH.joinpath("parkfield")
 
 AURORA_RESULTS_PATH = PARKFIELD_PATH.joinpath("aurora_results")
