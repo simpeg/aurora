@@ -10,7 +10,11 @@
    :caption: User Documentation
 
    user-docs/installing
-   examples/index
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Examples
+
    notebooks/operate_aurora.ipynb
 
 .. toctree::
@@ -18,6 +22,3 @@
    :caption: Reference documentation
 
    api/index.rst
-
-
-
