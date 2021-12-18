@@ -31,6 +31,50 @@ electric_xml_template = xml_path.joinpath("mtml_electrode_example.xml")
 fap_xml_example = ""
 
 
+def channel_summary_to_make_mth5(df, network="ZU"):
+    """
+    This function actually belongs in mth5.  Context is say you have a station_xml
+    that has come from somewhere and you want to make an mth5 from it, with all the
+    relevant data.  Then you should use make_mth5.  But make_mth5 wants a df with a
+    particular schema (which should be written down somewhere!!!)
+
+    This returns a dataframe with the schema that MakeMTH5() expects.
+
+    Parameters
+    ----------
+    df: the output from mth5_obj.channel_summary
+
+    Returns
+    -------
+
+    """
+    ch_map = {"ex":"LQN", "ey":"LQE", "hx":"LFN", "hy":"LFE", "hz":"LFZ"}
+    number_of_runs = len(df["run"].unique())
+    num_rows = 5*number_of_runs
+    networks = num_rows * [network]
+    stations = num_rows * [None]
+    locations = num_rows * [""]
+    channels = num_rows * [None]
+    starts = num_rows * [None]
+    ends = num_rows * [None]
+
+    column_labels = ["network", "station", "location", "channel", "start", "end", ]
+    i = 0
+    for group_id, group_df in df.groupby("run"):
+        print(group_id, group_df.start.unique(),  group_df.end.unique())
+        for index, row in group_df.iterrows():
+            stations[i] = row.station
+            channels[i] = ch_map[row.component]
+            starts[i] = row.start
+            ends[i] = row.end
+            print("OK")
+            i+=1
+
+    out_dict = {"network":networks, "station":stations, "location":locations,
+                "channel":channels, "start":starts, "end":ends}
+    out_df = pd.DataFrame(data=out_dict)
+    return out_df
+
 def mth5_from_iris_database(dataset_config, load_data=True, target_folder=Path()):
     """
     This can work in a way that uses data, or just initializes the mth5
@@ -56,40 +100,6 @@ def mth5_from_iris_database(dataset_config, load_data=True, target_folder=Path()
     return mth5_obj
 
 
-# def test_runts_from_xml(dataset_id, runts_obj=False):
-#     """
-#     THIS METHOD SHOULD BE DEPRECATED ONCE THE PARKFIELD EXAMPLE TEST IS RUNNING
-#     This means after github issues #33 and #34 are closed.
-#     This function is an example of mth5 creation.  It is a separate topic from
-#     aurora pipeline.  This is an Element#1 aspect of the proposal.
-#
-#     We base this on a dataset_id but really it needs a dataset config,
-#     so probably taking a config as an input would be more modular.
-#
-#     The flow here is to get the inventory object from the iris database using
-#     :param dataset_id:
-#     :param runts_obj:
-#     :return:
-#     """
-#     dataset_id = "pkd_test_00"
-#     #
-#     test_dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
-#     inventory = test_dataset_config.get_inventory_from_client(
-#         ensure_inventory_stages_are_named=True
-#     )
-#     experiment = get_experiment_from_obspy_inventory(inventory)
-#
-#     experiment.surveys[0].filters["fir_fs2d5_2000.0"]
-#     experiment.surveys[0].filters["fir_fs2d5_200.0"].decimation_input_sample_rate
-#     h5_path = Path("PKD.h5")
-#     run_obj = mth5_run_from_experiment("PKD", experiment, h5_path=h5_path)
-#
-#     if runts_obj:
-#         array_list = get_example_array_list(
-#             components_list=HEXY, load_actual=True, station_id="PKD"
-#         )
-#         runts_obj = cast_run_to_run_ts(run_obj, array_list=array_list)
-#     return experiment, run_obj, runts_obj
 
 
 # <GET EXPERIMENT>
@@ -111,31 +121,6 @@ def get_experiment_from_obspy_inventory(inventory):
 
 # </GET EXPERIMENT>
 
-
-# def get_filters_dict_from_experiment(experiment, verbose=False):
-#     """
-#     MTH5 HELPER
-#     Only takes the zero'th survey, we will need to index surveys eventually
-#     Parameters
-#     ----------
-#     experiment
-#     verbose
-#
-#     Returns
-#     -------
-#
-#     """
-#     surveys = experiment.surveys
-#     survey = surveys[0]
-#     survey_filters = survey.filters
-#     if verbose:
-#         print(experiment, type(experiment))
-#         print("Survey Filters", survey.filters)
-#         filter_keys = list(survey_filters.keys())
-#         print("FIlter keys", filter_keys)
-#         for filter_key in filter_keys:
-#             print(filter_key, survey_filters[filter_key])
-#     return survey_filters
 
 
 def check_run_channels_have_expected_properties(run):
@@ -228,49 +213,6 @@ def cast_run_to_run_ts(run, array_list=None, station_id=None):
     return runts_object
 
 
-# def filter_control_example(xml_path=None):
-#     """
-#     This has two stages:
-#     1. reads an xml
-#     2. casts to experiement
-#     3. does filter tests.
-#     The filter tests all belong in MTH5 Helpers.
-#     Loads an xml file and casts it to experiment.  Iterates over the filter objects to
-#     confirm that these all registered properly and are accessible.  Evaluates
-#     each filter at a few frequencies to confirm response function works
-#
-#     ToDo: Access "single_station_mt.xml" from metadata repository
-#     Parameters
-#     ----------
-#     xml_path
-#
-#     Returns
-#     -------
-#
-#     """
-#     if xml_path is None:
-#         from aurora.general_helper_functions import MT_METADATA_DATA
-#
-#         xml_path = MT_METADATA_DATA.joinpath("stationxml", "mtml_single_station.xml")
-#     experiment = get_experiment_from_xml_path(xml_path)
-#     filter_dict = get_filters_dict_from_experiment(experiment)
-#     frq = np.arange(5) + 1.2
-#     filter_keys = list(filter_dict.keys())
-#     for key in filter_keys:
-#         my_filter = filter_dict[key]
-#         response = my_filter.complex_response(frq)
-#         print(f"{key} response", response)
-#
-#     for key in filter_dict.keys():
-#         print(f"key = {key}")
-#     print("OK")
-
-
-# def test_filter_control():
-#     print("move this from driver")
-#     pass
-
-
 # </LOAD SOME DATA FROM A SINGLE STATION>
 
 
@@ -339,14 +281,6 @@ def main():
 
     # </CREATE METADATA XML>
 
-    # # <TEST FILTER CONTROL>
-    # if driver_parameters["test_filter_control"]:
-    #     filter_control_example()  # KeyError: 'survey' -20210828
-    #     dataset_id = "pkd_test_00"
-    #     test_dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
-    #     xml_path = test_dataset_config.get_station_xml_filename()
-    #     filter_control_example(xml_path=xml_path)
-    # # </TEST FILTER CONTROL>
 
     # <TEST RunTS FROM XML>
     if driver_parameters["run_ts_from_xml_02"]:
