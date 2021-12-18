@@ -3,11 +3,9 @@ import pickle
 
 from aurora.config.processing_config import RunConfig
 
-# from aurora.pipelines.process_mth5 import export_tf
 from aurora.pipelines.process_mth5 import process_mth5_run
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 
-# from mt_metadata.transfer_functions.core import TF
 
 from helpers import AURORA_RESULTS_PATH
 from helpers import EMTF_RESULTS_PATH
