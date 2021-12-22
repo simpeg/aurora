@@ -5,8 +5,8 @@ from obspy.core import Trace
 from aurora.general_helper_functions import TEST_PATH
 from aurora.test_utils.dataset_definitions import TEST_DATA_SET_CONFIGS
 from aurora.sandbox.mth5_helpers import get_experiment_from_obspy_inventory
-from aurora.pipelines.helpers import initialize_mth5
-from aurora.pipelines.helpers import read_back_data
+from mth5.utils.helpers import initialize_mth5
+from mth5.utils.helpers import read_back_data
 from mth5.timeseries import RunTS
 
 DATA_PATH = TEST_PATH.joinpath("parkfield", "data")

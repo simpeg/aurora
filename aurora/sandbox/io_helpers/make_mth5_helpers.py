@@ -2,13 +2,13 @@ import obspy
 
 from pathlib import Path
 
-from aurora.pipelines.helpers import initialize_mth5
 from aurora.sandbox.obspy_helpers import align_streams
 from aurora.sandbox.obspy_helpers import make_channel_labels_fdsn_compliant
 from aurora.sandbox.obspy_helpers import trim_streams_to_acquisition_run
 from aurora.sandbox.triage_metadata import triage_missing_coil_hollister
 from aurora.sandbox.triage_metadata import triage_mt_units_electric_field
 from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
+from mth5.utils.helpers import initialize_mth5
 from mth5.timeseries import RunTS
 
 
