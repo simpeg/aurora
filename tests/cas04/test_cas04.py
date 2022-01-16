@@ -116,7 +116,7 @@ def test_make_mth5():
 
 
 def main():
-    test_make_mth5()
+    #test_make_mth5()
 
     print("OK")
 
