@@ -35,7 +35,7 @@ jobs:
         conda install -c conda-forge pytest pytest-cov certifi">=2017.4.17" pandoc
         pip install -r requirements-dev.txt
         pip install git+https://github.com/kujaku11/mt_metadata.git
-        pip install git+https://github.com/kujaku11/mth5.git
+        pip install git+https://github.com/kujaku11/mth5.git@issue_76_make_mth5_factoring
         #pip install -e git+https://github.com/kujaku11/mth5_test_data.git#egg=mth5_test_data
 
     - name: Install Our Package
