@@ -49,7 +49,7 @@ def xml_to_mth5(xml_path, h5_path="tmp.h5"):
     -------
 
     """
-    inventory0 = read_inventory(xml_path) #8P
+    inventory0 = read_inventory(str(xml_path)) #8P
     translator = XMLInventoryMTExperiment()
     experiment = translator.xml_to_mt(inventory_object=inventory0)
     mth5_obj = initialize_mth5(h5_path)
