@@ -37,7 +37,7 @@ from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 CAS04_PATH = TEST_PATH.joinpath("cas04")
 DATA_PATH = CAS04_PATH.joinpath("data")
 DATA_PATH.mkdir(exist_ok=True)
-XML_PATH = "cas04_from_tim_20211203.xml"
+XML_PATH = CAS04_PATH.joinpath("cas04_from_tim_20211203.xml")
 
 def xml_to_mth5(xml_path, h5_path="tmp.h5"):
     """
