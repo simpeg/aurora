@@ -37,6 +37,7 @@ from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 CAS04_PATH = TEST_PATH.joinpath("cas04")
 DATA_PATH = CAS04_PATH.joinpath("data")
 DATA_PATH.mkdir(exist_ok=True)
+XML_PATH = "cas04_from_tim_20211203.xml"
 
 def xml_to_mth5(xml_path, h5_path="tmp.h5"):
     """
@@ -97,7 +98,7 @@ def make_cas04_data_for_processing(xml_path, h5_path="tmp.h5",
     return mth5_path
 
 
-def test_make_mth5(xml_path):
+def test_make_mth5():
     """
     WARNING: The returned variable is ci
     Returns
@@ -105,7 +106,7 @@ def test_make_mth5(xml_path):
 
     """
     h5_path = DATA_PATH.joinpath("cas04.h5")
-    mth5_path = make_cas04_data_for_processing(xml_path, h5_path=h5_path,
+    mth5_path = make_cas04_data_for_processing(XML_PATH, h5_path=h5_path,
                                                generate_channel_summary=True,
                                                summary_csv="channel_summary.csv",
                                                active_runs=None)#["a", ])
@@ -119,7 +120,7 @@ def test_make_mth5(xml_path):
     return mth5_path
 
 
-def test_process_run(run_id):
+def process_run(run_id):
     """
     Parameters
     ----------
@@ -133,23 +134,22 @@ def test_process_run(run_id):
     pass
 
 
-def test_process_merged_runs(run_ids):
+def process_merged_runs(run_ids):
     pass
 
 def main():
     make_mth5_from_scratch = True
-    xml_path = "cas04_from_tim_20211203.xml"
     if make_mth5_from_scratch:
-        mth5_path = test_make_mth5(xml_path)
+        mth5_path = test_make_mth5()
     else:
         mth5_path = DATA_PATH.joinpath("ZU_CAS04.h5")#../backup/data/
     m = initialize_mth5(mth5_path, mode="r")
     for run_id in ["a", "b", "c", "d"]:
-        test_process_run(run_id)
+        process_run(run_id)
     run_ids = ["b", "c"]
-    test_process_merged_runs(run_ids)
+    process_merged_runs(run_ids)
     run_ids = ["b", "c", "d"]
-    test_process_merged_runs(run_ids)
+    process_merged_runs(run_ids)
 
     print("OK")
 
