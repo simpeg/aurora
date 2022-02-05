@@ -87,13 +87,15 @@ def make_cas04_data_for_processing(xml_path, h5_path="tmp.h5",
     print(request_df)
     #</TRANSFORM CHANNEL SUMMARY INTO REQUEST DF>
 
-
+    #SOLUTION 1:
+    # mth5_obj.populate_runs_from_request(request_df, client="IRIS")
     maker = MakeMTH5(mth5_version="0.1.0")
     print("FAILED FOR 0.2.0 with some other error")
     #inventory, streams = maker.get_inventory_from_df(request_df, data=False, client="IRIS")
     # inventory==inventory0??
     mth5_path = maker.make_mth5_from_fdsnclient(request_df, client="IRIS", path=DATA_PATH)
-
+    #SOLUTION 2:
+    # port_metadata(source=mth5_obj, target=mth5_path)
     print(f"success {mth5_path}")
     return mth5_path
 
@@ -130,6 +132,7 @@ def process_run(run_id):
     -------
 
     """
+    
     print("you need a processing config for this run")
     pass
 
@@ -138,7 +141,7 @@ def process_merged_runs(run_ids):
     pass
 
 def main():
-    make_mth5_from_scratch = True
+    make_mth5_from_scratch = False
     if make_mth5_from_scratch:
         mth5_path = test_make_mth5()
     else:
