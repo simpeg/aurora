@@ -1,3 +1,7 @@
+"""
+THis may be moved to single_station processing example
+"""
+from aurora.config.processing_config import RunConfig
 from aurora.general_helper_functions import TEST_PATH
 
 from mth5.utils.helpers import initialize_mth5
@@ -19,6 +23,23 @@ def process_run(mth5_obj, run_id):
     print("you need a processing config for this run")
     pass
 
+def create_run_config(mth5_obj, run_id):
+    """
+    Need a kwarg for single station and for remote reference
+
+    Parameters
+    ----------
+    mth5_obj
+    run_id
+
+    Returns
+    -------
+
+    """
+    run_group = mth5_obj.get_run("CAS04", run_id)
+    print(run_group.metadata)
+
+    return
 
 def process_merged_runs(run_ids):
     pass

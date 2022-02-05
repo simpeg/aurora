@@ -21,7 +21,6 @@ from obspy import read_inventory
 import pandas as pd
 import pathlib
 
-from aurora.config.processing_config import RunConfig
 from aurora.general_helper_functions import TEST_PATH
 from aurora.pipelines.process_mth5 import process_mth5_run
 from aurora.test_utils.dataset_definitions import TEST_DATA_SET_CONFIGS
