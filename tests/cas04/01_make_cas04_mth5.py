@@ -122,39 +122,19 @@ def test_make_mth5():
     return mth5_path
 
 
-def process_run(run_id):
-    """
-    Parameters
-    ----------
-    run_id
-
-    Returns
-    -------
-
-    """
-    
-    print("you need a processing config for this run")
-    pass
-
-
-def process_merged_runs(run_ids):
-    pass
-
-def main():
+def run_tests():
     make_mth5_from_scratch = False
     if make_mth5_from_scratch:
         mth5_path = test_make_mth5()
     else:
         mth5_path = DATA_PATH.joinpath("ZU_CAS04.h5")#../backup/data/
-    m = initialize_mth5(mth5_path, mode="r")
-    for run_id in ["a", "b", "c", "d"]:
-        process_run(run_id)
-    run_ids = ["b", "c"]
-    process_merged_runs(run_ids)
-    run_ids = ["b", "c", "d"]
-    process_merged_runs(run_ids)
+    return mth5_path
 
-    print("OK")
+def main():
+    mth5_path = run_tests()
+    return mth5_path
+
 
 if __name__ == "__main__":
     main()
+    print("OK")
