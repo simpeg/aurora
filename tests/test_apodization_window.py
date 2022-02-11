@@ -54,15 +54,15 @@ def test_can_inititalize_apodization_window():
     """
     pass
 
-def main():
-    test_default_boxcar()
-    test_hamming()
-    test_blackmanharris()
-    test_kaiser()
-    test_dpss()
-    test_custom()
-    test_tukey()
-#    test_can_inititalize_apodization_window()
-
-if __name__ == "__main__":
-    main()
+# def main():
+#     test_default_boxcar()
+#     test_hamming()
+#     test_blackmanharris()
+#     test_kaiser()
+#     test_dpss()
+#     test_custom()
+#     test_tukey()
+# #    test_can_inititalize_apodization_window()
+# 
+# if __name__ == "__main__":
+#     main()
