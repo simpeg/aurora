@@ -1,54 +1,3 @@
-"""
-@author: kkappler
-
-Module to manage windowing prior to FFT.  Intended to support most
-apodization  windows available via scipy.signal.get_window()
-
-
-    Supported Window types = ['boxcar', 'triang', 'blackman', 'hamming', 'hann',
-      'bartlett', 'flattop', 'parzen', 'bohman', 'blackmanharris',
-      'nuttall', 'barthann', 'kaiser', 'gaussian', 'general_gaussian',
-      'slepian', 'chebwin']
-
-    have_additional_args = {
-      'kaiser' : 'beta',
-      'gaussian' : 'std',
-      'general_gaussian' : ('power', 'width'),
-      'slepian' : 'width',
-      'chebwin' : 'attenuation'
-    }
-
-The Taper Config has 2 possible forms:
-1. Standard form for accessing scipy.signal:
-["taper_family", "num_samples_window", "additional_args"]
-2. User-defined : for defining custom tapers
-
-Example 1 : Standard form
-"taper_family" = "hamming"
-"num_samples_window" = 128
-"additional_args" = {}
-
-Example 2 : Standard form
-"taper_family" = "kaiser"
-"num_samples_window" = 64
-"additional_args" = {"beta":8}
-
-Examples 3 : User Defined
-2. user-defined: ["array"]
-In this case num_samples_window is defined by the array.
-"array" = [1, 2, 3, 4, 5, 4, 3, 2, 1]
-If "array" is non-empty then assume the user-defined case.
-
-It is a little bit unsatisfying that the args need to be ordered for
-scipy.signal.get_window().  Probably use OrderedDict()
-for any windows that have more than one additional args.
-
-For example
-"taper_family" = 'general_gaussian'
-"additional_args" = OrderedDict("power":1.5, "sigma":7)
-
-"""
-
 import numpy as np
 import scipy.signal as ssig
 
@@ -70,10 +19,9 @@ class ApodizationWindow(object):
     [2] Harris FJ. On the use of windows for harmonic analysis with the discrete
     Fourier transform. Proceedings of the IEEE. 1978 Jan;66(1):51-83.
 
-    <Nomenclature from Heinzel et al.>
+    Nomenclature from Heinzel et al.
     ENBW: Effective Noise BandWidth, see Equation (22)
     NENBW Normalized Equivalent Noise BandWidth, see Equation (21)
-    </Nomenclature from Heinzel et al.>
 
 
 
@@ -122,8 +70,6 @@ class ApodizationWindow(object):
         """
         Returns a string comprised of the taper_family, number_of_samples,
         and True/False if self.taper is not None
-
-        Note: ? cal this __str__()
         -------
 
         """
@@ -253,7 +199,12 @@ class ApodizationWindow(object):
 
 
 def test_can_inititalize_apodization_window():
-    """ """
+    """
+
+    Returns
+    -------
+
+    """
     apodization_window = ApodizationWindow(num_samples_window=4)
     print(apodization_window.summary)
     apodization_window = ApodizationWindow(
@@ -277,12 +228,12 @@ def test_can_inititalize_apodization_window():
     )
     print(apodization_window.summary)
 
-
-def main():
-    """ """
-    test_can_inititalize_apodization_window()
-    print("fin")
-
-
-if __name__ == "__main__":
-    main()
+#
+# def main():
+#     """ """
+#     test_can_inititalize_apodization_window()
+#     print("fin")
+#
+#
+# if __name__ == "__main__":
+#     main()
