@@ -280,12 +280,12 @@ def test_can_inititalize_apodization_window():
     )
     print(apodization_window.summary)
 
-#
-# def main():
-#     """ """
-#     test_can_inititalize_apodization_window()
-#     print("fin")
-#
-#
-# if __name__ == "__main__":
-#     main()
+
+def main():
+    """ """
+    test_can_inititalize_apodization_window()
+    print("fin")
+
+
+if __name__ == "__main__":
+    main()
