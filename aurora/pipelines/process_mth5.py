@@ -365,32 +365,6 @@ def process_mth5_run(
         processing_config.reference_station_id = run_config.reference_station_id
         processing_config.channel_scale_factors = run_config.channel_scale_factors
 
-        # <GET DATA>
-        # Careful here -- for multiple station processing we will need to load
-        # many time series' here.  Will probably have another version of
-        # process_mth5_run for MMT
-        # Also, this will need to be modified when run_id is a list.  When run_id is
-        # a list, we could return a list of local, remote objects, one per run. Then 
-        # we would need a second step where the runs are
-        # merged, which can be done acccording to one of two schemes
-        # Scheme 1: Nan-fill (or effective Nan fill)
-        # Scheme 2 Interpolate / replace with numeric data
-        # In all cases, merging runs implies a gap, and the gap will either have
-        # numbers, nans, or will persist as an undefined chunk.
-        #Nan-fill is a nice, simple solution, that allows generically for numeric
-        # overwrite, without a structural modification.
-        # Two things can go wrong here:
-        # 1. The gap could be very large ... in which case we can generate a
-        # needlessly long time series ... and possibly overload something RAM-wise
-        # ... that could be solved by reading from the MTH5 on an as-needed basis,
-        # effectively chunking from one filesystem to another ... so you would open a
-        # "receiver of FCs" h5 and then read-->process-->write until the job is done.
-        # If the gap is not very large, then this is not an issue.
-        # 2. Nan in the time-series can cause issues with anti-alias filters (for
-        # decimation) or other issues in the time series processing.
-        # This could be solved by any standard method, even replacing the gap with zeros, 
-        # processing, and then assigning nan to data in STFT-land where there were gaps 
-        # in TS-land.  The FC processing already handles nans (I think).
 
         if dec_level_id == 0:
             local, remote = get_data_from_decimation_level_from_mth5(
@@ -399,8 +373,9 @@ def process_mth5_run(
 
             # APPLY TIMING CORRECTIONS HERE
         else:
-            # THIS ASSUMES CASCADING DECIMATION, and that the decimated data is from
-            # the previous decimation level.  This should be revisited .. it may make
+            # This code structure assumes application of cascading decimation,
+            # and that the decimated data will be accessed from the previous
+            # decimation level.  This should be revisited .. it may make
             # more sense to have a get_decimation_level() interface that provides an
             # option of applying decimation or loading predecimated data.
             local = prototype_decimate(processing_config, local)
@@ -410,11 +385,10 @@ def process_mth5_run(
         # </GET DATA>
         local_stft_obj, remote_stft_obj = make_stft_objects(processing_config,
                                                             local, remote, units)
+        # MERGE STFTS goes here
         tf_obj = process_mth5_decimation_level(
             processing_config, local_stft_obj, remote_stft_obj, units=units
         )
-        # z_correction = kwargs.get("z_correction", 1.0)
-        # tf_obj.rho *= z_correction
         tf_dict[dec_level_id] = tf_obj
 
         if show_plot:
