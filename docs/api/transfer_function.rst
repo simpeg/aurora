@@ -42,7 +42,7 @@ EMTF Z File Helpers
 Iter Control
 ************
 
-.. automodule:: aurora.transfer_function.iter_control
+.. automodule:: aurora.transfer_function.regression.iter_control
     :show-inheritance:
     :members:
     :undoc-members:

@@ -49,6 +49,7 @@ For example
 
 """
 
+
 import numpy as np
 import scipy.signal as ssig
 
@@ -70,10 +71,9 @@ class ApodizationWindow(object):
     [2] Harris FJ. On the use of windows for harmonic analysis with the discrete
     Fourier transform. Proceedings of the IEEE. 1978 Jan;66(1):51-83.
 
-    <Nomenclature from Heinzel et al.>
+    Nomenclature from Heinzel et al.
     ENBW: Effective Noise BandWidth, see Equation (22)
     NENBW Normalized Equivalent Noise BandWidth, see Equation (21)
-    </Nomenclature from Heinzel et al.>
 
 
 
@@ -122,8 +122,6 @@ class ApodizationWindow(object):
         """
         Returns a string comprised of the taper_family, number_of_samples,
         and True/False if self.taper is not None
-
-        Note: ? cal this __str__()
         -------
 
         """
@@ -253,7 +251,12 @@ class ApodizationWindow(object):
 
 
 def test_can_inititalize_apodization_window():
-    """ """
+    """
+
+    Returns
+    -------
+
+    """
     apodization_window = ApodizationWindow(num_samples_window=4)
     print(apodization_window.summary)
     apodization_window = ApodizationWindow(

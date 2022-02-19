@@ -112,25 +112,18 @@ def prototype_decimate(config, run_run_ts):
 
     return result
 
-
-def process_mth5_decimation_level(config, local, remote, units="MT"):
+def make_stft_objects(config, local, remote, units):
     """
-    Processing pipeline for a single decimation_level
-    TODO: Add a check that the processing config sample rates agree with the
-    data sampling rates otherwise raise Exception
-    This method can be single station or remote based on the process cfg
-    :param processing_cfg:
-    :return:
+    2022-02-08: Factor this out of process_mth5_decimation_level in prep for merging
+    runs.   
     Parameters
     ----------
-    config : aurora.config.decimation_level_config.DecimationLevelConfig
-    units
+    config
+    local
+    remote
 
     Returns
     -------
-    transfer_function_obj : aurora.transfer_function.TTFZ.TTFZ
-
-
 
     """
     local_run_obj = local["run"]
@@ -138,7 +131,6 @@ def process_mth5_decimation_level(config, local, remote, units="MT"):
 
     remote_run_obj = remote["run"]
     remote_run_xrts = remote["mvts"]
-
     # <CHECK DATA COVERAGE IS THE SAME IN BOTH LOCAL AND RR>
     # This should be pushed into a previous validator before pipeline starts
     # if config.reference_station_id:
@@ -167,7 +159,64 @@ def process_mth5_decimation_level(config, local, remote, units="MT"):
         )
     else:
         remote_stft_obj = None
+    return local_stft_obj, remote_stft_obj
 
+
+def process_mth5_decimation_level(config, local_stft_obj, remote_stft_obj, units="MT"):
+    """
+    Processing pipeline for a single decimation_level
+    TODO: Add a check that the processing config sample rates agree with the
+    data sampling rates otherwise raise Exception
+    This method can be single station or remote based on the process cfg
+    :param processing_cfg:
+    :return:
+    Parameters
+    ----------
+    config : aurora.config.decimation_level_config.DecimationLevelConfig
+    units
+
+    Returns
+    -------
+    transfer_function_obj : aurora.transfer_function.TTFZ.TTFZ
+
+
+
+    """
+    # local_stft_obj, remote_stft_obj = make_stft_objects(config, local, remote, units)
+    # local_run_obj = local["run"]
+    # local_run_xrts = local["mvts"]
+    #
+    # remote_run_obj = remote["run"]
+    # remote_run_xrts = remote["mvts"]
+    #
+    # # <CHECK DATA COVERAGE IS THE SAME IN BOTH LOCAL AND RR>
+    # # This should be pushed into a previous validator before pipeline starts
+    # # if config.reference_station_id:
+    # #    local_run_xrts = local_run_xrts.where(local_run_xrts.time <=
+    # #                                          remote_run_xrts.time[-1]).dropna(
+    # #                                          dim="time")
+    # # </CHECK DATA COVERAGE IS THE SAME IN BOTH LOCAL AND RR>
+    #
+    # local_stft_obj = run_ts_to_stft(config, local_run_xrts)
+    # local_scale_factors = config.station_scale_factors(config.local_station_id)
+    # # local_stft_obj = run_ts_to_stft_scipy(config, local_run_xrts)
+    # local_stft_obj = calibrate_stft_obj(
+    #     local_stft_obj,
+    #     local_run_obj,
+    #     units=units,
+    #     channel_scale_factors=local_scale_factors,
+    # )
+    # if config.reference_station_id:
+    #     remote_stft_obj = run_ts_to_stft(config, remote_run_xrts)
+    #     remote_scale_factors = config.station_scale_factors(config.reference_station_id)
+    #     remote_stft_obj = calibrate_stft_obj(
+    #         remote_stft_obj,
+    #         remote_run_obj,
+    #         units=units,
+    #         channel_scale_factors=remote_scale_factors,
+    #     )
+    # else:
+    #     remote_stft_obj = None
     frequency_bands = configure_frequency_bands(config)
     transfer_function_header = transfer_function_header_from_config(config)
     transfer_function_obj = TTFZ(
@@ -277,6 +326,8 @@ def process_mth5_run(
     **kwargs,
 ):
     """
+    2022-02-08: TODO: Need to replace run_id (string) with a list, or, maybe,
+    support either a list of strings or a single string.
     Stages here:
     1. Read in the config and figure out how many decimation levels there are
 
@@ -314,10 +365,6 @@ def process_mth5_run(
         processing_config.reference_station_id = run_config.reference_station_id
         processing_config.channel_scale_factors = run_config.channel_scale_factors
 
-        # <GET DATA>
-        # Careful here -- for multiple station processing we will need to load
-        # many time series' here.  Will probably have another version of
-        # process_mth5_run for MMT
 
         if dec_level_id == 0:
             local, remote = get_data_from_decimation_level_from_mth5(
@@ -326,17 +373,22 @@ def process_mth5_run(
 
             # APPLY TIMING CORRECTIONS HERE
         else:
+            # This code structure assumes application of cascading decimation,
+            # and that the decimated data will be accessed from the previous
+            # decimation level.  This should be revisited .. it may make
+            # more sense to have a get_decimation_level() interface that provides an
+            # option of applying decimation or loading predecimated data.
             local = prototype_decimate(processing_config, local)
             if processing_config.reference_station_id:
                 remote = prototype_decimate(processing_config, remote)
 
         # </GET DATA>
-
+        local_stft_obj, remote_stft_obj = make_stft_objects(processing_config,
+                                                            local, remote, units)
+        # MERGE STFTS goes here
         tf_obj = process_mth5_decimation_level(
-            processing_config, local, remote, units=units
+            processing_config, local_stft_obj, remote_stft_obj, units=units
         )
-        # z_correction = kwargs.get("z_correction", 1.0)
-        # tf_obj.rho *= z_correction
         tf_dict[dec_level_id] = tf_obj
 
         if show_plot:
@@ -344,7 +396,7 @@ def process_mth5_run(
 
             plot_tf_obj(tf_obj, out_filename="out")
 
-    # TODO: Add run_obj to TransferFunctionCollection
+    # TODO: Add run_obj to TransferFunctionCollection ? WHY? so it doesn't need header?
     tf_collection = TransferFunctionCollection(header=tf_obj.tf_header, tf_dict=tf_dict)
     local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
 
