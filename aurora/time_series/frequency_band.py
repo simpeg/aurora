@@ -115,6 +115,16 @@ class FrequencyBand(Interval):
         return indices
 
     def in_band_harmonics(self, frequencies):
+        """
+        
+        Parameters
+        ----------
+        frequencies
+
+        Returns the actual harmonics or frequencies in band, rather than the indces.
+        -------
+
+        """
         indices = self.fourier_coefficient_indices(frequencies)
         harmonics = frequencies[indices]
         return harmonics
