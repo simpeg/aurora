@@ -1,0 +1,46 @@
+{
+    "id": {
+        "type": "string",
+        "required": true,
+        "style": "free form",
+        "units": null,
+        "description": "Station ID",
+        "options": [],
+        "alias": [],
+        "example": "mt001",
+		"default": null
+    },
+    "mth5_path": {
+        "type": "string",
+        "required": true,
+        "style": "free form",
+        "units": null,
+        "description": "full path to MTH5 file where the station data is contained",
+        "options": [],
+        "alias": [],
+        "example": "/home/mt/experiment_01.h5",
+		"default": null
+    },
+	"remote": {
+        "type": "boolean",
+        "required": true,
+        "style": "free form",
+        "units": null,
+        "description": "remote station (True) or local station (False)",
+        "options": [],
+        "alias": [],
+        "example": "False",
+		"default": false
+    },
+	"channel_scale_factors": {
+        "type": "string",
+        "required": true,
+        "style": "free form",
+        "units": null,
+        "description": "channel scale factors",
+        "options": [],
+        "alias": [],
+        "example": "[10]",
+		"default": false
+    }
+}
