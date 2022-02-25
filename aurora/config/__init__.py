@@ -1,3 +1,3 @@
-from .metadata import (Window, Station, Channel, Stations)
+from .metadata import (Window, Station, Channel, Stations, Decimation)
 
-__all__ = ["Window", "Station", "Channel", "Stations"]
+__all__ = ["Window", "Station", "Channel", "Stations", "Decimation"]
