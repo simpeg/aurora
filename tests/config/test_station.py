@@ -33,7 +33,6 @@ class TestStation(unittest.TestCase):
             self.assertIsInstance(self.station.channel_scale_factors, dict)
     
     def test_add_dict(self):
-        print(self.station.channel_scale_factors)
         ch_dict = {"ex": Channel(id="ex")}
         self.station.channel_scale_factors = ch_dict
         with self.subTest("is dict"):
