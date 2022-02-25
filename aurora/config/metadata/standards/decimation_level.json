@@ -1,40 +1,35 @@
 {
-    "config_id": {
+    "anti_alias_filter": {
         "type": "string",
         "required": true,
-        "style": "free form",
+        "style": "controlled vocabulary",
         "units": null,
-        "description": "ID of the configuration setup. ",
-        "options": [],
+        "description": "Name of anti alias filter to be applied",
+        "options": ["deafult", "other"],
         "alias": [],
-        "example": "CAS04-01",
-		"default": null
+        "example": "default",
+		"default": "default"
     },
-    "longitude": {
-        "type": "float",
+	"prewhitening_type": {
+        "type": "string",
         "required": true,
-        "style": "number",
-        "units": "degrees",
-        "description": "Longitude of location in datum specified at survey level.",
-        "options": [],
-        "alias": [
-            "lon",
-            "long"
-        ],
-        "example": "14.23",
-		"default": 0.0
+        "style": "controlled vocabulary",
+        "units": null,
+        "description": "Prewhitening method to be applied",
+        "options": ["first difference", "other"],
+        "alias": [],
+        "example": "first difference",
+		"default": "first difference"
     },
-    "elevation": {
-        "type": "float",
+	"extra_pre_fft_detrend_type": {
+        "type": "string",
         "required": true,
-        "style": "number",
-        "units": "meters",
-        "description": "Elevation of location in datum specified at survey level.",
-        "options": [],
-        "alias": [
-            "elev"
-        ],
-        "example": "123.4",
-		"default": 0.0
+        "style": "controlled vocabulary",
+        "units": null,
+        "description": "Pre FFT detrend method to be applied",
+        "options": ["linear", "other"],
+        "alias": [],
+        "example": "linear",
+		"default": "linear"
     }
 }

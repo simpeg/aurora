@@ -1,0 +1,24 @@
+{
+    "engine": {
+        "type": "string",
+        "required": true,
+        "style": "controlled vocabulary",
+        "units": null,
+        "description": "The transfer function estimator engine",
+        "options": ["RME_RR", "other"],
+        "alias": [],
+        "example": "RME_RR",
+		"default": "RME_RR"
+    },
+    "estimate_per_channel": {
+        "type": "boolean",
+        "required": true,
+        "style": "free form",
+        "units": null,
+        "description": "Estimate per channel",
+        "options": [],
+        "alias": [],
+        "example": "True",
+		"default": true
+    }
+}

@@ -3,6 +3,8 @@ from .station import Station
 from .channel import Channel
 from .stations import Stations
 from .decimation import Decimation
+from .regression import Regression
+from .estimator import Estimator
 
 __all__ = [
     "Window",
@@ -10,4 +12,6 @@ __all__ = [
     "Channel",
     "Stations",
     "Decimation",
+    "Regression",
+    "Estimator",
     ]
