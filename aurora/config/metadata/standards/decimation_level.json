@@ -1,0 +1,40 @@
+{
+    "config_id": {
+        "type": "string",
+        "required": true,
+        "style": "free form",
+        "units": null,
+        "description": "ID of the configuration setup. ",
+        "options": [],
+        "alias": [],
+        "example": "CAS04-01",
+		"default": null
+    },
+    "longitude": {
+        "type": "float",
+        "required": true,
+        "style": "number",
+        "units": "degrees",
+        "description": "Longitude of location in datum specified at survey level.",
+        "options": [],
+        "alias": [
+            "lon",
+            "long"
+        ],
+        "example": "14.23",
+		"default": 0.0
+    },
+    "elevation": {
+        "type": "float",
+        "required": true,
+        "style": "number",
+        "units": "meters",
+        "description": "Elevation of location in datum specified at survey level.",
+        "options": [],
+        "alias": [
+            "elev"
+        ],
+        "example": "123.4",
+		"default": 0.0
+    }
+}
