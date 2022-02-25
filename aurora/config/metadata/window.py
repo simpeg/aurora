@@ -27,6 +27,8 @@ class Window(Base):
     
     @additional_args.setter
     def additional_args(self, args):
+        if not isinstance(args, dict):
+            raise TypeError("additional_args must be a dictionary")
         self._additional_args = args
         
     
