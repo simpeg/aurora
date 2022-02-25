@@ -23,6 +23,8 @@ class TestDecimation(unittest.TestCase):
             self.assertEqual(self.decimation.factor, 1)
         with self.subTest("test method"):
             self.assertEqual(self.decimation.method, "default")
+        with self.subTest("test sample_rate"):
+            self.assertEqual(self.decimation.rate, 1.0)
         
         
 

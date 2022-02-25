@@ -31,5 +31,16 @@
         "alias": [],
         "example": "default",
 		"default": "default"
+    },    
+	"sample_rate": {
+        "type": "float",
+        "required": true,
+        "style": "number",
+        "units": "samples per second",
+        "description": "Initial sample rate of the data.",
+        "options": [],
+        "alias": [],
+        "example": "256",
+		"default": 1
     }
 }
