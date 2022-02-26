@@ -18,7 +18,6 @@ from pathlib import Path
 
 from aurora.test_utils.dataset_definitions import TEST_DATA_SET_CONFIGS
 
-# from aurora.sandbox.io_helpers.test_data import get_example_array_list
 from aurora.sandbox.io_helpers.test_data import get_example_data
 from aurora.sandbox.xml_sandbox import describe_inventory_stages
 from mth5.utils.helpers import initialize_mth5
@@ -33,16 +32,16 @@ fap_xml_example = ""
 
 
 
-
 # <GET EXPERIMENT>
-def get_experiment_from_xml_path(xml):
-    from mt_metadata.timeseries import Experiment
-
-    xml_path = Path(xml)
-    experiment = Experiment()
-    experiment.from_xml(fn=xml_path)
-    print(experiment, type(experiment))
-    return experiment
+#DEPRECATED: these tools exist in mt_metadata
+# def get_experiment_from_xml_path(xml):
+#     from mt_metadata.timeseries import Experiment
+#
+#     xml_path = Path(xml)
+#     experiment = Experiment()
+#     experiment.from_xml(fn=xml_path)
+#     print(experiment, type(experiment))
+#     return experiment
 
 
 def get_experiment_from_obspy_inventory(inventory):
