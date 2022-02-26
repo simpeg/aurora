@@ -1,0 +1,57 @@
+{
+    "decimation_level": {
+        "type": "integer",
+        "required": true,
+        "style": "number",
+        "units": null,
+        "description": "Decimation level for the band",
+        "options": [],
+        "alias": [],
+        "example": "0",
+		"default": 0
+    },
+    "index_max": {
+        "type": "integer",
+        "required": true,
+        "style": "number",
+        "units": null,
+        "description": "maximum band index",
+        "options": [],
+        "alias": [],
+        "example": "10",
+		"default": 5
+    },
+    "index_min": {
+        "type": "integer",
+        "required": true,
+        "style": "number",
+        "units": null,
+        "description": "minimum band index",
+        "options": [],
+        "alias": [],
+        "example": "10",
+		"default": 5
+    },
+    "frequency_max": {
+        "type": "integer",
+        "required": true,
+        "style": "number",
+        "units": "samples per second",
+        "description": "maximum band frequency",
+        "options": [],
+        "alias": [],
+        "example": "10",
+		"default": 10
+    },
+    "frequency_min": {
+        "type": "integer",
+        "required": true,
+        "style": "number",
+        "units": "samples per second",
+        "description": "minimum band frequency",
+        "options": [],
+        "alias": [],
+        "example": "10",
+		"default": 10
+    }
+}
