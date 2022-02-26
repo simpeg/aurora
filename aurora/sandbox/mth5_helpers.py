@@ -30,28 +30,10 @@ electric_xml_template = xml_path.joinpath("mtml_electrode_example.xml")
 fap_xml_example = ""
 
 
-
-
-# <GET EXPERIMENT>
-#DEPRECATED: these tools exist in mt_metadata
-# def get_experiment_from_xml_path(xml):
-#     from mt_metadata.timeseries import Experiment
-#
-#     xml_path = Path(xml)
-#     experiment = Experiment()
-#     experiment.from_xml(fn=xml_path)
-#     print(experiment, type(experiment))
-#     return experiment
-
-
 def get_experiment_from_obspy_inventory(inventory):
     translator = XMLInventoryMTExperiment()
     experiment = translator.xml_to_mt(inventory_object=inventory)
     return experiment
-
-
-# </GET EXPERIMENT>
-
 
 
 def check_run_channels_have_expected_properties(run):
