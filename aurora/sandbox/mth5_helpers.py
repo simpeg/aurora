@@ -31,30 +31,30 @@ electric_xml_template = xml_path.joinpath("mtml_electrode_example.xml")
 fap_xml_example = ""
 
 
-
-def mth5_from_iris_database(dataset_config, load_data=True, target_folder=Path()):
-    """
-    This can work in a way that uses data, or just initializes the mth5
-
-    Parameters
-    ----------
-    metadata_config:
-
-    Returns
-    -------
-
-    """
-    inventory = dataset_config.get_inventory_from_client(
-        ensure_inventory_stages_are_named=True
-    )
-    experiment = get_experiment_from_obspy_inventory(inventory)
-
-    # make an MTH5
-    h5_path = target_folder.joinpath(f"{dataset_config.dataset_id}.h5")
-    mth5_obj = initialize_mth5(h5_path)
-    mth5_obj.from_experiment(experiment)
-
-    return mth5_obj
+#DEPRECATED: We now have MakeMTH5 tools
+# def mth5_from_iris_database(dataset_config, load_data=True, target_folder=Path()):
+#     """
+#     This can work in a way that uses data, or just initializes the mth5
+#
+#     Parameters
+#     ----------
+#     metadata_config:
+#
+#     Returns
+#     -------
+#
+#     """
+#     inventory = dataset_config.get_inventory_from_client(
+#         ensure_inventory_stages_are_named=True
+#     )
+#     experiment = get_experiment_from_obspy_inventory(inventory)
+#
+#     # make an MTH5
+#     h5_path = target_folder.joinpath(f"{dataset_config.dataset_id}.h5")
+#     mth5_obj = initialize_mth5(h5_path)
+#     mth5_obj.from_experiment(experiment)
+#
+#     return mth5_obj
 
 
 
