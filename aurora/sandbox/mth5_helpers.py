@@ -208,11 +208,18 @@ def main():
 
     # <INITIALIZE DATA>
     if driver_parameters["initialize_data"]:
-        pkd_mvts = get_example_data(station_id="PKD", component_station_label=True)
-        sao_mvts = get_example_data(station_id="SAO", component_station_label=True)
-        pkd = pkd_mvts.dataset
-        sao = sao_mvts.dataset
-        pkd.update(sao)
+        try:
+            pkd_mvts = get_example_data(station_id="PKD", component_station_label=True)
+            sao_mvts = get_example_data(station_id="SAO", component_station_label=True)
+            pkd = pkd_mvts.dataset
+            sao = sao_mvts.dataset
+            pkd.update(sao)
+        except FileNotFoundError:
+            print("failing to find: "
+                  "aurora/tests/parkfield/data/pkd_sao_2004_272_00-02.h5 ")
+            print("I put a copy of that data here:")
+            print("https://drive.google.com/drive/folders/1WFhhLrt5wSlw4FaAFkfb58allNdGjwck")
+
     # </INITIALIZE DATA>
     print("try to combine these runs")
 
