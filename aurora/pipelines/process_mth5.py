@@ -420,3 +420,123 @@ def process_mth5_run(
             survey_dict=survey_dict
         )
         return tf_cls
+
+
+
+
+def process_mth5_runs(
+        run_cfg,
+        run_ids,
+        units="MT",
+        show_plot=False,
+        z_file_path=None,
+        return_collection=True,
+        **kwargs,
+):
+    """
+    2022-02-08: TODO: Need to replace run_id (string) with a list, or, maybe,
+    support either a list of strings or a single string.
+    Stages here:
+    1. Read in the config and figure out how many decimation levels there are
+
+    Parameters
+    ----------
+    run_cfg: config object or path to config
+    run_ids: list of strings, supports a single string as well
+    units: string
+        "MT" or "SI".  To be deprecated once data have units embedded
+    show_plot: boolean
+        Only used for dev
+    z_file_path: string or pathlib.Path
+        Target path for a z_file output if desired
+    return_collection : boolean
+        return_collection=False will return an mt_metadata TF object
+    kwargs
+
+    Returns
+    -------
+
+    """
+    #make run_id a list if it is a string denoting a single run
+    if isinstance(run_ids, str):
+        run_ids = [run_ids, ]
+    else:
+        print("Expecting run_ids to be a list")
+        print("This processing is experimentatal being developed Mar 2022")
+        print(f"run_ids = {run_ids}")
+
+    mth5_path = kwargs.get("mth5_path", None)
+    run_config, mth5_obj = initialize_pipeline(run_cfg, mth5_path)
+    print(
+        f"config indicates {run_config.number_of_decimation_levels} "
+        f"decimation levels to process: {run_config.decimation_level_ids}"
+    )
+
+    tf_dict = {}
+
+    for dec_level_id in run_config.decimation_level_ids:
+
+        processing_config = run_config.decimation_level_configs[dec_level_id]
+        processing_config.local_station_id = run_config.local_station_id
+        processing_config.reference_station_id = run_config.reference_station_id
+        processing_config.channel_scale_factors = run_config.channel_scale_factors
+
+
+        if dec_level_id == 0:
+            local, remote = get_data_from_decimation_level_from_mth5(
+                processing_config, mth5_obj, run_ids
+            )
+
+            # APPLY TIMING CORRECTIONS HERE
+        else:
+            # This code structure assumes application of cascading decimation,
+            # and that the decimated data will be accessed from the previous
+            # decimation level.  This should be revisited .. it may make
+            # more sense to have a get_decimation_level() interface that provides an
+            # option of applying decimation or loading predecimated data.
+            local = prototype_decimate(processing_config, local)
+            if processing_config.reference_station_id:
+                remote = prototype_decimate(processing_config, remote)
+
+        # </GET DATA>
+        local_stft_obj, remote_stft_obj = make_stft_objects(processing_config,
+                                                            local, remote, units)
+        # MERGE STFTS goes here
+        tf_obj = process_mth5_decimation_level(
+            processing_config, local_stft_obj, remote_stft_obj, units=units
+        )
+        tf_dict[dec_level_id] = tf_obj
+
+        if show_plot:
+            from aurora.sandbox.plot_helpers import plot_tf_obj
+
+            plot_tf_obj(tf_obj, out_filename="out")
+
+    # TODO: Add run_obj to TransferFunctionCollection ? WHY? so it doesn't need header?
+    tf_collection = TransferFunctionCollection(header=tf_obj.tf_header, tf_dict=tf_dict)
+
+    #
+    print("Need to review this info @Jared, review role of local_run_obj in export tf ")
+
+    local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
+
+    if z_file_path:
+        tf_collection.write_emtf_z_file(z_file_path, run_obj=local_run_obj)
+
+    if return_collection:
+        return tf_collection
+    else:
+        # intended to be the default in future
+        station_metadata = local_run_obj.station_group.metadata
+        station_metadata._runs = []
+        run_metadata = local_run_obj.metadata
+        station_metadata.add_run(run_metadata)
+        survey_dict = mth5_obj.survey_group.metadata.to_dict()
+
+        print(station_metadata.run_list)
+        tf_cls = export_tf(
+            tf_collection,
+            station_metadata_dict=station_metadata.to_dict(),
+            survey_dict=survey_dict
+        )
+        return tf_cls

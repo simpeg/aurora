@@ -1,19 +1,44 @@
 """
-THis may be moved to single_station processing example
+This may be moved to single_station processing example
+2022-02-25
+Time to start setting up the TFKernel.  We already have a prototype config class.
+What is lacking is a DatasetDefinition
 """
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import pathlib
 
 from aurora.config.config_creator import ConfigCreator
 from aurora.config.processing_config import RunConfig
 from aurora.general_helper_functions import TEST_PATH
 from aurora.pipelines.process_mth5 import process_mth5_run
+from aurora.sandbox.mth5_channel_summary_helpers import channel_summary_to_dataset_definition
+
 
 from mth5.utils.helpers import initialize_mth5
 
+from dataset import DatasetDefinition
+
 CAS04_PATH = TEST_PATH.joinpath("cas04")
 DATA_PATH = CAS04_PATH.joinpath("data")
+
+def test_make_dataset_definition():
+    """
+    ToDo: talk to Jared about validations here ... what is already being checked in
+    mth5?
+    Things to make sure of:
+    1. That there are the same number of channels (and same channels exactly) in each run,
+     otherwise we would need separate processing paramters for separate runs
+    Returns
+    -------
+
+    """
+    summary_csv = pathlib.Path("channel_summary.csv")
+    df = pd.read_csv(summary_csv, parse_dates=["start", "end"])
+    dataset_definition = channel_summary_to_dataset_definition(df)
+    return dataset_definition
+
 
 def make_processing_config_a(h5_path):#:station_id, run_id, sample_rate):
     """
@@ -85,6 +110,9 @@ def process_merged_runs(run_ids):
     pass
 
 def main():
+    defn_df = test_make_dataset_definition()
+
+    #To process only run "a":
     mth5_path = DATA_PATH.joinpath("ZU_CAS04.h5")#../backup/data/
     config_path = make_processing_config_a(mth5_path)
     qq = process_run_a(config_path, mth5_path)
