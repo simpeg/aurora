@@ -2,10 +2,12 @@ from .metadata import (
     Window, 
     Station, 
     Channel, 
-    Stations, 
+    Stations,
+    Band,
     Decimation, 
     Regression,
     Estimator,
+    DecimationLevel,
 )
 
 __all__ = [
@@ -13,7 +15,9 @@ __all__ = [
     "Station",
     "Channel",
     "Stations",
+    "Band",
     "Decimation",
     "Regression",
     "Estimator",
+    "DecimationLevel",
     ]

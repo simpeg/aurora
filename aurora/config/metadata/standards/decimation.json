@@ -1,5 +1,5 @@
 {
-    "level_id": {
+    "level": {
         "type": "integer",
         "required": true,
         "style": "number",

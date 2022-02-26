@@ -31,5 +31,39 @@
         "alias": [],
         "example": "linear",
 		"default": "linear"
+    },
+	"bands": {
+        "type": "integer",
+        "required": true,
+        "style": "name list",
+        "units": null,
+        "description": "List of bands",
+        "options": [],
+        "alias": [],
+        "example": "[]",
+		"default": null
+    },
+	"input_channels": {
+        "type": "string",
+        "required": true,
+        "style": "name list",
+        "units": null,
+        "description": "list of input channels (sources)",
+        "options": [],
+        "alias": [],
+        "example": "hx, hy",
+		"default": "hx, hy"
+    },
+	"output_channels": {
+        "type": "string",
+        "required": true,
+        "style": "name list",
+        "units": null,
+        "description": "list of output channels (responses)",
+        "options": [],
+        "alias": [],
+        "example": "ex, ey, hz",
+		"default": "ex, ey, hz"
     }
+	
 }

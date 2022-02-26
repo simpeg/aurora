@@ -7,10 +7,15 @@ Created on Thu Feb 24 13:58:07 2022
 # =============================================================================
 # Imports
 # =============================================================================
-from mt_metadata.base import Base
+from mt_metadata.base import Base, get_schema
+from .standards import SCHEMA_FN_PATHS
 from .station import Station
-# =============================================================================
 
+# =============================================================================
+attr_dict = get_schema("stations", SCHEMA_FN_PATHS)
+attr_dict.add_dict(get_schema("station", SCHEMA_FN_PATHS), "local")
+
+# =============================================================================
 class Stations(Base):
     """
     class to hold station information
@@ -22,9 +27,9 @@ class Stations(Base):
     
     def __init__(self, **kwargs):
         self.local = Station()
-        self.remote = {}
+        self._remote = {}
         
-        super().__init__(**kwargs)
+        super().__init__(attr_dict=attr_dict, **kwargs)
         
         
     @property
