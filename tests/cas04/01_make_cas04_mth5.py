@@ -23,12 +23,12 @@ import pathlib
 
 from aurora.general_helper_functions import TEST_PATH
 from aurora.pipelines.process_mth5 import process_mth5_run
+from aurora.sandbox.mth5_channel_summary_helpers import channel_summary_to_make_mth5
 from aurora.test_utils.dataset_definitions import TEST_DATA_SET_CONFIGS
 from mth5.utils.helpers import initialize_mth5
 from mth5.utils.helpers import read_back_data
-from mth5.clients.helper_functions import channel_summary_to_make_mth5
-from mth5.clients.make_mth5_rev_002 import MakeMTH5
-#from mth5.clients.make_mth5 import MakeMTH5
+#from mth5.clients.make_mth5_rev_002 import MakeMTH5
+from mth5.clients.make_mth5 import MakeMTH5
 from mt_metadata.timeseries.stationxml import xml_network_mt_survey
 from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 
@@ -88,7 +88,8 @@ def make_cas04_data_for_processing(xml_path, h5_path="tmp.h5",
 
     #SOLUTION 1:
     # mth5_obj.populate_runs_from_request(request_df, client="IRIS")
-    maker = MakeMTH5(mth5_version="0.1.0")
+    #maker = MakeMTH5(mth5_version="0.1.0")
+    maker = MakeMTH5(mth5_version="0.2.0")
     print("FAILED FOR 0.2.0 with some other error")
     #inventory, streams = maker.get_inventory_from_df(request_df, data=False, client="IRIS")
     # inventory==inventory0??
@@ -122,7 +123,7 @@ def test_make_mth5():
 
 
 def run_tests():
-    make_mth5_from_scratch = False
+    make_mth5_from_scratch = True
     if make_mth5_from_scratch:
         mth5_path = test_make_mth5()
     else:

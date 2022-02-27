@@ -1,3 +1,5 @@
+import xarray as xr
+
 from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import run_ts_to_calibrated_stft
@@ -78,6 +80,9 @@ def prototype_decimate(config, run_run_ts):
 
     Returns
     -------
+    dict: keyed by "run" and "mvts"
+    out_dict["run"] is mth5.groups.master_station_run_channel.RunGroup
+    out_dict["mvts"] is mth5.timeseries.run_ts.RunTS
 
     """
     import numpy as np
@@ -89,7 +94,7 @@ def prototype_decimate(config, run_run_ts):
     run_obj.metadata.sample_rate = config.sample_rate
 
     # <Replace with rolling mean, somethng that works with time>
-    # and preferably takes the average time, not the start of th
+    # and preferably takes the average time, not the start of the window
     slicer = slice(None, None, config.decimation_factor)
     downsampled_time_axis = run_xrts.time.data[slicer]
     # <Replace with rolling mean, somethng that works with time>
@@ -258,7 +263,7 @@ def get_data_from_decimation_level_from_mth5(config, mth5_obj, run_id):
     decimation_level_config, runs and run_ts'
     decimation_level_config, mth5
     Returns: tuple of dicts
-        Each dictionary is associated with a staiton, one for local and one
+        Each dictionary is associated with a station, one for local and one
         for remote at this point
         Each Dict has keys "run" and "mvts" which are the mth5_run and the
         mth5_run_ts objects respectively for the associated station
@@ -269,7 +274,7 @@ def get_data_from_decimation_level_from_mth5(config, mth5_obj, run_id):
     local_run_obj = mth5_obj.get_run(config["local_station_id"], run_id)
     local_run_ts = local_run_obj.to_runts()
     validate_sample_rate(local_run_ts, config)
-    local = {"run": local_run_obj, "mvts": local_run_ts.dataset}
+    local = {"run": local_run_obj, "mvts": local_run_ts.dataset, "run_id":run_id}
     # </LOCAL>
 
     # <REMOTE>
@@ -436,12 +441,14 @@ def process_mth5_runs(
     """
     2022-02-08: TODO: Need to replace run_id (string) with a list, or, maybe,
     support either a list of strings or a single string.
+
     Stages here:
     1. Read in the config and figure out how many decimation levels there are
 
     Parameters
     ----------
-    run_cfg: config object or path to config
+    run_cfg: aurora.config.processing_config.RunConfig object or path to json
+    representation of that config
     run_ids: list of strings, supports a single string as well
     units: string
         "MT" or "SI".  To be deprecated once data have units embedded
@@ -483,27 +490,53 @@ def process_mth5_runs(
 
 
         if dec_level_id == 0:
-            local, remote = get_data_from_decimation_level_from_mth5(
-                processing_config, mth5_obj, run_ids
-            )
-
-            # APPLY TIMING CORRECTIONS HERE
+            #This needs to be modified so that local and remote are lists
+            local = []
+            remote = []
+            for run_id in run_ids:
+                local_run, remote_run = get_data_from_decimation_level_from_mth5(
+                    processing_config, mth5_obj, run_id
+                )
+                local.append(local_run)
+                remote.append(remote_run)
+                # APPLY TIMING CORRECTIONS HERE
         else:
             # This code structure assumes application of cascading decimation,
             # and that the decimated data will be accessed from the previous
             # decimation level.  This should be revisited .. it may make
             # more sense to have a get_decimation_level() interface that provides an
             # option of applying decimation or loading predecimated data.
+
+            # This method must be modified to iterate over lists
             local = prototype_decimate(processing_config, local)
             if processing_config.reference_station_id:
                 remote = prototype_decimate(processing_config, remote)
 
         # </GET DATA>
-        local_stft_obj, remote_stft_obj = make_stft_objects(processing_config,
-                                                            local, remote, units)
+
+        #<CONVERT TO STFT>
+        local_stfts = []
+        remote_stfts = []
+        for i_run, run_id in enumerate(run_ids):
+            local_stft_obj, remote_stft_obj = make_stft_objects(processing_config,
+                                                                local[i_run],
+                                                                remote[i_run],
+                                                                units)
+            local_stfts.append(local_stft_obj)
+            remote_stfts.append(remote_stft_obj)
         # MERGE STFTS goes here
+        print("merge-o-rama")
+        local_merged_stft_obj = xr.concat(local_stfts, "time")
+        if processing_config.reference_station_id:
+            remote_merged_stft_obj = xr.concat(remote_stfts, "time")
+        else:
+            remote_merged_stft_obj = None
+
         tf_obj = process_mth5_decimation_level(
-            processing_config, local_stft_obj, remote_stft_obj, units=units
+            processing_config,
+            local_merged_stft_obj,
+            remote_merged_stft_obj,
+            units=units
         )
         tf_dict[dec_level_id] = tf_obj
 

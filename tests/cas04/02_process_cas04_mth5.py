@@ -13,6 +13,7 @@ from aurora.config.config_creator import ConfigCreator
 from aurora.config.processing_config import RunConfig
 from aurora.general_helper_functions import TEST_PATH
 from aurora.pipelines.process_mth5 import process_mth5_run
+from aurora.pipelines.process_mth5 import process_mth5_runs
 from aurora.sandbox.mth5_channel_summary_helpers import channel_summary_to_dataset_definition
 
 
@@ -73,6 +74,21 @@ def process_run_a(config_path, mth5_path):
     print(f"would be nice if {tmp} was the xml")
     return
 
+
+def process_runs_a_b(config_path, mth5_path):
+    tf_cls = process_mth5_runs(
+        config_path,
+        ["a", "b"],
+        mth5_path=mth5_path,
+        units="MT",
+        show_plot=True,
+        z_file_path="a_b.zss",
+        return_collection=False,
+    )
+    tmp = tf_cls.write_tf_file(fn="cas04_ss_a.xml", file_type="emtfxml")
+    print(f"would be nice if {tmp} was the xml")
+    return
+
 def process_run(mth5_obj, run_id):
     """
     Parameters
@@ -115,7 +131,8 @@ def main():
     #To process only run "a":
     mth5_path = DATA_PATH.joinpath("ZU_CAS04.h5")#../backup/data/
     config_path = make_processing_config_a(mth5_path)
-    qq = process_run_a(config_path, mth5_path)
+    #qq = process_run_a(config_path, mth5_path)
+    ww = process_runs_a_b(config_path, mth5_path)
     # m = initialize_mth5(mth5_path, mode="r")
     # #How do we know these are the run_ids?
     # for run_id in ["a", "b", "c", "d"]:
