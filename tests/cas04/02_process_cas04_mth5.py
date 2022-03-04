@@ -85,7 +85,7 @@ def process_runs_a_b(config_path, mth5_path):
         z_file_path="a_b.zss",
         return_collection=False,
     )
-    tmp = tf_cls.write_tf_file(fn="cas04_ss_a.xml", file_type="emtfxml")
+    tmp = tf_cls.write_tf_file(fn="cas04_ss_a_b.xml", file_type="emtfxml")
     print(f"would be nice if {tmp} was the xml")
     return
 

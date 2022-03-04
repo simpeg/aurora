@@ -412,6 +412,10 @@ def process_mth5_run(
         return tf_collection
     else:
         # intended to be the default in future
+
+        # N.B. Currently, only the last run makes it into the tf object,
+        # but we can simply iterate of the run list here, getting run metadata
+        # station_metadata.add_run(run_metadata)
         station_metadata = local_run_obj.station_group.metadata
         station_metadata._runs = []
         run_metadata = local_run_obj.metadata
@@ -439,12 +443,13 @@ def process_mth5_runs(
         **kwargs,
 ):
     """
-    2022-02-08: TODO: Need to replace run_id (string) with a list, or, maybe,
+    2022-02-08: TODO: Replace run_id (string) with a list, or, maybe,
     support either a list of strings or a single string.
 
     Stages here:
     1. Read in the config and figure out how many decimation levels there are
-
+    2. ToDo: Based on the run durations, and sampling rates, determined which runs
+    are valid for which decimation levels, or for which effective sample rates.
     Parameters
     ----------
     run_cfg: aurora.config.processing_config.RunConfig object or path to json
@@ -490,43 +495,69 @@ def process_mth5_runs(
 
 
         if dec_level_id == 0:
-            #This needs to be modified so that local and remote are lists
-            local = []
-            remote = []
+            #2022-02-27: Modified so that local and remote are lists
+            local_runs = []
+            remote_runs = []
             for run_id in run_ids:
                 local_run, remote_run = get_data_from_decimation_level_from_mth5(
                     processing_config, mth5_obj, run_id
                 )
-                local.append(local_run)
-                remote.append(remote_run)
+                local_runs.append(local_run)
+                remote_runs.append(remote_run)
                 # APPLY TIMING CORRECTIONS HERE
         else:
-            # This code structure assumes application of cascading decimation,
+            # Assumes application of cascading decimation,
             # and that the decimated data will be accessed from the previous
             # decimation level.  This should be revisited .. it may make
             # more sense to have a get_decimation_level() interface that provides an
             # option of applying decimation or loading predecimated data.
 
-            # This method must be modified to iterate over lists
-            local = prototype_decimate(processing_config, local)
+            # 2022-02-27: This method modified to iterate over lists
+            print("ENSURE HERE THAT LOCAL RUN IS MODIFIED IN PLACE IN THE LIST!!!")
+            # local_decimated = []
+            # remote_decimated = []
+            #Question: Can we run into cases where some of these runs can be
+            # decimated and others can not?  We need a way to handle this.
+            # for example, a short run may not yield any data from a later decimation
+            #level.  Returning an empty xarray may work, ... we need the empty xarray,
+            # or whatever comes back to pass through STFT and MERGE steps.
+            # if it is empty, we could just drop the run entirely but this may have
+            # adverse consequences on downstream bookkeeping, like the creation of
+            # station_metadata before packaging the tf for export.  This could be
+            # worked around by extracting the metadata at the start of this method.
+            # In fact, it would be a good idea in general to run a pre-check on the data
+            # that identifies which decimation levels are valid for each run.
+            for i_run, local_run in enumerate(local_runs):
+                local_runs[i_run] = prototype_decimate(processing_config, local_run)
+#                local_decimated.append(local_run)
+            #do we need this if statement?  Maybe better to just do the for loop and
+            # make prototype decimate accept {'run': None, 'mvts': None} and return
+            # {'run': None, 'mvts': None}
             if processing_config.reference_station_id:
-                remote = prototype_decimate(processing_config, remote)
+                for i_run, remote_run in enumerate(remote_runs):
+                    remote_runs[i_run] = prototype_decimate(processing_config, remote_run)
 
         # </GET DATA>
 
         #<CONVERT TO STFT>
         local_stfts = []
         remote_stfts = []
+        #Careful, you are iterating over run_ids, could any runs have been dropped at
+        # this stage?  Use a "valid_run_ids" list as well?
         for i_run, run_id in enumerate(run_ids):
             local_stft_obj, remote_stft_obj = make_stft_objects(processing_config,
-                                                                local[i_run],
-                                                                remote[i_run],
+                                                                local_runs[i_run],
+                                                                remote_runs[i_run],
                                                                 units)
             local_stfts.append(local_stft_obj)
             remote_stfts.append(remote_stft_obj)
         # MERGE STFTS goes here
         print("merge-o-rama")
         local_merged_stft_obj = xr.concat(local_stfts, "time")
+
+        # MUTE BAD FCs HERE - Not implemented yet.
+        # RETURN FC_OBJECT
+
         if processing_config.reference_station_id:
             remote_merged_stft_obj = xr.concat(remote_stfts, "time")
         else:
@@ -560,6 +591,12 @@ def process_mth5_runs(
         return tf_collection
     else:
         # intended to be the default in future
+        #
+        # There is a container that can handle storage of multiple runs in xml
+        # Anna made something like this.
+	# N.B. Currently, only the last run makes it into the tf object,
+        # but we can simply iterate of the run list here, getting run metadata
+        # station_metadata.add_run(run_metadata)
         station_metadata = local_run_obj.station_group.metadata
         station_metadata._runs = []
         run_metadata = local_run_obj.metadata
