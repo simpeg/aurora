@@ -91,7 +91,7 @@ class Processing(Base):
         for line in emtf_fn.read_text().split("\n")[1:]:
             if len(line) >= 3:
                 level, low, high = [int(ii.strip()) for ii in line.split()]
-                band = Band(level=level, index_min=low, index_max=high)
+                band = Band(decimation_level=level, index_min=low, index_max=high)
                 try:
                     self.decimations[level].bands.append(band)
                 except KeyError:

@@ -7,6 +7,7 @@ from .decimation import Decimation
 from .regression import Regression
 from .estimator import Estimator
 from .decimation_level import DecimationLevel
+from .processing import Processing
 
 __all__ = [
     "Window",
@@ -18,4 +19,5 @@ __all__ = [
     "Regression",
     "Estimator",
     "DecimationLevel",
+    "Processing",
     ]

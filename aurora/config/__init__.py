@@ -8,6 +8,7 @@ from .metadata import (
     Regression,
     Estimator,
     DecimationLevel,
+    Processing,
 )
 
 __all__ = [
@@ -20,4 +21,5 @@ __all__ = [
     "Regression",
     "Estimator",
     "DecimationLevel",
+    "Processing",
     ]
