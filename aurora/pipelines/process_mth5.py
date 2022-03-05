@@ -11,6 +11,7 @@ from aurora.pipelines.transfer_function_helpers import (
 )
 
 # from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
+# from aurora.time_series.decimate import prototype_decimate
 from aurora.time_series.frequency_band_helpers import configure_frequency_bands
 from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
@@ -97,7 +98,7 @@ def prototype_decimate(config, run_run_ts):
     # and preferably takes the average time, not the start of the window
     slicer = slice(None, None, config.decimation_factor)
     downsampled_time_axis = run_xrts.time.data[slicer]
-    # <Replace with rolling mean, somethng that works with time>
+    # </Replace with rolling mean, somethng that works with time>
 
     num_observations = len(downsampled_time_axis)
     channel_labels = list(run_xrts.data_vars.keys())  # run_ts.channels
@@ -187,41 +188,6 @@ def process_mth5_decimation_level(config, local_stft_obj, remote_stft_obj, units
 
 
     """
-    # local_stft_obj, remote_stft_obj = make_stft_objects(config, local, remote, units)
-    # local_run_obj = local["run"]
-    # local_run_xrts = local["mvts"]
-    #
-    # remote_run_obj = remote["run"]
-    # remote_run_xrts = remote["mvts"]
-    #
-    # # <CHECK DATA COVERAGE IS THE SAME IN BOTH LOCAL AND RR>
-    # # This should be pushed into a previous validator before pipeline starts
-    # # if config.reference_station_id:
-    # #    local_run_xrts = local_run_xrts.where(local_run_xrts.time <=
-    # #                                          remote_run_xrts.time[-1]).dropna(
-    # #                                          dim="time")
-    # # </CHECK DATA COVERAGE IS THE SAME IN BOTH LOCAL AND RR>
-    #
-    # local_stft_obj = run_ts_to_stft(config, local_run_xrts)
-    # local_scale_factors = config.station_scale_factors(config.local_station_id)
-    # # local_stft_obj = run_ts_to_stft_scipy(config, local_run_xrts)
-    # local_stft_obj = calibrate_stft_obj(
-    #     local_stft_obj,
-    #     local_run_obj,
-    #     units=units,
-    #     channel_scale_factors=local_scale_factors,
-    # )
-    # if config.reference_station_id:
-    #     remote_stft_obj = run_ts_to_stft(config, remote_run_xrts)
-    #     remote_scale_factors = config.station_scale_factors(config.reference_station_id)
-    #     remote_stft_obj = calibrate_stft_obj(
-    #         remote_stft_obj,
-    #         remote_run_obj,
-    #         units=units,
-    #         channel_scale_factors=remote_scale_factors,
-    #     )
-    # else:
-    #     remote_stft_obj = None
     frequency_bands = configure_frequency_bands(config)
     transfer_function_header = transfer_function_header_from_config(config)
     transfer_function_obj = TTFZ(
