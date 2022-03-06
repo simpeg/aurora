@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from pathlib import Path
+from scipy.signal import medfilt
 
 plt.ion()
 
@@ -30,6 +31,32 @@ def load_bf4_fap_for_parkfield_test_using_mt_metadata(frequencies):
     bf4_resp = bf4_obj.complex_response(frequencies)
     bf4_resp *= 421721.0  # counts-per-volt compensation for PKD
     return bf4_resp
+
+def plot_responses(key, 
+                   frequencies, 
+                   pz_calibration_response, 
+                   bf4_resp,
+                   figures_path,
+                   show_response_curves):
+
+    if key[0].lower() == "h":
+        response_units = "counts/nT"
+    else:
+        response_units = "counts/mV/km"
+
+    plt.figure(1)
+    plt.clf()
+    plt.loglog(frequencies, np.abs(pz_calibration_response), label="pole-zero")
+    if bf4_resp is not None:
+        plt.loglog(frequencies, np.abs(bf4_resp), label="fap EMI")
+    plt.legend()
+    plt.title(f"Calibration Response Functions {key}")
+    plt.xlabel("Frequency (Hz)")
+    plt.ylabel(f"Response {response_units}")
+    png_name = f"{key}_response_function.png"
+    plt.savefig(figures_path.joinpath(png_name))
+    if show_response_curves:
+        plt.show()
 
 
 def parkfield_sanity_check(
@@ -61,11 +88,9 @@ def parkfield_sanity_check(
         print(f"calibrating channel {key}")
         if key[0].lower() == "h":
             bf4 = True
-            response_units = "counts/nT"
             spectral_units = "nT/sqrt(Hz)"
         else:
             bf4 = False
-            response_units = "counts/mV/km"
             spectral_units = "mv/km/sqrt(Hz)"
 
         channel = run_obj.get_channel(key)
@@ -76,69 +101,78 @@ def parkfield_sanity_check(
         )
 
         # Frequency response table response
+        bf4_resp = None
         if bf4:
             bf4_resp = load_bf4_fap_for_parkfield_test_using_mt_metadata(frequencies)
-            abs_bf4_resp = np.abs(bf4_resp)
-
+            
         # compare responses graphically
-        plt.figure(1)
-        plt.clf()
-        plt.loglog(frequencies, np.abs(pz_calibration_response), label="pole-zero")
-        if bf4:
-            plt.loglog(frequencies, np.abs(bf4_resp), label="fap EMI")
-        plt.legend()
-        plt.title(f"Calibration Response Functions {key}")
-        plt.xlabel("Frequency (Hz)")
-        plt.ylabel(f"Response {response_units}")
-        png_name = f"{key}_response_function.png"
-        plt.savefig(figures_path.joinpath(png_name))
-        if show_response_curves:
-            plt.show()
+        plot_responses(key,
+                       frequencies,
+                       pz_calibration_response,
+                       bf4_resp,
+                       figures_path,
+                       show_response_curves)
+
+        # Add assert test issue #156 here:
+        if bf4_resp is not None:
+            response_ratio = np.abs(pz_calibration_response) / np.abs(bf4_resp)
+            if np.median(response_ratio) > 1000.0:
+                print("ERROR in response calculation")
+                print("See issue #156")
+                print("Regarding Issue #156: Add a test here to show that the ratio of these "
+                  "curves is near 1.0 for most of the frequency band")
 
         # create smoothed amplitude spectra
-        n_smooth = 131
+        n_smooth = 131 #use 1 for no smoothing
         show_raw = 0
         raw_spectral_density = fft_obj[key].data[:, 1:]
-        raw_spectral_density = raw_spectral_density.squeeze()
-        # squeeze because there is only one FFT window
+        raw_spectral_density = raw_spectral_density.squeeze() #because only 1 FFT window
         calibrated_data_pz = raw_spectral_density / pz_calibration_response
-
+        smooth_calibrated_data_pz = medfilt(np.abs(calibrated_data_pz), n_smooth)
         if bf4:
-            calibrated_data_fap = raw_spectral_density / abs_bf4_resp
+            calibrated_data_fap = raw_spectral_density / np.abs(bf4_resp)
+            smooth_calibrated_data_fap = medfilt(np.abs(calibrated_data_fap), n_smooth)
 
+        # Add assert test issue #156 here:
+        if bf4 & (key == "hx"):
+            schumann_cond = (frequencies>7.6) & (frequencies<8.0)
+            schumann_amplitude_fap = np.median(smooth_calibrated_data_fap[schumann_cond])
+            schumann_amplitude_pz = np.median(smooth_calibrated_data_pz[schumann_cond])
+            schumann_ratio = schumann_amplitude_pz / schumann_amplitude_fap
+            if (schumann_ratio > 10) | (schumann_ratio < 0.1):
+                print("ERROR in response calculation")
+                print("See issue #156")
+                print("Amplitude of field around Schumann band incorrect")
+
+
+
+        #Do Plotting (can factor this out)
         plt.figure(2)
         plt.clf()
-        if n_smooth:
-            import scipy.signal as ssig
+        bf4_colour = "red"
+        pz_color = "blue"
 
-            smooth_calibrated_data_pz = ssig.medfilt(
-                np.abs(calibrated_data_pz), n_smooth
-            )
-            if bf4:
-                smooth_calibrated_data_fap = ssig.medfilt(
-                    np.abs(calibrated_data_fap), n_smooth
-                )
         if show_raw:
-            plt.loglog(frequencies, calibrated_data_pz, color="b", label="pole-zero")
+            plt.loglog(frequencies, calibrated_data_pz, color=pz_color, label="pole-zero")
             if bf4:
                 plt.loglog(
                     frequencies,
                     calibrated_data_fap,
-                    color="r",
+                    color=bf4_colour,
                     label="response table (EMI)",
                 )
         if n_smooth:
             plt.loglog(
                 frequencies,
                 smooth_calibrated_data_pz,
-                color="b",
+                color=pz_color,
                 label="smooth pole-zero",
             )
             if bf4:
                 plt.loglog(
                     frequencies,
                     smooth_calibrated_data_fap,
-                    color="r",
+                    color=bf4_colour,
                     label="response table (EMI)",
                 )
 
