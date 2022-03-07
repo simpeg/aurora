@@ -16,14 +16,15 @@ from pathlib import Path
 from aurora.config.decimation_level_config import DecimationLevelConfig
 from aurora.config.processing_config import RunConfig
 from aurora.general_helper_functions import BAND_SETUP_PATH
+from aurora.config import Processing, Station, Run, BANDS_DEFAULT_FILE
 
 
-class ConfigCreator(object):
+class ConfigCreator:
+    
     def __init__(self, **kwargs):
         default_config_path = Path("config")
         self.config_path = kwargs.get("config_path", default_config_path)
 
-    # def to_json(self):
 
     # pass an mth5, it has: station_id, run_id, mth5_path, sample_rate
     def create_run_config(
@@ -88,6 +89,38 @@ class ConfigCreator(object):
         json_path = self.config_path.joinpath(json_fn)
         run_config.to_json(json_fn=json_path)
         return json_path
+    
+    def create_single_run_processing_object(
+            self, station_id="", run_id="", mth5_path="", sample_rate=-1, **kwargs):
+        """
+        Create a default processing object
+        
+        :return: DESCRIPTION
+        :rtype: TYPE
+
+        """
+        processing_obj = Processing(**kwargs)
+        
+        run_obj = Run(
+            id=run_id,
+            input_channels=["hx", "hy"],
+            output_channels=["hz", "ex", "ey"],
+            sample_rate=sample_rate)
+        station_obj = Station(id=station_id, mth5_path=mth5_path)
+        station_obj.runs = [run_obj]
+
+        
+        processing_obj.stations.local = station_obj
+        processing_obj.read_emtf_bands(BANDS_DEFAULT_FILE)
+        
+        for key in sorted(processing_obj.decimations.keys()):
+            if key in [0, "0"]:
+                d = 1
+            else:
+                d = 4
+            processing_obj.decimations[key].decimation.factor = d
+        
+        return processing_obj
 
 
 def test_cas04():

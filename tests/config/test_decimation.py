@@ -17,14 +17,10 @@ class TestDecimation(unittest.TestCase):
         self.decimation = Decimation()
         
     def test_initialization(self):
-        with self.subTest("test level_id"):
-            self.assertEqual(self.decimation.level_id, 0)
-        with self.subTest("test factor"):
-            self.assertEqual(self.decimation.factor, 1)
-        with self.subTest("test method"):
-            self.assertEqual(self.decimation.method, "default")
-        with self.subTest("test sample_rate"):
-            self.assertEqual(self.decimation.sample_rate, 1.0)
+        for key in self.decimation.get_attribute_list():
+            with self.subTest(key):
+                self.assertEqual(self.decimation.get_attr_from_name(key),
+                                 self.decimation._attr_dict[key]["default"])
         
         
 

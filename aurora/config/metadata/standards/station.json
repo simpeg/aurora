@@ -32,15 +32,15 @@
         "example": "False",
 		"default": false
     },
-	"channel_scale_factors": {
+	"runs": {
         "type": "string",
         "required": true,
-        "style": "free form",
+        "style": "name list",
         "units": null,
-        "description": "channel scale factors",
+        "description": "List of runs to process",
         "options": [],
         "alias": [],
-        "example": "[10]",
-		"default": false
+        "example": "001",
+		"default": []
     }
 }

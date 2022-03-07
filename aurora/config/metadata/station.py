@@ -10,7 +10,7 @@ Created on Thu Feb 17 14:15:20 2022
 from mt_metadata.base.helpers import write_lines
 from mt_metadata.base import get_schema, Base
 from .standards import SCHEMA_FN_PATHS
-from .channel import Channel
+from .run import Run
 
 # =============================================================================
 attr_dict = get_schema("station", SCHEMA_FN_PATHS)
@@ -20,33 +20,32 @@ class Station(Base):
 
     def __init__(self, **kwargs):
         super().__init__(attr_dict=attr_dict, **kwargs)
-        self.channel_scale_factors = {}
-        
+        self._runs = []
+            
     @property
-    def channel_scale_factors(self):
-        return self._channel_scale_factors
+    def runs(self):
+        return self._runs
     
-    @channel_scale_factors.setter
-    def channel_scale_factors(self, values):
-        if isinstance(values, list):
-            ch_dict = {}
-            for element in values:
-                if not isinstance(element, Channel):
-                    raise ValueError("Elements of list must be Channel objects")
-                ch_dict[element.id] = element
-            self._channel_scale_factors = ch_dict
-        
-        elif isinstance(values, dict):
-            for key, value in values.items():
-                if not isinstance(value, Channel):
-                    raise ValueError("Elements of list must be Channel objects")
+    @runs.setter
+    def runs(self, values):
+        self._runs = []
+        if not isinstance(values, list):
+            values = [values]
             
-            self._channel_scale_factors = values
+        for item in values:
+            if isinstance(item, str):
+                run = Run(id=item)
+            elif isinstance(item, Run):
+                run = item
+                    
+            else:
+                raise TypeError(f"not sure what to do with type {type(item)}")
             
-        elif isinstance(values, Channel):
-            self._channel_scale_factors[values.id] =  values
+            self._runs.append(run)
             
-    # def to_dict(self, nested=False, single=False, required=True):
+    
+            
+
         
             
 
