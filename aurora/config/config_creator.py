@@ -91,7 +91,7 @@ class ConfigCreator:
         return json_path
     
     def create_single_run_processing_object(
-            self, station_id="", run_id="", mth5_path="", sample_rate=-1, **kwargs):
+            self, station_id=None, run_id=None, mth5_path=None, sample_rate=-1, **kwargs):
         """
         Create a default processing object
         

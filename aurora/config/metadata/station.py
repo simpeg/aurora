@@ -43,6 +43,13 @@ class Station(Base):
             
             self._runs.append(run)
             
+    @property
+    def run_list(self):
+        """ list of run names """
+        
+        return [r.id for r in self.runs]
+        
+            
     
             
 
