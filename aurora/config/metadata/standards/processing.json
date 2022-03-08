@@ -9,5 +9,16 @@
         "alias": [],
         "example": "0",
 		"default": null
+    },
+	"id": {
+        "type": "string",
+        "required": true,
+        "style": "free form",
+        "units": null,
+        "description": "Configuration ID",
+        "options": [],
+        "alias": [],
+        "example": "0",
+		"default": null
     }
 }

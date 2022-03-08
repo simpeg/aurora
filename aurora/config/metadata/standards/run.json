@@ -32,6 +32,17 @@
         "example": "ex, ey, hz",
 		"default": []
     },
+	"time_periods": {
+        "type": "string",
+        "required": true,
+        "style": "name list",
+        "units": null,
+        "description": "List of time periods to process",
+        "options": [],
+        "alias": [],
+        "example": "",
+		"default": []
+    },
     "sample_rate": {
         "type": "float",
         "required": true,

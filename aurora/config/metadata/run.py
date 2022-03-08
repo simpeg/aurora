@@ -15,7 +15,6 @@ from .channel import Channel
 
 # =============================================================================
 attr_dict = get_schema("run", SCHEMA_FN_PATHS)
-attr_dict.add_dict(TimePeriod()._attr_dict, "time_period")
 # =============================================================================
 class Run(Base):
     __doc__ = write_lines(attr_dict)
@@ -23,7 +22,7 @@ class Run(Base):
     def __init__(self, **kwargs):
         self._input = []
         self._output = []
-        self.time_period = TimePeriod()
+        self._time_periods = []
         
         super().__init__(attr_dict=attr_dict, **kwargs)
         
@@ -69,6 +68,22 @@ class Run(Base):
                 raise TypeError(f"not sure what to do with type {type(item)}")
             
             self._output.append(ch)
+        
+    @property
+    def time_periods(self):
+        return self._time_periods
+    
+    @time_periods.setter
+    def time_periods(self, values):
+        self._time_periods = []
+        if not isinstance(values, list):
+            values = [values]
+            
+        for item in values:
+            if not isinstance(item, TimePeriod):
+                raise TypeError(f"not sure what to do with type {type(item)}")
+            
+            self._time_periods.append(item)
                 
 
         

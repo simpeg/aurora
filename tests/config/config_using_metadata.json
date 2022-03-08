@@ -10,33 +10,6 @@
                                 "decimation_level": 1,
                                 "frequency_max": 0,
                                 "frequency_min": 0,
-                                "index_max": 55,
-                                "index_min": 47
-                            }
-                        },
-                        {
-                            "band": {
-                                "decimation_level": 1,
-                                "frequency_max": 0,
-                                "frequency_min": 0,
-                                "index_max": 46,
-                                "index_min": 39
-                            }
-                        },
-                        {
-                            "band": {
-                                "decimation_level": 1,
-                                "frequency_max": 0,
-                                "frequency_min": 0,
-                                "index_max": 37,
-                                "index_min": 31
-                            }
-                        },
-                        {
-                            "band": {
-                                "decimation_level": 1,
-                                "frequency_max": 0,
-                                "frequency_min": 0,
                                 "index_max": 30,
                                 "index_min": 25
                             }
@@ -105,7 +78,7 @@
                             }
                         }
                     ],
-                    "decimation.factor": 1.0,
+                    "decimation.factor": 4.0,
                     "decimation.level": 1,
                     "decimation.method": "default",
                     "decimation.sample_rate": 1.0,
@@ -187,7 +160,7 @@
                             }
                         }
                     ],
-                    "decimation.factor": 1.0,
+                    "decimation.factor": 4.0,
                     "decimation.level": 2,
                     "decimation.method": "default",
                     "decimation.sample_rate": 1.0,
@@ -269,7 +242,7 @@
                             }
                         }
                     ],
-                    "decimation.factor": 1.0,
+                    "decimation.factor": 4.0,
                     "decimation.level": 3,
                     "decimation.method": "default",
                     "decimation.sample_rate": 1.0,
@@ -322,9 +295,27 @@
                                 "index_max": 13,
                                 "index_min": 10
                             }
+                        },
+                        {
+                            "band": {
+                                "decimation_level": 4,
+                                "frequency_max": 0,
+                                "frequency_min": 0,
+                                "index_max": 9,
+                                "index_min": 7
+                            }
+                        },
+                        {
+                            "band": {
+                                "decimation_level": 4,
+                                "frequency_max": 0,
+                                "frequency_min": 0,
+                                "index_max": 6,
+                                "index_min": 5
+                            }
                         }
                     ],
-                    "decimation.factor": 1.0,
+                    "decimation.factor": 4.0,
                     "decimation.level": 4,
                     "decimation.method": "default",
                     "decimation.sample_rate": 1.0,
@@ -348,10 +339,62 @@
                 }
             }
         },
-        "stations.local.channel_scale_factors": [],
+        "id": "None-None",
         "stations.local.id": null,
         "stations.local.mth5_path": null,
         "stations.local.remote": false,
-        "stations.remote": []
+        "stations.local.runs": [
+            {
+                "run": {
+                    "id": [
+                        "None"
+                    ],
+                    "input_channels": [
+                        {
+                            "channel": {
+                                "id": "hx",
+                                "scale_factor": 1.0
+                            }
+                        },
+                        {
+                            "channel": {
+                                "id": "hy",
+                                "scale_factor": 1.0
+                            }
+                        }
+                    ],
+                    "output_channels": [
+                        {
+                            "channel": {
+                                "id": "hz",
+                                "scale_factor": 1.0
+                            }
+                        },
+                        {
+                            "channel": {
+                                "id": "ex",
+                                "scale_factor": 1.0
+                            }
+                        },
+                        {
+                            "channel": {
+                                "id": "ey",
+                                "scale_factor": 1.0
+                            }
+                        }
+                    ],
+                    "sample_rate": -1.0,
+                    "time_periods": [
+                        {
+                            "time_period": {
+                                "end": "1980-01-01T00:00:00+00:00",
+                                "start": "1980-01-01T00:00:00+00:00"
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "stations.remote": {}
     }
 }

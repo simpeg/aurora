@@ -99,17 +99,23 @@ class ConfigCreator:
         :rtype: TYPE
 
         """
-        processing_obj = Processing(**kwargs)
+        processing_obj = Processing(id=f"{station_id}-{run_id}", **kwargs)
         
-        run_obj = Run(
-            id=run_id,
-            input_channels=["hx", "hy"],
-            output_channels=["hz", "ex", "ey"],
-            sample_rate=sample_rate)
+        if not isinstance(run_id, list):
+            run_id = [run_id]
+            
+        runs = []
+        for run in run_id:
+            run_obj = Run(
+                id=run_id,
+                input_channels=["hx", "hy"],
+                output_channels=["hz", "ex", "ey"],
+                sample_rate=sample_rate)
+            runs.append(run_obj)
+            
         station_obj = Station(id=station_id, mth5_path=mth5_path)
-        station_obj.runs = [run_obj]
+        station_obj.runs = runs
 
-        
         processing_obj.stations.local = station_obj
         processing_obj.read_emtf_bands(BANDS_DEFAULT_FILE)
         
@@ -121,6 +127,22 @@ class ConfigCreator:
             processing_obj.decimations[key].decimation.factor = d
         
         return processing_obj
+    
+    def to_json(self, path, processing_object, nested=True, required=False):
+        """
+        Write a processing object to path
+        
+        :param path: DESCRIPTION
+        :type path: TYPE
+        :param processing_object: DESCRIPTION
+        :type processing_object: TYPE
+        :return: DESCRIPTION
+        :rtype: TYPE
+
+        """
+        
+        with open(path, "w") as fid:
+            fid.write(processing_object.to_json(nested=nested, required=required))
 
 
 def test_cas04():
