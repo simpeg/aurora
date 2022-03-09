@@ -7,7 +7,7 @@ Created on Thu Feb 17 14:15:20 2022
 # =============================================================================
 # Imports
 # =============================================================================
-from pathlib import Path
+import numpy as np
 
 from mt_metadata.base.helpers import write_lines
 from mt_metadata.base import get_schema, Base
@@ -38,7 +38,19 @@ class DecimationLevel(Base):
         
     @property
     def bands(self):
-        return self._bands
+        """
+        get bands, something weird is going on with appending.
+        
+        """
+        return_list = []
+        for band in self._bands:
+            if isinstance(band, dict):
+                b = Band()
+                b.from_dict(band)
+            elif isinstance(band, Band):
+                b = band
+            return_list.append(b)
+        return return_list
     
     @bands.setter
     def bands(self, value):
@@ -56,15 +68,55 @@ class DecimationLevel(Base):
         elif isinstance(value, list):
             self._bands = []
             for obj in value:
-                if not isinstance(obj, Band):
+                if not isinstance(obj, (Band, dict)):
                     raise TypeError(
                         f"List entry must be a Band object not {type(obj)}"
                         )
+                if isinstance(obj, dict):
+                    band = Band()
+                    band.from_dict(obj)
+                
                 else:
-                    self._bands.append(obj)
+                    band = obj
+
+                self._bands.append(band)
         else:
             raise TypeError(f"Not sure what to do with {type(value)}")
             
+    def add_band(self, band):
+        """
+        add a band
+        """
+        
+        if not isinstance(band, (Band, dict)):
+            raise TypeError(
+                f"List entry must be a Band object not {type(band)}"
+                )
+        if isinstance(band, dict):
+            obj = Band()
+            obj.from_dict(band)
+        
+        else:
+            obj = band
+
+        self._bands.append(obj)
+            
+    
+    @property
+    def lower_bounds(self):
+        """
+        get lower bounds index values into an array.
+        """
+            
+        return np.array(sorted([band.index_min for band in self.bands]))
+    
+    @property
+    def upper_bounds(self):
+        """
+        get upper bounds index values into an array.
+        """
+            
+        return np.array(sorted([band.index_max for band in self.bands]))
         
             
                     

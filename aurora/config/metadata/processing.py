@@ -33,6 +33,15 @@ class Processing(Base):
         
     @property
     def decimations(self):
+        return_dict = {}
+        for k, v in self._decimations.items():
+            if isinstance(v, dict):
+                level = DecimationLevel()
+                level.from_dict(v)
+            elif isinstance(v, DecimationLevel):
+                level = v
+            return_dict[k] = level
+            
         return self._decimations
     
     @decimations.setter
@@ -72,6 +81,29 @@ class Processing(Base):
         else:
             raise TypeError(f"Not sure what to do with {type(value)}")
             
+    def get_decimation_level(self, level):
+        """
+        Get a decimation level for easy access
+        
+        :param level: DESCRIPTION
+        :type level: TYPE
+        :return: DESCRIPTION
+        :rtype: TYPE
+
+        """
+        
+        try:
+            decimation = self.decimations[level]
+        
+        except KeyError:
+            raise KeyError(f"Could not find {level} in decimations.")
+            
+        if isinstance(decimation, dict):
+            decimation_level = DecimationLevel()
+            decimation_level.from_dict(decimation)
+            return decimation_level
+        
+        return decimation
     
     def read_emtf_bands(self, emtf_fn):
         """
@@ -93,23 +125,10 @@ class Processing(Base):
                 level, low, high = [int(ii.strip()) for ii in line.split()]
                 band = Band(decimation_level=level, index_min=low, index_max=high)
                 try:
-                    self.decimations[level].bands.append(band)
+                    self.decimations[level].add_band(band)
                 except KeyError:
                     new_level = DecimationLevel()
                     new_level.decimation.level = level
-                    new_level.bands.append(band)
+                    new_level.add_band(band)
                     self.decimations.update({level: new_level})
                 
-            
-            
-            
-        
-            
-                    
-            
-
-        
-
-        
-    
-    

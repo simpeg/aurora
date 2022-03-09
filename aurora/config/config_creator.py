@@ -90,8 +90,9 @@ class ConfigCreator:
         run_config.to_json(json_fn=json_path)
         return json_path
     
-    def create_single_run_processing_object(
-            self, station_id=None, run_id=None, mth5_path=None, sample_rate=-1, **kwargs):
+    def create_run_processing_object(
+            self, station_id=None, run_id=None, mth5_path=None, sample_rate=-1, 
+            input_channels=["hx", "hy"], output_channels=["hz", "ex", "ey"], **kwargs):
         """
         Create a default processing object
         
@@ -108,8 +109,8 @@ class ConfigCreator:
         for run in run_id:
             run_obj = Run(
                 id=run_id,
-                input_channels=["hx", "hy"],
-                output_channels=["hz", "ex", "ey"],
+                input_channels=input_channels,
+                output_channels=output_channels,
                 sample_rate=sample_rate)
             runs.append(run_obj)
             
