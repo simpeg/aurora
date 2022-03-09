@@ -120,12 +120,12 @@ class ConfigCreator:
         processing_obj.stations.local = station_obj
         processing_obj.read_emtf_bands(BANDS_DEFAULT_FILE)
         
-        for key in sorted(processing_obj.decimations.keys()):
+        for key in sorted(processing_obj.decimations_dict.keys()):
             if key in [0, "0"]:
                 d = 1
             else:
                 d = 4
-            processing_obj.decimations[key].decimation.factor = d
+            processing_obj.decimations_dict[key].decimation.factor = d
         
         return processing_obj
     

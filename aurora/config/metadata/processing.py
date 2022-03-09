@@ -27,22 +27,22 @@ class Processing(Base):
     def __init__(self, **kwargs):
         
         self.stations = Stations()
-        self._decimations = {}
+        self._decimations = []
         
         super().__init__(attr_dict=attr_dict, **kwargs)
         
     @property
     def decimations(self):
-        return_dict = {}
-        for k, v in self._decimations.items():
-            if isinstance(v, dict):
+        return_list = []
+        for item in self._decimations:
+            if isinstance(item, dict):
                 level = DecimationLevel()
-                level.from_dict(v)
-            elif isinstance(v, DecimationLevel):
-                level = v
-            return_dict[k] = level
+                level.from_dict(item)
+            elif isinstance(item, DecimationLevel):
+                level = item
+            return_list.append(level)
             
-        return self._decimations
+        return return_list
     
     @decimations.setter
     def decimations(self, value):
@@ -55,31 +55,49 @@ class Processing(Base):
         """
         
         if isinstance(value, DecimationLevel):
-            self._decimations = {value.decimation.level: value}
+            self._decimations.append(value)
 
         
         elif isinstance(value, dict):
-            self._decimations = {}
+            self._decimations = []
             for key, obj in value.items():
                 if not isinstance(obj, DecimationLevel):
                     raise TypeError(
                         f"List entry must be a DecimationLevel object not {type(obj)}"
                         )
                 else:
-                    self._decimations[key] = obj
+                    self._decimations.append(obj)
                     
         elif isinstance(value, list):
-            self._decimations = {}
+            self._decimations = []
             for obj in value:
-                if not isinstance(obj, DecimationLevel):
-                    raise TypeError(
-                        f"List entry must be a DecimationLevel object not {type(obj)}"
-                        )
+                if isinstance(value, DecimationLevel):
+                    self._decimations.append(obj)
+
+                elif isinstance(obj, dict):
+                    level = DecimationLevel()
+                    level.from_dict(obj)
+                    self._decimations.append(level)
                 else:
-                    self._decimations[obj.decimation.level] = obj
+                    raise TypeError(
+                        f"List entry must be a DecimationLevel or dict object not {type(obj)}"
+                        )
                     
         else:
             raise TypeError(f"Not sure what to do with {type(value)}")
+            
+    @property
+    def decimations_dict(self):
+        """
+        need to have a dictionary, but it can't be an attribute cause that
+        gets confusing when reading in a json file
+        
+        :return: DESCRIPTION
+        :rtype: TYPE
+
+        """
+        return dict([(d.decimation.level, d) for d in self.decimations])
+    
             
     def get_decimation_level(self, level):
         """
@@ -93,7 +111,7 @@ class Processing(Base):
         """
         
         try:
-            decimation = self.decimations[level]
+            decimation = self.decimations_dict[level]
         
         except KeyError:
             raise KeyError(f"Could not find {level} in decimations.")
@@ -125,10 +143,10 @@ class Processing(Base):
                 level, low, high = [int(ii.strip()) for ii in line.split()]
                 band = Band(decimation_level=level, index_min=low, index_max=high)
                 try:
-                    self.decimations[level].add_band(band)
+                    self.decimations_dict[level].add_band(band)
                 except KeyError:
                     new_level = DecimationLevel()
                     new_level.decimation.level = level
                     new_level.add_band(band)
-                    self.decimations.update({level: new_level})
+                    self._decimations.append(new_level)
                 

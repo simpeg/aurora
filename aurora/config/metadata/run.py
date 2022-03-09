@@ -42,6 +42,10 @@ class Run(Base):
             elif isinstance(item, Channel):
                 ch = item
                 
+            elif isinstance(item, dict):
+                ch = Channel()
+                ch.from_dict(item)
+                
             else:
                 raise TypeError(f"not sure what to do with type {type(item)}")
             
@@ -63,6 +67,9 @@ class Run(Base):
                 ch = Channel(id=item)
             elif isinstance(item, Channel):
                 ch = item
+            elif isinstance(item, dict):
+                ch = Channel()
+                ch.from_dict(item)
                     
             else:
                 raise TypeError(f"not sure what to do with type {type(item)}")

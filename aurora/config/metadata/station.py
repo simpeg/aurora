@@ -37,6 +37,9 @@ class Station(Base):
                 run = Run(id=item)
             elif isinstance(item, Run):
                 run = item
+            elif isinstance(item, dict):
+                run = Run()
+                run.from_dict(item)
                     
             else:
                 raise TypeError(f"not sure what to do with type {type(item)}")

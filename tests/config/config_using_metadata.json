@@ -1,7 +1,7 @@
 {
     "processing": {
-        "decimations": {
-            "1": {
+        "decimations": [
+            {
                 "decimation_level": {
                     "anti_alias_filter": "default",
                     "bands": [
@@ -101,7 +101,7 @@
                     "window.type": "boxcar"
                 }
             },
-            "2": {
+            {
                 "decimation_level": {
                     "anti_alias_filter": "default",
                     "bands": [
@@ -183,7 +183,7 @@
                     "window.type": "boxcar"
                 }
             },
-            "3": {
+            {
                 "decimation_level": {
                     "anti_alias_filter": "default",
                     "bands": [
@@ -265,7 +265,7 @@
                     "window.type": "boxcar"
                 }
             },
-            "4": {
+            {
                 "decimation_level": {
                     "anti_alias_filter": "default",
                     "bands": [
@@ -338,7 +338,7 @@
                     "window.type": "boxcar"
                 }
             }
-        },
+        ],
         "id": "None-None",
         "stations.local.id": null,
         "stations.local.mth5_path": null,
@@ -384,14 +384,7 @@
                         }
                     ],
                     "sample_rate": -1.0,
-                    "time_periods": [
-                        {
-                            "time_period": {
-                                "end": "1980-01-01T00:00:00+00:00",
-                                "start": "1980-01-01T00:00:00+00:00"
-                            }
-                        }
-                    ]
+                    "time_periods": []
                 }
             }
         ],
