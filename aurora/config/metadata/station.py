@@ -51,16 +51,16 @@ class Station(Base):
         """ list of run names """
         
         return [r.id for r in self.runs]
-        
-            
     
-            
-
+    @property
+    def run_dict(self):
+        """
+        need to have a dictionary, but it can't be an attribute cause that
+        gets confusing when reading in a json file
         
-            
+        :return: DESCRIPTION
+        :rtype: TYPE
 
-        
-
-        
-    
+        """
+        return dict([(rr.id, rr) for rr in self.runs])
     

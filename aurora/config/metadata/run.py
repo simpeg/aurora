@@ -91,6 +91,23 @@ class Run(Base):
                 raise TypeError(f"not sure what to do with type {type(item)}")
             
             self._time_periods.append(item)
+            
+    @property
+    def channel_scale_factors(self):
+        """
+        return a dictionary of channel scale factors
+    
+        :return: DESCRIPTION
+        :rtype: TYPE
+
+        """
+        
+        scales = {}
+        
+        for ch in self.input_channels + self.output_channels:
+            scales[ch.id] = ch.scale_factor
+            
+        return scales
                 
 
         

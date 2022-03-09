@@ -20,6 +20,10 @@ class Decimation(Base):
     def __init__(self, **kwargs):
         
         super().__init__(attr_dict=attr_dict, **kwargs)
+        
+    @property
+    def decimated_sample_rate(self):
+        return self.sample_rate / self.factor
 
         
 
