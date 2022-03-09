@@ -123,6 +123,24 @@ class Processing(Base):
         
         return decimation
     
+    def add_decimation_level(self, decimation_level):
+        """
+        add a decimation level
+        """
+        
+        if not isinstance(decimation_level, (DecimationLevel, dict)):
+            raise TypeError(
+                f"List entry must be a DecimationLevel object not {type(decimation_level)}"
+                )
+        if isinstance(decimation_level, dict):
+            obj = DecimationLevel()
+            obj.from_dict(decimation_level)
+        
+        else:
+            obj = decimation_level
+
+        self._decimations.append(obj)
+    
     def read_emtf_bands(self, emtf_fn):
         """
         Read an emtf style file for defining the bands
@@ -148,5 +166,5 @@ class Processing(Base):
                     new_level = DecimationLevel()
                     new_level.decimation.level = level
                     new_level.add_band(band)
-                    self._decimations.append(new_level)
+                    self.add_decimation_level(new_level)
                 
