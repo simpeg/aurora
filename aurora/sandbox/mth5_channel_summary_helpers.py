@@ -54,6 +54,16 @@ def channel_summary_to_make_mth5(df, network="ZU"):
 
 
 def channel_summary_to_dataset_definition(df):
+    """
+
+    Parameters
+    ----------
+    df
+
+    Returns
+    -------
+
+    """
     grouper = df.groupby(["station", "run"])
     n_station_runs = len(grouper)
     station_ids = n_station_runs * [None]

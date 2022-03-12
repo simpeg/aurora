@@ -70,13 +70,13 @@ def make_cas04_data_for_processing(xml_path, h5_path="tmp.h5",
     inventory0 = read_inventory(str(xml_path)) #8P
     translator = XMLInventoryMTExperiment()
     experiment = translator.xml_to_mt(inventory_object=inventory0)
-    mth5_obj = initialize_mth5(h5_path)
+    mth5_obj = initialize_mth5(h5_path, mode="w")
     mth5_obj.from_experiment(experiment)
     if generate_channel_summary:
         summary_df = mth5_obj.channel_summary
-        summary_df.to_csv(summary_csv)
+        summary_df.to_csv(summary_csv, index=False)
     else:
-        summary_df = pd.read_csv(summary_csv)
+        summary_df = pd.read_csv(summary_csv, parse_dates=["start", "end"])
     #</CREATE MTH5 FROM XML AND SUMMARIZE DATA TO QUEUE>
 
     #<TRANSFORM CHANNEL SUMMARY INTO REQUEST DF>

@@ -5,9 +5,9 @@ method returns the same array as scipy.signal.spectrogram
 import numpy as np
 
 from aurora.general_helper_functions import TEST_PATH
-from aurora.pipelines.process_mth5 import get_data_from_decimation_level_from_mth5
 from aurora.pipelines.process_mth5 import initialize_pipeline
-from aurora.pipelines.process_mth5 import prototype_decimate
+from aurora.pipelines.time_series_helpers import get_data_from_mth5
+from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
 from aurora.test_utils.synthetic.make_processing_configs import create_test_run_config
@@ -30,9 +30,7 @@ def test_stft_methods_agree():
         processing_config.local_station_id = run_config.local_station_id
 
         if dec_level_id == 0:
-            local, remote = get_data_from_decimation_level_from_mth5(
-                processing_config, mth5_obj, run_id
-            )
+            local, remote = get_data_from_mth5(processing_config, mth5_obj, run_id)
         else:
             local = prototype_decimate(processing_config, local)
             # if processing_config.reference_station_id:
