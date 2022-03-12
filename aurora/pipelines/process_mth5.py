@@ -246,7 +246,7 @@ def process_mth5_run(
 
 
         if dec_level_id == 0:
-            local, remote = get_data_from_from_mth5(processing_config, mth5_obj, run_id)
+            local, remote = get_data_from_mth5(processing_config, mth5_obj, run_id)
             # APPLY TIMING CORRECTIONS HERE
         else:
             # This code structure assumes application of cascading decimation,
@@ -320,7 +320,8 @@ def process_mth5_runs(
     and remote stations.  If the run_lists are not provided specifically,
     we can extract them from the mth5s.  I would prefer to handle all that logic outside
     of this method, which expects the decision of what to process to be already made.
-    Thus, we need run_lists with time_intervals
+    Thus, we need run_lists with time_intervals, thus we are back at the dataset
+    defintion
 
     Stages here:
     1. Read in the config and figure out how many decimation levels there are
