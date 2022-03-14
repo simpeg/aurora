@@ -419,9 +419,12 @@ class TransferFunctionCollection(object):
                         cond2 = cov_nn_xr.output_channel_2 == out_ch2
                         chchnn = cov_nn_xr.where(cond1 & cond2, drop=True)
                         chchnn = chchnn.data.squeeze()
-                        real_part = np.real(chchnn[period_index])
-                        imag_part = np.imag(chchnn[period_index])
-                        line += f"{data_format.write([real_part])}"
+                        if np.isnan(chchnn[period_index]):
+                            real_part = -1.0
+                            imag_part = -1.0
+                        else:
+                            real_part = np.real(chchnn[period_index])
+                            imag_part = np.imag(chchnn[period_index])
                         line += f"{data_format.write([imag_part])}"
                     line += "\n"
                 f.writelines(line)
