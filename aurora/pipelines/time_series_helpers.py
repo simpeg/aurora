@@ -116,7 +116,10 @@ def run_ts_to_stft(config, run_xrts_orig):
 
     Returns
     -------
-
+    stft_obj: xarray.core.dataset.Dataset
+        Note that the STFT object may have inf/nan in the DC harmonic, introduced by
+        recoloring. This really doesn't matter since we don't use the DC harmonic for
+        anything.
     """
     from aurora.time_series.windowed_time_series import WindowedTimeSeries
 
@@ -263,6 +266,52 @@ def get_data_from_mth5(config, mth5_obj, run_id):
         remote = {"run": None, "mvts": None}
     # </REMOTE>
     return local, remote
+
+
+def get_data_from_mth5_new(config, mth5_obj, station_id, run_id):
+    """
+    ToDo: Review if this method should be moved into mth5.  If that were the case,
+    the config being passed here should be replaced with a list of station_ids and
+    the config sampling_rate, so that there is no dependency on the config object in
+    mth5.
+    In a future version this could also take a decimation level as an argument.  It
+    could then be merged with prototype decimate, depending on the decimation level.
+
+    Parameters
+    ----------
+    config : decimation_level_config
+    mth5_obj
+
+    Returns
+    -------
+
+    Somewhat complicated function -- see issue #13.  Ultimately this method could be
+    embedded in mth5, where the specific attributes of the config needed for this
+    method are passed as explicit arguments.
+
+    Should be able to
+    1. accept a config and an mth5_obj and return decimation_level_0,
+    2. Accept data from a given decimation level, and decimation
+    instrucntions and return it
+    3. If we decide to house decimated data in an mth5 should return time
+    series for the run at the perscribed decimation level
+
+    Thus args are
+    decimation_level_config, mth5,
+    decimation_level_config, runs and run_ts'
+    decimation_level_config, mth5
+    Returns: dict
+        Each dictionary is associated with a station-run
+        Each Dict has keys "run" and "mvts" which are the mth5_run and the
+        mth5_run_ts objects respectively for the associated station
+    -------
+
+    """
+    run_obj = mth5_obj.get_run(station_id, run_id)
+    run_ts = run_obj.to_runts()
+    validate_sample_rate(run_ts, config)
+    output = {"run": run_obj, "mvts": run_ts.dataset, "run_id":run_id}
+    return output
 
 
 def prototype_decimate(config, run_run_ts):
