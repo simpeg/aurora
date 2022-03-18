@@ -1,0 +1,146 @@
+{
+    "config_id": "pkd_test",
+    "mth5_path": "C:\\Users\\jpeacock\\Documents\\GitHub\\aurora\\tests\\parkfield\\data\\pkd_test_00.h5",
+    "local_station_id": "PKD",
+    "reference_station_id": "",
+    "channel_scale_factors": {
+        "PKD": {},
+        "SAO": {}
+    },
+    "0": {
+        "mth5_path": "",
+        "decimation_level_id": 0,
+        "decimation_factor": 1,
+        "decimation_method": "default",
+        "anti_alias_filter": "default",
+        "taper_family": "hamming",
+        "taper_additional_args": {},
+        "num_samples_window": 128,
+        "num_samples_overlap": 32,
+        "sample_rate": 40.0,
+        "prewhitening_type": "first difference",
+        "extra_pre_fft_detrend_type": "linear",
+        "band_setup_style": "EMTF",
+        "emtf_band_setup_file": "C:\\Users\\jpeacock\\Documents\\GitHub\\aurora\\aurora\\config\\emtf_band_setup\\bs_test.cfg",
+        "minimum_number_of_cycles": 10,
+        "max_number_of_iterations": 10,
+        "max_number_of_redescending_iterations": 2,
+        "local_station_id": "",
+        "reference_station_id": "",
+        "channel_scale_factors": {},
+        "estimation_engine": "RME",
+        "estimate_per_channel": true,
+        "input_channels": [
+            "hx",
+            "hy"
+        ],
+        "output_channels": [
+            "hz",
+            "ex",
+            "ey"
+        ],
+        "reference_channels": []
+    },
+    "1": {
+        "mth5_path": "",
+        "decimation_level_id": 1,
+        "decimation_factor": 4,
+        "decimation_method": "default",
+        "anti_alias_filter": "default",
+        "taper_family": "hamming",
+        "taper_additional_args": {},
+        "num_samples_window": 128,
+        "num_samples_overlap": 32,
+        "sample_rate": 10.0,
+        "prewhitening_type": "first difference",
+        "extra_pre_fft_detrend_type": "linear",
+        "band_setup_style": "EMTF",
+        "emtf_band_setup_file": "C:\\Users\\jpeacock\\Documents\\GitHub\\aurora\\aurora\\config\\emtf_band_setup\\bs_test.cfg",
+        "minimum_number_of_cycles": 10,
+        "max_number_of_iterations": 10,
+        "max_number_of_redescending_iterations": 2,
+        "local_station_id": "",
+        "reference_station_id": "",
+        "channel_scale_factors": {},
+        "estimation_engine": "RME",
+        "estimate_per_channel": true,
+        "input_channels": [
+            "hx",
+            "hy"
+        ],
+        "output_channels": [
+            "hz",
+            "ex",
+            "ey"
+        ],
+        "reference_channels": []
+    },
+    "2": {
+        "mth5_path": "",
+        "decimation_level_id": 2,
+        "decimation_factor": 4,
+        "decimation_method": "default",
+        "anti_alias_filter": "default",
+        "taper_family": "hamming",
+        "taper_additional_args": {},
+        "num_samples_window": 128,
+        "num_samples_overlap": 32,
+        "sample_rate": 2.5,
+        "prewhitening_type": "first difference",
+        "extra_pre_fft_detrend_type": "linear",
+        "band_setup_style": "EMTF",
+        "emtf_band_setup_file": "C:\\Users\\jpeacock\\Documents\\GitHub\\aurora\\aurora\\config\\emtf_band_setup\\bs_test.cfg",
+        "minimum_number_of_cycles": 10,
+        "max_number_of_iterations": 10,
+        "max_number_of_redescending_iterations": 2,
+        "local_station_id": "",
+        "reference_station_id": "",
+        "channel_scale_factors": {},
+        "estimation_engine": "RME",
+        "estimate_per_channel": true,
+        "input_channels": [
+            "hx",
+            "hy"
+        ],
+        "output_channels": [
+            "hz",
+            "ex",
+            "ey"
+        ],
+        "reference_channels": []
+    },
+    "3": {
+        "mth5_path": "",
+        "decimation_level_id": 3,
+        "decimation_factor": 4,
+        "decimation_method": "default",
+        "anti_alias_filter": "default",
+        "taper_family": "hamming",
+        "taper_additional_args": {},
+        "num_samples_window": 128,
+        "num_samples_overlap": 32,
+        "sample_rate": 0.625,
+        "prewhitening_type": "first difference",
+        "extra_pre_fft_detrend_type": "linear",
+        "band_setup_style": "EMTF",
+        "emtf_band_setup_file": "C:\\Users\\jpeacock\\Documents\\GitHub\\aurora\\aurora\\config\\emtf_band_setup\\bs_test.cfg",
+        "minimum_number_of_cycles": 10,
+        "max_number_of_iterations": 10,
+        "max_number_of_redescending_iterations": 2,
+        "local_station_id": "",
+        "reference_station_id": "",
+        "channel_scale_factors": {},
+        "estimation_engine": "RME",
+        "estimate_per_channel": true,
+        "input_channels": [
+            "hx",
+            "hy"
+        ],
+        "output_channels": [
+            "hz",
+            "ex",
+            "ey"
+        ],
+        "reference_channels": []
+    }
+}

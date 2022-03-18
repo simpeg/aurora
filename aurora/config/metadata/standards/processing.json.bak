@@ -1,0 +1,13 @@
+{
+    "decimations": {
+        "type": "string",
+        "required": true,
+        "style": "name list",
+        "units": null,
+        "description": "decimation levels",
+        "options": [],
+        "alias": [],
+        "example": "0",
+		"default": null
+    }
+}
