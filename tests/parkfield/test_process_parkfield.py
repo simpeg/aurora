@@ -4,7 +4,7 @@ from aurora.time_series.frequency_band_helpers import configure_frequency_bands
 from make_processing_configs import create_decimation_level_test_config
 
 
-def process_mth5_decimation_level(config, run_id, units="MT"):
+def process_decimation_level(config, run_id, units="MT"):
     """
     20210718: Moved this code out of process_mth5 to keep this test passing.
     This will be replaced with process_mth5_run as soon as the configs have
@@ -58,7 +58,7 @@ def test(plot=False):
     # processing_cfg = Path(cwd, "config", "ascii_pkd_processing_config.json")
     # config = DecimationLevelConfig()
     # config.from_json(processing_cfg)
-    tf_obj = process_mth5_decimation_level(config, "001", units="SI")
+    tf_obj = process_decimation_level(config, "001", units="SI")
     if plot:
         plot_tf_obj(tf_obj)
 
