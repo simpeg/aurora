@@ -13,7 +13,6 @@ from aurora.config.config_creator import ConfigCreator
 from aurora.config.processing_config import RunConfig
 from aurora.general_helper_functions import TEST_PATH
 from aurora.pipelines.process_mth5 import process_mth5_run
-from aurora.pipelines.process_mth5 import process_mth5_runs
 from aurora.pipelines.process_mth5 import process_mth5_from_dataset_definition
 from aurora.sandbox.mth5_channel_summary_helpers import channel_summary_to_dataset_definition
 from aurora.tf_kernel.base import TransferFunctionKernel
@@ -79,30 +78,6 @@ def process_run_a(config_path, mth5_path):
     print(f"would be nice if {tmp} was the xml")
     return
 
-def process_run_a_new(config_path, mth5_path):
-    """
-    Just like process_run_a but in this case we use
-    Parameters
-    ----------
-    config_path
-    mth5_path
-
-    Returns
-    -------
-
-    """
-    tf_cls = process_mth5_runs(
-        config_path,
-        "a",
-        mth5_path=mth5_path,
-        units="MT",
-        show_plot=True,
-        z_file_path="a.zss",
-        return_collection=False,
-    )
-    tmp = tf_cls.write_tf_file(fn="cas04_ss_a.xml", file_type="emtfxml")
-    print(f"would be nice if {tmp} was the xml")
-    return
 
 def process_with_dataset_definition(config_path, mth5_path, dataset_dfn,
                                           show_plot=False, z_file_path="test.zss"):

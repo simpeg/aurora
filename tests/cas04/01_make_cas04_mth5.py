@@ -22,7 +22,6 @@ import pandas as pd
 import pathlib
 
 from aurora.general_helper_functions import TEST_PATH
-from aurora.pipelines.process_mth5 import process_mth5_run
 from aurora.sandbox.mth5_channel_summary_helpers import channel_summary_to_make_mth5
 from aurora.test_utils.dataset_definitions import TEST_DATA_SET_CONFIGS
 from mth5.utils.helpers import initialize_mth5

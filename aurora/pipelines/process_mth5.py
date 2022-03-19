@@ -1,5 +1,5 @@
 """
-Note 1: process_mth5_runs assumes application of cascading decimation, and that the
+Note 1: process_mth5_run assumes application of cascading decimation, and that the
 decimated data will be accessed from the previous decimation level.  This should be
 revisited. It may make more sense to have a get_decimation_level() interface that
 provides an option of applying decimation or loading predecimated data.
