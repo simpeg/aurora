@@ -9,6 +9,8 @@ tests/synthetic/aurora_results/*
 tests/synthetic/config/*
 tests/synthetic/data/*h5
 tests/synthetic/out.png
+*.bak
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
