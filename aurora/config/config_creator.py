@@ -91,7 +91,7 @@ class ConfigCreator:
         return json_path
     
     def create_run_processing_object(
-            self, station_id=None, run_id=None, mth5_path=None, sample_rate=-1, 
+            self, station_id=None, run_id=None, mth5_path=None, sample_rate=1, 
             input_channels=["hx", "hy"], output_channels=["hz", "ex", "ey"], 
             emtf_band_file=BANDS_DEFAULT_FILE, **kwargs):
         """
@@ -125,9 +125,12 @@ class ConfigCreator:
             for key in sorted(processing_obj.decimations_dict.keys()):
                 if key in [0, "0"]:
                     d = 1
+                    sr = sample_rate
                 else:
                     d = 4
+                    sr = sample_rate / (d ** int(key))
                 processing_obj.decimations_dict[key].decimation.factor = d
+                processing_obj.decimations_dict[key].decimation.sample_rate = sr
         
         return processing_obj
     
