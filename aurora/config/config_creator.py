@@ -92,7 +92,8 @@ class ConfigCreator:
     
     def create_run_processing_object(
             self, station_id=None, run_id=None, mth5_path=None, sample_rate=-1, 
-            input_channels=["hx", "hy"], output_channels=["hz", "ex", "ey"], **kwargs):
+            input_channels=["hx", "hy"], output_channels=["hz", "ex", "ey"], 
+            emtf_band_file=BANDS_DEFAULT_FILE, **kwargs):
         """
         Create a default processing object
         
@@ -118,14 +119,15 @@ class ConfigCreator:
         station_obj.runs = runs
 
         processing_obj.stations.local = station_obj
-        processing_obj.read_emtf_bands(BANDS_DEFAULT_FILE)
+        if emtf_band_file is not None:
+            processing_obj.read_emtf_bands(emtf_band_file)
         
-        for key in sorted(processing_obj.decimations_dict.keys()):
-            if key in [0, "0"]:
-                d = 1
-            else:
-                d = 4
-            processing_obj.decimations_dict[key].decimation.factor = d
+            for key in sorted(processing_obj.decimations_dict.keys()):
+                if key in [0, "0"]:
+                    d = 1
+                else:
+                    d = 4
+                processing_obj.decimations_dict[key].decimation.factor = d
         
         return processing_obj
     

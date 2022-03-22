@@ -13,7 +13,7 @@ from mt_metadata.base.helpers import write_lines
 from mt_metadata.base import get_schema, Base
 from .standards import SCHEMA_FN_PATHS
 
-from . import Window, Decimation, Band, Regression
+from . import Window, Decimation, Band, Regression, Estimator
 
 
 # =============================================================================
@@ -21,6 +21,7 @@ attr_dict = get_schema("decimation_level", SCHEMA_FN_PATHS)
 attr_dict.add_dict(get_schema("decimation", SCHEMA_FN_PATHS), "decimation")
 attr_dict.add_dict(get_schema("window", SCHEMA_FN_PATHS), "window")
 attr_dict.add_dict(get_schema("regression", SCHEMA_FN_PATHS), "regression")
+attr_dict.add_dict(get_schema("estimator", SCHEMA_FN_PATHS), "estimator")
 
 # =============================================================================
 class DecimationLevel(Base):
@@ -31,6 +32,7 @@ class DecimationLevel(Base):
         self.window = Window()
         self.decimation = Decimation()
         self.regression = Regression()
+        self.estimator = Estimator()
         
         self._bands = []
         

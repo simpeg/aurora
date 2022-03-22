@@ -159,12 +159,14 @@ class Processing(Base):
         for line in emtf_fn.read_text().split("\n")[1:]:
             if len(line) >= 3:
                 level, low, high = [int(ii.strip()) for ii in line.split()]
+                # python starts from 0
+                level = int(level) - 1
                 band = Band(decimation_level=level, index_min=low, index_max=high)
                 try:
                     self.decimations_dict[level].add_band(band)
                 except KeyError:
                     new_level = DecimationLevel()
-                    new_level.decimation.level = level
+                    new_level.decimation.level = int(level)
                     new_level.add_band(band)
                     self.add_decimation_level(new_level)
                 
