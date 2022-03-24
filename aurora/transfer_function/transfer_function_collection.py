@@ -425,6 +425,7 @@ class TransferFunctionCollection(object):
                         else:
                             real_part = np.real(chchnn[period_index])
                             imag_part = np.imag(chchnn[period_index])
+                        line += f"{data_format.write([real_part])}"
                         line += f"{data_format.write([imag_part])}"
                     line += "\n"
                 f.writelines(line)
