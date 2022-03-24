@@ -482,7 +482,7 @@ def process_mth5_from_dataset_definition(
         # in a future version.
 	#get_time_series_data(dec_level_id, ...)
 
-	if dec_level_id == 0:
+	    if dec_level_id == 0:
             for i,row in dataset_df.iterrows():
                 run_dict = get_data_from_mth5_new(processing_config, mth5_obj,
                                                   row.station_id, row.run_id)
