@@ -467,7 +467,22 @@ def process_mth5_from_dataset_definition(
         # #grouper = df.groupby(["station", "run"])
 
         # <GET TIME SERIES DATA>
-        if dec_level_id == 0:
+        #Factor this out into a function.
+        #function takes an (mth5_obj_list, local_station_id, remote_station_id,
+        # local_run_list, remote_run_list)
+        #OR (mth5_obj_list, local_station_id, remote_station_id, dataset_df)
+        #Note that the dataset_df should be easy to generate from the local_station_id,
+        # remote_station_id, local_run_list, remote_run_list, but allows for
+        # specification of time_intervals.  This is important in the case where
+        # aquisition_runs are non-overlapping between local and remote.  Although,
+        # theoretically, merging on the FCs should make nans in the places where
+        # there is no overlapping data, and this should be dropped in the TF portion
+        # of the code.  However, time-intervals where the data do not have coverage
+        # at both stations can be identified in a method before GET TIME SERIES
+        # in a future version.
+	#get_time_series_data(dec_level_id, ...)
+
+	if dec_level_id == 0:
             for i,row in dataset_df.iterrows():
                 run_dict = get_data_from_mth5_new(processing_config, mth5_obj,
                                                   row.station_id, row.run_id)
@@ -535,6 +550,7 @@ def process_mth5_from_dataset_definition(
             remote_merged_stft_obj = xr.concat(remote_stfts, "time")
         else:
             remote_merged_stft_obj = None
+        #</CONVERT TO STFT>
 
         tf_obj = process_tf_decimation_level(
             processing_config,
