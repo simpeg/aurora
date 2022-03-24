@@ -450,6 +450,7 @@ def process_mth5_from_dataset_definition(
     dataset_df["stft"] = None
 
     for dec_level_id in run_config.decimation_level_ids:
+
         #<This will be replaced by a 1-line call issue #153>
         processing_config = run_config.decimation_level_configs[dec_level_id]
         processing_config.local_station_id = run_config.local_station_id
@@ -480,9 +481,9 @@ def process_mth5_from_dataset_definition(
         # of the code.  However, time-intervals where the data do not have coverage
         # at both stations can be identified in a method before GET TIME SERIES
         # in a future version.
-	#get_time_series_data(dec_level_id, ...)
+        # get_time_series_data(dec_level_id, ...)
 
-	    if dec_level_id == 0:
+        if dec_level_id == 0:
             for i,row in dataset_df.iterrows():
                 run_dict = get_data_from_mth5_new(processing_config, mth5_obj,
                                                   row.station_id, row.run_id)
