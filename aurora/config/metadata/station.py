@@ -131,10 +131,14 @@ class Station(Base):
         self.runs = []
         
         self.id = df.station_id.unique()[0]
+        self.mth5_path = df.mth5_path.unique()[0]
         
         for entry in df.itertuples():
             try:
                 r = self.run_dict[entry.run_id]
+                r.time_periods.append(TimePeriod(start=entry.start.isoformat(),
+                                                 end=entry.end.isoformat()))
+                
             except KeyError:
                 r = Run(
                     id=entry.run_id, 
@@ -143,9 +147,9 @@ class Station(Base):
                     output_channels=entry.output_channels
                     )
                 
-            r.time_periods.append(TimePeriod(start=entry.start.isoformat(),
-                                             end=entry.end.isoformat()))
-            self.runs.append(r)
+                r.time_periods.append(TimePeriod(start=entry.start.isoformat(),
+                                                 end=entry.end.isoformat()))
+                self.runs.append(r)
             
             
             
