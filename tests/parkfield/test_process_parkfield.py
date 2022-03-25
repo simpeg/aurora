@@ -31,7 +31,7 @@ def process_decimation_level(config, run_id, units="MT"):
 
     local_run_obj = mth5_obj.get_run(config["local_station_id"], run_id)
     local_run_ts = local_run_obj.to_runts()
-    validate_sample_rate(local_run_ts, config)
+    validate_sample_rate(local_run_ts, config.sample_rate)
     local_stft_obj = run_ts_to_calibrated_stft(
         local_run_ts, local_run_obj, config, units=units
     )
