@@ -27,6 +27,11 @@ class Run(Base):
         super().__init__(attr_dict=attr_dict, **kwargs)
         
     @property
+    def input_channel_names(self):
+        """ list of channel names """
+        return [ch.id for ch in self._input]
+    
+    @property
     def input_channels(self):
         return self._input
     
@@ -51,7 +56,11 @@ class Run(Base):
             
             self._input.append(ch)
                 
-            
+    @property
+    def output_channel_names(self):
+        """ list of channel names """
+        return [ch.id for ch in self._output]
+        
     @property
     def output_channels(self):
         return self._output

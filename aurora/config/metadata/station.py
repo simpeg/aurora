@@ -7,8 +7,11 @@ Created on Thu Feb 17 14:15:20 2022
 # =============================================================================
 # Imports
 # =============================================================================
+import pandas as pd
+
 from mt_metadata.base.helpers import write_lines
 from mt_metadata.base import get_schema, Base
+from mt_metadata.timeseries import TimePeriod
 from .standards import SCHEMA_FN_PATHS
 from .run import Run
 
@@ -64,3 +67,86 @@ class Station(Base):
         """
         return dict([(rr.id, rr) for rr in self.runs])
     
+    def to_dataset_dataframe(self):
+        """
+        Create a dataset definition dataframe that can be used in the 
+        processing
+        
+        [
+            "station_id", 
+            "run_id",
+            "start",
+            "end",
+            "mth5_path",
+            "sample_rate",
+            "input_channels",
+            "output_channels"
+        ] 
+        
+        """
+        
+        data_list = []
+        
+        for run in self.runs:
+            for tp in run.time_periods:
+                entry = {
+                    "station_id": self.id,
+                    "run_id": run.id,
+                    "start": tp.start,
+                    "end": tp.end,
+                    "mth5_path": self.mth5_path,
+                    "sample_rate": run.sample_rate,
+                    "input_channels": run.input_channel_names,
+                    "output_channels": run.output_channel_names}
+                data_list.append(entry)
+                
+        df = pd.DataFrame(data_list)
+        df.start = pd.to_datetime(df.start)
+        df.end = pd.to_datetime(df.end)
+  
+        return df
+    
+    def from_dataset_dataframe(self, df):
+        """
+        set a data frame
+        
+        [
+            "station_id", 
+            "run_id",
+            "start",
+            "end",
+            "mth5_path",
+            "sample_rate",
+            "input_channels",
+            "output_channels"
+        ] 
+        
+        :param df: DESCRIPTION
+        :type df: TYPE
+        :return: DESCRIPTION
+        :rtype: TYPE
+
+        """
+        
+        self.runs = []
+        
+        self.id = df.station_id.unique()[0]
+        
+        for entry in df.itertuples():
+            try:
+                r = self.run_dict[entry.run_id]
+            except KeyError:
+                r = Run(
+                    id=entry.run_id, 
+                    sample_rate=entry.sample_rate,
+                    input_channels=entry.input_channels,
+                    output_channels=entry.output_channels
+                    )
+                
+            r.time_periods.append(TimePeriod(start=entry.start.isoformat(),
+                                             end=entry.end.isoformat()))
+            self.runs.append(r)
+            
+            
+            
+            
