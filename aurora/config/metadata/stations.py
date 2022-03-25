@@ -98,6 +98,47 @@ class Stations(Base):
 
         """
         return dict([(rr.id, rr) for rr in self.remote])
+    
+    def from_dataset_dataframe(self, df):
+        """
+        from a dataset dataframe
+        
+        :return: DESCRIPTION
+        :rtype: TYPE
+
+        """
+        
+        station = df[df.remote==False].station_id.unique()[0]
+        rr_stations = df[df.remote==True].station_id.unique()
+        
+        self.local.from_dataset_dataframe(df[df.station_id==station])
+        
+        for rr_station in rr_stations:
+            rr = Station()
+            rr.from_dataset_dataframe(df[df.station_id==rr_station])
+            self.add_remote(rr)
+            
+    def to_dataset_dataframe(self):
+        """
+        output a dataframe
+        
+        :return: DESCRIPTION
+        :rtype: TYPE
+
+        """
+        
+        local_df = self.local.to_dataset_dataframe()
+        
+        for rr in self.remote:
+            local_df = local_df.append(rr.to_dataset_dataframe())
+            
+        local_df = local_df.reset_index()
+            
+        return local_df
+            
+        
+        
+        
         
         
     
