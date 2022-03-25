@@ -330,3 +330,23 @@ class FrequencyBands(object):
         self.band_edges = band_edges
 
         return
+    
+    def from_decimation_object(self, decimation_object):
+        """
+        Convert band edges from a :class:`aurora.config.Decimation` object,
+        Which has all the information in it.
+        
+        :param decimation_object: DESCRIPTION
+        :type decimation_object: TYPE
+        :return: DESCRIPTION
+        :rtype: TYPE
+
+        """
+        
+        df = decimation_object.decimation.sample_rate / decimation_object.window.num_samples
+        half_df = df / 2.0
+        # half_df /=100
+        lower_edges = (decimation_object.lower_bounds * df) - half_df
+        upper_edges = (decimation_object.upper_bounds * df) + half_df
+        band_edges = np.vstack((lower_edges, upper_edges)).T
+        self.band_edges = band_edges

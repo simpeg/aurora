@@ -1,0 +1,24 @@
+{
+    "id": {
+        "type": "string",
+        "required": true,
+        "style": "free form",
+        "units": null,
+        "description": "channel ID",
+        "options": [],
+        "alias": [],
+        "example": "mt001",
+		"default": null
+    },
+    "scale_factor": {
+        "type": "float",
+        "required": true,
+        "style": "number",
+        "units": null,
+        "description": "scale factor of the channel",
+        "options": [],
+        "alias": [],
+        "example": "10.0",
+		"default": 1.0
+    }
+}

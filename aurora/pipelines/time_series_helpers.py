@@ -5,7 +5,8 @@ import xarray as xr
 from aurora.time_series.windowing_scheme import WindowingScheme
 
 
-def validate_sample_rate(run_ts, config):
+#<<<<<<< HEAD
+def validate_sample_rate(run_ts, expected_sample_rate):
     """
 
     Parameters
@@ -17,39 +18,63 @@ def validate_sample_rate(run_ts, config):
     -------
 
     """
-    if run_ts.sample_rate != config.sample_rate:
+    if run_ts.sample_rate != expected_sample_rate:
+# =======
+# def validate_sample_rate(run_ts, decimation_obj):
+#     if run_ts.sample_rate != decimation_obj.sample_rate:
+# >>>>>>> e09ef862ef90d065e34374ea6ae6c61addf97230
         print(
             f"sample rate in run time series {run_ts.sample_rate} and "
-            f"processing config {config.sample_rate} do not match"
+            f"processing decimation_obj {decimation_obj.sample_rate} do not match"
         )
         raise Exception
     return
 
 
-def apply_prewhitening(config, run_xrts_input):
-    if config["prewhitening_type"] == "first difference":
+def apply_prewhitening(decimation_obj, run_xrts_input):
+    """
+    Parameters
+    ----------
+    decimation_obj : aurora.config.Decimation object
+
+    Returns
+    -------
+
+    """
+    if decimation_obj.prewhitening_type == "first difference":
         run_xrts = run_xrts_input.diff("time")
     else:
         run_xrts = run_xrts_input
     return run_xrts
 
 
-def apply_recoloring(config, stft_obj):
-    if config["prewhitening_type"] == "first difference":
+def apply_recoloring(decimation_obj, stft_obj):
+    """
+    Parameters
+    ----------
+    decimation_obj : aurora.config.Decimation object
+
+
+    Returns
+    -------
+
+    """
+    if decimation_obj.prewhitening_type == "first difference":
         from aurora.time_series.frequency_domain_helpers import get_fft_harmonics
         from numpy import pi
 
-        freqs = get_fft_harmonics(config.num_samples_window, config.sample_rate)
+        freqs = get_fft_harmonics(decimation_obj.window.num_samples, 
+                                  decimation_obj.sample_rate)
         prewhitening_correction = 1.0j * 2 * pi * freqs  # jw
         stft_obj /= prewhitening_correction
     return stft_obj
 
 
-def run_ts_to_stft_scipy(config, run_xrts_orig):
+def run_ts_to_stft_scipy(decimation_obj, run_xrts_orig):
     """
     Parameters
     ----------
-    config
+    decimation_obj : aurora.config.Decimation object
     run_xrts
 
     Returns
@@ -58,24 +83,24 @@ def run_ts_to_stft_scipy(config, run_xrts_orig):
     """
     import xarray as xr
 
-    run_xrts = apply_prewhitening(config, run_xrts_orig)
+    run_xrts = apply_prewhitening(decimation_obj, run_xrts_orig)
 
     windowing_scheme = WindowingScheme(
-        taper_family=config.taper_family,
-        num_samples_window=config.num_samples_window,
-        num_samples_overlap=config.num_samples_overlap,
-        taper_additional_args=config.taper_additional_args,
-        sample_rate=config.sample_rate,
+        taper_family=decimation_obj.window.type,
+        num_samples_window=decimation_obj.window.num_samples,
+        num_samples_overlap=decimation_obj.window.overlap,
+        taper_additional_args=decimation_obj.window.additional_args,
+        sample_rate=decimation_obj.sample_rate,
     )
-    # stft_obj = run_xrts.copy(deep=True)
+
     stft_obj = xr.Dataset()
     for channel_id in run_xrts.data_vars:
         ff, tt, specgm = ssig.spectrogram(
             run_xrts[channel_id].data,
-            fs=config.sample_rate,
+            fs=decimation_obj.sample_rate,
             window=windowing_scheme.taper,
-            nperseg=config.num_samples_window,
-            noverlap=config.num_samples_overlap,
+            nperseg=decimation_obj.window.num_samples,
+            noverlap=decimation_obj.window.overlap,
             detrend="linear",
             scaling="density",
             mode="complex",
@@ -91,7 +116,7 @@ def run_ts_to_stft_scipy(config, run_xrts_orig):
 
         # make time_axis
         tt = tt - tt[0]
-        tt *= config.sample_rate
+        tt *= decimation_obj.sample_rate
         time_axis = run_xrts.time.data[tt.astype(int)]
 
         xrd = xr.DataArray(
@@ -101,17 +126,17 @@ def run_ts_to_stft_scipy(config, run_xrts_orig):
         )
         stft_obj.update({channel_id: xrd})
 
-    stft_obj = apply_recoloring(config, stft_obj)
+    stft_obj = apply_recoloring(decimation_obj, stft_obj)
 
     return stft_obj
 
 
-def run_ts_to_stft(config, run_xrts_orig):
+def run_ts_to_stft(decimation_obj, run_xrts_orig):
     """
 
     Parameters
     ----------
-    config : ShortTimeFourierTransformConfig object
+    decimation_obj : aurora.config.Decimation object
     run_ts ; xarray.core.dataset.Dataset, normally extracted from mth5.RunTS
 
     Returns
@@ -124,17 +149,17 @@ def run_ts_to_stft(config, run_xrts_orig):
     from aurora.time_series.windowed_time_series import WindowedTimeSeries
 
     windowing_scheme = WindowingScheme(
-        taper_family=config.taper_family,
-        num_samples_window=config.num_samples_window,
-        num_samples_overlap=config.num_samples_overlap,
-        taper_additional_args=config.taper_additional_args,
-        sample_rate=config.sample_rate,
+        taper_family=decimation_obj.window.type,
+        num_samples_window=decimation_obj.window.num_samples,
+        num_samples_overlap=decimation_obj.window.overlap,
+        taper_additional_args=decimation_obj.window.additional_args,
+        sample_rate=decimation_obj.sample_rate,
     )
 
-    run_xrts = apply_prewhitening(config, run_xrts_orig)
+    run_xrts = apply_prewhitening(decimation_obj, run_xrts_orig)
 
     windowed_obj = windowing_scheme.apply_sliding_window(
-        run_xrts, dt=1.0 / config.sample_rate
+        run_xrts, dt=1.0 / decimation_obj.sample_rate
     )
     windowed_obj = WindowedTimeSeries.detrend(data=windowed_obj, detrend_type="linear")
 
@@ -145,27 +170,27 @@ def run_ts_to_stft(config, run_xrts_orig):
     # scale_factor=windowing_scheme.linear_spectral_density_calibration_factor)
 
     stft_obj = windowing_scheme.apply_fft(
-        tapered_obj, detrend_type=config.extra_pre_fft_detrend_type
+        tapered_obj, detrend_type=decimation_obj.extra_pre_fft_detrend_type
     )
-    stft_obj = apply_recoloring(config, stft_obj)
+    stft_obj = apply_recoloring(decimation_obj, stft_obj)
 
     return stft_obj
 
 
-def run_ts_to_calibrated_stft(run_ts, run_obj, config, units="MT"):
+def run_ts_to_calibrated_stft(run_ts, run_obj, decimation_obj, units="MT"):
     """
     Parameters
     ----------
     run_ts
     run_obj
-    config
+    decimation_obj
     units
 
     Returns
     -------
 
     """
-    stft_obj = run_ts_to_stft(config, run_ts.dataset)
+    stft_obj = run_ts_to_stft(decimation_obj, run_ts.dataset)
     stft_obj = calibrate_stft_obj(stft_obj, run_obj, units=units)
 
     return stft_obj
@@ -252,7 +277,7 @@ def get_data_from_mth5(config, mth5_obj, run_id):
     # <LOCAL>
     local_run_obj = mth5_obj.get_run(config["local_station_id"], run_id)
     local_run_ts = local_run_obj.to_runts()
-    validate_sample_rate(local_run_ts, config)
+    validate_sample_rate(local_run_ts, config.sample_rate)
     local = {"run": local_run_obj, "mvts": local_run_ts.dataset, "run_id":run_id}
     # </LOCAL>
 
@@ -260,7 +285,7 @@ def get_data_from_mth5(config, mth5_obj, run_id):
     if config.reference_station_id:
         remote_run_obj = mth5_obj.get_run(config["reference_station_id"], run_id)
         remote_run_ts = remote_run_obj.to_runts()
-        validate_sample_rate(remote_run_ts, config)
+        validate_sample_rate(remote_run_ts, config.sample_rate)
         remote = {"run": remote_run_obj, "mvts": remote_run_ts.dataset}
     else:
         remote = {"run": None, "mvts": None}
@@ -309,7 +334,7 @@ def get_data_from_mth5_new(config, mth5_obj, station_id, run_id):
     """
     run_obj = mth5_obj.get_run(station_id, run_id)
     run_ts = run_obj.to_runts()
-    validate_sample_rate(run_ts, config)
+    validate_sample_rate(run_ts, config.sample_rate)
     output = {"run": run_obj, "mvts": run_ts.dataset, "run_id":run_id}
     return output
 

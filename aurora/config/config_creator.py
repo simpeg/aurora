@@ -16,14 +16,15 @@ from pathlib import Path
 from aurora.config.decimation_level_config import DecimationLevelConfig
 from aurora.config.processing_config import RunConfig
 from aurora.general_helper_functions import BAND_SETUP_PATH
+from aurora.config import Processing, Station, Run, BANDS_DEFAULT_FILE
 
 
-class ConfigCreator(object):
+class ConfigCreator:
+    
     def __init__(self, **kwargs):
         default_config_path = Path("config")
         self.config_path = kwargs.get("config_path", default_config_path)
 
-    # def to_json(self):
 
     # pass an mth5, it has: station_id, run_id, mth5_path, sample_rate
     def create_run_config(
@@ -88,6 +89,66 @@ class ConfigCreator(object):
         json_path = self.config_path.joinpath(json_fn)
         run_config.to_json(json_fn=json_path)
         return json_path
+    
+    def create_run_processing_object(
+            self, station_id=None, run_id=None, mth5_path=None, sample_rate=1, 
+            input_channels=["hx", "hy"], output_channels=["hz", "ex", "ey"], 
+            emtf_band_file=BANDS_DEFAULT_FILE, **kwargs):
+        """
+        Create a default processing object
+        
+        :return: DESCRIPTION
+        :rtype: TYPE
+
+        """
+        processing_obj = Processing(id=f"{station_id}-{run_id}", **kwargs)
+        
+        if not isinstance(run_id, list):
+            run_id = [run_id]
+            
+        runs = []
+        for run in run_id:
+            run_obj = Run(
+                id=run_id,
+                input_channels=input_channels,
+                output_channels=output_channels,
+                sample_rate=sample_rate)
+            runs.append(run_obj)
+            
+        station_obj = Station(id=station_id, mth5_path=mth5_path)
+        station_obj.runs = runs
+
+        processing_obj.stations.local = station_obj
+        if emtf_band_file is not None:
+            processing_obj.read_emtf_bands(emtf_band_file)
+        
+            for key in sorted(processing_obj.decimations_dict.keys()):
+                if key in [0, "0"]:
+                    d = 1
+                    sr = sample_rate
+                else:
+                    d = 4
+                    sr = sample_rate / (d ** int(key))
+                processing_obj.decimations_dict[key].decimation.factor = d
+                processing_obj.decimations_dict[key].decimation.sample_rate = sr
+        
+        return processing_obj
+    
+    def to_json(self, path, processing_object, nested=True, required=False):
+        """
+        Write a processing object to path
+        
+        :param path: DESCRIPTION
+        :type path: TYPE
+        :param processing_object: DESCRIPTION
+        :type processing_object: TYPE
+        :return: DESCRIPTION
+        :rtype: TYPE
+
+        """
+        
+        with open(path, "w") as fid:
+            fid.write(processing_object.to_json(nested=nested, required=required))
 
 
 def test_cas04():

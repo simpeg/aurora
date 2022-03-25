@@ -1,0 +1,24 @@
+{
+    "decimations": {
+        "type": "string",
+        "required": true,
+        "style": "name list",
+        "units": null,
+        "description": "decimation levels",
+        "options": [],
+        "alias": [],
+        "example": "0",
+		"default": null
+    },
+	"id": {
+        "type": "string",
+        "required": true,
+        "style": "free form",
+        "units": null,
+        "description": "Configuration ID",
+        "options": [],
+        "alias": [],
+        "example": "0",
+		"default": null
+    }
+}

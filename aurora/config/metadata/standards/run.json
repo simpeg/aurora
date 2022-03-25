@@ -1,0 +1,57 @@
+{
+    "id": {
+        "type": "string",
+        "required": true,
+        "style": "free form",
+        "units": null,
+        "description": "run ID",
+        "options": [],
+        "alias": [],
+        "example": "001",
+		"default": null
+    },
+	"input_channels": {
+        "type": "string",
+        "required": true,
+        "style": "name list",
+        "units": null,
+        "description": "List of input channels (source)",
+        "options": [],
+        "alias": [],
+        "example": "hx, hy",
+		"default": []
+    },
+	"output_channels": {
+        "type": "string",
+        "required": true,
+        "style": "name list",
+        "units": null,
+        "description": "List of output channels (response)",
+        "options": [],
+        "alias": [],
+        "example": "ex, ey, hz",
+		"default": []
+    },
+	"time_periods": {
+        "type": "string",
+        "required": true,
+        "style": "name list",
+        "units": null,
+        "description": "List of time periods to process",
+        "options": [],
+        "alias": [],
+        "example": "",
+		"default": []
+    },
+    "sample_rate": {
+        "type": "float",
+        "required": true,
+        "style": "number",
+        "units": "samples per second",
+        "description": "sample rate of the run",
+        "options": [],
+        "alias": [],
+        "example": "1",
+		"default": 1.0
+    }	
+}

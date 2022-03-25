@@ -1,0 +1,35 @@
+{
+    "minimum_cycles": {
+        "type": "integer",
+        "required": true,
+        "style": "number",
+        "units": null,
+        "description": "Minimum number of cycles in the regression",
+        "options": [],
+        "alias": [],
+        "example": "10",
+		"default": 10
+    },
+    "max_iterations": {
+        "type": "integer",
+        "required": true,
+        "style": "number",
+        "units": null,
+        "description": "Max iterations of the regression",
+        "options": [],
+        "alias": [],
+        "example": "10",
+		"default": 10
+    },
+	"max_redescending_iterations": {
+        "type": "integer",
+        "required": true,
+        "style": "number",
+        "units": null,
+        "description": "Max redescending iterations of the regression",
+        "options": [],
+        "alias": [],
+        "example": "10",
+		"default": 10
+    }
+}
