@@ -80,7 +80,8 @@ class Station(Base):
             "mth5_path",
             "sample_rate",
             "input_channels",
-            "output_channels"
+            "output_channels",
+            "remote",
         ] 
         
         """
@@ -97,7 +98,8 @@ class Station(Base):
                     "mth5_path": self.mth5_path,
                     "sample_rate": run.sample_rate,
                     "input_channels": run.input_channel_names,
-                    "output_channels": run.output_channel_names}
+                    "output_channels": run.output_channel_names,
+                    "remote": self.remote}
                 data_list.append(entry)
                 
         df = pd.DataFrame(data_list)
@@ -118,7 +120,8 @@ class Station(Base):
             "mth5_path",
             "sample_rate",
             "input_channels",
-            "output_channels"
+            "output_channels",
+            "remote",
         ] 
         
         :param df: DESCRIPTION
@@ -132,6 +135,7 @@ class Station(Base):
         
         self.id = df.station_id.unique()[0]
         self.mth5_path = df.mth5_path.unique()[0]
+        self.remote = df.remote.unique()[0]
         
         for entry in df.itertuples():
             try:

@@ -22,6 +22,7 @@ class TestStationDataset(unittest.TestCase):
         self.station = Station()
         self.station.id = "mt01"
         self.station.mth5_path = r"/home/mth5_path.h5"
+        self.station.remote = False
         
         self.maxDiff = None
         
@@ -46,7 +47,8 @@ class TestStationDataset(unittest.TestCase):
                                   'mth5_path',
                                   'sample_rate',
                                   'input_channels',
-                                  'output_channels'])
+                                  'output_channels',
+                                  "remote"])
             
         with self.subTest("single station"):
             self.assertTrue(len(df.station_id.unique())==1)
