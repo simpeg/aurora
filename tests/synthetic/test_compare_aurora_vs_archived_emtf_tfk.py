@@ -321,7 +321,7 @@ def run_test2r1():
 
 def test():
     create_test1_h5()
-    #create_test12rr_h5()
+    create_test12rr_h5()
     run_test1("fortran", expected_rms_misfit=EXPECTED_RMS_MISFIT["test1"])
 #    run_test1("matlab")
 #    run_test2r1()
