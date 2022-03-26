@@ -49,6 +49,21 @@ class Station(Base):
             
             self._runs.append(run)
             
+    def get_run(self, run_id):
+        """
+        
+        :param run_id: DESCRIPTION
+        :type run_id: TYPE
+        :return: DESCRIPTION
+        :rtype: TYPE
+
+        """
+        
+        try: 
+            return self.run_dict[run_id]
+        except KeyError:
+            raise KeyError(f"Could not find {run_id}")
+            
     @property
     def run_list(self):
         """ list of run names """
