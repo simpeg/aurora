@@ -19,12 +19,12 @@ import pandas as pd
 import xarray as xr
 
 from aurora.pipelines.helpers import initialize_config
-from aurora.pipelines.time_series_helpers import calibrate_stft_obj
-from aurora.pipelines.time_series_helpers import get_data_from_mth5
-from aurora.pipelines.time_series_helpers import get_data_from_mth5_new
-from aurora.pipelines.time_series_helpers import prototype_decimate
-from aurora.pipelines.time_series_helpers import run_ts_to_calibrated_stft
-from aurora.pipelines.time_series_helpers import run_ts_to_stft
+from aurora.pipelines.time_series_helpers_new import calibrate_stft_obj
+from aurora.pipelines.time_series_helpers_new import get_data_from_mth5
+from aurora.pipelines.time_series_helpers_new import get_data_from_mth5_new
+from aurora.pipelines.time_series_helpers_new import prototype_decimate
+from aurora.pipelines.time_series_helpers_new import run_ts_to_calibrated_stft
+from aurora.pipelines.time_series_helpers_new import run_ts_to_stft
 from aurora.pipelines.transfer_function_helpers import process_transfer_functions
 from aurora.pipelines.transfer_function_helpers import (
     transfer_function_header_from_config,
@@ -156,7 +156,8 @@ def make_stft_objects(config, local, remote, units):
     return local_stft_obj, remote_stft_obj
 
 
-def make_stft_objects_new(config, run_obj, run_xrts, units, station_id):#local, remote,
+def make_stft_objects_new(processing_config, i_dec_level, run_obj, run_xrts, units,
+                          station_id):
     """
     Note 1: CHECK DATA COVERAGE IS THE SAME IN BOTH LOCAL AND RR
     This should be pushed into a previous validator before pipeline starts
@@ -173,7 +174,7 @@ def make_stft_objects_new(config, run_obj, run_xrts, units, station_id):#local, 
 
     Parameters
     ----------
-    config
+    config: processing config top level
     local
     remote
 
@@ -182,15 +183,20 @@ def make_stft_objects_new(config, run_obj, run_xrts, units, station_id):#local, 
 
     """
     print("OK - here we go ... ")
-    print(f"CONFIG type {type(config)}")
-    stft_config = config.to_stft_config_dict()
+    stft_config = processing_config.get_decimation_level(i_dec_level)
+    #stft_config = config.to_stft_config_dict() #another approach
     stft_obj = run_ts_to_stft(stft_config, run_xrts)
-    print("WOW!!!!")
-    print("WOW!!!!")
-    print("WOW!!!!")
-    print("WOW!!!!")
 
-    scale_factors = config.station_scale_factors(station_id)
+    print("OK")
+    #still local and remote agnstic, it would be nice to be abel to acess
+    #p.stations[station_id]
+    #for today
+    print("fix this so that it gets from config based on station_id, without caring "
+          "if local or remote")
+    run_id = run_obj.metadata.id
+    if station_id==processing_config.stations.local.id:
+        scale_factors = processing_config.stations.local.run_dict[
+            run_id].channel_scale_factors
     # local_stft_obj = run_ts_to_stft_scipy(config, local_run_xrts)
     stft_obj = calibrate_stft_obj(
         stft_obj,
@@ -222,6 +228,7 @@ def process_tf_decimation_level(config, local_stft_obj, remote_stft_obj, units="
 
     """
     frequency_bands = configure_frequency_bands(config)
+    #frequency_bands = configure_frequency_bands(config)
     transfer_function_header = transfer_function_header_from_config(config)
     transfer_function_obj = TTFZ(
         transfer_function_header, frequency_bands, processing_config=config
@@ -234,7 +241,41 @@ def process_tf_decimation_level(config, local_stft_obj, remote_stft_obj, units="
     transfer_function_obj.apparent_resistivity(units=units)
     return transfer_function_obj
 
+def process_tf_decimation_level_new(config, i_dec_level, local_stft_obj,
+                                    remote_stft_obj,
+                                    units="MT"):
+    """
+    Processing pipeline for a single decimation_level
+    TODO: Add a check that the processing config sample rates agree with the
+    data sampling rates otherwise raise Exception
+    This method can be single station or remote based on the process cfg
+    :param processing_cfg:
+    :return:
+    Parameters
+    ----------
+    config : aurora.config.decimation_level_config.DecimationLevelConfig
+    units
 
+    Returns
+    -------
+    transfer_function_obj : aurora.transfer_function.TTFZ.TTFZ
+
+
+
+    """
+    config.decimations[i_dec_level].bands.to_frequency_bands_obj()
+    #frequency_bands = configure_frequency_bands(config)
+    transfer_function_header = transfer_function_header_from_config(config)
+    transfer_function_obj = TTFZ(
+        transfer_function_header, frequency_bands, processing_config=config
+    )
+
+    transfer_function_obj = process_transfer_functions(
+        config, local_stft_obj, remote_stft_obj, transfer_function_obj
+    )
+
+    transfer_function_obj.apparent_resistivity(units=units)
+    return transfer_function_obj
 
 def export_tf(tf_collection, station_metadata_dict={}, survey_dict={}):
     """
@@ -582,51 +623,7 @@ def process_mth5_from_dataset_definition(
     #     remote_station_id = processing_config.stations.remote.id
 
     for i_dec_level, dec_level_config in enumerate(processing_config.decimations):
-        #i_dec_level, config, dataset_df
         dataset_df = populate_dataset_df(i_dec_level, dec_level_config, dataset_df)
-        #qq
-        # if i_dec_level == 0:
-        #     for i,row in dataset_df.iterrows():
-        #         run_dict = get_data_from_mth5_new(mth5_obj,
-        #                                           row.station_id,
-        #                                           row.run_id,
-        #                                           sample_rate=dec_level_config.decimation.sample_rate)
-        #         dataset_df["run"].loc[i] = run_dict["run"]
-        #         dataset_df["run_dataarray"].loc[i] = run_dict["mvts"].to_array("channel")
-        #         #Dataframe doesn't like an xarray Dataset in a cell, need to convert
-        #         # to DataArray
-        #
-        #         all_run_objs[i] = run_dict["run"]
-        #         all_run_ts_objs[i] = run_dict["mvts"]
-        #         #careful here, i must run from 0 to len(df), otherwise will get
-        #         # indexing errors.  Maybe reset_index() before this loop?
-        #
-        #         # APPLY TIMING CORRECTIONS HERE
-        # else:
-        #     # See Note 1 top of module
-        #     # See Note 2 top of module
-        #     # 2022-02-27: This method modified to iterate over lists
-        #     print("ENSURE HERE THAT LOCAL RUN IS MODIFIED IN PLACE IN THE LIST!!!")
-        #     for i,row in dataset_df.iterrows():
-        #         print(i)
-        #         run_xrts = row["run_dataarray"].to_dataset("channel")
-        #         input_dict = {"run":row["run"], "mvts":run_xrts}
-        #         run_dict = prototype_decimate(processing_config, input_dict)
-        #         dataset_df["run"].loc[i] = run_dict["run"]
-        #         dataset_df["run_dataarray"].loc[i] = run_dict["mvts"].to_array("channel")
-        #
-        #     # for i_run, local_run in enumerate(local_runs):
-        #     #     local_runs[i_run] = prototype_decimate(processing_config, local_run)
-        #     # #                local_decimated.append(local_run)
-        #     # #do we need this if statement?  Maybe better to just do the for loop and
-        #     # # make prototype decimate accept {'run': None, 'mvts': None} and return
-        #     # # {'run': None, 'mvts': None}
-        #     # if processing_config.reference_station_id:
-        #     #     for i_run, remote_run in enumerate(remote_runs):
-        #     #         remote_runs[i_run] = prototype_decimate(processing_config, remote_run)
-
-        # </GET TIME SERIES DATA>
-
         #ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
 
         #<CONVERT TO STFT>
@@ -636,12 +633,13 @@ def process_mth5_from_dataset_definition(
             run_xrts = row["run_dataarray"].to_dataset("channel")
             print("The decimation_level_config here does not have the scale factors, "
                   "which are needed in make_stft_objects")
-            stft_obj = make_stft_objects_new(dec_level_config, row["run"],
+            stft_obj = make_stft_objects_new(processing_config, i_dec_level, row["run"],
                                               run_xrts, units, row.station_id) #stftconfig
 
-            if row.station_id == processing_config.local_station_id:
+            if row.station_id == processing_config.stations.local.id:#local_station_id:
                 local_stfts.append(stft_obj)
-            elif row.station_id == processing_config.reference_station_id:
+            elif row.station_id == \
+                    processing_config.stations.remote.id:#reference_station_id:
                 remote_stfts.append(stft_obj)
             # all_stft_objs[i] = stft_obj
             # dataset_df["stft"].loc[i] = stft_obj.to_array("channel")
@@ -649,11 +647,12 @@ def process_mth5_from_dataset_definition(
 
         # MERGE STFTS goes here
         print("merge-o-rama")
+
         local_merged_stft_obj = xr.concat(local_stfts, "time")
         # MUTE BAD FCs HERE - Not implemented yet.
         # RETURN FC_OBJECT
 
-        if processing_config.reference_station_id:
+        if processing_config.stations.remote:#reference_station_id:
             remote_merged_stft_obj = xr.concat(remote_stfts, "time")
         else:
             remote_merged_stft_obj = None
@@ -665,6 +664,13 @@ def process_mth5_from_dataset_definition(
             remote_merged_stft_obj,
             units=units
         )
+        print("WOW!!!!")
+        print("WOW!!!!")
+        print("WOW!!!!")
+        print("WOW!!!!")
+        print("WOW!!!!")
+        print("WOW!!!!")
+        print("WOW!!!!")
         tf_dict[dec_level_id] = tf_obj
 
         if show_plot:
