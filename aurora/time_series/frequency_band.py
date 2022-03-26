@@ -321,6 +321,20 @@ class FrequencyBands(object):
         """
         emtf_band_setup = EMTFBandSetupFile(filepath=filepath)
         emtf_band_df = emtf_band_setup.get_decimation_level(decimation_level)
+        self.from_emtf_band_df(emtf_band_df, decimation_level, sample_rate,
+                               num_samples_window)
+        # df = sample_rate / (num_samples_window)
+        # half_df = df / 2.0
+        # # half_df /=100
+        # lower_edges = (emtf_band_df.lower_bound_index * df) - half_df
+        # upper_edges = (emtf_band_df.upper_bound_index * df) + half_df
+        # band_edges = np.vstack((lower_edges.values, upper_edges.values)).T
+        # self.band_edges = band_edges
+
+        return
+
+    def from_emtf_band_df(self, emtf_band_df, decimation_level, sample_rate,
+                          num_samples_window):
         df = sample_rate / (num_samples_window)
         half_df = df / 2.0
         # half_df /=100

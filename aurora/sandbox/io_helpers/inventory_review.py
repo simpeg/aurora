@@ -1,4 +1,4 @@
-def scan_inventory_for_nonconformity(inventory):
+def scan_inventory_for_nonconformity(inventory, verbose=False):
     """
     One off method for dealing with issues of historical data.
     Checks for the following:
@@ -56,12 +56,13 @@ def scan_inventory_for_nonconformity(inventory):
             for channel in station:
                 response = channel.response
                 for stage in response.response_stages:
-                    msg = f"{channel.code} {stage.stage_sequence_number}"
-                    msg = f"{msg} {stage.input_units}"
-                    print(msg)
-                    if stage.input_units == "T":
-                        stage.input_units == "nT"
-                        stage.stage_gain *= 1e-9
+                    if verbose:
+                        msg = f"{channel.code} {stage.stage_sequence_number}"
+                        msg = f"{msg} {stage.input_units}"
+                        print(msg)
+                        if stage.input_units == "T":
+                            stage.input_units == "nT"
+                            stage.stage_gain *= 1e-9
                 # print(f"{channel}")
             # <Tesla to nanoTesla>
     return inventory
