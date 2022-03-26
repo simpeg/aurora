@@ -120,6 +120,18 @@ class DecimationLevel(Base):
             
         return np.array(sorted([band.index_max for band in self.bands]))
 
+    def frequency_bands_obj(self):
+        from aurora.time_series.frequency_band_helpers import df_from_bands
+        from aurora.time_series.frequency_band import FrequencyBands
+        emtf_band_df = df_from_bands(self.bands)
+        frequency_bands = FrequencyBands()
+        frequency_bands.from_emtf_band_df(emtf_band_df,
+                                         self.decimation.level,
+                                         self.decimation.sample_rate,
+                                         self.window.num_samples)
+        return frequency_bands
+
+    
 
     # def to_stft_config_dict(self):
     #     """

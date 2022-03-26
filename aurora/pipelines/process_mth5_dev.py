@@ -25,8 +25,8 @@ from aurora.pipelines.time_series_helpers_new import get_data_from_mth5_new
 from aurora.pipelines.time_series_helpers_new import prototype_decimate
 from aurora.pipelines.time_series_helpers_new import run_ts_to_calibrated_stft
 from aurora.pipelines.time_series_helpers_new import run_ts_to_stft
-from aurora.pipelines.transfer_function_helpers import process_transfer_functions
-from aurora.pipelines.transfer_function_helpers import (
+from aurora.pipelines.transfer_function_helpers_new import process_transfer_functions
+from aurora.pipelines.transfer_function_helpers_new import (
     transfer_function_header_from_config,
 )
 
@@ -207,41 +207,7 @@ def make_stft_objects_new(processing_config, i_dec_level, run_obj, run_xrts, uni
     return stft_obj
 
 
-def process_tf_decimation_level(config, local_stft_obj, remote_stft_obj, units="MT"):
-    """
-    Processing pipeline for a single decimation_level
-    TODO: Add a check that the processing config sample rates agree with the
-    data sampling rates otherwise raise Exception
-    This method can be single station or remote based on the process cfg
-    :param processing_cfg:
-    :return:
-    Parameters
-    ----------
-    config : aurora.config.decimation_level_config.DecimationLevelConfig
-    units
-
-    Returns
-    -------
-    transfer_function_obj : aurora.transfer_function.TTFZ.TTFZ
-
-
-
-    """
-    frequency_bands = configure_frequency_bands(config)
-    #frequency_bands = configure_frequency_bands(config)
-    transfer_function_header = transfer_function_header_from_config(config)
-    transfer_function_obj = TTFZ(
-        transfer_function_header, frequency_bands, processing_config=config
-    )
-
-    transfer_function_obj = process_transfer_functions(
-        config, local_stft_obj, remote_stft_obj, transfer_function_obj
-    )
-
-    transfer_function_obj.apparent_resistivity(units=units)
-    return transfer_function_obj
-
-def process_tf_decimation_level_new(config, i_dec_level, local_stft_obj,
+def process_tf_decimation_level(config, i_dec_level, local_stft_obj,
                                     remote_stft_obj,
                                     units="MT"):
     """
@@ -263,15 +229,14 @@ def process_tf_decimation_level_new(config, i_dec_level, local_stft_obj,
 
 
     """
-    config.decimations[i_dec_level].bands.to_frequency_bands_obj()
-    #frequency_bands = configure_frequency_bands(config)
-    transfer_function_header = transfer_function_header_from_config(config)
+    frequency_bands = config.decimations[i_dec_level].frequency_bands_obj()
+    transfer_function_header = transfer_function_header_from_config(config, i_dec_level)
     transfer_function_obj = TTFZ(
         transfer_function_header, frequency_bands, processing_config=config
     )
 
     transfer_function_obj = process_transfer_functions(
-        config, local_stft_obj, remote_stft_obj, transfer_function_obj
+        config, i_dec_level, local_stft_obj, remote_stft_obj, transfer_function_obj
     )
 
     transfer_function_obj.apparent_resistivity(units=units)
@@ -500,7 +465,7 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
             print(i)
             run_xrts = row["run_dataarray"].to_dataset("channel")
             input_dict = {"run":row["run"], "mvts":run_xrts}
-            run_dict = prototype_decimate(config, input_dict)
+            run_dict = prototype_decimate(config.decimation, input_dict)
             dataset_df["run"].loc[i] = run_dict["run"]
             dataset_df["run_dataarray"].loc[i] = run_dict["mvts"].to_array("channel")
 
@@ -660,18 +625,13 @@ def process_mth5_from_dataset_definition(
 
         tf_obj = process_tf_decimation_level(
             processing_config,
+            i_dec_level,
             local_merged_stft_obj,
             remote_merged_stft_obj,
             units=units
         )
-        print("WOW!!!!")
-        print("WOW!!!!")
-        print("WOW!!!!")
-        print("WOW!!!!")
-        print("WOW!!!!")
-        print("WOW!!!!")
-        print("WOW!!!!")
-        tf_dict[dec_level_id] = tf_obj
+
+        tf_dict[i_dec_level] = tf_obj
 
         if show_plot:
             from aurora.sandbox.plot_helpers import plot_tf_obj

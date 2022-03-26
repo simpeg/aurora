@@ -347,7 +347,7 @@ def prototype_decimate(config, run_run_ts):
     TODO: ?Move this function into time_series/decimate.py?
     Parameters
     ----------
-    config : DecimationConfig object
+    config : aurora.config.metadata.decimation.Decimation
     run_run_ts: dict keyed by "run" and "mvts"
     out_dict["run"] is mth5.groups.master_station_run_channel.RunGroup
     out_dict["mvts"] is mth5.timeseries.run_ts.RunTS
@@ -362,7 +362,7 @@ def prototype_decimate(config, run_run_ts):
 
     # <Replace with rolling mean, somethng that works with time>
     # and preferably takes the average time, not the start of the window
-    slicer = slice(None, None, config.decimation_factor)
+    slicer = slice(None, None, int(config.factor))#decimation.factor
     downsampled_time_axis = run_xrts.time.data[slicer]
     # </Replace with rolling mean, somethng that works with time>
 
@@ -371,7 +371,7 @@ def prototype_decimate(config, run_run_ts):
     num_channels = len(channel_labels)
     new_data = np.full((num_observations, num_channels), np.nan)
     for i_ch, ch_label in enumerate(channel_labels):
-        new_data[:, i_ch] = ssig.decimate(run_xrts[ch_label], config.decimation_factor)
+        new_data[:, i_ch] = ssig.decimate(run_xrts[ch_label], int(config.factor))
 
     xr_da = xr.DataArray(
         new_data,

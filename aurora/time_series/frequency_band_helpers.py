@@ -149,7 +149,9 @@ def configure_frequency_bands(config):
 
 def df_from_bands(band_list):
     """
-    ToDo: Note that the decimation_level
+    Note: The decimation_level here is +1 to agree with EMTF convention. 
+    Not clear this is really necessary
+    
     Parameters
     ----------
     band_list: list
@@ -172,5 +174,5 @@ def df_from_bands(band_list):
         df_columns_dict["lower_bound_index"][i_band] = band.index_min
         df_columns_dict["upper_bound_index"][i_band] = band.index_max
     out_df = pd.DataFrame(data=df_columns_dict)
-    print("OK")
+    out_df.sort_values(by="lower_bound_index", inplace=True)
     return out_df
