@@ -121,7 +121,8 @@ class FrequencyBand(Interval):
         ----------
         frequencies
 
-        Returns the actual harmonics or frequencies in band, rather than the indces.
+        Returns: numpy array
+            the actual harmonics or frequencies in band, rather than the indices.
         -------
 
         """
