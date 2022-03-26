@@ -55,9 +55,6 @@ def process_decimation_level(config, run_id, units="MT"):
 
 def test(plot=False):
     config = create_decimation_level_test_config()
-    # processing_cfg = Path(cwd, "config", "ascii_pkd_processing_config.json")
-    # config = DecimationLevelConfig()
-    # config.from_json(processing_cfg)
     tf_obj = process_decimation_level(config, "001", units="SI")
     if plot:
         plot_tf_obj(tf_obj)
