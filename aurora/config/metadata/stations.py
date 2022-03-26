@@ -135,6 +135,26 @@ class Stations(Base):
         local_df = local_df.reset_index()
             
         return local_df
+    
+    def get_station(self, station_id):
+        """
+        get a station object from the id
+        
+        :param station_id: DESCRIPTION
+        :type station_id: TYPE
+        :return: DESCRIPTION
+        :rtype: TYPE
+
+        """
+        
+        if self.local.id == station_id:
+            return self.local
+        
+        elif station_id in self.remote_dict.keys():
+            return self.remote_dict[station_id]
+        
+        raise KeyError(f"could not find {station_id}")
+            
             
         
         
