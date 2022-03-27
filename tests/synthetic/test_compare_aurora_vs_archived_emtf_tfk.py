@@ -261,20 +261,10 @@ def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
     """
     processing_config_path = create_test_run_config(test_case_id,
                                                     matlab_or_fortran=emtf_version)
-    #print("OVERWRITE processing_config_path")
-    #processing_config_path = Path(str(Path(str(processing_config_path).replace(
-    # ".json", "_new.json"))))
-    #import json
-    #f = open(processing_config_path)
-    #ww = json.load(f)
-    #f.close()
-    #print(ww["processing"].keys())
-    #local_station = ww["processing"]["stations.local.id"]
-    #json.loads(processing_config_path)
     c = ConfigCreator()
     p = c.create_run_processing_object()
     p.id = "test1-fortran"
-    p.stations.local.mth5_path = "/home/kkappler/software/irismt/aurora/tests/synthetic/data/test1.h5"
+    p.stations.local.mth5_path = str(DATA_PATH.joinpath("test1.h5"))
     p.stations.local.id = "test1"
     run_id = "001"
     p.stations.local.runs = [run_id,]
