@@ -18,8 +18,7 @@ from pathlib import Path
 
 from aurora.test_utils.dataset_definitions import TEST_DATA_SET_CONFIGS
 
-# from aurora.sandbox.io_helpers.test_data import get_example_array_list
-from aurora.sandbox.io_helpers.test_data import get_example_data
+from aurora.sandbox.io_helpers.testing_data import get_example_data
 from aurora.sandbox.xml_sandbox import describe_inventory_stages
 from mth5.utils.helpers import initialize_mth5
 from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
@@ -31,53 +30,10 @@ electric_xml_template = xml_path.joinpath("mtml_electrode_example.xml")
 fap_xml_example = ""
 
 
-
-def mth5_from_iris_database(dataset_config, load_data=True, target_folder=Path()):
-    """
-    This can work in a way that uses data, or just initializes the mth5
-
-    Parameters
-    ----------
-    metadata_config:
-
-    Returns
-    -------
-
-    """
-    inventory = dataset_config.get_inventory_from_client(
-        ensure_inventory_stages_are_named=True
-    )
-    experiment = get_experiment_from_obspy_inventory(inventory)
-
-    # make an MTH5
-    h5_path = target_folder.joinpath(f"{dataset_config.dataset_id}.h5")
-    mth5_obj = initialize_mth5(h5_path)
-    mth5_obj.from_experiment(experiment)
-
-    return mth5_obj
-
-
-
-
-# <GET EXPERIMENT>
-def get_experiment_from_xml_path(xml):
-    from mt_metadata.timeseries import Experiment
-
-    xml_path = Path(xml)
-    experiment = Experiment()
-    experiment.from_xml(fn=xml_path)
-    print(experiment, type(experiment))
-    return experiment
-
-
 def get_experiment_from_obspy_inventory(inventory):
     translator = XMLInventoryMTExperiment()
     experiment = translator.xml_to_mt(inventory_object=inventory)
     return experiment
-
-
-# </GET EXPERIMENT>
-
 
 
 def check_run_channels_have_expected_properties(run):
@@ -252,11 +208,18 @@ def main():
 
     # <INITIALIZE DATA>
     if driver_parameters["initialize_data"]:
-        pkd_mvts = get_example_data(station_id="PKD", component_station_label=True)
-        sao_mvts = get_example_data(station_id="SAO", component_station_label=True)
-        pkd = pkd_mvts.dataset
-        sao = sao_mvts.dataset
-        pkd.update(sao)
+        try:
+            pkd_mvts = get_example_data(station_id="PKD", component_station_label=True)
+            sao_mvts = get_example_data(station_id="SAO", component_station_label=True)
+            pkd = pkd_mvts.dataset
+            sao = sao_mvts.dataset
+            pkd.update(sao)
+        except FileNotFoundError:
+            print("failing to find: "
+                  "aurora/tests/parkfield/data/pkd_sao_2004_272_00-02.h5 ")
+            print("I put a copy of that data here:")
+            print("https://drive.google.com/drive/folders/1WFhhLrt5wSlw4FaAFkfb58allNdGjwck")
+
     # </INITIALIZE DATA>
     print("try to combine these runs")
 

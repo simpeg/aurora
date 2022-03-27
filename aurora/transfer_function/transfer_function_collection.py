@@ -359,12 +359,23 @@ class TransferFunctionCollection(object):
             cov_nn_xr = tf.cov_nn
             periods = tf.frequency_bands.band_centers(frequency_or_period="period")
             periods = np.flip(periods)  # EMTF works in increasing period
+            try:
+                dec_level_config = tf.processing_config.decimations[i_dec]
+            except:
+                print("OLD STYLE ProceessingConfig in use")
+                dec_level_config = tf.processing_config
+
             for band in tf.frequency_bands.bands(direction="increasing_period"):
+                #print(f"band {band}")
                 line1 = f"period :      {band.center_period:.5f}    "
                 line1 += f"decimation level   {i_dec+1}     "
                 # <Make a method of processing config?>
-                sample_rate = tf.processing_config.sample_rate
-                num_samples_window = tf.processing_config.num_samples_window
+                try:
+                    sample_rate = tf.processing_config.sample_rate
+                    num_samples_window = tf.processing_config.num_samples_window
+                except AttributeError:
+                    sample_rate = dec_level_config.decimation.sample_rate
+                    num_samples_window = dec_level_config.window.num_samples
                 freqs = np.fft.fftfreq(num_samples_window, 1.0 / sample_rate)
                 fc_indices = band.fourier_coefficient_indices(freqs)
                 # </Make a method of processing config?>
@@ -377,14 +388,14 @@ class TransferFunctionCollection(object):
                 period_index = tf.period_index(band.center_period)
                 num_segments = tf.num_segments.data[0, period_index]
                 line2 = f"number of data point    {int(num_segments)} "
-                line2 += f"sampling freq.   {tf.processing_config.sample_rate} Hz\n"
+                line2 += f"sampling freq.   {sample_rate} Hz\n"
                 f.writelines(line2)
 
                 f.writelines("  Transfer Functions\n")
                 # write the tf:
                 # rows are output channels (hz, ex, ey),
                 # columns are input channels (hx, hy)
-                period_index = tf.period_index(band.center_period)
+                
                 line = ""
                 for out_ch in tf.tf_header.output_channels:
                     for inp_ch in tf.tf_header.input_channels:
@@ -419,8 +430,12 @@ class TransferFunctionCollection(object):
                         cond2 = cov_nn_xr.output_channel_2 == out_ch2
                         chchnn = cov_nn_xr.where(cond1 & cond2, drop=True)
                         chchnn = chchnn.data.squeeze()
-                        real_part = np.real(chchnn[period_index])
-                        imag_part = np.imag(chchnn[period_index])
+                        if np.isnan(chchnn[period_index]):
+                            real_part = -1.0
+                            imag_part = -1.0
+                        else:
+                            real_part = np.real(chchnn[period_index])
+                            imag_part = np.imag(chchnn[period_index])
                         line += f"{data_format.write([real_part])}"
                         line += f"{data_format.write([imag_part])}"
                     line += "\n"

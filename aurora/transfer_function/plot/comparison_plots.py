@@ -14,6 +14,8 @@ def compare_two_z_files(
     scale_factor2=1.0,
     out_file="",
     show_plot=True,
+    use_ylims=True,
+    use_xlims=True,
     **kwargs,
 ):
     """
@@ -80,9 +82,11 @@ def compare_two_z_files(
     # axs[0].set_ylabel("$\rho_a$")
     axs[0].set_ylabel("Apparent Resistivity $\Omega$-m")
     rho_ylims = kwargs.get("rho_ylims", [1, 1e3])
-    axs[0].set_ylim(rho_ylims[0], rho_ylims[1])
+    if use_ylims:
+        axs[0].set_ylim(rho_ylims[0], rho_ylims[1])
     xlims = kwargs.get("xlims", [1e-3, 1e3])
-    axs[0].set_xlim(xlims[0], xlims[1])
+    if use_xlims:
+        axs[0].set_xlim(xlims[0], xlims[1])
 
     plot_phi(
         axs[1],

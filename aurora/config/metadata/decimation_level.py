@@ -119,9 +119,44 @@ class DecimationLevel(Base):
         """
             
         return np.array(sorted([band.index_max for band in self.bands]))
-        
-            
-                    
+
+    def frequency_bands_obj(self):
+        from aurora.time_series.frequency_band_helpers import df_from_bands
+        from aurora.time_series.frequency_band import FrequencyBands
+        emtf_band_df = df_from_bands(self.bands)
+        frequency_bands = FrequencyBands()
+        frequency_bands.from_emtf_band_df(emtf_band_df,
+                                         self.decimation.level,
+                                         self.decimation.sample_rate,
+                                         self.window.num_samples)
+        return frequency_bands
+
+    
+
+    # def to_stft_config_dict(self):
+    #     """
+    #     taper_family
+    #     num_samples_window
+    #     num_samples_overlap
+    #     taper_additional_args
+    #     sample_rate,
+    #     prewhitening_type
+    #     extra_pre_fft_detrend_type
+    #     Returns
+    #     -------
+    #     """
+    #     output = {}
+    #     print(self.window.type)
+    #     output["taper_family"] = self.window.type
+    #     output["num_samples_window"] = self.window.num_samples
+    #     output["num_samples_overlap"] = self.window.overlap
+    #     output["taper_additional_args"] = self.window.additional_args
+    #     output["sample_rate"] = self.decimation.sample_rate
+    #     output["prewhitening_type"] = self.prewhitening_type
+    #     output["extra_pre_fft_detrend_type"] = self.extra_pre_fft_detrend_type
+    #     return output
+
+
             
 
         
