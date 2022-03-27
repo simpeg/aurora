@@ -116,11 +116,10 @@ def parkfield_sanity_check(
         # Add assert test issue #156 here:
         if bf4_resp is not None:
             response_ratio = np.abs(pz_calibration_response) / np.abs(bf4_resp)
-            if np.median(response_ratio) > 1000.0:
+            if np.median(response_ratio) > 1.1:
                 print("ERROR in response calculation")
                 print("See issue #156")
-                print("Regarding Issue #156: Add a test here to show that the ratio of these "
-                  "curves is near 1.0 for most of the frequency band")
+                raise Exception
 
         # create smoothed amplitude spectra
         n_smooth = 131 #use 1 for no smoothing
