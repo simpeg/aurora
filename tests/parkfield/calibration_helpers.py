@@ -99,7 +99,12 @@ def parkfield_sanity_check(
         pz_calibration_response = channel.channel_response_filter.complex_response(
             frequencies, include_decimation=include_decimation
         )
-
+        
+        if channel.channel_response_filter.units_in.lower() in ["t", "tesla"]:
+            print("WARNING: Expecting nT but got T")
+            pz_calibration_response *= 1E-9
+            print("\tConverting units to nT")
+            
         # Frequency response table response
         bf4_resp = None
         if bf4:
@@ -117,7 +122,7 @@ def parkfield_sanity_check(
         if bf4_resp is not None:
             response_ratio = np.abs(pz_calibration_response) / np.abs(bf4_resp)
             if np.median(response_ratio) > 1000.0:
-                print("ERROR in response calculation")
+                print("ERROR: in response calculation")
                 print("See issue #156")
                 print("Regarding Issue #156: Add a test here to show that the ratio of these "
                   "curves is near 1.0 for most of the frequency band")
