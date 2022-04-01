@@ -4,11 +4,13 @@ from aurora.time_series.frequency_band import FrequencyBands
 
 def extract_band(frequency_band, fft_obj, epsilon=1e-7):
     """
-    TODO: This may want to be a method of fft_obj, or it may want to be a
-    method of frequency band.  For now leave as stand alone.
+    This may want to be a method of fft_obj, or it may want to be a method of frequency
+    band.  For now leave as stand alone.
 
     Parameters
     ----------
+    frequency_band: aurora.interval.Interval()
+        interval corresponding to a frequency band
     fft_obj: xr.DataArray
         To be replaced with an fft_obj() class in future
     epsilon: float
