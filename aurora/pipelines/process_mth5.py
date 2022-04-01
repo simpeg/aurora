@@ -72,7 +72,7 @@ def initialize_pipeline(run_config, mth5_path=None):
             print(f"config path changing from \n{config['mth5_path']} to \n{mth5_path}")
             config.mth5_path = str(mth5_path)
     mth5_obj = MTH5(file_version="0.1.0")
-    mth5_obj.open_mth5(config["mth5_path"], mode="r")
+    mth5_obj.open_mth5(config["mth5_path"], mode="a")
     # </Initialize mth5 for reading>
     return config, mth5_obj
 
@@ -87,7 +87,6 @@ def get_remote_stft(config, mth5_obj, run_id):
     else:
         remote_stft_obj = None
     return remote_stft_obj
-
 
 
 def make_stft_objects(config, local, remote, units):
@@ -142,7 +141,9 @@ def make_stft_objects(config, local, remote, units):
     return local_stft_obj, remote_stft_obj
 
 
-def make_stft_objects_new(config, run_obj, run_xrts, units, station_id):#local, remote,
+def make_stft_objects_new(
+    config, run_obj, run_xrts, units, station_id
+):  # local, remote,
     """
     Note 1: CHECK DATA COVERAGE IS THE SAME IN BOTH LOCAL AND RR
     This should be pushed into a previous validator before pipeline starts
@@ -171,10 +172,7 @@ def make_stft_objects_new(config, run_obj, run_xrts, units, station_id):#local, 
     scale_factors = config.station_scale_factors(station_id)
     # local_stft_obj = run_ts_to_stft_scipy(config, local_run_xrts)
     stft_obj = calibrate_stft_obj(
-        stft_obj,
-        run_obj,
-        units=units,
-        channel_scale_factors=scale_factors,
+        stft_obj, run_obj, units=units, channel_scale_factors=scale_factors,
     )
     return stft_obj
 
@@ -211,7 +209,6 @@ def process_tf_decimation_level(config, local_stft_obj, remote_stft_obj, units="
 
     transfer_function_obj.apparent_resistivity(units=units)
     return transfer_function_obj
-
 
 
 def export_tf(tf_collection, station_metadata_dict={}, survey_dict={}):
@@ -295,7 +292,6 @@ def process_mth5_run(
         processing_config.reference_station_id = run_config.reference_station_id
         processing_config.channel_scale_factors = run_config.channel_scale_factors
 
-
         if dec_level_id == 0:
             local, remote = get_data_from_mth5(processing_config, mth5_obj, run_id)
             # APPLY TIMING CORRECTIONS HERE
@@ -304,10 +300,10 @@ def process_mth5_run(
             local = prototype_decimate(processing_config, local)
             if processing_config.reference_station_id:
                 remote = prototype_decimate(processing_config, remote)
-
         # </GET DATA>
-        local_stft_obj, remote_stft_obj = make_stft_objects(processing_config,
-                                                            local, remote, units)
+        local_stft_obj, remote_stft_obj = make_stft_objects(
+            processing_config, local, remote, units
+        )
         # MERGE STFTS goes here
         tf_obj = process_tf_decimation_level(
             processing_config, local_stft_obj, remote_stft_obj, units=units
@@ -318,14 +314,12 @@ def process_mth5_run(
             from aurora.sandbox.plot_helpers import plot_tf_obj
 
             plot_tf_obj(tf_obj, out_filename="out")
-
     # TODO: Add run_obj to TransferFunctionCollection ? WHY? so it doesn't need header?
     tf_collection = TransferFunctionCollection(header=tf_obj.tf_header, tf_dict=tf_dict)
     local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
 
     if z_file_path:
         tf_collection.write_emtf_z_file(z_file_path, run_obj=local_run_obj)
-
     if return_collection:
         return tf_collection
     else:
@@ -339,25 +333,24 @@ def process_mth5_run(
         run_metadata = local_run_obj.metadata
         station_metadata.add_run(run_metadata)
         survey_dict = mth5_obj.survey_group.metadata.to_dict()
-        
+
         print(station_metadata.run_list)
         tf_cls = export_tf(
-            tf_collection, 
+            tf_collection,
             station_metadata_dict=station_metadata.to_dict(),
-            survey_dict=survey_dict
+            survey_dict=survey_dict,
         )
         return tf_cls
 
 
-
 def process_mth5_from_dataset_definition(
-        run_cfg,
-        dataset_definition=None,
-        units="MT",
-        show_plot=False,
-        z_file_path=None,
-        return_collection=True,
-        **kwargs,
+    run_cfg,
+    dataset_definition=None,
+    units="MT",
+    show_plot=False,
+    z_file_path=None,
+    return_collection=True,
+    **kwargs,
 ):
     """
     2022-02-08: TODO: Replace run_id (string) with a list, or, maybe,
@@ -399,31 +392,38 @@ def process_mth5_from_dataset_definition(
 
     """
     from aurora.pipelines.time_series_helpers import get_data_from_mth5_new
+
     mth5_path = kwargs.get("mth5_path", None)
     run_config, mth5_obj = initialize_pipeline(run_cfg, mth5_path)
 
-    #<Move into TFKernel()>
+    # <Move into TFKernel()>
     if dataset_definition is None:
         print("This case (no DatasetDefinition) will probably be deprecated (soon)")
         print("But for now we are supporting a run list as well so that old tests pass")
-        print("But a run_list is only appropriate for single station processing, "
-              "in general we would need a list of (station_id, run_id) tuples")
-        print("basically, I am going to assume that the dataset definition is already "
-              "cleanly restricted down to only what I want to process, "
-              "local_station_id, and remote station_id are only ids, and all runs "
-              "listed are candidates for TF")
-        #make run_id a list if it is a string denoting a single run
+        print(
+            "But a run_list is only appropriate for single station processing, "
+            "in general we would need a list of (station_id, run_id) tuples"
+        )
+        print(
+            "basically, I am going to assume that the dataset definition is already "
+            "cleanly restricted down to only what I want to process, "
+            "local_station_id, and remote station_id are only ids, and all runs "
+            "listed are candidates for TF"
+        )
+        # make run_id a list if it is a string denoting a single run
         if isinstance(run_ids, str):
-            run_ids = [run_ids, ]
+            run_ids = [
+                run_ids,
+            ]
         else:
             print("This processing is experimentatal being developed Mar 2022")
             print(f"run_ids = {run_ids}")
-            if not isinstance(run_ids,list):
+            if not isinstance(run_ids, list):
                 print("Error: Expecting run_ids to be a list")
                 raise Exception
         print("NOW MAKE DATASET DEFINITION FROM run_ids")
         summary_df = mth5_obj.channel_summary
-        #summary_df = pd.read_csv("channel_summary.csv", parse_dates=["start", "end"])
+        # summary_df = pd.read_csv("channel_summary.csv", parse_dates=["start", "end"])
         dataset_definition = DatasetDefinition()
         dataset_df = dataset_definition.from_mth5_channel_summary(summary_df)
         print("NOW restrict dataset definition to run_ids")
@@ -431,7 +431,7 @@ def process_mth5_from_dataset_definition(
         print("NOW might be a good time to reindex the defn_df")
     else:
         dataset_df = dataset_definition.df
-    #</Move into TFKernel()>
+    # </Move into TFKernel()>
 
     print(
         f"config indicates {run_config.number_of_decimation_levels} "
@@ -440,7 +440,7 @@ def process_mth5_from_dataset_definition(
 
     tf_dict = {}
 
-    #MAKE SURE DATASET DEFINITION DF HAS "run", "run_ts" columns
+    # MAKE SURE DATASET DEFINITION DF HAS "run", "run_ts" columns
 
     all_run_objs = len(dataset_df) * [None]
     all_run_ts_objs = len(dataset_df) * [None]
@@ -451,13 +451,12 @@ def process_mth5_from_dataset_definition(
 
     for dec_level_id in run_config.decimation_level_ids:
 
-        #<This will be replaced by a 1-line call issue #153>
+        # <This will be replaced by a 1-line call issue #153>
         processing_config = run_config.decimation_level_configs[dec_level_id]
         processing_config.local_station_id = run_config.local_station_id
         processing_config.reference_station_id = run_config.reference_station_id
         processing_config.channel_scale_factors = run_config.channel_scale_factors
-        #</This will be replaced by a 1-line call issue #153>
-
+        # </This will be replaced by a 1-line call issue #153>
 
         # local_dataset_defn_df = defn_df[defn_df[
         #                                     "station_id"]==processing_config.local_station_id]
@@ -468,11 +467,11 @@ def process_mth5_from_dataset_definition(
         # #grouper = df.groupby(["station", "run"])
 
         # <GET TIME SERIES DATA>
-        #Factor this out into a function.
-        #function takes an (mth5_obj_list, local_station_id, remote_station_id,
+        # Factor this out into a function.
+        # function takes an (mth5_obj_list, local_station_id, remote_station_id,
         # local_run_list, remote_run_list)
-        #OR (mth5_obj_list, local_station_id, remote_station_id, dataset_df)
-        #Note that the dataset_df should be easy to generate from the local_station_id,
+        # OR (mth5_obj_list, local_station_id, remote_station_id, dataset_df)
+        # Note that the dataset_df should be easy to generate from the local_station_id,
         # remote_station_id, local_run_list, remote_run_list, but allows for
         # specification of time_intervals.  This is important in the case where
         # aquisition_runs are non-overlapping between local and remote.  Although,
@@ -484,17 +483,20 @@ def process_mth5_from_dataset_definition(
         # get_time_series_data(dec_level_id, ...)
 
         if dec_level_id == 0:
-            for i,row in dataset_df.iterrows():
-                run_dict = get_data_from_mth5_new(processing_config, mth5_obj,
-                                                  row.station_id, row.run_id)
+            for i, row in dataset_df.iterrows():
+                run_dict = get_data_from_mth5_new(
+                    processing_config, mth5_obj, row.station_id, row.run_id
+                )
                 dataset_df["run"].loc[i] = run_dict["run"]
-                dataset_df["run_dataarray"].loc[i] = run_dict["mvts"].to_array("channel")
-                #Dataframe doesn't like an xarray Dataset in a cell, need to convert
+                dataset_df["run_dataarray"].loc[i] = run_dict["mvts"].to_array(
+                    "channel"
+                )
+                # Dataframe doesn't like an xarray Dataset in a cell, need to convert
                 # to DataArray
 
                 all_run_objs[i] = run_dict["run"]
                 all_run_ts_objs[i] = run_dict["mvts"]
-                #careful here, i must run from 0 to len(df), otherwise will get
+                # careful here, i must run from 0 to len(df), otherwise will get
                 # indexing errors.  Maybe reset_index() before this loop?
 
                 # APPLY TIMING CORRECTIONS HERE
@@ -503,14 +505,15 @@ def process_mth5_from_dataset_definition(
             # See Note 2 top of module
             # 2022-02-27: This method modified to iterate over lists
             print("ENSURE HERE THAT LOCAL RUN IS MODIFIED IN PLACE IN THE LIST!!!")
-            for i,row in dataset_df.iterrows():
+            for i, row in dataset_df.iterrows():
                 print(i)
                 run_xrts = row["run_dataarray"].to_dataset("channel")
-                input_dict = {"run":row["run"], "mvts":run_xrts}
+                input_dict = {"run": row["run"], "mvts": run_xrts}
                 run_dict = prototype_decimate(processing_config, input_dict)
                 dataset_df["run"].loc[i] = run_dict["run"]
-                dataset_df["run_dataarray"].loc[i] = run_dict["mvts"].to_array("channel")
-
+                dataset_df["run_dataarray"].loc[i] = run_dict["mvts"].to_array(
+                    "channel"
+                )
             # for i_run, local_run in enumerate(local_runs):
             #     local_runs[i_run] = prototype_decimate(processing_config, local_run)
             # #                local_decimated.append(local_run)
@@ -520,18 +523,18 @@ def process_mth5_from_dataset_definition(
             # if processing_config.reference_station_id:
             #     for i_run, remote_run in enumerate(remote_runs):
             #         remote_runs[i_run] = prototype_decimate(processing_config, remote_run)
-
         # </GET TIME SERIES DATA>
 
-        #ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
+        # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
 
-        #<CONVERT TO STFT>
+        # <CONVERT TO STFT>
         local_stfts = []
         remote_stfts = []
-        for i,row in dataset_df.iterrows():
+        for i, row in dataset_df.iterrows():
             run_xrts = row["run_dataarray"].to_dataset("channel")
-            stft_obj = make_stft_objects_new(processing_config, row["run"],
-                                              run_xrts, units, row.station_id)
+            stft_obj = make_stft_objects_new(
+                processing_config, row["run"], run_xrts, units, row.station_id
+            )
 
             if row.station_id == processing_config.local_station_id:
                 local_stfts.append(stft_obj)
@@ -539,8 +542,6 @@ def process_mth5_from_dataset_definition(
                 remote_stfts.append(stft_obj)
             # all_stft_objs[i] = stft_obj
             # dataset_df["stft"].loc[i] = stft_obj.to_array("channel")
-
-
         # MERGE STFTS goes here
         print("merge-o-rama")
         local_merged_stft_obj = xr.concat(local_stfts, "time")
@@ -551,13 +552,13 @@ def process_mth5_from_dataset_definition(
             remote_merged_stft_obj = xr.concat(remote_stfts, "time")
         else:
             remote_merged_stft_obj = None
-        #</CONVERT TO STFT>
+        # </CONVERT TO STFT>
 
         tf_obj = process_tf_decimation_level(
             processing_config,
             local_merged_stft_obj,
             remote_merged_stft_obj,
-            units=units
+            units=units,
         )
         tf_dict[dec_level_id] = tf_obj
 
@@ -565,18 +566,16 @@ def process_mth5_from_dataset_definition(
             from aurora.sandbox.plot_helpers import plot_tf_obj
 
             plot_tf_obj(tf_obj, out_filename="out")
-
     # TODO: Add run_obj to TransferFunctionCollection ? WHY? so it doesn't need header?
     tf_collection = TransferFunctionCollection(header=tf_obj.tf_header, tf_dict=tf_dict)
 
     #
     print("Need to review this info @Jared, review role of local_run_obj in export tf ")
 
-    #local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
+    # local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
     local_run_obj = dataset_df["run"].iloc[0]
     if z_file_path:
         tf_collection.write_emtf_z_file(z_file_path, run_obj=local_run_obj)
-
     if return_collection:
         return tf_collection
     else:
@@ -597,6 +596,6 @@ def process_mth5_from_dataset_definition(
         tf_cls = export_tf(
             tf_collection,
             station_metadata_dict=station_metadata.to_dict(),
-            survey_dict=survey_dict
+            survey_dict=survey_dict,
         )
         return tf_cls
