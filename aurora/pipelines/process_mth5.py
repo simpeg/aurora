@@ -72,7 +72,7 @@ def initialize_pipeline(run_config, mth5_path=None):
             print(f"config path changing from \n{config['mth5_path']} to \n{mth5_path}")
             config.mth5_path = str(mth5_path)
     mth5_obj = MTH5(file_version="0.1.0")
-    mth5_obj.open_mth5(config["mth5_path"], mode="r")
+    mth5_obj.open_mth5(config["mth5_path"], mode="a")
     # </Initialize mth5 for reading>
     return config, mth5_obj
 
@@ -87,7 +87,6 @@ def get_remote_stft(config, mth5_obj, run_id):
     else:
         remote_stft_obj = None
     return remote_stft_obj
-
 
 
 def make_stft_objects(config, local, remote, units):
@@ -142,7 +141,9 @@ def make_stft_objects(config, local, remote, units):
     return local_stft_obj, remote_stft_obj
 
 
-def make_stft_objects_new(config, run_obj, run_xrts, units, station_id):#local, remote,
+def make_stft_objects_new(
+    config, run_obj, run_xrts, units, station_id
+):  # local, remote,
     """
     Note 1: CHECK DATA COVERAGE IS THE SAME IN BOTH LOCAL AND RR
     This should be pushed into a previous validator before pipeline starts
@@ -171,10 +172,7 @@ def make_stft_objects_new(config, run_obj, run_xrts, units, station_id):#local, 
     scale_factors = config.station_scale_factors(station_id)
     # local_stft_obj = run_ts_to_stft_scipy(config, local_run_xrts)
     stft_obj = calibrate_stft_obj(
-        stft_obj,
-        run_obj,
-        units=units,
-        channel_scale_factors=scale_factors,
+        stft_obj, run_obj, units=units, channel_scale_factors=scale_factors,
     )
     return stft_obj
 
@@ -211,7 +209,6 @@ def process_tf_decimation_level(config, local_stft_obj, remote_stft_obj, units="
 
     transfer_function_obj.apparent_resistivity(units=units)
     return transfer_function_obj
-
 
 
 def export_tf(tf_collection, station_metadata_dict={}, survey_dict={}):
@@ -295,7 +292,6 @@ def process_mth5_run(
         processing_config.reference_station_id = run_config.reference_station_id
         processing_config.channel_scale_factors = run_config.channel_scale_factors
 
-
         if dec_level_id == 0:
             local, remote = get_data_from_mth5(processing_config, mth5_obj, run_id)
             # APPLY TIMING CORRECTIONS HERE
@@ -304,10 +300,10 @@ def process_mth5_run(
             local = prototype_decimate(processing_config, local)
             if processing_config.reference_station_id:
                 remote = prototype_decimate(processing_config, remote)
-
         # </GET DATA>
-        local_stft_obj, remote_stft_obj = make_stft_objects(processing_config,
-                                                            local, remote, units)
+        local_stft_obj, remote_stft_obj = make_stft_objects(
+            processing_config, local, remote, units
+        )
         # MERGE STFTS goes here
         tf_obj = process_tf_decimation_level(
             processing_config, local_stft_obj, remote_stft_obj, units=units
@@ -318,14 +314,12 @@ def process_mth5_run(
             from aurora.sandbox.plot_helpers import plot_tf_obj
 
             plot_tf_obj(tf_obj, out_filename="out")
-
     # TODO: Add run_obj to TransferFunctionCollection ? WHY? so it doesn't need header?
     tf_collection = TransferFunctionCollection(header=tf_obj.tf_header, tf_dict=tf_dict)
     local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
 
     if z_file_path:
         tf_collection.write_emtf_z_file(z_file_path, run_obj=local_run_obj)
-
     if return_collection:
         return tf_collection
     else:
@@ -339,11 +333,11 @@ def process_mth5_run(
         run_metadata = local_run_obj.metadata
         station_metadata.add_run(run_metadata)
         survey_dict = mth5_obj.survey_group.metadata.to_dict()
-        
+
         print(station_metadata.run_list)
         tf_cls = export_tf(
-            tf_collection, 
+            tf_collection,
             station_metadata_dict=station_metadata.to_dict(),
-            survey_dict=survey_dict
+            survey_dict=survey_dict,
         )
         return tf_cls

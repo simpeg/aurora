@@ -12,6 +12,9 @@ from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
 from aurora.test_utils.synthetic.make_processing_configs import create_test_run_config
 
+from mth5.helpers import close_open_files
+
+
 def test_stft_methods_agree():
     run_config = create_test_run_config("test1")
     run_id = "001"
@@ -22,7 +25,8 @@ def test_stft_methods_agree():
         from make_mth5_from_asc import create_test1_h5
 
         create_test1_h5()
-
+    # this seems to be needed for git actions
+    close_open_files()
     run_config, mth5_obj = initialize_pipeline(run_config, mth5_path=mth5_path)
 
     for dec_level_id in run_config.decimation_level_ids:
@@ -35,7 +39,6 @@ def test_stft_methods_agree():
             local = prototype_decimate(processing_config, local)
             # if processing_config.reference_station_id:
             #     remote = prototype_decimate(processing_config, remote)
-
         # </GET DATA>
         # local_run_obj = local["run"]
         local_run_xrts = local["mvts"]
