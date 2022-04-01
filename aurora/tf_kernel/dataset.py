@@ -107,7 +107,8 @@ class DatasetDefinition():
     def empty_dataframe(self):
         pass
 
-    def from_mth5_channel_summary(self, channel_summary_df):
+    def from_mth5_channel_summary(self, channel_summary):
+        channel_summary_df = channel_summary.to_dataframe()
         df = channel_summary_to_dataset_definition(channel_summary_df)
         df.sort_values(by=["station_id", "run_id", "start"], inplace=True)
         self.df = df

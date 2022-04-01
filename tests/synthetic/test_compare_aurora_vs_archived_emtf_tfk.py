@@ -175,9 +175,9 @@ def process_synthetic_1_standard(
     mth5_obj = initialize_mth5(mth5_path, mode="r")
     #mth5_obj = MTH5(file_version="0.1.0")
     #mth5_obj.open_mth5(config["mth5_path"], mode="r")
-    ch_summary_df = mth5_obj.channel_summary
+    ch_summary = mth5_obj.channel_summary
     dataset_definition = DatasetDefinition()
-    dataset_definition.from_mth5_channel_summary(ch_summary_df)
+    dataset_definition.from_mth5_channel_summary(ch_summary)
     #run_obj = mth5_obj.get_run("test1", "001")
     mth5_obj.close_mth5()
     print("group_by station")
@@ -261,6 +261,8 @@ def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
     """
     processing_config_path = create_test_run_config(test_case_id,
                                                     matlab_or_fortran=emtf_version)
+
+    #<UPDATED CONFIG>
     c = ConfigCreator()
     p = c.create_run_processing_object()
     p.id = "test1-fortran"
@@ -275,6 +277,7 @@ def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
         decimation.estimator.engine = "RME"
         decimation.window.type = "hamming"
         decimation.regression.max_redescending_iterations = 2
+    #</UPDATED CONFIG>
 
     process_synthetic_1_standard(
         processing_config_path,
