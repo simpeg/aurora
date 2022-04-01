@@ -381,8 +381,8 @@ class ZFile:
 def read_z_file(z_file_path):
     z_obj = ZFile(z_file_path)
     z_obj.load()
-    print(z_obj)
-    print(z_obj.impedance())
+    # print(z_obj)
+    # print(z_obj.impedance())
     z_obj.apparent_resistivity()
     return z_obj
 
