@@ -32,18 +32,20 @@ def load_bf4_fap_for_parkfield_test_using_mt_metadata(frequencies):
     bf4_resp *= 421721.0  # counts-per-volt compensation for PKD
     return bf4_resp
 
-def plot_responses(key, 
-                   frequencies, 
-                   pz_calibration_response, 
-                   bf4_resp,
-                   figures_path,
-                   show_response_curves):
+
+def plot_responses(
+    key,
+    frequencies,
+    pz_calibration_response,
+    bf4_resp,
+    figures_path,
+    show_response_curves,
+):
 
     if key[0].lower() == "h":
         response_units = "counts/nT"
     else:
         response_units = "counts/mV/km"
-
     plt.figure(1)
     plt.clf()
     plt.loglog(frequencies, np.abs(pz_calibration_response), label="pole-zero")
@@ -92,77 +94,72 @@ def parkfield_sanity_check(
         else:
             bf4 = False
             spectral_units = "mv/km/sqrt(Hz)"
-
         channel = run_obj.get_channel(key)
 
         # pole-zero calibration response
         pz_calibration_response = channel.channel_response_filter.complex_response(
             frequencies, include_decimation=include_decimation
         )
-        
+
         if channel.channel_response_filter.units_in.lower() in ["t", "tesla"]:
             print("WARNING: Expecting nT but got T")
-            pz_calibration_response *= 1E-9
+            pz_calibration_response *= 1e-9
             print("\tConverting units to nT")
-            
         # Frequency response table response
         bf4_resp = None
         if bf4:
             bf4_resp = load_bf4_fap_for_parkfield_test_using_mt_metadata(frequencies)
-            
         # compare responses graphically
-        plot_responses(key,
-                       frequencies,
-                       pz_calibration_response,
-                       bf4_resp,
-                       figures_path,
-                       show_response_curves)
+        plot_responses(
+            key,
+            frequencies,
+            pz_calibration_response,
+            bf4_resp,
+            figures_path,
+            show_response_curves,
+        )
 
         # Add assert test issue #156 here:
         if bf4_resp is not None:
             response_ratio = np.abs(pz_calibration_response) / np.abs(bf4_resp)
-<<<<<<< HEAD
-            if np.median(response_ratio) > 1000.0:
-                print("ERROR: in response calculation")
-=======
             if np.median(response_ratio) > 1.1:
                 print("ERROR in response calculation")
->>>>>>> 5bf7db05d39fb399acfb8c2bf09956eb9137dfed
                 print("See issue #156")
                 raise Exception
-
         # create smoothed amplitude spectra
-        n_smooth = 131 #use 1 for no smoothing
+        n_smooth = 131  # use 1 for no smoothing
         show_raw = 0
         raw_spectral_density = fft_obj[key].data[:, 1:]
-        raw_spectral_density = raw_spectral_density.squeeze() #because only 1 FFT window
+        raw_spectral_density = (
+            raw_spectral_density.squeeze()
+        )  # because only 1 FFT window
         calibrated_data_pz = raw_spectral_density / pz_calibration_response
         smooth_calibrated_data_pz = medfilt(np.abs(calibrated_data_pz), n_smooth)
         if bf4:
             calibrated_data_fap = raw_spectral_density / np.abs(bf4_resp)
             smooth_calibrated_data_fap = medfilt(np.abs(calibrated_data_fap), n_smooth)
-
         # Add assert test issue #156 here:
         if bf4 & (key == "hx"):
-            schumann_cond = (frequencies>7.6) & (frequencies<8.0)
-            schumann_amplitude_fap = np.median(smooth_calibrated_data_fap[schumann_cond])
+            schumann_cond = (frequencies > 7.6) & (frequencies < 8.0)
+            schumann_amplitude_fap = np.median(
+                smooth_calibrated_data_fap[schumann_cond]
+            )
             schumann_amplitude_pz = np.median(smooth_calibrated_data_pz[schumann_cond])
             schumann_ratio = schumann_amplitude_pz / schumann_amplitude_fap
             if (schumann_ratio > 10) | (schumann_ratio < 0.1):
                 print("ERROR in response calculation")
                 print("See issue #156")
                 print("Amplitude of field around Schumann band incorrect")
-
-
-
-        #Do Plotting (can factor this out)
+        # Do Plotting (can factor this out)
         plt.figure(2)
         plt.clf()
         bf4_colour = "red"
         pz_color = "blue"
 
         if show_raw:
-            plt.loglog(frequencies, calibrated_data_pz, color=pz_color, label="pole-zero")
+            plt.loglog(
+                frequencies, calibrated_data_pz, color=pz_color, label="pole-zero"
+            )
             if bf4:
                 plt.loglog(
                     frequencies,
@@ -184,7 +181,6 @@ def parkfield_sanity_check(
                     color=bf4_colour,
                     label="response table (EMI)",
                 )
-
         plt.legend()
         plt.grid(True, which="both", ls="-")
         plt.title(f"Calibrated Spectra {key}")
