@@ -474,6 +474,23 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
 
     # </GET TIME SERIES DATA>
 
+def close_mths_objs(df):
+    """
+    Loop over all unique mth5_objs in the df and make sure they are closed
+    Parameters
+    ----------
+    df
+
+    Returns
+    -------
+
+    """
+    mth5_objs = df["mth5_obj"].unique()
+    for mth5_obj in mth5_objs:
+        mth5_obj.close_mth5()
+    return
+
+
 def process_mth5_from_dataset_definition(
         run_cfg,
         dataset_definition=None,
@@ -650,6 +667,7 @@ def process_mth5_from_dataset_definition(
         tf_collection.write_emtf_z_file(z_file_path, run_obj=local_run_obj)
 
     if return_collection:
+        close_mths_objs(dataset_df)
         return tf_collection
     else:
         # intended to be the default in future
@@ -671,4 +689,5 @@ def process_mth5_from_dataset_definition(
             station_metadata_dict=station_metadata.to_dict(),
             survey_dict=survey_dict
         )
+        close_mths_objs(dataset_df)
         return tf_cls

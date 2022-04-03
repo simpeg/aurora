@@ -6,6 +6,8 @@ aurora/transfer_function/tf_kernel/dataset.py
 import copy
 import pandas as pd
 
+import mth5
+
 
 def channel_summary_to_dataset_definition(df):
     """
@@ -108,7 +110,11 @@ class DatasetDefinition():
         pass
 
     def from_mth5_channel_summary(self, channel_summary):
-        channel_summary_df = channel_summary.to_dataframe()
+        if isinstance(channel_summary, mth5.tables.channel_table.ChannelSummaryTable):
+            #this requires that the mth5 still be open
+            channel_summary_df = channel_summary.to_dataframe()
+        elif isinstance(channel_summary, pd.DataFrame):
+            channel_summary_df = channel_summary
         df = channel_summary_to_dataset_definition(channel_summary_df)
         df.sort_values(by=["station_id", "run_id", "start"], inplace=True)
         self.df = df

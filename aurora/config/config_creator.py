@@ -131,24 +131,28 @@ class ConfigCreator:
                     sr = sample_rate / (d ** int(key))
                 processing_obj.decimations_dict[key].decimation.factor = d
                 processing_obj.decimations_dict[key].decimation.sample_rate = sr
-        
+
         return processing_obj
     
-    def to_json(self, path, processing_object, nested=True, required=False):
+    def to_json(self, processing_obj, path=None, nested=True, required=False):
         """
         Write a processing object to path
         
         :param path: DESCRIPTION
         :type path: TYPE
-        :param processing_object: DESCRIPTION
-        :type processing_object: TYPE
+        :param processing_obj: DESCRIPTION
+        :type processing_obj: TYPE
         :return: DESCRIPTION
         :rtype: TYPE
 
         """
-        
+        json_fn = processing_obj.json_fn()#config_id + "_run_config.json"
+        if path is None:
+            json_fn = processing_obj.json_fn()#config_id + "_run_config.json"
+            self.config_path.mkdir(exist_ok=True)
+            path = self.config_path.joinpath(json_fn)
         with open(path, "w") as fid:
-            fid.write(processing_object.to_json(nested=nested, required=required))
+            fid.write(processing_obj.to_json(nested=nested, required=required))
 
 
 def test_cas04():

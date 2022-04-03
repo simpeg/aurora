@@ -20,7 +20,7 @@ from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.process_mth5 import process_mth5_run
 from aurora.pipelines.process_mth5_dev import process_mth5_from_dataset_definition
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
-from aurora.test_utils.synthetic.make_processing_configs import create_test_run_config
+from aurora.test_utils.synthetic.make_processing_configs_new import create_test_run_config
 from aurora.tf_kernel.dataset import DatasetDefinition
 from aurora.transfer_function.emtf_z_file_helpers import (
     merge_tf_collection_to_match_z_file,
@@ -39,21 +39,23 @@ EMTF_OUTPUT_PATH = SYNTHETIC_PATH.joinpath("emtf_output")
 AURORA_RESULTS_PATH = SYNTHETIC_PATH.joinpath("aurora_results")
 AURORA_RESULTS_PATH.mkdir(exist_ok=True)
 
-EXPECTED_RMS_MISFIT = {}
-EXPECTED_RMS_MISFIT["test1"] = {}
-EXPECTED_RMS_MISFIT["test1"]["rho"] = {}
-EXPECTED_RMS_MISFIT["test1"]["phi"] = {}
-EXPECTED_RMS_MISFIT["test1"]["rho"]["xy"] = 4.406358  #4.380757  # 4.357440
-EXPECTED_RMS_MISFIT["test1"]["phi"]["xy"] = 0.862902  #0.871609  # 0.884601
-EXPECTED_RMS_MISFIT["test1"]["rho"]["yx"] = 3.625859  #3.551043  # 3.501146
-EXPECTED_RMS_MISFIT["test1"]["phi"]["yx"] = 0.840394  #0.812733  # 0.808658
-EXPECTED_RMS_MISFIT["test2r1"] = {}
-EXPECTED_RMS_MISFIT["test2r1"]["rho"] = {}
-EXPECTED_RMS_MISFIT["test2r1"]["phi"] = {}
-EXPECTED_RMS_MISFIT["test2r1"]["rho"]["xy"] = 3.940519  #3.949857  #3.949919
-EXPECTED_RMS_MISFIT["test2r1"]["phi"]["xy"] = 0.959861  #0.962837  #0.957675
-EXPECTED_RMS_MISFIT["test2r1"]["rho"]["yx"] = 4.136467  #4.121772  #4.117700
-EXPECTED_RMS_MISFIT["test2r1"]["phi"]["yx"] = 1.635570  #1.637581  #1.629026
+def get_expected_rms_misfit(test_case_id):
+    expected_rms_misfit = {}
+    if test_case_id == "test1":
+        expected_rms_misfit["rho"] = {}
+        expected_rms_misfit["phi"] = {}
+        expected_rms_misfit["rho"]["xy"] = 4.406358  #4.380757  # 4.357440
+        expected_rms_misfit["phi"]["xy"] = 0.862902  #0.871609  # 0.884601
+        expected_rms_misfit["rho"]["yx"] = 3.625859  #3.551043  # 3.501146
+        expected_rms_misfit["phi"]["yx"] = 0.840394  #0.812733  # 0.808658
+    elif test_case_id == "test2r1":
+        expected_rms_misfit["rho"] = {}
+        expected_rms_misfit["phi"] = {}
+        expected_rms_misfit["rho"]["xy"] = 3.940519  #3.949857  #3.949919
+        expected_rms_misfit["phi"]["xy"] = 0.959861  #0.962837  #0.957675
+        expected_rms_misfit["rho"]["yx"] = 4.136467  #4.121772  #4.117700
+        expected_rms_misfit["phi"]["yx"] = 1.635570  #1.637581  #1.629026
+    return expected_rms_misfit
 
 def compute_rms(rho, phi, model_rho_a=100.0, model_phi=45.0, verbose=False):
     """
@@ -115,10 +117,10 @@ def assert_rms_misfit_ok(expected_rms_misfit, xy_or_yx, rho_rms_aurora,
 
 
 def process_synthetic_1_standard(
-        processing_config_path,
+        processing_config,
         auxilliary_z_file,
         z_file_base,
-        expected_rms_misfit=None,
+        expected_rms_misfit={},
         make_rho_phi_plot=True,
         show_rho_phi_plot=False,
         use_subtitle=True,
@@ -129,10 +131,12 @@ def process_synthetic_1_standard(
 
     Parameters
     ----------
-    processing_config_path: str or Path
+    processing_config: str or Path, or a Processing() object
         where the processing configuration file is found
     expected_rms_misfit: dict
-        see description in assert_rms_misfit_ok
+        has expected values for the RMS misfits for the TF quantities rho_xy, rho_yx,
+        phi_xy, phi_yx. These are used to validate that the processing results don't
+        change much.
     make_rho_phi_plot
     show_rho_phi_plot
     use_subtitle
@@ -161,27 +165,31 @@ def process_synthetic_1_standard(
     """
 
     z_file_path = AURORA_RESULTS_PATH.joinpath(z_file_base)
-    #workaround passing a processing object rather than file path; 2022-03-24
-    p = kwargs.get("processing_config", None)
-    if p is not None:
-        if isinstance(p, Processing):
-            config = p
-            mth5_path = config.stations.local.mth5_path
-    else:
-        config = initialize_config(processing_config_path)
-        #isinstance(aurora.config.processing_config.RunConfig)
-        mth5_path = config["mth5_path"]
 
+    cond1 = isinstance(processing_config, str)
+    cond2 = isinstance(processing_config, Path)
+    if (cond1 or cond2):
+        print("This needs to be updated to work with new mt_metadata Processing object")
+        #load from a json path or string
+        config = initialize_config(processing_config)
+    elif isinstance(processing_config, Processing):
+        config = processing_config
+        mth5_path = config.stations.local.mth5_path
+    else:
+        print(f"processing_config has unexpected type {type(processing_config)}")
+        raise Exception
+
+    #<get_channel_summary>
     mth5_obj = initialize_mth5(mth5_path, mode="r")
-    #mth5_obj = MTH5(file_version="0.1.0")
-    #mth5_obj.open_mth5(config["mth5_path"], mode="r")
     ch_summary = mth5_obj.channel_summary
     dataset_definition = DatasetDefinition()
     dataset_definition.from_mth5_channel_summary(ch_summary)
-    #run_obj = mth5_obj.get_run("test1", "001")
     mth5_obj.close_mth5()
-    print("group_by station")
-    #but we only have one run here
+    #</get_channel_summary>
+
+
+
+
     tf_collection = process_mth5_from_dataset_definition(config,
                                                dataset_definition,
                                                units="MT",
@@ -233,8 +241,7 @@ def process_synthetic_1_standard(
     return
 
 
-def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
-                   expected_rms_misfit=None):
+def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base):
     """
 
     Parameters
@@ -249,38 +256,20 @@ def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
         against the python aurora output
     z_file_base: str
         This is the z_file that aurora will write its output to
-    expected_rms_misfit: dict
-        has expected values for the RMS misfits for the TF quantities rho_xy, rho_yx,
-        phi_xy, phi_yx. These are used to validate that the processing results don't
-        change much.
+
 
 
     Returns
     -------
 
     """
-    processing_config_path = create_test_run_config(test_case_id,
-                                                    matlab_or_fortran=emtf_version)
-
-    #<UPDATED CONFIG>
-    c = ConfigCreator()
-    p = c.create_run_processing_object()
-    p.id = "test1-fortran"
-    p.stations.local.mth5_path = str(DATA_PATH.joinpath("test1.h5"))
-    p.stations.local.id = "test1"
-    run_id = "001"
-    p.stations.local.runs = [run_id,]
-    p.stations.local.run_dict[run_id].input_channels = ["hx", "hy"]
-    p.stations.local.run_dict[run_id].output_channels = ["ex", "ey", "hz"]
-
-    for decimation in p.decimations:
-        decimation.estimator.engine = "RME"
-        decimation.window.type = "hamming"
-        decimation.regression.max_redescending_iterations = 2
-    #</UPDATED CONFIG>
+    processing_config = create_test_run_config(test_case_id,
+                                               matlab_or_fortran=emtf_version)
+    processing_config_path = None
+    expected_rms_misfit = get_expected_rms_misfit(test_case_id)
 
     process_synthetic_1_standard(
-        processing_config_path,
+        processing_config,
         auxilliary_z_file,
         z_file_base,
         expected_rms_misfit=expected_rms_misfit,
@@ -288,17 +277,16 @@ def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
         make_rho_phi_plot=True,
         show_rho_phi_plot=False,
         use_subtitle=True,
-        processing_config=p
     )
+    return
 
 
-def run_test1(emtf_version, expected_rms_misfit=None):
+def run_test1(emtf_version):
     print(f"Test1 vs {emtf_version}")
     test_case_id = "test1"
     auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test1.zss")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zss"
-    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
-                   expected_rms_misfit=expected_rms_misfit)
+    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base)
     return
 
 def run_test2r1():
@@ -307,16 +295,15 @@ def run_test2r1():
     emtf_version = "fortran"
     auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test2r1.zrr")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zrr"
-    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
-                   expected_rms_misfit=EXPECTED_RMS_MISFIT[test_case_id])
+    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base)
     return
 
 
 def test():
     create_test1_h5()
     create_test12rr_h5()
-    run_test1("fortran", expected_rms_misfit=EXPECTED_RMS_MISFIT["test1"])
-#    run_test1("matlab")
+    run_test1("fortran")
+    run_test1("matlab")
 #    run_test2r1()
     print("success")
 

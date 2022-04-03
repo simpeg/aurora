@@ -169,4 +169,7 @@ class Processing(Base):
                     new_level.decimation.level = int(level)
                     new_level.add_band(band)
                     self.add_decimation_level(new_level)
-                
+
+    def json_fn(self):
+        json_fn = self.id + "_processing_config.json"
+        return json_fn            
