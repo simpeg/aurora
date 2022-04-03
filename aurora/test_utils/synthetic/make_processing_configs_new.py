@@ -1,7 +1,8 @@
 import json
 
+from aurora.config import BANDS_DEFAULT_FILE
+from aurora.config import BANDS_256_FILE
 from aurora.config.config_creator import ConfigCreator
-from aurora.general_helper_functions import BAND_SETUP_PATH
 from aurora.general_helper_functions import TEST_PATH
 from aurora.tf_kernel.dataset import DatasetDefinition
 from mth5.utils.helpers import initialize_mth5
@@ -52,31 +53,28 @@ def create_test_run_config(test_case_id, matlab_or_fortran=""):
         mth5_path = DATA_PATH.joinpath("test12rr.h5")
 
     if matlab_or_fortran == "matlab":
-        band_setup_file = BAND_SETUP_PATH.joinpath("bs_256_26.cfg")
+        emtf_band_setup_file = BANDS_256_FILE
         num_samples_window = 256
         num_samples_overlap = 64
         config_id = f"{local_station_id}-{matlab_or_fortran}"
     elif matlab_or_fortran == "fortran":
-        band_setup_file = BAND_SETUP_PATH.joinpath("bs_test.cfg")
+        emtf_band_setup_file = BANDS_DEFAULT_FILE
         num_samples_window = 128
         num_samples_overlap = 32
         config_id = f"{local_station_id}-{matlab_or_fortran}"
     else:
-        band_setup_file = BAND_SETUP_PATH.joinpath("bs_test.cfg")
+        emtf_band_setup_file = BANDS_DEFAULT_FILE
         num_samples_window = 128
         num_samples_overlap = 32
         config_id = f"{local_station_id}"
 
-    #<NEW>
-    #<UPDATED CONFIG>
     cc = ConfigCreator(config_path=CONFIG_PATH)
     
     if test_case_id=="test1":
-        # run_id doesn't work as it should when passed as a kwarg. Is this supposed
-        # to be a list?
+        # run_id doesn't work when passed as a kwarg. Supposed to be a list?
         p = cc.create_run_processing_object(station_id="test1",
                                            mth5_path=str(mth5_path),
-                                           to_file=True)
+                                           emtf_band_file=emtf_band_setup_file)
         p.id = config_id
 
         #run_list can also just be hard-coded here as ['001',]
@@ -89,6 +87,8 @@ def create_test_run_config(test_case_id, matlab_or_fortran=""):
         for decimation in p.decimations:
             decimation.estimator.engine = estimation_engine
             decimation.window.type = "hamming"
+            decimation.window.num_samples = num_samples_window
+            decimation.window.overlap = num_samples_overlap
             decimation.regression.max_redescending_iterations = 2
 
         cc.to_json(p)
