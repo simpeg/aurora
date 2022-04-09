@@ -2,6 +2,8 @@ import json
 
 from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config import BANDS_256_FILE
+from aurora.config.metadata import Run
+from aurora.config import Station
 from aurora.config.config_creator import ConfigCreator
 from aurora.general_helper_functions import TEST_PATH
 from aurora.tf_kernel.dataset import DatasetDefinition
@@ -25,15 +27,22 @@ def create_test_run_config(test_case_id, matlab_or_fortran=""):
     Returns
     -------
 
+#WHen creating the dataset dataframe, 
+#make the dataset_dataframe have these columns:
+    [
+            "station_id", X
+            "run_id", X
+            "start", X
+            "end", X
+            "mth5_path",X
+            "sample_rate",X
+            "input_channels",
+            "output_channels",
+            "remote",
+        ] 
+    
     """
     mth5_path = DATA_PATH.joinpath(f"{test_case_id}.h5")
-    mth5_obj = initialize_mth5(mth5_path, mode="a")
-    ch_summary = mth5_obj.channel_summary
-    dataset_definition = DatasetDefinition()
-    dataset_definition.from_mth5_channel_summary(ch_summary)
-    #run_obj = mth5_obj.get_run("test1", "001")
-    mth5_obj.close_mth5()
-
 
     estimation_engine = "RME"
     local_station_id = test_case_id
@@ -68,21 +77,22 @@ def create_test_run_config(test_case_id, matlab_or_fortran=""):
         num_samples_overlap = 32
         config_id = f"{local_station_id}"
 
+
+    mth5_obj = initialize_mth5(mth5_path, mode="a")
+    ch_summary = mth5_obj.channel_summary
+    dataset_definition = DatasetDefinition()
+    dataset_definition.from_mth5_channel_summary(ch_summary)
+    dd_df = dataset_definition.df
+    #channel_summary_to_dataset_definition2(ch_summary)
+    dd_df["mth5_path"] = str(mth5_path)
+    mth5_obj.close_mth5()
     cc = ConfigCreator(config_path=CONFIG_PATH)
     
     if test_case_id=="test1":
-        # run_id doesn't work when passed as a kwarg. Supposed to be a list?
-        p = cc.create_run_processing_object(station_id="test1",
-                                           mth5_path=str(mth5_path),
-                                           emtf_band_file=emtf_band_setup_file)
+        p = cc.create_run_processing_object(emtf_band_file=emtf_band_setup_file)
         p.id = config_id
-
-        #run_list can also just be hard-coded here as ['001',]
-        run_list = dataset_definition.df.run_id.unique().tolist()
-        p.stations.local.runs = run_list
-        for run_id in run_list:
-            p.stations.local.run_dict[run_id].input_channels = ["hx", "hy"]
-            p.stations.local.run_dict[run_id].output_channels = ["ex", "ey", "hz"]
+        dd_df["remote"] = False
+        p.stations.from_dataset_dataframe(dd_df)
 
         for decimation in p.decimations:
             decimation.estimator.engine = estimation_engine
@@ -90,9 +100,33 @@ def create_test_run_config(test_case_id, matlab_or_fortran=""):
             decimation.window.num_samples = num_samples_window
             decimation.window.overlap = num_samples_overlap
             decimation.regression.max_redescending_iterations = 2
-
+    
         cc.to_json(p)
+    elif test_case_id=="test2r1":
+        dd_df["remote"] = "test1"
+        p = cc.create_run_processing_object(emtf_band_file=emtf_band_setup_file)
+        p.id = config_id
+        p.stations.from_dataset_dataframe(dd_df)
+        # rr = Station()
+        # rr.id = "test1"
+        # rr.mth5_path = p.stations.local.mth5_path
+        # p.stations.add_remote(rr)
+        # p.stations.remote[0].id
 
+        #run_list can also just be hard-coded here as ['001',]
+        # run_list = dataset_definition.df.run_id.unique().tolist()
+        # p.stations.local.runs = run_list
+        # p.stations.remote[0].runs = run_list
+        # for run_id in run_list:
+        #     p.stations.local.run_dict[run_id].input_channels = ["hx", "hy"]
+        #     p.stations.local.run_dict[run_id].output_channels = ["ex", "ey", "hz"]
+
+        for decimation in p.decimations:
+            decimation.estimator.engine = estimation_engine
+            decimation.window.type = "hamming"
+            decimation.window.num_samples = num_samples_window
+            decimation.window.overlap = num_samples_overlap
+            decimation.regression.max_redescending_iterations = 2
 
     return p
 

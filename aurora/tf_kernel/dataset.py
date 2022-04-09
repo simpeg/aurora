@@ -8,34 +8,45 @@ import pandas as pd
 
 import mth5
 
-
-def channel_summary_to_dataset_definition(df):
+def channel_summary_to_dataset_definition(ch_summary):
     """
-
+    TODO: replace station_id with station, and run_if with run
     Parameters
     ----------
-    df: pandas DataFrame representation of an mth5 channel_summary.
-    Maybe restricted to only have certain stations and runs before being passed to
-    this method
+    ch_summary: mth5.tables.channel_table.ChannelSummaryTable or pandas DataFrame
+       If its a dataframe it is a representation of an mth5 channel_summary.
+        Maybe restricted to only have certain stations and runs before being passed to
+        this method
 
     Returns
     -------
 
     """
-    grouper = df.groupby(["station", "run"])
+    if isinstance(ch_summary, mth5.tables.channel_table.ChannelSummaryTable):
+        ch_summary_df = ch_summary.to_dataframe()
+    elif isinstance(ch_summary, pd.DataFrame):
+        ch_summary_df = ch_summary
+    grouper = ch_summary_df.groupby(["station", "run"])
     n_station_runs = len(grouper)
     station_ids = n_station_runs * [None]
     run_ids = n_station_runs * [None]
     start_times = n_station_runs * [None]
     end_times = n_station_runs * [None]
+    sample_rates = n_station_runs * [None]
+    input_channels = n_station_runs * [None]
+    output_channels = n_station_runs * [None]
     i = 0
     for (station_id, run_id), group in grouper:
         print(f"{i} {station_id} {run_id}")
-        #print(group)
+        print(group)
         station_ids[i] = station_id
         run_ids[i] = run_id
         start_times[i] = group.start.iloc[0]
         end_times[i] = group.end.iloc[0]
+        sample_rates[i] = group.sample_rate.iloc[0]
+        print("ADD LOGIC FOR INPUT/OUTPUT Channels")
+        input_channels[i] = ["hx", "hy", ]
+        output_channels[i] = ["ex", "ey", "hz", ]
         i += 1
 
     data_dict = {}
@@ -43,8 +54,12 @@ def channel_summary_to_dataset_definition(df):
     data_dict["run_id"] = run_ids
     data_dict["start"] = start_times
     data_dict["end"] = end_times
+    data_dict["sample_rate"] = sample_rates
+    data_dict["input_channels"] = input_channels
+    data_dict["output_channels"] = output_channels
     dataset_definition = pd.DataFrame(data=data_dict)
     return dataset_definition
+
 
 class DatasetDefinition():
     """

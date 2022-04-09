@@ -201,16 +201,6 @@ def process_synthetic_1_standard(
                                                z_file_path=z_file_path)
 
 
-    #TAP POINT
-    # HERE WE NEED TO MAKE A TFKernel
-    #
-    # run_id = "001"
-    # tf_collection = process_mth5_run(
-    #     processing_config_path, run_id, units="MT", show_plot=False,
-    #     z_file_path=z_file_path
-    # )
-    # tf_collection._merge_decimation_levels()
-
     #END THE NORMAL PROCESSING TEST
 
     aux_data = read_z_file(auxilliary_z_file)
