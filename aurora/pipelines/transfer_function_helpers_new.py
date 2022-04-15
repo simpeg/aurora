@@ -63,16 +63,18 @@ def set_up_iter_control(config):
 def transfer_function_header_from_config(config, i_dec_level):
     remote_station_id = ""
     reference_channels = []
+    dec_level_config = config.decimations[i_dec_level]
     if config.stations.remote:
-        remote_station_id = config.stations.remote.id
-        reference_channels = config.decimations[i_dec_level].reference_channels
+        remote_station_id = config.stations.remote[0].id
+        reference_channels = dec_level_config.input_channels
+            #reference_channels
 
     transfer_function_header = TransferFunctionHeader(
-        processing_scheme=config.decimations[i_dec_level].estimator.engine,
+        processing_scheme=dec_level_config.estimator.engine,
         local_station_id=config.stations.local.id,
         reference_station_id=remote_station_id,
-        input_channels=config.decimations[i_dec_level].input_channels,
-        output_channels=config.decimations[i_dec_level].output_channels,
+        input_channels=dec_level_config.input_channels,
+        output_channels=dec_level_config.output_channels,
         reference_channels=reference_channels,
     )
     return transfer_function_header
@@ -141,7 +143,8 @@ def get_band_for_tf_estimate(band, config, i_dec_level, local_stft_obj,
     check_time_axes_synched(X, Y)
     if config.stations.remote:
         band_dataset = extract_band(band, remote_stft_obj)
-        RR = band_dataset[config.reference_channels]
+        RR = band_dataset[dec_level_config.input_channels]
+        #was config.reference_channels
         check_time_axes_synched(Y, RR)
     else:
         RR = None

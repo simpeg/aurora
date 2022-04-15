@@ -84,7 +84,7 @@ def initialize_pipeline(run_config):#, local_mth5_obj=None, remote_mth5_obj=None
     local_mth5_obj.open_mth5(config.stations.local.mth5_path, mode="r")
     if config.stations.remote:
         remote_mth5_obj = MTH5(file_version="0.1.0")
-        remote_mth5_obj.open_mth5(config.stations.remote.mth5_path, mode="r")
+        remote_mth5_obj.open_mth5(config.stations.remote[0].mth5_path, mode="r")
     else:
         remote_mth5_obj = None
     # </Initialize mth5 for reading>
@@ -188,14 +188,18 @@ def make_stft_objects_new(processing_config, i_dec_level, run_obj, run_xrts, uni
     stft_obj = run_ts_to_stft(stft_config, run_xrts)
 
     print("OK")
-    #still local and remote agnstic, it would be nice to be abel to acess
+    #still local and remote agnostic, it would be nice to be able to acess
     #p.stations[station_id]
-    #for today
+
     print("fix this so that it gets from config based on station_id, without caring "
           "if local or remote")
     run_id = run_obj.metadata.id
     if station_id==processing_config.stations.local.id:
         scale_factors = processing_config.stations.local.run_dict[
+            run_id].channel_scale_factors
+    #Need to add logic here to look through list of remote ids
+    elif station_id==processing_config.stations.remote[0].id:
+        scale_factors = processing_config.stations.remote[0].run_dict[
             run_id].channel_scale_factors
     # local_stft_obj = run_ts_to_stft_scipy(config, local_run_xrts)
     stft_obj = calibrate_stft_obj(
@@ -577,20 +581,12 @@ def process_mth5_from_dataset_definition(
     #Make a dict of the active mth5_objects (keyed by station_id? namespace clash?)
     mth5_objs = {processing_config.stations.local.id:local_mth5_obj}
     if processing_config.stations.remote:
-        mth5_objs[processing_config.stations.remote.id] = remote_mth5_obj
+        mth5_objs[processing_config.stations.remote[0].id] = remote_mth5_obj
     #flesh out dataset_df, populate the with mth5_objs
     all_mth5_objs = len(dataset_df) * [None]
     for i, station_id in enumerate(mth5_objs.keys()):
         all_mth5_objs[i] = mth5_objs[station_id]
     dataset_df["mth5_obj"] = all_mth5_objs
-    # for station_id, mth5_obj in mth5_objs.items():
-    #     cond = dataset_df.station_id == station_id
-    #     all_mth5_objs[cond] =
-    #     dataset_df.loc[cond]["mth5_obj"] = mth5_obj
-    #flesh out dataset_df, create space for run, run_ts, stft
-    # all_run_objs = len(dataset_df) * [None]
-    # all_run_ts_objs = len(dataset_df) * [None]
-    # all_stft_objs = len(dataset_df) * [None]
     dataset_df["run"] = None
     dataset_df["run_dataarray"] = None
     dataset_df["stft"] = None
@@ -621,7 +617,7 @@ def process_mth5_from_dataset_definition(
             if row.station_id == processing_config.stations.local.id:#local_station_id:
                 local_stfts.append(stft_obj)
             elif row.station_id == \
-                    processing_config.stations.remote.id:#reference_station_id:
+                    processing_config.stations.remote[0].id:#reference_station_id:
                 remote_stfts.append(stft_obj)
             # all_stft_objs[i] = stft_obj
             # dataset_df["stft"].loc[i] = stft_obj.to_array("channel")

@@ -27,15 +27,14 @@ def create_test_run_config(test_case_id, matlab_or_fortran=""):
     Returns
     -------
 
-#WHen creating the dataset dataframe, 
-#make the dataset_dataframe have these columns:
+    When creating the dataset dataframe, make it have these columns:
     [
-            "station_id", X
-            "run_id", X
-            "start", X
-            "end", X
-            "mth5_path",X
-            "sample_rate",X
+            "station_id",
+            "run_id",
+            "start",
+            "end",
+            "mth5_path",
+            "sample_rate",
             "input_channels",
             "output_channels",
             "remote",
@@ -103,7 +102,7 @@ def create_test_run_config(test_case_id, matlab_or_fortran=""):
     
         cc.to_json(p)
     elif test_case_id=="test2r1":
-        dd_df["remote"] = "test1"
+        dd_df["remote"] = [True, False]
         p = cc.create_run_processing_object(emtf_band_file=emtf_band_setup_file)
         p.id = config_id
         p.stations.from_dataset_dataframe(dd_df)
@@ -128,7 +127,7 @@ def create_test_run_config(test_case_id, matlab_or_fortran=""):
             decimation.window.overlap = num_samples_overlap
             decimation.regression.max_redescending_iterations = 2
 
-    return p
+    return p, dd_df
 
 
 

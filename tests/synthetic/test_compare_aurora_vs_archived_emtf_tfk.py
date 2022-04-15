@@ -125,6 +125,7 @@ def process_synthetic_1_standard(
         processing_config,
         auxilliary_z_file,
         z_file_base,
+        dd_df = None,
         expected_rms_misfit={},
         make_rho_phi_plot=True,
         show_rho_phi_plot=False,
@@ -185,11 +186,14 @@ def process_synthetic_1_standard(
         raise Exception
 
     #<get_channel_summary>
-    mth5_obj = initialize_mth5(mth5_path, mode="r")
-    ch_summary = mth5_obj.channel_summary
+    # mth5_obj = initialize_mth5(mth5_path, mode="r")
+    # ch_summary = mth5_obj.channel_summary
+    # dataset_definition = DatasetDefinition()
+    # dataset_definition.from_mth5_channel_summary(ch_summary)
+    # mth5_obj.close_mth5()
+
     dataset_definition = DatasetDefinition()
-    dataset_definition.from_mth5_channel_summary(ch_summary)
-    mth5_obj.close_mth5()
+    dataset_definition.df = dd_df
     #</get_channel_summary>
 
 
@@ -258,7 +262,7 @@ def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base):
     -------
 
     """
-    processing_config = create_test_run_config(test_case_id,
+    processing_config, dd_df = create_test_run_config(test_case_id,
                                                matlab_or_fortran=emtf_version)
     expected_rms_misfit = get_expected_rms_misfit(test_case_id, emtf_version)
 
@@ -266,6 +270,7 @@ def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base):
         processing_config,
         auxilliary_z_file,
         z_file_base,
+        dd_df=dd_df,
         expected_rms_misfit=expected_rms_misfit,
         emtf_version=emtf_version,
         make_rho_phi_plot=True,
@@ -298,7 +303,7 @@ def test():
     create_test12rr_h5()
     run_test1("fortran")
     run_test1("matlab")
-#    run_test2r1()
+    run_test2r1()
     print("success")
 
 
