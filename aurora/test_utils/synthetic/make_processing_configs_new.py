@@ -12,6 +12,15 @@ from mth5.utils.helpers import initialize_mth5
 CONFIG_PATH = TEST_PATH.joinpath("synthetic", "config")
 DATA_PATH = TEST_PATH.joinpath("synthetic", "data")
 
+def get_mth5_path(test_case_id):
+    mth5_path = DATA_PATH.joinpath(f"{test_case_id}.h5")
+    if (test_case_id == "test1r2") or (test_case_id == "test2r1"):
+        mth5_path = DATA_PATH.joinpath("test12rr.h5")
+    return mth5_path
+
+def create_dataset_definition(test_case_id):
+    mth5_path = get_mth5_path(test_case_id)
+    return None
 
 def create_test_run_config(test_case_id, matlab_or_fortran=""):
     """
@@ -41,7 +50,7 @@ def create_test_run_config(test_case_id, matlab_or_fortran=""):
         ] 
     
     """
-    mth5_path = DATA_PATH.joinpath(f"{test_case_id}.h5")
+    mth5_path = get_mth5_path(test_case_id)
 
     estimation_engine = "RME"
     local_station_id = test_case_id
@@ -52,13 +61,11 @@ def create_test_run_config(test_case_id, matlab_or_fortran=""):
         reference_channels = ["hx", "hy"]
         local_station_id = "test1"
         reference_station_id = "test2"
-        mth5_path = DATA_PATH.joinpath("test12rr.h5")
     if test_case_id == "test2r1":
         estimation_engine = "RME_RR"
         reference_channels = ["hx", "hy"]
         local_station_id = "test2"
         reference_station_id = "test1"
-        mth5_path = DATA_PATH.joinpath("test12rr.h5")
 
     if matlab_or_fortran == "matlab":
         emtf_band_setup_file = BANDS_256_FILE

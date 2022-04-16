@@ -25,7 +25,6 @@ from aurora.tf_kernel.dataset import DatasetDefinition
 from aurora.transfer_function.emtf_z_file_helpers import (
     merge_tf_collection_to_match_z_file,
 )
-from mth5.mth5 import MTH5
 from mth5.utils.helpers import initialize_mth5
 
 from make_mth5_from_asc import create_test1_h5
