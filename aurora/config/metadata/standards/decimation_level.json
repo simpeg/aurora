@@ -64,6 +64,17 @@
         "alias": [],
         "example": "ex, ey, hz",
 		"default": "ex, ey, hz"
+    },
+	"reference_channels": {
+        "type": "string",
+        "required": true,
+        "style": "name list",
+        "units": null,
+        "description": "list of reference channels (remote sources)",
+        "options": [],
+        "alias": [],
+        "example": "hx, hy",
+		"default": "hx, hy"
     }
 	
 }

@@ -66,8 +66,7 @@ def transfer_function_header_from_config(config, i_dec_level):
     dec_level_config = config.decimations[i_dec_level]
     if config.stations.remote:
         remote_station_id = config.stations.remote[0].id
-        reference_channels = dec_level_config.input_channels
-            #reference_channels
+        reference_channels = dec_level_config.reference_channels
 
     transfer_function_header = TransferFunctionHeader(
         processing_scheme=dec_level_config.estimator.engine,
@@ -143,8 +142,7 @@ def get_band_for_tf_estimate(band, config, i_dec_level, local_stft_obj,
     check_time_axes_synched(X, Y)
     if config.stations.remote:
         band_dataset = extract_band(band, remote_stft_obj)
-        RR = band_dataset[dec_level_config.input_channels]
-        #was config.reference_channels
+        RR = band_dataset[dec_level_config.reference_channels]
         check_time_axes_synched(Y, RR)
     else:
         RR = None
