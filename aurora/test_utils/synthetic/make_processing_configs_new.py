@@ -99,26 +99,14 @@ def create_test_run_config(test_case_id, matlab_or_fortran=""):
             decimation.window.num_samples = num_samples_window
             decimation.window.overlap = num_samples_overlap
             decimation.regression.max_redescending_iterations = 2
-    
+
+        p.drop_reference_channels()
         cc.to_json(p)
     elif test_case_id=="test2r1":
         dd_df["remote"] = [True, False]
         p = cc.create_run_processing_object(emtf_band_file=emtf_band_setup_file)
         p.id = config_id
         p.stations.from_dataset_dataframe(dd_df)
-        # rr = Station()
-        # rr.id = "test1"
-        # rr.mth5_path = p.stations.local.mth5_path
-        # p.stations.add_remote(rr)
-        # p.stations.remote[0].id
-
-        #run_list can also just be hard-coded here as ['001',]
-        # run_list = dataset_definition.df.run_id.unique().tolist()
-        # p.stations.local.runs = run_list
-        # p.stations.remote[0].runs = run_list
-        # for run_id in run_list:
-        #     p.stations.local.run_dict[run_id].input_channels = ["hx", "hy"]
-        #     p.stations.local.run_dict[run_id].output_channels = ["ex", "ey", "hz"]
 
         for decimation in p.decimations:
             decimation.estimator.engine = estimation_engine

@@ -173,3 +173,11 @@ class Processing(Base):
     def json_fn(self):
         json_fn = self.id + "_processing_config.json"
         return json_fn            
+    
+    def num_decimation_levels(self):
+        return len(self.decimations)
+
+    def drop_reference_channels(self):
+        for decimation in self.decimations:
+            decimation.reference_channels = []
+        return
