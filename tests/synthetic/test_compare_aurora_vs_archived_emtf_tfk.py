@@ -13,6 +13,7 @@ FORTRAN config file
 import numpy as np
 from pathlib import Path
 
+import pandas as pd
 from aurora.config.metadata.processing import Processing
 from aurora.config.config_creator import ConfigCreator
 from aurora.general_helper_functions import TEST_PATH
@@ -22,6 +23,7 @@ from aurora.pipelines.process_mth5_dev import process_mth5_from_dataset_definiti
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.test_utils.synthetic.make_processing_configs_new import create_test_run_config
 from aurora.tf_kernel.dataset import DatasetDefinition
+from aurora.tf_kernel.helpers import extract_run_summaries_from_mth5s
 from aurora.transfer_function.emtf_z_file_helpers import (
     merge_tf_collection_to_match_z_file,
 )
@@ -296,10 +298,15 @@ def run_test2r1():
     aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base)
     return
 
+def make_mth5s():
+    mth5_path_1 = create_test1_h5()
+    mth5_path_2 = create_test12rr_h5()
+    return [mth5_path_1, mth5_path_2]
+
 
 def test():
-    create_test1_h5()
-    create_test12rr_h5()
+    mth5_paths = make_mth5s()
+    super_summary = extract_run_summaries_from_mth5s(mth5_paths)
     run_test1("fortran")
     run_test1("matlab")
     run_test2r1()

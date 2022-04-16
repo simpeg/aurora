@@ -155,7 +155,7 @@ def create_mth5_synthetic_file(station_cfg, plot=False, add_nan_values=False):
         m.filters_group.add_filter(fltr)
 
     m.close_mth5()
-    return
+    return mth5_path
 
 
 def create_mth5_synthetic_file_for_array(station_cfgs, h5_name="", plot=False):
@@ -191,27 +191,35 @@ def create_mth5_synthetic_file_for_array(station_cfgs, h5_name="", plot=False):
     for fltr in active_filters:
         m.filters_group.add_filter(fltr)
     m.close_mth5()
+    return h5_name
 
 
 def create_test1_h5():
     station_01_params = make_station_01_config_dict()
-    create_mth5_synthetic_file(station_01_params, plot=False)
+    mth5_path = create_mth5_synthetic_file(station_01_params, plot=False)
+    return mth5_path
 
 
 def create_test2_h5():
     station_02_params = make_station_02_config_dict()
-    create_mth5_synthetic_file(station_02_params, plot=False)
+    mth5_path = create_mth5_synthetic_file(station_02_params, plot=False)
+    return mth5_path
 
 
 def create_test1_h5_with_nan():
     station_01_params = make_station_01_config_dict()
-    create_mth5_synthetic_file(station_01_params, plot=False, add_nan_values=True)
+    mth5_path = create_mth5_synthetic_file(station_01_params,
+                                           plot=False,
+                                           add_nan_values=True)
+    return mth5_path
 
 
 def create_test12rr_h5():
     station_01_params = make_station_01_config_dict()
     station_02_params = make_station_02_config_dict()
-    create_mth5_synthetic_file_for_array([station_01_params, station_02_params])
+    station_params = [station_01_params, station_02_params]
+    mth5_path = create_mth5_synthetic_file_for_array(station_params)
+    return mth5_path
 
 
 def main():
