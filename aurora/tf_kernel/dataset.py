@@ -10,7 +10,12 @@ import mth5
 
 def channel_summary_to_dataset_definition(ch_summary):
     """
-    TODO: replace station_id with station, and run_if with run
+    TODO: replace station_id with station, and run_id with run
+    TODO: Add logic for handling input and output channels based on channel
+    summary.  Specifically, consider the case where there is no vertical magnetic
+    field, this information is available via ch_summary, and output channels should
+    then not include hz.
+
     When creating the dataset dataframe, make it have these columns:
     [
             "station_id",
@@ -22,7 +27,8 @@ def channel_summary_to_dataset_definition(ch_summary):
             "input_channels",
             "output_channels",
             "remote",
-        ] 
+        ]
+
     Parameters
     ----------
     ch_summary: mth5.tables.channel_table.ChannelSummaryTable or pandas DataFrame
@@ -58,7 +64,6 @@ def channel_summary_to_dataset_definition(ch_summary):
         start_times[i] = group.start.iloc[0]
         end_times[i] = group.end.iloc[0]
         sample_rates[i] = group.sample_rate.iloc[0]
-        print("ADD LOGIC FOR INPUT/OUTPUT Channels")
         input_channels[i] = ["hx", "hy", ]
         output_channels[i] = ["ex", "ey", "hz", ]
         i += 1

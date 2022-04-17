@@ -68,8 +68,9 @@ def create_test_run_config(test_case_id, ds_df, matlab_or_fortran=""):
             decimation.regression.max_redescending_iterations = 2
 
         p.drop_reference_channels()
-        cc.to_json(p)
+        #cc.to_json(p)
     elif test_case_id=="test2r1":
+        config_id = f"{config_id}-Rtest1"
         p = cc.create_run_processing_object(emtf_band_file=emtf_band_setup_file)
         p.id = config_id
         p.stations.from_dataset_dataframe(ds_df)
@@ -80,7 +81,7 @@ def create_test_run_config(test_case_id, ds_df, matlab_or_fortran=""):
             decimation.window.num_samples = num_samples_window
             decimation.window.overlap = num_samples_overlap
             decimation.regression.max_redescending_iterations = 2
-
+    cc.to_json(p)
     return p
 
 

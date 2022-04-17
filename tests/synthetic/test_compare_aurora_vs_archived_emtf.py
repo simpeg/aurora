@@ -28,6 +28,7 @@ from aurora.transfer_function.emtf_z_file_helpers import (
 )
 
 from make_mth5_from_asc import create_test1_h5
+from make_mth5_from_asc import create_test2_h5
 from make_mth5_from_asc import create_test12rr_h5
 from plot_helpers_synthetic import plot_rho_phi
 
@@ -218,16 +219,25 @@ def run_test2r1(ds_df):
     aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df)
     return
 
-def make_mth5s():
-    mth5_path_1 = create_test1_h5()
-    mth5_path_2 = create_test12rr_h5()
-    return [mth5_path_1, mth5_path_2]
+def make_mth5s(merged=True):
+    """
+    Returns
+    -------
+    mth5_paths: list of Path objs or str(Path)
+    """
+    if merged:
+        mth5_path = create_test12rr_h5()
+        mth5_paths = [mth5_path,]
+    else:
+        mth5_path_1 = create_test1_h5()
+        mth5_path_2 = create_test2_h5()
+        mth5_paths = [mth5_path_1, mth5_path_2]
+    return mth5_paths
 
 
-def test():
-    mth5_paths = make_mth5s()
-    
-    super_summary = extract_run_summaries_from_mth5s([mth5_paths[1],])
+def test_pipeline(merged=True):
+    mth5_paths = make_mth5s(merged=merged)
+    super_summary = extract_run_summaries_from_mth5s(mth5_paths)
 
     dataset_df = super_summary[super_summary.station_id=="test1"]
     dataset_df["remote"] = False
@@ -237,6 +247,12 @@ def test():
     dataset_df = super_summary.copy(deep=True)
     dataset_df["remote"] = [True, False]
     run_test2r1(dataset_df)
+
+
+
+def test():
+    test_pipeline(merged=False)
+    test_pipeline(merged=True)
     print("success")
 
 
