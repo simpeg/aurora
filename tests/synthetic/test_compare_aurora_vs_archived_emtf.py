@@ -241,7 +241,8 @@ def process_synthetic_1_standard(
     return
 
 
-def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base):
+def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
+                   dddf=None):
     """
 
     Parameters
@@ -263,8 +264,15 @@ def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base):
     -------
 
     """
-    processing_config, dd_df = create_test_run_config(test_case_id,
-                                               matlab_or_fortran=emtf_version)
+    if test_case_id=="test1":
+        dd_df = dddf[dddf.station_id=="test1"]
+    elif dddf is not None:
+        dd_df = dddf
+
+    processing_config = create_test_run_config(test_case_id, dd_df,
+                                                      matlab_or_fortran=emtf_version)
+
+
     expected_rms_misfit = get_expected_rms_misfit(test_case_id, emtf_version)
 
     process_synthetic_1_standard(
@@ -281,21 +289,22 @@ def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base):
     return
 
 
-def run_test1(emtf_version):
+def run_test1(emtf_version, dddf=None):
     print(f"Test1 vs {emtf_version}")
     test_case_id = "test1"
     auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test1.zss")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zss"
-    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base)
+    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
+                   dddf=dddf)
     return
 
-def run_test2r1():
+def run_test2r1(dddf=None):
     print(f"Test2r1")
     test_case_id = "test2r1"
     emtf_version = "fortran"
     auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test2r1.zrr")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zrr"
-    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base)
+    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base, dddf=dddf)
     return
 
 def make_mth5s():
@@ -306,10 +315,17 @@ def make_mth5s():
 
 def test():
     mth5_paths = make_mth5s()
-    super_summary = extract_run_summaries_from_mth5s(mth5_paths)
-    run_test1("fortran")
-    run_test1("matlab")
-    run_test2r1()
+    
+    super_summary = extract_run_summaries_from_mth5s([mth5_paths[1],])
+
+    dataset_df = super_summary[super_summary.station_id=="test1"]
+    dataset_df["remote"] = False
+    run_test1("fortran", dddf=dataset_df)
+    run_test1("matlab", dddf=dataset_df)
+    
+    dataset_df = super_summary.copy(deep=True)
+    dataset_df["remote"] = [True, False]
+    run_test2r1(dddf=dataset_df)
     print("success")
 
 

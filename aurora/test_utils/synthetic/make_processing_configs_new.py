@@ -16,13 +16,13 @@ def get_mth5_path(test_case_id):
     mth5_path = DATA_PATH.joinpath(f"{test_case_id}.h5")
     if (test_case_id == "test1r2") or (test_case_id == "test2r1"):
         mth5_path = DATA_PATH.joinpath("test12rr.h5")
-    return mth5_path
+    return DATA_PATH.joinpath("test12rr.h5")
 
 def create_dataset_definition(test_case_id):
     mth5_path = get_mth5_path(test_case_id)
     return None
 
-def create_test_run_config(test_case_id, matlab_or_fortran=""):
+def create_test_run_config(test_case_id, dd_df, matlab_or_fortran=""):
     """
     Use config creator to generate a processing config file for the synthetic data.  
     
@@ -83,21 +83,11 @@ def create_test_run_config(test_case_id, matlab_or_fortran=""):
         num_samples_overlap = 32
         config_id = f"{local_station_id}"
 
-
-    mth5_obj = initialize_mth5(mth5_path, mode="a")
-    ch_summary = mth5_obj.channel_summary
-    dataset_definition = DatasetDefinition()
-    dataset_definition.from_mth5_channel_summary(ch_summary)
-    dd_df = dataset_definition.df
-    #channel_summary_to_dataset_definition2(ch_summary)
-    dd_df["mth5_path"] = str(mth5_path)
-    mth5_obj.close_mth5()
     cc = ConfigCreator(config_path=CONFIG_PATH)
     
     if test_case_id=="test1":
         p = cc.create_run_processing_object(emtf_band_file=emtf_band_setup_file)
         p.id = config_id
-        dd_df["remote"] = False
         p.stations.from_dataset_dataframe(dd_df)
 
         for decimation in p.decimations:
@@ -110,7 +100,6 @@ def create_test_run_config(test_case_id, matlab_or_fortran=""):
         p.drop_reference_channels()
         cc.to_json(p)
     elif test_case_id=="test2r1":
-        dd_df["remote"] = [True, False]
         p = cc.create_run_processing_object(emtf_band_file=emtf_band_setup_file)
         p.id = config_id
         p.stations.from_dataset_dataframe(dd_df)
@@ -122,7 +111,7 @@ def create_test_run_config(test_case_id, matlab_or_fortran=""):
             decimation.window.overlap = num_samples_overlap
             decimation.regression.max_redescending_iterations = 2
 
-    return p, dd_df
+    return p#, dd_df
 
 
 
