@@ -463,10 +463,7 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
     else:
         # See Note 1 top of module
         # See Note 2 top of module
-        # 2022-02-27: This method modified to iterate over lists
-        print("ENSURE HERE THAT LOCAL RUN IS MODIFIED IN PLACE IN THE LIST!!!")
         for i,row in dataset_df.iterrows():
-            print(i)
             run_xrts = row["run_dataarray"].to_dataset("channel")
             input_dict = {"run":row["run"], "mvts":run_xrts}
             run_dict = prototype_decimate(config.decimation, input_dict)
@@ -546,35 +543,7 @@ def process_mth5_from_dataset_definition(
     
     processing_config, local_mth5_obj, remote_mth5_obj = initialize_pipeline(run_cfg)
 
-    #<Move into TFKernel()>
-    if dataset_definition is None:
-        print("This case (no DatasetDefinition) will probably be deprecated (soon)")
-        print("But for now we are supporting a run list as well so that old tests pass")
-        print("But a run_list is only appropriate for single station processing, "
-              "in general we would need a list of (station_id, run_id) tuples")
-        print("basically, I am going to assume that the dataset definition is already "
-              "cleanly restricted down to only what I want to process, "
-              "local_station_id, and remote station_id are only ids, and all runs "
-              "listed are candidates for TF")
-        #make run_id a list if it is a string denoting a single run
-        if isinstance(run_ids, str):
-            run_ids = [run_ids, ]
-        else:
-            print("This processing is experimentatal being developed Mar 2022")
-            print(f"run_ids = {run_ids}")
-            if not isinstance(run_ids,list):
-                print("Error: Expecting run_ids to be a list")
-                raise Exception
-        print("NOW MAKE DATASET DEFINITION FROM run_ids")
-        summary_df = mth5_obj.channel_summary
-        #summary_df = pd.read_csv("channel_summary.csv", parse_dates=["start", "end"])
-        dataset_definition = DatasetDefinition()
-        dataset_df = dataset_definition.from_mth5_channel_summary(summary_df)
-        print("NOW restrict dataset definition to run_ids")
-        dataset_df = dataset_df[dataset_df["run_id"].isin(run_ids)]
-        print("NOW might be a good time to reindex the defn_df")
-    else:
-        dataset_df = dataset_definition.df
+    dataset_df = dataset_definition.df
     #</Move into TFKernel()>
 
     #move this into initialize_pipeline?  maybe even into TF Kernel?
@@ -584,7 +553,7 @@ def process_mth5_from_dataset_definition(
         mth5_objs[processing_config.stations.remote[0].id] = remote_mth5_obj
     #flesh out dataset_df, populate the with mth5_objs
     all_mth5_objs = len(dataset_df) * [None]
-    for i, station_id in enumerate(mth5_objs.keys()):
+    for i, station_id in enumerate(dataset_df["station_id"]):
         all_mth5_objs[i] = mth5_objs[station_id]
     dataset_df["mth5_obj"] = all_mth5_objs
     dataset_df["run"] = None

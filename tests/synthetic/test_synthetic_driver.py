@@ -1,6 +1,8 @@
 from aurora.general_helper_functions import TEST_PATH
 from aurora.pipelines.process_mth5 import process_mth5_run
 from aurora.test_utils.synthetic.make_processing_configs import create_test_run_config
+#from aurora.test_utils.synthetic.make_processing_configs_new import
+# create_test_run_config
 
 from make_mth5_from_asc import create_test1_h5
 from make_mth5_from_asc import create_test2_h5

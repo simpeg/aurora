@@ -10,26 +10,25 @@ It is being used in the stft test, but maybe that can be made to depend on the
 FORTRAN config file
 
 """
-import numpy as np
 from pathlib import Path
 
-import pandas as pd
 from aurora.config.metadata.processing import Processing
-from aurora.config.config_creator import ConfigCreator
 from aurora.general_helper_functions import TEST_PATH
 from aurora.pipelines.helpers import initialize_config
-from aurora.pipelines.process_mth5 import process_mth5_run
 from aurora.pipelines.process_mth5_dev import process_mth5_from_dataset_definition
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.test_utils.synthetic.make_processing_configs_new import create_test_run_config
+from aurora.test_utils.synthetic.rms_helpers import assert_rms_misfit_ok
+from aurora.test_utils.synthetic.rms_helpers import compute_rms
+from aurora.test_utils.synthetic.rms_helpers import get_expected_rms_misfit
 from aurora.tf_kernel.dataset import DatasetDefinition
 from aurora.tf_kernel.helpers import extract_run_summaries_from_mth5s
 from aurora.transfer_function.emtf_z_file_helpers import (
     merge_tf_collection_to_match_z_file,
 )
-from mth5.utils.helpers import initialize_mth5
 
 from make_mth5_from_asc import create_test1_h5
+from make_mth5_from_asc import create_test2_h5
 from make_mth5_from_asc import create_test12rr_h5
 from plot_helpers_synthetic import plot_rho_phi
 
@@ -40,93 +39,13 @@ EMTF_OUTPUT_PATH = SYNTHETIC_PATH.joinpath("emtf_output")
 AURORA_RESULTS_PATH = SYNTHETIC_PATH.joinpath("aurora_results")
 AURORA_RESULTS_PATH.mkdir(exist_ok=True)
 
-def get_expected_rms_misfit(test_case_id, emtf_version=None):
-    expected_rms_misfit = {}
-    expected_rms_misfit["rho"] = {}
-    expected_rms_misfit["phi"] = {}
-    if test_case_id == "test1":
-        if emtf_version == "fortran":
-            expected_rms_misfit["rho"]["xy"] = 4.406358  #4.380757  # 4.357440
-            expected_rms_misfit["phi"]["xy"] = 0.862902  #0.871609  # 0.884601
-            expected_rms_misfit["rho"]["yx"] = 3.625859  #3.551043  # 3.501146
-            expected_rms_misfit["phi"]["yx"] = 0.840394  #0.812733  # 0.808658
-        elif emtf_version == "matlab":
-            expected_rms_misfit["rho"]["xy"] = 2.691072
-            expected_rms_misfit["phi"]["xy"] = 0.780713
-            expected_rms_misfit["rho"]["yx"] = 3.676269
-            expected_rms_misfit["phi"]["yx"] = 1.392265
-
-    elif test_case_id == "test2r1":
-        expected_rms_misfit["rho"]["xy"] = 3.940519  #3.949857  #3.949919
-        expected_rms_misfit["phi"]["xy"] = 0.959861  #0.962837  #0.957675
-        expected_rms_misfit["rho"]["yx"] = 4.136467  #4.121772  #4.117700
-        expected_rms_misfit["phi"]["yx"] = 1.635570  #1.637581  #1.629026
-    return expected_rms_misfit
-
-def compute_rms(rho, phi, model_rho_a=100.0, model_phi=45.0, verbose=False):
-    """
-    This function being used to make comparative plots for synthetic data.  Could be 
-    used in general to compare different processing results.  For example by replacing 
-    model_rho_a and model_phi with other processing results, or other (
-    non-uniform) model results. 
-    
-    Parameters
-    ----------
-    rho: numpy.ndarray
-        1D array of computed apparent resistivities (expected in Ohmm)
-    phi: numpy.ndarrayx
-        1D array of computed phases (expected in degrees)
-    model_rho_a: float or numpy array
-        if numpy array must be the same shape as rho
-    model_phi: float or numpy array
-        if numpy array must be the same shape as phi.
-    Returns
-    -------
-    rho_rms: float
-        rms misfit between the model apparent resistivity and the computed resistivity
-    phi_rms: float
-        rms misfit between the model phase (or phases) and the computed phase
-    """
-    rho_rms = np.sqrt(np.mean((rho - model_rho_a) ** 2))
-    phi_rms = np.sqrt(np.mean((phi - model_phi) ** 2))
-    if verbose:
-        print(f"rho_rms = {rho_rms}")
-        print(f"phi_rms = {phi_rms}")
-    return rho_rms, phi_rms
-
-
-
-def assert_rms_misfit_ok(expected_rms_misfit, xy_or_yx, rho_rms_aurora,
-                         phi_rms_aurora, rho_tol=1e-4, phi_tol=1e-4):
-    """
-
-    Parameters
-    ----------
-    expected_rms_misfit: dictionary
-        precomputed RMS misfits for test data in rho and phi
-    xy_or_yx: str
-        mode
-    rho_rms_aurora: float
-    phi_rms_aurora: float
-
-    Returns
-    -------
-
-    """
-    expected_rms_rho = expected_rms_misfit['rho'][xy_or_yx]
-    expected_rms_phi = expected_rms_misfit['phi'][xy_or_yx]
-    print(f"expected_rms_rho_{xy_or_yx} {expected_rms_rho}")
-    print(f"expected_rms_phi_{xy_or_yx} {expected_rms_phi}")
-    assert np.isclose(rho_rms_aurora - expected_rms_rho, 0, atol=rho_tol)
-    assert np.isclose(phi_rms_aurora - expected_rms_phi, 0, atol=phi_tol)
-    return
 
 
 def process_synthetic_1_standard(
         processing_config,
         auxilliary_z_file,
         z_file_base,
-        dd_df = None,
+        ds_df = None,
         expected_rms_misfit={},
         make_rho_phi_plot=True,
         show_rho_phi_plot=False,
@@ -186,19 +105,8 @@ def process_synthetic_1_standard(
         print(f"processing_config has unexpected type {type(processing_config)}")
         raise Exception
 
-    #<get_channel_summary>
-    # mth5_obj = initialize_mth5(mth5_path, mode="r")
-    # ch_summary = mth5_obj.channel_summary
-    # dataset_definition = DatasetDefinition()
-    # dataset_definition.from_mth5_channel_summary(ch_summary)
-    # mth5_obj.close_mth5()
-
     dataset_definition = DatasetDefinition()
-    dataset_definition.df = dd_df
-    #</get_channel_summary>
-
-
-
+    dataset_definition.df = ds_df
 
     tf_collection = process_mth5_from_dataset_definition(config,
                                                dataset_definition,
@@ -241,8 +149,7 @@ def process_synthetic_1_standard(
     return
 
 
-def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
-                   dddf=None):
+def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df):
     """
 
     Parameters
@@ -264,12 +171,7 @@ def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
     -------
 
     """
-    if test_case_id=="test1":
-        dd_df = dddf[dddf.station_id=="test1"]
-    elif dddf is not None:
-        dd_df = dddf
-
-    processing_config = create_test_run_config(test_case_id, dd_df,
+    processing_config = create_test_run_config(test_case_id, ds_df,
                                                       matlab_or_fortran=emtf_version)
 
 
@@ -279,7 +181,7 @@ def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
         processing_config,
         auxilliary_z_file,
         z_file_base,
-        dd_df=dd_df,
+        ds_df=ds_df,
         expected_rms_misfit=expected_rms_misfit,
         emtf_version=emtf_version,
         make_rho_phi_plot=True,
@@ -289,43 +191,68 @@ def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
     return
 
 
-def run_test1(emtf_version, dddf=None):
+def run_test1(emtf_version, ds_df):
+    """
+
+    Parameters
+    ----------
+    emtf_version
+    ds_df
+
+    Returns
+    -------
+
+    """
     print(f"Test1 vs {emtf_version}")
     test_case_id = "test1"
     auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test1.zss")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zss"
-    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
-                   dddf=dddf)
+    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df)
     return
 
-def run_test2r1(dddf=None):
+def run_test2r1(ds_df):
     print(f"Test2r1")
     test_case_id = "test2r1"
     emtf_version = "fortran"
     auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test2r1.zrr")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zrr"
-    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base, dddf=dddf)
+    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df)
     return
 
-def make_mth5s():
-    mth5_path_1 = create_test1_h5()
-    mth5_path_2 = create_test12rr_h5()
-    return [mth5_path_1, mth5_path_2]
+def make_mth5s(merged=True):
+    """
+    Returns
+    -------
+    mth5_paths: list of Path objs or str(Path)
+    """
+    if merged:
+        mth5_path = create_test12rr_h5()
+        mth5_paths = [mth5_path,]
+    else:
+        mth5_path_1 = create_test1_h5()
+        mth5_path_2 = create_test2_h5()
+        mth5_paths = [mth5_path_1, mth5_path_2]
+    return mth5_paths
 
 
-def test():
-    mth5_paths = make_mth5s()
-    
-    super_summary = extract_run_summaries_from_mth5s([mth5_paths[1],])
+def test_pipeline(merged=True):
+    mth5_paths = make_mth5s(merged=merged)
+    super_summary = extract_run_summaries_from_mth5s(mth5_paths)
 
     dataset_df = super_summary[super_summary.station_id=="test1"]
     dataset_df["remote"] = False
-    run_test1("fortran", dddf=dataset_df)
-    run_test1("matlab", dddf=dataset_df)
+    run_test1("fortran", dataset_df)
+    run_test1("matlab", dataset_df)
     
     dataset_df = super_summary.copy(deep=True)
     dataset_df["remote"] = [True, False]
-    run_test2r1(dddf=dataset_df)
+    run_test2r1(dataset_df)
+
+
+
+def test():
+    test_pipeline(merged=False)
+    test_pipeline(merged=True)
     print("success")
 
 

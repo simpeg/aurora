@@ -6,7 +6,7 @@ from aurora.general_helper_functions import TEST_PATH
 CONFIG_PATH = TEST_PATH.joinpath("synthetic", "config")
 
 
-def create_test_run_config(test_case_id, dd_df, matlab_or_fortran=""):
+def create_test_run_config(test_case_id, ds_df, matlab_or_fortran=""):
     """
     Use config creator to generate a processing config file for the synthetic data.  
     
@@ -58,7 +58,7 @@ def create_test_run_config(test_case_id, dd_df, matlab_or_fortran=""):
     if test_case_id=="test1":
         p = cc.create_run_processing_object(emtf_band_file=emtf_band_setup_file)
         p.id = config_id
-        p.stations.from_dataset_dataframe(dd_df)
+        p.stations.from_dataset_dataframe(ds_df)
 
         for decimation in p.decimations:
             decimation.estimator.engine = estimation_engine
@@ -68,11 +68,12 @@ def create_test_run_config(test_case_id, dd_df, matlab_or_fortran=""):
             decimation.regression.max_redescending_iterations = 2
 
         p.drop_reference_channels()
-        cc.to_json(p)
+        #cc.to_json(p)
     elif test_case_id=="test2r1":
+        config_id = f"{config_id}-Rtest1"
         p = cc.create_run_processing_object(emtf_band_file=emtf_band_setup_file)
         p.id = config_id
-        p.stations.from_dataset_dataframe(dd_df)
+        p.stations.from_dataset_dataframe(ds_df)
 
         for decimation in p.decimations:
             decimation.estimator.engine = estimation_engine
@@ -80,7 +81,7 @@ def create_test_run_config(test_case_id, dd_df, matlab_or_fortran=""):
             decimation.window.num_samples = num_samples_window
             decimation.window.overlap = num_samples_overlap
             decimation.regression.max_redescending_iterations = 2
-
+    cc.to_json(p)
     return p
 
 
