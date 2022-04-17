@@ -1,26 +1,10 @@
-import json
-
 from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config import BANDS_256_FILE
-from aurora.config.metadata import Run
-from aurora.config import Station
 from aurora.config.config_creator import ConfigCreator
 from aurora.general_helper_functions import TEST_PATH
-from aurora.tf_kernel.dataset import DatasetDefinition
-from mth5.utils.helpers import initialize_mth5
 
 CONFIG_PATH = TEST_PATH.joinpath("synthetic", "config")
-DATA_PATH = TEST_PATH.joinpath("synthetic", "data")
 
-def get_mth5_path(test_case_id):
-    mth5_path = DATA_PATH.joinpath(f"{test_case_id}.h5")
-    if (test_case_id == "test1r2") or (test_case_id == "test2r1"):
-        mth5_path = DATA_PATH.joinpath("test12rr.h5")
-    return DATA_PATH.joinpath("test12rr.h5")
-
-def create_dataset_definition(test_case_id):
-    mth5_path = get_mth5_path(test_case_id)
-    return None
 
 def create_test_run_config(test_case_id, dd_df, matlab_or_fortran=""):
     """
@@ -36,22 +20,8 @@ def create_test_run_config(test_case_id, dd_df, matlab_or_fortran=""):
     Returns
     -------
 
-    When creating the dataset dataframe, make it have these columns:
-    [
-            "station_id",
-            "run_id",
-            "start",
-            "end",
-            "mth5_path",
-            "sample_rate",
-            "input_channels",
-            "output_channels",
-            "remote",
-        ] 
     
     """
-    mth5_path = get_mth5_path(test_case_id)
-
     estimation_engine = "RME"
     local_station_id = test_case_id
     reference_station_id = ""
@@ -111,7 +81,7 @@ def create_test_run_config(test_case_id, dd_df, matlab_or_fortran=""):
             decimation.window.overlap = num_samples_overlap
             decimation.regression.max_redescending_iterations = 2
 
-    return p#, dd_df
+    return p
 
 
 

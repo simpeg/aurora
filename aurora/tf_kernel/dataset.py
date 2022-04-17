@@ -11,12 +11,26 @@ import mth5
 def channel_summary_to_dataset_definition(ch_summary):
     """
     TODO: replace station_id with station, and run_if with run
+    When creating the dataset dataframe, make it have these columns:
+    [
+            "station_id",
+            "run_id",
+            "start",
+            "end",
+            "mth5_path",
+            "sample_rate",
+            "input_channels",
+            "output_channels",
+            "remote",
+        ] 
     Parameters
     ----------
     ch_summary: mth5.tables.channel_table.ChannelSummaryTable or pandas DataFrame
        If its a dataframe it is a representation of an mth5 channel_summary.
         Maybe restricted to only have certain stations and runs before being passed to
         this method
+
+
 
     Returns
     -------
