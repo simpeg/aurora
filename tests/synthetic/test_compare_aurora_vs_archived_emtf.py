@@ -126,7 +126,7 @@ def process_synthetic_1_standard(
         processing_config,
         auxilliary_z_file,
         z_file_base,
-        dd_df = None,
+        ds_df = None,
         expected_rms_misfit={},
         make_rho_phi_plot=True,
         show_rho_phi_plot=False,
@@ -186,19 +186,8 @@ def process_synthetic_1_standard(
         print(f"processing_config has unexpected type {type(processing_config)}")
         raise Exception
 
-    #<get_channel_summary>
-    # mth5_obj = initialize_mth5(mth5_path, mode="r")
-    # ch_summary = mth5_obj.channel_summary
-    # dataset_definition = DatasetDefinition()
-    # dataset_definition.from_mth5_channel_summary(ch_summary)
-    # mth5_obj.close_mth5()
-
     dataset_definition = DatasetDefinition()
-    dataset_definition.df = dd_df
-    #</get_channel_summary>
-
-
-
+    dataset_definition.df = ds_df
 
     tf_collection = process_mth5_from_dataset_definition(config,
                                                dataset_definition,
@@ -241,8 +230,7 @@ def process_synthetic_1_standard(
     return
 
 
-def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
-                   dddf=None):
+def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df):
     """
 
     Parameters
@@ -264,12 +252,7 @@ def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
     -------
 
     """
-    if test_case_id=="test1":
-        dd_df = dddf[dddf.station_id=="test1"]
-    elif dddf is not None:
-        dd_df = dddf
-
-    processing_config = create_test_run_config(test_case_id, dd_df,
+    processing_config = create_test_run_config(test_case_id, ds_df,
                                                       matlab_or_fortran=emtf_version)
 
 
@@ -279,7 +262,7 @@ def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
         processing_config,
         auxilliary_z_file,
         z_file_base,
-        dd_df=dd_df,
+        ds_df=ds_df,
         expected_rms_misfit=expected_rms_misfit,
         emtf_version=emtf_version,
         make_rho_phi_plot=True,
@@ -289,22 +272,32 @@ def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
     return
 
 
-def run_test1(emtf_version, dddf=None):
+def run_test1(emtf_version, ds_df):
+    """
+
+    Parameters
+    ----------
+    emtf_version
+    ds_df
+
+    Returns
+    -------
+
+    """
     print(f"Test1 vs {emtf_version}")
     test_case_id = "test1"
     auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test1.zss")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zss"
-    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base,
-                   dddf=dddf)
+    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df)
     return
 
-def run_test2r1(dddf=None):
+def run_test2r1(ds_df):
     print(f"Test2r1")
     test_case_id = "test2r1"
     emtf_version = "fortran"
     auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test2r1.zrr")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zrr"
-    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base, dddf=dddf)
+    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df)
     return
 
 def make_mth5s():
@@ -320,12 +313,12 @@ def test():
 
     dataset_df = super_summary[super_summary.station_id=="test1"]
     dataset_df["remote"] = False
-    run_test1("fortran", dddf=dataset_df)
-    run_test1("matlab", dddf=dataset_df)
+    run_test1("fortran", dataset_df)
+    run_test1("matlab", dataset_df)
     
     dataset_df = super_summary.copy(deep=True)
     dataset_df["remote"] = [True, False]
-    run_test2r1(dddf=dataset_df)
+    run_test2r1(dataset_df)
     print("success")
 
 
