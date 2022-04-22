@@ -81,6 +81,7 @@ def run_ts_to_stft_scipy(decimation_obj, run_xrts_orig):
     -------
 
     """
+    import numpy as np
     import xarray as xr
 
     run_xrts = apply_prewhitening(decimation_obj, run_xrts_orig)
@@ -90,14 +91,14 @@ def run_ts_to_stft_scipy(decimation_obj, run_xrts_orig):
         num_samples_window=decimation_obj.window.num_samples,
         num_samples_overlap=decimation_obj.window.overlap,
         taper_additional_args=decimation_obj.window.additional_args,
-        sample_rate=decimation_obj.sample_rate,
+        sample_rate=decimation_obj.decimation.sample_rate,
     )
 
     stft_obj = xr.Dataset()
     for channel_id in run_xrts.data_vars:
         ff, tt, specgm = ssig.spectrogram(
             run_xrts[channel_id].data,
-            fs=decimation_obj.sample_rate,
+            fs=decimation_obj.decimation.sample_rate,
             window=windowing_scheme.taper,
             nperseg=decimation_obj.window.num_samples,
             noverlap=decimation_obj.window.overlap,
@@ -109,14 +110,11 @@ def run_ts_to_stft_scipy(decimation_obj, run_xrts_orig):
         # drop Nyquist>
         ff = ff[:-1]
         specgm = specgm[:-1, :]
-
-        import numpy as np
-
         specgm *= np.sqrt(2)
 
         # make time_axis
         tt = tt - tt[0]
-        tt *= decimation_obj.sample_rate
+        tt *= decimation_obj.decimation.sample_rate
         time_axis = run_xrts.time.data[tt.astype(int)]
 
         xrd = xr.DataArray(
