@@ -96,9 +96,10 @@ class DatasetDefinition():
     1.  to STFT, that will be made into merged FC data structures
     2. to bind together into xarray time series, for eventual gap fill or STFT.
 
-    The basic data strucutre can be represented as a tree:
-    Station --> run --> [Intervals], where the --> is taken as "branches that specify"
-    or as a table.
+    The basic data strucutre can be represented as a table or as a tree:
+    Station --> run --> [Intervals],
+    where the --> symbol is reads "branches that specify (a)".
+
     This is described in issue #118 https://github.com/simpeg/aurora/issues/118
 
     Desired Properties

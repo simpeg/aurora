@@ -1,15 +1,3 @@
-"""
-Working Notes:
-1. Need to create a processing config for the remote reference case and run the RR
-processing.  Use the examples from test_synthetic_driver
-2. Get baseline RR values and use them in an assertion test here
-
-3. Check if the previously committed json config is being used by the single station
-tests, it looks like maybe it is not anymore.
-It is being used in the stft test, but maybe that can be made to depend on the
-FORTRAN config file
-
-"""
 from pathlib import Path
 
 from aurora.config.metadata.processing import Processing
@@ -40,58 +28,25 @@ AURORA_RESULTS_PATH = SYNTHETIC_PATH.joinpath("aurora_results")
 AURORA_RESULTS_PATH.mkdir(exist_ok=True)
 
 
-
-def process_synthetic_1_standard(
-        processing_config,
-        auxilliary_z_file,
-        z_file_base,
-        ds_df = None,
-        expected_rms_misfit={},
-        make_rho_phi_plot=True,
-        show_rho_phi_plot=False,
-        use_subtitle=True,
-        emtf_version="matlab",
-        **kwargs
-    ):
+def process_sythetic_data(processing_config, dataset_definition, z_file_path=None):
     """
 
     Parameters
     ----------
     processing_config: str or Path, or a Processing() object
         where the processing configuration file is found
-    expected_rms_misfit: dict
-        has expected values for the RMS misfits for the TF quantities rho_xy, rho_yx,
-        phi_xy, phi_yx. These are used to validate that the processing results don't
-        change much.
-    make_rho_phi_plot
-    show_rho_phi_plot
-    use_subtitle
-    emtf_version: string
-        "fortran" or "matlab"
+    dataset_definition: aurora.tf_kernel.dataset.DatasetDefinition
+        class that has a df that describes the runs to be processed.
+    z_file_path: str or Path
+        Optional, a place to store the output TF in EMTF z-file format.
 
     Returns
     -------
-
-
-    Just like the normal test runs, but this uses a previously committed json file
-    and has a known result.  The results are plotted and stored and checked against a
-    standard result calculated originally in August 2021.
-
-    Want to support two cases of comparison here.  In one case we compare against
-    the committed .zss file in the EMTF repository, and in the other case we compare
-    against a committed .mat file created by the matlab codes.
-
-    Note that the comparison values got slightly worse since the original commit.
-    It turns out that we can recover the original values by setting beta to the old
-    formula, where beta is .8843, not .7769.
-
-    Returns
-    -------
+    tf_collection:
+    aurora.transfer_function.transfer_function_collection.TransferFunctionCollection
+        Container for TF.  TransferFunctionCollection will probably be deprecated.
 
     """
-
-    z_file_path = AURORA_RESULTS_PATH.joinpath(z_file_base)
-
     cond1 = isinstance(processing_config, str)
     cond2 = isinstance(processing_config, Path)
     if (cond1 or cond2):
@@ -105,19 +60,75 @@ def process_synthetic_1_standard(
         print(f"processing_config has unexpected type {type(processing_config)}")
         raise Exception
 
+    tf_collection = process_mth5_from_dataset_definition(config,
+                                                         dataset_definition,
+                                                         units="MT",
+                                                         z_file_path=z_file_path)
+    return tf_collection
+
+
+
+
+def aurora_vs_emtf(test_case_id,
+                   emtf_version,
+                   auxilliary_z_file,
+                   z_file_base,
+                   ds_df,
+                   make_rho_phi_plot=True,
+                   show_rho_phi_plot=False,
+                   use_subtitle=True,):
+    """
+    ToDo: Consider storing the processing config for this case as a json file,
+    committed with the code.
+
+    Just like a normal test of processing synthetic data, but this uses a
+    known processing configuration and has a known result.  The results are plotted and
+    stored and checked against a standard result calculated originally in August 2021.
+
+    There are two cases of comparisons here.  In one case we compare against
+    the committed .zss file in the EMTF repository, and in the other case we compare
+    against a committed .mat file created by the matlab codes.
+
+    Note that the comparison values got slightly worse since the original commit.
+    It turns out that we can recover the original values by setting beta to the old
+    formula, where beta is .8843, not .7769.
+
+    Parameters
+    ----------
+    test_case_id: str
+        one of ["test1", "test2r1"].  "test1" is associated with single station
+        processing. "test2r1" is remote refernce processing
+    emtf_version: str
+        one of ["fortran", "matlab"]
+    auxilliary_z_file: str or pathlib.Path
+        points to a .zss, .zrr or .zmm that EMTF produced that will be compared
+        against the python aurora output
+    z_file_base: str
+        This is the z_file that aurora will write its output to
+    ds_df
+    make_rho_phi_plot: bool
+    show_rho_phi_plot: bool
+    use_subtitle: bool
+
+
+    Returns
+    -------
+
+    """
     dataset_definition = DatasetDefinition()
     dataset_definition.df = ds_df
-
-    tf_collection = process_mth5_from_dataset_definition(config,
-                                               dataset_definition,
-                                               units="MT",
-                                               z_file_path=z_file_path)
+    processing_config = create_test_run_config(test_case_id, ds_df,
+                                                      matlab_or_fortran=emtf_version)
 
 
-    #END THE NORMAL PROCESSING TEST
+    expected_rms_misfit = get_expected_rms_misfit(test_case_id, emtf_version)
+    z_file_path  = AURORA_RESULTS_PATH.joinpath(z_file_base)
+
+    tf_collection = process_sythetic_data(processing_config,
+                                          dataset_definition,
+                                          z_file_path=z_file_path)
 
     aux_data = read_z_file(auxilliary_z_file)
-
     aurora_rho_phi = merge_tf_collection_to_match_z_file(aux_data, tf_collection)
 
     for xy_or_yx in ["xy", "yx"]:
@@ -146,48 +157,7 @@ def process_synthetic_1_standard(
                          use_subtitle=use_subtitle,
                          show_plot=show_rho_phi_plot,
                          output_path=AURORA_RESULTS_PATH)
-    return
 
-
-def aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df):
-    """
-
-    Parameters
-    ----------
-    test_case_id: str
-        one of ["test1", "test2r1"].  "test1" is associated with single station
-        processing. "test2r1" is remote refernce processing
-    emtf_version: str
-        one of ["fortran", "matlab"]
-    auxilliary_z_file: str or pathlib.Path
-        points to a .zss, .zrr or .zmm that EMTF produced that will be compared
-        against the python aurora output
-    z_file_base: str
-        This is the z_file that aurora will write its output to
-
-
-
-    Returns
-    -------
-
-    """
-    processing_config = create_test_run_config(test_case_id, ds_df,
-                                                      matlab_or_fortran=emtf_version)
-
-
-    expected_rms_misfit = get_expected_rms_misfit(test_case_id, emtf_version)
-
-    process_synthetic_1_standard(
-        processing_config,
-        auxilliary_z_file,
-        z_file_base,
-        ds_df=ds_df,
-        expected_rms_misfit=expected_rms_misfit,
-        emtf_version=emtf_version,
-        make_rho_phi_plot=True,
-        show_rho_phi_plot=False,
-        use_subtitle=True,
-    )
     return
 
 
