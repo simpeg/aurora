@@ -237,65 +237,6 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
     return stft_obj
 
 
-def get_data_from_mth5(config, mth5_obj, run_id):
-    """
-    ToDo: Review if this method should be moved into mth5.  If that were the case,
-    the config being passed here should be replaced with a list of station_ids and
-    the config sampling_rate, so that there is no dependency on the config object in
-    mth5.
-    In a future version this could also take a decimation level as an argument.  It
-    could then be merged with prototype decimate, depending on the decimation level.
-
-    Parameters
-    ----------
-    config : decimation_level_config
-    mth5_obj
-
-    Returns
-    -------
-
-    Somewhat complicated function -- see issue #13.  Ultimately this method could be
-    embedded in mth5, where the specific attributes of the config needed for this
-    method are passed as explicit arguments.
-
-    Should be able to
-    1. accept a config and an mth5_obj and return decimation_level_0,
-    2. Accept data from a given decimation level, and decimation
-    instrucntions and return it
-    3. If we decide to house decimated data in an mth5 should return time
-    series for the run at the perscribed decimation level
-
-    Thus args are
-    decimation_level_config, mth5,
-    decimation_level_config, runs and run_ts'
-    decimation_level_config, mth5
-    Returns: tuple of dicts
-        Each dictionary is associated with a station, one for local and one
-        for remote at this point
-        Each Dict has keys "run" and "mvts" which are the mth5_run and the
-        mth5_run_ts objects respectively for the associated station
-    -------
-
-    """
-    # <LOCAL>
-    local_run_obj = mth5_obj.get_run(config["local_station_id"], run_id)
-    local_run_ts = local_run_obj.to_runts()
-    validate_sample_rate(local_run_ts, config.sample_rate)
-    local = {"run": local_run_obj, "mvts": local_run_ts.dataset, "run_id":run_id}
-    # </LOCAL>
-
-    # <REMOTE>
-    if config.reference_station_id:
-        remote_run_obj = mth5_obj.get_run(config["reference_station_id"], run_id)
-        remote_run_ts = remote_run_obj.to_runts()
-        validate_sample_rate(remote_run_ts, config.sample_rate)
-        remote = {"run": remote_run_obj, "mvts": remote_run_ts.dataset}
-    else:
-        remote = {"run": None, "mvts": None}
-    # </REMOTE>
-    return local, remote
-
-
 def get_data_from_mth5_new(mth5_obj, station_id, run_id, expected_sample_rate):
     """
     ToDo: Review if this method should be moved into mth5.  If that were the case,

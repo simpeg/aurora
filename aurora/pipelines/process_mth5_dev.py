@@ -20,7 +20,6 @@ import xarray as xr
 
 from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.time_series_helpers_new import calibrate_stft_obj
-from aurora.pipelines.time_series_helpers_new import get_data_from_mth5
 from aurora.pipelines.time_series_helpers_new import get_data_from_mth5_new
 from aurora.pipelines.time_series_helpers_new import prototype_decimate
 from aurora.pipelines.time_series_helpers_new import run_ts_to_calibrated_stft
