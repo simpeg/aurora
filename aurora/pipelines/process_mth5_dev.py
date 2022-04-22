@@ -103,59 +103,7 @@ def get_remote_stft(config, mth5_obj, run_id):
 
 
 
-def make_stft_objects(config, local, remote, units):
-    """
-    2022-02-08: Factor this out of process_tf_decimation_level in prep for merging
-    runs.
-    2022-03-13: This method to be deprecated/replaced by make_stft_objects_new (which
-    will eventually be renamed back to make_stft_objects after testing)
-    Parameters
-    ----------
-    config
-    local
-    remote
-
-    Returns
-    -------
-
-    """
-    local_run_obj = local["run"]
-    local_run_xrts = local["mvts"]
-
-    remote_run_obj = remote["run"]
-    remote_run_xrts = remote["mvts"]
-    # <CHECK DATA COVERAGE IS THE SAME IN BOTH LOCAL AND RR>
-    # This should be pushed into a previous validator before pipeline starts
-    # if config.reference_station_id:
-    #    local_run_xrts = local_run_xrts.where(local_run_xrts.time <=
-    #                                          remote_run_xrts.time[-1]).dropna(
-    #                                          dim="time")
-    # </CHECK DATA COVERAGE IS THE SAME IN BOTH LOCAL AND RR>
-
-    local_stft_obj = run_ts_to_stft(config, local_run_xrts)
-    local_scale_factors = config.station_scale_factors(config.local_station_id)
-    # local_stft_obj = run_ts_to_stft_scipy(config, local_run_xrts)
-    local_stft_obj = calibrate_stft_obj(
-        local_stft_obj,
-        local_run_obj,
-        units=units,
-        channel_scale_factors=local_scale_factors,
-    )
-    if config.reference_station_id:
-        remote_stft_obj = run_ts_to_stft(config, remote_run_xrts)
-        remote_scale_factors = config.station_scale_factors(config.reference_station_id)
-        remote_stft_obj = calibrate_stft_obj(
-            remote_stft_obj,
-            remote_run_obj,
-            units=units,
-            channel_scale_factors=remote_scale_factors,
-        )
-    else:
-        remote_stft_obj = None
-    return local_stft_obj, remote_stft_obj
-
-
-def make_stft_objects_new(processing_config, i_dec_level, run_obj, run_xrts, units,
+def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrts, units,
                           station_id):
     """
     Note 1: CHECK DATA COVERAGE IS THE SAME IN BOTH LOCAL AND RR
@@ -477,7 +425,7 @@ def process_mth5_from_dataset_definition(
             run_xrts = row["run_dataarray"].to_dataset("channel")
             print("The decimation_level_config here does not have the scale factors, "
                   "which are needed in make_stft_objects")
-            stft_obj = make_stft_objects_new(processing_config, i_dec_level, row["run"],
+            stft_obj = make_stft_objects(processing_config, i_dec_level, row["run"],
                                               run_xrts, units, row.station_id) #stftconfig
 
             if row.station_id == processing_config.stations.local.id:#local_station_id:
