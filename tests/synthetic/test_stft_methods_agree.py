@@ -34,13 +34,9 @@ def test_stft_methods_agree():
 
         if dec_level_id == 0:
             run_dict = get_data_from_mth5_new(mth5_obj, "test1", run_id, 1.0)
-            #local, remote = get_data_from_mth5(processing_config, mth5_obj, run_id)
         else:
             run_dict = prototype_decimate(dec_config.decimation, run_dict)
-            # if processing_config.reference_station_id:
-            #     remote = prototype_decimate(processing_config, remote)
-        # </GET DATA>
-        # local_run_obj = local["run"]
+
         local_run_xrts = run_dict["mvts"]
         dec_config.extra_pre_fft_detrend_type = ""
         local_stft_obj = run_ts_to_stft(dec_config, local_run_xrts)
