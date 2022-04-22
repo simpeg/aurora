@@ -4,7 +4,8 @@ from aurora.config.metadata.processing import Processing
 from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.process_mth5_dev import process_mth5_from_dataset_definition
 
-def process_sythetic_data(processing_config, dataset_definition, z_file_path=None):
+def process_sythetic_data(processing_config, dataset_definition, units="MT",
+                          z_file_path=""):
     """
 
     Parameters
@@ -37,6 +38,6 @@ def process_sythetic_data(processing_config, dataset_definition, z_file_path=Non
 
     tf_collection = process_mth5_from_dataset_definition(config,
                                                          dataset_definition,
-                                                         units="MT",
+                                                         units=units,
                                                          z_file_path=z_file_path)
     return tf_collection
