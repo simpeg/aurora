@@ -1,11 +1,9 @@
 from pathlib import Path
 
-from aurora.config.metadata.processing import Processing
 from aurora.general_helper_functions import TEST_PATH
-from aurora.pipelines.helpers import initialize_config
-from aurora.pipelines.process_mth5_dev import process_mth5_from_dataset_definition
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.test_utils.synthetic.make_processing_configs_new import create_test_run_config
+from aurora.test_utils.synthetic.processing_helpers import process_sythetic_data
 from aurora.test_utils.synthetic.rms_helpers import assert_rms_misfit_ok
 from aurora.test_utils.synthetic.rms_helpers import compute_rms
 from aurora.test_utils.synthetic.rms_helpers import get_expected_rms_misfit
@@ -27,44 +25,6 @@ EMTF_OUTPUT_PATH = SYNTHETIC_PATH.joinpath("emtf_output")
 AURORA_RESULTS_PATH = SYNTHETIC_PATH.joinpath("aurora_results")
 AURORA_RESULTS_PATH.mkdir(exist_ok=True)
 
-
-def process_sythetic_data(processing_config, dataset_definition, z_file_path=None):
-    """
-
-    Parameters
-    ----------
-    processing_config: str or Path, or a Processing() object
-        where the processing configuration file is found
-    dataset_definition: aurora.tf_kernel.dataset.DatasetDefinition
-        class that has a df that describes the runs to be processed.
-    z_file_path: str or Path
-        Optional, a place to store the output TF in EMTF z-file format.
-
-    Returns
-    -------
-    tf_collection:
-    aurora.transfer_function.transfer_function_collection.TransferFunctionCollection
-        Container for TF.  TransferFunctionCollection will probably be deprecated.
-
-    """
-    cond1 = isinstance(processing_config, str)
-    cond2 = isinstance(processing_config, Path)
-    if (cond1 or cond2):
-        print("This needs to be updated to work with new mt_metadata Processing object")
-        #load from a json path or string
-        config = initialize_config(processing_config)
-    elif isinstance(processing_config, Processing):
-        config = processing_config
-        mth5_path = config.stations.local.mth5_path
-    else:
-        print(f"processing_config has unexpected type {type(processing_config)}")
-        raise Exception
-
-    tf_collection = process_mth5_from_dataset_definition(config,
-                                                         dataset_definition,
-                                                         units="MT",
-                                                         z_file_path=z_file_path)
-    return tf_collection
 
 
 
@@ -223,7 +183,6 @@ def test_pipeline(merged=True):
 def test():
     test_pipeline(merged=False)
     test_pipeline(merged=True)
-    print("success")
 
 
 def main():
