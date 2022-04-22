@@ -22,7 +22,7 @@ def test_stft_methods_agree():
 
     # ensure h5 exists
     if not mth5_path.exists():
-        from make_mth5_from_asc import create_test1_h5
+        from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
 
         create_test1_h5()
     # this seems to be needed for git actions

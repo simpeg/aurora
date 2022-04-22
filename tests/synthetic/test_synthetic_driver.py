@@ -1,12 +1,9 @@
 from aurora.general_helper_functions import TEST_PATH
 from aurora.pipelines.process_mth5 import process_mth5_run
+from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
+from aurora.test_utils.synthetic.make_mth5_from_asc import create_test2_h5
+from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
 from aurora.test_utils.synthetic.make_processing_configs import create_test_run_config
-#from aurora.test_utils.synthetic.make_processing_configs_new import
-# create_test_run_config
-
-from make_mth5_from_asc import create_test1_h5
-from make_mth5_from_asc import create_test2_h5
-from make_mth5_from_asc import create_test12rr_h5
 
 
 CONFIG_PATH = TEST_PATH.joinpath("synthetic", "config")
@@ -76,7 +73,7 @@ def process_synthetic_2():
 
 def process_synthetic_rr12():
     test_config = create_test_run_config("test1r2")
-    from synthetic_station_config import make_station_01_config_dict
+    from aurora.test_utils.synthetic.synthetic_station_config import make_station_01_config_dict
     station_01_params = make_station_01_config_dict()
     run_id = station_01_params["run_id"]
     process_mth5_run(test_config, run_id, units="MT", show_plot=False)
