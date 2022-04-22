@@ -307,9 +307,11 @@ def get_data_from_mth5_new(mth5_obj, station_id, run_id, expected_sample_rate):
 
     Parameters
     ----------
-    config : decimation_level_config
-    mth5_obj
-
+    mth5_obj:
+    station_id
+    run_id
+    sample_rate : float (may choose to also support  None)
+        expected sample rate of data in the mth5
     Returns
     -------
 
@@ -337,6 +339,7 @@ def get_data_from_mth5_new(mth5_obj, station_id, run_id, expected_sample_rate):
     """
     run_obj = mth5_obj.get_run(station_id, run_id)
     run_ts = run_obj.to_runts()
+    #if expected_sample_rate:
     validate_sample_rate(run_ts, expected_sample_rate)
     output = {"run": run_obj, "mvts": run_ts.dataset, "run_id":run_id}
     return output

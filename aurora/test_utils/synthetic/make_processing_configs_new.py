@@ -55,7 +55,7 @@ def create_test_run_config(test_case_id, ds_df, matlab_or_fortran=""):
 
     cc = ConfigCreator(config_path=CONFIG_PATH)
     
-    if test_case_id=="test1":
+    if test_case_id in ["test1", "test2"]:
         p = cc.create_run_processing_object(emtf_band_file=emtf_band_setup_file)
         p.id = config_id
         p.stations.from_dataset_dataframe(ds_df)
@@ -69,7 +69,7 @@ def create_test_run_config(test_case_id, ds_df, matlab_or_fortran=""):
 
         p.drop_reference_channels()
 
-    elif (test_case_id=="test2r1") or (test_case_id=="test1r2"):
+    elif test_case_id in ["test2r1", "test1r2"]:
         config_id = f"{config_id}-RR{reference_station_id}"
         p = cc.create_run_processing_object(emtf_band_file=emtf_band_setup_file)
         p.id = config_id
