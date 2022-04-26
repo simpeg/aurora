@@ -8,7 +8,7 @@ import pandas as pd
 
 import mth5
 
-def channel_summary_to_dataset_definition(ch_summary):
+def channel_summary_to_run_summary(ch_summary):
     """
     TODO: replace station_id with station, and run_id with run
     TODO: Add logic for handling input and output channels based on channel
@@ -76,8 +76,8 @@ def channel_summary_to_dataset_definition(ch_summary):
     data_dict["sample_rate"] = sample_rates
     data_dict["input_channels"] = input_channels
     data_dict["output_channels"] = output_channels
-    dataset_definition = pd.DataFrame(data=data_dict)
-    return dataset_definition
+    run_summary = pd.DataFrame(data=data_dict)
+    return run_summary
 
 
 class DatasetDefinition():
@@ -150,7 +150,7 @@ class DatasetDefinition():
             channel_summary_df = channel_summary.to_dataframe()
         elif isinstance(channel_summary, pd.DataFrame):
             channel_summary_df = channel_summary
-        df = channel_summary_to_dataset_definition(channel_summary_df)
+        df = channel_summary_to_run_summary(channel_summary_df)
         df.sort_values(by=["station_id", "run_id", "start"], inplace=True)
         self.df = df
         return self.df
