@@ -61,7 +61,7 @@ def scan_inventory_for_nonconformity(inventory, verbose=False):
                         msg = f"{msg} {stage.input_units}"
                         print(msg)
                     if stage.input_units == "T":
-                        stage.input_units == "nT"
+                        stage.input_units = "nT"
                         stage.stage_gain *= 1e-9
                 # print(f"{channel}")
             # <Tesla to nanoTesla>
