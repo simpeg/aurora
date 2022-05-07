@@ -9,12 +9,16 @@ plt.ion()
 
 def load_bf4_fap_for_parkfield_test_using_mt_metadata(frequencies):
     """
-    ToDo: we could go so far as to add the hardware repsonses (AAF and
-    digitizer) here but anywhere away from the Nyquist we are getting
-    reasonable results, and near the Nyquist the filters are insuffucient to
-    calibrate.  It looks from the plots like the intrinsic noise in the data
-    is larger than that in the DAQ and as a result we appear to
-    overcompensate in calibration.  This is not surprising.
+    The hardware repsonses (AAF and digitizer) are not included in this response,
+    but these do not make any significant difference away from the Nyquist frequecny.
+
+    Near the Nyquist calibration is inadequate anyhow.  Looking at the output plots,
+    which show the "full calibration" vs "response table (EMI)", neither one is
+    realistic at high frequency.  The fap ("response table (EMI)") curve does not
+    compensate for AAF and plunges down at high frequency.  The full calibration
+    from the PZ response on the other hand rises unrealistically.  The PZ rising
+    signal amplitude at high frequency is an artefact of calibrating noise.
+
     Parameters
     ----------
     frequencies : numpy array
@@ -41,11 +45,33 @@ def plot_responses(
     figures_path,
     show_response_curves,
 ):
+    """
+
+    Parameters
+    ----------
+    key : str
+        The channel name, "hx", "hy", "ex", "ey", "hz"
+    frequencies : numpy array
+        The frequencies at which the response will be plotted
+    pz_calibration_response : numpy.ndarray
+        The complex-values resposne function from the pole-zero response
+    bf4_resp : None or numpy.ndarray
+        The complex-values resposne function from the BF-4 coil only.
+    figures_path : str or Path
+        Where the figures will be saved
+    show_response_curves : bool
+        If True, plots flash to screen - for debugging
+
+    Returns
+    -------
+
+    """
 
     if key[0].lower() == "h":
         response_units = "counts/nT"
     else:
         response_units = "counts/mV/km"
+
     plt.figure(1)
     plt.clf()
     plt.loglog(frequencies, np.abs(pz_calibration_response), label="pole-zero")
@@ -74,7 +100,8 @@ def parkfield_sanity_check(
 
     Parameters
     ----------
-    fft_obj
+    fft_obj : xarray.core.dataset.Dataset
+        The FFT of the data.  This is actually an STFT but with only one time window.
 
     Returns
     -------
@@ -103,8 +130,7 @@ def parkfield_sanity_check(
 
         if channel.channel_response_filter.units_in.lower() in ["t", "tesla"]:
             print("WARNING: Expecting nT but got T")
-            pz_calibration_response *= 1e-9
-            print("\tConverting units to nT")
+
         # Frequency response table response
         bf4_resp = None
         if bf4:
@@ -130,15 +156,13 @@ def parkfield_sanity_check(
         n_smooth = 131  # use 1 for no smoothing
         show_raw = 0
         raw_spectral_density = fft_obj[key].data[:, 1:]
-        raw_spectral_density = (
-            raw_spectral_density.squeeze()
-        )  # because only 1 FFT window
+        raw_spectral_density = (raw_spectral_density.squeeze())  # only 1 FFT window
         calibrated_data_pz = raw_spectral_density / pz_calibration_response
         smooth_calibrated_data_pz = medfilt(np.abs(calibrated_data_pz), n_smooth)
         if bf4:
             calibrated_data_fap = raw_spectral_density / np.abs(bf4_resp)
             smooth_calibrated_data_fap = medfilt(np.abs(calibrated_data_fap), n_smooth)
-        # Add assert test issue #156 here:
+
         if bf4 & (key == "hx"):
             schumann_cond = (frequencies > 7.6) & (frequencies < 8.0)
             schumann_amplitude_fap = np.median(
@@ -150,6 +174,8 @@ def parkfield_sanity_check(
                 print("ERROR in response calculation")
                 print("See issue #156")
                 print("Amplitude of field around Schumann band incorrect")
+                raise Exception
+
         # Do Plotting (can factor this out)
         plt.figure(2)
         plt.clf()

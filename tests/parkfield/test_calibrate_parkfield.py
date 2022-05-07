@@ -1,7 +1,7 @@
 from aurora.general_helper_functions import TEST_PATH
 from aurora.time_series.windowing_scheme import WindowingScheme
 from mth5.mth5 import MTH5
-from calibration_helpers import parkfield_sanity_check
+from aurora.test_utils.parkfield.calibration_helpers import parkfield_sanity_check
 from helpers import AURORA_RESULTS_PATH
 
 
@@ -34,8 +34,8 @@ def test():
     parkfield_h5_path = TEST_PATH.joinpath("parkfield", "data", "pkd_test_00.h5")
     if not parkfield_h5_path.exists():
         from make_parkfield_mth5 import test_make_parkfield_mth5
-
         test_make_parkfield_mth5()
+
     m = MTH5(file_version="0.1.0")
     m.open_mth5(parkfield_h5_path, mode="r")
     run_obj = m.get_run(station_id, run_id)
