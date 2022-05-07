@@ -1,4 +1,6 @@
 """
+Process an MTH5 using the metdata config object.
+
 Note 1: process_mth5_run assumes application of cascading decimation, and that the
 decimated data will be accessed from the previous decimation level.  This should be
 revisited. It may make more sense to have a get_decimation_level() interface that
@@ -15,10 +17,14 @@ packaging the tf for export.  This could be worked around by extracting the meta
 at the start of this method. In fact, it would be a good idea in general to run a
 pre-check on the data that identifies which decimation levels are valid for each run.
 """
+# =============================================================================
+# Imports
+# =============================================================================
+
 import pandas as pd
 import xarray as xr
 
-from aurora.pipelines.helpers import initialize_config
+from aurora.pipelines.helpers_new import initialize_config
 from aurora.pipelines.time_series_helpers_new import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers_new import get_data_from_mth5_new
 from aurora.pipelines.time_series_helpers_new import prototype_decimate
@@ -39,6 +45,7 @@ from aurora.transfer_function.TTFZ import TTFZ
 from aurora.tf_kernel.dataset import DatasetDefinition
 from mt_metadata.transfer_functions.core import TF
 from mth5.mth5 import MTH5
+# =============================================================================
 
 
 def initialize_pipeline(run_config):#, local_mth5_obj=None, remote_mth5_obj=None):
