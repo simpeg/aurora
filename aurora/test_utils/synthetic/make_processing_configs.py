@@ -1,12 +1,12 @@
+from aurora.config import BANDS_DEFAULT_FILE
+from aurora.config import BANDS_256_FILE
 from aurora.config.config_creator import ConfigCreator
-from aurora.general_helper_functions import BAND_SETUP_PATH
 from aurora.general_helper_functions import TEST_PATH
 
 CONFIG_PATH = TEST_PATH.joinpath("synthetic", "config")
-DATA_PATH = TEST_PATH.joinpath("synthetic", "data")
 
 
-def create_test_run_config(test_case_id, matlab_or_fortran=""):
+def create_test_run_config(test_case_id, ds_df, matlab_or_fortran="", save="json"):
     """
     Use config creator to generate a processing config file for the synthetic data.  
     
@@ -20,10 +20,8 @@ def create_test_run_config(test_case_id, matlab_or_fortran=""):
     Returns
     -------
 
+    
     """
-    mth5_path = DATA_PATH.joinpath(f"{test_case_id}.h5")
-
-    cc = ConfigCreator(config_path=CONFIG_PATH)
     estimation_engine = "RME"
     local_station_id = test_case_id
     reference_station_id = ""
@@ -33,53 +31,116 @@ def create_test_run_config(test_case_id, matlab_or_fortran=""):
         reference_channels = ["hx", "hy"]
         local_station_id = "test1"
         reference_station_id = "test2"
-        mth5_path = DATA_PATH.joinpath("test12rr.h5")
     if test_case_id == "test2r1":
         estimation_engine = "RME_RR"
         reference_channels = ["hx", "hy"]
         local_station_id = "test2"
         reference_station_id = "test1"
-        mth5_path = DATA_PATH.joinpath("test12rr.h5")
 
     if matlab_or_fortran == "matlab":
-        band_setup_file = BAND_SETUP_PATH.joinpath("bs_256_26.cfg")
+        emtf_band_setup_file = BANDS_256_FILE
         num_samples_window = 256
         num_samples_overlap = 64
         config_id = f"{local_station_id}-{matlab_or_fortran}"
     elif matlab_or_fortran == "fortran":
-        band_setup_file = BAND_SETUP_PATH.joinpath("bs_test.cfg")
+        emtf_band_setup_file = BANDS_DEFAULT_FILE
         num_samples_window = 128
         num_samples_overlap = 32
         config_id = f"{local_station_id}-{matlab_or_fortran}"
     else:
-        band_setup_file = BAND_SETUP_PATH.joinpath("bs_test.cfg")
+        emtf_band_setup_file = BANDS_DEFAULT_FILE
         num_samples_window = 128
         num_samples_overlap = 32
         config_id = f"{local_station_id}"
 
-    run_config_path = cc.create_run_config(
-        station_id=local_station_id,
-        mth5_path=mth5_path,
-        sample_rate=1.0,
-        num_samples_window=num_samples_window,
-        num_samples_overlap=num_samples_overlap,
-        config_id=config_id,
-        output_channels=["hz", "ex", "ey"],
-        reference_station_id=reference_station_id,
-        reference_channels=reference_channels,
-        band_setup_file = str(band_setup_file),
-        estimation_engine=estimation_engine,
-    )
-    return run_config_path
+    cc = ConfigCreator(config_path=CONFIG_PATH)
+    
+    if test_case_id in ["test1", "test2"]:
+        p = cc.create_run_processing_object(emtf_band_file=emtf_band_setup_file)
+        p.id = config_id
+        p.stations.from_dataset_dataframe(ds_df)
+
+        for decimation in p.decimations:
+            decimation.estimator.engine = estimation_engine
+            decimation.window.type = "hamming"
+            decimation.window.num_samples = num_samples_window
+            decimation.window.overlap = num_samples_overlap
+            decimation.regression.max_redescending_iterations = 2
+
+        p.drop_reference_channels()
+
+    elif test_case_id in ["test2r1", "test1r2"]:
+        config_id = f"{config_id}-RR{reference_station_id}"
+        p = cc.create_run_processing_object(emtf_band_file=emtf_band_setup_file)
+        p.id = config_id
+        p.stations.from_dataset_dataframe(ds_df)
+
+        for decimation in p.decimations:
+            decimation.estimator.engine = estimation_engine
+            decimation.window.type = "hamming"
+            decimation.window.num_samples = num_samples_window
+            decimation.window.overlap = num_samples_overlap
+            decimation.regression.max_redescending_iterations = 2
+            decimation.reference_channels = reference_channels
+
+    if save == "json":
+        cc.to_json(p)
+
+    return p
 
 
 
+
+def test_to_from_json():
+    """
+    Test related to issue #172
+    Trying to save to json and then read back a Processing object
+
+    Start by manually creating the dataset_df for syntehtic test1
+
+
+    Returns
+    -------
+
+    """
+    import pandas as pd
+    from aurora.config.metadata import Processing
+    from aurora.general_helper_functions import TEST_PATH
+    from aurora.tf_kernel.dataset import RUN_SUMMARY_COLUMNS
+
+    #Specify path to mth5
+    data_path = TEST_PATH.joinpath("synthetic").joinpath("data").joinpath("test1.h5")
+    if not data_path.exists():
+        print("You need to run make_mth5_from_asc.py")
+        raise Exception
+
+    # create run summary
+    df = pd.DataFrame(columns=RUN_SUMMARY_COLUMNS)
+    df["station_id"] = ["test1",]
+    df["run_id"] = ["001",]
+    df["remote"] = False
+    df["output_channels"] = [['ex', 'ey', 'hz'],]
+    df["input_channels"] = [['hx', 'hy'],]
+    df["start"] = [pd.Timestamp("1980-01-01 00:00:00")]
+    df["end"] = [pd.Timestamp("1980-01-01 11:06:39")]
+    df["sample_rate"] = [1.0]
+    df["mth5_path"] = str(data_path)
+
+    #create processing config, and save to a json file
+    p = create_test_run_config("test1", df, save="json")
+
+    #test can read json back into Processing obj:
+    json_fn = CONFIG_PATH.joinpath(p.json_fn())
+    p2 = Processing()
+    p2.from_json(json_fn)
+    return
 
 def main():
-    create_run_config_for_test_case("test1")
-    create_run_config_for_test_case("test2")
-    create_run_config_for_test_case("test1r2")
-    create_run_config_for_test_case("test2r1")
+    test_to_from_json()
+    # create_test_run_config("test1", df)
+    # create_test_run_config("test2")
+    # create_test_run_config("test1r2")
+    # create_test_run_config("test2r1")
 
 if __name__ == "__main__":
     main()

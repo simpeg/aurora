@@ -5,7 +5,7 @@ from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test2_h5
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
-from aurora.test_utils.synthetic.make_processing_configs_new import create_test_run_config
+from aurora.test_utils.synthetic.make_processing_configs import create_test_run_config
 from aurora.test_utils.synthetic.processing_helpers import process_sythetic_data
 from aurora.test_utils.synthetic.rms_helpers import assert_rms_misfit_ok
 from aurora.test_utils.synthetic.rms_helpers import compute_rms
@@ -127,8 +127,10 @@ def run_test1(emtf_version, ds_df):
 
     Parameters
     ----------
-    emtf_version
-    ds_df
+    emtf_version : string
+        "matlab", or "fortran"
+    ds_df : pandas.DataFrame
+        Basically a run_summary dataframe
 
     Returns
     -------
@@ -142,6 +144,16 @@ def run_test1(emtf_version, ds_df):
     return
 
 def run_test2r1(ds_df):
+    """
+
+    Parameters
+    ----------
+    ds_df : pandas.DataFrame
+        Basically a run_summary dataframe
+    Returns
+    -------
+
+    """
     print(f"Test2r1")
     test_case_id = "test2r1"
     emtf_version = "fortran"
@@ -167,6 +179,18 @@ def make_mth5s(merged=True):
 
 
 def test_pipeline(merged=True):
+    """
+
+    Parameters
+    ----------
+    merged: bool
+        If true, summarise two separate mth5 files and merge their run summaries
+        If False, use an already-merged mth5
+
+    Returns
+    -------
+
+    """
     mth5_paths = make_mth5s(merged=merged)
     super_summary = extract_run_summaries_from_mth5s(mth5_paths)
 
