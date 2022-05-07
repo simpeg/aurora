@@ -7,6 +7,8 @@ import copy
 import pandas as pd
 
 import mth5
+RUN_SUMMARY_COLUMNS = ["station_id", "run_id", "start", "end", "sample_rate",
+                       "input_channels", "output_channels", "remote", "mth5_path"]
 
 def channel_summary_to_run_summary(ch_summary):
     """
@@ -225,3 +227,11 @@ class DatasetDefinition():
         return df
 
 
+
+
+def main():
+    return
+
+
+if __name__ == "__main__":
+    main()
