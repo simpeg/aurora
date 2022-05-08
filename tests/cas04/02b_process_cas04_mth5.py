@@ -13,7 +13,7 @@ from aurora.config.config_creator import ConfigCreator
 from aurora.config.processing_config import RunConfig
 from aurora.general_helper_functions import TEST_PATH
 from aurora.pipelines.process_mth5 import process_mth5_run
-from aurora.pipelines.process_mth5_dev import process_mth5_from_dataset_definition
+from aurora.pipelines.process_mth5_dev import process_mth5
 from aurora.tf_kernel.dataset import channel_summary_to_run_summary
 from aurora.tf_kernel.base import TransferFunctionKernel
 from aurora.tf_kernel.dataset import DatasetDefinition
@@ -81,7 +81,7 @@ def process_run_a(config_path, mth5_path):
 
 def process_with_dataset_definition(config_path, mth5_path, dataset_dfn,
                                           show_plot=False, z_file_path="test.zss"):
-    tf_cls = process_mth5_from_dataset_definition(
+    tf_cls = process_mth5(
         config_path,
         dataset_dfn,
         mth5_path=mth5_path,

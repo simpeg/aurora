@@ -2,7 +2,7 @@ from pathlib import Path
 
 from aurora.config.metadata.processing import Processing
 from aurora.pipelines.helpers import initialize_config
-from aurora.pipelines.process_mth5_dev import process_mth5_from_dataset_definition
+from aurora.pipelines.process_mth5_dev import process_mth5
 
 def process_sythetic_data(processing_config, dataset_definition, units="MT",
                           z_file_path=""):
@@ -36,8 +36,6 @@ def process_sythetic_data(processing_config, dataset_definition, units="MT",
         print(f"processing_config has unexpected type {type(processing_config)}")
         raise Exception
 
-    tf_collection = process_mth5_from_dataset_definition(config,
-                                                         dataset_definition,
-                                                         units=units,
-                                                         z_file_path=z_file_path)
+    tf_collection = process_mth5(config, dataset_definition, units=units, 
+                                 z_file_path=z_file_path)
     return tf_collection

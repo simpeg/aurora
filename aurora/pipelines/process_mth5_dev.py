@@ -344,7 +344,7 @@ def close_mths_objs(df):
     return
 
 
-def process_mth5_from_dataset_definition(
+def process_mth5(
         run_cfg,
         dataset_definition=None,
         units="MT",
