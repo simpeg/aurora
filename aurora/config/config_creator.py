@@ -15,7 +15,6 @@ from pathlib import Path
 
 from aurora.config.decimation_level_config import DecimationLevelConfig
 from aurora.config.processing_config import RunConfig
-from aurora.general_helper_functions import BAND_SETUP_PATH
 from aurora.config import Processing, Station, Run, BANDS_DEFAULT_FILE
 
 
@@ -30,7 +29,7 @@ class ConfigCreator:
     def create_run_config(
         self, station_id="", run_id="", mth5_path="", sample_rate=-1.0, **kwargs
     ):
-        default_band_setup = str(BAND_SETUP_PATH.joinpath("bs_test.cfg"))
+        default_band_setup = str(BANDS_DEFAULT_FILE)
         config_id = kwargs.get("config_id", f"{station_id}-{run_id}")
         decimation_factors = kwargs.get("decimation_factors", [1, 4, 4, 4])
         num_samples_window = kwargs.get("num_samples_window", 128)
