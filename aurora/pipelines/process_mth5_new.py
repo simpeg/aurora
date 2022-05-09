@@ -48,43 +48,24 @@ from mth5.mth5 import MTH5
 # =============================================================================
 
 
-def initialize_pipeline(run_config):
+def initialize_pipeline(config):
     """
-    A place to organize args and kwargs.
-    This could be split into initialize_config() and initialize_mth5()
+    Prepare to process data, get mth5 objects open in read mode and processing_config
+    initialized if needed.
 
     Parameters
     ----------
-    run_config : str, pathlib.Path, or a RunConfig object
+    config : str, pathlib.Path, or aurora.config.metadata.processing.Processing object
         If str or Path is provided, this will read in the config and return it as a
         RunConfig object.
-    mth5_path : string or pathlib.Path
-        optional argument.  If it is provided, it overrides the path in the RunConfig
-        object
 
     Returns
     -------
-    config : aurora.config.processing_config import RunConfig
-    mth5_obj :
+    config : aurora.config.metadata.processing.Processing
+    local_mth5_obj : mth5.mth5.MTH5
+    remote_mth5_obj: mth5.mth5.MTH5
     """
-    config = initialize_config(run_config)
-
-
-    # <Initialize mth5 for reading>
-    # from aurora.config.processing_config import RunConfig
-    # if isinstance(config, RunConfig):
-    #     if mth5_path:
-    #         if config["mth5_path"] != str(mth5_path):
-    #             print(
-    #                 "Warning - the mth5 path supplied to initialize pipeline differs"
-    #                 "from the one in the config file"
-    #             )
-    #             print(f"config path changing from \n{config['mth5_path']} to \n{mth5_path}")
-    #             config.mth5_path = str(mth5_path)
-    #         mth5_obj = MTH5(file_version="0.1.0")
-    #         mth5_obj.open_mth5(config["mth5_path"], mode="r")
-    #         return config, mth5_obj
-    # else:
+    config = initialize_config(config)
 
     local_mth5_obj = MTH5(file_version="0.1.0")
     local_mth5_obj.open_mth5(config.stations.local.mth5_path, mode="r")
@@ -93,8 +74,14 @@ def initialize_pipeline(run_config):
         remote_mth5_obj.open_mth5(config.stations.remote[0].mth5_path, mode="r")
     else:
         remote_mth5_obj = None
-    # </Initialize mth5 for reading>
-    return config, local_mth5_obj, remote_mth5_obj
+
+    #Make a dict of the active mth5_objects (keyed by station_id? namespace clash?)
+    #Maybe just use the keys "local" and "remote"?
+    mth5_objs = {config.stations.local.id:local_mth5_obj}
+    if config.stations.remote:
+        mth5_objs[config.stations.remote[0].id] = remote_mth5_obj
+
+    return config, mth5_objs
 
 
 def get_remote_stft(config, mth5_obj, run_id):
@@ -380,16 +367,11 @@ def process_mth5(
 
     """
     
-    processing_config, local_mth5_obj, remote_mth5_obj = initialize_pipeline(config)
+    processing_config, mth5_objs = initialize_pipeline(config)
 
     dataset_df = dataset_definition.df
     #</Move into TFKernel()>
 
-    #move this into initialize_pipeline?  maybe even into TF Kernel?
-    #Make a dict of the active mth5_objects (keyed by station_id? namespace clash?)
-    mth5_objs = {processing_config.stations.local.id:local_mth5_obj}
-    if processing_config.stations.remote:
-        mth5_objs[processing_config.stations.remote[0].id] = remote_mth5_obj
     #flesh out dataset_df, populate the with mth5_objs
     all_mth5_objs = len(dataset_df) * [None]
     for i, station_id in enumerate(dataset_df["station_id"]):
