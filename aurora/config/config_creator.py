@@ -100,7 +100,8 @@ class ConfigCreator:
         :rtype: TYPE
 
         """
-        processing_obj = Processing(id=f"{station_id}-{run_id}", **kwargs)
+        processing_id = f"{station_id}-{run_id}"
+        processing_obj = Processing(id=processing_id, **kwargs)
         
         if not isinstance(run_id, list):
             run_id = [run_id]

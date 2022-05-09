@@ -345,7 +345,7 @@ def close_mths_objs(df):
 
 
 def process_mth5(
-        run_cfg,
+        config,
         dataset_definition=None,
         units="MT",
         show_plot=False,
@@ -375,9 +375,10 @@ def process_mth5(
     are valid for which decimation levels, or for which effective sample rates.
     Parameters
     ----------
-    run_cfg: aurora.config.processing_config.RunConfig object or path to json
-    representation of that config
-    run_ids: list of strings, supports a single string as well
+    config: aurora.config.metadata.processing.Processing object or path to json
+        All processing parameters
+    dataset_definition: aurora.tf_kernel.dataset.DatasetDefinition or None
+        Specifies what datasets to process according to config
     units: string
         "MT" or "SI".  To be deprecated once data have units embedded
     show_plot: boolean
@@ -393,7 +394,7 @@ def process_mth5(
 
     """
     
-    processing_config, local_mth5_obj, remote_mth5_obj = initialize_pipeline(run_cfg)
+    processing_config, local_mth5_obj, remote_mth5_obj = initialize_pipeline(config)
 
     dataset_df = dataset_definition.df
     #</Move into TFKernel()>
@@ -498,7 +499,13 @@ def process_mth5(
         station_metadata._runs = []
         run_metadata = local_run_obj.metadata
         station_metadata.add_run(run_metadata)
-        survey_dict = mth5_obj.survey_group.metadata.to_dict()
+        if len(mth5_objs) == 1:
+            key = list(mth5_objs.keys())[0]
+            survey_dict = mth5_objs[key].survey_group.metadata.to_dict()
+        else:
+            print("We do not currently handle multiple mth5 objs for "
+                  "non-tf_collection output")
+            raise Exception
 
         print(station_metadata.run_list)
         tf_cls = export_tf(
