@@ -53,6 +53,9 @@ def initialize_pipeline(config):
     Prepare to process data, get mth5 objects open in read mode and processing_config
     initialized if needed.
 
+    ToDo: Review dict.  Theoretically, you could get namespace clashes here.
+    Could key by survey-station, but also just use the keys "local" and "remote"
+
     Parameters
     ----------
     config : str, pathlib.Path, or aurora.config.metadata.processing.Processing object
@@ -62,8 +65,10 @@ def initialize_pipeline(config):
     Returns
     -------
     config : aurora.config.metadata.processing.Processing
-    local_mth5_obj : mth5.mth5.MTH5
-    remote_mth5_obj: mth5.mth5.MTH5
+    mth5_objs : dict
+        Keyed by station_ids.
+        local_mth5_obj : mth5.mth5.MTH5
+        remote_mth5_obj: mth5.mth5.MTH5
     """
     config = initialize_config(config)
 
@@ -75,8 +80,6 @@ def initialize_pipeline(config):
     else:
         remote_mth5_obj = None
 
-    #Make a dict of the active mth5_objects (keyed by station_id? namespace clash?)
-    #Maybe just use the keys "local" and "remote"?
     mth5_objs = {config.stations.local.id:local_mth5_obj}
     if config.stations.remote:
         mth5_objs[config.stations.remote[0].id] = remote_mth5_obj
@@ -240,14 +243,6 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
     -------
 
     """
-    #<This will be replaced by a 1-line call issue #153>
-    # processing_config = run_config.decimation_level_configs[dec_level_id]
-    # processing_config.local_station_id = run_config.local_station_id
-    # processing_config.reference_station_id = run_config.reference_station_id
-    # processing_config.channel_scale_factors = run_config.channel_scale_factors
-    #</This will be replaced by a 1-line call issue #153>
-
-
     # local_dataset_defn_df = defn_df[defn_df[
     #                                     "station_id"]==processing_config.local_station_id]
     # remote_dataset_defn_df = defn_df[defn_df[
@@ -292,7 +287,7 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
 
             all_run_objs[i] = run_dict["run"]
             all_run_ts_objs[i] = run_dict["mvts"]
-            #careful here, i must run from 0 to len(df), otherwise will get
+            #careful here, (i)ndex must run from 0 to len(df), otherwise will get
             # indexing errors.  Maybe reset_index() before this loop?
             # or push reindexing into TF Kernel, so that this method only gets
             # a cleanly indexed df, restricted to only the runs to be processed for
