@@ -48,7 +48,7 @@ from mth5.mth5 import MTH5
 # =============================================================================
 
 
-def initialize_pipeline(run_config):#, local_mth5_obj=None, remote_mth5_obj=None):
+def initialize_pipeline(run_config):
     """
     A place to organize args and kwargs.
     This could be split into initialize_config() and initialize_mth5()
@@ -85,7 +85,7 @@ def initialize_pipeline(run_config):#, local_mth5_obj=None, remote_mth5_obj=None
     #         mth5_obj.open_mth5(config["mth5_path"], mode="r")
     #         return config, mth5_obj
     # else:
-    print("New mt_metadataa Processing class")
+
     local_mth5_obj = MTH5(file_version="0.1.0")
     local_mth5_obj.open_mth5(config.stations.local.mth5_path, mode="r")
     if config.stations.remote:

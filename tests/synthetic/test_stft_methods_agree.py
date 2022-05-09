@@ -4,8 +4,6 @@ method returns the same array as scipy.signal.spectrogram
 """
 import numpy as np
 
-from aurora.general_helper_functions import TEST_PATH
-from aurora.pipelines.process_mth5 import initialize_pipeline
 from aurora.pipelines.time_series_helpers_new import get_data_from_mth5_new
 from aurora.pipelines.time_series_helpers_new import prototype_decimate
 from aurora.pipelines.time_series_helpers_new import run_ts_to_stft
@@ -19,8 +17,8 @@ from mth5.mth5 import MTH5
 def test_stft_methods_agree():
     mth5_path = create_test1_h5()
     mth5_paths = [mth5_path, ]
-    super_summary = extract_run_summaries_from_mth5s(mth5_paths)
-    dataset_df = super_summary[super_summary.station_id=="test1"]
+    run_summary = extract_run_summaries_from_mth5s(mth5_paths)
+    dataset_df = run_summary[run_summary.station_id=="test1"]
     dataset_df["remote"] = False
 
     processing_config = create_test_run_config("test1", dataset_df)
