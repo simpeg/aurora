@@ -4,7 +4,7 @@ from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config.config_creator import ConfigCreator
 from aurora.config.metadata import Processing
 
-from aurora.pipelines.process_mth5_dev import process_mth5
+from aurora.pipelines.process_mth5_new import process_mth5
 from aurora.test_utils.parkfield.path_helpers import AURORA_RESULTS_PATH
 from aurora.test_utils.parkfield.path_helpers import CONFIG_PATH
 from aurora.test_utils.parkfield.path_helpers import DATA_PATH

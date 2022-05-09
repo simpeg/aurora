@@ -13,7 +13,7 @@ from aurora.config.config_creator import ConfigCreator
 from aurora.config.processing_config import RunConfig
 from aurora.general_helper_functions import TEST_PATH
 from aurora.pipelines.process_mth5 import process_mth5_run
-from aurora.pipelines.process_mth5_dev import process_mth5
+from aurora.pipelines.process_mth5_new import process_mth5
 from aurora.tf_kernel.dataset import channel_summary_to_run_summary
 from aurora.tf_kernel.base import TransferFunctionKernel
 from aurora.tf_kernel.dataset import DatasetDefinition
