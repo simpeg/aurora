@@ -131,6 +131,8 @@ class ConfigCreator:
                     sr = sample_rate / (d ** int(key))
                 processing_obj.decimations_dict[key].decimation.factor = d
                 processing_obj.decimations_dict[key].decimation.sample_rate = sr
+                processing_obj.decimations_dict[key].input_channels = input_channels
+                processing_obj.decimations_dict[key].output_channels = output_channels
 
         return processing_obj
     

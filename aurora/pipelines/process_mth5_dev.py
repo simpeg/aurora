@@ -354,20 +354,6 @@ def process_mth5(
         **kwargs,
 ):
     """
-    2022-02-08: TODO: Replace run_id (string) with a list, or, maybe,
-    support either a list of strings or a single string.
-    2022-03-07: TODO: Note that run_lists will in general be different at the local
-    and remote stations.  If the run_lists are not provided specifically,
-    we can extract them from the mth5s.  I would prefer to handle all that logic outside
-    of this method, which expects the decision of what to process to be already made.
-    Thus, we need run_lists with time_intervals, thus we are back at the dataset
-    defintion
-    2022-03-12: We could still support run_ids as a list, and what would happen is we
-    would then build the DatasetDefinition from the mth5.channel_summary and the
-    run_list.  But this would be best done outside this method.  Basically, we want
-    to have a dataset_definition.  If one is not given one will be generated.
-    2022-03-13: This method will eventually replace process_mth5_run and
-    process_mth5_runs and be named process_mth5.
 
     Stages here:
     1. Read in the config and figure out how many decimation levels there are
