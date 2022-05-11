@@ -9,8 +9,12 @@ import pandas as pd
 import mth5
 RUN_SUMMARY_COLUMNS = ["station_id", "run_id", "start", "end", "sample_rate",
                        "input_channels", "output_channels", "remote", "mth5_path"]
+INPUT_CHANNELS = ["hx", "hy", ]
+OUTPUT_CHANNELS = ["ex", "ey", "hz", ]
 
-def channel_summary_to_run_summary(ch_summary):
+def channel_summary_to_run_summary(ch_summary,
+                                   allowed_input_channels=INPUT_CHANNELS,
+                                   allowed_output_channels=OUTPUT_CHANNELS):
     """
     TODO: replace station_id with station, and run_id with run
     TODO: Add logic for handling input and output channels based on channel
@@ -37,6 +41,18 @@ def channel_summary_to_run_summary(ch_summary):
        If its a dataframe it is a representation of an mth5 channel_summary.
         Maybe restricted to only have certain stations and runs before being passed to
         this method
+    allowed_input_channels: list of strings
+        Normally ["hx", "hy", ]
+        These are the allowable input channel names for the processing.  See further
+        note under allowed_output_channels.
+    allowed_output_channels: list of strings
+        Normally ["ex", "ey", "hz", ]
+        These are the allowable output channel names for the processing.
+        A global list of these is kept at the top of this module.  The purpose of
+        this is to distinguish between runs that have different layouts, for example
+        some runs will have hz and some will not, and we cannot process for hz the
+        runs that do not have it.  By making this a kwarg we sort of prop the door
+        open for more general names (see issue #74).
 
 
 
@@ -66,8 +82,9 @@ def channel_summary_to_run_summary(ch_summary):
         start_times[i] = group.start.iloc[0]
         end_times[i] = group.end.iloc[0]
         sample_rates[i] = group.sample_rate.iloc[0]
-        input_channels[i] = ["hx", "hy", ]
-        output_channels[i] = ["ex", "ey", "hz", ]
+        channels_list = group.component.to_list()
+        input_channels[i] = [x for x in channels_list if x in allowed_input_channels]
+        output_channels[i] = [x for x in channels_list if x in allowed_output_channels]
         i += 1
 
     data_dict = {}
