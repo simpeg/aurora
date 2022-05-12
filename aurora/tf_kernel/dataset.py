@@ -1,6 +1,5 @@
 """
-This will likely wind up in
-aurora/transfer_function/tf_kernel/dataset.py
+This will likely wind up in aurora/transfer_function/tf_kernel/dataset.py
 """
 
 import copy
