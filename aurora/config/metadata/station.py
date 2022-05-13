@@ -114,7 +114,8 @@ class Station(Base):
                     "sample_rate": run.sample_rate,
                     "input_channels": run.input_channel_names,
                     "output_channels": run.output_channel_names,
-                    "remote": self.remote}
+                    "remote": self.remote,
+                    "channel_scale_factors": run.channel_scale_factors}
                 data_list.append(entry)
                 
         df = pd.DataFrame(data_list)
@@ -151,7 +152,7 @@ class Station(Base):
         self.id = df.station_id.unique()[0]
         self.mth5_path = df.mth5_path.unique()[0]
         self.remote = df.remote.unique()[0]
-        
+
         for entry in df.itertuples():
             try:
                 r = self.run_dict[entry.run_id]
@@ -159,11 +160,16 @@ class Station(Base):
                                                  end=entry.end.isoformat()))
                 
             except KeyError:
+                if hasattr(entry, "channel_scale_factors"):
+                    channel_scale_factors = entry.channel_scale_factors
+                else:
+                    channel_scale_factors = {}
                 r = Run(
                     id=entry.run_id, 
                     sample_rate=entry.sample_rate,
                     input_channels=entry.input_channels,
-                    output_channels=entry.output_channels
+                    output_channels=entry.output_channels,
+                    channel_scale_factors=channel_scale_factors
                     )
                 
                 r.time_periods.append(TimePeriod(start=entry.start.isoformat(),

@@ -48,7 +48,8 @@ class TestStationDataset(unittest.TestCase):
                                   'sample_rate',
                                   'input_channels',
                                   'output_channels',
-                                  "remote"])
+                                  "remote",
+                                  "channel_scale_factors"])
             
         with self.subTest("single station"):
             self.assertTrue(len(df.station_id.unique())==1)
