@@ -56,6 +56,8 @@ def process_synthetic_1():
     dataset_df["remote"] = False
     dataset_definition = DatasetDefinition()
     dataset_definition.df = dataset_df
+    #Test that channel_scale_factors column is optional
+    dataset_df.drop(columns=["channel_scale_factors"], inplace=True)
     processing_config = create_test_run_config("test1", dataset_df)
     tfc = process_sythetic_data(processing_config, dataset_definition)
     return tfc
