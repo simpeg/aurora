@@ -18,7 +18,7 @@ Or we could the station info in a dictionary and formlize it with a standards.js
 
 import random
 
-from aurora.general_helper_functions import TEST_PATH
+from aurora.test_utils.synthetic.paths import DATA_PATH
 from aurora.time_series.filters.filter_helpers import make_coefficient_filter
 
 random.seed(0)
@@ -50,8 +50,8 @@ def make_filters(as_list=False):
 
 def make_station_01_config_dict():
     station_dict = {}
-    station_dict["raw_data_path"] = TEST_PATH.joinpath("synthetic", "data", "test1.asc")
-    station_dict["mth5_path"] = TEST_PATH.joinpath("synthetic", "data", "test1.h5")
+    station_dict["raw_data_path"] = DATA_PATH.joinpath("test1.asc")
+    station_dict["mth5_path"] = DATA_PATH.joinpath("test1.h5")
     station_dict["columns"] = ["hx", "hy", "hz", "ex", "ey"]
     station_dict["noise_scalar"] = {}
     for col in station_dict["columns"]:
@@ -87,8 +87,8 @@ def make_station_01_config_dict():
 
 def make_station_02_config_dict():
     station_dict = make_station_01_config_dict()
-    station_dict["raw_data_path"] = TEST_PATH.joinpath("synthetic", "data", "test2.asc")
-    station_dict["mth5_path"] = TEST_PATH.joinpath("synthetic", "data", "test2.h5")
+    station_dict["raw_data_path"] = DATA_PATH.joinpath("test2.asc")
+    station_dict["mth5_path"] = DATA_PATH.joinpath("test2.h5")
     station_dict["station_id"] = "test2"
     station_dict["nan_indices"] = {}
     for col in station_dict["columns"]:

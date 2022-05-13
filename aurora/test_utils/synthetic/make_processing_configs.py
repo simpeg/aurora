@@ -1,9 +1,8 @@
 from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config import BANDS_256_FILE
 from aurora.config.config_creator import ConfigCreator
-from aurora.general_helper_functions import TEST_PATH
-
-CONFIG_PATH = TEST_PATH.joinpath("synthetic", "config")
+from aurora.test_utils.synthetic.paths import CONFIG_PATH
+from aurora.test_utils.synthetic.paths import DATA_PATH
 
 
 def create_test_run_config(test_case_id, ds_df, matlab_or_fortran="", save="json"):
@@ -105,11 +104,10 @@ def test_to_from_json():
     """
     import pandas as pd
     from aurora.config.metadata import Processing
-    from aurora.general_helper_functions import TEST_PATH
     from aurora.tf_kernel.dataset import RUN_SUMMARY_COLUMNS
 
     #Specify path to mth5
-    data_path = TEST_PATH.joinpath("synthetic").joinpath("data").joinpath("test1.h5")
+    data_path = DATA_PATH.joinpath("test1.h5")
     if not data_path.exists():
         print("You need to run make_mth5_from_asc.py")
         raise Exception

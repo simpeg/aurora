@@ -1,11 +1,13 @@
 from pathlib import Path
 
-from aurora.general_helper_functions import TEST_PATH
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test2_h5
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
 from aurora.test_utils.synthetic.make_processing_configs import create_test_run_config
+from aurora.test_utils.synthetic.paths import AURORA_RESULTS_PATH
+from aurora.test_utils.synthetic.paths import SYNTHETIC_PATH
+from aurora.test_utils.synthetic.paths import EMTF_OUTPUT_PATH
 from aurora.test_utils.synthetic.processing_helpers import process_sythetic_data
 from aurora.test_utils.synthetic.rms_helpers import assert_rms_misfit_ok
 from aurora.test_utils.synthetic.rms_helpers import compute_rms
@@ -16,18 +18,7 @@ from aurora.transfer_function.emtf_z_file_helpers import (
     merge_tf_collection_to_match_z_file,
 )
 
-
 from plot_helpers_synthetic import plot_rho_phi
-
-SYNTHETIC_PATH = TEST_PATH.joinpath("synthetic")
-CONFIG_PATH = SYNTHETIC_PATH.joinpath("config")
-DATA_PATH = SYNTHETIC_PATH.joinpath("data")
-EMTF_OUTPUT_PATH = SYNTHETIC_PATH.joinpath("emtf_output")
-AURORA_RESULTS_PATH = SYNTHETIC_PATH.joinpath("aurora_results")
-AURORA_RESULTS_PATH.mkdir(exist_ok=True)
-
-
-
 
 
 def aurora_vs_emtf(test_case_id,
