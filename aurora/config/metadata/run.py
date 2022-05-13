@@ -117,7 +117,25 @@ class Run(Base):
             scales[ch.id] = ch.scale_factor
             
         return scales
-                
+
+    @channel_scale_factors.setter
+    def channel_scale_factors(self, values):
+        """
+        Parameters
+        ----------
+        values: dict
+            expected to be keyed like
+            {"ex":1.0, "ey":1.0, "hx":1.0, "hy":1.0, "hz":1.0}
+
+        """
+        if not isinstance(values, dict):
+            raise TypeError(f"not sure what to do with type {type(values)}")
+        for i, channel in enumerate(self.input_channels):
+            if channel.id in values.keys():
+                self.input_channels[i].scale_factor = values[channel.id]
+        for i, channel in enumerate(self.output_channels):
+            if channel.id in values.keys():
+                self.output_channels[i].scale_factor = values[channel.id]
 
         
     

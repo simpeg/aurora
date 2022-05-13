@@ -163,7 +163,8 @@ class Station(Base):
                     id=entry.run_id, 
                     sample_rate=entry.sample_rate,
                     input_channels=entry.input_channels,
-                    output_channels=entry.output_channels
+                    output_channels=entry.output_channels,
+                    channel_scale_factors=entry.channel_scale_factors
                     )
                 
                 r.time_periods.append(TimePeriod(start=entry.start.isoformat(),

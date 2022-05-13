@@ -32,6 +32,7 @@ def channel_summary_to_run_summary(ch_summary,
             "input_channels",
             "output_channels",
             "remote",
+	    "channel_scale_factors",
         ]
 
     Parameters
@@ -72,6 +73,7 @@ def channel_summary_to_run_summary(ch_summary,
     sample_rates = n_station_runs * [None]
     input_channels = n_station_runs * [None]
     output_channels = n_station_runs * [None]
+    channel_scale_factors = n_station_runs * [None]
     i = 0
     for (station_id, run_id), group in grouper:
         print(f"{i} {station_id} {run_id}")
@@ -82,8 +84,10 @@ def channel_summary_to_run_summary(ch_summary,
         end_times[i] = group.end.iloc[0]
         sample_rates[i] = group.sample_rate.iloc[0]
         channels_list = group.component.to_list()
+        num_channels = len(channels_list)
         input_channels[i] = [x for x in channels_list if x in allowed_input_channels]
         output_channels[i] = [x for x in channels_list if x in allowed_output_channels]
+        channel_scale_factors[i] = dict(zip(channels_list, num_channels*[1.0]))
         i += 1
 
     data_dict = {}
@@ -94,6 +98,7 @@ def channel_summary_to_run_summary(ch_summary,
     data_dict["sample_rate"] = sample_rates
     data_dict["input_channels"] = input_channels
     data_dict["output_channels"] = output_channels
+    data_dict["channel_scale_factors"] = channel_scale_factors
     run_summary = pd.DataFrame(data=data_dict)
     return run_summary
 
