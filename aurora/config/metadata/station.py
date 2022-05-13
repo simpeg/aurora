@@ -114,7 +114,8 @@ class Station(Base):
                     "sample_rate": run.sample_rate,
                     "input_channels": run.input_channel_names,
                     "output_channels": run.output_channel_names,
-                    "remote": self.remote}
+                    "remote": self.remote,
+                    "channel_scale_factors": run.channel_scale_factors}
                 data_list.append(entry)
                 
         df = pd.DataFrame(data_list)
