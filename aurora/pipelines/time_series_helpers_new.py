@@ -79,9 +79,6 @@ def run_ts_to_stft_scipy(decimation_obj, run_xrts_orig):
     -------
 
     """
-    import numpy as np
-    import xarray as xr
-
     run_xrts = apply_prewhitening(decimation_obj, run_xrts_orig)
 
     windowing_scheme = WindowingScheme(
@@ -276,7 +273,6 @@ def get_data_from_mth5(mth5_obj, station_id, run_id, expected_sample_rate):
     """
     run_obj = mth5_obj.get_run(station_id, run_id)
     run_ts = run_obj.to_runts()
-    #if expected_sample_rate:
     validate_sample_rate(run_ts, expected_sample_rate)
     output = {"run": run_obj, "mvts": run_ts.dataset, "run_id":run_id}
     return output
