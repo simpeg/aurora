@@ -234,6 +234,23 @@ def get_run_run_ts_from_mth5(mth5_obj, station_id, run_id, expected_sample_rate,
     """
     ToDo: Review if this method should be moved into mth5.
 
+    Simple implementation of what could eventually become a somewhat complicated
+    function -- see issue #13.  In a future version this could also take a decimation
+    level as an argument.  It could then be merged with prototype decimate, depending
+    on the decimation level.
+
+    Future version should be able to
+    1. accept a config and an mth5_obj and return decimation_level_0,
+    2. Accept data from a given decimation level, and decimation
+    instrucntions and return it
+    3. If we decide to house decimated data in an mth5 should return time
+    series for the run at the perscribed decimation level
+
+    Thus args would be
+    decimation_level_config, mth5,
+    decimation_level_config, runs and run_ts'
+    decimation_level_config, mth5
+
     Parameters
     ----------
     mth5_obj: mth5.mth5.MTH5
@@ -247,27 +264,14 @@ def get_run_run_ts_from_mth5(mth5_obj, station_id, run_id, expected_sample_rate,
     Returns
     -------
 
-    Simple implementation of what could eventually become a somewhat complicated
-    function -- see issue #13.  Ultimately this method could be
-    In a future version this could also take a decimation level as an argument.  It
-    could then be merged with prototype decimate, depending on the decimation level.
 
-    Future version should be able to
-    1. accept a config and an mth5_obj and return decimation_level_0,
-    2. Accept data from a given decimation level, and decimation
-    instrucntions and return it
-    3. If we decide to house decimated data in an mth5 should return time
-    series for the run at the perscribed decimation level
 
-    Thus args are
-    decimation_level_config, mth5,
-    decimation_level_config, runs and run_ts'
-    decimation_level_config, mth5
-    Returns: dict
-        Each dictionary is associated with a station-run
-        Each Dict has keys "run" and "mvts" which are the mth5_run and the
-        mth5_run_ts objects respectively for the associated station
+    Returns
     -------
+    run_run_ts : dict
+        Dictionary associated with a station-run. Has keys "run" and "mvts".
+        "run" maps to mth5.groups.master_station_run_channel.RunGroup
+        "mvts" maps to xarray.core.dataset.Dataset
 
     """
     run_obj = mth5_obj.get_run(station_id, run_id)
