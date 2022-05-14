@@ -41,7 +41,26 @@ from aurora.transfer_function.TTFZ import TTFZ
 from mt_metadata.transfer_functions.core import TF
 from mth5.mth5 import MTH5
 # =============================================================================
+def fix_time(tstmp):
+    """
+    One-off temporary workaround for mt_metadata issue #86
+    Parameters
+    ----------
+    tstmp: pandas Timestamp
 
+    Returns
+    -------
+    datetime.datetime
+    """
+    import datetime
+    year = tstmp.year
+    month = tstmp.month
+    day = tstmp.day
+    hour = tstmp.hour
+    minute = tstmp.minute
+    second = tstmp.second
+    out = datetime.datetime(year, month,day,hour,minute,second)
+    return out
 
 def initialize_pipeline(config):
     """
@@ -236,9 +255,12 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
     if i_dec_level == 0:
         for i,row in dataset_df.iterrows():
             run_dict = get_run_run_ts_from_mth5(row.mth5_obj,
-                                          row.station_id,
-                                          row.run_id,
-                                          config.decimation.sample_rate)
+                                                row.station_id,
+                                                row.run_id,
+                                                config.decimation.sample_rate,
+                                                start=fix_time(row.start),
+                                                end=fix_time(row.end)
+                                                )
             dataset_df["run"].at[i] = run_dict["run"]
             dataset_df["run_dataarray"].at[i] = run_dict["mvts"].to_array("channel")
             #Dataframe dislikes xarray Dataset in a cell, need convert to DataArray
