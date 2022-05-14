@@ -87,19 +87,6 @@ def initialize_pipeline(config):
     return config, mth5_objs
 
 
-def get_remote_stft(config, mth5_obj, run_id):
-    if config.reference_station_id:
-        remote_run_obj = mth5_obj.get_run(config["reference_station_id"], run_id)
-        remote_run_ts = remote_run_obj.to_runts()
-        remote_stft_obj = run_ts_to_calibrated_stft(
-            remote_run_ts, remote_run_obj, config
-        )
-    else:
-        remote_stft_obj = None
-    return remote_stft_obj
-
-
-
 def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrts, units,
                           station_id):
     """
@@ -377,7 +364,8 @@ def process_mth5(
     dataset_df["stft"] = None
     #</MAKE SURE DATASET DEFINITION DF HAS "run", "run_ts" columns>
 
-    print(f"config indicates {len(processing_config.decimations)} decimation levels ")
+    print(f"Processing config indicates {len(processing_config.decimations)} "
+          f"decimation levels ")
 
     tf_dict = {}
 
