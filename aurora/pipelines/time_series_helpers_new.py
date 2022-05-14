@@ -277,7 +277,7 @@ def get_data_from_mth5(mth5_obj, station_id, run_id, expected_sample_rate):
     run_obj = mth5_obj.get_run(station_id, run_id)
     run_ts = run_obj.to_runts()
     validate_sample_rate(run_ts, expected_sample_rate)
-    output = {"run": run_obj, "mvts": run_ts.dataset, "run_id":run_id}
+    output = {"run": run_obj, "mvts": run_ts.dataset}
     return output
 
 
