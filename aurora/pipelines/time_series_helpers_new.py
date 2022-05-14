@@ -192,17 +192,21 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
 
     Parameters
     ----------
-    stft_obj
-    run_obj
-    units
-    scale_factors : dict
+    stft_obj : xarray.core.dataset.Dataset
+        Time series of Fourier coefficients to be calibrated
+    run_obj : mth5.groups.master_station_run_channel.RunGroup
+        Provides information about filters for calibration
+    units : string
+        usually "MT", contemplating supporting "SI"
+    scale_factors : dict or None
         keyed by channel, supports a single scalar to apply to that channels data
         Useful for debugging.  Should not be used in production and should throw a
         warning if it is not None
 
     Returns
     -------
-
+    stft_obj : xarray.core.dataset.Dataset
+        Time series of calibrated Fourier coefficients
     """
     for channel_id in stft_obj.keys():
         mth5_channel = run_obj.get_channel(channel_id)
@@ -236,19 +240,23 @@ def get_data_from_mth5(mth5_obj, station_id, run_id, expected_sample_rate):
 
     Parameters
     ----------
-    mth5_obj:
-    station_id
-    run_id
+    mth5_obj: mth5.mth5.MTH5
+        The data container with run and time series'
+    station_id: str
+        The name of the station to get data from
+    run_id: str
+        The name of the run to get data from
     sample_rate : float (may choose to also support  None)
         expected sample rate of data in the mth5
     Returns
     -------
 
-    Somewhat complicated function -- see issue #13.  Ultimately this method could be
+    Simple implementation of what could eventually become a somewhat complicated
+    function -- see issue #13.  Ultimately this method could be
     embedded in mth5, where the specific attributes of the config needed for this
     method are passed as explicit arguments.
 
-    Should be able to
+    Future version should be able to
     1. accept a config and an mth5_obj and return decimation_level_0,
     2. Accept data from a given decimation level, and decimation
     instrucntions and return it
