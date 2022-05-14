@@ -187,25 +187,6 @@ def run_ts_to_stft(decimation_obj, run_xrts_orig):
     return stft_obj
 
 
-def run_ts_to_calibrated_stft(run_ts, run_obj, decimation_obj, units="MT"):
-    """
-    Parameters
-    ----------
-    run_ts
-    run_obj
-    decimation_obj
-    units
-
-    Returns
-    -------
-
-    """
-    stft_obj = run_ts_to_stft(decimation_obj, run_ts.dataset)
-    stft_obj = calibrate_stft_obj(stft_obj, run_obj, units=units)
-
-    return stft_obj
-
-
 def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None):
     """
 

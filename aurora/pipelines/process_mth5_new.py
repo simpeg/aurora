@@ -28,14 +28,12 @@ from aurora.pipelines.helpers_new import initialize_config
 from aurora.pipelines.time_series_helpers_new import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers_new import get_data_from_mth5
 from aurora.pipelines.time_series_helpers_new import prototype_decimate
-from aurora.pipelines.time_series_helpers_new import run_ts_to_calibrated_stft
 from aurora.pipelines.time_series_helpers_new import run_ts_to_stft
 from aurora.pipelines.transfer_function_helpers_new import process_transfer_functions
 from aurora.pipelines.transfer_function_helpers_new import (
     transfer_function_header_from_config,
 )
 
-# from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
 from aurora.time_series.frequency_band_helpers import configure_frequency_bands
 from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
@@ -113,14 +111,13 @@ def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrts, units,
     -------
 
     """
-    print("OK - here we go ... ")
     stft_config = processing_config.get_decimation_level(i_dec_level)
     #stft_config = config.to_stft_config_dict() #another approach
     stft_obj = run_ts_to_stft(stft_config, run_xrts)
 
-    print("OK")
-    #still local and remote agnostic, it would be nice to be able to acess
-    #p.stations[station_id]
+    #Still local and remote agnostic, it would be nice to be able to acesss
+    #p.stations[station_id] in multi-station processing, but for classic RR
+    # "local" and "remote" work fine.
 
     print("fix this so that it gets from config based on station_id, without caring "
           "if local or remote")
