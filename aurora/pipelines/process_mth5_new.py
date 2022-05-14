@@ -21,7 +21,6 @@ pre-check on the data that identifies which decimation levels are valid for each
 # Imports
 # =============================================================================
 
-import pandas as pd
 import xarray as xr
 
 from aurora.pipelines.helpers_new import initialize_config
@@ -34,13 +33,11 @@ from aurora.pipelines.transfer_function_helpers_new import (
     transfer_function_header_from_config,
 )
 
-from aurora.time_series.frequency_band_helpers import configure_frequency_bands
 from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
 )
 from aurora.transfer_function.TTFZ import TTFZ
 
-from aurora.tf_kernel.dataset import DatasetDefinition
 from mt_metadata.transfer_functions.core import TF
 from mth5.mth5 import MTH5
 # =============================================================================
@@ -221,26 +218,7 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
     -------
 
     """
-    """
-    
-    Returns
-    -------
-
-    """
-    # local_dataset_defn_df = defn_df[defn_df[
-    #                                     "station_id"]==processing_config.local_station_id]
-    # remote_dataset_defn_df = defn_df[defn_df[
-    #                                      "station_id"]==processing_config.remote_station_id]
-    # local_grouper = local_dataset_defn_df.groupby("run")
-    # remote_grouper = remote_dataset_defn_df.groupby("run")
-    # #grouper = df.groupby(["station", "run"])
-
-    # <GET TIME SERIES DATA>
-    #Factor this out into a function.
-    #function takes an (mth5_obj_list, local_station_id, remote_station_id,
-    # local_run_list, remote_run_list)
-    #OR (mth5_obj_list, local_station_id, remote_station_id, dataset_df)
-    #Note that the dataset_df should be easy to generate from the local_station_id,
+    # Dataset_df should be easy to generate from the local_station_id,
     # remote_station_id, local_run_list, remote_run_list, but allows for
     # specification of time_intervals.  This is important in the case where
     # aquisition_runs are non-overlapping between local and remote.  Although,
@@ -249,7 +227,6 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
     # of the code.  However, time-intervals where the data do not have coverage
     # at both stations can be identified in a method before GET TIME SERIES
     # in a future version.
-    #get_time_series_data(dec_level_id, ...)
 
     all_run_objs = len(dataset_df) * [None]
     all_run_ts_objs = len(dataset_df) * [None]
