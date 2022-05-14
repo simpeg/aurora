@@ -5,24 +5,22 @@ import xarray as xr
 from aurora.time_series.windowing_scheme import WindowingScheme
 
 
-#<<<<<<< HEAD
 def validate_sample_rate(run_ts, expected_sample_rate):
     """
 
     Parameters
     ----------
-    run_ts
-    config
+    run_ts: mth5.timeseries.run_ts.RunTS
+        Time series object
+    expected_sample_rate: float
+        The samepling rate the time series is expected to have. Normally taken from
+        the processing config
 
     Returns
     -------
 
     """
     if run_ts.sample_rate != expected_sample_rate:
-# =======
-# def validate_sample_rate(run_ts, decimation_obj):
-#     if run_ts.sample_rate != decimation_obj.sample_rate:
-# >>>>>>> e09ef862ef90d065e34374ea6ae6c61addf97230
         print(
             f"sample rate in run time series {run_ts.sample_rate} and "
             f"processing decimation_obj {decimation_obj.sample_rate} do not match"
