@@ -55,7 +55,7 @@ def xml_to_mth5(xml_path, h5_path="tmp.h5"):
     return mth5_obj
 
 def make_cas04_data_for_processing(xml_path, h5_path="tmp.h5",
-                                   generate_channel_summary=False,
+                                   generate_channel_summary=True,
                                    summary_csv="channel_summary.csv",
                                    active_runs=["a", ]):
     """
@@ -71,8 +71,10 @@ def make_cas04_data_for_processing(xml_path, h5_path="tmp.h5",
     experiment = translator.xml_to_mt(inventory_object=inventory0)
     mth5_obj = initialize_mth5(h5_path, mode="w")
     mth5_obj.from_experiment(experiment)
+
     if generate_channel_summary:
-        summary_df = mth5_obj.channel_summary
+        mth5_obj.channel_summary.summarize()
+        summary_df = mth5_obj.channel_summary.to_dataframe()
         summary_df.to_csv(summary_csv, index=False)
     else:
         summary_df = pd.read_csv(summary_csv, parse_dates=["start", "end"])
