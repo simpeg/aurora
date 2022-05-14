@@ -262,12 +262,9 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
                                           row.station_id,
                                           row.run_id,
                                           config.decimation.sample_rate)
-            #dataset_df.loc[i]["run"] = run_dict["run"]
-            dataset_df["run"].loc[i] = run_dict["run"] #value try to set??
-            #dataset_df.loc[i]["run_dataarray"] = run_dict["mvts"].to_array("channel")
-            dataset_df["run_dataarray"].loc[i] = run_dict["mvts"].to_array("channel")
-            #Dataframe doesn't like an xarray Dataset in a cell, need to convert
-            # to DataArray
+            dataset_df["run"].at[i] = run_dict["run"]
+            dataset_df["run_dataarray"].at[i] = run_dict["mvts"].to_array("channel")
+            #Dataframe dislikes xarray Dataset in a cell, need convert to DataArray
 
             all_run_objs[i] = run_dict["run"]
             all_run_ts_objs[i] = run_dict["mvts"]
