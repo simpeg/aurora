@@ -2,8 +2,9 @@ import numpy as np
 import scipy.signal as ssig
 import xarray as xr
 
+from aurora.time_series.frequency_domain_helpers import get_fft_harmonics
+from aurora.time_series.windowed_time_series import WindowedTimeSeries
 from aurora.time_series.windowing_scheme import WindowingScheme
-
 
 def validate_sample_rate(run_ts, expected_sample_rate):
     """
@@ -31,17 +32,25 @@ def validate_sample_rate(run_ts, expected_sample_rate):
 
 def apply_prewhitening(decimation_obj, run_xrts_input):
     """
+
     Parameters
     ----------
-    decimation_obj : aurora.config.Decimation object
+    decimation_obj : aurora.config.metadata.decimation_level.DecimationLevel
+        Information about how the decimation level is to be processed
+    run_xrts_input : xarray.core.dataset.Dataset
+        Time series to be prewhitened
 
     Returns
     -------
+    run_xrts : xarray.core.dataset.Dataset
+        prewhitened time series
 
     """
     if decimation_obj.prewhitening_type == "first difference":
         run_xrts = run_xrts_input.diff("time")
     else:
+        print(f"{decimation_obj.prewhitening_type} prehitening not yet implemented")
+        print(f"returning original time series")
         run_xrts = run_xrts_input
     return run_xrts
 
@@ -50,20 +59,21 @@ def apply_recoloring(decimation_obj, stft_obj):
     """
     Parameters
     ----------
-    decimation_obj : aurora.config.Decimation object
+    decimation_obj : aurora.config.metadata.decimation_level.DecimationLevel
+        Information about how the decimation level is to be processed
+    stft_obj : xarray.core.dataset.Dataset
+        Time series of Fourier coefficients to be recoloured
 
 
     Returns
     -------
-
+    stft_obj : xarray.core.dataset.Dataset
+        Recolored time series of Fourier coefficients
     """
     if decimation_obj.prewhitening_type == "first difference":
-        from aurora.time_series.frequency_domain_helpers import get_fft_harmonics
-        from numpy import pi
-
         freqs = get_fft_harmonics(decimation_obj.window.num_samples, 
                                   decimation_obj.decimation.sample_rate)
-        prewhitening_correction = 1.0j * 2 * pi * freqs  # jw
+        prewhitening_correction = 1.0j * 2 * np.pi * freqs  # jw
         stft_obj /= prewhitening_correction
     return stft_obj
 
@@ -72,12 +82,15 @@ def run_ts_to_stft_scipy(decimation_obj, run_xrts_orig):
     """
     Parameters
     ----------
-    decimation_obj : aurora.config.Decimation object
-    run_xrts
+    decimation_obj : aurora.config.metadata.decimation_level.DecimationLevel
+        Information about how the decimation level is to be processed
+    run_xrts : : xarray.core.dataset.Dataset
+        Time series to be processed
 
     Returns
     -------
-
+    stft_obj : xarray.core.dataset.Dataset
+        Time series of Fourier coefficients
     """
     run_xrts = apply_prewhitening(decimation_obj, run_xrts_orig)
 
@@ -129,8 +142,10 @@ def run_ts_to_stft(decimation_obj, run_xrts_orig):
 
     Parameters
     ----------
-    decimation_obj : aurora.config.Decimation object
-    run_ts ; xarray.core.dataset.Dataset, normally extracted from mth5.RunTS
+    decimation_obj : aurora.config.metadata.decimation_level.DecimationLevel
+        Information about how the decimation level is to be processed
+    run_ts ; xarray.core.dataset.Dataset
+        normally extracted from mth5.RunTS
 
     Returns
     -------
@@ -139,8 +154,6 @@ def run_ts_to_stft(decimation_obj, run_xrts_orig):
         recoloring. This really doesn't matter since we don't use the DC harmonic for
         anything.
     """
-    from aurora.time_series.windowed_time_series import WindowedTimeSeries
-
     try:
         windowing_scheme = WindowingScheme(
             taper_family=decimation_obj.window.type,
@@ -150,7 +163,8 @@ def run_ts_to_stft(decimation_obj, run_xrts_orig):
             sample_rate=decimation_obj.decimation.sample_rate,
         )
     except AttributeError:
-        pass
+        print("AttributeError --- run_ts_to_stft ?")
+
 
     run_xrts = apply_prewhitening(decimation_obj, run_xrts_orig)
 
