@@ -233,7 +233,7 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
     return stft_obj
 
 
-def get_data_from_mth5_new(mth5_obj, station_id, run_id, expected_sample_rate):
+def get_data_from_mth5(mth5_obj, station_id, run_id, expected_sample_rate):
     """
     ToDo: Review if this method should be moved into mth5.  If that were the case,
     the config being passed here should be replaced with a list of station_ids and

@@ -26,7 +26,7 @@ import xarray as xr
 
 from aurora.pipelines.helpers_new import initialize_config
 from aurora.pipelines.time_series_helpers_new import calibrate_stft_obj
-from aurora.pipelines.time_series_helpers_new import get_data_from_mth5_new
+from aurora.pipelines.time_series_helpers_new import get_data_from_mth5
 from aurora.pipelines.time_series_helpers_new import prototype_decimate
 from aurora.pipelines.time_series_helpers_new import run_ts_to_calibrated_stft
 from aurora.pipelines.time_series_helpers_new import run_ts_to_stft
@@ -274,10 +274,10 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
 
     if i_dec_level == 0:
         for i,row in dataset_df.iterrows():
-            run_dict = get_data_from_mth5_new(row.mth5_obj,
-                                              row.station_id,
-                                              row.run_id,
-                                              config.decimation.sample_rate)
+            run_dict = get_data_from_mth5(row.mth5_obj,
+                                          row.station_id,
+                                          row.run_id,
+                                          config.decimation.sample_rate)
             #dataset_df.loc[i]["run"] = run_dict["run"]
             dataset_df["run"].loc[i] = run_dict["run"] #value try to set??
             #dataset_df.loc[i]["run_dataarray"] = run_dict["mvts"].to_array("channel")

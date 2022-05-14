@@ -4,7 +4,7 @@ method returns the same array as scipy.signal.spectrogram
 """
 import numpy as np
 
-from aurora.pipelines.time_series_helpers_new import get_data_from_mth5_new
+from aurora.pipelines.time_series_helpers_new import get_data_from_mth5
 from aurora.pipelines.time_series_helpers_new import prototype_decimate
 from aurora.pipelines.time_series_helpers_new import run_ts_to_stft
 from aurora.pipelines.time_series_helpers_new import run_ts_to_stft_scipy
@@ -30,7 +30,7 @@ def test_stft_methods_agree():
     for dec_level_id, dec_config in enumerate(processing_config.decimations):
 
         if dec_level_id == 0:
-            run_dict = get_data_from_mth5_new(mth5_obj, "test1", run_id, 1.0)
+            run_dict = get_data_from_mth5(mth5_obj, "test1", run_id, 1.0)
         else:
             run_dict = prototype_decimate(dec_config.decimation, run_dict)
 
