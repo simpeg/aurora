@@ -44,7 +44,7 @@ def extract_run_summaries_from_mth5s(mth5_list, type="run", deduplicate=True):
     super_summary: pd.DataFrame
 
     """
-    dfs = len(mth5s) * [None]
+    dfs = len(mth5_list) * [None]
 
     for i, mth5_elt in enumerate(mth5_list):
         if isinstance(mth5_elt, MTH5):
