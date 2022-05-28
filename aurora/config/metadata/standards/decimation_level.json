@@ -1,0 +1,80 @@
+{
+    "anti_alias_filter": {
+        "type": "string",
+        "required": true,
+        "style": "controlled vocabulary",
+        "units": null,
+        "description": "Name of anti alias filter to be applied",
+        "options": ["deafult", "other"],
+        "alias": [],
+        "example": "default",
+		"default": "default"
+    },
+	"prewhitening_type": {
+        "type": "string",
+        "required": true,
+        "style": "controlled vocabulary",
+        "units": null,
+        "description": "Prewhitening method to be applied",
+        "options": ["first difference", "other"],
+        "alias": [],
+        "example": "first difference",
+		"default": "first difference"
+    },
+	"extra_pre_fft_detrend_type": {
+        "type": "string",
+        "required": true,
+        "style": "controlled vocabulary",
+        "units": null,
+        "description": "Pre FFT detrend method to be applied",
+        "options": ["linear", "other"],
+        "alias": [],
+        "example": "linear",
+		"default": "linear"
+    },
+	"bands": {
+        "type": "integer",
+        "required": true,
+        "style": "name list",
+        "units": null,
+        "description": "List of bands",
+        "options": [],
+        "alias": [],
+        "example": "[]",
+		"default": null
+    },
+	"input_channels": {
+        "type": "string",
+        "required": true,
+        "style": "name list",
+        "units": null,
+        "description": "list of input channels (sources)",
+        "options": [],
+        "alias": [],
+        "example": "hx, hy",
+		"default": "hx, hy"
+    },
+	"output_channels": {
+        "type": "string",
+        "required": true,
+        "style": "name list",
+        "units": null,
+        "description": "list of output channels (responses)",
+        "options": [],
+        "alias": [],
+        "example": "ex, ey, hz",
+		"default": "ex, ey, hz"
+    },
+	"reference_channels": {
+        "type": "string",
+        "required": true,
+        "style": "name list",
+        "units": null,
+        "description": "list of reference channels (remote sources)",
+        "options": [],
+        "alias": [],
+        "example": "hx, hy",
+		"default": "hx, hy"
+    }
+	
+}

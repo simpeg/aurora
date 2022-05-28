@@ -1,0 +1,13 @@
+{
+    "remote": {
+        "type": "string",
+        "required": true,
+        "style": "name list",
+        "units": null,
+        "description": "list of remote sites",
+        "options": [],
+        "alias": [],
+        "example": "10",
+		"default": null
+    }
+}

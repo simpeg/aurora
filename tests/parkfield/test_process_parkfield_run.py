@@ -1,18 +1,19 @@
+from deprecated import deprecated
 from pathlib import Path
 import pickle
 
 from aurora.config.processing_config import RunConfig
 
 from aurora.pipelines.process_mth5 import process_mth5_run
+from aurora.test_utils.parkfield.path_helpers import AURORA_RESULTS_PATH
+from aurora.test_utils.parkfield.path_helpers import EMTF_RESULTS_PATH
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 
 
-from helpers import AURORA_RESULTS_PATH
-from helpers import EMTF_RESULTS_PATH
 from make_parkfield_mth5 import test_make_parkfield_mth5
 from make_processing_configs import create_run_test_config
 
-
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def test_process_to_tf_collection(z_file_path=None):
     processing_run_cfg = create_run_test_config()
     print(f"CONFIG {processing_run_cfg.name}")
@@ -38,6 +39,7 @@ def test_process_to_tf_collection(z_file_path=None):
     return tf_collection
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def test_processing(z_file_path=None):
     """
 
@@ -81,6 +83,7 @@ def test_processing(z_file_path=None):
     return tf_cls
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def main():
     z_file_path = AURORA_RESULTS_PATH.joinpath("pkd.zss")
     test_process_to_tf_collection(z_file_path)

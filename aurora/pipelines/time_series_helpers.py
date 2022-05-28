@@ -1,18 +1,34 @@
+import numpy as np
 import scipy.signal as ssig
+import xarray as xr
+
+from deprecated import deprecated
 
 from aurora.time_series.windowing_scheme import WindowingScheme
 
+@deprecated(version="0.0.3")
+def validate_sample_rate(run_ts, expected_sample_rate):
+    """
 
-def validate_sample_rate(run_ts, config):
-    if run_ts.sample_rate != config.sample_rate:
+    Parameters
+    ----------
+    run_ts
+    config
+
+    Returns
+    -------
+
+    """
+    if run_ts.sample_rate != expected_sample_rate:
         print(
             f"sample rate in run time series {run_ts.sample_rate} and "
-            f"processing config {config.sample_rate} do not match"
+            f"processing config {expected_sample_rate} do not match"
         )
         raise Exception
     return
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def apply_prewhitening(config, run_xrts_input):
     if config["prewhitening_type"] == "first difference":
         run_xrts = run_xrts_input.diff("time")
@@ -21,6 +37,7 @@ def apply_prewhitening(config, run_xrts_input):
     return run_xrts
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def apply_recoloring(config, stft_obj):
     if config["prewhitening_type"] == "first difference":
         from aurora.time_series.frequency_domain_helpers import get_fft_harmonics
@@ -32,6 +49,7 @@ def apply_recoloring(config, stft_obj):
     return stft_obj
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def run_ts_to_stft_scipy(config, run_xrts_orig):
     """
     Parameters
@@ -93,6 +111,7 @@ def run_ts_to_stft_scipy(config, run_xrts_orig):
     return stft_obj
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def run_ts_to_stft(config, run_xrts_orig):
     """
 
@@ -103,7 +122,10 @@ def run_ts_to_stft(config, run_xrts_orig):
 
     Returns
     -------
-
+    stft_obj: xarray.core.dataset.Dataset
+        Note that the STFT object may have inf/nan in the DC harmonic, introduced by
+        recoloring. This really doesn't matter since we don't use the DC harmonic for
+        anything.
     """
     from aurora.time_series.windowed_time_series import WindowedTimeSeries
 
@@ -136,6 +158,7 @@ def run_ts_to_stft(config, run_xrts_orig):
     return stft_obj
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def run_ts_to_calibrated_stft(run_ts, run_obj, config, units="MT"):
     """
     Parameters
@@ -155,6 +178,7 @@ def run_ts_to_calibrated_stft(run_ts, run_obj, config, units="MT"):
     return stft_obj
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None):
     """
 
@@ -191,3 +215,107 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
 
         stft_obj[channel_id].data /= calibration_response
     return stft_obj
+
+
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
+def get_data_from_mth5(config, mth5_obj, run_id):
+    """
+    ToDo: Review if this method should be moved into mth5.  If that were the case,
+    the config being passed here should be replaced with a list of station_ids and
+    the config sampling_rate, so that there is no dependency on the config object in
+    mth5.
+    In a future version this could also take a decimation level as an argument.  It
+    could then be merged with prototype decimate, depending on the decimation level.
+
+    Parameters
+    ----------
+    config : decimation_level_config
+    mth5_obj
+
+    Returns
+    -------
+
+    Somewhat complicated function -- see issue #13.  Ultimately this method could be
+    embedded in mth5, where the specific attributes of the config needed for this
+    method are passed as explicit arguments.
+
+    Should be able to
+    1. accept a config and an mth5_obj and return decimation_level_0,
+    2. Accept data from a given decimation level, and decimation
+    instrucntions and return it
+    3. If we decide to house decimated data in an mth5 should return time
+    series for the run at the perscribed decimation level
+
+    Thus args are
+    decimation_level_config, mth5,
+    decimation_level_config, runs and run_ts'
+    decimation_level_config, mth5
+    Returns: tuple of dicts
+        Each dictionary is associated with a station, one for local and one
+        for remote at this point
+        Each Dict has keys "run" and "mvts" which are the mth5_run and the
+        mth5_run_ts objects respectively for the associated station
+    -------
+
+    """
+    # <LOCAL>
+    local_run_obj = mth5_obj.get_run(config["local_station_id"], run_id)
+    local_run_ts = local_run_obj.to_runts()
+    validate_sample_rate(local_run_ts, config.sample_rate)
+    local = {"run": local_run_obj, "mvts": local_run_ts.dataset, "run_id":run_id}
+    # </LOCAL>
+
+    # <REMOTE>
+    if config.reference_station_id:
+        remote_run_obj = mth5_obj.get_run(config["reference_station_id"], run_id)
+        remote_run_ts = remote_run_obj.to_runts()
+        validate_sample_rate(remote_run_ts, config.sample_rate)
+        remote = {"run": remote_run_obj, "mvts": remote_run_ts.dataset}
+    else:
+        remote = {"run": None, "mvts": None}
+    # </REMOTE>
+    return local, remote
+
+
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
+def prototype_decimate(config, run_run_ts):
+    """
+    TODO: ?Move this function into time_series/decimate.py?
+    Parameters
+    ----------
+    config : DecimationConfig object
+    run_run_ts: dict keyed by "run" and "mvts"
+    out_dict["run"] is mth5.groups.master_station_run_channel.RunGroup
+    out_dict["mvts"] is mth5.timeseries.run_ts.RunTS
+
+    Returns
+    -------
+    dict: same structure as run_run_ts
+    """
+    run_obj = run_run_ts["run"]
+    run_xrts = run_run_ts["mvts"]
+    run_obj.metadata.sample_rate = config.sample_rate
+
+    # <Replace with rolling mean, somethng that works with time>
+    # and preferably takes the average time, not the start of the window
+    slicer = slice(None, None, config.decimation_factor)
+    downsampled_time_axis = run_xrts.time.data[slicer]
+    # </Replace with rolling mean, somethng that works with time>
+
+    num_observations = len(downsampled_time_axis)
+    channel_labels = list(run_xrts.data_vars.keys())  # run_ts.channels
+    num_channels = len(channel_labels)
+    new_data = np.full((num_observations, num_channels), np.nan)
+    for i_ch, ch_label in enumerate(channel_labels):
+        new_data[:, i_ch] = ssig.decimate(run_xrts[ch_label], config.decimation_factor)
+
+    xr_da = xr.DataArray(
+        new_data,
+        dims=["time", "channel"],
+        coords={"time": downsampled_time_axis, "channel": channel_labels},
+    )
+
+    xr_ds = xr_da.to_dataset("channel")
+    result = {"run": run_obj, "mvts": xr_ds}
+
+    return result

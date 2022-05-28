@@ -1,0 +1,46 @@
+{
+    "level": {
+        "type": "integer",
+        "required": true,
+        "style": "number",
+        "units": null,
+        "description": "Decimation level in sequential order",
+        "options": [],
+        "alias": [],
+        "example": "0",
+		"default": 0
+    },
+    "factor": {
+        "type": "float",
+        "required": true,
+        "style": "number",
+        "units": null,
+        "description": "Decimation factor",
+        "options": [],
+        "alias": [],
+        "example": "1",
+		"default": 1.0
+    },
+    "method": {
+        "type": "string",
+        "required": true,
+        "style": "controlled vocabulary",
+        "units": "",
+        "description": "Type of decimation",
+        "options": ["default", "other"],
+        "alias": [],
+        "example": "default",
+		"default": "default"
+    },    
+	"sample_rate": {
+        "type": "float",
+        "required": true,
+        "style": "number",
+        "units": "samples per second",
+        "description": "Initial sample rate of the data.",
+        "options": [],
+        "alias": [],
+        "example": "256",
+		"default": 1
+    }
+}

@@ -8,8 +8,7 @@ dataset_id
 from aurora.test_utils.dataset_definitions import TEST_DATA_SET_CONFIGS
 from mth5.utils.helpers import read_back_data
 from aurora.sandbox.io_helpers.make_mth5_helpers import create_from_server_multistation
-
-from helpers import DATA_PATH
+from aurora.test_utils.parkfield.path_helpers import DATA_PATH
 
 # create_from_server DEPRECATED 2021-09-18
 # def create_from_server(dataset_config, data_source="IRIS", target_folder=Path()):

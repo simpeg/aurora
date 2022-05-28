@@ -88,9 +88,6 @@ class WindowingScheme(ApodizationWindow):
     window ... still not sure if we want to make sample_rate an attr here
     or if its better to put properties like window_duration() as a method of
     some composition of time series and windowing scheme.
-
-    kwargs:
-
     """
 
     def __init__(self, **kwargs):
@@ -162,7 +159,9 @@ class WindowingScheme(ApodizationWindow):
 
         Returns windowed_obj
         -------
-
+        windowed_obj: arraylike
+            Normally an object of type xarray.core.dataarray.DataArray
+            Could be numpy array as well.
         """
         if isinstance(data, np.ndarray):
             windowed_obj = self._apply_sliding_window_numpy(

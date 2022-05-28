@@ -4,6 +4,7 @@ and transfer_function_processing helpers.
 
 
 """
+from deprecated import deprecated
 import numpy as np
 
 from aurora.time_series.frequency_band_helpers import extract_band
@@ -23,7 +24,7 @@ from aurora.transfer_function.weights.edf_weights import (
 
 REGRESSION_LIBRARY = {"OLS": RegressionEstimator, "RME": TRME, "RME_RR": TRME_RR}
 
-
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def get_regression_class(config):
     try:
         regression_class = REGRESSION_LIBRARY[config.estimation_engine]
@@ -33,7 +34,7 @@ def get_regression_class(config):
         raise Exception
     return regression_class
 
-
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def set_up_iter_control(config):
     """
     TODO: Review: maybe better to just make this the __init__ method of the
@@ -60,6 +61,7 @@ def set_up_iter_control(config):
     return iter_control
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def transfer_function_header_from_config(config):
     transfer_function_header = TransferFunctionHeader(
         processing_scheme=config.estimation_engine,
@@ -72,6 +74,7 @@ def transfer_function_header_from_config(config):
     return transfer_function_header
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def check_time_axes_synched(X, Y):
     """
     Utility function for checking that time axes agree
@@ -100,6 +103,7 @@ def check_time_axes_synched(X, Y):
     return
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def get_band_for_tf_estimate(band, config, local_stft_obj, remote_stft_obj):
     """
     Get data for TF estimation for a particular band.
@@ -141,6 +145,7 @@ def get_band_for_tf_estimate(band, config, local_stft_obj, remote_stft_obj):
     return X, Y, RR
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def select_channel(xrda, channel_label):
     """
     Extra helper function to make process_transfer_functions more readable without
@@ -162,6 +167,7 @@ def select_channel(xrda, channel_label):
     return ch
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def process_transfer_functions(
     config,
     local_stft_obj,

@@ -1,8 +1,30 @@
+"""
+Note 1: process_mth5_run assumes application of cascading decimation, and that the
+decimated data will be accessed from the previous decimation level.  This should be
+revisited. It may make more sense to have a get_decimation_level() interface that
+provides an option of applying decimation or loading predecimated data.
+
+#Note 2: Question: Can we run into cases where some of these runs can be decimated
+and others can not?  We need a way to handle this. For example, a short run may not
+yield any data from a later decimation level.  Returning an empty xarray may work,
+... It is desireable that the empty xarray, or whatever comes back to pass through STFT
+and MERGE steps smoothy.
+If it is empty, we could just drop the run entirely but this may have adverse
+consequences on downstream bookkeeping, like the creation of station_metadata before
+packaging the tf for export.  This could be worked around by extracting the metadata
+at the start of this method. In fact, it would be a good idea in general to run a
+pre-check on the data that identifies which decimation levels are valid for each run.
+"""
+from deprecated import deprecated
+import pandas as pd
+import xarray as xr
+
 from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
+from aurora.pipelines.time_series_helpers import get_data_from_mth5
+from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_calibrated_stft
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
-from aurora.pipelines.time_series_helpers import validate_sample_rate
 from aurora.pipelines.transfer_function_helpers import process_transfer_functions
 from aurora.pipelines.transfer_function_helpers import (
     transfer_function_header_from_config,
@@ -15,10 +37,12 @@ from aurora.transfer_function.transfer_function_collection import (
 )
 from aurora.transfer_function.TTFZ import TTFZ
 
+from aurora.tf_kernel.dataset import DatasetDefinition
 from mt_metadata.transfer_functions.core import TF
 from mth5.mth5 import MTH5
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def initialize_pipeline(run_config, mth5_path=None):
     """
     A place to organize args and kwargs.
@@ -50,11 +74,12 @@ def initialize_pipeline(run_config, mth5_path=None):
             print(f"config path changing from \n{config['mth5_path']} to \n{mth5_path}")
             config.mth5_path = str(mth5_path)
     mth5_obj = MTH5(file_version="0.1.0")
-    mth5_obj.open_mth5(config["mth5_path"], mode="r")
+    mth5_obj.open_mth5(config["mth5_path"], mode="a")
     # </Initialize mth5 for reading>
     return config, mth5_obj
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def get_remote_stft(config, mth5_obj, run_id):
     if config.reference_station_id:
         remote_run_obj = mth5_obj.get_run(config["reference_station_id"], run_id)
@@ -67,55 +92,13 @@ def get_remote_stft(config, mth5_obj, run_id):
     return remote_stft_obj
 
 
-def prototype_decimate(config, run_run_ts):
-    """
-    TODO: Move this function into time_series/decimate.py
-
-    Parameters
-    ----------
-    config : DecimationConfig object
-    run_run_ts
-
-    Returns
-    -------
-
-    """
-    import numpy as np
-    import scipy.signal as ssig
-    import xarray as xr
-
-    run_obj = run_run_ts["run"]
-    run_xrts = run_run_ts["mvts"]
-    run_obj.metadata.sample_rate = config.sample_rate
-
-    # <Replace with rolling mean, somethng that works with time>
-    # and preferably takes the average time, not the start of th
-    slicer = slice(None, None, config.decimation_factor)
-    downsampled_time_axis = run_xrts.time.data[slicer]
-    # <Replace with rolling mean, somethng that works with time>
-
-    num_observations = len(downsampled_time_axis)
-    channel_labels = list(run_xrts.data_vars.keys())  # run_ts.channels
-    num_channels = len(channel_labels)
-    new_data = np.full((num_observations, num_channels), np.nan)
-    for i_ch, ch_label in enumerate(channel_labels):
-        new_data[:, i_ch] = ssig.decimate(run_xrts[ch_label], config.decimation_factor)
-
-    xr_da = xr.DataArray(
-        new_data,
-        dims=["time", "channel"],
-        coords={"time": downsampled_time_axis, "channel": channel_labels},
-    )
-
-    xr_ds = xr_da.to_dataset("channel")
-    result = {"run": run_obj, "mvts": xr_ds}
-
-    return result
-
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def make_stft_objects(config, local, remote, units):
     """
-    2022-02-08: Factor this out of process_mth5_decimation_level in prep for merging
-    runs.   
+    2022-02-08: Factor this out of process_tf_decimation_level in prep for merging
+    runs.
+    2022-03-13: This method to be deprecated/replaced by make_stft_objects_new (which
+    will eventually be renamed back to make_stft_objects after testing)
     Parameters
     ----------
     config
@@ -162,7 +145,8 @@ def make_stft_objects(config, local, remote, units):
     return local_stft_obj, remote_stft_obj
 
 
-def process_mth5_decimation_level(config, local_stft_obj, remote_stft_obj, units="MT"):
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
+def process_tf_decimation_level(config, local_stft_obj, remote_stft_obj, units="MT"):
     """
     Processing pipeline for a single decimation_level
     TODO: Add a check that the processing config sample rates agree with the
@@ -182,41 +166,6 @@ def process_mth5_decimation_level(config, local_stft_obj, remote_stft_obj, units
 
 
     """
-    # local_stft_obj, remote_stft_obj = make_stft_objects(config, local, remote, units)
-    # local_run_obj = local["run"]
-    # local_run_xrts = local["mvts"]
-    #
-    # remote_run_obj = remote["run"]
-    # remote_run_xrts = remote["mvts"]
-    #
-    # # <CHECK DATA COVERAGE IS THE SAME IN BOTH LOCAL AND RR>
-    # # This should be pushed into a previous validator before pipeline starts
-    # # if config.reference_station_id:
-    # #    local_run_xrts = local_run_xrts.where(local_run_xrts.time <=
-    # #                                          remote_run_xrts.time[-1]).dropna(
-    # #                                          dim="time")
-    # # </CHECK DATA COVERAGE IS THE SAME IN BOTH LOCAL AND RR>
-    #
-    # local_stft_obj = run_ts_to_stft(config, local_run_xrts)
-    # local_scale_factors = config.station_scale_factors(config.local_station_id)
-    # # local_stft_obj = run_ts_to_stft_scipy(config, local_run_xrts)
-    # local_stft_obj = calibrate_stft_obj(
-    #     local_stft_obj,
-    #     local_run_obj,
-    #     units=units,
-    #     channel_scale_factors=local_scale_factors,
-    # )
-    # if config.reference_station_id:
-    #     remote_stft_obj = run_ts_to_stft(config, remote_run_xrts)
-    #     remote_scale_factors = config.station_scale_factors(config.reference_station_id)
-    #     remote_stft_obj = calibrate_stft_obj(
-    #         remote_stft_obj,
-    #         remote_run_obj,
-    #         units=units,
-    #         channel_scale_factors=remote_scale_factors,
-    #     )
-    # else:
-    #     remote_stft_obj = None
     frequency_bands = configure_frequency_bands(config)
     transfer_function_header = transfer_function_header_from_config(config)
     transfer_function_obj = TTFZ(
@@ -231,59 +180,7 @@ def process_mth5_decimation_level(config, local_stft_obj, remote_stft_obj, units
     return transfer_function_obj
 
 
-def get_data_from_decimation_level_from_mth5(config, mth5_obj, run_id):
-    """
-
-    Parameters
-    ----------
-    config : decimation_level_config
-    mth5_obj
-
-    Returns
-    -------
-
-    Somewhat complicated function -- see issue #13.  Ultimately this method could be
-    embedded in mth5, where the specific attributes of the config needed for this
-    method are passed as explicit arguments.
-
-    Should be able to
-    1. accept a config and an mth5_obj and return decimation_level_0,
-    2. Accept data from a given decimation level, and decimation
-    instrucntions and return it
-    3. If we decide to house decimated data in an mth5 should return time
-    series for the run at the perscribed decimation level
-
-    Thus args are
-    decimation_level_config, mth5,
-    decimation_level_config, runs and run_ts'
-    decimation_level_config, mth5
-    Returns: tuple of dicts
-        Each dictionary is associated with a staiton, one for local and one
-        for remote at this point
-        Each Dict has keys "run" and "mvts" which are the mth5_run and the
-        mth5_run_ts objects respectively for the associated station
-    -------
-
-    """
-    # <LOCAL>
-    local_run_obj = mth5_obj.get_run(config["local_station_id"], run_id)
-    local_run_ts = local_run_obj.to_runts()
-    validate_sample_rate(local_run_ts, config)
-    local = {"run": local_run_obj, "mvts": local_run_ts.dataset}
-    # </LOCAL>
-
-    # <REMOTE>
-    if config.reference_station_id:
-        remote_run_obj = mth5_obj.get_run(config["reference_station_id"], run_id)
-        remote_run_ts = remote_run_obj.to_runts()
-        validate_sample_rate(remote_run_ts, config)
-        remote = {"run": remote_run_obj, "mvts": remote_run_ts.dataset}
-    else:
-        remote = {"run": None, "mvts": None}
-    # </REMOTE>
-    return local, remote
-
-
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def export_tf(tf_collection, station_metadata_dict={}, survey_dict={}):
     """
     This method may wind up being embedded in the TF class
@@ -316,6 +213,7 @@ def export_tf(tf_collection, station_metadata_dict={}, survey_dict={}):
     return tf_cls
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def process_mth5_run(
     run_cfg,
     run_id,
@@ -365,28 +263,20 @@ def process_mth5_run(
         processing_config.reference_station_id = run_config.reference_station_id
         processing_config.channel_scale_factors = run_config.channel_scale_factors
 
-
         if dec_level_id == 0:
-            local, remote = get_data_from_decimation_level_from_mth5(
-                processing_config, mth5_obj, run_id
-            )
-
+            local, remote = get_data_from_mth5(processing_config, mth5_obj, run_id)
             # APPLY TIMING CORRECTIONS HERE
         else:
-            # This code structure assumes application of cascading decimation,
-            # and that the decimated data will be accessed from the previous
-            # decimation level.  This should be revisited .. it may make
-            # more sense to have a get_decimation_level() interface that provides an
-            # option of applying decimation or loading predecimated data.
+            # See Note#1 at top of module
             local = prototype_decimate(processing_config, local)
             if processing_config.reference_station_id:
                 remote = prototype_decimate(processing_config, remote)
-
         # </GET DATA>
-        local_stft_obj, remote_stft_obj = make_stft_objects(processing_config,
-                                                            local, remote, units)
+        local_stft_obj, remote_stft_obj = make_stft_objects(
+            processing_config, local, remote, units
+        )
         # MERGE STFTS goes here
-        tf_obj = process_mth5_decimation_level(
+        tf_obj = process_tf_decimation_level(
             processing_config, local_stft_obj, remote_stft_obj, units=units
         )
         tf_dict[dec_level_id] = tf_obj
@@ -395,28 +285,30 @@ def process_mth5_run(
             from aurora.sandbox.plot_helpers import plot_tf_obj
 
             plot_tf_obj(tf_obj, out_filename="out")
-
     # TODO: Add run_obj to TransferFunctionCollection ? WHY? so it doesn't need header?
     tf_collection = TransferFunctionCollection(header=tf_obj.tf_header, tf_dict=tf_dict)
     local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
 
     if z_file_path:
         tf_collection.write_emtf_z_file(z_file_path, run_obj=local_run_obj)
-
     if return_collection:
         return tf_collection
     else:
         # intended to be the default in future
+
+        # N.B. Currently, only the last run makes it into the tf object,
+        # but we can simply iterate of the run list here, getting run metadata
+        # station_metadata.add_run(run_metadata)
         station_metadata = local_run_obj.station_group.metadata
         station_metadata._runs = []
         run_metadata = local_run_obj.metadata
         station_metadata.add_run(run_metadata)
         survey_dict = mth5_obj.survey_group.metadata.to_dict()
-        
+
         print(station_metadata.run_list)
         tf_cls = export_tf(
-            tf_collection, 
+            tf_collection,
             station_metadata_dict=station_metadata.to_dict(),
-            survey_dict=survey_dict
+            survey_dict=survey_dict,
         )
         return tf_cls

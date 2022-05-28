@@ -15,6 +15,7 @@ tests/synthetic/out.png
 __pycache__/
 *.py[cod]
 *$py.class
+*.bak
 
 # C extensions
 *.so
