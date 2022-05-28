@@ -1,50 +1,78 @@
-from deprecated import deprecated
 from pathlib import Path
 
-from aurora.config.processing_config import RunConfig
-from aurora.pipelines.process_mth5 import process_mth5_run
+from aurora.config import BANDS_DEFAULT_FILE
+from aurora.config.config_creator import ConfigCreator
+from aurora.config.metadata import Processing
+
+from aurora.pipelines.process_mth5_new import process_mth5
+from aurora.test_utils.parkfield.path_helpers import AURORA_RESULTS_PATH
+from aurora.test_utils.parkfield.path_helpers import CONFIG_PATH
+from aurora.test_utils.parkfield.path_helpers import DATA_PATH
+from aurora.test_utils.parkfield.path_helpers import EMTF_RESULTS_PATH
+from aurora.tf_kernel.dataset import DatasetDefinition
+from aurora.tf_kernel.helpers import extract_run_summaries_from_mth5s
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 
 from make_parkfield_mth5 import test_make_parkfield_hollister_mth5
-from make_processing_configs import create_run_test_config_remote_reference
 
-from aurora.test_utils.parkfield.path_helpers import AURORA_RESULTS_PATH
-from aurora.test_utils.parkfield.path_helpers import EMTF_RESULTS_PATH
-
-
-@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def test_processing(z_file_path=None):
-    # processing_run_cfg = create_run_test_config()
+    """
+    Parameters
+    ----------
+    return_collection: bool
+        Controls dtype of returned object
+    z_file_path: str or Path or None
+        Where to store zfile
 
-    # processing_run_cfg = create_run_test_config()
-    # processing_run_cfg = Path("config", "PKD-RR_SAO_run_config.json")
-    # processing_run_cfg = Path("config", "pkd_test-RR_SAO_run_config.json")
-    processing_run_cfg = create_run_test_config_remote_reference()
-    config = RunConfig()
-    config.from_json(processing_run_cfg)
-    mth5_path = Path(config.mth5_path)
+    Returns
+    -------
+    tf_cls: TF object,
+        if  return_collection is True:
+        aurora.transfer_function.transfer_function_collection.TransferFunctionCollection
+        if  return_collection is False:
+        mt_metadata.transfer_functions.core.TF
+    """
+
+    mth5_path = DATA_PATH.joinpath("pkd_sao_test_00.h5")
 
     # Ensure there is an mth5 to process
     if not mth5_path.exists():
         test_make_parkfield_hollister_mth5()
 
-    run_id = "001"
+    run_summary = extract_run_summaries_from_mth5s([mth5_path,])
+    run_summary["remote"] = False
+    run_summary["remote"][run_summary["station_id"]=="SAO"] = True
+
+    cc = ConfigCreator(config_path=CONFIG_PATH)
+    config = cc.create_run_processing_object(emtf_band_file=BANDS_DEFAULT_FILE,
+                                        sample_rate=40.0,
+                                             output_channels=["ex", "ey"]
+                                        )
+    config.stations.from_dataset_dataframe(run_summary)
+    for decimation in config.decimations:
+        decimation.estimator.engine = "RME_RR"
+
+    dataset_definition = DatasetDefinition()
+    dataset_definition.df = run_summary
     show_plot = False
-    tf_collection = process_mth5_run(
-        processing_run_cfg,
-        run_id,
-        mth5_path=mth5_path,
-        units="MT",
-        show_plot=show_plot,
-        z_file_path=z_file_path,
-    )
-    return tf_collection
+    tf_cls = process_mth5(config,
+                          dataset_definition,
+                         units="MT",
+                         show_plot=show_plot,
+                         z_file_path=z_file_path,
+                         return_collection=True
+                         )
+
+    #tf_cls.write_tf_file(fn="emtfxml_test.xml", file_type="emtfxml")
+    return tf_cls
 
 
-@deprecated(version="0.0.3", reason="new mt_metadata based config")
+
+
+
 def main():
     z_file_path = AURORA_RESULTS_PATH.joinpath("pkd.zrr")
-    test_processing(z_file_path)
+    test_processing(z_file_path=z_file_path)
 
     # COMPARE WITH ARCHIVED Z-FILE
     auxilliary_z_file = EMTF_RESULTS_PATH.joinpath("PKD_272_00.zrr")
