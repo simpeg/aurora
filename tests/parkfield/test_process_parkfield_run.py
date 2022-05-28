@@ -1,3 +1,4 @@
+from deprecated import deprecated
 from pathlib import Path
 import pickle
 

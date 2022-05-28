@@ -254,7 +254,6 @@ def main():
     check_that_all_sliding_window_functions_return_equivalent_arrays()
     do_some_tests()
     test_apply_taper()
-    print("Fin")
 
 
 if __name__ == "__main__":

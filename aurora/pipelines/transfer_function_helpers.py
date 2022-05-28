@@ -4,6 +4,7 @@ and transfer_function_processing helpers.
 
 
 """
+from deprecated import deprecated
 import numpy as np
 
 from aurora.time_series.frequency_band_helpers import extract_band

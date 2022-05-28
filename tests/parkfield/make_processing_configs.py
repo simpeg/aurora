@@ -1,11 +1,11 @@
 """
 Creates configs for process one decimation level and one run
 """
+from deprecated import deprecated
 
 from aurora.general_helper_functions import BAND_SETUP_PATH
 from aurora.config.config_creator import ConfigCreator
 from aurora.config.decimation_level_config import DecimationLevelConfig
-
 from aurora.test_utils.parkfield.path_helpers import DATA_PATH
 from aurora.test_utils.parkfield.path_helpers import CONFIG_PATH
 

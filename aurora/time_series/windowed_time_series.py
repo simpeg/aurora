@@ -107,25 +107,11 @@ class WindowedTimeSeries(object):
     @staticmethod
     def apply_taper(data=None, taper=None, in_place=True):
         """
-            it turns out xarray handles this very cleanly as a direct multiply
-            operation.  Initially I was looping over channels and multiplying
-            each array using
-            tapered_obj = WindowedTimeSeries.apply_taper(data=windowed_obj,
-        #                                           taper=windowing_scheme.taper)
-            but one can simply call:
-            tapered_obj = windowed_obj * windowing_scheme.taper
-
-            Thus this method will be deprecated.
+        Point by point multiplication of taper against time series.
+        xarray handles this very cleanly as a direct multiply operation.
+        tapered_obj = windowed_obj * windowing_scheme.taper
         """
         data = data * taper
-        # validate_coordinate_ordering_time_domain(data)
-        #
-        # for key in data.keys():
-        #     print(f"key {key}")
-        #     windowed_array = data[key].data
-        #     tapered_windowed_data = windowed_array * taper
-        #     data[key].data = tapered_windowed_data
-
         return data
 
     @staticmethod

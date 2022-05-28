@@ -15,6 +15,7 @@ packaging the tf for export.  This could be worked around by extracting the meta
 at the start of this method. In fact, it would be a good idea in general to run a
 pre-check on the data that identifies which decimation levels are valid for each run.
 """
+from deprecated import deprecated
 import pandas as pd
 import xarray as xr
 
@@ -41,6 +42,7 @@ from mt_metadata.transfer_functions.core import TF
 from mth5.mth5 import MTH5
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def initialize_pipeline(run_config, mth5_path=None):
     """
     A place to organize args and kwargs.
@@ -77,6 +79,7 @@ def initialize_pipeline(run_config, mth5_path=None):
     return config, mth5_obj
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def get_remote_stft(config, mth5_obj, run_id):
     if config.reference_station_id:
         remote_run_obj = mth5_obj.get_run(config["reference_station_id"], run_id)
@@ -89,6 +92,7 @@ def get_remote_stft(config, mth5_obj, run_id):
     return remote_stft_obj
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def make_stft_objects(config, local, remote, units):
     """
     2022-02-08: Factor this out of process_tf_decimation_level in prep for merging
@@ -141,42 +145,7 @@ def make_stft_objects(config, local, remote, units):
     return local_stft_obj, remote_stft_obj
 
 
-def make_stft_objects_new(
-    config, run_obj, run_xrts, units, station_id
-):  # local, remote,
-    """
-    Note 1: CHECK DATA COVERAGE IS THE SAME IN BOTH LOCAL AND RR
-    This should be pushed into a previous validator before pipeline starts
-    # # if config.reference_station_id:
-    # #    local_run_xrts = local_run_xrts.where(local_run_xrts.time <=
-    # #                                          remote_run_xrts.time[-1]).dropna(
-    # #                                          dim="time")
-
-    2022-02-08: Factor this out of process_tf_decimation_level in prep for merging
-    runs.
-    2022-03-13: This method will supercede make_stft_objects.  This will operate on
-    local and remote independently.
-
-
-    Parameters
-    ----------
-    config
-    local
-    remote
-
-    Returns
-    -------
-
-    """
-    stft_obj = run_ts_to_stft(config, run_xrts)
-    scale_factors = config.station_scale_factors(station_id)
-    # local_stft_obj = run_ts_to_stft_scipy(config, local_run_xrts)
-    stft_obj = calibrate_stft_obj(
-        stft_obj, run_obj, units=units, channel_scale_factors=scale_factors,
-    )
-    return stft_obj
-
-
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def process_tf_decimation_level(config, local_stft_obj, remote_stft_obj, units="MT"):
     """
     Processing pipeline for a single decimation_level
@@ -211,6 +180,7 @@ def process_tf_decimation_level(config, local_stft_obj, remote_stft_obj, units="
     return transfer_function_obj
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def export_tf(tf_collection, station_metadata_dict={}, survey_dict={}):
     """
     This method may wind up being embedded in the TF class
@@ -243,6 +213,7 @@ def export_tf(tf_collection, station_metadata_dict={}, survey_dict={}):
     return tf_cls
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def process_mth5_run(
     run_cfg,
     run_id,
