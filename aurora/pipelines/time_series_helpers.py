@@ -2,9 +2,11 @@ import numpy as np
 import scipy.signal as ssig
 import xarray as xr
 
+from deprecated import deprecated
+
 from aurora.time_series.windowing_scheme import WindowingScheme
 
-
+@deprecated(version="0.0.3")
 def validate_sample_rate(run_ts, expected_sample_rate):
     """
 
@@ -26,6 +28,7 @@ def validate_sample_rate(run_ts, expected_sample_rate):
     return
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def apply_prewhitening(config, run_xrts_input):
     if config["prewhitening_type"] == "first difference":
         run_xrts = run_xrts_input.diff("time")
@@ -34,6 +37,7 @@ def apply_prewhitening(config, run_xrts_input):
     return run_xrts
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def apply_recoloring(config, stft_obj):
     if config["prewhitening_type"] == "first difference":
         from aurora.time_series.frequency_domain_helpers import get_fft_harmonics
@@ -45,6 +49,7 @@ def apply_recoloring(config, stft_obj):
     return stft_obj
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def run_ts_to_stft_scipy(config, run_xrts_orig):
     """
     Parameters
@@ -106,6 +111,7 @@ def run_ts_to_stft_scipy(config, run_xrts_orig):
     return stft_obj
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def run_ts_to_stft(config, run_xrts_orig):
     """
 
@@ -152,6 +158,7 @@ def run_ts_to_stft(config, run_xrts_orig):
     return stft_obj
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def run_ts_to_calibrated_stft(run_ts, run_obj, config, units="MT"):
     """
     Parameters
@@ -171,6 +178,7 @@ def run_ts_to_calibrated_stft(run_ts, run_obj, config, units="MT"):
     return stft_obj
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None):
     """
 
@@ -209,6 +217,7 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
     return stft_obj
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def get_data_from_mth5(config, mth5_obj, run_id):
     """
     ToDo: Review if this method should be moved into mth5.  If that were the case,
@@ -268,6 +277,7 @@ def get_data_from_mth5(config, mth5_obj, run_id):
     return local, remote
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def prototype_decimate(config, run_run_ts):
     """
     TODO: ?Move this function into time_series/decimate.py?
