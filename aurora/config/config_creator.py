@@ -11,6 +11,7 @@ info required to process a contiguous time series block at fixed samppling rate.
 RunConfig: This is a collection of processing configs, together with specifications for
 decimation.
 """
+from deprecated import deprecated
 from pathlib import Path
 
 from aurora.config.decimation_level_config import DecimationLevelConfig
@@ -26,6 +27,7 @@ class ConfigCreator:
 
 
     # pass an mth5, it has: station_id, run_id, mth5_path, sample_rate
+    @deprecated(version="0.0.3", reason="old config class no longer supported")
     def create_run_config(
         self, station_id="", run_id="", mth5_path="", sample_rate=-1.0, **kwargs
     ):

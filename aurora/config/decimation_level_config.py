@@ -1,9 +1,10 @@
+from deprecated import deprecated
 import json
 from pathlib import Path
 
 from mt_metadata.base import BaseDict
 
-
+@deprecated(version="0.0.3", reason="old config class no longer supported")
 class DecimationLevelConfig(BaseDict):
     """
     ToDo: Deprecate mth5_path from this level after addressing strategy in

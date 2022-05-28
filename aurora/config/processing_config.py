@@ -12,6 +12,7 @@ are reusable provided we use an EMTF-style band averaging scheme
 Once this is mature, put it into aurora.pipelines
 """
 # from collections.abc import MutableMapping
+from deprecated import deprecated
 from pathlib import Path
 
 import json
@@ -20,7 +21,7 @@ from aurora.config.decimation_level_config import DecimationLevelConfig
 from mt_metadata.base import BaseDict
 from mt_metadata.base.helpers import NumpyEncoder
 
-
+@deprecated(version="0.0.3", reason="old config class no longer supported")
 class RunConfig(BaseDict):
     """
     Class to contain a collection of DecimationLevelConfigs
