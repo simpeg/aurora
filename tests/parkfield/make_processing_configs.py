@@ -17,7 +17,7 @@ CHANNEL_SCALE_FACTORS["SAO"] = {}
 # CHANNEL_SCALE_FACTORS["SAO"]["ex"] = 1e6
 # CHANNEL_SCALE_FACTORS["SAO"]["ey"] = 1e6
 
-
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def create_decimation_level_test_config():
     cfg = DecimationLevelConfig()
     cfg.mth5_path = str(DATA_PATH.joinpath("pkd_test_00.h5"))
@@ -30,6 +30,7 @@ def create_decimation_level_test_config():
     return cfg
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def create_run_test_config():
     mth5_path = DATA_PATH.joinpath("pkd_test_00.h5")
     cc = ConfigCreator(config_path=CONFIG_PATH)
@@ -47,6 +48,7 @@ def create_run_test_config():
     return run_config_path
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def create_run_test_config_remote_reference():
     mth5_path = DATA_PATH.joinpath("pkd_sao_test_00.h5")
     cc = ConfigCreator(config_path=CONFIG_PATH)
@@ -67,6 +69,7 @@ def create_run_test_config_remote_reference():
     return run_config_path
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def main():
     create_decimation_level_test_config()
     create_run_test_config()

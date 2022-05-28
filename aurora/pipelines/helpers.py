@@ -2,7 +2,7 @@ from pathlib import Path
 
 from aurora.config.processing_config import RunConfig
 
-
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def initialize_config(run_config):
     """
 

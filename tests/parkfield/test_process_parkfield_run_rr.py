@@ -11,6 +11,7 @@ from aurora.test_utils.parkfield.path_helpers import AURORA_RESULTS_PATH
 from aurora.test_utils.parkfield.path_helpers import EMTF_RESULTS_PATH
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def test_processing(z_file_path=None):
     # processing_run_cfg = create_run_test_config()
 
@@ -39,6 +40,7 @@ def test_processing(z_file_path=None):
     return tf_collection
 
 
+@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def main():
     z_file_path = AURORA_RESULTS_PATH.joinpath("pkd.zrr")
     test_processing(z_file_path)

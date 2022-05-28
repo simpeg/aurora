@@ -25,6 +25,19 @@ ESTIMATOR_LIBRARY = {"OLS": RegressionEstimator, "RME": TRME, "RME_RR": TRME_RR}
 
 
 def get_estimator_class(estimation_engine):
+    """
+
+    Parameters
+    ----------
+    estimation_engine: str
+        One of the keys in the ESTIMATOR_LIBRARY, designates the method that will be
+        used to estimate the transfer function
+
+    Returns
+    -------
+    estimator_class: aurora.transfer_function.regression.base.RegressionEstimator
+        The class that will do the TF estimation
+    """
     try:
         estimator_class = ESTIMATOR_LIBRARY[estimation_engine]
     except KeyError:
