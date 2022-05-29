@@ -5,7 +5,7 @@
         "style": "controlled vocabulary",
         "units": null,
         "description": "The transfer function estimator engine",
-        "options": ["RME_RR", "other"],
+        "options": ["RME_RR", "RME", "other"],
         "alias": [],
         "example": "RME_RR",
 		"default": "RME_RR"
