@@ -20,13 +20,17 @@ def make_orientation_block_of_z_file(run_obj, channel_list=None):
     based on this fortran snippet:
             write(3, 115) k, orient(1, k), orient(2, k), stname(1: 3), chid(k)
     format(i5, 1x, f8.2, 1x, f8.2, 1x, a3, 2x, a6) #Fortran Format
+
     Parameters
     ----------
-    run_obj
+    run_obj: mth5.groups.master_station_run_channel.RunGroup
+        Container with metadata about the channels
 
     Returns
     -------
-
+    output_strings: list (of strings)
+        Each element of the list corresponds to one channel, and is a block of text for
+        the emtf z-file with the channel orientation, name and associated station
     """
     output_strings = []
     ff_format = ff.FortranRecordWriter("(i5, 1x, f8.2, 1x, f8.2, 1x, " "a3, 1x, a3)")
@@ -46,9 +50,7 @@ def make_orientation_block_of_z_file(run_obj, channel_list=None):
         )
         out_str = f"{fortran_str}\n"
         output_strings.append(out_str)
-        # except:
-        #     print(f"No channel {channel_id} in run")
-        #     pass
+
     if not output_strings:
         print("No channels found in run_object")
         raise Exception

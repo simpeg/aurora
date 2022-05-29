@@ -1,5 +1,4 @@
 """
-Placeholder class.  Will probably evolve structure in time.
 This is a container to hold:
 1. TransferFunctionHeader
 2. Dictionary of TransferFunction Objects
@@ -8,6 +7,7 @@ Note that a single transfer function object is associated with a station,
 which we call the "local_station".  In a database of TFs we could add a column
 for local_station and one for reference station.
 """
+
 import fortranformat as ff
 import numpy as np
 import xarray as xr
@@ -278,7 +278,7 @@ class TransferFunctionCollection(object):
         f.writelines(" **** IMPEDANCE IN MEASUREMENT COORDINATES ****\n")
         f.writelines(" ********** WITH FULL ERROR COVARINCE**********\n")
 
-        # <processing scheme>
+        #processing scheme
         try:
             processing_scheme = EMTF_REGRESSION_ENGINE_LABELS[
                 self.header.processing_scheme
@@ -291,7 +291,6 @@ class TransferFunctionCollection(object):
         line = f"{processing_scheme}"
         line += (80 - len(line)) * " " + "\n"
         f.writelines(line)
-        # </processing scheme>
 
         # <station>
         # format('station    :', a20)
@@ -320,16 +319,15 @@ class TransferFunctionCollection(object):
         f.writelines(location_str)
         # </location>
 
-        # <num channels / num frequencies>
+        # num channels and num frequencies
         # 110   format('number of channels ',i3,2x,' number of frequencies ',i4)
         num_frequencies = self.total_number_of_frequencies
         num_channels_str = f"number of channels   {self.total_number_of_channels}"
         num_frequencies_str = f"number of frequencies   {num_frequencies}"
         out_str = f"{num_channels_str}   {num_frequencies_str}\n"
         f.writelines(out_str)
-        # </num channels / num frequencies>
 
-        # <Orientations and tilts>
+        #Orientations and tilts
         print("CHANNEL ORIENTATION METADATA NEEDED")
         print("Make the channel list be only the active channels for a z-file")
         assert self.total_number_of_channels == len(self.channel_list)
@@ -340,7 +338,7 @@ class TransferFunctionCollection(object):
                 run_obj, channel_list=ch_list
             )
         f.writelines(orientation_strs)
-        # </Orientations and tilts>
+
 
         f.writelines("\n")
 
@@ -360,18 +358,16 @@ class TransferFunctionCollection(object):
             periods = tf.frequency_bands.band_centers(frequency_or_period="period")
             periods = np.flip(periods)  # EMTF works in increasing period
             dec_level_config = tf.processing_config.decimations[i_dec]
-            
+
             for band in tf.frequency_bands.bands(direction="increasing_period"):
                 #print(f"band {band}")
                 line1 = f"period :      {band.center_period:.5f}    "
                 line1 += f"decimation level   {i_dec+1}     "
 
-                # <Make a method of processing config?>
                 sample_rate = dec_level_config.decimation.sample_rate
                 num_samples_window = dec_level_config.window.num_samples
                 freqs = np.fft.fftfreq(num_samples_window, 1.0 / sample_rate)
                 fc_indices = band.fourier_coefficient_indices(freqs)
-                # </Make a method of processing config?>
                 fc_indices_str = f"{fc_indices[0]} to   {fc_indices[-1]}"
                 line1 += f"freq. band from   {fc_indices_str}\n"
                 f.writelines(line1)
@@ -384,11 +380,12 @@ class TransferFunctionCollection(object):
                 line2 += f"sampling freq.   {sample_rate} Hz\n"
                 f.writelines(line2)
 
-                f.writelines("  Transfer Functions\n")
+
                 # write the tf:
                 # rows are output channels (hz, ex, ey),
                 # columns are input channels (hx, hy)
-                
+                f.writelines("  Transfer Functions\n")
+
                 line = ""
                 for out_ch in tf.tf_header.output_channels:
                     for inp_ch in tf.tf_header.input_channels:
