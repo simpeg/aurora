@@ -1,27 +1,26 @@
-from deprecated import deprecated
 from pathlib import Path
 
-from aurora.config.processing_config import RunConfig
+from aurora.config import Processing
 
-@deprecated(version="0.0.3", reason="new mt_metadata based config")
-def initialize_config(run_config):
+
+def initialize_config(processing_config):
     """
 
     Parameters
     ----------
     processing_cfg: path or str
-
+        Either an instance of the processing class or a path to a json file that a
+        Processing object is stored in.
     Returns :
     -------
-
+    config: aurora.config.metadata.processing.Processing
+        Object that contains the processing parameters
     """
-    if isinstance(run_config, Path) or isinstance(run_config, str):
-        config = RunConfig()
-        config.from_json(run_config)
-    elif isinstance(run_config, RunConfig):
-        config = run_config
-        print("ToBeDeprecated")
+    if isinstance(processing_config, (Path, str)):
+        config = Processing()
+        config.from_json(processing_config)
+    elif isinstance(processing_config, Processing):
+        config = processing_config
     else:
-        print(f"Unrecognized config of type {type(run_config)}")
-        raise Exception
+        raise Exception(f"Unrecognized config of type {type(processing_config)}")
     return config

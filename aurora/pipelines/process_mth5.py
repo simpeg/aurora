@@ -23,7 +23,7 @@ pre-check on the data that identifies which decimation levels are valid for each
 
 import xarray as xr
 
-from aurora.pipelines.helpers_new import initialize_config
+from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.time_series_helpers_new import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers_new import get_run_run_ts_from_mth5
 from aurora.pipelines.time_series_helpers_new import prototype_decimate
@@ -74,7 +74,7 @@ def initialize_pipeline(config):
     ----------
     config : str, pathlib.Path, or aurora.config.metadata.processing.Processing object
         If str or Path is provided, this will read in the config and return it as a
-        RunConfig object.
+        Processing object.
 
     Returns
     -------

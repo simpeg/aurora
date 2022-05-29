@@ -10,7 +10,6 @@ import pandas as pd
 import pathlib
 
 from aurora.config.config_creator import ConfigCreator
-from aurora.config.processing_config import RunConfig
 from aurora.general_helper_functions import TEST_PATH
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.tf_kernel.dataset import channel_summary_to_run_summary
@@ -40,78 +39,7 @@ def test_make_dataset_definition():
     return dataset_definition
 
 
-def make_processing_config_a(h5_path):#:station_id, run_id, sample_rate):
-    """
-    
-    Returns
-    -------
 
-    """
-    station_id = "CAS04"
-    run_id = "a"
-    sample_rate = 1.0
-    config_maker = ConfigCreator()
-    #decimation_factors = [1, 4, 4, 4, 4]
-    decimation_factors = [1, 4, 4, 4,]
-    config_path = config_maker.create_run_config(station_id,
-                                                 run_id,
-                                                 h5_path,
-                                                 sample_rate,
-                                                 decimation_factors=decimation_factors,
-                                                 channel_scale_factors={
-                                                     "CAS04":{"ex":1e6, "ey":1e6}} )
-    return config_path
-
-
-
-def process_with_dataset_definition(config_path, mth5_path, dataset_dfn,
-                                          show_plot=False, z_file_path="test.zss"):
-    tf_cls = process_mth5(
-        config_path,
-        dataset_dfn,
-        mth5_path=mth5_path,
-        units="MT",
-        show_plot=show_plot,
-        z_file_path=z_file_path,
-        return_collection=False,
-    )
-    tmp = tf_cls.write_tf_file(fn="cas04_ss_a.xml", file_type="emtfxml")
-    print(f"would be nice if {tmp} was the xml")
-    return
-
-
-def process_run(mth5_obj, run_id):
-    """
-    Parameters
-    ----------
-    run_id
-
-    Returns
-    -------
-
-    """
-
-    print("you need a processing config for this run")
-    pass
-
-def create_run_config(mth5_obj, run_id):
-    """
-    Need a kwarg for single station and for remote reference
-
-    Parameters
-    ----------
-    mth5_obj
-    run_id
-
-    Returns
-    -------
-
-    """
-    run_group = mth5_obj.get_run("CAS04", run_id)
-    print(run_group.metadata)
-
-
-    return
 
 def process_merged_runs(run_ids):
     pass
@@ -120,7 +48,7 @@ def main():
     defn_df = test_make_dataset_definition()
 
     #To process only run "a":
-    mth5_path = DATA_PATH.joinpath("ZU_CAS04.h5")#../backup/data/
+    mth5_path = DATA_PATH.joinpath("8P_CAS04.h5")#../backup/data/
     tfk = TransferFunctionKernel(mth5_path=mth5_path)
 
     #Make quick channel_summary for rapid testing
@@ -128,28 +56,20 @@ def main():
     print("COnvert Summary DF into a list of runs to process, with start and end times")
     print(f"summary df={summary_df}")
 
-    # Make Slow channel summary for thorough testing
-    # summary_df2 = tfk.get_channel_summary()
-    # print(f"summary df2={summary_df}")
-    # print(f"OK? {summary_df==summary_df2}")
-
     dataset_definition = DatasetDefinition()
     dataset_definition.from_mth5_channel_summary(summary_df)
     dataset_df = dataset_definition.restrict_runs_by_station("CAS04", ["a",],
                                                              overwrite=True)
-    config_path = make_processing_config_a(mth5_path)
-    print("NEW PROCESSING OK")
-    # process_with_dataset_definition(config_path, mth5_path,
-    #                                       dataset_definition, show_plot=False,
-    #                                       z_file_path="a.zss")
-    print("DATASET DEFN A OK")
+
     dataset_definition = DatasetDefinition()
     dataset_definition.from_mth5_channel_summary(summary_df)
     run_ids = ["a", "b"]
 #    run_ids = ["b", "c", "d"]
     dataset_df = dataset_definition.restrict_runs_by_station("CAS04", run_ids,
                                                              overwrite=True)
-    ee = process_with_dataset_definition(config_path, mth5_path,
+
+    ##NEED A CONFIG HERE, THIS WAS NEVER RUN WITH NEW PROCESSING CONFIG
+    ee = process_mth5(config, mth5_path,
                                         dataset_definition, show_plot=False,
                                         z_file_path="a_b.zss")
     print("A,B OK")

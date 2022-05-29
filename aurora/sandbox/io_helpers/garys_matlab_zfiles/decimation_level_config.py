@@ -7,9 +7,7 @@ from mt_metadata.base import BaseDict
 @deprecated(version="0.0.3", reason="old config class no longer supported")
 class DecimationLevelConfig(BaseDict):
     """
-    ToDo: Deprecate mth5_path from this level after addressing strategy in
-    issue #13
-
+    This class is only used to read in garys matlab z-files and not for anything else.
     """
 
     def __init__(self, *args, **kwargs):

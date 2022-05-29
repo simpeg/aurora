@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.io as sio
 
-from aurora.config.decimation_level_config import DecimationLevelConfig
+from decimation_level_config import DecimationLevelConfig
 from aurora.general_helper_functions import BAND_SETUP_PATH
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.time_series.frequency_band import FrequencyBands
