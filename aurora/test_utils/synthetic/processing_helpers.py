@@ -2,7 +2,7 @@ from pathlib import Path
 
 from aurora.config.metadata.processing import Processing
 from aurora.pipelines.helpers import initialize_config
-from aurora.pipelines.process_mth5_new import process_mth5
+from aurora.pipelines.process_mth5 import process_mth5
 
 def process_sythetic_data(processing_config, dataset_definition, units="MT",
                           z_file_path=""):

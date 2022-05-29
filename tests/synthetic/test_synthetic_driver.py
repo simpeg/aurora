@@ -1,4 +1,3 @@
-from aurora.pipelines.process_mth5 import process_mth5_run
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test2_h5
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
@@ -24,7 +23,7 @@ from aurora.tf_kernel.helpers import extract_run_summaries_from_mth5s
 #     test_config = CONFIG_PATH.joinpath("test1_run_config_underdetermined.json")
 #     # test_config = Path("config", "test1_run_config_underdetermined.json")
 #     run_id = "001"
-#     process_mth5_run(test_config, run_id, units="MT")
+#     process_sythetic_data(test_config, run_id, units="MT")
 #
 #
 # def process_synthetic_1_with_nans():
@@ -37,7 +36,7 @@ from aurora.tf_kernel.helpers import extract_run_summaries_from_mth5s
 #     test_config = CONFIG_PATH.joinpath("test1_run_config_nan.json")
 #     #    test_config = Path("config", "test1_run_config_nan.json")
 #     run_id = "001"
-#     process_mth5_run(test_config, run_id, units="MT")
+#     process_sythetic_data(test_config, run_id, units="MT")
 
 
 def process_synthetic_1(z_file_path="", test_scale_factor=False):

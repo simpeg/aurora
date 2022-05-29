@@ -12,8 +12,7 @@ import pathlib
 from aurora.config.config_creator import ConfigCreator
 from aurora.config.processing_config import RunConfig
 from aurora.general_helper_functions import TEST_PATH
-from aurora.pipelines.process_mth5 import process_mth5_run
-from aurora.pipelines.process_mth5_new import process_mth5
+from aurora.pipelines.process_mth5 import process_mth5
 from aurora.tf_kernel.dataset import channel_summary_to_run_summary
 from aurora.tf_kernel.base import TransferFunctionKernel
 from aurora.tf_kernel.dataset import DatasetDefinition
@@ -63,20 +62,6 @@ def make_processing_config_a(h5_path):#:station_id, run_id, sample_rate):
                                                      "CAS04":{"ex":1e6, "ey":1e6}} )
     return config_path
 
-def process_run_a(config_path, mth5_path):
-    tf_cls = process_mth5_run(
-        config_path,
-        "a",
-        mth5_path=mth5_path,
-        units="MT",
-        show_plot=True,
-        z_file_path="a.zss",
-        return_collection=False,
-    )
-
-    tmp = tf_cls.write_tf_file(fn="cas04_ss_a.xml", file_type="emtfxml")
-    print(f"would be nice if {tmp} was the xml")
-    return
 
 
 def process_with_dataset_definition(config_path, mth5_path, dataset_dfn,
@@ -153,8 +138,6 @@ def main():
     dataset_df = dataset_definition.restrict_runs_by_station("CAS04", ["a",],
                                                              overwrite=True)
     config_path = make_processing_config_a(mth5_path)
-    #qq = process_run_a(config_path, mth5_path)
-    #ww = process_run_a_new(config_path, mth5_path)
     print("NEW PROCESSING OK")
     # process_with_dataset_definition(config_path, mth5_path,
     #                                       dataset_definition, show_plot=False,
