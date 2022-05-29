@@ -365,7 +365,7 @@ class TransferFunctionCollection(object):
                 print("OLD STYLE ProceessingConfig in use")
                 print("This is supposed to be deprecated in 0.0.3")
                 dec_level_config = tf.processing_config
-                raise Exception
+                #raise Exception
 
             for band in tf.frequency_bands.bands(direction="increasing_period"):
                 #print(f"band {band}")
@@ -380,7 +380,7 @@ class TransferFunctionCollection(object):
                     print("This is supposed to be deprecated in 0.0.3")
                     sample_rate = dec_level_config.decimation.sample_rate
                     num_samples_window = dec_level_config.window.num_samples
-                    raise Exception
+                    #raise Exception
                 freqs = np.fft.fftfreq(num_samples_window, 1.0 / sample_rate)
                 fc_indices = band.fourier_coefficient_indices(freqs)
                 # </Make a method of processing config?>
