@@ -359,28 +359,16 @@ class TransferFunctionCollection(object):
             cov_nn_xr = tf.cov_nn
             periods = tf.frequency_bands.band_centers(frequency_or_period="period")
             periods = np.flip(periods)  # EMTF works in increasing period
-            try:
-                dec_level_config = tf.processing_config.decimations[i_dec]
-            except:
-                print("OLD STYLE ProceessingConfig in use")
-                print("This is supposed to be deprecated in 0.0.3")
-                dec_level_config = tf.processing_config
-                #raise Exception
-
+            dec_level_config = tf.processing_config.decimations[i_dec]
+            
             for band in tf.frequency_bands.bands(direction="increasing_period"):
                 #print(f"band {band}")
                 line1 = f"period :      {band.center_period:.5f}    "
                 line1 += f"decimation level   {i_dec+1}     "
+
                 # <Make a method of processing config?>
-                try:
-                    sample_rate = tf.processing_config.sample_rate
-                    num_samples_window = tf.processing_config.num_samples_window
-                except AttributeError:
-                    print("OLD STYLE ProceessingConfig in use")
-                    print("This is supposed to be deprecated in 0.0.3")
-                    sample_rate = dec_level_config.decimation.sample_rate
-                    num_samples_window = dec_level_config.window.num_samples
-                    #raise Exception
+                sample_rate = dec_level_config.decimation.sample_rate
+                num_samples_window = dec_level_config.window.num_samples
                 freqs = np.fft.fftfreq(num_samples_window, 1.0 / sample_rate)
                 fc_indices = band.fourier_coefficient_indices(freqs)
                 # </Make a method of processing config?>
