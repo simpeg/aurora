@@ -18,7 +18,7 @@ from pathlib import Path
 
 from aurora.test_utils.dataset_definitions import TEST_DATA_SET_CONFIGS
 
-from aurora.sandbox.io_helpers.testing_data import get_example_data
+from aurora.test_utils.parkfield.testing_data import get_example_data
 from aurora.sandbox.xml_sandbox import describe_inventory_stages
 from mth5.utils.helpers import initialize_mth5
 from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
