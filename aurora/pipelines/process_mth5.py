@@ -173,15 +173,19 @@ def process_tf_decimation_level(config, i_dec_level, local_stft_obj,
     :return:
     Parameters
     ----------
-    config : aurora.config.decimation_level_config.DecimationLevelConfig
+    config: aurora.config.metadata.decimation_level.DecimationLevel
+        Config for a single decimation level
+    i_dec_level: int
+        decimation level_id
+        ?could we pack this into the decimation level as an attr?
+    local_stft_obj
+    remote_stft_obj
     units
 
     Returns
     -------
     transfer_function_obj : aurora.transfer_function.TTFZ.TTFZ
-
-
-
+        The transfer function values packed into an object
     """
     frequency_bands = config.decimations[i_dec_level].frequency_bands_obj()
     transfer_function_header = transfer_function_header_from_config(config, i_dec_level)
@@ -373,10 +377,10 @@ def process_mth5(
         remote_stfts = []
         for i,row in dataset_df.iterrows():
             run_xrts = row["run_dataarray"].to_dataset("channel")
-            print("The decimation_level_config here does not have the scale factors, "
-                  "which are needed in make_stft_objects")
-            stft_obj = make_stft_objects(processing_config, i_dec_level, row["run"],
-                                              run_xrts, units, row.station_id)
+            run_obj = row["run"]
+            station_id = row.station_id
+            stft_obj = make_stft_objects(processing_config, i_dec_level, run_obj,
+                                              run_xrts, units, station_id)
 
             if row.station_id == processing_config.stations.local.id:
                 local_stfts.append(stft_obj)

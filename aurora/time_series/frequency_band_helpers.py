@@ -86,6 +86,9 @@ def frequency_band_edges(
 
 def configure_frequency_bands(config):
     """
+    2022-05-30: This method was never put into production and will need to be
+    modified to use the new Processing class.
+
     May want to make config a "frequency band config object", but maybe not.
     For now just using a flat config structure (per decimation level)
 
@@ -97,7 +100,8 @@ def configure_frequency_bands(config):
 
     Parameters
     ----------
-    config : aurora.config.decimation_level_config.DecimationLevelConfig
+    config : aurora.config.metadata.decimation_level.DecimationLevel
+
         The configuration parameters for setting up the frequency bands.
 
         If config["band_setup_style"] is "EMTF" this will look for one of
