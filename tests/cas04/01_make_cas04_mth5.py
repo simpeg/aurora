@@ -55,7 +55,8 @@ def make_cas04_data_for_processing(xml_path=None, h5_path="tmp.h5",
     if xml_path is not None:
         mth5_obj = xml_to_mth5(str(xml_path)) #8P
     else:
-
+        print("get file from IRIS")
+        raise NotImplementedError
     mth5_obj.channel_summary.summarize()
     summary_df = mth5_obj.channel_summary.to_dataframe()
     #     summary_df.to_csv(summary_csv, index=False)
