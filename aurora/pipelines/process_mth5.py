@@ -44,13 +44,16 @@ from mth5.mth5 import MTH5
 def fix_time(tstmp):
     """
     One-off temporary workaround for mt_metadata issue #86
+
     Parameters
     ----------
-    tstmp: pandas Timestamp
+    tstmp: pd.Timestamp
+        Timestamp with a format that is resulting in ValueError: Time zone must be UTC
 
     Returns
     -------
-    datetime.datetime
+    out: datetime.datetime
+        The pandas timestamp as a datetime.datetime object
     """
     import datetime
     year = tstmp.year
