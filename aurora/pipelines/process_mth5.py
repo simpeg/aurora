@@ -257,11 +257,6 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
 
 
     """
-    # all_run_objs = len(dataset_df) * [None]
-    # all_run_ts_objs = len(dataset_df) * [None]
-    all_stft_objs = len(dataset_df) * [None] #need these bc df not taking assingments
-
-
     if i_dec_level == 0:
         #see Note 1 in this function doc notes
         for i,row in dataset_df.iterrows():
@@ -275,9 +270,6 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
             dataset_df["run"].at[i] = run_dict["run"]
             #see Note 2 in this function doc notes
             dataset_df["run_dataarray"].at[i] = run_dict["mvts"].to_array("channel")
-
-            # all_run_objs[i] = run_dict["run"]
-            # all_run_ts_objs[i] = run_dict["mvts"]
 
             # APPLY TIMING CORRECTIONS HERE
     else:
@@ -349,11 +341,9 @@ def process_mth5(
     """
     
     processing_config, mth5_objs = initialize_pipeline(config)
-
     dataset_df = dataset_definition.df
-    #</Move into TFKernel()>
 
-    #flesh out dataset_df, populate the with mth5_objs
+    #Assign additional columns to dataset_df, populate with mth5_objs
     all_mth5_objs = len(dataset_df) * [None]
     for i, station_id in enumerate(dataset_df["station_id"]):
         all_mth5_objs[i] = mth5_objs[station_id]
@@ -361,22 +351,18 @@ def process_mth5(
     dataset_df["run"] = None
     dataset_df["run_dataarray"] = None
     dataset_df["stft"] = None
-    #</MAKE SURE DATASET DEFINITION DF HAS "run", "run_ts" columns>
+
 
     print(f"Processing config indicates {len(processing_config.decimations)} "
           f"decimation levels ")
 
     tf_dict = {}
 
-    # local_station_id = processing_config.stations.local.id #still need this?
-    # if processing_config.stations.remote:
-    #     remote_station_id = processing_config.stations.remote.id
-
     for i_dec_level, dec_level_config in enumerate(processing_config.decimations):
         dataset_df = populate_dataset_df(i_dec_level, dec_level_config, dataset_df)
         #ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
 
-        #<CONVERT TO STFT>
+        # Convert to STFT
         local_stfts = []
         remote_stfts = []
         for i,row in dataset_df.iterrows():
@@ -391,22 +377,18 @@ def process_mth5(
             elif row.station_id == \
                     processing_config.stations.remote[0].id:#reference_station_id:
                 remote_stfts.append(stft_obj)
-            # all_stft_objs[i] = stft_obj
-            # dataset_df["stft"].loc[i] = stft_obj.to_array("channel")
 
 
-        # MERGE STFTS goes here
-        print("merge-o-rama")
-
+        # Merge STFTs
         local_merged_stft_obj = xr.concat(local_stfts, "time")
-        # MUTE BAD FCs HERE - Not implemented yet.
+        # Could mute bad FCs here - Not implemented yet.
         # RETURN FC_OBJECT
 
         if processing_config.stations.remote:#reference_station_id:
             remote_merged_stft_obj = xr.concat(remote_stfts, "time")
         else:
             remote_merged_stft_obj = None
-        #</CONVERT TO STFT>
+
 
         tf_obj = process_tf_decimation_level(
             processing_config,
@@ -420,14 +402,10 @@ def process_mth5(
 
         if show_plot:
             from aurora.sandbox.plot_helpers import plot_tf_obj
-
             plot_tf_obj(tf_obj, out_filename="out")
 
-    # TODO: Add run_obj to TransferFunctionCollection ? WHY? so it doesn't need header?
+    # TODO: Add run_obj to TransferFunctionCollection so it doesn't need header?
     tf_collection = TransferFunctionCollection(header=tf_obj.tf_header, tf_dict=tf_dict)
-
-    #
-    print("Need to review this info @Jared, review role of local_run_obj in export tf ")
 
     #local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
     local_run_obj = dataset_df["run"].iloc[0]
@@ -439,16 +417,12 @@ def process_mth5(
         return tf_collection
     else:
         # intended to be the default in future
-        #
-        # There is a container that can handle storage of multiple runs in xml
-        # Anna made something like this.
-        # N.B. Currently, only the last run makes it into the tf object,
-        # but we can simply iterate of the run list here, getting run metadata
-        # station_metadata.add_run(run_metadata)
         station_metadata = local_run_obj.station_group.metadata
         station_metadata._runs = []
         run_metadata = local_run_obj.metadata
         station_metadata.add_run(run_metadata)
+
+        #We need to create an issue for this as well
         if len(mth5_objs) == 1:
             key = list(mth5_objs.keys())[0]
             survey_dict = mth5_objs[key].survey_group.metadata.to_dict()
