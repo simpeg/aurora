@@ -257,9 +257,9 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
 
 
     """
-    all_run_objs = len(dataset_df) * [None]
-    all_run_ts_objs = len(dataset_df) * [None]
-    all_stft_objs = len(dataset_df) * [None] #need these bc df not taking assingments 
+    # all_run_objs = len(dataset_df) * [None]
+    # all_run_ts_objs = len(dataset_df) * [None]
+    all_stft_objs = len(dataset_df) * [None] #need these bc df not taking assingments
 
 
     if i_dec_level == 0:
@@ -276,8 +276,8 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
             #see Note 2 in this function doc notes
             dataset_df["run_dataarray"].at[i] = run_dict["mvts"].to_array("channel")
 
-            all_run_objs[i] = run_dict["run"]
-            all_run_ts_objs[i] = run_dict["mvts"]
+            # all_run_objs[i] = run_dict["run"]
+            # all_run_ts_objs[i] = run_dict["mvts"]
 
             # APPLY TIMING CORRECTIONS HERE
     else:
