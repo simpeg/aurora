@@ -5,6 +5,10 @@ several other issues and testing out several functionalities.
 First, an mth5 is created for all available data.  This is accomplished by starting
 with a station_xml file that was provided by Anna (and then modified by Tim).
 
+This xml was being used in lieu of what is kept in the iris archive because what is
+in the archive had errors.  An alternative approach would be to get the inventory
+object from IRIS.
+
 Seem to be encountering an issue with mth5 not being 0.1.0
 
 This tests the make_mth5_from_fdsnclient() method of MakeMTH5.
@@ -17,7 +21,6 @@ This tests the make_mth5_from_fdsnclient() method of MakeMTH5.
 
 """
 
-from obspy import read_inventory
 import pandas as pd
 import pathlib
 
@@ -29,34 +32,17 @@ from mth5.utils.helpers import read_back_data
 #from mth5.clients.make_mth5_rev_002 import MakeMTH5
 from mth5.clients.make_mth5 import MakeMTH5
 from mt_metadata.timeseries.stationxml import xml_network_mt_survey
-from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 
+from helper_functions import xml_to_mth5
 
 CAS04_PATH = TEST_PATH.joinpath("cas04")
 DATA_PATH = CAS04_PATH.joinpath("data")
 DATA_PATH.mkdir(exist_ok=True)
 XML_PATH = CAS04_PATH.joinpath("cas04_from_tim_20211203.xml")
+NETWORK = "8P"
 
-def xml_to_mth5(xml_path, h5_path="tmp.h5"):
-    """
-    Parameters
-    ----------
-    xml_path
 
-    Returns
-    -------
-
-    """
-    inventory0 = read_inventory(str(xml_path)) #8P
-    translator = XMLInventoryMTExperiment()
-    experiment = translator.xml_to_mt(inventory_object=inventory0)
-    mth5_obj = initialize_mth5(h5_path)
-    mth5_obj.from_experiment(experiment)
-    return mth5_obj
-
-def make_cas04_data_for_processing(xml_path, h5_path="tmp.h5",
-                                   generate_channel_summary=True,
-                                   summary_csv="channel_summary.csv",
+def make_cas04_data_for_processing(xml_path=None, h5_path="tmp.h5",
                                    active_runs=["a", ]):
     """
     This example is intended to be a template for working with XML files and
@@ -66,24 +52,21 @@ def make_cas04_data_for_processing(xml_path, h5_path="tmp.h5",
 
     """
     #<CREATE MTH5 FROM XML AND SUMMARIZE DATA TO QUEUE>
-    inventory0 = read_inventory(str(xml_path)) #8P
-    translator = XMLInventoryMTExperiment()
-    experiment = translator.xml_to_mt(inventory_object=inventory0)
-    mth5_obj = initialize_mth5(h5_path, mode="w")
-    mth5_obj.from_experiment(experiment)
-
-    if generate_channel_summary:
-        mth5_obj.channel_summary.summarize()
-        summary_df = mth5_obj.channel_summary.to_dataframe()
-        summary_df.to_csv(summary_csv, index=False)
+    if xml_path is not None:
+        mth5_obj = xml_to_mth5(str(xml_path)) #8P
     else:
-        summary_df = pd.read_csv(summary_csv, parse_dates=["start", "end"])
+
+    mth5_obj.channel_summary.summarize()
+    summary_df = mth5_obj.channel_summary.to_dataframe()
+    #     summary_df.to_csv(summary_csv, index=False)
+    # else:
+    #     summary_df = pd.read_csv(summary_csv, parse_dates=["start", "end"])
     #</CREATE MTH5 FROM XML AND SUMMARIZE DATA TO QUEUE>
 
     #<TRANSFORM CHANNEL SUMMARY INTO REQUEST DF>
     if active_runs is not None:
         summary_df = summary_df[summary_df["run"].isin(active_runs)] #summary_df[0:5]
-    request_df = channel_summary_to_make_mth5(summary_df, network="ZU")
+    request_df = channel_summary_to_make_mth5(summary_df, network=NETWORK)
     print(request_df)
     #</TRANSFORM CHANNEL SUMMARY INTO REQUEST DF>
 
@@ -110,8 +93,6 @@ def test_make_mth5():
     """
     h5_path = DATA_PATH.joinpath("cas04.h5")
     mth5_path = make_cas04_data_for_processing(XML_PATH, h5_path=h5_path,
-                                               generate_channel_summary=True,
-                                               summary_csv="channel_summary.csv",
                                                active_runs=None)#["a", ])
     #mth5_path = DATA_PATH.joinpath("../backup/data/ZU_CAS04.h5")
     read_back_data(mth5_path, "CAS04", "a")
@@ -128,7 +109,7 @@ def run_tests():
     if make_mth5_from_scratch:
         mth5_path = test_make_mth5()
     else:
-        mth5_path = DATA_PATH.joinpath("ZU_CAS04.h5")#../backup/data/
+        mth5_path = DATA_PATH.joinpath("8P_CAS04.h5")#../backup/data/
     return mth5_path
 
 def main():
