@@ -24,10 +24,10 @@ pre-check on the data that identifies which decimation levels are valid for each
 import xarray as xr
 
 from aurora.pipelines.helpers import initialize_config
-from aurora.pipelines.time_series_helpers_new import calibrate_stft_obj
-from aurora.pipelines.time_series_helpers_new import get_run_run_ts_from_mth5
-from aurora.pipelines.time_series_helpers_new import prototype_decimate
-from aurora.pipelines.time_series_helpers_new import run_ts_to_stft
+from aurora.pipelines.time_series_helpers import calibrate_stft_obj
+from aurora.pipelines.time_series_helpers import get_run_run_ts_from_mth5
+from aurora.pipelines.time_series_helpers import prototype_decimate
+from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.transfer_function_helpers_new import process_transfer_functions
 from aurora.pipelines.transfer_function_helpers_new import (
     transfer_function_header_from_config,
