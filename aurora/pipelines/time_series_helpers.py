@@ -17,9 +17,6 @@ def validate_sample_rate(run_ts, expected_sample_rate):
         The samepling rate the time series is expected to have. Normally taken from
         the processing config
 
-    Returns
-    -------
-
     """
     if run_ts.sample_rate != expected_sample_rate:
         print(
@@ -27,8 +24,7 @@ def validate_sample_rate(run_ts, expected_sample_rate):
             f"processing decimation_obj {decimation_obj.sample_rate} do not match"
         )
         raise Exception
-    return
-
+    
 
 def apply_prewhitening(decimation_obj, run_xrts_input):
     """
