@@ -422,15 +422,31 @@ def process_mth5(
         return tf_collection
     else:
         # intended to be the default in future
-        #get a list of local runs:
 
-        # iterate over these
+        #See ISSUE #181: Uncomment this once we have a mature multi-run test
+        # #dataset_definition.get_station_metadata_for_tf_archive()
+        # #get a list of local runs:
+        # cond1 = dataset_df["station_id"]==processing_config.stations.local.id
+        # sub_df = dataset_df[cond1]
+        # #sanity check:
+        # run_ids = sub_df.run_id.unique()
+        # assert(len(run_ids) == len(sub_df))
+        # # iterate over these runs, packing metadata into
+        # station_metadata = None
+        # for i,row in sub_df.iterrows():
+        #     local_run_obj = row.run
+        #     if station_metadata is None:
+        #         station_metadata = local_run_obj.station_group.metadata
+        #         station_metadata._runs = []
+        #     run_metadata = local_run_obj.metadata
+        #     station_metadata.add_run(run_metadata)
+
         station_metadata = local_run_obj.station_group.metadata
         station_metadata._runs = []
         run_metadata = local_run_obj.metadata
         station_metadata.add_run(run_metadata)
 
-        #We need to create an issue for this as well
+        # Need to create an issue for this as well
         if len(mth5_objs) == 1:
             key = list(mth5_objs.keys())[0]
             survey_dict = mth5_objs[key].survey_group.metadata.to_dict()
