@@ -107,36 +107,39 @@ def initialize_pipeline(config):
 def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrts, units,
                           station_id):
     """
+    Operates on a "per-run" basis
+
     Note 1: CHECK DATA COVERAGE IS THE SAME IN BOTH LOCAL AND RR
     This should be pushed into a previous validator before pipeline starts
-    # # if config.reference_station_id:
-    # #    local_run_xrts = local_run_xrts.where(local_run_xrts.time <=
-    # #                                          remote_run_xrts.time[-1]).dropna(
-    # #                                          dim="time")
-
-    2022-02-08: Factor this out of process_tf_decimation_level in prep for merging
-    runs.
-    2022-03-13: This method will supercede make_stft_objects.  This will operate on
-    local and remote independently.
+    # if config.reference_station_id:
+    #    local_run_xrts = local_run_xrts.where(local_run_xrts.time <=
+    #                                          remote_run_xrts.time[-1]).dropna(
+    #                                          dim="time")
 
 
     Parameters
     ----------
-    config: processing config top level
-    local
-    remote
+    processing_config: aurora.config.metadata.processing.Processing
+        Metadata about the processing to be applied
+    i_dec_level: int
+        The decimation level to process
+    run_obj: mth5.groups.master_station_run_channel.RunGroup
+        The run to transform to stft
+    run_xrts: xarray.core.dataset.Dataset
+        The data time series from the run to transform
+    units: str
+        expects "MT".  May change so that this is the only accepted set of units
+    station_id: str
+        To be deprecated, this information is contained in the run_obj as
+        run_obj.station_group.metadata.id
 
     Returns
     -------
-
+    stft_obj: xarray.core.dataset.Dataset
+        Time series of calibrated Fourier coefficients per each channel in the run
     """
     stft_config = processing_config.get_decimation_level(i_dec_level)
-    #stft_config = config.to_stft_config_dict() #another approach
     stft_obj = run_ts_to_stft(stft_config, run_xrts)
-
-    #Still local and remote agnostic, it would be nice to be able to acesss
-    #p.stations[station_id] in multi-station processing, but for classic RR
-    # "local" and "remote" work fine.
 
     print("fix this so that it gets from config based on station_id, without caring "
           "if local or remote")
@@ -288,8 +291,6 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
     return dataset_df
 
 
-    # </GET TIME SERIES DATA>
-
 def close_mths_objs(df):
     """
     Loop over all unique mth5_objs in the df and make sure they are closed
@@ -321,7 +322,9 @@ def process_mth5(
     Stages here:
     1. Read in the config and figure out how many decimation levels there are
     2. ToDo: Based on the run durations, and sampling rates, determined which runs
-    are valid for which decimation levels, or for which effective sample rates.
+    are valid for which decimation levels, or for which effective sample rates.  This
+    action should be taken before we get here.  The dataset_definition should already
+    be trimmed to exactly what will be processed.
     Parameters
     ----------
     config: aurora.config.metadata.processing.Processing object or path to json
@@ -365,7 +368,7 @@ def process_mth5(
         dataset_df = populate_dataset_df(i_dec_level, dec_level_config, dataset_df)
         #ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
 
-        # Convert to STFT
+        # Apply STFT to all runs
         local_stfts = []
         remote_stfts = []
         for i,row in dataset_df.iterrows():
@@ -373,12 +376,11 @@ def process_mth5(
             print("The decimation_level_config here does not have the scale factors, "
                   "which are needed in make_stft_objects")
             stft_obj = make_stft_objects(processing_config, i_dec_level, row["run"],
-                                              run_xrts, units, row.station_id) #stftconfig
+                                              run_xrts, units, row.station_id)
 
-            if row.station_id == processing_config.stations.local.id:#local_station_id:
+            if row.station_id == processing_config.stations.local.id:
                 local_stfts.append(stft_obj)
-            elif row.station_id == \
-                    processing_config.stations.remote[0].id:#reference_station_id:
+            elif row.station_id == processing_config.stations.remote[0].id:
                 remote_stfts.append(stft_obj)
 
 
@@ -420,6 +422,9 @@ def process_mth5(
         return tf_collection
     else:
         # intended to be the default in future
+        #get a list of local runs:
+
+        # iterate over these
         station_metadata = local_run_obj.station_group.metadata
         station_metadata._runs = []
         run_metadata = local_run_obj.metadata
