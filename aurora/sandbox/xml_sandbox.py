@@ -25,21 +25,6 @@ from obspy import UTCDateTime
 from obspy import read_inventory
 
 
-def test_instantiate_and_export_mth5_metadata_example():
-    """
-    ToDo: Move this function into mth5_helpers.  It does not depend on xml so
-    shouldn't be in xml_sandbox.
-    Returns
-    -------
-
-    """
-    print("test_instantiate_and_export_mth5_metadata_example")
-    mt_station = Station()
-    json_string = mt_station.to_json(required=False, nested=True)
-    f = open("meta.json", "w")
-    f.write(json_string)
-    f.close()
-    return
 
 
 def get_response_inventory_from_server(
@@ -177,7 +162,6 @@ def iterate_through_mtml(networks):
 
 def main():
     """ """
-    test_instantiate_and_export_mth5_metadata_example()
     test_get_example_xml_inventory()
     test_get_example_em_xml_from_iris_via_web()
     print("finito {}".format(datetime.datetime.now()))
