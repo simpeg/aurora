@@ -2,9 +2,6 @@
 follows Gary's TTF.m in
 iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
 
-2021-07-02 Removed some prototype methods intended to edit specific station data
-when many stations are being processed.  MMT methods to be addressed later.
-
 2021-07-20: Addressing Issue #12.  If we are going to use xarray it is
 tempting to use the frequency band centers as the axis for the arrays
 here, rather than simple integer indexing.  This has the advantage of

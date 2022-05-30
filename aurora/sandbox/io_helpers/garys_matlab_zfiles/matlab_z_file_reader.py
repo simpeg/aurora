@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.io as sio
 
-from decimation_level_config import DecimationLevelConfig
+from aurora.config.metadata.decimation_level import DecimationLevel
+from aurora.config.metadata.processing import Processing
 from aurora.general_helper_functions import BAND_SETUP_PATH
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.time_series.frequency_band import FrequencyBands
@@ -36,6 +37,7 @@ frequency_bands = FrequencyBands()
 sample_rate = 1.0
 tf_dict = {}
 
+p = Processing()
 for i_dec in range(4):
     frequency_bands = FrequencyBands()
     frequency_bands.from_emtf_band_setup(
@@ -57,12 +59,14 @@ for i_dec in range(4):
         reference_channels=[],
     )
     tf_obj = TTFZ(transfer_function_header, frequency_bands)
-    config = DecimationLevelConfig()
-    config.sample_rate = sample_rate
-    config.num_samples_window = 256
-    tf_obj.processing_config = config
-    tf_dict[i_dec] = tf_obj
 
+    dec_level_cfg = DecimationLevel()
+    dec_level_cfg.decimation.sample_rate = sample_rate
+    dec_level_cfg.window.num_samples = 256
+    p.add_decimation_level(dec_level_cfg)
+    tf_obj.processing_config = p
+
+    tf_dict[i_dec] = tf_obj
     sample_rate /= 4.0
 
 tmp = sio.loadmat(z_mat)
