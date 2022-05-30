@@ -1,94 +1,33 @@
 """
-20210520: This is a copy of aurora_driver.py which is going to be overwritten.
-Most of the tests and tools are associated with MTH5 helper stuffs so moved
-to mth5_helpers.py for now.  Needs a clean up.
+This module was inside of mth5/clients/helper_functions.py
+on branch issue_76_make_mth5_factoring
 
-2021-09-17: I have started commenting out blocks of code here that are not used anymore.
-This future of this module is not certain.  Most of these tests will be moved to
-mt_metadata and mth5, however, there is one application I would like to support here:
-Karl would like to create tools in aurora to work and develop offline.  This means
-1. Pulling station_xml and storing locally as xml and then reloading on demand to
-create inventory, --> experiement, --> mth5
-2. Using rover to access datasets into a local archive and then populating mth5 from
-the data.  **is this a solution for NCEDC?? Does ROVER work with NCEDC??
+Some of these functions are handy, and should eventually be merged into mth5.
 
+I would also like to use some of these functions from time-to-time, so I am putting
+them here for now, until we can decide what to move to mth5 and what to keep in
+aurora (and what to throw out).
 """
-import numpy as np
-from pathlib import Path
+import hashlib
+import json
+import pandas as pd
 
-from aurora.test_utils.dataset_definitions import TEST_DATA_SET_CONFIGS
+from obspy import UTCDateTime
+from typing import Dict, Any
 
-from aurora.test_utils.parkfield.testing_data import get_example_data
-from aurora.sandbox.xml_sandbox import describe_inventory_stages
-from mth5.utils.helpers import initialize_mth5
 from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
-
-HEXY = ["hx", "hy", "ex", "ey"]  # default components list
-xml_path = Path("/home/kkappler/software/irismt/mt_metadata/data/xml")
-magnetic_xml_template = xml_path.joinpath("mtml_magnetometer_example.xml")
-electric_xml_template = xml_path.joinpath("mtml_electrode_example.xml")
-fap_xml_example = ""
-
+from mth5.utils.helpers import initialize_mth5
 
 def get_experiment_from_obspy_inventory(inventory):
     translator = XMLInventoryMTExperiment()
     experiment = translator.xml_to_mt(inventory_object=inventory)
     return experiment
 
-
-def check_run_channels_have_expected_properties(run):
-    """
-    Just some sanity check that we can access filters
-    Parameters
-    ----------
-    run
-
-    Returns
-    -------
-
-    """
-    print(run.channel_summary)
-    hx = run.get_channel("hx")
-    print(hx.channel_response_filter)
-    print(hx.channel_response_filter.filters_list)
-    print(hx.channel_response_filter.complex_response(np.arange(3) + 1))
-    ex = run.get_channel("ex")
-    print(ex.channel_response_filter)
-    print(ex.channel_response_filter.filters_list)
-    print(ex.channel_response_filter.complex_response(np.arange(3) + 1))
-    return
-
-
-def run_obj_from_mth5(mth5_obj):
-    """
-    one off method showing how we create runs in an mth5 object
-
-    Parameters
-    ----------
-    mth5_obj
-
-    Returns
-    -------
-
-    """
-    if "REW09" in mth5_obj.station_list:  # old test
-        run_obj = mth5_obj.get_run("REW09", "a")
-    elif "PKD" in mth5_obj.station_list:  # pkd test
-        run_obj = mth5_obj.get_run("PKD", "001")  # this run is created here
-        check_run_channels_have_expected_properties(run_obj)
-    else:
-        print("skipping creation of run ")
-        raise Exception
-
-    return run_obj
-
-
-def mth5_run_from_experiment(station_id, experiment, h5_path=None):
+def mth5_from_experiment(experiment, h5_path=None):
     """
 
     Parameters
     ----------
-    station_id
     experiment
     h5_path
 
@@ -98,132 +37,190 @@ def mth5_run_from_experiment(station_id, experiment, h5_path=None):
     """
     mth5_obj = initialize_mth5(h5_path)
     mth5_obj.from_experiment(experiment)
-    run_obj = run_obj_from_mth5(mth5_obj)
-    return run_obj
+    return mth5_obj
+
+#
+# def dict_hash(dictionary: Dict[str, Any]) -> str:
+#     """MD5 hash of a dictionary.
+#     source:
+#     https://www.doc.ic.ac.uk/~nuric/coding/how-to-hash-a-dictionary-in-python.html
+#     There could be any values, such as lists, floats and other types.
+#     Note the two following assumptions:
+#     We will assume any value is serialisable as a string.
+#     We assume the keys are strings which allows us to order them.
+#     """
+#
+#     dhash = hashlib.md5()
+#     # We need to sort arguments so {'a': 1, 'b': 2} is
+#     # the same as {'b': 2, 'a': 1}
+#     encoded = json.dumps(dictionary, sort_keys=True).encode()
+#     dhash.update(encoded)
+#     return dhash.hexdigest()
 
 
-def cast_run_to_run_ts(run, array_list=None, station_id=None):
+# def get_channel_from_row(client, row):
+#     """
+#     A helper function that uses obspy client to get a station inventory.  Although
+#     this could theoretically return muliple stations, as the name of this function
+#     suggests, it is intended to return only one single channel.
+#
+#     Parameters
+#     ----------
+#     client: obspy.clients.fdsn.client.Clien
+#     row: pandas.core.frame.Pandas
+#         A row of a dataframe
+#
+#     Returns
+#     -------
+#
+#     """
+#     channel_inventory = client.get_stations(
+#         row.start,
+#         row.end,
+#         network=row.network,
+#         station=row.station,
+#         loc=row.location,
+#         channel=row.channel,
+#         level="response",
+#     )
+#     return channel_inventory
+
+
+# def get_network_uuid(network):
+#     print("this fails because ")
+#     print("TypeError: Object of type Comment is not JSON serializable")
+#     try:
+#         uuid = dict_hash(network.__dict__)
+#     except TypeError:
+#         uuid = None
+#     return uuid
+
+
+# def make_network_inventory(df, client):
+#     """
+#     20220109: This can be made more robust.  The issue here is that the same network
+#     can be returned multiple times, if the dataframe calls data from the same network
+#     with mutiple start times.  The way to simplify the situationis to return only
+#     the unique netowrks.  This however is going to require a re-keying of the
+#     dictionary.  See comments in issue#76
+#
+#     Parameters
+#     ----------
+#     df
+#     client
+#
+#     Returns
+#     -------
+#     Dictionary keyed first by network_id, and then by starttime of desired streams.
+#     """
+#     print("Making Network Inventory")
+#     df["netork_uuid"] = ""
+#     networks = {}
+#     for network_id in df.network.unique():
+#         networks[network_id] = {}
+#     for network_id in networks.keys():
+#         sub_df = df[df.network == network_id]
+#         for row in sub_df.itertuples():
+#             print(row)
+#             if row.start not in networks[network_id].keys():
+#                 print("client.get_stations is super fricken slow!")
+#                 net_inv = client.get_stations(
+#                     row.start, row.end, network=row.network, level="network"
+#                 )
+#                 networks[network_id][row.start] = net_inv.networks[0]
+#                 # HERE is where you tranlate network into a UUID
+#                 # that UUID is appended to
+#                 # network = net_inv.networks[0]
+#                 # uuid = get_network_uuid(network)
+#                 # if uuid is None:
+#                 #     uuid = f"{network_id}_{row.start}"
+#                 # sub_df["network_uuid"] = uuid
+#     return networks
+
+
+# def make_station_inventory(df, client):
+#     """
+#
+#     Parameters
+#     ----------
+#     df
+#     client
+#
+#     Returns
+#     -------
+#     Dictionary keyed first by station_id, then by network_id, and then by
+#     starttime of desired streams.
+#     """
+#     print("Making Station Inventory")
+#     stations = {}
+#     for station_id in df.station.unique():
+#         # print(f"station_id = {station_id}")
+#         stations[station_id] = {}
+#
+#     for row in df.itertuples():
+#         # make sure that there is a subdict for the active network
+#         if stations[row.station] == {}:
+#             stations[row.station][row.network] = {}
+#
+#     for station_id in stations.keys():
+#         sub_df = df[df.station == station_id]
+#         for row in sub_df.itertuples():
+#             if row.start not in stations[station_id][row.network].keys():
+#                 sta_inv = client.get_stations(
+#                     row.start,
+#                     row.end,
+#                     network=row.network,
+#                     station=row.station,
+#                     level="station",
+#                 )
+#                 station = sta_inv.networks[0].stations[0]
+#                 stations[station_id][row.network][row.start] = station
+#     return stations
+
+
+def augment_streams(row, streams, client):
     """
-    basically embed data into a run_ts object.
-    array_list = get_example_array_list(components_list=HEXY,
-                                        load_actual=True,
-                                        station_id="PKD")
+
+    Returns
+    -------
+
+    """
+    streams = (
+        client.get_waveforms(
+            row.network,
+            row.station,
+            row.location,
+            row.channel,
+            UTCDateTime(row.start),
+            UTCDateTime(row.end),
+        )
+        + streams
+    )
+    return streams
+
+
+
+
+def get_trace_start_end_times(msstreams):
+    """
+    usage: trace_start_times, trace_end_times = get_trace_start_end_times(msstreams)
     Parameters
     ----------
-    run
-    array_list
-    station_id
+    msstreams
 
     Returns
     -------
 
     """
-    runts_object = run.to_runts()
-    if array_list:
-        runts_object.set_dataset(array_list)
-    if station_id:
-        runts_object.station_metadata.id = station_id
-    return runts_object
-
-
-# </LOAD SOME DATA FROM A SINGLE STATION>
-
-
-def set_driver_parameters():
-    driver_parameters = {}
-    driver_parameters["create_xml"] = True
-    #    driver_parameters["test_filter_control"] = False  # failing because cannot
-    # find/read xml
-    driver_parameters["run_ts_from_xml_01"] = True
-    driver_parameters["run_ts_from_xml_02"] = False  # Fail: no access to pkd.xml
-    driver_parameters["initialize_data"] = True
-    return driver_parameters
-
-
-def test_can_access_fap_filters():
-    """
-    Need a test in mt_metadata that does this
-    Returns
-    -------
-
-    """
-
-    from aurora.sandbox.io_helpers.fdsn_dataset_config import FDSNDatasetConfig
-
-    test_data_set = FDSNDatasetConfig()
-    test_data_set.dataset_id = "fap_test"
-    test_data_set.network = "EM"
-    test_data_set.station = "FL001"
-    test_data_set.starttime = None
-    test_data_set.endtime = None
-    test_data_set.channel_codes = "MFN"
-    test_data_set.description = "test of a fap xml"
-
-    fap_inventory = test_data_set.get_inventory_from_client(
-        ensure_inventory_stages_are_named=True
+    trace_start_times = sorted(
+        list(set([tr.stats.starttime.isoformat() for tr in msstreams]))
     )
-    describe_inventory_stages(fap_inventory)
-    # <HERE IS THE SPOT TO DROP TRACE TO REVIEW INGEST OF FAP>
-    experiment = get_experiment_from_obspy_inventory(fap_inventory)
-    filters_dict = experiment.surveys[0].filters
-    print(filters_dict)
-    fap = filters_dict["mfn_0"]
-    print(fap)
-    num_filters = len(experiment.surveys[0].filters)
-    print(f"num_filters {num_filters}")
-    return
-
-
-def main():
-    # test_can_access_fap_filters()
-
-    driver_parameters = set_driver_parameters()
-    # <CREATE METADATA XML>
-    if driver_parameters["create_xml"]:
-        dataset_ids = [
-            "pkd_test_00",
-            "sao_test_00",
-        ]
-        for dataset_id in dataset_ids:
-            test_dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
-            inventory = test_dataset_config.get_inventory_from_client(
-                ensure_inventory_stages_are_named=False
-            )
-            experiment = get_experiment_from_obspy_inventory(inventory)
-            print(experiment)
-
-    # </CREATE METADATA XML>
-
-
-    # <TEST RunTS FROM XML>
-    if driver_parameters["run_ts_from_xml_02"]:
-        dataset_id = "pkd_test_00"
-        test_dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
-        pkd_xml = test_dataset_config.get_station_xml_filename()
-        experiment = get_experiment_from_xml_path(pkd_xml)
-        run_obj = mth5_run_from_experiment("PKD", experiment)
-        runts_obj = cast_run_to_run_ts(run_obj, station_id="PKD")
-        print(runts_obj)
-    # </TEST RunTS FROM XML>
-
-    # <INITIALIZE DATA>
-    if driver_parameters["initialize_data"]:
-        try:
-            pkd_mvts = get_example_data(station_id="PKD", component_station_label=True)
-            sao_mvts = get_example_data(station_id="SAO", component_station_label=True)
-            pkd = pkd_mvts.dataset
-            sao = sao_mvts.dataset
-            pkd.update(sao)
-        except FileNotFoundError:
-            print("failing to find: "
-                  "aurora/tests/parkfield/data/pkd_sao_2004_272_00-02.h5 ")
-            print("I put a copy of that data here:")
-            print("https://drive.google.com/drive/folders/1WFhhLrt5wSlw4FaAFkfb58allNdGjwck")
-
-    # </INITIALIZE DATA>
-    print("try to combine these runs")
-
-
-if __name__ == "__main__":
-    main()
-    print("Fin")
+    trace_end_times = sorted(
+        list(set([tr.stats.endtime.isoformat() for tr in msstreams]))
+    )
+    if len(trace_start_times) != len(trace_end_times):
+        raise ValueError(
+            f"Do not have the same number of start {len(trace_start_times)}"
+            f" and end times {len(trace_end_times)} from streams"
+        )
+    return trace_start_times, trace_end_times

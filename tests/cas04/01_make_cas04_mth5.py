@@ -75,7 +75,7 @@ def make_cas04_data_for_processing(xml_path=None, h5_path="tmp.h5",
     # mth5_obj.populate_runs_from_request(request_df, client="IRIS")
     #maker = MakeMTH5(mth5_version="0.1.0")
     maker = MakeMTH5(mth5_version="0.2.0")
-    print("FAILED FOR 0.2.0 with some other error")
+    #print("FAILED FOR 0.2.0 with some other error")
     #inventory, streams = maker.get_inventory_from_df(request_df, data=False, client="IRIS")
     # inventory==inventory0??
     mth5_path = maker.make_mth5_from_fdsnclient(request_df, client="IRIS", path=DATA_PATH)
@@ -93,7 +93,7 @@ def test_make_mth5():
 
     """
     h5_path = DATA_PATH.joinpath("cas04.h5")
-    mth5_path = make_cas04_data_for_processing(XML_PATH, h5_path=h5_path,
+    mth5_path = make_cas04_data_for_processing(xml_path=XML_PATH, h5_path=h5_path,
                                                active_runs=None)#["a", ])
     #mth5_path = DATA_PATH.joinpath("../backup/data/ZU_CAS04.h5")
     read_back_data(mth5_path, "CAS04", "a")
