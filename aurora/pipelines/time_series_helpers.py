@@ -24,7 +24,7 @@ def validate_sample_rate(run_ts, expected_sample_rate):
             f"processing decimation_obj {decimation_obj.sample_rate} do not match"
         )
         raise Exception
-    
+
 
 def apply_prewhitening(decimation_obj, run_xrts_input):
     """
@@ -257,10 +257,6 @@ def get_run_run_ts_from_mth5(mth5_obj, station_id, run_id, expected_sample_rate,
         The name of the run to get data from
     sample_rate : float (may choose to also support  None)
         expected sample rate of data in the mth5
-    Returns
-    -------
-
-
 
     Returns
     -------
