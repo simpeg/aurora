@@ -18,7 +18,6 @@ Filter application info: they always have either "value" or "poles_zeros"
 
 import datetime
 
-from mt_metadata.timeseries import Station
 
 from obspy.clients.fdsn import Client
 from obspy import UTCDateTime
