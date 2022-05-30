@@ -224,35 +224,46 @@ def export_tf(tf_collection, station_metadata_dict={}, survey_dict={}):
 
 def populate_dataset_df(i_dec_level, config, dataset_df):
     """
-    Could move this into a method of DatasetDefinition
-    Called self.populate_with_data()
+    Move this into a method of DatasetDefinition, self.populate_with_data()
+
+    Notes:
+    1. When iterating over dataframe, (i)ndex must run from 0 to len(df), otherwise
+    get indexing errors.  Maybe reset_index() before main loop? or push reindexing
+    into TF Kernel, so that this method only gets a cleanly indexed df, restricted to
+    only the runs to be processed for this specific TF?
+    2. When assigning xarrays to dataframe cells, df dislikes xr.Dataset,
+    so we convert to DataArray before assignment
+    3.  Dataset_df should be easy to generate from the local_station_id,
+    remote_station_id, local_run_list, remote_run_list, but allows specification of
+    time_intervals.  This is important in the case where aquisition_runs are
+    non-overlapping between local and remote.  Although,  theoretically, merging on
+    the FCs should make nans in the places where there is no overlapping data,
+    and this should be dropped in the TF portion of the code.  However,
+    time-intervals where the data do not have coverage at both stations can be
+    identified in a method before GET TIME SERIES in a future version.
+
     Parameters
     ----------
-    i_dec_level
-    dataset_df
+    i_dec_level: int
+        decimation level id, indexed from zero
     config: aurora.config.metadata.decimation_level.DecimationLevel
         decimation level config
+    dataset_df: pd.DataFrame
 
     Returns
     -------
+    dataset_df: pd.DataFrame
+        Same df that was input to the function but now has columns:
+
 
     """
-    # Dataset_df should be easy to generate from the local_station_id,
-    # remote_station_id, local_run_list, remote_run_list, but allows for
-    # specification of time_intervals.  This is important in the case where
-    # aquisition_runs are non-overlapping between local and remote.  Although,
-    # theoretically, merging on the FCs should make nans in the places where
-    # there is no overlapping data, and this should be dropped in the TF portion
-    # of the code.  However, time-intervals where the data do not have coverage
-    # at both stations can be identified in a method before GET TIME SERIES
-    # in a future version.
-
     all_run_objs = len(dataset_df) * [None]
     all_run_ts_objs = len(dataset_df) * [None]
     all_stft_objs = len(dataset_df) * [None] #need these bc df not taking assingments 
 
 
     if i_dec_level == 0:
+        #see Note 1 in this function doc notes
         for i,row in dataset_df.iterrows():
             run_dict = get_run_run_ts_from_mth5(row.mth5_obj,
                                                 row.station_id,
@@ -262,16 +273,11 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
                                                 end=fix_time(row.end)
                                                 )
             dataset_df["run"].at[i] = run_dict["run"]
+            #see Note 2 in this function doc notes
             dataset_df["run_dataarray"].at[i] = run_dict["mvts"].to_array("channel")
-            #Dataframe dislikes xarray Dataset in a cell, need convert to DataArray
 
             all_run_objs[i] = run_dict["run"]
             all_run_ts_objs[i] = run_dict["mvts"]
-            #careful here, (i)ndex must run from 0 to len(df), otherwise will get
-            # indexing errors.  Maybe reset_index() before this loop?
-            # or push reindexing into TF Kernel, so that this method only gets
-            # a cleanly indexed df, restricted to only the runs to be processed for
-            # this specific TF
 
             # APPLY TIMING CORRECTIONS HERE
     else:

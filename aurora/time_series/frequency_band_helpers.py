@@ -4,8 +4,8 @@ from aurora.time_series.frequency_band import FrequencyBands
 
 def extract_band(frequency_band, fft_obj, epsilon=1e-7):
     """
-    This may want to be a method of fft_obj, or it may want to be a method of frequency
-    band.  For now leave as stand alone.
+    This may become a method of fft_obj, or frequency band.
+    For now leave as stand alone.
 
     Parameters
     ----------
