@@ -15,7 +15,7 @@ apodization  windows available via scipy.signal.get_window()
       'gaussian' : 'std',
       'general_gaussian' : ('power', 'width'),
       'slepian' : 'width',
-      'chebwin' : 'attenuation'
+      'chebwin' : 'attenuation',
     }
 
 The Taper Config has 2 possible forms:
@@ -60,7 +60,6 @@ class ApodizationWindow(object):
     apod_window = ApodizationWindow()
     taper=ApodizationWindow(taper_family='hanning', num_samples_window=55 )
 
-
     Window factors S1, S2, CG, ENBW are modelled after Heinzel et al. p12-14
     [1] Spectrum and spectral density estimation by the Discrete Fourier transform
     (DFT), including a comprehensive list of window functions and some new
@@ -75,21 +74,18 @@ class ApodizationWindow(object):
     ENBW: Effective Noise BandWidth, see Equation (22)
     NENBW Normalized Equivalent Noise BandWidth, see Equation (21)
 
-
-
-        Parameters
-        ----------
-        kwargs:
-        taper_family : string
-            Specify the taper type - boxcar, kaiser, hanning, etc
-        num_samples_window : int
-            The number of samples in the taper
-        taper : numpy array
-            The actual window coefficients themselves.  This can be passed if a
-            particular custom window is desired.
-        additional_args: dictionary
-            These are any additional requirements scipy needs in order to
-            generate the window.
+    Parameters
+    ----------
+    taper_family : string
+        Specify the taper type - boxcar, kaiser, hanning, etc
+    num_samples_window : int
+        The number of samples in the taper
+    taper : numpy array
+        The actual window coefficients themselves.  This can be passed if a
+        particular custom window is desired.
+    additional_args: dictionary
+        These are any additional requirements scipy needs in order to
+        generate the window.
     """
 
     def __init__(self, **kwargs):
@@ -97,11 +93,8 @@ class ApodizationWindow(object):
 
         Parameters
         ----------
-        kwargs:
-        taper_family
-        num_samples_window
-        taper
-        additional_args
+        kwargs: dict
+            See parameters list in class level documentation above
         """
         self.taper_family = kwargs.get("taper_family", "boxcar")
         self._num_samples_window = kwargs.get("num_samples_window", 0)
@@ -120,17 +113,20 @@ class ApodizationWindow(object):
     @property
     def summary(self):
         """
-        Returns a string comprised of the taper_family, number_of_samples,
-        and True/False if self.taper is not None
-        -------
 
+        Returns
+        -------
+        out_str: str
+            String comprised of the taper_family, number_of_samples, and True/False
+            if self.taper is not None
         """
         self.test_linear_spectral_density_factor()
         string1 = f"{self.taper_family} {self.num_samples_window}"
         string1 += f" taper_exists = {bool(self.taper.any())}"
         string2 = f"NENBW = {self.nenbw:.3f}, CG = {self.coherent_gain:.3f},  "
         string2 += f"window factor = {self.apodization_factor:.3f}"
-        return "\n".join([string1, string2])
+        out_str = "\n".join([string1, string2])
+        return out_str
 
     def __str__(self):
         """

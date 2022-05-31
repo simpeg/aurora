@@ -82,7 +82,7 @@ def test_get_example_xml_inventory():
     print("ok")
 
 
-def describe_inventory_stages(inventory, assign_names=False):
+def describe_inventory_stages(inventory, assign_names=False, verbose=False):
     """
     Scans inventory looking for stages.  Has option to assign names to stages,
     these names are used as keys in MTH5. Modifies inventory in place.
@@ -103,19 +103,23 @@ def describe_inventory_stages(inventory, assign_names=False):
             for channel in station:
                 response = channel.response
                 stages = response.response_stages
-                info = (
-                    f"{network.code}-{station.code}-{channel.code}"
-                    f" {len(stages)}-stage response"
-                )
-                print(info)
+                if verbose:
+                    info = (
+                        f"{network.code}-{station.code}-{channel.code}"
+                        f" {len(stages)}-stage response"
+                    )
+                    print(info)
+
                 for i, stage in enumerate(stages):
-                    print(f"stagename {stage.name}")
+                    if verbose:
+                        print(f"stagename {stage.name}")
                     if stage.name is None:
                         if assign_names:
                             new_names_were_assigned = True
                             new_name = f"{station.code}_{channel.code}_{i}"
                             stage.name = new_name
-                            print(f"ASSIGNING stage {stage}, name {stage.name}")
+                            if verbose:
+                                print(f"ASSIGNING stage {stage}, name {stage.name}")
                     if hasattr(stage, "symmetry"):
                         pass
                         # import matplotlib.pyplot as plt

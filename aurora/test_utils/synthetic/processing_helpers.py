@@ -27,8 +27,8 @@ def process_sythetic_data(processing_config, dataset_definition, units="MT",
     cond1 = isinstance(processing_config, str)
     cond2 = isinstance(processing_config, Path)
     if (cond1 or cond2):
-        print("This needs to be updated to work with new mt_metadata Processing object")
         #load from a json path or string
+        print("Not tested since implementation of new mt_metadata Processing object")
         config = initialize_config(processing_config)
     elif isinstance(processing_config, Processing):
         config = processing_config

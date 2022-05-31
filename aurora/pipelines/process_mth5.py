@@ -8,14 +8,14 @@ provides an option of applying decimation or loading predecimated data.
 
 #Note 2: Question: Can we run into cases where some of these runs can be decimated
 and others can not?  We need a way to handle this. For example, a short run may not
-yield any data from a later decimation level.  Returning an empty xarray may work,
-... It is desireable that the empty xarray, or whatever comes back to pass through STFT
-and MERGE steps smoothy.
-If it is empty, we could just drop the run entirely but this may have adverse
-consequences on downstream bookkeeping, like the creation of station_metadata before
-packaging the tf for export.  This could be worked around by extracting the metadata
-at the start of this method. In fact, it would be a good idea in general to run a
-pre-check on the data that identifies which decimation levels are valid for each run.
+yield any data from a later decimation level. Returning an empty xarray may work.
+It is desireable that the empty xarray, or whatever comes back to pass through STFT
+and MERGE steps smoothy. If it is empty, we could just drop the run entirely but
+this may have adverse consequences on downstream bookkeeping, like the creation of
+station_metadata before packaging the tf for export. This could be worked around by
+extracting the metadata at the start of this method. It would be a good idea in
+general to run a pre-check on the data that identifies which decimation levels are
+valid for each run. (see Issue #182)
 """
 # =============================================================================
 # Imports
@@ -164,11 +164,11 @@ def process_tf_decimation_level(config, i_dec_level, local_stft_obj,
                                     units="MT"):
     """
     Processing pipeline for a single decimation_level
-    TODO: Add a check that the processing config sample rates agree with the
-    data sampling rates otherwise raise Exception
+
+    TODO: Add a check that the processing config sample rates agree with the data
+    sampling rates otherwise raise Exception
     This method can be single station or remote based on the process cfg
-    :param processing_cfg:
-    :return:
+
     Parameters
     ----------
     config: aurora.config.metadata.decimation_level.DecimationLevel
@@ -176,9 +176,12 @@ def process_tf_decimation_level(config, i_dec_level, local_stft_obj,
     i_dec_level: int
         decimation level_id
         ?could we pack this into the decimation level as an attr?
-    local_stft_obj
-    remote_stft_obj
-    units
+    local_stft_obj: xarray.core.dataset.Dataset
+        The time series of Fourier coefficients from the local station
+    remote_stft_obj: xarray.core.dataset.Dataset or None
+        The time series of Fourier coefficients from the remote station
+    units: str
+        one of ["MT","SI"]
 
     Returns
     -------
