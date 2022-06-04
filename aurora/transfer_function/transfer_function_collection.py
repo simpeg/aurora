@@ -328,7 +328,6 @@ class TransferFunctionCollection(object):
         f.writelines(out_str)
 
         #Orientations and tilts
-        print("CHANNEL ORIENTATION METADATA NEEDED")
         print("Make the channel list be only the active channels for a z-file")
         assert self.total_number_of_channels == len(self.channel_list)
         ch_list = self.channel_list

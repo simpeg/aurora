@@ -318,19 +318,17 @@ def process_mth5(
         show_plot=False,
         z_file_path=None,
         return_collection=True,
-        **kwargs,
-):
+        ):
     """
-
-    Stages here:
     1. Read in the config and figure out how many decimation levels there are
     2. ToDo: Based on the run durations, and sampling rates, determined which runs
     are valid for which decimation levels, or for which effective sample rates.  This
     action should be taken before we get here.  The dataset_definition should already
     be trimmed to exactly what will be processed.
+
     Parameters
     ----------
-    config: aurora.config.metadata.processing.Processing object or path to json
+    config: aurora.config.metadata.processing.Processing or path to json
         All processing parameters
     dataset_definition: aurora.tf_kernel.dataset.DatasetDefinition or None
         Specifies what datasets to process according to config
@@ -342,13 +340,13 @@ def process_mth5(
         Target path for a z_file output if desired
     return_collection : boolean
         return_collection=False will return an mt_metadata TF object
-    kwargs
 
     Returns
     -------
-
+    tf: TransferFunctionCollection or mt_metadata TF
+        The transfer funtion object
     """
-    
+
     processing_config, mth5_objs = initialize_pipeline(config)
     dataset_df = dataset_definition.df
 
