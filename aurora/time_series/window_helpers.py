@@ -11,32 +11,34 @@ import time
 from numba import jit
 
 
-# <WINDOW - TIME SERIES RELATIONSHIP>
+#Window-to-timeseries relationshp
 def available_number_of_windows_in_array(n_samples_array, n_samples_window, n_advance):
     """
 
     Parameters
     ----------
-    n_samples_array
-    n_samples_window
-    n_advance
+    n_samples_array: int
+        The length of the time series
+    n_samples_window: int
+        The length of the window (in samples)
+    n_advance: int
+        The number of samples the window advances at each step
 
     Returns
     -------
-
+    available_number_of_strides: int
+        The number of windows the time series will yield
     """
     stridable_samples = n_samples_array - n_samples_window
     if stridable_samples < 0:
         print("Window is longer than the time series")
         raise Exception
     available_number_of_strides = int(np.floor(stridable_samples / n_advance))
-    return available_number_of_strides + 1
+    available_number_of_strides += 1
+    return available_number_of_strides
 
 
-# </WINDOW - TIME SERIES RELATIONSHIP>
-
-
-# <SLIDING WINDOW OPERATORS>
+#Sliding Window Operators
 def sliding_window_crude(
     data, num_samples_window, num_samples_advance, num_windows=None
 ):
@@ -44,14 +46,20 @@ def sliding_window_crude(
 
     Parameters
     ----------
-    data: numpy array
-    num_samples_window
-    num_samples_advance
-    num_windows
+    data: np.ndarray
+        The time series data to be windowed
+    num_samples_window: int
+        The length of the window (in samples)
+    num_samples_advance: int
+        The number of samples the window advances at each step
+    num_windows: int
+        The number of windows to "take".  Must be less or equal to the number of
+        available windows.
 
     Returns
     -------
-
+    output_array: numpy.ndarray
+        The windowed time series
     """
     if num_windows is None:
         num_windows = available_number_of_windows_in_array(
@@ -72,14 +80,19 @@ def sliding_window_numba(data, num_samples_window, num_samples_advance, num_wind
 
     Parameters
     ----------
-    data
-    num_samples_window
-    num_samples_advance
-    num_windows
+    data: np.ndarray
+        The time series data to be windowed
+    num_samples_window: int
+        The length of the window (in samples)
+    num_samples_advance: int
+        The number of samples the window advances at each step
+    num_windows: int
+        The number of windows to "take".
 
     Returns
     -------
-
+    output_array: numpy.ndarray
+        The windowed time series
     """
     output_array = np.full((num_windows, num_samples_window), np.nan)
     for i in range(num_windows):
@@ -91,7 +104,8 @@ def sliding_window_numba(data, num_samples_window, num_samples_advance, num_wind
 
 
 def striding_window(data, num_samples_window, num_samples_advance, num_windows=None):
-    """applies a striding window to an array.  We use 1D arrays here.
+    """
+    Applies a striding window to an array.  We use 1D arrays here.
     Note that this method is extendable to N-dimensional arrays as was once shown
     at  http://www.johnvinyard.com/blog/?p=268
 
@@ -114,8 +128,24 @@ def striding_window(data, num_samples_window, num_samples_advance, num_windows=N
            [4, 5, 6],
            [6, 7, 8]])
 
+    Parameters
+    ----------
+    data: np.ndarray
+        The time series data to be windowed
+    num_samples_window: int
+        The length of the window (in samples)
+    num_samples_advance: int
+        The number of samples the window advances at each step
+    num_windows: int
+        The number of windows to "take".  Must be less or equal to the number of
+        available windows.
+
+    Returns
+    -------
+    strided_window: numpy.ndarray
+        The windowed time series
+
     """
-    print("num_samples_advance", num_samples_advance)
     if num_windows is None:
         num_windows = available_number_of_windows_in_array(
             len(data), num_samples_window, num_samples_advance
@@ -123,7 +153,7 @@ def striding_window(data, num_samples_window, num_samples_advance, num_windows=N
     # min_ = (num_windows - 1) * num_samples_advance + num_samples_window
     bytes_per_element = data.itemsize
     output_shape = (num_windows, num_samples_window)
-    print("output_shape", output_shape)
+    # print("output_shape", output_shape)
     strides_shape = (num_samples_advance * bytes_per_element, bytes_per_element)
     # strides_shape = None
     print("strides_shape", strides_shape)
@@ -133,19 +163,15 @@ def striding_window(data, num_samples_window, num_samples_advance, num_windows=N
     return strided_window
 
 
-# </SLIDING WINDOW OPERATORS>>
-
+#Sliding Window Functions
 SLIDING_WINDOW_FUNCTIONS = {
     "crude": sliding_window_crude,
     "numba": sliding_window_numba,
     "stride": striding_window,
 }
-# SLIDING_WINDOW_FUNCTIONS["crude"] = sliding_window_crude
-# SLIDING_WINDOW_FUNCTIONS["numba"] = sliding_window_numba
-# SLIDING_WINDOW_FUNCTIONS["stride"] = striding_window
 
 
-# <FFT HELPERS>
+#FFT Helpers
 def apply_fft_to_windowed_array(windowed_array):
     """
     This will operate row-wise as well
@@ -160,7 +186,7 @@ def apply_fft_to_windowed_array(windowed_array):
     pass
 
 
-def check_that_all_sliding_window_functions_return_equivalent_arrays():
+def check_all_sliding_window_functions_are_equivalent():
     """
     simple sanity check that runs each sliding window function on a small array and
     confirms the results are numerically identical.
@@ -251,7 +277,7 @@ def test_apply_taper():
 
 
 def main():
-    check_that_all_sliding_window_functions_return_equivalent_arrays()
+    check_all_sliding_window_functions_are_equivalent()
     do_some_tests()
     test_apply_taper()
 

@@ -4,10 +4,10 @@ method returns the same array as scipy.signal.spectrogram
 """
 import numpy as np
 
-from aurora.pipelines.time_series_helpers_new import get_run_run_ts_from_mth5
-from aurora.pipelines.time_series_helpers_new import prototype_decimate
-from aurora.pipelines.time_series_helpers_new import run_ts_to_stft
-from aurora.pipelines.time_series_helpers_new import run_ts_to_stft_scipy
+from aurora.pipelines.time_series_helpers import get_run_run_ts_from_mth5
+from aurora.pipelines.time_series_helpers import prototype_decimate
+from aurora.pipelines.time_series_helpers import run_ts_to_stft
+from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
 from aurora.test_utils.synthetic.make_processing_configs import create_test_run_config
 from aurora.tf_kernel.helpers import extract_run_summaries_from_mth5s

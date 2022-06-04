@@ -18,28 +18,12 @@ Filter application info: they always have either "value" or "poles_zeros"
 
 import datetime
 
-from mt_metadata.timeseries import Station
 
 from obspy.clients.fdsn import Client
 from obspy import UTCDateTime
 from obspy import read_inventory
 
 
-def test_instantiate_and_export_mth5_metadata_example():
-    """
-    ToDo: Move this function into mth5_helpers.  It does not depend on xml so
-    shouldn't be in xml_sandbox.
-    Returns
-    -------
-
-    """
-    print("test_instantiate_and_export_mth5_metadata_example")
-    mt_station = Station()
-    json_string = mt_station.to_json(required=False, nested=True)
-    f = open("meta.json", "w")
-    f.write(json_string)
-    f.close()
-    return
 
 
 def get_response_inventory_from_server(
@@ -98,7 +82,7 @@ def test_get_example_xml_inventory():
     print("ok")
 
 
-def describe_inventory_stages(inventory, assign_names=False):
+def describe_inventory_stages(inventory, assign_names=False, verbose=False):
     """
     Scans inventory looking for stages.  Has option to assign names to stages,
     these names are used as keys in MTH5. Modifies inventory in place.
@@ -119,19 +103,23 @@ def describe_inventory_stages(inventory, assign_names=False):
             for channel in station:
                 response = channel.response
                 stages = response.response_stages
-                info = (
-                    f"{network.code}-{station.code}-{channel.code}"
-                    f" {len(stages)}-stage response"
-                )
-                print(info)
+                if verbose:
+                    info = (
+                        f"{network.code}-{station.code}-{channel.code}"
+                        f" {len(stages)}-stage response"
+                    )
+                    print(info)
+
                 for i, stage in enumerate(stages):
-                    print(f"stagename {stage.name}")
+                    if verbose:
+                        print(f"stagename {stage.name}")
                     if stage.name is None:
                         if assign_names:
                             new_names_were_assigned = True
                             new_name = f"{station.code}_{channel.code}_{i}"
                             stage.name = new_name
-                            print(f"ASSIGNING stage {stage}, name {stage.name}")
+                            if verbose:
+                                print(f"ASSIGNING stage {stage}, name {stage.name}")
                     if hasattr(stage, "symmetry"):
                         pass
                         # import matplotlib.pyplot as plt
@@ -177,7 +165,6 @@ def iterate_through_mtml(networks):
 
 def main():
     """ """
-    test_instantiate_and_export_mth5_metadata_example()
     test_get_example_xml_inventory()
     test_get_example_em_xml_from_iris_via_web()
     print("finito {}".format(datetime.datetime.now()))

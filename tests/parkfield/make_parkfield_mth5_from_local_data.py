@@ -4,6 +4,7 @@ from obspy.core import Trace
 
 from aurora.general_helper_functions import TEST_PATH
 from aurora.test_utils.dataset_definitions import TEST_DATA_SET_CONFIGS
+from aurora.test_utils.parkfield.testing_data import get_example_array_list
 from aurora.sandbox.mth5_helpers import get_experiment_from_obspy_inventory
 from mth5.utils.helpers import initialize_mth5
 from mth5.utils.helpers import read_back_data
@@ -28,8 +29,6 @@ def create_from_local_data(dataset_id, run_id):
     -------
 
     """
-    from aurora.sandbox.io_helpers.testing_data import get_example_array_list
-
     dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
     inventory = dataset_config.get_inventory_from_client(
         ensure_inventory_stages_are_named=True

@@ -6,6 +6,7 @@ tests/parkfield/config/*backup.json
 tests/parkfield/config/pkd_test-RR_SAO_run_config.json
 tests/parkfield/data/*
 tests/synthetic/aurora_results/*
+tests/synthetic/backup/*
 tests/synthetic/config/*
 tests/synthetic/data/*h5
 tests/synthetic/out.png

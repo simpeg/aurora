@@ -4,7 +4,6 @@ and transfer_function_processing helpers.
 
 
 """
-from deprecated import deprecated
 import numpy as np
 
 from aurora.time_series.frequency_band_helpers import extract_band
@@ -22,19 +21,32 @@ from aurora.transfer_function.weights.edf_weights import (
     effective_degrees_of_freedom_weights,
 )
 
-REGRESSION_LIBRARY = {"OLS": RegressionEstimator, "RME": TRME, "RME_RR": TRME_RR}
+ESTIMATOR_LIBRARY = {"OLS": RegressionEstimator, "RME": TRME, "RME_RR": TRME_RR}
 
-@deprecated(version="0.0.3", reason="new mt_metadata based config")
-def get_regression_class(config):
+
+def get_estimator_class(estimation_engine):
+    """
+
+    Parameters
+    ----------
+    estimation_engine: str
+        One of the keys in the ESTIMATOR_LIBRARY, designates the method that will be
+        used to estimate the transfer function
+
+    Returns
+    -------
+    estimator_class: aurora.transfer_function.regression.base.RegressionEstimator
+        The class that will do the TF estimation
+    """
     try:
-        regression_class = REGRESSION_LIBRARY[config.estimation_engine]
+        estimator_class = ESTIMATOR_LIBRARY[estimation_engine]
     except KeyError:
-        print(f"processing_scheme {config.estimation_engine} not supported")
-        print(f"processing_scheme must be one of {list(REGRESSION_LIBRARY.keys())}")
+        print(f"processing_scheme {estimation_engine} not supported")
+        print(f"processing_scheme must be one of {list(ESTIMATOR_LIBRARY.keys())}")
         raise Exception
-    return regression_class
+    return estimator_class
 
-@deprecated(version="0.0.3", reason="new mt_metadata based config")
+
 def set_up_iter_control(config):
     """
     TODO: Review: maybe better to just make this the __init__ method of the
@@ -43,38 +55,43 @@ def set_up_iter_control(config):
 
     Parameters
     ----------
-    config
+    config: aurora.config.metadata.decimation_level.DecimationLevel
 
     Returns
     -------
 
     """
-    if config.estimation_engine in ["RME", "RME_RR"]:
+    if config.estimator.engine in ["RME", "RME_RR"]:
         iter_control = IterControl(
-            max_number_of_iterations=config.max_number_of_iterations,
-            max_number_of_redescending_iterations=config.max_number_of_redescending_iterations,
+            max_number_of_iterations=config.regression.max_iterations,
+            max_number_of_redescending_iterations=config.regression.max_redescending_iterations,
         )
-    elif config.estimation_engine in [
+    elif config.estimator.engine in [
         "OLS",
     ]:
         iter_control = None
     return iter_control
 
 
-@deprecated(version="0.0.3", reason="new mt_metadata based config")
-def transfer_function_header_from_config(config):
+def tf_header_from_config(config, i_dec_level):
+    remote_station_id = ""
+    reference_channels = []
+    dec_level_config = config.decimations[i_dec_level]
+    if config.stations.remote:
+        remote_station_id = config.stations.remote[0].id
+        reference_channels = dec_level_config.reference_channels
+
     transfer_function_header = TransferFunctionHeader(
-        processing_scheme=config.estimation_engine,
-        local_station_id=config.local_station_id,
-        reference_station_id=config.reference_station_id,
-        input_channels=config.input_channels,
-        output_channels=config.output_channels,
-        reference_channels=config.reference_channels,
+        processing_scheme=dec_level_config.estimator.engine,
+        local_station_id=config.stations.local.id,
+        reference_station_id=remote_station_id,
+        input_channels=dec_level_config.input_channels,
+        output_channels=dec_level_config.output_channels,
+        reference_channels=reference_channels,
     )
     return transfer_function_header
 
 
-@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def check_time_axes_synched(X, Y):
     """
     Utility function for checking that time axes agree
@@ -103,8 +120,8 @@ def check_time_axes_synched(X, Y):
     return
 
 
-@deprecated(version="0.0.3", reason="new mt_metadata based config")
-def get_band_for_tf_estimate(band, config, local_stft_obj, remote_stft_obj):
+def get_band_for_tf_estimate(band, config, i_dec_level, local_stft_obj,
+                             remote_stft_obj):
     """
     Get data for TF estimation for a particular band.
 
@@ -113,7 +130,7 @@ def get_band_for_tf_estimate(band, config, local_stft_obj, remote_stft_obj):
     band : aurora.time_series.frequency_band.FrequencyBand
         object with lower_bound and upper_bound to tell stft object which
         subarray to return
-    config : aurora.config.decimation_level_config.DecimationLevelConfig
+    config : aurora.config.metadata.decimation_level.DecimationLevel
         information about the input and output channels needed for TF
         estimation problem setup
     local_stft_obj : xarray.core.dataset.Dataset or None
@@ -130,14 +147,15 @@ def get_band_for_tf_estimate(band, config, local_stft_obj, remote_stft_obj):
         reference_channels and also the frequency axes are restricted to
         being within the frequency band given as an input argument.
     """
+    dec_level_config = config.decimations[0]
     print(f"Processing band {band.center_period:.6f}s")
     band_dataset = extract_band(band, local_stft_obj)
-    X = band_dataset[config.input_channels]
-    Y = band_dataset[config.output_channels]
+    X = band_dataset[dec_level_config.input_channels]
+    Y = band_dataset[dec_level_config.output_channels]
     check_time_axes_synched(X, Y)
-    if config.reference_station_id:
+    if config.stations.remote:
         band_dataset = extract_band(band, remote_stft_obj)
-        RR = band_dataset[config.reference_channels]
+        RR = band_dataset[dec_level_config.reference_channels]
         check_time_axes_synched(Y, RR)
     else:
         RR = None
@@ -145,7 +163,6 @@ def get_band_for_tf_estimate(band, config, local_stft_obj, remote_stft_obj):
     return X, Y, RR
 
 
-@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def select_channel(xrda, channel_label):
     """
     Extra helper function to make process_transfer_functions more readable without
@@ -167,9 +184,9 @@ def select_channel(xrda, channel_label):
     return ch
 
 
-@deprecated(version="0.0.3", reason="new mt_metadata based config")
 def process_transfer_functions(
     config,
+    i_dec_level,
     local_stft_obj,
     remote_stft_obj,
     transfer_function_obj,
@@ -202,11 +219,12 @@ def process_transfer_functions(
 
     """
     # PUT COHERENCE SORTING HERE IF WIDE BAND?
-    regression_class = get_regression_class(config)
+    dec_level_config = config.decimations[i_dec_level]
+    estimator_class = get_estimator_class(dec_level_config.estimator.engine)
     for band in transfer_function_obj.frequency_bands.bands():
-        iter_control = set_up_iter_control(config)
+        iter_control = set_up_iter_control(dec_level_config)
         X, Y, RR = get_band_for_tf_estimate(
-            band, config, local_stft_obj, remote_stft_obj
+            band, config, i_dec_level, local_stft_obj, remote_stft_obj
         )
         # if there are segment weights apply them here
         # if there are channel weights apply them here
@@ -235,8 +253,8 @@ def process_transfer_functions(
         #     X, Y, RR = compute_coherence_weights(X,Y,RR, coh_type=coh_type)
         # </ INSERT COHERENCE SORTING HERE>
 
-        if config.estimate_per_channel:
-            for ch in config.output_channels:
+        if dec_level_config.estimator.estimate_per_channel:
+            for ch in dec_level_config.output_channels:
                 Y_ch = Y[ch].to_dataset()  # keep as a dataset, maybe not needed
 
                 X_, Y_, RR_ = handle_nan(X, Y_ch, RR, drop_dim="observation")
@@ -247,7 +265,7 @@ def process_transfer_functions(
                 # if RR is not None:
                 #     RR_ *= W
 
-                regression_estimator = regression_class(
+                regression_estimator = estimator_class(
                     X=X_, Y=Y_, Z=RR_, iter_control=iter_control
                 )
                 regression_estimator.estimate()

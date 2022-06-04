@@ -145,6 +145,7 @@ class WindowingScheme(ApodizationWindow):
     ):
         """
         I would like this method to support numpy arrays as well as xarrays.
+
         Parameters
         ----------
         data: 1D numpy array, xr.DataArray, xr.Dataset
@@ -157,7 +158,7 @@ class WindowingScheme(ApodizationWindow):
             If True will return an xarray object, even if the input object was a
             numpy array
 
-        Returns windowed_obj
+        Returns
         -------
         windowed_obj: arraylike
             Normally an object of type xarray.core.dataarray.DataArray
@@ -169,10 +170,7 @@ class WindowingScheme(ApodizationWindow):
             )
 
         elif isinstance(data, xr.DataArray):
-            """
-            Cast DataArray to DataSet, iterate and then Dataset back to
-            DataArray
-            """
+            #Cast DataArray to DataSet, iterate and then Dataset back to DataArray
             xrds = data.to_dataset("channel")
             windowed_obj = self.apply_sliding_window(
                 xrds, time_vector=time_vector, dt=dt
@@ -203,38 +201,46 @@ class WindowingScheme(ApodizationWindow):
 
         Parameters
         ----------
-        data
-        time_vector: standin for the time coordinate of xarray.
-        dt: stand in for sampling interval
+        data: numpy.ndarray
+            A channel of time series data
+        time_vector: numpy.ndarray or None
+            Time coordinate of xarray.  If None is passed we just assign integer counts
+        dt: float or None
+            Sampling interval
+        return_xarray: bool
+            If True an xarray is returned,
+            If False we just return a numpy array of the windowed data
+
 
         Returns
         -------
-
+        output: xr.DataArray or np.ndarray
+            The windowed time series, bound to time axis or just as numpy array,
+            depending on the value of return_xarray
         """
         sliding_window_function = SLIDING_WINDOW_FUNCTIONS[self.striding_function_label]
         windowed_array = sliding_window_function(
             data, self.num_samples_window, self.num_samples_advance
         )
 
-        # <FACTOR TO ANOTHER METHOD>
         if return_xarray:
-            # <Get window_time_axis coordinate>
+            #Get window_time_axis coordinate
             if time_vector is None:
                 time_vector = np.arange(len(data))
             window_time_axis = self.downsample_time_axis(time_vector)
-            # </Get window_time_axis coordinate>
 
-            xrd = self.cast_windowed_data_to_xarray(
+            output = self.cast_windowed_data_to_xarray(
                 windowed_array, window_time_axis, dt=dt
             )
-            return xrd
-        # </FACTOR TO ANOTHER METHOD>
         else:
-            return windowed_array
+            output = windowed_array
+
+        return output
 
     def cast_windowed_data_to_xarray(self, windowed_array, time_vector, dt=None):
         """
         TODO?: Factor this method to a standalone function in window_helpers?
+
         Parameters
         ----------
         windowed_array
