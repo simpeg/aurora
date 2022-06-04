@@ -76,8 +76,8 @@ def channel_summary_to_run_summary(ch_summary,
     channel_scale_factors = n_station_runs * [None]
     i = 0
     for (station_id, run_id), group in grouper:
-        print(f"{i} {station_id} {run_id}")
-        print(group)
+        #print(f"{i} {station_id} {run_id}")
+        #print(group)
         station_ids[i] = station_id
         run_ids[i] = run_id
         start_times[i] = group.start.iloc[0]
