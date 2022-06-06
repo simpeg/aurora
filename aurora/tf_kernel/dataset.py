@@ -109,7 +109,7 @@ class DatasetDefinition():
     like that.  This is a specification of time series and intervals that is
     compatible with mth5.  The main idea is to specify one or two stations, together
     with a list of acquisition "runs" that can be merged into a "processing run".
-    Each acquistion run can further divided into non-overlapping chunks by specifying
+    Each acquistion run can be further divided into non-overlapping chunks by specifying
     time-intervals associated with that acquistion run.  An empty iterable of
     time-intervals associated with a run is interpretted as the interval
     corresponding to the entire run.

@@ -5,16 +5,43 @@ from aurora.tf_kernel.dataset import DatasetDefinition
 from mth5.mth5 import MTH5
 from mth5.utils.helpers import initialize_mth5
 
-def extract_run_summary_from_mth5(mth5_obj, type="run"):
+def extract_run_summary_from_mth5(mth5_obj,
+                                  summary_type="run",
+                                  return_type="df"):
+    """
+
+    Parameters
+    ----------
+    mth5_obj: mth5.mth5.MTH5
+        The initialized mth5 object that will be interrogated
+    summary_type: str
+        One of ["run", "channel"].  Returns a run summary or a channel summary
+    return_type: str
+        One of ["df", "ddef"]. Returns a dataframe or a dataset_defintion
+
+    Returns
+    -------
+
+    """
     ch_summary = mth5_obj.channel_summary
-    if type == "run":
+    if summary_type == "run":
         dataset_definition = DatasetDefinition()
         dataset_definition.from_mth5_channel_summary(ch_summary)
-        df = dataset_definition.df
-        df["mth5_path"] = str(mth5_obj.filename)
-    elif type == "channel":
+        dataset_definition.df["mth5_path"] = str(mth5_obj.filename)
+        if return_type == "ddef":
+            return dataset_definition
+        elif return_type=="df":
+            df = dataset_definition.df
+            return df
+    elif summary_type == "channel":
         df = ch_summary.to_dataframe()
-    return df
+        if return_type=="ddef":
+            print("channel summary only available as dataframe, not dataset defintion")
+            raise NotImplemented
+        return df
+    else:
+        print(f"summary type {summary_type} not supported")
+        raise NotImplementedError
 
 def extract_run_summaries_from_mth5s(mth5_list, type="run", deduplicate=True):
     """
@@ -52,7 +79,8 @@ def extract_run_summaries_from_mth5s(mth5_list, type="run", deduplicate=True):
         else:   #its a path or a string
             mth5_obj = initialize_mth5(mth5_elt, mode="a")
 
-        df = extract_run_summary_from_mth5(mth5_obj, type=type)
+        df = extract_run_summary_from_mth5(mth5_obj, summary_type=type,
+                                           return_type="df")
 
         #close it back up if you opened it
         if not isinstance(mth5_elt, MTH5):

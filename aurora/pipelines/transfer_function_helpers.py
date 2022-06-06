@@ -248,7 +248,7 @@ def process_transfer_functions(
 
         # < INSERT COHERENCE SORTING HERE>
         # coh_type = "local"
-        # if config.decimation_level_id == 0:
+        # if i_dec_level == 0:
         #     from aurora.transfer_function.weights.coherence_weights import compute_coherence_weights
         #     X, Y, RR = compute_coherence_weights(X,Y,RR, coh_type=coh_type)
         # </ INSERT COHERENCE SORTING HERE>

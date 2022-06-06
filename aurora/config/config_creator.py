@@ -22,7 +22,8 @@ class ConfigCreator:
     
     def create_run_processing_object(
             self, station_id=None, run_id=None, mth5_path=None, sample_rate=1, 
-            input_channels=["hx", "hy"], output_channels=["hz", "ex", "ey"], 
+            input_channels=["hx", "hy"], output_channels=["hz", "ex", "ey"],
+            estimator="RME_RR",
             emtf_band_file=BANDS_DEFAULT_FILE, **kwargs):
         """
         Create a default processing object
