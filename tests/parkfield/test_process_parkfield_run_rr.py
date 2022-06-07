@@ -46,11 +46,9 @@ def test_processing(z_file_path=None):
     cc = ConfigCreator(config_path=CONFIG_PATH)
     config = cc.create_run_processing_object(emtf_band_file=BANDS_DEFAULT_FILE,
                                         sample_rate=40.0,
-                                             output_channels=["ex", "ey"]
+                                        output_channels=["ex", "ey"],
                                         )
     config.stations.from_dataset_dataframe(run_summary)
-    for decimation in config.decimations:
-        decimation.estimator.engine = "RME_RR"
 
     dataset_definition = DatasetDefinition()
     dataset_definition.df = run_summary

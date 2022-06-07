@@ -181,3 +181,23 @@ class Processing(Base):
         for decimation in self.decimations:
             decimation.reference_channels = []
         return
+
+    def validate(self):
+        """
+        Placeholder.  Some of the checks and methods here maybe better placed in
+        TFKernel, which would validate the dataset against the processing config.
+
+        The reason the validator is being created is that the default estimation
+        engine from the json file is "RME_RR", which is fine (we expect to in general
+        do more RR processing than SS) but if there is only one station (no remote)
+        then the RME_RR should be replaced by default with "RME".
+
+        Returns
+        -------
+
+        """
+        # Make sure a RR method is not being called for a SS config
+        if not self.stations.remote:
+            for decimation in self.decimations:
+                if decimation.estimator.engine == "RME_RR":
+                    decimation.estimator.engine = "RME"

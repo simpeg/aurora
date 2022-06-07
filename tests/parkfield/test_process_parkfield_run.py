@@ -44,11 +44,11 @@ def test_processing(return_collection=False, z_file_path=None):
     run_summary["remote"] = False
     cc = ConfigCreator(config_path=CONFIG_PATH)
     p = cc.create_run_processing_object(emtf_band_file=BANDS_DEFAULT_FILE,
-                                        sample_rate=40.0
+                                        sample_rate=40.0,
+                                        estimator={"engine":"RME"}
                                         )
     p.stations.from_dataset_dataframe(run_summary)
-    for decimation in p.decimations:
-        decimation.estimator.engine = "RME"
+    #p.validate()
 
     if DEBUG_ISSUE_172:
         config = Processing()

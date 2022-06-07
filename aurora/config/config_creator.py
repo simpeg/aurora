@@ -23,7 +23,7 @@ class ConfigCreator:
     def create_run_processing_object(
             self, station_id=None, run_id=None, mth5_path=None, sample_rate=1, 
             input_channels=["hx", "hy"], output_channels=["hz", "ex", "ey"],
-            estimator="RME_RR",
+            estimator=None,
             emtf_band_file=BANDS_DEFAULT_FILE, **kwargs):
         """
         Create a default processing object
@@ -61,11 +61,17 @@ class ConfigCreator:
                 else:
                     d = 4
                     sr = sample_rate / (d ** int(key))
-                processing_obj.decimations_dict[key].decimation.factor = d
-                processing_obj.decimations_dict[key].decimation.sample_rate = sr
-                processing_obj.decimations_dict[key].input_channels = input_channels
-                processing_obj.decimations_dict[key].output_channels = output_channels
-
+                decimation_obj = processing_obj.decimations_dict[key]
+                decimation_obj.decimation.factor = d
+                decimation_obj.decimation.sample_rate = sr
+                decimation_obj.input_channels = input_channels
+                decimation_obj.output_channels = output_channels
+                #set estimator if provided as kwarg
+                if estimator:
+                    try:
+                        decimation_obj.estimator.engine = estimator["engine"]
+                    except KeyError:
+                        pass
         return processing_obj
     
     def to_json(self, processing_obj, path=None, nested=True, required=False):

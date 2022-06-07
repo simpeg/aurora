@@ -45,6 +45,7 @@ from aurora.tf_kernel.dataset import channel_summary_to_run_summary
 from aurora.tf_kernel.base import TransferFunctionKernel
 from aurora.tf_kernel.dataset import DatasetDefinition
 from aurora.tf_kernel.helpers import extract_run_summaries_from_mth5s
+from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 from mth5.utils.helpers import initialize_mth5
 
 
@@ -55,7 +56,7 @@ DATA_PATH = CAS04_PATH.joinpath("data")
 H5_PATH = DATA_PATH.joinpath("8P_CAS04.h5")
 
 
-def main():
+def process_runlist(run_list, return_collection=False):
     # identify the h5 files that you will use
     relevant_h5_list = [H5_PATH,]
 
@@ -68,78 +69,68 @@ def main():
     # Here you can show tools that DatasetDefinition could have
     # See Note 1 above: Functionality of DatasetDefinition()
 
-    #To process only run "a":
+
 
     # tfk = TransferFunctionKernel(mth5_path=mth5_path)
-    #
     # #Make quick channel_summary for rapid testing
     # summary_df = tfk.get_channel_summary(csv_path="channel_summary.csv")
-    # print("COnvert Summary DF into a list of runs to process, with start and end times")
-    # print(f"summary df={summary_df}")
-    #
-    # dataset_definition = DatasetDefinition(df=run_summary_df)
-    # dataset_definition.from_mth5_channel_summary(summary_df)
-    dataset_df = dataset_definition.restrict_runs_by_station("CAS04", ["a",],
+
+    dataset_df = dataset_definition.restrict_runs_by_station("CAS04", run_list,
                                                              overwrite=False)
     dataset_df["remote"] = False
     input_dataset = DatasetDefinition(df=dataset_df)
     cc = ConfigCreator()
     cc = ConfigCreator(config_path=CONFIG_PATH)
     pc = cc.create_run_processing_object(emtf_band_file=BANDS_DEFAULT_FILE,
-                                    sample_rate=1.0
-                                    )
-    pc.stations.from_dataset_dataframe(input_dataset.df)
-    for decimation in pc.decimations:
-        decimation.estimator.engine = "RME"
-    # a_only = process_mth5(pc, input_dataset, show_plot=False,
-    #                   z_file_path="a.zss")
-    # print("OKOKOKOKOKOKO")
-
-    dataset_df = dataset_definition.restrict_runs_by_station("CAS04", ["a","b",],
-                                                         overwrite=False)
-    dataset_df["remote"] = False
-    input_dataset = DatasetDefinition(df=dataset_df)
-    pc = cc.create_run_processing_object(emtf_band_file=BANDS_DEFAULT_FILE,
                                          sample_rate=1.0
                                          )
-    dsdf = input_dataset.df
-    pc.stations.from_dataset_dataframe(dsdf)
-    for decimation in pc.decimations:
-        decimation.estimator.engine = "RME"
+    pc.stations.from_dataset_dataframe(input_dataset.df)
+    pc.validate()
+    z_file_name = f"{'_'.join(run_list)}.zss"
+    tf_result = process_mth5(pc, input_dataset, show_plot=False,
+                             z_file_path=z_file_name,
+                          return_collection=return_collection)
+    if not return_collection:
+        xml_file_name = f"{'_'.join(run_list)}.xml"
+        tf_result.write_tf_file(fn=xml_file_name, file_type="emtfxml")
+    return tf_result
 
-    # ab_only = process_mth5(pc, input_dataset, show_plot=False,
-    #                       z_file_path="a_b.zss")
 
-    print("A,B OK")
 
-    from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
+
+def compare_results(run_list):
     emtf_file = "emtf_results/CAS04-CAS04bcd_REV06-CAS04bcd_NVR08.zmm"
+    z_file_name = f"{'_'.join(run_list)}.zss"
     compare_two_z_files(emtf_file,
-                        "a_b.zss",
-                        label1="emtf",
-                        label2="a_b",
-                        scale_factor1=1,
-                        out_file="aab.png",
-                        markersize=3,
-                        #rho_ylims=[1e-20, 1e-6],
-                        #rho_ylims=[1e-8, 1e6],
-                        xlims=[1, 5000],
-                        )
-#     1    13.20     0.00 CAS  Hx
-# 2   103.20     0.00 CAS  Hy
-# 3     0.00     0.00 CAS  Hz
-# 4    13.20     0.00 CAS  Ex
-# 5   103.20     0.00 CAS  Ey
+                    z_file_name,
+                    label1="emtf",
+                    label2="a_b",
+                    scale_factor1=1,
+                    out_file="aab.png",
+                    markersize=3,
+                    #rho_ylims=[1e-20, 1e-6],
+                    #rho_ylims=[1e-8, 1e6],
+                    xlims=[1, 5000],
+                    )
+def process_all_runs_individually():
+    all_runs = ["a", "b", "c", "d"]
+    for run in all_runs:
+        run_list = [run,]
+        process_runlist(run_list)
+        compare_results(run_list)
 
-# m = initialize_mth5(mth5_path, mode="r")
-    # #How do we know these are the run_ids?
-    # for run_id in ["a", "b", "c", "d"]:
-    #     process_run(m, run_id)
-    # run_ids = ["b", "c"]
-    # process_merged_runs(run_ids)
-    # run_ids = ["b", "c", "d"]
-    # process_merged_runs(run_ids)
+def main():
+    process_all_runs_individually()
 
+    # #To process only run "a":
+    # run_list = ["a", ]
+    # process_runlist(run_list)
+    # #
+    # #
+    # run_list = ["b", "c", "d"]
+    # process_runlist(run_list)
+    #
+    # compare_results(run_list)
     print("OK")
 
 if __name__ == "__main__":
