@@ -114,6 +114,7 @@ def compare_results(run_list):
                     )
 def process_all_runs_individually():
     all_runs = ["a", "b", "c", "d"]
+    #all_runs = ["c",]
     for run in all_runs:
         run_list = [run,]
         process_runlist(run_list)
@@ -122,15 +123,14 @@ def process_all_runs_individually():
 def main():
     process_all_runs_individually()
 
-    # #To process only run "a":
-    # run_list = ["a", ]
-    # process_runlist(run_list)
+    run_list = ["a", "b"]
+    process_runlist(run_list)
     # #
     # #
     # run_list = ["b", "c", "d"]
     # process_runlist(run_list)
     #
-    # compare_results(run_list)
+    compare_results(run_list)
     print("OK")
 
 if __name__ == "__main__":
