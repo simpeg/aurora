@@ -39,21 +39,21 @@ def get_expected_rms_misfit(test_case_id, emtf_version=None):
     expected_rms_misfit["phi"] = {}
     if test_case_id == "test1":
         if emtf_version == "fortran":
-            expected_rms_misfit["rho"]["xy"] = 4.406358  #4.380757  # 4.357440
-            expected_rms_misfit["phi"]["xy"] = 0.862902  #0.871609  # 0.884601
-            expected_rms_misfit["rho"]["yx"] = 3.625859  #3.551043  # 3.501146
-            expected_rms_misfit["phi"]["yx"] = 0.840394  #0.812733  # 0.808658
+            expected_rms_misfit["rho"]["xy"] = 4.433905
+            expected_rms_misfit["phi"]["xy"] = 0.910484
+            expected_rms_misfit["rho"]["yx"] = 3.658614
+            expected_rms_misfit["phi"]["yx"] = 0.844645
         elif emtf_version == "matlab":
-            expected_rms_misfit["rho"]["xy"] = 2.691072
-            expected_rms_misfit["phi"]["xy"] = 0.780713
-            expected_rms_misfit["rho"]["yx"] = 3.676269
-            expected_rms_misfit["phi"]["yx"] = 1.392265
+            expected_rms_misfit["rho"]["xy"] = 2.713543
+            expected_rms_misfit["phi"]["xy"] = 0.784464
+            expected_rms_misfit["rho"]["yx"] = 3.74120
+            expected_rms_misfit["phi"]["yx"] = 1.375335
 
     elif test_case_id == "test2r1":
-        expected_rms_misfit["rho"]["xy"] = 3.940519  #3.949857  #3.949919
-        expected_rms_misfit["phi"]["xy"] = 0.959861  #0.962837  #0.957675
-        expected_rms_misfit["rho"]["yx"] = 4.136467  #4.121772  #4.117700
-        expected_rms_misfit["phi"]["yx"] = 1.635570  #1.637581  #1.629026
+        expected_rms_misfit["rho"]["xy"] = 3.971313
+        expected_rms_misfit["phi"]["xy"] = 0.982613
+        expected_rms_misfit["rho"]["yx"] = 3.967259
+        expected_rms_misfit["phi"]["yx"] = 1.62881
     return expected_rms_misfit
 
 
@@ -70,10 +70,6 @@ def assert_rms_misfit_ok(expected_rms_misfit, xy_or_yx, rho_rms_aurora,
         mode
     rho_rms_aurora: float
     phi_rms_aurora: float
-
-    Returns
-    -------
-
     """
     expected_rms_rho = expected_rms_misfit['rho'][xy_or_yx]
     expected_rms_phi = expected_rms_misfit['phi'][xy_or_yx]

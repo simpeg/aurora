@@ -28,6 +28,7 @@ def validate_sample_rate(run_ts, expected_sample_rate):
 
 def apply_prewhitening(decimation_obj, run_xrts_input):
     """
+    Applys prewhitening to time series to avoid spectral leakage when FFT is applied.
 
     Parameters
     ----------
@@ -43,7 +44,7 @@ def apply_prewhitening(decimation_obj, run_xrts_input):
 
     """
     if decimation_obj.prewhitening_type == "first difference":
-        run_xrts = run_xrts_input.diff("time")
+        run_xrts = run_xrts_input.differentiate("time")
     else:
         print(f"{decimation_obj.prewhitening_type} prehitening not yet implemented")
         print(f"returning original time series")
