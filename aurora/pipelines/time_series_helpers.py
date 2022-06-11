@@ -164,6 +164,15 @@ def run_ts_to_stft(decimation_obj, run_xrts_orig):
 
     run_xrts = apply_prewhitening(decimation_obj, run_xrts_orig)
 
+    #optionally clip data based on clock zero
+    if decimation_obj.window.clock_zero_type == "ignore":
+        pass #ignore clock zero
+    elif decimation_obj.window.clock_zero_type == "data zero":
+        raise NotImplementedError
+    elif decimation_obj.window.clock_zero_type == "user defined":
+        raise NotImplementedError
+        #clock_zero = decimation_obj.window.clock_zero
+
     windowed_obj = windowing_scheme.apply_sliding_window(
         run_xrts, dt=1.0 / decimation_obj.decimation.sample_rate
     )
