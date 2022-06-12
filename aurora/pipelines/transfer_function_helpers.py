@@ -246,12 +246,11 @@ def process_transfer_functions(
         if RR is not None:
             RR = RR.dropna(dim="observation")
 
-        # < INSERT COHERENCE SORTING HERE>
+        # INSERT COHERENCE SORTING HERE>
         # coh_type = "local"
         # if i_dec_level == 0:
         #     from aurora.transfer_function.weights.coherence_weights import compute_coherence_weights
         #     X, Y, RR = compute_coherence_weights(X,Y,RR, coh_type=coh_type)
-        # </ INSERT COHERENCE SORTING HERE>
 
         if dec_level_config.estimator.estimate_per_channel:
             for ch in dec_level_config.output_channels:
@@ -272,7 +271,7 @@ def process_transfer_functions(
                 transfer_function_obj.set_tf(regression_estimator, band.center_period)
         else:
             X, Y, RR = handle_nan(X, Y, RR, drop_dim="observation")
-            regression_estimator = regression_class(
+            regression_estimator = estimator_class(
                 X=X, Y=Y, Z=RR, iter_control=iter_control
             )
             regression_estimator.estimate()

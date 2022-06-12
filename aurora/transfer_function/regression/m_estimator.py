@@ -291,10 +291,10 @@ class MEstimator(RegressionEstimator):
         
         """
         res = self.Y - self.Y_hat
-        SSR = np.real(res.conj().T @ res)
+        SSR = np.real(np.diag(res.conj().T @ res)).T
         Yc2 = np.abs(self.Yc) ** 2
         SSYC = np.sum(Yc2, axis=0)
-        R2 = 1 - np.diag(SSR).T / SSYC
+        R2 = 1 - SSR / SSYC
         R2[R2 < 0] = 0
 
         self.R2 = xr.DataArray(
