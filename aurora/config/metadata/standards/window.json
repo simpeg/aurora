@@ -48,5 +48,30 @@
         "alias": [],
         "example": "hamming",
 		"default": "boxcar"
+    },
+    "clock_zero_type": {
+      "type": "string",
+      "required": true,
+      "units": null,
+      "style": "controlled vocabulary",
+      "description": "how the clock-zero is specified",
+      "options": [
+        "user specified",
+        "data start",
+        "ignore"],
+      "alias": [],
+      "example": "user specified",
+      "default": "ignore"
+    },
+    "clock_zero": {
+      "type": "string",
+      "required": false,
+      "units": null,
+      "style": "time",
+      "description": "Start date and time of the first data window",
+      "options": [],
+      "alias": [],
+      "example": "2020-02-01T09:23:45.453670+00:00",
+      "default": "1980-01-01T00:00:00+00:00"
     }
 }

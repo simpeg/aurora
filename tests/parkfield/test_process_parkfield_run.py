@@ -16,7 +16,7 @@ from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 from make_parkfield_mth5 import test_make_parkfield_mth5
 
 DEBUG_ISSUE_172 = False
-def test_processing(return_collection=False, z_file_path=None):
+def test_processing(return_collection=False, z_file_path=None, test_clock_zero=False):
     """
     Parameters
     ----------
@@ -48,13 +48,18 @@ def test_processing(return_collection=False, z_file_path=None):
                                         estimator={"engine":"RME"}
                                         )
     p.stations.from_dataset_dataframe(run_summary)
-    #p.validate()
 
     if DEBUG_ISSUE_172:
         config = Processing()
         config.from_json(processing_run_cfg)
     else:
         config = p
+
+    if test_clock_zero:
+        for dec_lvl_cfg in p.decimations:
+            dec_lvl_cfg.window.clock_zero_type = test_clock_zero
+            if test_clock_zero == "user specified":
+                dec_lvl_cfg.window.clock_zero = '2004-09-28 00:00:10+00:00'
 
     dataset_definition = DatasetDefinition()
     dataset_definition.df = run_summary
@@ -78,9 +83,13 @@ def test_processing(return_collection=False, z_file_path=None):
 
 
 
-def main():
+def test():
     z_file_path = AURORA_RESULTS_PATH.joinpath("pkd.zss")
     test_processing(return_collection=True, z_file_path=z_file_path)
+    test_processing(return_collection=False, z_file_path=z_file_path,
+                    test_clock_zero="user specified")
+    test_processing(return_collection=False, z_file_path=z_file_path,
+                    test_clock_zero="data start")
     test_processing(return_collection=False, z_file_path=z_file_path)
 
     # COMPARE WITH ARCHIVED Z-FILE
@@ -99,4 +108,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    test()

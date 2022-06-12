@@ -131,7 +131,18 @@ class DecimationLevel(Base):
                                          self.window.num_samples)
         return frequency_bands
 
-    
+
+    @property
+    def windowing_scheme(self):
+        from aurora.time_series.windowing_scheme import WindowingScheme
+        windowing_scheme = WindowingScheme(
+            taper_family=self.window.type,
+            num_samples_window=self.window.num_samples,
+            num_samples_overlap=self.window.overlap,
+            taper_additional_args=self.window.additional_args,
+            sample_rate=self.decimation.sample_rate,
+        )
+        return windowing_scheme
 
     # def to_stft_config_dict(self):
     #     """
