@@ -83,7 +83,7 @@ def test_processing(return_collection=False, z_file_path=None, test_clock_zero=F
 
 
 
-def main():
+def test():
     z_file_path = AURORA_RESULTS_PATH.joinpath("pkd.zss")
     test_processing(return_collection=True, z_file_path=z_file_path)
     test_processing(return_collection=False, z_file_path=z_file_path,
@@ -108,4 +108,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    test()
