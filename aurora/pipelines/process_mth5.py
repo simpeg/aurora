@@ -350,6 +350,9 @@ def process_mth5(
     processing_config, mth5_objs = initialize_pipeline(config)
     dataset_df = dataset_definition.df
 
+    # Here is where any checks that would be done by TF Kernel would be applied
+
+
     #Assign additional columns to dataset_df, populate with mth5_objs
     all_mth5_objs = len(dataset_df) * [None]
     for i, station_id in enumerate(dataset_df["station_id"]):
@@ -368,6 +371,10 @@ def process_mth5(
     for i_dec_level, dec_level_config in enumerate(processing_config.decimations):
         dataset_df = populate_dataset_df(i_dec_level, dec_level_config, dataset_df)
         #ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
+
+        #TFK 1: get clock-zero from data if needed
+        if dec_level_config.window.clock_zero_type == "data start":
+            dec_level_config.window.clock_zero = dataset_df.start.min().__str__()
 
         # Apply STFT to all runs
         local_stfts = []

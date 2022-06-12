@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import scipy.signal as ssig
 import xarray as xr
 
@@ -29,6 +30,9 @@ def validate_sample_rate(run_ts, expected_sample_rate):
 def apply_prewhitening(decimation_obj, run_xrts_input):
     """
     Applys prewhitening to time series to avoid spectral leakage when FFT is applied.
+
+    If "first difference", may want to consider clipping first and last sample from
+    the differentiated time series.
 
     Parameters
     ----------
@@ -133,6 +137,49 @@ def run_ts_to_stft_scipy(decimation_obj, run_xrts_orig):
 
     return stft_obj
 
+def truncate_to_clock_zero(decimation_obj, run_xrts):
+    """
+    Compute the time interval between the first data sample and the clockzero
+    Identify the first sample in the xarray time series that corresponds to a
+    window start sample.
+
+    Parameters
+    ----------
+    decimation_obj: aurora.config.metadata.decimation_level.DecimationLevel
+        Information about how the decimation level is to be processed
+    run_xrts : xarray.core.dataset.Dataset
+        normally extracted from mth5.RunTS
+
+
+    Returns
+    -------
+    run_xrts : xarray.core.dataset.Dataset
+        same as the input time series, but possibly slightly shortened
+    """
+    if decimation_obj.window.clock_zero_type == "ignore":
+        pass
+    else:
+        clock_zero = pd.Timestamp(decimation_obj.window.clock_zero)
+        # Uncomment these two lines to test moving the clock zero around
+        # import datetime
+        # clock_zero += datetime.timedelta(seconds=-5)
+        clock_zero = clock_zero.to_datetime64()
+        delta_t = clock_zero - run_xrts.time[0]
+        assert(delta_t.dtype == "<m8[ns]") #expected in nanoseconds
+        delta_t_seconds = int(delta_t) / 1e9
+        if delta_t_seconds==0:
+            pass # time series start is already clock zero
+        else:
+            number_of_steps = delta_t_seconds / windowing_scheme.duration_advance
+            n_partial_steps = number_of_steps - np.floor(number_of_steps)
+            n_clip = n_partial_steps * windowing_scheme.num_samples_advance
+            n_clip = int(np.round(n_clip))
+            t_clip = run_xrts.time[n_clip]
+            cond1 = run_xrts.time >= t_clip
+            print(f"dropping {n_clip} samples to agree with clock zero {clock_zero}")
+            run_xrts = run_xrts.where(cond1, drop=True)
+    return run_xrts
+
 
 def run_ts_to_stft(decimation_obj, run_xrts_orig):
     """
@@ -141,7 +188,7 @@ def run_ts_to_stft(decimation_obj, run_xrts_orig):
     ----------
     decimation_obj : aurora.config.metadata.decimation_level.DecimationLevel
         Information about how the decimation level is to be processed
-    run_ts ; xarray.core.dataset.Dataset
+    run_ts : xarray.core.dataset.Dataset
         normally extracted from mth5.RunTS
 
     Returns
@@ -166,13 +213,7 @@ def run_ts_to_stft(decimation_obj, run_xrts_orig):
     run_xrts = apply_prewhitening(decimation_obj, run_xrts_orig)
 
     #optionally clip data based on clock zero
-    if decimation_obj.window.clock_zero_type == "ignore":
-        pass #ignore clock zero
-    elif decimation_obj.window.clock_zero_type == "data zero":
-        raise NotImplementedError
-    elif decimation_obj.window.clock_zero_type == "user defined":
-        raise NotImplementedError
-        #clock_zero = decimation_obj.window.clock_zero
+    run_xrts = truncate_to_clock_zero(decimation_obj, run_xrts)
 
     windowed_obj = windowing_scheme.apply_sliding_window(
         run_xrts, dt=1.0 / decimation_obj.decimation.sample_rate
