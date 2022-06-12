@@ -197,9 +197,17 @@ def export_tf(tf_collection, station_metadata_dict={}, survey_dict={}):
     This method may wind up being embedded in the TF class
     Assign transfer_function, residual_covariance, inverse_signal_power, station, survey
 
+    Parameters
+    ----------
+    tf_collection: aurora.transfer_function.transfer_function_collection
+    .TransferFunctionCollection
+    station_metadata_dict: dict
+    survey_dict: dict
+
     Returns
     -------
-
+    tf_cls: mt_metadata.transfer_functions.core.TF
+        Transfer function container
     """
     merged_tf_dict = tf_collection.get_merged_dict()
     tf_cls = TF()
@@ -372,7 +380,7 @@ def process_mth5(
 
         #TFK 1: get clock-zero from data if needed
         if dec_level_config.window.clock_zero_type == "data start":
-            dec_level_config.window.clock_zero = dataset_df.start.min().__str__()
+            dec_level_config.window.clock_zero = str(dataset_df.start.min())
 
         # Apply STFT to all runs
         local_stfts = []

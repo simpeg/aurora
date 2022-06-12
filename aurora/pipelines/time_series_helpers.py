@@ -302,7 +302,11 @@ def get_run_run_ts_from_mth5(mth5_obj, station_id, run_id, expected_sample_rate,
 
 def prototype_decimate(config, run_run_ts):
     """
-    TODO: ?Move this function into time_series/decimate.py?
+    Consider:
+    1. Moving this function into time_series/decimate.py
+    2. Replacing the downsampled_time_axis with rolling mean, or somthing that takes
+    the average value of the time, not the window start
+
     Parameters
     ----------
     config : aurora.config.metadata.decimation.Decimation
@@ -318,11 +322,8 @@ def prototype_decimate(config, run_run_ts):
     run_xrts = run_run_ts["mvts"]
     run_obj.metadata.sample_rate = config.sample_rate
 
-    # <Replace with rolling mean, somethng that works with time>
-    # and preferably takes the average time, not the start of the window
-    slicer = slice(None, None, int(config.factor))#decimation.factor
+    slicer = slice(None, None, int(config.factor)) #decimation.factor
     downsampled_time_axis = run_xrts.time.data[slicer]
-    # </Replace with rolling mean, somethng that works with time>
 
     num_observations = len(downsampled_time_axis)
     channel_labels = list(run_xrts.data_vars.keys())  # run_ts.channels
