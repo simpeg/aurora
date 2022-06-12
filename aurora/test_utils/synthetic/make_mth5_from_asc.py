@@ -133,24 +133,19 @@ def create_mth5_synthetic_file(station_cfg, plot=False, add_nan_values=False,):
     m.open_mth5(mth5_path, mode="w")
     station_group = m.add_station(station_cfg["station_id"])
 
-    # <try assign location>
+    # Try assign location
     # Reported this conundrum https://github.com/kujaku11/mt_metadata/issues/85
     from mt_metadata.timeseries.location import Location
 
     location = Location()
     location.latitude = station_cfg["latitude"]
     station_group.metadata.location = location
-    # print(
-    #     "DEBUG: setting latitude in the above line does not wind up being "
-    #     "in the run, but it is in the station_group"
-    # )
+    # setting latitude as above does not wind up in run, but is in station_group
+
     run_group = station_group.add_run(station_cfg["run_id"])
     run_group.station_group.metadata.location = location
-    # print(
-    #     "DEBUG: setting latitude in the above line does not wind up being "
-    #     "in the run either"
-    # )
-    # </try assign location>
+    # setting latitude as above line does not wind up in the run either"
+
     run_group.from_runts(runts)
 
     # add filters

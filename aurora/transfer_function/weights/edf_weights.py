@@ -14,10 +14,9 @@ class EffectiveDegreesOfFreedom(object):
         ----------
         kwargs
         n_data : integer
-        Notes number of "numeric" observations in the input and remote reference
-        data.  Any time-frequency index having nan value in any channel is subtracted
-        from the total number of observations before computation of p1, p2
-
+            Number of "numeric" observations in the input and remote reference data.
+            Any time-frequency index having nan value in any channel is subtracted
+            from the total number of observations before computation of p1, p2
         edfl1 : int or float
              the effective number of degrees of freedom at which a datapoint should be
               removed from the total energy calculation in the iterative loop
@@ -29,7 +28,7 @@ class EffectiveDegreesOfFreedom(object):
             ad hoc parameter for scaling the p2 threshold
         p3 : float
             parameter controling the threshold at which the ratio of a data weighting
-        associated with remote and input channel is unaccepatble.
+            associated with remote and input channel is unaccepatble.
         """
 
         self.edfl1 = kwargs.get("edf_l1", 20.0)

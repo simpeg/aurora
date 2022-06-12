@@ -288,19 +288,13 @@ class MEstimator(RegressionEstimator):
         SSR : Sum of squares of the residuals.  Diagonal is real
         This method could use some cleanup for readability
         see aurora issue #78.
-        Parameters
-        ----------
-        Y_hat
-
-        Returns
-        -------
-
+        
         """
         res = self.Y - self.Y_hat
-        SSR = np.conj(res.conj().T @ res)
+        SSR = np.real(res.conj().T @ res)
         Yc2 = np.abs(self.Yc) ** 2
         SSYC = np.sum(Yc2, axis=0)
-        R2 = 1 - np.diag(np.real(SSR)).T / SSYC
+        R2 = 1 - np.diag(SSR).T / SSYC
         R2[R2 < 0] = 0
 
         self.R2 = xr.DataArray(
