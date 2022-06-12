@@ -5,7 +5,6 @@ import xarray as xr
 
 from aurora.time_series.frequency_domain_helpers import get_fft_harmonics
 from aurora.time_series.windowed_time_series import WindowedTimeSeries
-from aurora.time_series.windowing_scheme import WindowingScheme
 
 def validate_sample_rate(run_ts, expected_sample_rate):
     """
@@ -94,14 +93,7 @@ def run_ts_to_stft_scipy(decimation_obj, run_xrts_orig):
         Time series of Fourier coefficients
     """
     run_xrts = apply_prewhitening(decimation_obj, run_xrts_orig)
-
-    windowing_scheme = WindowingScheme(
-        taper_family=decimation_obj.window.type,
-        num_samples_window=decimation_obj.window.num_samples,
-        num_samples_overlap=decimation_obj.window.overlap,
-        taper_additional_args=decimation_obj.window.additional_args,
-        sample_rate=decimation_obj.decimation.sample_rate,
-    )
+    windowing_scheme = decimation_obj.windowing_scheme
 
     stft_obj = xr.Dataset()
     for channel_id in run_xrts.data_vars:
@@ -160,9 +152,6 @@ def truncate_to_clock_zero(decimation_obj, run_xrts):
         pass
     else:
         clock_zero = pd.Timestamp(decimation_obj.window.clock_zero)
-        # Uncomment these two lines to test moving the clock zero around
-        # import datetime
-        # clock_zero += datetime.timedelta(seconds=-5)
         clock_zero = clock_zero.to_datetime64()
         delta_t = clock_zero - run_xrts.time[0]
         assert(delta_t.dtype == "<m8[ns]") #expected in nanoseconds
@@ -170,13 +159,15 @@ def truncate_to_clock_zero(decimation_obj, run_xrts):
         if delta_t_seconds==0:
             pass # time series start is already clock zero
         else:
+            windowing_scheme = decimation_obj.windowing_scheme
             number_of_steps = delta_t_seconds / windowing_scheme.duration_advance
             n_partial_steps = number_of_steps - np.floor(number_of_steps)
             n_clip = n_partial_steps * windowing_scheme.num_samples_advance
             n_clip = int(np.round(n_clip))
             t_clip = run_xrts.time[n_clip]
             cond1 = run_xrts.time >= t_clip
-            print(f"dropping {n_clip} samples to agree with clock zero {clock_zero}")
+            print(f"dropping {n_clip} samples to agree with "
+                  f"{decimation_obj.window.clock_zero_type} clock zero {clock_zero}")
             run_xrts = run_xrts.where(cond1, drop=True)
     return run_xrts
 
@@ -198,28 +189,13 @@ def run_ts_to_stft(decimation_obj, run_xrts_orig):
         recoloring. This really doesn't matter since we don't use the DC harmonic for
         anything.
     """
-    try:
-        windowing_scheme = WindowingScheme(
-            taper_family=decimation_obj.window.type,
-            num_samples_window=decimation_obj.window.num_samples,
-            num_samples_overlap=decimation_obj.window.overlap,
-            taper_additional_args=decimation_obj.window.additional_args,
-            sample_rate=decimation_obj.decimation.sample_rate,
-        )
-    except AttributeError:
-        print("AttributeError --- run_ts_to_stft ?")
-
-
     run_xrts = apply_prewhitening(decimation_obj, run_xrts_orig)
-
-    #optionally clip data based on clock zero
     run_xrts = truncate_to_clock_zero(decimation_obj, run_xrts)
-
+    windowing_scheme = decimation_obj.windowing_scheme
     windowed_obj = windowing_scheme.apply_sliding_window(
         run_xrts, dt=1.0 / decimation_obj.decimation.sample_rate
     )
     windowed_obj = WindowedTimeSeries.detrend(data=windowed_obj, detrend_type="linear")
-
     tapered_obj = windowed_obj * windowing_scheme.taper
     # stft_obj = WindowedTimeSeries.apply_stft(data=tapered_obj,
     #                                          sample_rate=windowing_scheme.sample_rate,

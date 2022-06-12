@@ -107,13 +107,9 @@ def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrts, units,
     """
     Operates on a "per-run" basis
 
-    Note 1: CHECK DATA COVERAGE IS THE SAME IN BOTH LOCAL AND RR
-    This should be pushed into a previous validator before pipeline starts
-    # if config.reference_station_id:
-    #    local_run_xrts = local_run_xrts.where(local_run_xrts.time <=
-    #                                          remote_run_xrts.time[-1]).dropna(
-    #                                          dim="time")
-
+    This method could be modifed in a multiple station code so that it doesn't care
+    if the station is "local" or "remote" but rather uses scale factors keyed by
+    station_id
 
     Parameters
     ----------
@@ -138,18 +134,15 @@ def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrts, units,
     """
     stft_config = processing_config.get_decimation_level(i_dec_level)
     stft_obj = run_ts_to_stft(stft_config, run_xrts)
-
-    print("fix this so that it gets from config based on station_id, without caring "
-          "if local or remote")
+    # stft_obj = run_ts_to_stft_scipy(stft_config, run_xrts)
     run_id = run_obj.metadata.id
     if station_id==processing_config.stations.local.id:
         scale_factors = processing_config.stations.local.run_dict[
             run_id].channel_scale_factors
-    #Need to add logic here to look through list of remote ids
     elif station_id==processing_config.stations.remote[0].id:
         scale_factors = processing_config.stations.remote[0].run_dict[
             run_id].channel_scale_factors
-    # local_stft_obj = run_ts_to_stft_scipy(config, local_run_xrts)
+
     stft_obj = calibrate_stft_obj(
         stft_obj,
         run_obj,
@@ -321,10 +314,15 @@ def process_mth5(
         ):
     """
     1. Read in the config and figure out how many decimation levels there are
-    2. ToDo: Based on the run durations, and sampling rates, determined which runs
+    2. ToDo TFK: Based on the run durations, and sampling rates, determined which runs
     are valid for which decimation levels, or for which effective sample rates.  This
     action should be taken before we get here.  The dataset_definition should already
     be trimmed to exactly what will be processed.
+    3. ToDo TFK Check that data coverage is the same in both local and RR data
+    # if config.reference_station_id:
+    #    local_run_xrts = local_run_xrts.where(local_run_xrts.time <=
+    #                                          remote_run_xrts.time[-1]).dropna(
+    #                                          dim="time")
 
     Parameters
     ----------
@@ -351,7 +349,7 @@ def process_mth5(
     dataset_df = dataset_definition.df
 
     # Here is where any checks that would be done by TF Kernel would be applied
-
+    #see notes labelled with ToDo TFK above
 
     #Assign additional columns to dataset_df, populate with mth5_objs
     all_mth5_objs = len(dataset_df) * [None]
