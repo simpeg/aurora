@@ -64,6 +64,7 @@ def process_synthetic_1(z_file_path="", test_scale_factor=False,
     dataset_df["remote"] = False
     dataset_definition = DatasetDefinition()
     dataset_definition.df = dataset_df
+
     #Test that channel_scale_factors column is optional
     if test_scale_factor:
         scale_factors = {'ex': 10.0, 'ey': 3.0, 'hx': 6.0, 'hy': 5.0, 'hz': 100.0}
@@ -144,6 +145,7 @@ def test_process_mth5():
     tfc = process_synthetic_1(z_file_path=z_file_path)
     z_file_path=AURORA_RESULTS_PATH.joinpath("syn1_scaled.zss")
     tfc = process_synthetic_1(z_file_path=z_file_path, test_scale_factor=True)
+    z_file_path=AURORA_RESULTS_PATH.joinpath("syn1_simultaneous_estimate.zss")
     tfc = process_synthetic_1(z_file_path=z_file_path,
                               test_simultaneous_regression=True)
     tfc = process_synthetic_2()
