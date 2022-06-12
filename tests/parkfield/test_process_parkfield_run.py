@@ -57,8 +57,9 @@ def test_processing(return_collection=False, z_file_path=None, test_clock_zero=F
 
     if test_clock_zero:
         for dec_lvl_cfg in p.decimations:
-            dec_lvl_cfg.window.clock_zero_type = "user specified"
-            dec_lvl_cfg.window.clock_zero = '2004-09-28 00:00:10+00:00'
+            dec_lvl_cfg.window.clock_zero_type = test_clock_zero
+            if test_clock_zero == "user specified":
+                dec_lvl_cfg.window.clock_zero = '2004-09-28 00:00:10+00:00'
 
     dataset_definition = DatasetDefinition()
     dataset_definition.df = run_summary
@@ -84,10 +85,12 @@ def test_processing(return_collection=False, z_file_path=None, test_clock_zero=F
 
 def main():
     z_file_path = AURORA_RESULTS_PATH.joinpath("pkd.zss")
-    test_processing(return_collection=True, z_file_path=z_file_path)
+    #test_processing(return_collection=True, z_file_path=z_file_path)
     test_processing(return_collection=False, z_file_path=z_file_path,
-                    test_clock_zero=True)
-    test_processing(return_collection=False, z_file_path=z_file_path)
+                    test_clock_zero="user specified")
+    test_processing(return_collection=False, z_file_path=z_file_path,
+                    test_clock_zero="data start")
+    #test_processing(return_collection=False, z_file_path=z_file_path)
 
     # COMPARE WITH ARCHIVED Z-FILE
     auxilliary_z_file = EMTF_RESULTS_PATH.joinpath("PKD_272_00.zrr")
