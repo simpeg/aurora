@@ -284,23 +284,16 @@ class MEstimator(RegressionEstimator):
     
     def compute_squared_coherence(self):
         """
-        res: Residuals: The original data minus the predicted data.
-        SSR : Sum of squares of the residuals.  Diagonal is real
-        This method could use some cleanup for readability
-        see aurora issue #78.
-        Parameters
-        ----------
-        Y_hat
-
-        Returns
-        -------
+        res: Residuals, the original data minus the predicted data.
+        SSR : Sum of squares of the residuals, per channel
 
         """
         res = self.Y - self.Y_hat
-        SSR = np.conj(res.conj().T @ res)
+        SSR = np.einsum('ij,ji->i', res.conj().T, res)
+        SSR = np.real(SSR).T
         Yc2 = np.abs(self.Yc) ** 2
         SSYC = np.sum(Yc2, axis=0)
-        R2 = 1 - np.diag(np.real(SSR)).T / SSYC
+        R2 = 1 - SSR / SSYC
         R2[R2 < 0] = 0
 
         self.R2 = xr.DataArray(

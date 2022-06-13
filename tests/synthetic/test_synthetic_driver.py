@@ -39,8 +39,19 @@ from aurora.tf_kernel.helpers import extract_run_summaries_from_mth5s
 #     process_sythetic_data(test_config, run_id, units="MT")
 
 
-def process_synthetic_1(z_file_path="", test_scale_factor=False):
+def process_synthetic_1(z_file_path="", test_scale_factor=False,
+                        test_simultaneous_regression=False):
     """
+
+    Parameters
+    ----------
+    z_file_path: str or path
+        Where the z-file will be output
+    test_scale_factor: bool
+        If true, will assign scale factors to the channels
+    test_simultaneous_regression: bool
+        If True will do regression all outut channels in one step, rather than the
+        usual, channel-by-channel method
 
     Returns
     -------
@@ -53,13 +64,20 @@ def process_synthetic_1(z_file_path="", test_scale_factor=False):
     dataset_df["remote"] = False
     dataset_definition = DatasetDefinition()
     dataset_definition.df = dataset_df
+
     #Test that channel_scale_factors column is optional
     if test_scale_factor:
         scale_factors = {'ex': 10.0, 'ey': 3.0, 'hx': 6.0, 'hy': 5.0, 'hz': 100.0}
         dataset_df["channel_scale_factors"].at[0] = scale_factors
     else:
         dataset_df.drop(columns=["channel_scale_factors"], inplace=True)
+
     processing_config = create_test_run_config("test1", dataset_df)
+
+    if test_simultaneous_regression:
+        for decimation in processing_config.decimations:
+            decimation.estimator.estimate_per_channel=False
+
     tfc = process_sythetic_data(processing_config,
                                 dataset_definition,
                                 z_file_path=z_file_path)
@@ -127,6 +145,9 @@ def test_process_mth5():
     tfc = process_synthetic_1(z_file_path=z_file_path)
     z_file_path=AURORA_RESULTS_PATH.joinpath("syn1_scaled.zss")
     tfc = process_synthetic_1(z_file_path=z_file_path, test_scale_factor=True)
+    z_file_path=AURORA_RESULTS_PATH.joinpath("syn1_simultaneous_estimate.zss")
+    tfc = process_synthetic_1(z_file_path=z_file_path,
+                              test_simultaneous_regression=True)
     tfc = process_synthetic_2()
     tfc = process_synthetic_rr12()
 
