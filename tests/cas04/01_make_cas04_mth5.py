@@ -1,23 +1,25 @@
 """
-Here is an integrated test that is aimed at Issue #31.  This test is also related to
-several other issues and testing out several functionalities.
+Here is a test aimed at building an h5 for CAS04 (see Issue#31)
+This test is also related to several other issues and testing out several
+functionalities, including:
+- make_mth5_from_fdsnclient() method of MakeMTH5.
 
-First, an mth5 is created for all available data.  This is accomplished by starting
-with a station_xml file that was provided by Anna (and then modified by Tim).
+First, an mth5 is created that summarizes available data.
 
+This is done  can be done via either
+1. Starting with a station.xml file (provided by Anna or Tim).
 This xml was being used in lieu of what is kept in the iris archive because what is
 in the archive had errors.  An alternative approach would be to get the inventory
 object from IRIS.
-
-Seem to be encountering an issue with mth5 not being 0.1.0
-
-This tests the make_mth5_from_fdsnclient() method of MakeMTH5.
+2. Querying the IRIS metadata.
 
 
-    consider the case where you have a station data locally, but you also have a
-    candidate remote reference .. we want a tool that can load the RR metadata and
-    identify time intervals that data are available simultaneously
 
+
+ToDo: DEBUG: Seem to be encountering an issue with mth5 not being 0.1.0
+ToDo: ISSUE: Consider the case where you have a station data locally, but you also
+have a candidate remote reference .. we want a tool that can load the RR metadata and
+identify time intervals that data are available simultaneously
 
 """
 
@@ -32,9 +34,10 @@ from mth5.utils.helpers import read_back_data
 #from mth5.clients.make_mth5_rev_002 import MakeMTH5
 from mth5.clients.make_mth5 import MakeMTH5
 from mt_metadata.timeseries.stationxml import xml_network_mt_survey
-
+from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 from helper_functions import xml_to_mth5
 
+#Define paths
 CAS04_PATH = TEST_PATH.joinpath("cas04")
 DATA_PATH = CAS04_PATH.joinpath("data")
 DATA_PATH.mkdir(exist_ok=True)
@@ -43,46 +46,83 @@ NETWORK = "8P"
 
 
 def make_cas04_data_for_processing(xml_path=None, h5_path="tmp.h5",
-                                   active_runs=["a", ]):
+                                   active_runs=["a", ], mth5_version="0.1.0"):
     """
     This example is intended to be a template for working with XML files and
     associated metadata.  When an XML file is to be tested,
+
+    Parameters
+    ----------
+    xml_path: Str or None
+        Path to xml file to use for metdata definition.  If None the xml will be
+        downloaded from IRIS
+    h5_path: str or Path
+        Where the data will be stored
+    active_runs: list
+        List of strings with run names, e.g. ["a", "b", "c", "d"]
+    mth5_version: str
+        One of "0.1.0", or "0.2.0"
+
     Returns
     -------
 
+
     """
-    #<CREATE MTH5 FROM XML AND SUMMARIZE DATA TO QUEUE>
+    #CREATE MTH5 FROM XML AND SUMMARIZE DATA TO QUEUE
     if xml_path is not None:
-        mth5_obj = xml_to_mth5(str(xml_path)) #8P
+        mth5_obj = xml_to_mth5(str(xml_path))
     else:
         print("get file from IRIS")
-        raise NotImplementedError
-    mth5_obj.channel_summary.summarize()
+        maker = MakeMTH5(mth5_version='0.1.0')
+        maker.client = "IRIS"
+
+        # Generate data frame of FDSN Network, Station, Location, Channel, Startime, Endtime codes of interest
+        CAS04LQE = ['8P', 'CAS04', '', 'LQE', '2020-06-02T19:00:00', '2020-07-13T19:00:00']
+        CAS04LQN = ['8P', 'CAS04', '', 'LQN', '2020-06-02T19:00:00', '2020-07-13T19:00:00']
+        CAS04BFE = ['8P', 'CAS04', '', 'LFE', '2020-06-02T19:00:00', '2020-07-13T19:00:00']
+        CAS04BFN = ['8P', 'CAS04', '', 'LFN', '2020-06-02T19:00:00', '2020-07-13T19:00:00']
+        CAS04BFZ = ['8P', 'CAS04', '', 'LFZ', '2020-06-02T19:00:00', '2020-07-13T19:00:00']
+
+        request_list = [CAS04LQE, CAS04LQN, CAS04BFE, CAS04BFN, CAS04BFZ]
+        print(request_list)
+
+        # Turn list into dataframe
+        metadata_request_df =  pd.DataFrame(request_list, columns=maker.column_names)
+        print(metadata_request_df)
+
+        # Request the inventory information from IRIS
+        inventory, traces = maker.get_inventory_from_df(metadata_request_df, data=False)
+        translator = XMLInventoryMTExperiment()
+        experiment = translator.xml_to_mt(inventory_object=inventory)
+
+        #Note m is a MakeMTH5 obj, not an MTH5
+        mth5_obj = initialize_mth5(h5_path)# mode="a")
+        mth5_obj.from_experiment(experiment)
+        mth5_obj.channel_summary.summarize()
+
     summary_df = mth5_obj.channel_summary.to_dataframe()
-    #     summary_df.to_csv(summary_csv, index=False)
-    # else:
-    #     summary_df = pd.read_csv(summary_csv, parse_dates=["start", "end"])
-    #</CREATE MTH5 FROM XML AND SUMMARIZE DATA TO QUEUE>
+    #summary_df = summary_df.loc[0:4] #restrict to a single run
+    #tmp_mth5_obj.close_mth5()
+
 
     #<TRANSFORM CHANNEL SUMMARY INTO REQUEST DF>
     if active_runs is not None:
         summary_df = summary_df[summary_df["run"].isin(active_runs)] #summary_df[0:5]
     request_df = channel_summary_to_make_mth5(summary_df, network=NETWORK)
     print(request_df)
-    #</TRANSFORM CHANNEL SUMMARY INTO REQUEST DF>
+
 
     #SOLUTION 1:
     # mth5_obj.populate_runs_from_request(request_df, client="IRIS")
-    #maker = MakeMTH5(mth5_version="0.1.0")
-    maker = MakeMTH5(mth5_version="0.2.0")
+    maker = MakeMTH5(mth5_version=mth5_version)
     #print("FAILED FOR 0.2.0 with some other error")
-    #inventory, streams = maker.get_inventory_from_df(request_df, data=False, client="IRIS")
-    # inventory==inventory0??
-    mth5_path = maker.make_mth5_from_fdsnclient(request_df, client="IRIS", path=DATA_PATH)
+    #inventory, streams = maker.get_inventory_from_df(request_df, data=False, client="IRIS")    # inventory==inventory0??
+    mth5_obj = maker.make_mth5_from_fdsnclient(request_df, client="IRIS",
+                                                path=DATA_PATH, interact=True)
     #SOLUTION 2:
     # port_metadata(source=mth5_obj, target=mth5_path)
-    print(f"success {mth5_path}")
-    return mth5_path
+    #print(f"success {mth5_path}")
+    return mth5_obj
 
 
 def test_make_mth5():
@@ -92,9 +132,15 @@ def test_make_mth5():
     -------
 
     """
-    h5_path = DATA_PATH.joinpath("cas04.h5")
-    mth5_path = make_cas04_data_for_processing(xml_path=XML_PATH, h5_path=h5_path,
+    h5_path = DATA_PATH.joinpath("cas04_from_iris_20220615.h5")
+    mth5_path = make_cas04_data_for_processing(xml_path=None, h5_path=h5_path,
                                                active_runs=None)#["a", ])
+    # import pdb
+    # print("pdb")
+    # pdb.set_trace()
+    # h5_path = DATA_PATH.joinpath("cas04.h5")
+    # mth5_path = make_cas04_data_for_processing(xml_path=XML_PATH, h5_path=h5_path,
+    #                                            active_runs=None)#["a", ])
     #mth5_path = DATA_PATH.joinpath("../backup/data/ZU_CAS04.h5")
     read_back_data(mth5_path, "CAS04", "a")
     read_back_data(mth5_path, "CAS04", "b")
