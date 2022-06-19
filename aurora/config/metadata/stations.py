@@ -110,7 +110,7 @@ class Stations(Base):
         
         station = df[df.remote==False].station_id.unique()[0]
         rr_stations = df[df.remote==True].station_id.unique()
-        
+
         self.local.from_dataset_dataframe(df[df.station_id==station])
         
         for rr_station in rr_stations:
