@@ -6,9 +6,9 @@ Players on the stage:  One or more mth5s.
 
 Each mth5 has a mth5_obj.channel_summary dataframe which tells what data are available.
 I am using a compressed view of this df with one line per acquisition run as the main
-reference point for defining the TFKernel.  I've been calling that a
-"dataset_definition" but I think it is better termed a "run_summary", and this could
-likely be pushed up into mth5, so that each mth5 has a mth5_obj.run_summary dataframe.
+reference point for defining the TFKernel.  I've been calling that a "run_summary", and
+ this could likely be pushed up into mth5, so that each mth5 has a
+ mth5_obj.run_summary dataframe.
 
 The run_summary provides options for the local and possibly remote reference stations.
  Candidates for local station are the unique value in the station column.

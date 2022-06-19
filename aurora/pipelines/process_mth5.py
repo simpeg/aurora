@@ -234,7 +234,7 @@ def export_tf(tf_collection, station_metadata_dict={}, survey_dict={}):
 
 def populate_dataset_df(i_dec_level, config, dataset_df):
     """
-    Move this into a method of DatasetDefinition, self.populate_with_data()
+    Move this into a method of TFKDataset, self.populate_with_data()
 
     Notes:
     1. When iterating over dataframe, (i)ndex must run from 0 to len(df), otherwise
@@ -314,7 +314,7 @@ def close_mths_objs(df):
 
 def process_mth5(
         config,
-        dataset_definition=None,
+        tfk_dataset=None,
         units="MT",
         show_plot=False,
         z_file_path=None,
@@ -324,7 +324,7 @@ def process_mth5(
     1. Read in the config and figure out how many decimation levels there are
     2. ToDo TFK: Based on the run durations, and sampling rates, determined which runs
     are valid for which decimation levels, or for which effective sample rates.  This
-    action should be taken before we get here.  The dataset_definition should already
+    action should be taken before we get here.  The tfk_dataset should already
     be trimmed to exactly what will be processed.
     3. ToDo TFK Check that data coverage is the same in both local and RR data
     # if config.reference_station_id:
@@ -336,7 +336,7 @@ def process_mth5(
     ----------
     config: aurora.config.metadata.processing.Processing or path to json
         All processing parameters
-    dataset_definition: aurora.tf_kernel.dataset.DatasetDefinition or None
+    tfk_dataset: aurora.tf_kernel.dataset.Dataset or None
         Specifies what datasets to process according to config
     units: string
         "MT" or "SI".  To be deprecated once data have units embedded
@@ -354,7 +354,7 @@ def process_mth5(
     """
 
     processing_config, mth5_objs = initialize_pipeline(config)
-    dataset_df = dataset_definition.df
+    dataset_df = tfk_dataset.df
 
     # Here is where any checks that would be done by TF Kernel would be applied
     #see notes labelled with ToDo TFK above
@@ -438,7 +438,7 @@ def process_mth5(
         # intended to be the default in future
 
         #See ISSUE #181: Uncomment this once we have a mature multi-run test
-        # #dataset_definition.get_station_metadata_for_tf_archive()
+        # #tfk_dataset.get_station_metadata_for_tf_archive()
         # #get a list of local runs:
         # cond1 = dataset_df["station_id"]==processing_config.stations.local.id
         # sub_df = dataset_df[cond1]

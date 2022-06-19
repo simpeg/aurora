@@ -1,6 +1,6 @@
 import pandas as pd
 
-from aurora.tf_kernel.dataset import DatasetDefinition
+from aurora.tf_kernel.dataset import Dataset as TFKDataset
 
 from mth5.mth5 import MTH5
 from mth5.utils.helpers import initialize_mth5
@@ -17,7 +17,7 @@ def extract_run_summary_from_mth5(mth5_obj,
     summary_type: str
         One of ["run", "channel"].  Returns a run summary or a channel summary
     return_type: str
-        One of ["df", "ddef"]. Returns a dataframe or a dataset_defintion
+        One of ["df", "ddef"]. Returns a dataframe or a TFKDataset
 
     Returns
     -------
@@ -25,13 +25,13 @@ def extract_run_summary_from_mth5(mth5_obj,
     """
     ch_summary = mth5_obj.channel_summary
     if summary_type == "run":
-        dataset_definition = DatasetDefinition()
-        dataset_definition.from_mth5_channel_summary(ch_summary)
-        dataset_definition.df["mth5_path"] = str(mth5_obj.filename)
+        tfk_dataset = TFKDataset()
+        tfk_dataset.from_mth5_channel_summary(ch_summary)
+        tfk_dataset.df["mth5_path"] = str(mth5_obj.filename)
         if return_type == "ddef":
-            return dataset_definition
+            return tfk_dataset
         elif return_type=="df":
-            df = dataset_definition.df
+            df = tfk_dataset.df
             return df
     elif summary_type == "channel":
         df = ch_summary.to_dataframe()

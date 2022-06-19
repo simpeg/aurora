@@ -103,7 +103,7 @@ def channel_summary_to_run_summary(ch_summary,
     return run_summary
 
 
-class DatasetDefinition():
+class Dataset():
     """
     Could be called "ProcessableDataset", KernelDataset, InputDataset or something
     like that.  This is a specification of time series and intervals that is
@@ -180,7 +180,7 @@ class DatasetDefinition():
 
     def restrict_to_station_list(self, station_ids, overwrite=False, df=None):
         """
-        Drops all rows of dataset_definiation dataframe where station_ids are NOT in
+        Drops all rows of tfk_dataset.dataframe where station_ids are NOT in
         the provided list of station_ids.  Operates on a deepcopy of self.df if a df
         isn't provided
 
@@ -211,7 +211,7 @@ class DatasetDefinition():
     def restrict_runs_by_station(self, station_id, keep_run_ids, overwrite=False,
                                  df=None):
         """
-        Drops all rows of dataset_definiation dataframe where station_id matches
+        Drops all rows of tfk_dataset.dataframe where station_id matches
         input arg, and run_id is NOT in the provided list of keep_run_ids.  Operates on
         a deepcopy of self.df if a df isn't provided
 

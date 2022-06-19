@@ -12,7 +12,7 @@ from aurora.test_utils.synthetic.processing_helpers import process_sythetic_data
 from aurora.test_utils.synthetic.rms_helpers import assert_rms_misfit_ok
 from aurora.test_utils.synthetic.rms_helpers import compute_rms
 from aurora.test_utils.synthetic.rms_helpers import get_expected_rms_misfit
-from aurora.tf_kernel.dataset import DatasetDefinition
+from aurora.tf_kernel.dataset import Dataset as TFKDataset
 from aurora.tf_kernel.helpers import extract_run_summaries_from_mth5s
 from aurora.transfer_function.emtf_z_file_helpers import (
     merge_tf_collection_to_match_z_file,
@@ -67,8 +67,8 @@ def aurora_vs_emtf(test_case_id,
     -------
 
     """
-    dataset_definition = DatasetDefinition()
-    dataset_definition.df = ds_df
+    tfk_dataset = TFKDataset()
+    tfk_dataset.df = ds_df
     processing_config = create_test_run_config(test_case_id, ds_df,
                                                       matlab_or_fortran=emtf_version)
 
@@ -77,7 +77,7 @@ def aurora_vs_emtf(test_case_id,
     z_file_path  = AURORA_RESULTS_PATH.joinpath(z_file_base)
 
     tf_collection = process_sythetic_data(processing_config,
-                                          dataset_definition,
+                                          tfk_dataset,
                                           z_file_path=z_file_path)
 
     aux_data = read_z_file(auxilliary_z_file)

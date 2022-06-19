@@ -5,7 +5,7 @@ from aurora.test_utils.synthetic.make_processing_configs import create_test_run_
 from aurora.test_utils.synthetic.paths import AURORA_RESULTS_PATH
 from aurora.test_utils.synthetic.paths import CONFIG_PATH
 from aurora.test_utils.synthetic.processing_helpers import process_sythetic_data
-from aurora.tf_kernel.dataset import DatasetDefinition
+from aurora.tf_kernel.dataset import Dataset as TFKDataset
 from aurora.tf_kernel.helpers import extract_run_summaries_from_mth5s
 
 
@@ -62,8 +62,8 @@ def process_synthetic_1(z_file_path="", test_scale_factor=False,
     super_summary = extract_run_summaries_from_mth5s([mth5_path,])
     dataset_df = super_summary[super_summary.station_id=="test1"]
     dataset_df["remote"] = False
-    dataset_definition = DatasetDefinition()
-    dataset_definition.df = dataset_df
+    tfk_dataset = TFKDataset()
+    tfk_dataset.df = dataset_df
 
     #Test that channel_scale_factors column is optional
     if test_scale_factor:
@@ -79,7 +79,7 @@ def process_synthetic_1(z_file_path="", test_scale_factor=False,
             decimation.estimator.estimate_per_channel=False
 
     tfc = process_sythetic_data(processing_config,
-                                dataset_definition,
+                                tfk_dataset,
                                 z_file_path=z_file_path)
 
     z_figure_name = z_file_path.name.replace("zss", "png")
@@ -101,10 +101,10 @@ def process_synthetic_2():
     super_summary = extract_run_summaries_from_mth5s([mth5_path,])
     dataset_df = super_summary[super_summary.station_id=="test2"]
     dataset_df["remote"] = False
-    dataset_definition = DatasetDefinition()
-    dataset_definition.df = dataset_df
+    tfk_dataset = TFKDataset()
+    tfk_dataset.df = dataset_df
     processing_config = create_test_run_config("test2", dataset_df)
-    tfc = process_sythetic_data(processing_config, dataset_definition)
+    tfc = process_sythetic_data(processing_config, tfk_dataset)
     return tfc
 
 
@@ -114,10 +114,10 @@ def process_synthetic_rr12():
     super_summary = extract_run_summaries_from_mth5s([mth5_path,])
     dataset_df = super_summary
     dataset_df["remote"] = [False, True]
-    dataset_definition = DatasetDefinition()
-    dataset_definition.df = dataset_df
+    tfk_dataset = TFKDataset()
+    tfk_dataset.df = dataset_df
     processing_config = create_test_run_config("test1r2", dataset_df)
-    tfc = process_sythetic_data(processing_config, dataset_definition)
+    tfc = process_sythetic_data(processing_config, tfk_dataset)
 
 
 def test_process_mth5():

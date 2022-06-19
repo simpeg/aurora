@@ -9,7 +9,7 @@ from aurora.test_utils.parkfield.path_helpers import AURORA_RESULTS_PATH
 from aurora.test_utils.parkfield.path_helpers import CONFIG_PATH
 from aurora.test_utils.parkfield.path_helpers import DATA_PATH
 from aurora.test_utils.parkfield.path_helpers import EMTF_RESULTS_PATH
-from aurora.tf_kernel.dataset import DatasetDefinition
+from aurora.tf_kernel.dataset import Dataset as TFKDataset
 from aurora.tf_kernel.helpers import extract_run_summaries_from_mth5s
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 
@@ -50,16 +50,16 @@ def test_processing(z_file_path=None):
                                         )
     config.stations.from_dataset_dataframe(run_summary)
 
-    dataset_definition = DatasetDefinition()
-    dataset_definition.df = run_summary
+    tfk_dataset = TFKDataset()
+    tfk_dataset.df = run_summary
     show_plot = False
     tf_cls = process_mth5(config,
-                          dataset_definition,
-                         units="MT",
-                         show_plot=show_plot,
-                         z_file_path=z_file_path,
-                         return_collection=True
-                         )
+                          tfk_dataset,
+                          units="MT",
+                          show_plot=show_plot,
+                          z_file_path=z_file_path,
+                          return_collection=True
+                          )
 
     #tf_cls.write_tf_file(fn="emtfxml_test.xml", file_type="emtfxml")
     return tf_cls
