@@ -6,101 +6,12 @@ import copy
 import pandas as pd
 
 import mth5
+
+from aurora.tf_kernel.helpers import  channel_summary_to_run_summary
+
 RUN_SUMMARY_COLUMNS = ["station_id", "run_id", "start", "end", "sample_rate",
                        "input_channels", "output_channels", "remote", "mth5_path"]
-INPUT_CHANNELS = ["hx", "hy", ]
-OUTPUT_CHANNELS = ["ex", "ey", "hz", ]
 
-def channel_summary_to_run_summary(ch_summary,
-                                   allowed_input_channels=INPUT_CHANNELS,
-                                   allowed_output_channels=OUTPUT_CHANNELS):
-    """
-    TODO: replace station_id with station, and run_id with run
-    TODO: Add logic for handling input and output channels based on channel
-    summary.  Specifically, consider the case where there is no vertical magnetic
-    field, this information is available via ch_summary, and output channels should
-    then not include hz.
-
-    When creating the dataset dataframe, make it have these columns:
-    [
-            "station_id",
-            "run_id",
-            "start",
-            "end",
-            "mth5_path",
-            "sample_rate",
-            "input_channels",
-            "output_channels",
-            "remote",
-	    "channel_scale_factors",
-        ]
-
-    Parameters
-    ----------
-    ch_summary: mth5.tables.channel_table.ChannelSummaryTable or pandas DataFrame
-       If its a dataframe it is a representation of an mth5 channel_summary.
-        Maybe restricted to only have certain stations and runs before being passed to
-        this method
-    allowed_input_channels: list of strings
-        Normally ["hx", "hy", ]
-        These are the allowable input channel names for the processing.  See further
-        note under allowed_output_channels.
-    allowed_output_channels: list of strings
-        Normally ["ex", "ey", "hz", ]
-        These are the allowable output channel names for the processing.
-        A global list of these is kept at the top of this module.  The purpose of
-        this is to distinguish between runs that have different layouts, for example
-        some runs will have hz and some will not, and we cannot process for hz the
-        runs that do not have it.  By making this a kwarg we sort of prop the door
-        open for more general names (see issue #74).
-
-
-
-    Returns
-    -------
-
-    """
-    if isinstance(ch_summary, mth5.tables.channel_table.ChannelSummaryTable):
-        ch_summary_df = ch_summary.to_dataframe()
-    elif isinstance(ch_summary, pd.DataFrame):
-        ch_summary_df = ch_summary
-    grouper = ch_summary_df.groupby(["station", "run"])
-    n_station_runs = len(grouper)
-    station_ids = n_station_runs * [None]
-    run_ids = n_station_runs * [None]
-    start_times = n_station_runs * [None]
-    end_times = n_station_runs * [None]
-    sample_rates = n_station_runs * [None]
-    input_channels = n_station_runs * [None]
-    output_channels = n_station_runs * [None]
-    channel_scale_factors = n_station_runs * [None]
-    i = 0
-    for (station_id, run_id), group in grouper:
-        #print(f"{i} {station_id} {run_id}")
-        #print(group)
-        station_ids[i] = station_id
-        run_ids[i] = run_id
-        start_times[i] = group.start.iloc[0]
-        end_times[i] = group.end.iloc[0]
-        sample_rates[i] = group.sample_rate.iloc[0]
-        channels_list = group.component.to_list()
-        num_channels = len(channels_list)
-        input_channels[i] = [x for x in channels_list if x in allowed_input_channels]
-        output_channels[i] = [x for x in channels_list if x in allowed_output_channels]
-        channel_scale_factors[i] = dict(zip(channels_list, num_channels*[1.0]))
-        i += 1
-
-    data_dict = {}
-    data_dict["station_id"] = station_ids
-    data_dict["run_id"] = run_ids
-    data_dict["start"] = start_times
-    data_dict["end"] = end_times
-    data_dict["sample_rate"] = sample_rates
-    data_dict["input_channels"] = input_channels
-    data_dict["output_channels"] = output_channels
-    data_dict["channel_scale_factors"] = channel_scale_factors
-    run_summary = pd.DataFrame(data=data_dict)
-    return run_summary
 
 
 class Dataset():
