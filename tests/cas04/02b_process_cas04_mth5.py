@@ -41,7 +41,6 @@ from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config.config_creator import ConfigCreator
 from aurora.general_helper_functions import TEST_PATH
 from aurora.pipelines.process_mth5 import process_mth5
-from aurora.tf_kernel.dataset import channel_summary_to_run_summary
 from aurora.tf_kernel.base import TransferFunctionKernel
 from aurora.tf_kernel.dataset import Dataset as TFKDataset
 from aurora.tf_kernel.helpers import extract_run_summaries_from_mth5s
@@ -120,7 +119,16 @@ def process_all_runs_individually():
         process_runlist(run_list)
         compare_results(run_list)
 
+def see_channel_summary():
+    h5_path = DATA_PATH.joinpath("8P_CAS04_CAV07_NVR11_REV06.h5")
+    mth5_obj = initialize_mth5(h5_path=h5_path, )
+    mth5_obj.channel_summary.summarize()
+    #mth5_obj.close_mth5()
+    summary_df = mth5_obj.channel_summary.to_dataframe()
+    print(summary_df)
+
 def main():
+    see_channel_summary()
     #process_all_runs_individually()
 
     run_list = ["b", "c", "d",]
