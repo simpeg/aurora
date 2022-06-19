@@ -74,7 +74,15 @@ def apply_recoloring(decimation_obj, stft_obj):
         freqs = get_fft_harmonics(decimation_obj.window.num_samples, 
                                   decimation_obj.decimation.sample_rate)
         prewhitening_correction = 1.0j * 2 * np.pi * freqs  # jw
+
         stft_obj /= prewhitening_correction
+
+        #suppress nan and inf to mute later warnings
+        if prewhitening_correction[0] == 0.0:
+            cond = stft_obj.frequency != 0.0
+            stft_obj = stft_obj.where(cond, complex(0.0))
+
+
     return stft_obj
 
 
