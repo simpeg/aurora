@@ -1,9 +1,3 @@
-"""
-Split this into a module for time_domain processing helpers,
-and transfer_function_processing helpers.
-
-
-"""
 import numpy as np
 
 from aurora.time_series.frequency_band_helpers import extract_band
@@ -13,9 +7,6 @@ from aurora.transfer_function.transfer_function_header import TransferFunctionHe
 from aurora.transfer_function.regression.TRME import TRME
 from aurora.transfer_function.regression.TRME_RR import TRME_RR
 
-# <TF PROCESSING HELPERS>
-# TODO: Make all these regression methods accept kwargs on init so that
-# none of them choke if we pass them Z=None or iter_control=None
 from aurora.transfer_function.regression.base import RegressionEstimator
 from aurora.transfer_function.weights.edf_weights import (
     effective_degrees_of_freedom_weights,
@@ -59,16 +50,15 @@ def set_up_iter_control(config):
 
     Returns
     -------
-
+    iter_control: aurora.transfer_function.regression.iter_control.IterControl
+        Object with parameters about iteration control in regression
     """
     if config.estimator.engine in ["RME", "RME_RR"]:
         iter_control = IterControl(
             max_number_of_iterations=config.regression.max_iterations,
             max_number_of_redescending_iterations=config.regression.max_redescending_iterations,
         )
-    elif config.estimator.engine in [
-        "OLS",
-    ]:
+    elif config.estimator.engine in ["OLS", ]:
         iter_control = None
     return iter_control
 
@@ -194,26 +184,31 @@ def process_transfer_functions(
     channel_weights=None,
 ):
     """
-    This method is very similar to TTFestBand.m
+    This method based on TTFestBand.m
 
     Parameters
     ----------
     config
     local_stft_obj
     remote_stft_obj
-    transfer_function_obj
+    transfer_function_obj: aurora.transfer_function.TTFZ.TTFZ
+        The transfer function container ready to receive values in this method.
     segment_weights : numpy array or None
         1D array which should be of the same length as the time axis of the STFT objects
         If these weights are zero anywhere, we drop all that segment across all channels
     channel_weights : numpy array or None
 
 
-    TODO: Review the advantages of excuting the regression all at once vs
+    TODO:
+    1. Review the advantages of excuting the regression all at once vs
     channel-by-channel.  If there is not disadvantage to always
     using a channel-by-channel approach we can modify this to only support that
-    method.  We also may want to push the nan-handling into the band extraction as a
-    kwarg.  Finally, the reindexing of the band may be done in the extraction as
-    well.  This would result in an "edf-weighting-scheme-ready" format.
+    method.  However, we still need a way to get residual covariances (see issue #87)
+    2. Consider push the nan-handling into the band extraction as a
+    kwarg.
+    3. The reindexing of the band may be done in the extraction as well.  This would
+    result in an "edf-weighting-scheme-ready" format.
+
     Returns
     -------
 
