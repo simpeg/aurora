@@ -9,8 +9,8 @@ from aurora.test_utils.parkfield.path_helpers import AURORA_RESULTS_PATH
 from aurora.test_utils.parkfield.path_helpers import CONFIG_PATH
 from aurora.test_utils.parkfield.path_helpers import DATA_PATH
 from aurora.test_utils.parkfield.path_helpers import EMTF_RESULTS_PATH
-from aurora.tf_kernel.dataset import Dataset as TFKDataset
-from aurora.tf_kernel.helpers import extract_run_summaries_from_mth5s
+from aurora.tf_kernel.dataset import KernelDataset
+from aurora.tf_kernel.run_summary import RunSummary
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 
 from make_parkfield_mth5 import test_make_parkfield_hollister_mth5
@@ -39,19 +39,18 @@ def test_processing(z_file_path=None):
     if not mth5_path.exists():
         test_make_parkfield_hollister_mth5()
 
-    run_summary = extract_run_summaries_from_mth5s([mth5_path,])
-    run_summary["remote"] = False
-    run_summary["remote"][run_summary["station_id"]=="SAO"] = True
+    run_summary = RunSummary()
+    run_summary.from_mth5s([mth5_path,])
+    tfk_dataset = KernelDataset()
+    tfk_dataset.from_run_summary(run_summary, "PKD", "SAO")
 
     cc = ConfigCreator(config_path=CONFIG_PATH)
     config = cc.create_run_processing_object(emtf_band_file=BANDS_DEFAULT_FILE,
                                         sample_rate=40.0,
                                         output_channels=["ex", "ey"],
                                         )
-    config.stations.from_dataset_dataframe(run_summary)
+    config.stations.from_dataset_dataframe(tfk_dataset.df)
 
-    tfk_dataset = TFKDataset()
-    tfk_dataset.df = run_summary
     show_plot = False
     tf_cls = process_mth5(config,
                           tfk_dataset,

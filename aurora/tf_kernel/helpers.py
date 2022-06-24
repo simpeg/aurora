@@ -14,10 +14,13 @@ def channel_summary_to_run_summary(ch_summary,
                                    sortby=["station_id", "run_id", "start"]):
     """
     TODO: replace station_id with station, and run_id with run
+    Note will need to modify: aurora/tests/config$ more test_dataset_dataframe.py
     TODO: Add logic for handling input and output channels based on channel
     summary.  Specifically, consider the case where there is no vertical magnetic
     field, this information is available via ch_summary, and output channels should
     then not include hz.
+    TODO: Just inherit all the run-level and higher el'ts of the channel_summary,
+    including n_samples?
 
     When creating the dataset dataframe, make it have these columns:
     [
@@ -56,7 +59,7 @@ def channel_summary_to_run_summary(ch_summary,
 
     Returns
     -------
-    run_summary: pd.Dataframe
+    run_summary_df: pd.Dataframe
         A table with one row per "acquistion run" that was in the input channel
         summary table
     """
@@ -99,10 +102,11 @@ def channel_summary_to_run_summary(ch_summary,
     data_dict["input_channels"] = input_channels
     data_dict["output_channels"] = output_channels
     data_dict["channel_scale_factors"] = channel_scale_factors
-    run_summary = pd.DataFrame(data=data_dict)
+
+    run_summary_df = pd.DataFrame(data=data_dict)
     if sortby:
-        run_summary.sort_values(by=sortby, inplace=True)
-    return run_summary
+        run_summary_df.sort_values(by=sortby, inplace=True)
+    return run_summary_df
 
 
 

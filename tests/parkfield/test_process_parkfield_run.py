@@ -9,8 +9,9 @@ from aurora.test_utils.parkfield.path_helpers import AURORA_RESULTS_PATH
 from aurora.test_utils.parkfield.path_helpers import CONFIG_PATH
 from aurora.test_utils.parkfield.path_helpers import DATA_PATH
 from aurora.test_utils.parkfield.path_helpers import EMTF_RESULTS_PATH
-from aurora.tf_kernel.dataset import Dataset as TFKDataset
-from aurora.tf_kernel.helpers import extract_run_summaries_from_mth5s
+from aurora.tf_kernel.dataset import KernelDataset
+from aurora.tf_kernel.run_summary import RunSummary
+
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 
 from make_parkfield_mth5 import test_make_parkfield_mth5
@@ -40,14 +41,17 @@ def test_processing(return_collection=False, z_file_path=None, test_clock_zero=F
     if not mth5_path.exists():
         test_make_parkfield_mth5()
 
-    run_summary = extract_run_summaries_from_mth5s([mth5_path,])
-    run_summary["remote"] = False
+    run_summary = RunSummary()
+    run_summary.from_mth5s([mth5_path,])
+    tfk_dataset = KernelDataset()
+    tfk_dataset.from_run_summary(run_summary, "PKD")
+
     cc = ConfigCreator(config_path=CONFIG_PATH)
     p = cc.create_run_processing_object(emtf_band_file=BANDS_DEFAULT_FILE,
                                         sample_rate=40.0,
                                         estimator={"engine":"RME"}
                                         )
-    p.stations.from_dataset_dataframe(run_summary)
+    p.stations.from_dataset_dataframe(tfk_dataset.df)
 
     if DEBUG_ISSUE_172:
         config = Processing()
@@ -61,8 +65,6 @@ def test_processing(return_collection=False, z_file_path=None, test_clock_zero=F
             if test_clock_zero == "user specified":
                 dec_lvl_cfg.window.clock_zero = '2004-09-28 00:00:10+00:00'
 
-    tfk_dataset = TFKDataset()
-    tfk_dataset.df = run_summary
     show_plot = False
     tf_cls = process_mth5(config,
                           tfk_dataset,

@@ -2,8 +2,8 @@
 This may be moved to single_station processing example
 2022-02-25
 Time to start setting up the TFKernel.  We already have a prototype config class.
-What is lacking is a Dataset() class
-Note 1: Functionality of Dataset()
+What is lacking is a RunSummary() class
+Note 1: Functionality of RunSummary()
 1. User can see all possible ways of processing the data
 (possibly one list per station in run_summary)
 2. User can get a list of local_station options
@@ -119,16 +119,37 @@ def process_all_runs_individually():
         process_runlist(run_list)
         compare_results(run_list)
 
-def see_channel_summary():
+def get_channel_summary(h5_path):
     h5_path = DATA_PATH.joinpath("8P_CAS04_CAV07_NVR11_REV06.h5")
     mth5_obj = initialize_mth5(h5_path=h5_path, )
     mth5_obj.channel_summary.summarize()
-    #mth5_obj.close_mth5()
-    summary_df = mth5_obj.channel_summary.to_dataframe()
-    print(summary_df)
+    channel_summary_df = mth5_obj.channel_summary.to_dataframe()
+    mth5_obj.close_mth5()
+    print(channel_summary_df)
+    return channel_summary_df
+
+
+def get_run_summary(h5_path):
+    run_summary_df = extract_run_summaries_from_mth5s([h5_path,])
+    print(run_summary_df)
+    return run_summary_df
+
 
 def main():
-    see_channel_summary()
+    h5_path = DATA_PATH.joinpath("8P_CAS04_CAV07_NVR11_REV06.h5")
+    channel_summary = get_channel_summary(h5_path)
+    run_summary = get_run_summary(h5_path)
+    print("OK")
+    # TODO:
+    #  1. Make Run Summary
+    #  2. Drop runs that are shorter than X (1h?)
+    #  3. Select CAS04 as station to process
+    #  4. Give a list of reference stations
+    #  5. Selected reference station,
+    #  6. Generate a tfk_dataset obj that is "sliced" to the station-pair
+    #  7. Define Reference station
+    #  8 Create processing config
+    # 9. Process see what we get ...
     #process_all_runs_individually()
 
     run_list = ["b", "c", "d",]

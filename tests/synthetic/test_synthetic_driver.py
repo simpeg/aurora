@@ -5,9 +5,8 @@ from aurora.test_utils.synthetic.make_processing_configs import create_test_run_
 from aurora.test_utils.synthetic.paths import AURORA_RESULTS_PATH
 from aurora.test_utils.synthetic.paths import CONFIG_PATH
 from aurora.test_utils.synthetic.processing_helpers import process_sythetic_data
-from aurora.tf_kernel.dataset import Dataset as TFKDataset
-from aurora.tf_kernel.helpers import extract_run_summaries_from_mth5s
-
+from aurora.tf_kernel.dataset import KernelDataset
+from aurora.tf_kernel.run_summary import RunSummary
 
 
 # def process_synthetic_1_underdetermined():
@@ -59,20 +58,20 @@ def process_synthetic_1(z_file_path="", test_scale_factor=False,
         Should change so that it is mt_metadata.TF (see Issue #143)
     """
     mth5_path = create_test1_h5()
-    super_summary = extract_run_summaries_from_mth5s([mth5_path,])
-    dataset_df = super_summary[super_summary.station_id=="test1"]
-    dataset_df["remote"] = False
-    tfk_dataset = TFKDataset()
-    tfk_dataset.df = dataset_df
+    run_summary = RunSummary()
+    run_summary.from_mth5s([mth5_path,])
+    #run_summary.drop_runs_shorter_than(100000)
+    tfk_dataset = KernelDataset()
+    tfk_dataset.from_run_summary(run_summary, "test1")
 
     #Test that channel_scale_factors column is optional
     if test_scale_factor:
         scale_factors = {'ex': 10.0, 'ey': 3.0, 'hx': 6.0, 'hy': 5.0, 'hz': 100.0}
-        dataset_df["channel_scale_factors"].at[0] = scale_factors
+        tfk_dataset.df["channel_scale_factors"].at[0] = scale_factors
     else:
-        dataset_df.drop(columns=["channel_scale_factors"], inplace=True)
+        tfk_dataset.df.drop(columns=["channel_scale_factors"], inplace=True)
 
-    processing_config = create_test_run_config("test1", dataset_df)
+    processing_config = create_test_run_config("test1", tfk_dataset.df)
 
     if test_simultaneous_regression:
         for decimation in processing_config.decimations:
@@ -98,25 +97,22 @@ def process_synthetic_1(z_file_path="", test_scale_factor=False,
 
 def process_synthetic_2():
     mth5_path = create_test2_h5()
-    super_summary = extract_run_summaries_from_mth5s([mth5_path,])
-    dataset_df = super_summary[super_summary.station_id=="test2"]
-    dataset_df["remote"] = False
-    tfk_dataset = TFKDataset()
-    tfk_dataset.df = dataset_df
-    processing_config = create_test_run_config("test2", dataset_df)
+    run_summary = RunSummary()
+    run_summary.from_mth5s([mth5_path,])
+    tfk_dataset = KernelDataset()
+    tfk_dataset.from_run_summary(run_summary, "test2")
+    processing_config = create_test_run_config("test2", tfk_dataset.df)
     tfc = process_sythetic_data(processing_config, tfk_dataset)
     return tfc
 
 
 def process_synthetic_rr12():
     mth5_path = create_test12rr_h5()
-    mth5_paths = [mth5_path,]
-    super_summary = extract_run_summaries_from_mth5s([mth5_path,])
-    dataset_df = super_summary
-    dataset_df["remote"] = [False, True]
-    tfk_dataset = TFKDataset()
-    tfk_dataset.df = dataset_df
-    processing_config = create_test_run_config("test1r2", dataset_df)
+    run_summary = RunSummary()
+    run_summary.from_mth5s([mth5_path,])
+    tfk_dataset = KernelDataset()
+    tfk_dataset.from_run_summary(run_summary, "test1", "test2")
+    processing_config = create_test_run_config("test1r2", tfk_dataset.df)
     tfc = process_sythetic_data(processing_config, tfk_dataset)
 
 
@@ -141,13 +137,13 @@ def test_process_mth5():
     # process_synthetic_1_underdetermined()
     # process_synthetic_1_with_nans()
 
-    z_file_path=AURORA_RESULTS_PATH.joinpath("syn1.zss")
-    tfc = process_synthetic_1(z_file_path=z_file_path)
-    z_file_path=AURORA_RESULTS_PATH.joinpath("syn1_scaled.zss")
-    tfc = process_synthetic_1(z_file_path=z_file_path, test_scale_factor=True)
-    z_file_path=AURORA_RESULTS_PATH.joinpath("syn1_simultaneous_estimate.zss")
-    tfc = process_synthetic_1(z_file_path=z_file_path,
-                              test_simultaneous_regression=True)
+    # z_file_path=AURORA_RESULTS_PATH.joinpath("syn1.zss")
+    # tfc = process_synthetic_1(z_file_path=z_file_path)
+    # z_file_path=AURORA_RESULTS_PATH.joinpath("syn1_scaled.zss")
+    # tfc = process_synthetic_1(z_file_path=z_file_path, test_scale_factor=True)
+    # z_file_path=AURORA_RESULTS_PATH.joinpath("syn1_simultaneous_estimate.zss")
+    # tfc = process_synthetic_1(z_file_path=z_file_path,
+    #                           test_simultaneous_regression=True)
     tfc = process_synthetic_2()
     tfc = process_synthetic_rr12()
 

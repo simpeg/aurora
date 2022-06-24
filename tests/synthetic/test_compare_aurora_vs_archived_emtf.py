@@ -12,8 +12,8 @@ from aurora.test_utils.synthetic.processing_helpers import process_sythetic_data
 from aurora.test_utils.synthetic.rms_helpers import assert_rms_misfit_ok
 from aurora.test_utils.synthetic.rms_helpers import compute_rms
 from aurora.test_utils.synthetic.rms_helpers import get_expected_rms_misfit
-from aurora.tf_kernel.dataset import Dataset as TFKDataset
-from aurora.tf_kernel.helpers import extract_run_summaries_from_mth5s
+from aurora.tf_kernel.dataset import KernelDataset
+from aurora.tf_kernel.run_summary import RunSummary
 from aurora.transfer_function.emtf_z_file_helpers import (
     merge_tf_collection_to_match_z_file,
 )
@@ -25,7 +25,7 @@ def aurora_vs_emtf(test_case_id,
                    emtf_version,
                    auxilliary_z_file,
                    z_file_base,
-                   ds_df,
+                   tfk_dataset,
                    make_rho_phi_plot=True,
                    show_rho_phi_plot=False,
                    use_subtitle=True,):
@@ -67,10 +67,9 @@ def aurora_vs_emtf(test_case_id,
     -------
 
     """
-    tfk_dataset = TFKDataset()
-    tfk_dataset.df = ds_df
-    processing_config = create_test_run_config(test_case_id, ds_df,
-                                                      matlab_or_fortran=emtf_version)
+    processing_config = create_test_run_config(test_case_id,
+                                               tfk_dataset.df,
+                                               matlab_or_fortran=emtf_version)
 
 
     expected_rms_misfit = get_expected_rms_misfit(test_case_id, emtf_version)
@@ -134,7 +133,7 @@ def run_test1(emtf_version, ds_df):
     aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df)
     return
 
-def run_test2r1(ds_df):
+def run_test2r1(tfk_dataset):
     """
 
     Parameters
@@ -150,7 +149,11 @@ def run_test2r1(ds_df):
     emtf_version = "fortran"
     auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test2r1.zrr")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zrr"
-    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df)
+    aurora_vs_emtf(test_case_id,
+                   emtf_version,
+                   auxilliary_z_file,
+                   z_file_base,
+                   tfk_dataset)
     return
 
 def make_mth5s(merged=True):
@@ -183,16 +186,17 @@ def test_pipeline(merged=True):
 
     """
     mth5_paths = make_mth5s(merged=merged)
-    super_summary = extract_run_summaries_from_mth5s(mth5_paths)
+    run_summary = RunSummary()
+    run_summary.from_mth5s(mth5_paths)
+    tfk_dataset = KernelDataset()
+    tfk_dataset.from_run_summary(run_summary, "test1")
 
-    dataset_df = super_summary[super_summary.station_id=="test1"]
-    dataset_df["remote"] = False
-    run_test1("fortran", dataset_df)
-    run_test1("matlab", dataset_df)
-    
-    dataset_df = super_summary.copy(deep=True)
-    dataset_df["remote"] = [True, False]
-    run_test2r1(dataset_df)
+    run_test1("fortran", tfk_dataset)
+    run_test1("matlab", tfk_dataset)
+
+    tfk_dataset = KernelDataset()
+    tfk_dataset.from_run_summary(run_summary, "test2", "test1")
+    run_test2r1(tfk_dataset)
 
 
 
