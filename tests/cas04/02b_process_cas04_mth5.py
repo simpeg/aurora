@@ -41,9 +41,9 @@ from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config.config_creator import ConfigCreator
 from aurora.general_helper_functions import TEST_PATH
 from aurora.pipelines.process_mth5 import process_mth5
-from aurora.tf_kernel.base import TransferFunctionKernel
-from aurora.tf_kernel.dataset import Dataset as TFKDataset
-from aurora.tf_kernel.helpers import extract_run_summaries_from_mth5s
+
+from aurora.tf_kernel.dataset import KernelDataset
+from aurora.tf_kernel.run_summary import RunSummary
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 from mth5.utils.helpers import initialize_mth5
 
@@ -60,7 +60,8 @@ def process_runlist(run_list, return_collection=False):
     relevant_h5_list = [H5_PATH,]
 
     # get a merged run summary from all h5_list
-    run_summary_df = extract_run_summaries_from_mth5s(relevant_h5_list)
+    run_summary = RunSummary()
+    run_summary.from_mth5s(relevant_h5_list)
 
     # Pass the run_summary to a Dataset class
     tfk_dataset = TFKDataset(df=run_summary_df)
@@ -70,9 +71,6 @@ def process_runlist(run_list, return_collection=False):
 
 
 
-    # tfk = TransferFunctionKernel(mth5_path=mth5_path)
-    # #Make quick channel_summary for rapid testing
-    # summary_df = tfk.get_channel_summary(csv_path="channel_summary.csv")
 
     dataset_df = tfk_dataset.restrict_runs_by_station("CAS04", run_list,
                                                              overwrite=False)

@@ -78,6 +78,13 @@ class KernelDataset():
         self.local_station_id = kwargs.get("local_station_id")
         self.reference_station_id = kwargs.get("reference_station_id")
 
+    def clone(self):
+        return copy.deepcopy(self)
+
+    def clone_dataframe(self):
+        return copy.deepcopy(self.df)
+
+
     def from_run_summary(self, run_summary,
                          local_station_id,
                          reference_station_id=None):
@@ -87,9 +94,7 @@ class KernelDataset():
         station_ids = [local_station_id,]
         if reference_station_id:
             station_ids.append(reference_station_id)
-        df = run_summary.restrict_to_station_list(station_ids,
-                                                  overwrite=False,
-                                                  df=None)
+        df = restrict_to_station_list(run_summary.df, station_ids, inplace=False)
         df["remote"] = False
         if reference_station_id:
             cond = df.station_id == reference_station_id
@@ -117,7 +122,67 @@ class KernelDataset():
 
 
 
+def restrict_to_station_list(df, station_ids, inplace=True):
+    """
+    Drops all rows of run_summary dataframe where station_ids are NOT in
+    the provided list of station_ids.  Operates on a deepcopy of self.df if a df
+    isn't provided
 
+    Parameters
+    ----------
+    station_ids: str or list of strings
+        These are the station ids to keep, normally local and remote
+    overwrite: bool
+        If True, self.df is overwritten with the reduced dataframe
+
+    Returns
+    -------
+        reduced dataframe with only stations associated with the station_ids
+    """
+    if isinstance(station_ids, str):
+        station_ids = [station_ids, ]
+    if not inplace:
+        df = copy.deepcopy(df)
+    cond1 = ~df["station_id"].isin(station_ids)
+    df.drop(df[cond1].index, inplace=True)
+    df = df.reset_index()
+    return df
+
+
+def restrict_runs_by_station(df, station_id, keep_run_ids, inplace=False):
+    """
+    Drops all rows where station_id==station_id, and run_id is NOT in the provided
+     list of keep_run_ids.  Operates on a deepcopy of self.df if a df isn't provided
+
+    Note1: Logic of keep/drop
+    keep where cond1 is false
+    keep where cond1 & cond2 both true
+    drop where cond1 is true but cond2 is false
+
+    Parameters
+    ----------
+    station_id: str
+        The id of the station for which runs are to be dropped
+    keep_run_ids: str or list of strings
+        These are the run ids to keep.
+    overwrite: bool
+        If True, self.df is overwritten with the reduced dataframe
+
+    Returns
+    -------
+        reduced dataframe with only run_ids provided removed.
+    """
+    if isinstance(keep_run_ids, str):
+        keep_run_ids = [keep_run_ids, ]
+    if not inplace:
+        df = copy.deepcopy(df)
+    cond1 = df["station_id"]==station_id
+    cond2 = df["run_id"].isin(keep_run_ids)
+    #See Note1 above:
+    drop_df = df[cond1 & ~cond2]
+    df.drop(drop_df.index, inplace=True)
+    df = df.reset_index()
+    return df
 
 
 
