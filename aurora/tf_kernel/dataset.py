@@ -93,7 +93,7 @@ class KernelDataset():
         df["remote"] = False
         if reference_station_id:
             cond = df.station_id == reference_station_id
-            df.remote.at[cond] = True
+            df.remote = cond
         self.df = df
 
 
