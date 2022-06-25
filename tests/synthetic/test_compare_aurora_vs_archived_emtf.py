@@ -12,12 +12,11 @@ from aurora.test_utils.synthetic.processing_helpers import process_sythetic_data
 from aurora.test_utils.synthetic.rms_helpers import assert_rms_misfit_ok
 from aurora.test_utils.synthetic.rms_helpers import compute_rms
 from aurora.test_utils.synthetic.rms_helpers import get_expected_rms_misfit
-from aurora.tf_kernel.dataset import KernelDataset
 from aurora.tf_kernel.run_summary import RunSummary
 from aurora.transfer_function.emtf_z_file_helpers import (
     merge_tf_collection_to_match_z_file,
 )
-
+from aurora.transfer_function.kernel_dataset import KernelDataset
 from plot_helpers_synthetic import plot_rho_phi
 
 

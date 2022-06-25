@@ -5,9 +5,8 @@ from aurora.test_utils.synthetic.make_processing_configs import create_test_run_
 from aurora.test_utils.synthetic.paths import AURORA_RESULTS_PATH
 from aurora.test_utils.synthetic.paths import CONFIG_PATH
 from aurora.test_utils.synthetic.processing_helpers import process_sythetic_data
-from aurora.tf_kernel.dataset import KernelDataset
 from aurora.tf_kernel.run_summary import RunSummary
-
+from aurora.transfer_function.kernel_dataset import KernelDataset
 
 # def process_synthetic_1_underdetermined():
 #     """
