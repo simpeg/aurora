@@ -137,13 +137,13 @@ def test_process_mth5():
     # process_synthetic_1_underdetermined()
     # process_synthetic_1_with_nans()
 
-    # z_file_path=AURORA_RESULTS_PATH.joinpath("syn1.zss")
-    # tfc = process_synthetic_1(z_file_path=z_file_path)
-    # z_file_path=AURORA_RESULTS_PATH.joinpath("syn1_scaled.zss")
-    # tfc = process_synthetic_1(z_file_path=z_file_path, test_scale_factor=True)
-    # z_file_path=AURORA_RESULTS_PATH.joinpath("syn1_simultaneous_estimate.zss")
-    # tfc = process_synthetic_1(z_file_path=z_file_path,
-    #                           test_simultaneous_regression=True)
+    z_file_path=AURORA_RESULTS_PATH.joinpath("syn1.zss")
+    tfc = process_synthetic_1(z_file_path=z_file_path)
+    z_file_path=AURORA_RESULTS_PATH.joinpath("syn1_scaled.zss")
+    tfc = process_synthetic_1(z_file_path=z_file_path, test_scale_factor=True)
+    z_file_path=AURORA_RESULTS_PATH.joinpath("syn1_simultaneous_estimate.zss")
+    tfc = process_synthetic_1(z_file_path=z_file_path,
+                              test_simultaneous_regression=True)
     tfc = process_synthetic_2()
     tfc = process_synthetic_rr12()
 

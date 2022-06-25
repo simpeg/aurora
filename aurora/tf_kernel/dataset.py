@@ -143,6 +143,38 @@ class KernelDataset():
     def restrict_run_intervals_to_simultaneous(self):
         raise NotImplementedError
 
+    def get_station_metadata(self, local_station_id):
+        """
+        Helper function for archiving the TF
+
+        Parameters
+        ----------
+        local_station_id: str
+            The name of the local station
+
+        Returns
+        -------
+
+        """
+        #get a list of local runs:
+        cond = self.df["station_id"] == local_station_id
+        sub_df = self.df[cond]
+
+        #sanity check:
+        run_ids = sub_df.run_id.unique()
+        assert(len(run_ids) == len(sub_df))
+
+        # iterate over these runs, packing metadata into
+        station_metadata = None
+        for i,row in sub_df.iterrows():
+            local_run_obj = row.run
+            if station_metadata is None:
+                station_metadata = local_run_obj.station_group.metadata
+                station_metadata._runs = []
+            run_metadata = local_run_obj.metadata
+            station_metadata.add_run(run_metadata)
+        return station_metadata
+
 
 
 def restrict_to_station_list(df, station_ids, inplace=True):

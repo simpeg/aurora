@@ -360,10 +360,10 @@ def process_mth5(
     #see notes labelled with ToDo TFK above
 
     #Assign additional columns to dataset_df, populate with mth5_objs
-    all_mth5_objs = len(dataset_df) * [None]
+    mth5_obj_column = len(dataset_df) * [None]
     for i, station_id in enumerate(dataset_df["station_id"]):
-        all_mth5_objs[i] = mth5_objs[station_id]
-    dataset_df["mth5_obj"] = all_mth5_objs
+        mth5_obj_column[i] = mth5_objs[station_id]
+    dataset_df["mth5_obj"] = mth5_obj_column
     dataset_df["run"] = None
     dataset_df["run_dataarray"] = None
     dataset_df["stft"] = None
@@ -388,9 +388,12 @@ def process_mth5(
         for i,row in dataset_df.iterrows():
             run_xrts = row["run_dataarray"].to_dataset("channel")
             run_obj = row["run"]
-            station_id = row.station_id
-            stft_obj = make_stft_objects(processing_config, i_dec_level, run_obj,
-                                              run_xrts, units, station_id)
+            stft_obj = make_stft_objects(processing_config,
+                                         i_dec_level,
+                                         run_obj,
+                                         run_xrts,
+                                         units,
+                                         row.station_id)
 
             if row.station_id == processing_config.stations.local.id:
                 local_stfts.append(stft_obj)
@@ -403,7 +406,7 @@ def process_mth5(
         # Could mute bad FCs here - Not implemented yet.
         # RETURN FC_OBJECT
 
-        if processing_config.stations.remote:#reference_station_id:
+        if processing_config.stations.remote:
             remote_merged_stft_obj = xr.concat(remote_stfts, "time")
         else:
             remote_merged_stft_obj = None
@@ -435,30 +438,10 @@ def process_mth5(
         close_mths_objs(dataset_df)
         return tf_collection
     else:
-        # intended to be the default in future
+        # intended to be the default in future (return tf_cls, not tf_collection)
 
-        #See ISSUE #181: Uncomment this once we have a mature multi-run test
-        # #tfk_dataset.get_station_metadata_for_tf_archive()
-        # #get a list of local runs:
-        # cond1 = dataset_df["station_id"]==processing_config.stations.local.id
-        # sub_df = dataset_df[cond1]
-        # #sanity check:
-        # run_ids = sub_df.run_id.unique()
-        # assert(len(run_ids) == len(sub_df))
-        # # iterate over these runs, packing metadata into
-        # station_metadata = None
-        # for i,row in sub_df.iterrows():
-        #     local_run_obj = row.run
-        #     if station_metadata is None:
-        #         station_metadata = local_run_obj.station_group.metadata
-        #         station_metadata._runs = []
-        #     run_metadata = local_run_obj.metadata
-        #     station_metadata.add_run(run_metadata)
-
-        station_metadata = local_run_obj.station_group.metadata
-        station_metadata._runs = []
-        run_metadata = local_run_obj.metadata
-        station_metadata.add_run(run_metadata)
+        local_station_id = processing_config.stations.local.id
+        station_metadata = tfk_dataset.get_station_metadata(local_station_id)
 
         # Need to create an issue for this as well
         if len(mth5_objs) == 1:
