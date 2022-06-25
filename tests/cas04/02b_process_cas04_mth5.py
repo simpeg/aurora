@@ -2,7 +2,7 @@
 This may be moved to single_station processing example
 2022-02-25
 Time to start setting up the TFKernel.  We already have a prototype config class.
-What is lacking is a RunSummary() class
+
 Note 1: Functionality of RunSummary()
 1. User can see all possible ways of processing the data
 (possibly one list per station in run_summary)
