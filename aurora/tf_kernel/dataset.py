@@ -101,9 +101,9 @@ class KernelDataset():
     def add_duration(self):
         """
         """
-        timedeltas = df.end - df.start
+        timedeltas = self.df.end - self.df.start
         durations = [x.seconds for x in timedeltas]
-        df["duration"] = durations
+        self.df["duration"] = durations
         return
 
     def drop_runs_shorter_than(self, duration, units="s"):
