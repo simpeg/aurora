@@ -128,9 +128,10 @@ def get_channel_summary(h5_path):
 
 
 def get_run_summary(h5_path):
-    run_summary_df = extract_run_summaries_from_mth5s([h5_path,])
-    print(run_summary_df)
-    return run_summary_df
+    run_summary = RunSummary()
+    run_summary.from_mth5s([h5_path,])
+    print(run_summary.df)
+    return run_summary
 
 
 def main():
