@@ -10,18 +10,21 @@ from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
 from aurora.test_utils.synthetic.make_processing_configs import create_test_run_config
-from aurora.tf_kernel.helpers import extract_run_summaries_from_mth5s
+from aurora.tf_kernel.dataset import KernelDataset
+from aurora.tf_kernel.run_summary import RunSummary
 from mth5.mth5 import MTH5
 
 
 def test_stft_methods_agree():
     mth5_path = create_test1_h5()
     mth5_paths = [mth5_path, ]
-    run_summary = extract_run_summaries_from_mth5s(mth5_paths)
-    dataset_df = run_summary[run_summary.station_id=="test1"]
-    dataset_df["remote"] = False
 
-    processing_config = create_test_run_config("test1", dataset_df)
+    run_summary = RunSummary()
+    run_summary.from_mth5s(mth5_paths)
+    tfk_dataset = KernelDataset()
+    tfk_dataset.from_run_summary(run_summary, "test1")
+
+    processing_config = create_test_run_config("test1", tfk_dataset.df)
 
     mth5_obj = MTH5(file_version="0.1.0")
     mth5_obj.open_mth5(mth5_path, mode="a")
