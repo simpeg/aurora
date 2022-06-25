@@ -104,7 +104,7 @@ class RunSummary():
         self._input_dict = kwargs.get("input_dict", None)
         self.df = kwargs.get("df", None)
 
-    @property
+
     def clone(self):
         return copy.deepcopy(self)
 

@@ -11,10 +11,6 @@ import mth5
 from aurora.tf_kernel.helpers import channel_summary_to_run_summary
 from aurora.tf_kernel.helpers import extract_run_summaries_from_mth5s
 
-RUN_SUMMARY_COLUMNS = ["station_id", "run_id", "start", "end", "sample_rate",
-                       "input_channels", "output_channels", "remote", "mth5_path"]
-
-
 
 class KernelDataset():
     """
@@ -101,6 +97,33 @@ class KernelDataset():
             df.remote = cond
         self.df = df
 
+    @property
+    def add_duration(self):
+        """
+        """
+        timedeltas = df.end - df.start
+        durations = [x.seconds for x in timedeltas]
+        df["duration"] = durations
+        return
+
+    def drop_runs_shorter_than(self, duration, units="s"):
+        if units != "s":
+            raise NotImplementedError
+        if "duration" not in self.df.columns:
+            self.add_duration
+        drop_cond = self.df.duration < duration
+        self.df.drop(self.df[drop_cond].index, inplace=True)
+        self.df.reset_index()
+        return
+
+
+
+    def select_station_runs(self, station_runs_dict, keep_or_drop):
+        df = select_station_runs(self.df, station_runs_dict, keep_or_drop)
+        self.df = df
+        return
+
+
 
     @property
     def is_single_station(self):
@@ -149,10 +172,12 @@ def restrict_to_station_list(df, station_ids, inplace=True):
     return df
 
 
-def restrict_runs_by_station(df, station_id, keep_run_ids, inplace=False):
+def select_station_runs(df, station_runs_dict, keep_or_drop, overwrite=True,):
     """
     Drops all rows where station_id==station_id, and run_id is NOT in the provided
-     list of keep_run_ids.  Operates on a deepcopy of self.df if a df isn't provided
+     list of keep_run_ids.  Operates on a deepcopy df if inplace=False
+    Uncommon use case the way this is coded, because it will restrict to a single
+    station processing case.  Better to use drop runs, or a dict-style input
 
     Note1: Logic of keep/drop
     keep where cond1 is false
@@ -161,10 +186,12 @@ def restrict_runs_by_station(df, station_id, keep_run_ids, inplace=False):
 
     Parameters
     ----------
-    station_id: str
-        The id of the station for which runs are to be dropped
-    keep_run_ids: str or list of strings
-        These are the run ids to keep.
+    station_runs_dict: dict
+        Keys are string ids of the stations to keep
+        Values are lists of string labels for run_ids to keep
+    keep_or_drop: str
+        If "keep": returns df with only the station_rus specified in station_runs_dict
+        If "drop": returns df with station_runs_dict excised
     overwrite: bool
         If True, self.df is overwritten with the reduced dataframe
 
@@ -172,16 +199,21 @@ def restrict_runs_by_station(df, station_id, keep_run_ids, inplace=False):
     -------
         reduced dataframe with only run_ids provided removed.
     """
-    if isinstance(keep_run_ids, str):
-        keep_run_ids = [keep_run_ids, ]
-    if not inplace:
+
+    if not overwrite:
         df = copy.deepcopy(df)
-    cond1 = df["station_id"]==station_id
-    cond2 = df["run_id"].isin(keep_run_ids)
-    #See Note1 above:
-    drop_df = df[cond1 & ~cond2]
-    df.drop(drop_df.index, inplace=True)
-    df = df.reset_index()
+    for station_id, run_ids in station_runs_dict.items():
+        if isinstance(run_ids, str):
+            run_ids = [run_ids, ]
+        cond1 = df["station_id"]==station_id
+        cond2 = df["run_id"].isin(run_ids)
+        if keep_or_drop == "keep":
+            drop_df = df[cond1 & ~cond2]
+        else:
+            drop_df = df[cond1 & cond2]
+
+        df.drop(drop_df.index, inplace=True)
+        df = df.reset_index()
     return df
 
 
