@@ -21,7 +21,7 @@ from mth5.mth5 import MTH5
 from aurora.test_utils.synthetic.synthetic_station_config import make_filters
 from aurora.test_utils.synthetic.synthetic_station_config import make_station_01
 from aurora.test_utils.synthetic.synthetic_station_config import make_station_02
-
+from aurora.test_utils.synthetic.synthetic_station_config import make_station_03
 
 
 seed(0)
@@ -121,8 +121,8 @@ def create_mth5_synthetic_file(station_cfgs, mth5_path, plot=False,
 
             # add noise
             for col in run.channels:
-                if run.noise_scalar[col]:
-                    df[col] += station_cfg["noise_scalar"][col] * np.random.randn(len(df))
+                if run.noise_scalars[col]:
+                    df[col] += run.noise_scalars[col] * np.random.randn(len(df))
 
             #add nan
             if add_nan_values:
@@ -186,12 +186,17 @@ def create_test12rr_h5():
     return mth5_path
 
 
+def create_test3_h5():
+    station_params = make_station_03()
+    mth5_path = create_mth5_synthetic_file([station_params, ], station_params.mth5_path)
+    return mth5_path
+
 def main():
     create_test1_h5()
     create_test1_h5_with_nan()
     create_test2_h5()
     create_test12rr_h5()
-
+    create_test3_h5()
 
 if __name__ == "__main__":
     main()

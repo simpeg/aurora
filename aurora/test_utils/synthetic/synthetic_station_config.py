@@ -8,14 +8,14 @@ Station level:'latitude':17.996
 
 Run level:'columns', :channel names as a list; ["hx", "hy", "hz", "ex", "ey"]
 Run level: 'raw_data_path', Path to ascii data source
-Run level: 'noise_scalar', [0.0, 0.0, 0.0, 0.0, 0.0]
+Run level: 'noise_scalars', dict keyed by channel, default is zero,
 Run level: 'nan_indices', iterable of integers, where to put nan [
 Run level: 'filters', dict of filters keyed by columns
 Run level: 'run_id', name of the run
 Run level: 'sample_rate', 1.0
 
 """
-
+import numpy as np
 import random
 
 from aurora.test_utils.synthetic.paths import DATA_PATH
@@ -54,14 +54,14 @@ class SyntheticRun(object):
         self.sample_rate = kwargs.get("sample_rate", 1.0)
         self.raw_data_path = kwargs.get("raw_data_path", None)
         self.channels = kwargs.get("channels", ["hx", "hy", "hz", "ex", "ey"])
-        self.noise_scalar = kwargs.get("noise_scalar", None)
+        self.noise_scalars = kwargs.get("noise_scalars", None)
         self.nan_indices = kwargs.get("nan_indices", {})
         self.filters = kwargs.get("filters", {})
 
-        if self.noise_scalar is None:
-            self.noise_scalar = {}
+        if self.noise_scalars is None:
+            self.noise_scalars = {}
             for channel in self.channels:
-                self.noise_scalar[channel] = 0.0 #np.random.rand(1)
+                self.noise_scalars[channel] = 0.0 #np.random.rand(1)
 
 
 class SyntheticStation(object):
@@ -73,34 +73,33 @@ class SyntheticStation(object):
 
 
 def make_station_01():
-    test1 = SyntheticStation("test1")
-    test1.mth5_path = DATA_PATH.joinpath("test1.h5")
-    channels = ["hx", "hy", "hz", "ex", "ey"]
+    station = SyntheticStation("test1")
+    station.mth5_path = DATA_PATH.joinpath("test1.h5")
 
     run_001 = SyntheticRun("001",
                            raw_data_path=DATA_PATH.joinpath("test1.asc"),
                            )
     nan_indices = {}
-    for col in run_001.channels:
-        nan_indices[col] = []
-        if col == "hx":
-            nan_indices[col].append([11, 100])
-        if col == "hy":
-            nan_indices[col].append([11, 100])
-            nan_indices[col].append([20000, 444])
+    for ch in run_001.channels:
+        nan_indices[ch] = []
+        if ch == "hx":
+            nan_indices[ch].append([11, 100])
+        if ch == "hy":
+            nan_indices[ch].append([11, 100])
+            nan_indices[ch].append([20000, 444])
     run_001.nan_indices = nan_indices
 
     filters = {}
-    for col in run_001.channels:
-        if col in ["ex", "ey"]:
-            filters[col] = [FILTERS["1x"].name,]
-        elif col in ["hx", "hy", "hz"]:
-            filters[col] = [FILTERS["10x"].name, FILTERS["0.1x"].name]
+    for ch in run_001.channels:
+        if ch in ["ex", "ey"]:
+            filters[ch] = [FILTERS["1x"].name,]
+        elif ch in ["hx", "hy", "hz"]:
+            filters[ch] = [FILTERS["10x"].name, FILTERS["0.1x"].name]
     run_001.filters = filters
 
-    test1.runs = [run_001,]
+    station.runs = [run_001,]
 
-    return test1
+    return station
 
 
 
@@ -119,15 +118,65 @@ def make_station_02():
 
 
 def make_station_03():
-    station_dict = make_station_01_config_dict()
-    station_dict["raw_data_path"] = DATA_PATH.joinpath("test3.asc")
-    station_dict["mth5_path"] = DATA_PATH.joinpath("test3.h5")
-    station_dict["station_id"] = "test3"
-    station_dict["nan_indices"] = {}
-    for col in station_dict["columns"]:
-        station_dict["nan_indices"][col] = []
-    station_dict["run_id"] = ["a", "b", "c", "d"]
-    return station_dict
+    station = SyntheticStation("test3")
+    station.mth5_path = DATA_PATH.joinpath("test3.h5")
+    channels = ["hx", "hy", "hz", "ex", "ey"]
+
+    nan_indices = {}
+    for ch in channels:
+        nan_indices[ch] = []
+
+    filters = {}
+    for ch in channels:
+        if ch in ["ex", "ey"]:
+            filters[ch] = [FILTERS["1x"].name,]
+        elif ch in ["hx", "hy", "hz"]:
+            filters[ch] = [FILTERS["10x"].name, FILTERS["0.1x"].name]
+
+    run_001 = SyntheticRun("001",
+                           raw_data_path=DATA_PATH.joinpath("test1.asc"),
+                           nan_indices=nan_indices,
+                           filters=filters,
+                           )
+
+    noise_scalars = {}
+    for ch in channels:
+        noise_scalars[ch] = 2.0
+    run_002 = SyntheticRun("002",
+                           raw_data_path=DATA_PATH.joinpath("test1.asc"),
+                           noise_scalars=noise_scalars,
+                           nan_indices=nan_indices,
+                           filters=filters,
+                           )
+
+    for ch in channels:
+        noise_scalars[ch] = 5.0
+    run_003 = SyntheticRun("003",
+                           raw_data_path=DATA_PATH.joinpath("test1.asc"),
+                           noise_scalars=noise_scalars,
+                           nan_indices=nan_indices,
+                           filters=filters,
+                           )
+
+    for ch in channels:
+        noise_scalars[ch] = 10.0
+    run_004 = SyntheticRun("004",
+                           raw_data_path=DATA_PATH.joinpath("test1.asc"),
+                           noise_scalars=noise_scalars,
+                           nan_indices=nan_indices,
+                           filters=filters,
+                           )
+    filters = {}
+    for col in run_001.channels:
+        if col in ["ex", "ey"]:
+            filters[col] = [FILTERS["1x"].name,]
+        elif col in ["hx", "hy", "hz"]:
+            filters[col] = [FILTERS["10x"].name, FILTERS["0.1x"].name]
+    run_001.filters = filters
+
+    station.runs = [run_001, run_002, run_003, run_004]
+
+    return station
 
 
 # def main():
