@@ -448,9 +448,11 @@ def process_mth5(
             key = list(mth5_objs.keys())[0]
             survey_dict = mth5_objs[key].survey_group.metadata.to_dict()
         else:
-            print("We do not currently handle multiple mth5 objs for "
+            print("WARNING We do not currently handle multiple mth5 objs for "
                   "non-tf_collection output")
-            raise Exception
+            key = list(mth5_objs.keys())[0]
+            survey_dict = mth5_objs[key].survey_group.metadata.to_dict()
+            #raise Exception
 
         print(station_metadata.run_list)
         tf_cls = export_tf(

@@ -138,6 +138,7 @@ class KernelDataset():
         if remote_station_id:
             cond = df.station_id == remote_station_id
             df.remote = cond
+
         self.df = df
 
     @property
@@ -149,7 +150,7 @@ class KernelDataset():
         """
         """
         timedeltas = self.df.end - self.df.start
-        durations = [x.seconds for x in timedeltas]
+        durations = [x.total_seconds() for x in timedeltas]
         self.df["duration"] = durations
         return
 
@@ -160,7 +161,7 @@ class KernelDataset():
             self.add_duration
         drop_cond = self.df.duration < duration
         self.df.drop(self.df[drop_cond].index, inplace=True)
-        self.df.reset_index()
+        self.df.reset_index(drop=True, inplace=True)
         return
 
 
@@ -189,18 +190,51 @@ class KernelDataset():
 
     def restrict_run_intervals_to_simultaneous(self):
         """
-        We assume that the dfs are sorted by start_time, i.e. the runs are sequential
+        For each run in local_station_id we check if it has overlap with other runs
 
-        For each run in local_station_id we check
-        1. does it overl
+        Room for optimiztion here
+
+        Note that you can wind up splitting runs here.  For example, in that case where
+        local is running continuously, but remote is intermittent.  Then the local
+        run may break into several chunks.
+
         Returns
         -------
 
         """
-        # local_df = self.df[self.df.station_id == self.local_station_id]
-        # remote_df = self.df[self.df.station_id == self.remote_station_id]
-        # print("remove run_id from sortby in RunSummary")
-        raise NotImplementedError
+        local_df = self.df[self.df.station_id == self.local_station_id]
+        remote_df = self.df[self.df.station_id == self.remote_station_id]
+        output_sub_runs = []
+        for i_local, local_row in local_df.iterrows():
+            for i_remote, remote_row in remote_df.iterrows():
+                if intervals_overlap(local_row.start,
+                                     local_row.end,
+                                     remote_row.start,
+                                     remote_row.end):
+                    print(f"OVERLAP {i_local}, {i_remote}")
+                    olap_start, olap_end = overlap(local_row.start,
+                                                   local_row.end,
+                                                   remote_row.start,
+                                                   remote_row.end)
+                    print(f"{olap_start} -- {olap_end}\n "
+                          f"{(olap_end-olap_start).seconds}s\n\n")
+
+                    local_sub_run = local_row.copy(deep=True)
+                    #local_sub_run.drop("index", inplace=True)
+                    remote_sub_run = remote_row.copy(deep=True)
+                    #remote_sub_run.drop("index", inplace=True)
+                    local_sub_run.start = olap_start
+                    local_sub_run.end = olap_end
+                    remote_sub_run.start = olap_start
+                    remote_sub_run.end = olap_end
+                    output_sub_runs.append(local_sub_run)
+                    output_sub_runs.append(remote_sub_run)
+                else:
+                    print(f"NOVERLAP {i_local}, {i_remote}")
+        df = pd.DataFrame(output_sub_runs)
+        df = df.reset_index(drop=True)
+        self.df = df
+        return
 
     def get_station_metadata(self, local_station_id):
         """
@@ -218,6 +252,7 @@ class KernelDataset():
         #get a list of local runs:
         cond = self.df["station_id"] == local_station_id
         sub_df = self.df[cond]
+        sub_df.drop_duplicates(subset="run_id", inplace=True)
 
         #sanity check:
         run_ids = sub_df.run_id.unique()
@@ -259,7 +294,7 @@ def restrict_to_station_list(df, station_ids, inplace=True):
         df = copy.deepcopy(df)
     cond1 = ~df["station_id"].isin(station_ids)
     df.drop(df[cond1].index, inplace=True)
-    df = df.reset_index()
+    df = df.reset_index(drop=True)
     return df
 
 
@@ -304,9 +339,53 @@ def select_station_runs(df, station_runs_dict, keep_or_drop, overwrite=True,):
             drop_df = df[cond1 & cond2]
 
         df.drop(drop_df.index, inplace=True)
-        df = df.reset_index()
+        df = df.reset_index(inplace=True)
     return df
 
+
+def intervals_overlap(start1, end1, start2, end2):
+    """
+    https://stackoverflow.com/questions/3721249/python-date-interval-intersection
+
+    Parameters
+    ----------
+    start1
+    end1
+    start2
+    end2
+
+    Returns
+    -------
+
+    """
+    return (start1 <= start2 <= end1) or (start2 <= start1 <= end2)
+
+
+def overlap(t1start, t1end, t2start, t2end):
+    """
+    https://stackoverflow.com/questions/3721249/python-date-interval-intersection
+
+    Parameters
+    ----------
+    t1start
+    t1end
+    t2start
+    t2end
+
+    Returns
+    -------
+
+    """
+    if (t1start <= t2start <= t2end <= t1end):
+        return t2start,t2end
+    elif (t1start <= t2start <= t1end):
+        return t2start,t1end
+    elif (t1start <= t2end <= t1end):
+        return t1start,t2end
+    elif (t2start <= t1start <= t1end <= t2end):
+        return t1start,t1end
+    else:
+        return None
 
 
 def main():

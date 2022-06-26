@@ -63,7 +63,13 @@ def process_runlist(run_list, return_collection=False):
     run_summary.from_mth5s(relevant_h5_list)
 
     # Pass the run_summary to a Dataset class
-    tfk_dataset = TFKDataset(df=run_summary_df)
+    kernel_dataset = KernelDataset()
+    kernel_dataset.from_run_summary(run_summary, "CAS04")
+
+    station_runs_dict = {}
+    station_runs_dict["CAS04"] = run_list
+    kernel_dataset.select_station_runs(station_runs_dict, "keep")
+    print(kernel_dataset.df)
 
     # Here you can show tools that TFKDataset could have
     # See Note 1 above: Functionality of TFKDataset()
@@ -94,9 +100,10 @@ def process_runlist(run_list, return_collection=False):
 
 
 
-def compare_results(run_list):
+def compare_results(run_list, z_file_name=None):
     emtf_file = "emtf_results/CAS04-CAS04bcd_REV06-CAS04bcd_NVR08.zmm"
-    z_file_name = f"{'_'.join(run_list)}.zss"
+    if z_file_name is None:
+        z_file_name = f"{'_'.join(run_list)}.zss"
     compare_two_z_files(emtf_file,
                     z_file_name,
                     label1="emtf",
@@ -133,14 +140,38 @@ def get_run_summary(h5_path):
     return run_summary
 
 
-def main():
+def process_with_remote(local, remote):
     h5_path = DATA_PATH.joinpath("8P_CAS04_CAV07_NVR11_REV06.h5")
     channel_summary = get_channel_summary(h5_path)
     run_summary = get_run_summary(h5_path)
     kernel_dataset = KernelDataset()
-#    kernel_dataset.from_run_summary(run_summary, "CAS04")
-    kernel_dataset.from_run_summary(run_summary, "CAS04", "CAV07")
+    #    kernel_dataset.from_run_summary(run_summary, "CAS04")
+    kernel_dataset.from_run_summary(run_summary, local, remote)
+    kernel_dataset.restrict_run_intervals_to_simultaneous()
+    kernel_dataset.drop_runs_shorter_than(15000)
+
+    #Add a method to ensure all samplintg rates are the same
+    sr = kernel_dataset.df.sample_rate.unique()
+
+    cc = ConfigCreator()#config_path=CONFIG_PATH)
+    config = cc.create_run_processing_object(emtf_band_file=BANDS_DEFAULT_FILE,
+                                             sample_rate=sr[0]
+                                             )
+    config.stations.from_dataset_dataframe(kernel_dataset.df)
+    show_plot = False
+    z_file_path = f"{local}_RR{remote}.zrr"
+    tf_cls = process_mth5(config,
+                          kernel_dataset,
+                          units="MT",
+                          show_plot=show_plot,
+                          z_file_path=z_file_path,
+                          return_collection=False
+                      )
     print("OK")
+    return
+
+def main():
+    #process_with_remote("CAS04", "CAV07")
     # TODO:
     #  1. Make Run Summary
     #  2. Drop runs that are shorter than X (1h?)
@@ -157,6 +188,7 @@ def main():
     #process_runlist(run_list)
 
     compare_results(run_list)
+    compare_results(run_list, z_file_name="CAS04_RRCAV07.zrr")
     print("OK")
 
 if __name__ == "__main__":

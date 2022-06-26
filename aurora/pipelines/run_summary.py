@@ -145,7 +145,7 @@ def channel_summary_to_run_summary(ch_summary,
         runs that do not have it.  By making this a kwarg we sort of prop the door
         open for more general names (see issue #74).
     sortby: bool or list
-        Default: ["station_id", "run_id", "start"]
+        Default: ["station_id", "start"]
 
     Returns
     -------
