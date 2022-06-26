@@ -80,7 +80,7 @@ class RunSummary():
         if df is None:
             df = self.df
         timedeltas = df.end - df.start
-        durations = [x.seconds for x in timedeltas]
+        durations = [x.total_seconds() for x in timedeltas]
         df["duration"] = durations
         return
 
@@ -101,9 +101,8 @@ class RunSummary():
 def channel_summary_to_run_summary(ch_summary,
                                    allowed_input_channels=INPUT_CHANNELS,
                                    allowed_output_channels=OUTPUT_CHANNELS,
-                                   sortby=["station_id", "run_id", "start"]):
+                                   sortby=["station_id", "start"]):
     """
-    TODO: rm run_id from sortby,
     TODO: replace station_id with station, and run_id with run
     Note will need to modify: aurora/tests/config$ more test_dataset_dataframe.py
     TODO: Add logic for handling input and output channels based on channel
