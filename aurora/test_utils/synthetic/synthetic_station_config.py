@@ -166,13 +166,11 @@ def make_station_03():
                            nan_indices=nan_indices,
                            filters=filters,
                            )
-    filters = {}
-    for col in run_001.channels:
-        if col in ["ex", "ey"]:
-            filters[col] = [FILTERS["1x"].name,]
-        elif col in ["hx", "hy", "hz"]:
-            filters[col] = [FILTERS["10x"].name, FILTERS["0.1x"].name]
+
     run_001.filters = filters
+    run_002.filters = filters
+    run_003.filters = filters
+    run_004.filters = filters
 
     station.runs = [run_001, run_002, run_003, run_004]
 
