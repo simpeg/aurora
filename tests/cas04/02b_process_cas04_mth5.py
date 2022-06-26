@@ -129,7 +129,7 @@ def get_channel_summary(h5_path):
 def get_run_summary(h5_path):
     run_summary = RunSummary()
     run_summary.from_mth5s([h5_path,])
-    print(run_summary.df)
+    #print(run_summary.df)
     return run_summary
 
 
@@ -137,6 +137,9 @@ def main():
     h5_path = DATA_PATH.joinpath("8P_CAS04_CAV07_NVR11_REV06.h5")
     channel_summary = get_channel_summary(h5_path)
     run_summary = get_run_summary(h5_path)
+    kernel_dataset = KernelDataset()
+#    kernel_dataset.from_run_summary(run_summary, "CAS04")
+    kernel_dataset.from_run_summary(run_summary, "CAS04", "CAV07")
     print("OK")
     # TODO:
     #  1. Make Run Summary

@@ -114,7 +114,8 @@ class KernelDataset():
     def __init__(self, **kwargs):
         self.df = kwargs.get("df")
         self.local_station_id = kwargs.get("local_station_id")
-        self.reference_station_id = kwargs.get("reference_station_id")
+        self.remote_station_id = kwargs.get("remote_station_id")
+        self._mini_summary_columns = ["station_id", "run_id", "start", "end"]
 
     def clone(self):
         return copy.deepcopy(self)
@@ -125,19 +126,23 @@ class KernelDataset():
 
     def from_run_summary(self, run_summary,
                          local_station_id,
-                         reference_station_id=None):
+                         remote_station_id=None):
         self.local_station_id = local_station_id
-        self.reference_station_id = reference_station_id
+        self.remote_station_id = remote_station_id
 
         station_ids = [local_station_id,]
-        if reference_station_id:
-            station_ids.append(reference_station_id)
+        if remote_station_id:
+            station_ids.append(remote_station_id)
         df = restrict_to_station_list(run_summary.df, station_ids, inplace=False)
         df["remote"] = False
-        if reference_station_id:
-            cond = df.station_id == reference_station_id
+        if remote_station_id:
+            cond = df.station_id == remote_station_id
             df.remote = cond
         self.df = df
+
+    @property
+    def mini_summary(self):
+        print(self.df[self._mini_summary_columns])
 
     @property
     def add_duration(self):
@@ -170,7 +175,7 @@ class KernelDataset():
     @property
     def is_single_station(self):
         if self.local_station_id:
-            if self.reference_station_id:
+            if self.remote_station_id:
                 return False
             else:
                 return True
@@ -183,6 +188,18 @@ class KernelDataset():
 
 
     def restrict_run_intervals_to_simultaneous(self):
+        """
+        We assume that the dfs are sorted by start_time, i.e. the runs are sequential
+
+        For each run in local_station_id we check
+        1. does it overl
+        Returns
+        -------
+
+        """
+        # local_df = self.df[self.df.station_id == self.local_station_id]
+        # remote_df = self.df[self.df.station_id == self.remote_station_id]
+        # print("remove run_id from sortby in RunSummary")
         raise NotImplementedError
 
     def get_station_metadata(self, local_station_id):

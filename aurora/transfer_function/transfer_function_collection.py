@@ -56,14 +56,14 @@ class TransferFunctionCollection(object):
         return self.tf_dict[0].tf_header.local_station_id
 
     @property
-    def reference_station_id(self):
+    def remote_station_id(self):
         """
         TODO: make this take the station_id directly from the header
         Returns
         -------
 
         """
-        return self.tf_dict[0].tf_header.reference_station_id
+        return self.tf_dict[0].tf_header.remote_station_id
 
     @property
     def total_number_of_frequencies(self):

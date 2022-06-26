@@ -38,7 +38,7 @@ def make_subtitle(rho_rms_aurora, rho_rms_emtf,
 
 
 def make_figure_basename(local_station_id,
-                         reference_station_id,
+                         remote_station_id,
                          xy_or_yx,
                          matlab_or_fortran):
     """
@@ -47,7 +47,7 @@ def make_figure_basename(local_station_id,
     ----------
     local_station_id: str
         station label
-    reference_station_id: str
+    remote_station_id: str
         remote reference station label
     xy_or_yx: str
         mode: "xy" or "yx"
@@ -61,8 +61,8 @@ def make_figure_basename(local_station_id,
 
     """
     station_string = f"{local_station_id}"
-    if reference_station_id:
-        station_string = f"{station_string}_rr{reference_station_id}"
+    if remote_station_id:
+        station_string = f"{station_string}_rr{remote_station_id}"
     figure_basename = (
         f"synthetic_{station_string}_{xy_or_yx}_{matlab_or_fortran}.png"
     )
@@ -106,7 +106,7 @@ def plot_rho_phi(xy_or_yx,
                                 matlab_or_fortran)
 
     figure_basename = make_figure_basename(tf_collection.local_station_id,
-                                           tf_collection.reference_station_id,
+                                           tf_collection.remote_station_id,
                                            xy_or_yx,
                                            matlab_or_fortran)
     tf_collection.rho_phi_plot(

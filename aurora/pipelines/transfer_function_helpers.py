@@ -74,7 +74,7 @@ def tf_header_from_config(config, i_dec_level):
     transfer_function_header = TransferFunctionHeader(
         processing_scheme=dec_level_config.estimator.engine,
         local_station_id=config.stations.local.id,
-        reference_station_id=remote_station_id,
+        remote_station_id=remote_station_id,
         input_channels=dec_level_config.input_channels,
         output_channels=dec_level_config.output_channels,
         reference_channels=reference_channels,

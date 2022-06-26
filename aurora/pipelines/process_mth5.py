@@ -327,7 +327,7 @@ def process_mth5(
     action should be taken before we get here.  The tfk_dataset should already
     be trimmed to exactly what will be processed.
     3. ToDo TFK Check that data coverage is the same in both local and RR data
-    # if config.reference_station_id:
+    # if config.remote_station_id:
     #    local_run_xrts = local_run_xrts.where(local_run_xrts.time <=
     #                                          remote_run_xrts.time[-1]).dropna(
     #                                          dim="time")

@@ -103,6 +103,7 @@ def channel_summary_to_run_summary(ch_summary,
                                    allowed_output_channels=OUTPUT_CHANNELS,
                                    sortby=["station_id", "run_id", "start"]):
     """
+    TODO: rm run_id from sortby,
     TODO: replace station_id with station, and run_id with run
     Note will need to modify: aurora/tests/config$ more test_dataset_dataframe.py
     TODO: Add logic for handling input and output channels based on channel
