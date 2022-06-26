@@ -84,6 +84,10 @@ def create_run_ts_from_synthetic_run(run, df):
     # add in metadata
     #runts.station_metadata.id = config["station_id"] #move out
     runts.run_metadata.id = run.id # was config["run_id"]
+    # if run.start is not None:
+    #     runts.run_metadata.time_period.start = run.start
+    # if run.end is not None:
+    #     runts.run_metadata.time_period.end = run.end
     return runts
 
 
@@ -139,7 +143,9 @@ def create_mth5_synthetic_file(station_cfgs, mth5_path, plot=False,
                 runts.plot()
 
 
-            run_group = station_group.add_run(run.id)
+            run_group = station_group.add_run(run.id, run_metadata={
+                "id":run.id,
+                "start":"1988-01-01T00:00:00+00:00"})
 
             run_group.from_runts(runts)
 

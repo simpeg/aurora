@@ -57,6 +57,8 @@ class SyntheticRun(object):
         self.noise_scalars = kwargs.get("noise_scalars", None)
         self.nan_indices = kwargs.get("nan_indices", {})
         self.filters = kwargs.get("filters", {})
+        self.start = kwargs.get("start", None)
+        self.end = kwargs.get("end", None)
 
         if self.noise_scalars is None:
             self.noise_scalars = {}
@@ -137,6 +139,8 @@ def make_station_03():
                            raw_data_path=DATA_PATH.joinpath("test1.asc"),
                            nan_indices=nan_indices,
                            filters=filters,
+                           start="1980-01-01T00:00:00+00:00",
+                           end = "1980-01-01T11:06:39+00:00"
                            )
 
     noise_scalars = {}
@@ -147,6 +151,8 @@ def make_station_03():
                            noise_scalars=noise_scalars,
                            nan_indices=nan_indices,
                            filters=filters,
+                           start="1980-01-02T00:00:00+00:00",
+                           end = "1980-01-02T11:06:39+00:00"
                            )
 
     for ch in channels:
@@ -156,6 +162,8 @@ def make_station_03():
                            noise_scalars=noise_scalars,
                            nan_indices=nan_indices,
                            filters=filters,
+                           start="1980-01-03T00:00:00+00:00",
+                           end = "1980-01-03T11:06:39+00:00"
                            )
 
     for ch in channels:
@@ -165,6 +173,8 @@ def make_station_03():
                            noise_scalars=noise_scalars,
                            nan_indices=nan_indices,
                            filters=filters,
+                           start="1980-01-04T00:00:00+00:00",
+                           end = "1980-01-04T11:06:39+00:00"
                            )
     filters = {}
     for col in run_001.channels:
@@ -172,7 +182,11 @@ def make_station_03():
             filters[col] = [FILTERS["1x"].name,]
         elif col in ["hx", "hy", "hz"]:
             filters[col] = [FILTERS["10x"].name, FILTERS["0.1x"].name]
+
     run_001.filters = filters
+    run_002.filters = filters
+    run_003.filters = filters
+    run_004.filters = filters
 
     station.runs = [run_001, run_002, run_003, run_004]
 
