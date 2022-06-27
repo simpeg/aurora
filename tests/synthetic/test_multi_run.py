@@ -70,8 +70,8 @@ def test_all_runs():
 
 
 def test():
+    test_each_run_individually()
     test_all_runs()
-    #test_each_run_individually()
 
 if __name__ == "__main__":
     test()

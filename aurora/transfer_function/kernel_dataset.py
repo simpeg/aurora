@@ -339,7 +339,7 @@ def select_station_runs(df, station_runs_dict, keep_or_drop, overwrite=True,):
             drop_df = df[cond1 & cond2]
 
         df.drop(drop_df.index, inplace=True)
-        df = df.reset_index(inplace=True)
+        df.reset_index(drop=True, inplace=True)
     return df
 
 
