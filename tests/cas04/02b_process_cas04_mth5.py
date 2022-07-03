@@ -100,14 +100,14 @@ def process_runlist(run_list, return_collection=False):
 
 
 
-def compare_results(run_list, z_file_name=None):
+def compare_results(run_list, z_file_name=None, aurora_label="aurora"):
     emtf_file = "emtf_results/CAS04-CAS04bcd_REV06-CAS04bcd_NVR08.zmm"
     if z_file_name is None:
         z_file_name = f"{'_'.join(run_list)}.zss"
     compare_two_z_files(emtf_file,
                     z_file_name,
                     label1="emtf",
-                    label2="a_b",
+                    label2=aurora_label,
                     scale_factor1=1,
                     out_file="aab.png",
                     markersize=3,
@@ -186,9 +186,12 @@ def main():
 
     run_list = ["b", "c", "d",]
     #process_runlist(run_list)
-
-    compare_results(run_list)
-    compare_results(run_list, z_file_name="CAS04_RRCAV07.zrr")
+    aurora_label = f"{'_'.join(run_list)}-SS"
+    compare_results(run_list, aurora_label=aurora_label)
+    aurora_label = "RR vs CAV07"
+    compare_results(run_list, z_file_name="CAS04_RRCAV07.zrr", aurora_label=aurora_label)
+    aurora_label = "RR vs CAV07 coh"
+    compare_results(run_list, z_file_name="CAS04_RRCAV07_coh.zrr",aurora_label=aurora_label)
     print("OK")
 
 if __name__ == "__main__":
