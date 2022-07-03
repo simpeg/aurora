@@ -49,7 +49,7 @@ for i_dec in range(4):
     transfer_function_header = TransferFunctionHeader(
         processing_scheme="RME",
         local_station_id="test1",
-        reference_station_id="",
+        remote_station_id="",
         input_channels=["hx", "hy"],
         output_channels=[
             "hz",

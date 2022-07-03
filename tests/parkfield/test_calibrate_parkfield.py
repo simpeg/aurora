@@ -49,7 +49,7 @@ def validate_bulk_spectra_have_correct_units(run_obj, run_ts_obj, show_spectra=F
     tapered_obj = windowing_scheme.apply_taper(windowed_obj)
 
     fft_obj = windowing_scheme.apply_fft(tapered_obj)
-    show_response_curves = True
+    show_response_curves = False #True
 
     parkfield_sanity_check(
         fft_obj,

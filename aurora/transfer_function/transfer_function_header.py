@@ -50,7 +50,7 @@ class TransferFunctionHeader(object):
 
         # <ByPass mt_metadata classes>
         self._local_station_id = kwargs.get("local_station_id", None)
-        self._reference_station_id = kwargs.get("reference_station_id", None)
+        self._remote_station_id = kwargs.get("remote_station_id", None)
         # </ByPass mt_metadata classes>
 
     @property
@@ -62,11 +62,11 @@ class TransferFunctionHeader(object):
         return station_id
 
     @property
-    def reference_station_id(self):
+    def remote_station_id(self):
         try:
-            station_id = self.reference_station.id
+            station_id = self.remote_station.id
         except AttributeError:
-            station_id = self._reference_station_id
+            station_id = self._remote_station_id
         return station_id
 
     @property

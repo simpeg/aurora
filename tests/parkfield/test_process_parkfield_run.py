@@ -5,18 +5,18 @@ from aurora.config.config_creator import ConfigCreator
 from aurora.config.metadata import Processing
 
 from aurora.pipelines.process_mth5 import process_mth5
+from aurora.pipelines.run_summary import RunSummary
 from aurora.test_utils.parkfield.path_helpers import AURORA_RESULTS_PATH
 from aurora.test_utils.parkfield.path_helpers import CONFIG_PATH
 from aurora.test_utils.parkfield.path_helpers import DATA_PATH
 from aurora.test_utils.parkfield.path_helpers import EMTF_RESULTS_PATH
-from aurora.tf_kernel.dataset import DatasetDefinition
-from aurora.tf_kernel.helpers import extract_run_summaries_from_mth5s
+from aurora.transfer_function.kernel_dataset import KernelDataset
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 
 from make_parkfield_mth5 import test_make_parkfield_mth5
 
 DEBUG_ISSUE_172 = False
-def test_processing(return_collection=False, z_file_path=None):
+def test_processing(return_collection=False, z_file_path=None, test_clock_zero=False):
     """
     Parameters
     ----------
@@ -40,15 +40,17 @@ def test_processing(return_collection=False, z_file_path=None):
     if not mth5_path.exists():
         test_make_parkfield_mth5()
 
-    run_summary = extract_run_summaries_from_mth5s([mth5_path,])
-    run_summary["remote"] = False
+    run_summary = RunSummary()
+    run_summary.from_mth5s([mth5_path,])
+    tfk_dataset = KernelDataset()
+    tfk_dataset.from_run_summary(run_summary, "PKD")
+
     cc = ConfigCreator(config_path=CONFIG_PATH)
     p = cc.create_run_processing_object(emtf_band_file=BANDS_DEFAULT_FILE,
-                                        sample_rate=40.0
+                                        sample_rate=40.0,
+                                        estimator={"engine":"RME"}
                                         )
-    p.stations.from_dataset_dataframe(run_summary)
-    for decimation in p.decimations:
-        decimation.estimator.engine = "RME"
+    p.stations.from_dataset_dataframe(tfk_dataset.df)
 
     if DEBUG_ISSUE_172:
         config = Processing()
@@ -56,16 +58,20 @@ def test_processing(return_collection=False, z_file_path=None):
     else:
         config = p
 
-    dataset_definition = DatasetDefinition()
-    dataset_definition.df = run_summary
+    if test_clock_zero:
+        for dec_lvl_cfg in p.decimations:
+            dec_lvl_cfg.window.clock_zero_type = test_clock_zero
+            if test_clock_zero == "user specified":
+                dec_lvl_cfg.window.clock_zero = '2004-09-28 00:00:10+00:00'
+
     show_plot = False
     tf_cls = process_mth5(config,
-                          dataset_definition,
-                         units="MT",
-                         show_plot=show_plot,
-                         z_file_path=z_file_path,
-                         return_collection=return_collection
-                         )
+                          tfk_dataset,
+                          units="MT",
+                          show_plot=show_plot,
+                          z_file_path=z_file_path,
+                          return_collection=return_collection
+                          )
 
     if return_collection:
         tf_collection = tf_cls
@@ -78,9 +84,13 @@ def test_processing(return_collection=False, z_file_path=None):
 
 
 
-def main():
+def test():
     z_file_path = AURORA_RESULTS_PATH.joinpath("pkd.zss")
     test_processing(return_collection=True, z_file_path=z_file_path)
+    test_processing(return_collection=False, z_file_path=z_file_path,
+                    test_clock_zero="user specified")
+    test_processing(return_collection=False, z_file_path=z_file_path,
+                    test_clock_zero="data start")
     test_processing(return_collection=False, z_file_path=z_file_path)
 
     # COMPARE WITH ARCHIVED Z-FILE
@@ -99,4 +109,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    test()

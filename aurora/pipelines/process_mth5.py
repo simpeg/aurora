@@ -107,13 +107,9 @@ def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrts, units,
     """
     Operates on a "per-run" basis
 
-    Note 1: CHECK DATA COVERAGE IS THE SAME IN BOTH LOCAL AND RR
-    This should be pushed into a previous validator before pipeline starts
-    # if config.reference_station_id:
-    #    local_run_xrts = local_run_xrts.where(local_run_xrts.time <=
-    #                                          remote_run_xrts.time[-1]).dropna(
-    #                                          dim="time")
-
+    This method could be modifed in a multiple station code so that it doesn't care
+    if the station is "local" or "remote" but rather uses scale factors keyed by
+    station_id
 
     Parameters
     ----------
@@ -138,18 +134,15 @@ def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrts, units,
     """
     stft_config = processing_config.get_decimation_level(i_dec_level)
     stft_obj = run_ts_to_stft(stft_config, run_xrts)
-
-    print("fix this so that it gets from config based on station_id, without caring "
-          "if local or remote")
+    # stft_obj = run_ts_to_stft_scipy(stft_config, run_xrts)
     run_id = run_obj.metadata.id
     if station_id==processing_config.stations.local.id:
         scale_factors = processing_config.stations.local.run_dict[
             run_id].channel_scale_factors
-    #Need to add logic here to look through list of remote ids
     elif station_id==processing_config.stations.remote[0].id:
         scale_factors = processing_config.stations.remote[0].run_dict[
             run_id].channel_scale_factors
-    # local_stft_obj = run_ts_to_stft_scipy(config, local_run_xrts)
+
     stft_obj = calibrate_stft_obj(
         stft_obj,
         run_obj,
@@ -204,9 +197,17 @@ def export_tf(tf_collection, station_metadata_dict={}, survey_dict={}):
     This method may wind up being embedded in the TF class
     Assign transfer_function, residual_covariance, inverse_signal_power, station, survey
 
+    Parameters
+    ----------
+    tf_collection: aurora.transfer_function.transfer_function_collection
+    .TransferFunctionCollection
+    station_metadata_dict: dict
+    survey_dict: dict
+
     Returns
     -------
-
+    tf_cls: mt_metadata.transfer_functions.core.TF
+        Transfer function container
     """
     merged_tf_dict = tf_collection.get_merged_dict()
     tf_cls = TF()
@@ -233,7 +234,7 @@ def export_tf(tf_collection, station_metadata_dict={}, survey_dict={}):
 
 def populate_dataset_df(i_dec_level, config, dataset_df):
     """
-    Move this into a method of DatasetDefinition, self.populate_with_data()
+    Move this into a method of TFKDataset, self.populate_with_data()
 
     Notes:
     1. When iterating over dataframe, (i)ndex must run from 0 to len(df), otherwise
@@ -313,7 +314,7 @@ def close_mths_objs(df):
 
 def process_mth5(
         config,
-        dataset_definition=None,
+        tfk_dataset=None,
         units="MT",
         show_plot=False,
         z_file_path=None,
@@ -321,16 +322,21 @@ def process_mth5(
         ):
     """
     1. Read in the config and figure out how many decimation levels there are
-    2. ToDo: Based on the run durations, and sampling rates, determined which runs
+    2. ToDo TFK: Based on the run durations, and sampling rates, determined which runs
     are valid for which decimation levels, or for which effective sample rates.  This
-    action should be taken before we get here.  The dataset_definition should already
+    action should be taken before we get here.  The tfk_dataset should already
     be trimmed to exactly what will be processed.
+    3. ToDo TFK Check that data coverage is the same in both local and RR data
+    # if config.remote_station_id:
+    #    local_run_xrts = local_run_xrts.where(local_run_xrts.time <=
+    #                                          remote_run_xrts.time[-1]).dropna(
+    #                                          dim="time")
 
     Parameters
     ----------
     config: aurora.config.metadata.processing.Processing or path to json
         All processing parameters
-    dataset_definition: aurora.tf_kernel.dataset.DatasetDefinition or None
+    tfk_dataset: aurora.tf_kernel.dataset.Dataset or None
         Specifies what datasets to process according to config
     units: string
         "MT" or "SI".  To be deprecated once data have units embedded
@@ -348,13 +354,16 @@ def process_mth5(
     """
 
     processing_config, mth5_objs = initialize_pipeline(config)
-    dataset_df = dataset_definition.df
+    dataset_df = tfk_dataset.df
+
+    # Here is where any checks that would be done by TF Kernel would be applied
+    #see notes labelled with ToDo TFK above
 
     #Assign additional columns to dataset_df, populate with mth5_objs
-    all_mth5_objs = len(dataset_df) * [None]
+    mth5_obj_column = len(dataset_df) * [None]
     for i, station_id in enumerate(dataset_df["station_id"]):
-        all_mth5_objs[i] = mth5_objs[station_id]
-    dataset_df["mth5_obj"] = all_mth5_objs
+        mth5_obj_column[i] = mth5_objs[station_id]
+    dataset_df["mth5_obj"] = mth5_obj_column
     dataset_df["run"] = None
     dataset_df["run_dataarray"] = None
     dataset_df["stft"] = None
@@ -369,15 +378,22 @@ def process_mth5(
         dataset_df = populate_dataset_df(i_dec_level, dec_level_config, dataset_df)
         #ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
 
+        #TFK 1: get clock-zero from data if needed
+        if dec_level_config.window.clock_zero_type == "data start":
+            dec_level_config.window.clock_zero = str(dataset_df.start.min())
+
         # Apply STFT to all runs
         local_stfts = []
         remote_stfts = []
         for i,row in dataset_df.iterrows():
             run_xrts = row["run_dataarray"].to_dataset("channel")
             run_obj = row["run"]
-            station_id = row.station_id
-            stft_obj = make_stft_objects(processing_config, i_dec_level, run_obj,
-                                              run_xrts, units, station_id)
+            stft_obj = make_stft_objects(processing_config,
+                                         i_dec_level,
+                                         run_obj,
+                                         run_xrts,
+                                         units,
+                                         row.station_id)
 
             if row.station_id == processing_config.stations.local.id:
                 local_stfts.append(stft_obj)
@@ -390,7 +406,7 @@ def process_mth5(
         # Could mute bad FCs here - Not implemented yet.
         # RETURN FC_OBJECT
 
-        if processing_config.stations.remote:#reference_station_id:
+        if processing_config.stations.remote:
             remote_merged_stft_obj = xr.concat(remote_stfts, "time")
         else:
             remote_merged_stft_obj = None
@@ -422,39 +438,21 @@ def process_mth5(
         close_mths_objs(dataset_df)
         return tf_collection
     else:
-        # intended to be the default in future
+        # intended to be the default in future (return tf_cls, not tf_collection)
 
-        #See ISSUE #181: Uncomment this once we have a mature multi-run test
-        # #dataset_definition.get_station_metadata_for_tf_archive()
-        # #get a list of local runs:
-        # cond1 = dataset_df["station_id"]==processing_config.stations.local.id
-        # sub_df = dataset_df[cond1]
-        # #sanity check:
-        # run_ids = sub_df.run_id.unique()
-        # assert(len(run_ids) == len(sub_df))
-        # # iterate over these runs, packing metadata into
-        # station_metadata = None
-        # for i,row in sub_df.iterrows():
-        #     local_run_obj = row.run
-        #     if station_metadata is None:
-        #         station_metadata = local_run_obj.station_group.metadata
-        #         station_metadata._runs = []
-        #     run_metadata = local_run_obj.metadata
-        #     station_metadata.add_run(run_metadata)
-
-        station_metadata = local_run_obj.station_group.metadata
-        station_metadata._runs = []
-        run_metadata = local_run_obj.metadata
-        station_metadata.add_run(run_metadata)
+        local_station_id = processing_config.stations.local.id
+        station_metadata = tfk_dataset.get_station_metadata(local_station_id)
 
         # Need to create an issue for this as well
         if len(mth5_objs) == 1:
             key = list(mth5_objs.keys())[0]
             survey_dict = mth5_objs[key].survey_group.metadata.to_dict()
         else:
-            print("We do not currently handle multiple mth5 objs for "
+            print("WARNING We do not currently handle multiple mth5 objs for "
                   "non-tf_collection output")
-            raise Exception
+            key = list(mth5_objs.keys())[0]
+            survey_dict = mth5_objs[key].survey_group.metadata.to_dict()
+            #raise Exception
 
         print(station_metadata.run_list)
         tf_cls = export_tf(

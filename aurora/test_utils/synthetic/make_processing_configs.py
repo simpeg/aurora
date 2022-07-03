@@ -23,18 +23,18 @@ def create_test_run_config(test_case_id, ds_df, matlab_or_fortran="", save="json
     """
     estimation_engine = "RME"
     local_station_id = test_case_id
-    reference_station_id = ""
+    remote_station_id = ""
     reference_channels = []
     if test_case_id == "test1r2":
         estimation_engine = "RME_RR"
         reference_channels = ["hx", "hy"]
         local_station_id = "test1"
-        reference_station_id = "test2"
+        remote_station_id = "test2"
     if test_case_id == "test2r1":
         estimation_engine = "RME_RR"
         reference_channels = ["hx", "hy"]
         local_station_id = "test2"
-        reference_station_id = "test1"
+        remote_station_id = "test1"
 
     if matlab_or_fortran == "matlab":
         emtf_band_setup_file = BANDS_256_FILE
@@ -69,7 +69,7 @@ def create_test_run_config(test_case_id, ds_df, matlab_or_fortran="", save="json
         p.drop_reference_channels()
 
     elif test_case_id in ["test2r1", "test1r2"]:
-        config_id = f"{config_id}-RR{reference_station_id}"
+        config_id = f"{config_id}-RR{remote_station_id}"
         p = cc.create_run_processing_object(emtf_band_file=emtf_band_setup_file)
         p.id = config_id
         p.stations.from_dataset_dataframe(ds_df)
