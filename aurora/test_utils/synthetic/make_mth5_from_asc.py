@@ -15,6 +15,8 @@ import numpy as np
 from pathlib import Path
 from random import seed
 import pandas as pd
+
+from mt_metadata.timeseries import Run
 from mth5.timeseries import ChannelTS, RunTS
 from mth5.mth5 import MTH5
 
@@ -55,6 +57,7 @@ def create_run_ts_from_synthetic_run(run, df):
                 "component": col,
                 "sample_rate": run.sample_rate,
                 "filter.name": run.filters[col],
+                "time_period.start": run.start,
             }
             chts = ChannelTS(
                 channel_type="electric", data=data, channel_metadata=meta_dict
@@ -69,6 +72,7 @@ def create_run_ts_from_synthetic_run(run, df):
                 "component": col,
                 "sample_rate": run.sample_rate,
                 "filter.name": run.filters[col],
+                "time_period.start": run.start,
             }
             chts = ChannelTS(
                 channel_type="magnetic", data=data, channel_metadata=meta_dict
@@ -142,10 +146,14 @@ def create_mth5_synthetic_file(station_cfgs, mth5_path, plot=False,
             if plot:
                 runts.plot()
 
-
-            run_group = station_group.add_run(run.id, run_metadata={
+            # the metadata will be overwritten from the runts object so the 
+            # start has no influence. If you want to change the metadata after
+            # you add the runts, then you could do:
+            # >>> run_group.metadata.time_period.start = "1980-01-01T00:00:00"
+            # >>> run_group.write_metadata()
+            run_group = station_group.add_run(run.id, run_metadata=Run(**{
                 "id":run.id,
-                "start":"1988-01-01T00:00:00+00:00"})
+                "time_period.start":"1988-01-01T00:00:00+00:00"}))
 
             run_group.from_runts(runts)
 
