@@ -24,8 +24,6 @@ from obspy import UTCDateTime
 from obspy import read_inventory
 
 
-
-
 def get_response_inventory_from_server(
     network=None,
     station=None,

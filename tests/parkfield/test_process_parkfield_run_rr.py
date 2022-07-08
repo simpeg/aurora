@@ -15,6 +15,7 @@ from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 
 from make_parkfield_mth5 import test_make_parkfield_hollister_mth5
 
+
 def test_processing(z_file_path=None):
     """
     Parameters
@@ -40,31 +41,34 @@ def test_processing(z_file_path=None):
         test_make_parkfield_hollister_mth5()
 
     run_summary = RunSummary()
-    run_summary.from_mth5s([mth5_path,])
+    run_summary.from_mth5s(
+        [
+            mth5_path,
+        ]
+    )
     tfk_dataset = KernelDataset()
     tfk_dataset.from_run_summary(run_summary, "PKD", "SAO")
 
     cc = ConfigCreator(config_path=CONFIG_PATH)
-    config = cc.create_run_processing_object(emtf_band_file=BANDS_DEFAULT_FILE,
-                                        sample_rate=40.0,
-                                        output_channels=["ex", "ey"],
-                                        )
+    config = cc.create_run_processing_object(
+        emtf_band_file=BANDS_DEFAULT_FILE,
+        sample_rate=40.0,
+        output_channels=["ex", "ey"],
+    )
     config.stations.from_dataset_dataframe(tfk_dataset.df)
 
     show_plot = False
-    tf_cls = process_mth5(config,
-                          tfk_dataset,
-                          units="MT",
-                          show_plot=show_plot,
-                          z_file_path=z_file_path,
-                          return_collection=True
-                          )
+    tf_cls = process_mth5(
+        config,
+        tfk_dataset,
+        units="MT",
+        show_plot=show_plot,
+        z_file_path=z_file_path,
+        return_collection=True,
+    )
 
-    #tf_cls.write_tf_file(fn="emtfxml_test.xml", file_type="emtfxml")
+    # tf_cls.write_tf_file(fn="emtfxml_test.xml", file_type="emtfxml")
     return tf_cls
-
-
-
 
 
 def main():

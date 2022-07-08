@@ -22,7 +22,7 @@ def channel_summary_to_make_mth5(df, network="ZU"):
     """
     ch_map = {"ex": "LQN", "ey": "LQE", "hx": "LFN", "hy": "LFE", "hz": "LFZ"}
     number_of_station_runs = len(df.groupby(["station", "run"]))
-    #number_of_runs = len(df["run"].unique())
+    # number_of_runs = len(df["run"].unique())
     num_channels_per_run = 5
     num_rows = num_channels_per_run * number_of_station_runs
     networks = num_rows * [network]

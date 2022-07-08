@@ -19,14 +19,16 @@ from aurora.transfer_function.kernel_dataset import KernelDataset
 from plot_helpers_synthetic import plot_rho_phi
 
 
-def aurora_vs_emtf(test_case_id,
-                   emtf_version,
-                   auxilliary_z_file,
-                   z_file_base,
-                   tfk_dataset,
-                   make_rho_phi_plot=True,
-                   show_rho_phi_plot=False,
-                   use_subtitle=True,):
+def aurora_vs_emtf(
+    test_case_id,
+    emtf_version,
+    auxilliary_z_file,
+    z_file_base,
+    tfk_dataset,
+    make_rho_phi_plot=True,
+    show_rho_phi_plot=False,
+    use_subtitle=True,
+):
     """
     ToDo: Consider storing the processing config for this case as a json file,
     committed with the code.
@@ -65,17 +67,16 @@ def aurora_vs_emtf(test_case_id,
     -------
 
     """
-    processing_config = create_test_run_config(test_case_id,
-                                               tfk_dataset.df,
-                                               matlab_or_fortran=emtf_version)
-
+    processing_config = create_test_run_config(
+        test_case_id, tfk_dataset.df, matlab_or_fortran=emtf_version
+    )
 
     expected_rms_misfit = get_expected_rms_misfit(test_case_id, emtf_version)
-    z_file_path  = AURORA_RESULTS_PATH.joinpath(z_file_base)
+    z_file_path = AURORA_RESULTS_PATH.joinpath(z_file_base)
 
-    tf_collection = process_sythetic_data(processing_config,
-                                          tfk_dataset,
-                                          z_file_path=z_file_path)
+    tf_collection = process_sythetic_data(
+        processing_config, tfk_dataset, z_file_path=z_file_path
+    )
 
     aux_data = read_z_file(auxilliary_z_file)
     aurora_rho_phi = merge_tf_collection_to_match_z_file(aux_data, tf_collection)
@@ -85,27 +86,30 @@ def aurora_vs_emtf(test_case_id,
         aurora_phi = aurora_rho_phi["phi"][xy_or_yx]
         aux_rho = aux_data.rho(xy_or_yx)
         aux_phi = aux_data.phi(xy_or_yx)
-        rho_rms_aurora, phi_rms_aurora = compute_rms(aurora_rho, aurora_phi, verbose=True)
+        rho_rms_aurora, phi_rms_aurora = compute_rms(
+            aurora_rho, aurora_phi, verbose=True
+        )
         rho_rms_emtf, phi_rms_emtf = compute_rms(aux_rho, aux_phi)
 
         if expected_rms_misfit is not None:
-            assert_rms_misfit_ok(expected_rms_misfit,
-                                 xy_or_yx,
-                                 rho_rms_aurora,
-                                 phi_rms_aurora)
+            assert_rms_misfit_ok(
+                expected_rms_misfit, xy_or_yx, rho_rms_aurora, phi_rms_aurora
+            )
 
         if make_rho_phi_plot:
-            plot_rho_phi(xy_or_yx,
-                         tf_collection,
-                         rho_rms_aurora,
-                         rho_rms_emtf,
-                         phi_rms_aurora,
-                         phi_rms_emtf,
-                         emtf_version,
-                         aux_data=aux_data,
-                         use_subtitle=use_subtitle,
-                         show_plot=show_rho_phi_plot,
-                         output_path=AURORA_RESULTS_PATH)
+            plot_rho_phi(
+                xy_or_yx,
+                tf_collection,
+                rho_rms_aurora,
+                rho_rms_emtf,
+                phi_rms_aurora,
+                phi_rms_emtf,
+                emtf_version,
+                aux_data=aux_data,
+                use_subtitle=use_subtitle,
+                show_plot=show_rho_phi_plot,
+                output_path=AURORA_RESULTS_PATH,
+            )
 
     return
 
@@ -131,6 +135,7 @@ def run_test1(emtf_version, ds_df):
     aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df)
     return
 
+
 def run_test2r1(tfk_dataset):
     """
 
@@ -147,12 +152,11 @@ def run_test2r1(tfk_dataset):
     emtf_version = "fortran"
     auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test2r1.zrr")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zrr"
-    aurora_vs_emtf(test_case_id,
-                   emtf_version,
-                   auxilliary_z_file,
-                   z_file_base,
-                   tfk_dataset)
+    aurora_vs_emtf(
+        test_case_id, emtf_version, auxilliary_z_file, z_file_base, tfk_dataset
+    )
     return
+
 
 def make_mth5s(merged=True):
     """
@@ -162,7 +166,9 @@ def make_mth5s(merged=True):
     """
     if merged:
         mth5_path = create_test12rr_h5()
-        mth5_paths = [mth5_path,]
+        mth5_paths = [
+            mth5_path,
+        ]
     else:
         mth5_path_1 = create_test1_h5()
         mth5_path_2 = create_test2_h5()
@@ -195,7 +201,6 @@ def test_pipeline(merged=True):
     tfk_dataset = KernelDataset()
     tfk_dataset.from_run_summary(run_summary, "test2", "test1")
     run_test2r1(tfk_dataset)
-
 
 
 def test():

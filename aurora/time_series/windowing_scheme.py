@@ -170,7 +170,7 @@ class WindowingScheme(ApodizationWindow):
             )
 
         elif isinstance(data, xr.DataArray):
-            #Cast DataArray to DataSet, iterate and then Dataset back to DataArray
+            # Cast DataArray to DataSet, iterate and then Dataset back to DataArray
             xrds = data.to_dataset("channel")
             windowed_obj = self.apply_sliding_window(
                 xrds, time_vector=time_vector, dt=dt
@@ -224,7 +224,7 @@ class WindowingScheme(ApodizationWindow):
         )
 
         if return_xarray:
-            #Get window_time_axis coordinate
+            # Get window_time_axis coordinate
             if time_vector is None:
                 time_vector = np.arange(len(data))
             window_time_axis = self.downsample_time_axis(time_vector)

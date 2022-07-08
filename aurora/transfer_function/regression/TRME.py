@@ -102,7 +102,6 @@ class TRME(MEstimator):
         super(TRME, self).__init__(**kwargs)
         self.qr_input = "X"
 
-    
     def update_y_hat(self):
         """?rename as update_predicted_data?"""
         self._Y_hat = self.Q @ self.QHYc
@@ -114,9 +113,8 @@ class TRME(MEstimator):
         return self._residual_variance
 
     def update_b(self):
-        """matlab was: b = R\QTY; """
+        """matlab was: b = R\QTY;"""
         self.b = solve_triangular(self.R, self.QHYc)
-
 
     def compute_inverse_signal_covariance(self):
         """

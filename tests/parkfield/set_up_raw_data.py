@@ -27,17 +27,14 @@ pkd_df = pkd_df[channel_keys]
 sao_df = pd.read_csv(RAW_DATA_DIR.joinpath("SAO_272_00.csv"))
 sao_df = sao_df[channel_keys]
 
-h5_fn = merged_h5# "test.h5"
+h5_fn = merged_h5  # "test.h5"
 
 
 for ch in channel_keys:
-    pkd_df[ch].to_hdf(h5_fn, f"{ch}_pkd", complib='zlib', complevel=5)
-    sao_df[ch].to_hdf(h5_fn, f"{ch}_sao", complib='zlib', complevel=5)
+    pkd_df[ch].to_hdf(h5_fn, f"{ch}_pkd", complib="zlib", complevel=5)
+    sao_df[ch].to_hdf(h5_fn, f"{ch}_sao", complib="zlib", complevel=5)
 pkd_df_hx = pd.read_hdf(h5_fn, "hx_pkd")
 
 with pd.HDFStore(merged_h5) as hdf:
-    #This prints a list of all group names:
+    # This prints a list of all group names:
     print(hdf.keys())
-
-
-

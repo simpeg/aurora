@@ -5,7 +5,6 @@ from aurora.test_utils.parkfield.calibration_helpers import parkfield_sanity_che
 from aurora.test_utils.parkfield.path_helpers import AURORA_RESULTS_PATH
 
 
-
 def validate_bulk_spectra_have_correct_units(run_obj, run_ts_obj, show_spectra=False):
     """
 
@@ -49,7 +48,7 @@ def validate_bulk_spectra_have_correct_units(run_obj, run_ts_obj, show_spectra=F
     tapered_obj = windowing_scheme.apply_taper(windowed_obj)
 
     fft_obj = windowing_scheme.apply_fft(tapered_obj)
-    show_response_curves = False #True
+    show_response_curves = False
 
     parkfield_sanity_check(
         fft_obj,
@@ -68,6 +67,7 @@ def test():
     parkfield_h5_path = TEST_PATH.joinpath("parkfield", "data", "pkd_test_00.h5")
     if not parkfield_h5_path.exists():
         from make_parkfield_mth5 import test_make_parkfield_mth5
+
         test_make_parkfield_mth5()
 
     m = MTH5(file_version="0.1.0")

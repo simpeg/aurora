@@ -51,9 +51,9 @@ class TRME_RR(MEstimator):
         if self.Z.shape != self.X.shape:
             print("sizes of local and remote do not agree in RR estimation routine")
             raise Exception
-    
+
     def update_y_hat(self):
-        self._Y_hat = self.X @ self.b 
+        self._Y_hat = self.X @ self.b
         return
 
     def update_b(self):
@@ -66,7 +66,6 @@ class TRME_RR(MEstimator):
         if self._QHX is None:
             self._QHX = self.QH @ self.X
         return self._QHX
-
 
     def update_residual_variance(self, correction_factor=1):
         self._residual_variance = self.residual_variance_method1()
@@ -96,4 +95,3 @@ class TRME_RR(MEstimator):
             },
         )
         return
-

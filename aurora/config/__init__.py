@@ -4,15 +4,14 @@ BANDS_DEFAULT_FILE = BAND_SETUP_PATH.joinpath("bs_test.cfg")
 BANDS_256_FILE = BAND_SETUP_PATH.joinpath("bs_256.cfg")
 
 
-
 from .metadata import (
-    Window, 
-    Station, 
+    Window,
+    Station,
     Channel,
     Run,
     Stations,
     Band,
-    Decimation, 
+    Decimation,
     Regression,
     Estimator,
     DecimationLevel,
@@ -31,6 +30,4 @@ __all__ = [
     "Estimator",
     "DecimationLevel",
     "Processing",
-    ]
-    
- 
+]

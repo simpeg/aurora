@@ -38,23 +38,22 @@ def scan_inventory_for_nonconformity(inventory, verbose=False):
                 for channel in station.channels:
                     if channel.code[1:3] == "Q3":
                         channel._code = f"{channel.code[0]}Q2"
-                #print("Applied unstable fix to electric channel names")
+                # print("Applied unstable fix to electric channel names")
                 print("{Q2, Q3} --> {Q1, Q2}")
 
-
-            #Magnetic channle remap {T1,T2,T3}-->{F1, F2, F3}
+            # Magnetic channle remap {T1,T2,T3}-->{F1, F2, F3}
             cond1 = "T1" in channel_codes
             cond2 = "T2" in channel_codes
             cond3 = "T3" in channel_codes
             if cond1 or cond2 or cond3:
                 if verbose:
                     print("Detected a likely non-FDSN conformant convention ")
-                    #unless there is Tidal data (channel code T)
+                    # unless there is Tidal data (channel code T)
                     print("Fixing Magnetic channel codes")
                 for channel in station.channels:
                     if channel.code[1] == "T":
                         channel._code = f"{channel.code[0]}F{channel.code[2]}"
-                #print("Applied unstable fix to magnetic channel names")
+                # print("Applied unstable fix to magnetic channel names")
                 print("{T1,T2,T3} --> {F1, F2, F3}")
 
             # Tesla to nanoTesla

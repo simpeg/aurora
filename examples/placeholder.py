@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 # ------
 # Some description of what we are doing in step one
 
-x = np.linspace(0, 4*np.pi, 100)
+x = np.linspace(0, 4 * np.pi, 100)
 
 # take the sin(x)
 y = np.sin(x)
@@ -28,5 +28,3 @@ y = np.sin(x)
 
 fig, ax = plt.subplots(1, 1)
 ax.plot(x, y)
-
-

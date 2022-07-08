@@ -11,7 +11,7 @@ import time
 from numba import jit
 
 
-#Window-to-timeseries relationshp
+# Window-to-timeseries relationshp
 def available_number_of_windows_in_array(n_samples_array, n_samples_window, n_advance):
     """
 
@@ -38,7 +38,7 @@ def available_number_of_windows_in_array(n_samples_array, n_samples_window, n_ad
     return available_number_of_strides
 
 
-#Sliding Window Operators
+# Sliding Window Operators
 def sliding_window_crude(
     data, num_samples_window, num_samples_advance, num_windows=None
 ):
@@ -163,7 +163,7 @@ def striding_window(data, num_samples_window, num_samples_advance, num_windows=N
     return strided_window
 
 
-#Sliding Window Functions
+# Sliding Window Functions
 SLIDING_WINDOW_FUNCTIONS = {
     "crude": sliding_window_crude,
     "numba": sliding_window_numba,
@@ -171,7 +171,7 @@ SLIDING_WINDOW_FUNCTIONS = {
 }
 
 
-#FFT Helpers
+# FFT Helpers
 def apply_fft_to_windowed_array(windowed_array):
     """
     This will operate row-wise as well

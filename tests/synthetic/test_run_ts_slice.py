@@ -4,6 +4,7 @@ from aurora.test_utils.synthetic.paths import DATA_PATH
 import datetime
 import pandas as pd
 
+
 def fix_time(tstmp):
     year = tstmp.year
     month = tstmp.month
@@ -11,7 +12,7 @@ def fix_time(tstmp):
     hour = tstmp.hour
     minute = tstmp.minute
     second = tstmp.second
-    out = datetime.datetime(year, month,day,hour,minute,second)
+    out = datetime.datetime(year, month, day, hour, minute, second)
     return out
 
 
@@ -27,11 +28,13 @@ def test_can_slice_a_run_ts_using_timestamp():
     start = fix_time(start)
     end = fix_time(end)
     run_ts_02 = run_001.to_runts(start=start, end=end)
-    run_ts_03 = run_001.to_runts(start=start, end=end+datetime.timedelta(
-        microseconds=499999))
+    run_ts_03 = run_001.to_runts(
+        start=start, end=end + datetime.timedelta(microseconds=499999)
+    )
 
-    run_ts_04 = run_001.to_runts(start=start, end=end+datetime.timedelta(
-        microseconds=500000))
+    run_ts_04 = run_001.to_runts(
+        start=start, end=end + datetime.timedelta(microseconds=500000)
+    )
     print(f"run_ts_01 has {len(run_ts_01.dataset.ex.data)} samples")
     print(f"run_ts_02 has {len(run_ts_02.dataset.ex.data)} samples")
     print(f"run_ts_03 has {len(run_ts_03.dataset.ex.data)} samples")
@@ -40,6 +43,7 @@ def test_can_slice_a_run_ts_using_timestamp():
 
 def main():
     test_can_slice_a_run_ts_using_timestamp()
+
 
 if __name__ == "__main__":
     main()

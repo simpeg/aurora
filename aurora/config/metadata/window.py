@@ -20,16 +20,13 @@ class Window(Base):
     def __init__(self, **kwargs):
         super().__init__(attr_dict=attr_dict, **kwargs)
         self.additional_args = {}
-        
+
     @property
     def additional_args(self):
         return self._additional_args
-    
+
     @additional_args.setter
     def additional_args(self, args):
         if not isinstance(args, dict):
             raise TypeError("additional_args must be a dictionary")
         self._additional_args = args
-        
-    
-    

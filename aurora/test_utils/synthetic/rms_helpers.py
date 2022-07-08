@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def compute_rms(rho, phi, model_rho_a=100.0, model_phi=45.0, verbose=False):
     """
     This function being used to make comparative plots for synthetic data.  Could be
@@ -32,7 +33,6 @@ def compute_rms(rho, phi, model_rho_a=100.0, model_phi=45.0, verbose=False):
     return rho_rms, phi_rms
 
 
-
 def get_expected_rms_misfit(test_case_id, emtf_version=None):
     expected_rms_misfit = {}
     expected_rms_misfit["rho"] = {}
@@ -57,9 +57,14 @@ def get_expected_rms_misfit(test_case_id, emtf_version=None):
     return expected_rms_misfit
 
 
-
-def assert_rms_misfit_ok(expected_rms_misfit, xy_or_yx, rho_rms_aurora,
-                         phi_rms_aurora, rho_tol=1e-4, phi_tol=1e-4):
+def assert_rms_misfit_ok(
+    expected_rms_misfit,
+    xy_or_yx,
+    rho_rms_aurora,
+    phi_rms_aurora,
+    rho_tol=1e-4,
+    phi_tol=1e-4,
+):
     """
 
     Parameters
@@ -71,8 +76,8 @@ def assert_rms_misfit_ok(expected_rms_misfit, xy_or_yx, rho_rms_aurora,
     rho_rms_aurora: float
     phi_rms_aurora: float
     """
-    expected_rms_rho = expected_rms_misfit['rho'][xy_or_yx]
-    expected_rms_phi = expected_rms_misfit['phi'][xy_or_yx]
+    expected_rms_rho = expected_rms_misfit["rho"][xy_or_yx]
+    expected_rms_phi = expected_rms_misfit["phi"][xy_or_yx]
     print(f"expected_rms_rho_{xy_or_yx} {expected_rms_rho}")
     print(f"expected_rms_phi_{xy_or_yx} {expected_rms_phi}")
     assert np.isclose(rho_rms_aurora - expected_rms_rho, 0, atol=rho_tol)

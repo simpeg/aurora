@@ -110,8 +110,9 @@ def check_time_axes_synched(X, Y):
     return
 
 
-def get_band_for_tf_estimate(band, config, i_dec_level, local_stft_obj,
-                             remote_stft_obj):
+def get_band_for_tf_estimate(
+    band, config, i_dec_level, local_stft_obj, remote_stft_obj
+):
     """
     Get data for TF estimation for a particular band.
 

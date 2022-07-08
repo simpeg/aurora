@@ -237,9 +237,9 @@ class RegressionEstimator(object):
         """
         if X is None:
             if self.qr_input == "X":
-                X=self.X
-            elif self.qr_input =="Z":
-                X=self.Z
+                X = self.X
+            elif self.qr_input == "Z":
+                X = self.Z
             else:
                 print("Matrix to perform QR decompostion not specified")
                 raise Exception

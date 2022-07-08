@@ -17,7 +17,9 @@ from mth5.mth5 import MTH5
 
 def test_stft_methods_agree():
     mth5_path = create_test1_h5()
-    mth5_paths = [mth5_path, ]
+    mth5_paths = [
+        mth5_path,
+    ]
 
     run_summary = RunSummary()
     run_summary.from_mth5s(mth5_paths)

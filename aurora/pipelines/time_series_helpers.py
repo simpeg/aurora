@@ -6,6 +6,7 @@ import xarray as xr
 from aurora.time_series.frequency_domain_helpers import get_fft_harmonics
 from aurora.time_series.windowed_time_series import WindowedTimeSeries
 
+
 def validate_sample_rate(run_ts, expected_sample_rate):
     """
 
@@ -71,17 +72,18 @@ def apply_recoloring(decimation_obj, stft_obj):
         Recolored time series of Fourier coefficients
     """
     if decimation_obj.prewhitening_type == "first difference":
-        freqs = get_fft_harmonics(decimation_obj.window.num_samples, 
-                                  decimation_obj.decimation.sample_rate)
+        # replace below with decimation_obj.get_fft_harmonics() ?
+        freqs = get_fft_harmonics(
+            decimation_obj.window.num_samples, decimation_obj.decimation.sample_rate
+        )
         prewhitening_correction = 1.0j * 2 * np.pi * freqs  # jw
 
         stft_obj /= prewhitening_correction
 
-        #suppress nan and inf to mute later warnings
+        # suppress nan and inf to mute later warnings
         if prewhitening_correction[0] == 0.0:
             cond = stft_obj.frequency != 0.0
             stft_obj = stft_obj.where(cond, complex(0.0))
-
 
     return stft_obj
 
@@ -137,6 +139,7 @@ def run_ts_to_stft_scipy(decimation_obj, run_xrts_orig):
 
     return stft_obj
 
+
 def truncate_to_clock_zero(decimation_obj, run_xrts):
     """
     Compute the time interval between the first data sample and the clockzero
@@ -162,10 +165,10 @@ def truncate_to_clock_zero(decimation_obj, run_xrts):
         clock_zero = pd.Timestamp(decimation_obj.window.clock_zero)
         clock_zero = clock_zero.to_datetime64()
         delta_t = clock_zero - run_xrts.time[0]
-        assert(delta_t.dtype == "<m8[ns]") #expected in nanoseconds
+        assert delta_t.dtype == "<m8[ns]"  # expected in nanoseconds
         delta_t_seconds = int(delta_t) / 1e9
-        if delta_t_seconds==0:
-            pass # time series start is already clock zero
+        if delta_t_seconds == 0:
+            pass  # time series start is already clock zero
         else:
             windowing_scheme = decimation_obj.windowing_scheme
             number_of_steps = delta_t_seconds / windowing_scheme.duration_advance
@@ -174,8 +177,10 @@ def truncate_to_clock_zero(decimation_obj, run_xrts):
             n_clip = int(np.round(n_clip))
             t_clip = run_xrts.time[n_clip]
             cond1 = run_xrts.time >= t_clip
-            print(f"dropping {n_clip} samples to agree with "
-                  f"{decimation_obj.window.clock_zero_type} clock zero {clock_zero}")
+            print(
+                f"dropping {n_clip} samples to agree with "
+                f"{decimation_obj.window.clock_zero_type} clock zero {clock_zero}"
+            )
             run_xrts = run_xrts.where(cond1, drop=True)
     return run_xrts
 
@@ -260,8 +265,9 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
     return stft_obj
 
 
-def get_run_run_ts_from_mth5(mth5_obj, station_id, run_id, expected_sample_rate,
-                             start=None, end=None):
+def get_run_run_ts_from_mth5(
+    mth5_obj, station_id, run_id, expected_sample_rate, start=None, end=None
+):
     """
     ToDo: Review if this method should be moved into mth5.
 
@@ -330,7 +336,7 @@ def prototype_decimate(config, run_run_ts):
     run_xrts = run_run_ts["mvts"]
     run_obj.metadata.sample_rate = config.sample_rate
 
-    slicer = slice(None, None, int(config.factor)) #decimation.factor
+    slicer = slice(None, None, int(config.factor))  # decimation.factor
     downsampled_time_axis = run_xrts.time.data[slicer]
 
     num_observations = len(downsampled_time_axis)
