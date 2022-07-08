@@ -15,7 +15,6 @@ from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 
 from make_parkfield_mth5 import test_make_parkfield_mth5
 
-DEBUG_ISSUE_172 = False
 
 
 def test_processing(return_collection=False, z_file_path=None, test_clock_zero=False):
@@ -52,19 +51,13 @@ def test_processing(return_collection=False, z_file_path=None, test_clock_zero=F
     tfk_dataset.from_run_summary(run_summary, "PKD")
 
     cc = ConfigCreator(config_path=CONFIG_PATH)
-    p = cc.create_run_processing_object(
+    config = cc.create_run_processing_object(
         emtf_band_file=BANDS_DEFAULT_FILE, sample_rate=40.0, estimator={"engine": "RME"}
     )
-    p.stations.from_dataset_dataframe(tfk_dataset.df)
-
-    if DEBUG_ISSUE_172:
-        config = Processing()
-        config.from_json(processing_run_cfg)
-    else:
-        config = p
+    config.stations.from_dataset_dataframe(tfk_dataset.df)
 
     if test_clock_zero:
-        for dec_lvl_cfg in p.decimations:
+        for dec_lvl_cfg in config.decimations:
             dec_lvl_cfg.window.clock_zero_type = test_clock_zero
             if test_clock_zero == "user specified":
                 dec_lvl_cfg.window.clock_zero = "2004-09-28 00:00:10+00:00"
