@@ -22,7 +22,7 @@ def validate_sample_rate(run_ts, expected_sample_rate):
     if run_ts.sample_rate != expected_sample_rate:
         print(
             f"sample rate in run time series {run_ts.sample_rate} and "
-            f"processing decimation_obj {decimation_obj.sample_rate} do not match"
+            f"processing decimation_obj {expected_sample_rate} do not match"
         )
         raise Exception
 
@@ -51,7 +51,7 @@ def apply_prewhitening(decimation_obj, run_xrts_input):
         run_xrts = run_xrts_input.differentiate("time")
     else:
         print(f"{decimation_obj.prewhitening_type} prehitening not yet implemented")
-        print(f"returning original time series")
+        print("returning original time series")
         run_xrts = run_xrts_input
     return run_xrts
 

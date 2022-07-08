@@ -25,17 +25,14 @@ ToDo: CAV07, NVR11, REV06
 """
 
 import pandas as pd
-import pathlib
 
 from aurora.general_helper_functions import TEST_PATH
 from aurora.sandbox.mth5_channel_summary_helpers import channel_summary_to_make_mth5
-from aurora.test_utils.dataset_definitions import TEST_DATA_SET_CONFIGS
 from mth5.utils.helpers import initialize_mth5
 from mth5.utils.helpers import read_back_data
 
 # from mth5.clients.make_mth5_rev_002 import MakeMTH5
 from mth5.clients.make_mth5 import MakeMTH5
-from mt_metadata.timeseries.stationxml import xml_network_mt_survey
 from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 from helper_functions import xml_to_mth5
 
@@ -142,7 +139,8 @@ def make_all_stations(h5_path="all.h5", mth5_version="0.1.0", return_obj=False):
     print("OK")
     maker = MakeMTH5(mth5_version=mth5_version)
     # print("FAILED FOR 0.2.0 with some other error")
-    # inventory, streams = maker.get_inventory_from_df(request_df, data=False, client="IRIS")    # inventory==inventory0??
+    # inventory, streams = maker.get_inventory_from_df(request_df,
+    # data=False, client="IRIS")    # inventory==inventory0??
     mth5_obj = maker.make_mth5_from_fdsnclient(
         request_df, client="IRIS", path=DATA_PATH, interact=True
     )
@@ -195,7 +193,8 @@ def make_cas04_data_for_processing(
         maker = MakeMTH5(mth5_version="0.1.0")
         maker.client = "IRIS"
 
-        # Generate data frame of FDSN Network, Station, Location, Channel, Startime, Endtime codes of interest
+        # Generate data frame of FDSN
+        # Network, Station, Location, Channel, Startime, Endtime codes of interest
         CAS04LQE = [
             "8P",
             "CAS04",
@@ -299,7 +298,7 @@ def test_make_mth5_from_individual_runs():
     return
 
 
-def test_make_mth5_from_individual_multiple_runs():
+def test_make_mth5_from_multiple_runs():
     runs = ["a", "b", "c", "d"]
     print(f"Testing RUN {runs}")
     h5_run_path = DATA_PATH.joinpath(f"cas04_from_iris_20220615_{'_'.join(runs)}.h5")
@@ -319,20 +318,11 @@ def test_make_mth5():
     -------
 
     """
-    all_h5_path = make_all_stations()
-    print(f"ALL data in {all_h5_path}")
-    import pdb
+    mth5_path = make_all_stations()
+    print(f"ALL data in {mth5_path}")
 
-    print("pdb")
-    pdb.set_trace()
     # test_make_mth5_from_individual_runs()
-    test_make_mth5_from_individual_multiple_runs()
-    h5_path = DATA_PATH.joinpath("cas04_from_iris_20220615.h5")
-
-    import pdb
-
-    print("pdb")
-    pdb.set_trace()
+    # test_make_mth5_from_multiple_runs()
     # h5_path = DATA_PATH.joinpath("cas04.h5")
     # mth5_path = make_cas04_data_for_processing(xml_path=XML_PATH, h5_path=h5_path,
     #                                            active_runs=None)#["a", ])

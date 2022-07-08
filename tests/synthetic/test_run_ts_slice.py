@@ -2,7 +2,6 @@ from mth5.utils.helpers import initialize_mth5
 from aurora.test_utils.synthetic.paths import DATA_PATH
 
 import datetime
-import pandas as pd
 
 
 def fix_time(tstmp):

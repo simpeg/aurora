@@ -1,8 +1,5 @@
-from pathlib import Path
-
 from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config.config_creator import ConfigCreator
-from aurora.config.metadata import Processing
 
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
@@ -14,7 +11,6 @@ from aurora.transfer_function.kernel_dataset import KernelDataset
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 
 from make_parkfield_mth5 import test_make_parkfield_mth5
-
 
 
 def test_processing(return_collection=False, z_file_path=None, test_clock_zero=False):

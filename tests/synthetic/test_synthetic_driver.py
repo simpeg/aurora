@@ -4,7 +4,8 @@ from aurora.test_utils.synthetic.make_mth5_from_asc import create_test2_h5
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
 from aurora.test_utils.synthetic.make_processing_configs import create_test_run_config
 from aurora.test_utils.synthetic.paths import AURORA_RESULTS_PATH
-from aurora.test_utils.synthetic.paths import CONFIG_PATH
+
+# from aurora.test_utils.synthetic.paths import CONFIG_PATH
 from aurora.test_utils.synthetic.processing_helpers import process_sythetic_data
 from aurora.transfer_function.kernel_dataset import KernelDataset
 

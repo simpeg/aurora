@@ -56,8 +56,6 @@ p.stations.from_dataset_dataframe(dd_df)
 import copy
 import pandas as pd
 
-import mth5
-
 
 class KernelDataset:
     """

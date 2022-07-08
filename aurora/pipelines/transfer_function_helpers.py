@@ -58,7 +58,9 @@ def set_up_iter_control(config):
             max_number_of_iterations=config.regression.max_iterations,
             max_number_of_redescending_iterations=config.regression.max_redescending_iterations,
         )
-    elif config.estimator.engine in ["OLS", ]:
+    elif config.estimator.engine in [
+        "OLS",
+    ]:
         iter_control = None
     return iter_control
 

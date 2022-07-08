@@ -1,4 +1,3 @@
-from pathlib import Path
 from aurora.pipelines.run_summary import RunSummary
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
@@ -6,7 +5,6 @@ from aurora.test_utils.synthetic.make_mth5_from_asc import create_test2_h5
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
 from aurora.test_utils.synthetic.make_processing_configs import create_test_run_config
 from aurora.test_utils.synthetic.paths import AURORA_RESULTS_PATH
-from aurora.test_utils.synthetic.paths import SYNTHETIC_PATH
 from aurora.test_utils.synthetic.paths import EMTF_OUTPUT_PATH
 from aurora.test_utils.synthetic.processing_helpers import process_sythetic_data
 from aurora.test_utils.synthetic.rms_helpers import assert_rms_misfit_ok
@@ -147,7 +145,7 @@ def run_test2r1(tfk_dataset):
     -------
 
     """
-    print(f"Test2r1")
+    print("Test2r1")
     test_case_id = "test2r1"
     emtf_version = "fortran"
     auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test2r1.zrr")

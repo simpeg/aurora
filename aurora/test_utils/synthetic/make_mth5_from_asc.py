@@ -4,8 +4,8 @@ Created on Fri Jun 25 16:03:21 2021
 
 @author: jpeacock
 
-This module is concerned with creating mth5 files from the synthetic test data 
-that origianlly came from EMTF.
+This module is concerned with creating mth5 files from the synthetic test data
+ that origianlly came from EMTF.
 
 Want to create a station1.h5, station2.h5 and array.h5
 where array has 2 stations.

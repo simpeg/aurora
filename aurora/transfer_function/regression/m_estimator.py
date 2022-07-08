@@ -212,7 +212,8 @@ class MEstimator(RegressionEstimator):
                 self.update_b()
                 self.update_y_hat()
                 self.update_residual_variance()
-            # crude estimate of expectation of psi accounts for redescending influence curve
+            # crude estimate of expectation of psi
+            # accounts for redescending influence curve
             self.expectation_psi_prime = 2 * self.expectation_psi_prime - 1
         return
 

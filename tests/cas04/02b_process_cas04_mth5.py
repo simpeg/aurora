@@ -32,11 +32,7 @@ orientations and tilts of each channel
     5    86.70     0.00 CAS  Ey
 
 """
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-import pathlib
-
+# import matplotlib.pyplot as plt
 from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config.config_creator import ConfigCreator
 from aurora.general_helper_functions import TEST_PATH
@@ -73,25 +69,17 @@ def process_runlist(run_list, return_collection=False):
     kernel_dataset.select_station_runs(station_runs_dict, "keep")
     print(kernel_dataset.df)
 
-    # Here you can show tools that TFKDataset could have
-    # See Note 1 above: Functionality of TFKDataset()
-
-    dataset_df = tfk_dataset.restrict_runs_by_station(
-        "CAS04", run_list, overwrite=False
-    )
-    dataset_df["remote"] = False
-    input_dataset = TFKDataset(df=dataset_df)
     cc = ConfigCreator()
     cc = ConfigCreator(config_path=CONFIG_PATH)
     pc = cc.create_run_processing_object(
         emtf_band_file=BANDS_DEFAULT_FILE, sample_rate=1.0
     )
-    pc.stations.from_dataset_dataframe(input_dataset.df)
+    pc.stations.from_dataset_dataframe(kernel_dataset.df)
     pc.validate()
     z_file_name = f"{'_'.join(run_list)}.zss"
     tf_result = process_mth5(
         pc,
-        input_dataset,
+        kernel_dataset,
         show_plot=False,
         z_file_path=z_file_name,
         return_collection=return_collection,
@@ -156,7 +144,7 @@ def get_run_summary(h5_path):
 
 def process_with_remote(local, remote):
     h5_path = DATA_PATH.joinpath("8P_CAS04_CAV07_NVR11_REV06.h5")
-    channel_summary = get_channel_summary(h5_path)
+    # channel_summary = get_channel_summary(h5_path)
     run_summary = get_run_summary(h5_path)
     kernel_dataset = KernelDataset()
     #    kernel_dataset.from_run_summary(run_summary, "CAS04")
@@ -182,7 +170,7 @@ def process_with_remote(local, remote):
         z_file_path=z_file_path,
         return_collection=False,
     )
-    print("OK")
+    print(f"{tf_cls}")
     return
 
 

@@ -1,8 +1,5 @@
-from pathlib import Path
-
 from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config.config_creator import ConfigCreator
-from aurora.config.metadata import Processing
 
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary

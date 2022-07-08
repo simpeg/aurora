@@ -96,18 +96,19 @@ class RunSummary:
         df["duration"] = durations
         return
 
-    def drop_runs_shorter_than(self, duration, units="s"):
-        if units != "s":
-            raise NotImplementedError
-        if "duration" not in self.df.columns:
-            self.add_duration()
-        drop_cond = self.df.duration < duration
-        # df = self.df[drop_cond]
-        self.df.drop(self.df[drop_cond].index, inplace=True)
-        df = df.reset_index()
-
-        self.df = df
-        return df
+    # BELOW FUNCTION CAN BE COPIED FROM METHOD IN KernelDataset()
+    # def drop_runs_shorter_than(self, duration, units="s"):
+    #     if units != "s":
+    #         raise NotImplementedError
+    #     if "duration" not in self.df.columns:
+    #         self.add_duration()
+    #     drop_cond = self.df.duration < duration
+    #     # df = self.df[drop_cond]
+    #     self.df.drop(self.df[drop_cond].index, inplace=True)
+    #     df = df.reset_index()
+    #
+    #     self.df = df
+    #     return df
 
 
 def channel_summary_to_run_summary(
@@ -231,9 +232,7 @@ def extract_run_summary_from_mth5(mth5_obj, summary_type="run"):
     channel_summary_df = mth5_obj.channel_summary.to_dataframe()
     # check that the mth5 has been summarized already
     if len(channel_summary_df) < 2:
-        print(
-            "Channel summary maybe not initialized yet, 3 or more channels expected."
-        )
+        print("Channel summary maybe not initialized yet, 3 or more channels expected.")
         mth5_obj.channel_summary.summarize()
         channel_summary_df = mth5_obj.channel_summary.to_dataframe()
     if summary_type == "run":

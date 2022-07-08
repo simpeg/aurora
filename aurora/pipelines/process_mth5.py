@@ -39,6 +39,7 @@ from aurora.transfer_function.TTFZ import TTFZ
 from mt_metadata.transfer_functions.core import TF
 from mth5.mth5 import MTH5
 
+
 # =============================================================================
 def fix_time(tstmp):
     """
@@ -453,9 +454,7 @@ def process_mth5(
             key = list(mth5_objs.keys())[0]
             survey_dict = mth5_objs[key].survey_group.metadata.to_dict()
         else:
-            print(
-                "WARN: Need test for multiple mth5 objs for non-tf_collection output"
-            )
+            print("WARN: Need test for multiple mth5 objs for non-tf_collection output")
             key = list(mth5_objs.keys())[0]
             survey_dict = mth5_objs[key].survey_group.metadata.to_dict()
             # raise Exception
