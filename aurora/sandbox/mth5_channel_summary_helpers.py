@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def channel_summary_to_make_mth5(df, network="ZU"):
+def channel_summary_to_make_mth5(df, network="", verbose=False):
     """
     Context is say you have a station_xml that has come from somewhere and you want
     to make an mth5 from it, with all the relevant data.  Then you should use
@@ -20,6 +20,9 @@ def channel_summary_to_make_mth5(df, network="ZU"):
     -------
 
     """
+    if not network:
+        print("Network not specified")
+        raise Exception
     ch_map = {"ex": "LQN", "ey": "LQE", "hx": "LFN", "hy": "LFE", "hz": "LFZ"}
     number_of_station_runs = len(df.groupby(["station", "run"]))
     # number_of_runs = len(df["run"].unique())
@@ -34,7 +37,12 @@ def channel_summary_to_make_mth5(df, network="ZU"):
 
     i = 0
     for group_id, group_df in df.groupby(["station", "run"]):
-        print(group_id, group_df.start.unique(), group_df.end.unique())
+        if verbose:
+            print(
+                f"{group_id}, from "
+                f"{group_df.start.unique()[0]}, to "
+                f"{group_df.end.unique()[0]}"
+            )
         for index, row in group_df.iterrows():
             stations[i] = row.station
             channels[i] = ch_map[row.component]
