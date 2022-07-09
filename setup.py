@@ -13,6 +13,7 @@ with open("README.rst") as readme_file:
 requirements = [
     "deprecated",    "matplotlib",
     "mth5",
+
     "mt_metadata",
     "numpy",
     "numba",
