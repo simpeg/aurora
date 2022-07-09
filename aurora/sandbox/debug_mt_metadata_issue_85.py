@@ -1,6 +1,7 @@
 from mt_metadata.timeseries.location import Location
 from mth5.mth5 import MTH5
 
+
 def test_can_add_location():
     """
     20220624: This mini test is being factored out of the normal tests.
@@ -37,7 +38,6 @@ def test_can_add_location():
     print(f"Run Group {run_group.station_group.metadata.location.latitude}")
     m.close_mth5()
 
-
     print("Reopen the file and check if update was done on close()")
     m.open_mth5("location_test.h5", mode="r")
     eureka = m.get_station("eureka")
@@ -50,6 +50,7 @@ def test_can_add_location():
 
 def main():
     test_can_add_location()
+
 
 if __name__ == "__main__":
     main()

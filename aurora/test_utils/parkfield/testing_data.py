@@ -15,7 +15,7 @@ DEFAULT_SAMPLING_RATE = 40.0
 DEFAULT_START_TIME = datetime.datetime(2004, 9, 28, 0, 0, 0)
 
 
-class DataHelper():
+class DataHelper:
     def __init__(self, **kwargs):
         self.dataset_id = kwargs.get("dataset_id")
         self.merged_h5 = DATA_DIR.joinpath("pkd_sao_2004_272_00-02.h5")

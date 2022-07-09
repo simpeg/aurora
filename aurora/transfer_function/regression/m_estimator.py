@@ -72,7 +72,6 @@ class MEstimator(RegressionEstimator):
             self.update_residual_variance()
         return self._residual_variance
 
-
     @property
     def r0(self):
         return self.iter_control.r0
@@ -99,13 +98,13 @@ class MEstimator(RegressionEstimator):
 
     def residual_variance_method1(self):
         """
-        This is the method that was originally in TRME_RR.m.  It seems more correct 
+        This is the method that was originally in TRME_RR.m.  It seems more correct
         than the one in TRME, but also has more computational overhead.
         """
         res = self.Yc - self.Y_hat  # intial estimate of error variance
         residual_variance = np.sum(np.abs(res * np.conj(res)), axis=0) / self.n_data
         return residual_variance
-    
+
     def residual_variance_method2(self):
         """
         These are the error variances.
@@ -149,7 +148,6 @@ class MEstimator(RegressionEstimator):
 
         return residual_variance
 
-
     def update_y_cleaned_via_huber_weights(self):
         """
         Updates the values of self.Yc and self.expectation_psi_prime
@@ -178,7 +176,7 @@ class MEstimator(RegressionEstimator):
             w = np.minimum(r0s / residuals, 1.0)
             self.Yc[:, k] = w * self.Y[:, k] + (1 - w) * self.Y_hat[:, k]
             self.expectation_psi_prime[k] = 1.0 * np.sum(w == 1) / self.n_data
-        self.update_QHYc() #note the QH is different in TRME_RR vs TRME
+        self.update_QHYc()  # note the QH is different in TRME_RR vs TRME
         return
 
     def initial_estimate(self):
@@ -189,7 +187,6 @@ class MEstimator(RegressionEstimator):
         self.update_b()
         self.update_y_hat()
         self.update_residual_variance()
-
 
     def apply_huber_regression(self):
         """This is the 'convergence loop' from TRME, TRME_RR"""
@@ -205,18 +202,18 @@ class MEstimator(RegressionEstimator):
             converged = self.iter_control.converged(self.b, b0)
         return
 
-
     def apply_redecending_influence_function(self):
         """one or two iterations with redescending influence curve cleaned data"""
         if self.iter_control.max_number_of_redescending_iterations:
-            self.iter_control.number_of_redescending_iterations = 0 #reset per channel
+            self.iter_control.number_of_redescending_iterations = 0  # reset per channel
             while self.iter_control.continue_redescending:
                 self.iter_control.number_of_redescending_iterations += 1
                 self.update_y_cleaned_via_redescend_weights()
                 self.update_b()
                 self.update_y_hat()
                 self.update_residual_variance()
-            # crude estimate of expectation of psi accounts for redescending influence curve
+            # crude estimate of expectation of psi
+            # accounts for redescending influence curve
             self.expectation_psi_prime = 2 * self.expectation_psi_prime - 1
         return
 
@@ -246,8 +243,8 @@ class MEstimator(RegressionEstimator):
     def update_y_cleaned_via_redescend_weights(self):
         """
         Updates estimate for self.Yc as a match-filtered sum of Y and Y_hat.
-        
-        
+
+
         Parameters
         ----------
         Y_hat: numpy array
@@ -281,7 +278,6 @@ class MEstimator(RegressionEstimator):
         self.update_QHYc()
         return
 
-    
     def compute_squared_coherence(self):
         """
         res: Residuals, the original data minus the predicted data.
@@ -289,7 +285,7 @@ class MEstimator(RegressionEstimator):
 
         """
         res = self.Y - self.Y_hat
-        SSR = np.einsum('ij,ji->i', res.conj().T, res)
+        SSR = np.einsum("ij,ji->i", res.conj().T, res)
         SSR = np.real(SSR).T
         Yc2 = np.abs(self.Yc) ** 2
         SSYC = np.sum(Yc2, axis=0)
@@ -307,7 +303,6 @@ class MEstimator(RegressionEstimator):
         )
 
         return
-
 
     def compute_noise_covariance(self):
         """

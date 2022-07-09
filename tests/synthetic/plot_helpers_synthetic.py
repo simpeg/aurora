@@ -1,8 +1,11 @@
-
-
-def make_subtitle(rho_rms_aurora, rho_rms_emtf,
-                  phi_rms_aurora, phi_rms_emtf,
-                  matlab_or_fortran, ttl_str=""):
+def make_subtitle(
+    rho_rms_aurora,
+    rho_rms_emtf,
+    phi_rms_aurora,
+    phi_rms_emtf,
+    matlab_or_fortran,
+    ttl_str="",
+):
     """
 
     Parameters
@@ -37,12 +40,11 @@ def make_subtitle(rho_rms_aurora, rho_rms_emtf,
     return ttl_str
 
 
-def make_figure_basename(local_station_id,
-                         remote_station_id,
-                         xy_or_yx,
-                         matlab_or_fortran):
+def make_figure_basename(
+    local_station_id, remote_station_id, xy_or_yx, matlab_or_fortran
+):
     """
-    
+
     Parameters
     ----------
     local_station_id: str
@@ -63,23 +65,23 @@ def make_figure_basename(local_station_id,
     station_string = f"{local_station_id}"
     if remote_station_id:
         station_string = f"{station_string}_rr{remote_station_id}"
-    figure_basename = (
-        f"synthetic_{station_string}_{xy_or_yx}_{matlab_or_fortran}.png"
-    )
+    figure_basename = f"synthetic_{station_string}_{xy_or_yx}_{matlab_or_fortran}.png"
     return figure_basename
 
 
-def plot_rho_phi(xy_or_yx,
-                 tf_collection,
-                 rho_rms_aurora,
-                 rho_rms_emtf,
-                 phi_rms_aurora,
-                 phi_rms_emtf,
-                 matlab_or_fortran,
-                 aux_data=None,
-                 use_subtitle=True,
-                 show_plot=False,
-                 output_path=None):
+def plot_rho_phi(
+    xy_or_yx,
+    tf_collection,
+    rho_rms_aurora,
+    rho_rms_emtf,
+    phi_rms_aurora,
+    phi_rms_emtf,
+    matlab_or_fortran,
+    aux_data=None,
+    use_subtitle=True,
+    show_plot=False,
+    output_path=None,
+):
     """
     Could be made into a method of TF Collection
     Parameters
@@ -101,20 +103,26 @@ def plot_rho_phi(xy_or_yx,
     """
     ttl_str = ""
     if use_subtitle:
-        ttl_str = make_subtitle(rho_rms_aurora, rho_rms_emtf,
-                                phi_rms_aurora, phi_rms_emtf,
-                                matlab_or_fortran)
+        ttl_str = make_subtitle(
+            rho_rms_aurora,
+            rho_rms_emtf,
+            phi_rms_aurora,
+            phi_rms_emtf,
+            matlab_or_fortran,
+        )
 
-    figure_basename = make_figure_basename(tf_collection.local_station_id,
-                                           tf_collection.remote_station_id,
-                                           xy_or_yx,
-                                           matlab_or_fortran)
+    figure_basename = make_figure_basename(
+        tf_collection.local_station_id,
+        tf_collection.remote_station_id,
+        xy_or_yx,
+        matlab_or_fortran,
+    )
     tf_collection.rho_phi_plot(
         aux_data=aux_data,
         xy_or_yx=xy_or_yx,
         ttl_str=ttl_str,
         show=show_plot,
         figure_basename=figure_basename,
-        figure_path=output_path
+        figure_path=output_path,
     )
     return

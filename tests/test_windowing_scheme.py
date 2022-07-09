@@ -133,10 +133,6 @@ def test_taper_dataset(plot=False):
         plt.plot(tapered_dataset["hx"].data[1, :], "g", label="tapered1")
         plt.legend()
         plt.show()
-    print("OK")
-
-    # windowed_dataset = test_can_create_xarray_dataset_from_several_sliding_window_xarrays()
-    # tapered_windowed_dataset = win
 
 
 def test_can_create_xarray_dataset_from_several_sliding_window_xarrays():

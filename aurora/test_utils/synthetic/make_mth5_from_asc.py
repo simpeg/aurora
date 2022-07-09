@@ -4,8 +4,8 @@ Created on Fri Jun 25 16:03:21 2021
 
 @author: jpeacock
 
-This module is concerned with creating mth5 files from the synthetic test data 
-that origianlly came from EMTF.
+This module is concerned with creating mth5 files from the synthetic test data
+ that origianlly came from EMTF.
 
 Want to create a station1.h5, station2.h5 and array.h5
 where array has 2 stations.
@@ -25,8 +25,6 @@ from aurora.test_utils.synthetic.synthetic_station_config import make_station_03
 
 
 seed(0)
-
-
 
 
 def create_run_ts_from_synthetic_run(run, df):
@@ -82,13 +80,17 @@ def create_run_ts_from_synthetic_run(run, df):
     runts = RunTS(array_list=ch_list)
 
     # add in metadata
-    #runts.station_metadata.id = config["station_id"] #move out
-    runts.run_metadata.id = run.id # was config["run_id"]
+    # runts.station_metadata.id = config["station_id"] #move out
+    runts.run_metadata.id = run.id  # was config["run_id"]
     return runts
 
 
-def create_mth5_synthetic_file(station_cfgs, mth5_path, plot=False,
-                               add_nan_values=False,):
+def create_mth5_synthetic_file(
+    station_cfgs,
+    mth5_path,
+    plot=False,
+    add_nan_values=False,
+):
     """
 
     Parameters
@@ -124,7 +126,7 @@ def create_mth5_synthetic_file(station_cfgs, mth5_path, plot=False,
                 if run.noise_scalars[col]:
                     df[col] += run.noise_scalars[col] * np.random.randn(len(df))
 
-            #add nan
+            # add nan
             if add_nan_values:
                 for col in run.channels:
                     for [ndx, num_nan] in run.nan_indices[col]:
@@ -137,7 +139,6 @@ def create_mth5_synthetic_file(station_cfgs, mth5_path, plot=False,
             # plot the data
             if plot:
                 runts.plot()
-
 
             run_group = station_group.add_run(run.id)
 
@@ -152,28 +153,43 @@ def create_mth5_synthetic_file(station_cfgs, mth5_path, plot=False,
     return mth5_path
 
 
-
 def create_test1_h5():
     station_01_params = make_station_01()
-    mth5_path = station_01_params.mth5_path # DATA_PATH.joinpath("test1.h5")
-    mth5_path = create_mth5_synthetic_file([station_01_params,], mth5_path, plot=False)
+    mth5_path = station_01_params.mth5_path  # DATA_PATH.joinpath("test1.h5")
+    mth5_path = create_mth5_synthetic_file(
+        [
+            station_01_params,
+        ],
+        mth5_path,
+        plot=False,
+    )
     return mth5_path
 
 
 def create_test2_h5():
     station_02_params = make_station_02()
     mth5_path = station_02_params.mth5_path
-    mth5_path = create_mth5_synthetic_file([station_02_params,], mth5_path, plot=False)
+    mth5_path = create_mth5_synthetic_file(
+        [
+            station_02_params,
+        ],
+        mth5_path,
+        plot=False,
+    )
     return mth5_path
 
 
 def create_test1_h5_with_nan():
     station_01_params = make_station_01()
-    mth5_path = station_01_params.mth5_path # DATA_PATH.joinpath("test1.h5")
-    mth5_path = create_mth5_synthetic_file([station_01_params,],
-                                           mth5_path,
-                                           plot=False,
-                                           add_nan_values=True)
+    mth5_path = station_01_params.mth5_path  # DATA_PATH.joinpath("test1.h5")
+    mth5_path = create_mth5_synthetic_file(
+        [
+            station_01_params,
+        ],
+        mth5_path,
+        plot=False,
+        add_nan_values=True,
+    )
     return mth5_path
 
 
@@ -188,8 +204,14 @@ def create_test12rr_h5():
 
 def create_test3_h5():
     station_params = make_station_03()
-    mth5_path = create_mth5_synthetic_file([station_params, ], station_params.mth5_path)
+    mth5_path = create_mth5_synthetic_file(
+        [
+            station_params,
+        ],
+        station_params.mth5_path,
+    )
     return mth5_path
+
 
 def main():
     create_test1_h5()
@@ -197,6 +219,7 @@ def main():
     create_test2_h5()
     create_test12rr_h5()
     create_test3_h5()
+
 
 if __name__ == "__main__":
     main()

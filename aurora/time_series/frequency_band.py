@@ -116,7 +116,7 @@ class FrequencyBand(Interval):
 
     def in_band_harmonics(self, frequencies):
         """
-        
+
         Parameters
         ----------
         frequencies
@@ -322,13 +322,15 @@ class FrequencyBands(object):
         """
         emtf_band_setup = EMTFBandSetupFile(filepath=filepath)
         emtf_band_df = emtf_band_setup.get_decimation_level(decimation_level)
-        self.from_emtf_band_df(emtf_band_df, decimation_level, sample_rate,
-                               num_samples_window)
-        
+        self.from_emtf_band_df(
+            emtf_band_df, decimation_level, sample_rate, num_samples_window
+        )
+
         return
 
-    def from_emtf_band_df(self, emtf_band_df, decimation_level, sample_rate,
-                          num_samples_window):
+    def from_emtf_band_df(
+        self, emtf_band_df, decimation_level, sample_rate, num_samples_window
+    ):
         df = sample_rate / (num_samples_window)
         half_df = df / 2.0
         # half_df /=100
@@ -338,20 +340,23 @@ class FrequencyBands(object):
         self.band_edges = band_edges
 
         return
-    
+
     def from_decimation_object(self, decimation_object):
         """
         Convert band edges from a :class:`aurora.config.Decimation` object,
         Which has all the information in it.
-        
+
         :param decimation_object: DESCRIPTION
         :type decimation_object: TYPE
         :return: DESCRIPTION
         :rtype: TYPE
 
         """
-        
-        df = decimation_object.decimation.sample_rate / decimation_object.window.num_samples
+        # replace below with decimation_object.delta_frequency ?
+        df = (
+            decimation_object.decimation.sample_rate
+            / decimation_object.window.num_samples
+        )
         half_df = df / 2.0
         # half_df /=100
         lower_edges = (decimation_object.lower_bounds * df) - half_df

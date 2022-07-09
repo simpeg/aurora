@@ -171,7 +171,7 @@ class RhoPlot(object):
         # hax = plt.axes('Position', axRect);
         ax.semilogx(xb, yb, "b-")
         ax.semilogx(self.tf.periods, phi[:, 0], "bo")
-        #print("OK, now set linewidth and markersize")
+        # print("OK, now set linewidth and markersize")
         # set(lines, 'LineWidth', 1, 'MarkerSize', 7);
         # hold on;
         xb, yb = err_log(

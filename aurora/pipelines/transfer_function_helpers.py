@@ -58,7 +58,9 @@ def set_up_iter_control(config):
             max_number_of_iterations=config.regression.max_iterations,
             max_number_of_redescending_iterations=config.regression.max_redescending_iterations,
         )
-    elif config.estimator.engine in ["OLS", ]:
+    elif config.estimator.engine in [
+        "OLS",
+    ]:
         iter_control = None
     return iter_control
 
@@ -110,8 +112,9 @@ def check_time_axes_synched(X, Y):
     return
 
 
-def get_band_for_tf_estimate(band, config, i_dec_level, local_stft_obj,
-                             remote_stft_obj):
+def get_band_for_tf_estimate(
+    band, config, i_dec_level, local_stft_obj, remote_stft_obj
+):
     """
     Get data for TF estimation for a particular band.
 

@@ -26,14 +26,29 @@ import mth5
 from mth5.utils.helpers import initialize_mth5
 
 
-INPUT_CHANNELS = ["hx", "hy", ]
-OUTPUT_CHANNELS = ["ex", "ey", "hz", ]
-RUN_SUMMARY_COLUMNS = ["station_id", "run_id", "start", "end", "sample_rate",
-                       "input_channels", "output_channels", "remote", "mth5_path"]
+INPUT_CHANNELS = [
+    "hx",
+    "hy",
+]
+OUTPUT_CHANNELS = [
+    "ex",
+    "ey",
+    "hz",
+]
+RUN_SUMMARY_COLUMNS = [
+    "station_id",
+    "run_id",
+    "start",
+    "end",
+    "sample_rate",
+    "input_channels",
+    "output_channels",
+    "remote",
+    "mth5_path",
+]
 
 
-
-class RunSummary():
+class RunSummary:
     """
     The dependencies aren't clear yet.
     Maybe still Dataset:
@@ -52,22 +67,19 @@ class RunSummary():
     Could also try the @staticmethod decorator so that it returns a modified df.
 
     """
+
     def __init__(self, **kwargs):
         self.columns = ["station_id", "run_id", "start", "end"]
         self.column_dtypes = [str, str, pd.Timestamp, pd.Timestamp]
         self._input_dict = kwargs.get("input_dict", None)
         self.df = kwargs.get("df", None)
 
-
     def clone(self):
         return copy.deepcopy(self)
-
 
     def from_mth5s(self, mth5_list):
         run_summary_df = extract_run_summaries_from_mth5s(mth5_list)
         self.df = run_summary_df
-
-
 
     def add_duration(self, df=None):
         """
@@ -84,24 +96,27 @@ class RunSummary():
         df["duration"] = durations
         return
 
-    def drop_runs_shorter_than(self, duration, units="s"):
-        if units != "s":
-            raise NotImplementedError
-        if "duration" not in self.df.columns:
-            self.add_duration()
-        drop_cond = self.df.duration < duration
-        #df = self.df[drop_cond]
-        self.df.drop(self.df[drop_cond].index, inplace=True)
-        df = df.reset_index()
+    # BELOW FUNCTION CAN BE COPIED FROM METHOD IN KernelDataset()
+    # def drop_runs_shorter_than(self, duration, units="s"):
+    #     if units != "s":
+    #         raise NotImplementedError
+    #     if "duration" not in self.df.columns:
+    #         self.add_duration()
+    #     drop_cond = self.df.duration < duration
+    #     # df = self.df[drop_cond]
+    #     self.df.drop(self.df[drop_cond].index, inplace=True)
+    #     df = df.reset_index()
+    #
+    #     self.df = df
+    #     return df
 
 
-        self.df = df
-        return df
-
-def channel_summary_to_run_summary(ch_summary,
-                                   allowed_input_channels=INPUT_CHANNELS,
-                                   allowed_output_channels=OUTPUT_CHANNELS,
-                                   sortby=["station_id", "start"]):
+def channel_summary_to_run_summary(
+    ch_summary,
+    allowed_input_channels=INPUT_CHANNELS,
+    allowed_output_channels=OUTPUT_CHANNELS,
+    sortby=["station_id", "start"],
+):
     """
     TODO: replace station_id with station, and run_id with run
     Note will need to modify: aurora/tests/config$ more test_dataset_dataframe.py
@@ -123,7 +138,7 @@ def channel_summary_to_run_summary(ch_summary,
             "input_channels",
             "output_channels",
             "remote",
-	    "channel_scale_factors",
+            "channel_scale_factors",
         ]
 
     Parameters
@@ -169,8 +184,8 @@ def channel_summary_to_run_summary(ch_summary,
     channel_scale_factors = n_station_runs * [None]
     i = 0
     for (station_id, run_id), group in grouper:
-        #print(f"{i} {station_id} {run_id}")
-        #print(group)
+        # print(f"{i} {station_id} {run_id}")
+        # print(group)
         station_ids[i] = station_id
         run_ids[i] = run_id
         start_times[i] = group.start.iloc[0]
@@ -180,7 +195,7 @@ def channel_summary_to_run_summary(ch_summary,
         num_channels = len(channels_list)
         input_channels[i] = [x for x in channels_list if x in allowed_input_channels]
         output_channels[i] = [x for x in channels_list if x in allowed_output_channels]
-        channel_scale_factors[i] = dict(zip(channels_list, num_channels*[1.0]))
+        channel_scale_factors[i] = dict(zip(channels_list, num_channels * [1.0]))
         i += 1
 
     data_dict = {}
@@ -199,7 +214,6 @@ def channel_summary_to_run_summary(ch_summary,
     return run_summary_df
 
 
-
 def extract_run_summary_from_mth5(mth5_obj, summary_type="run"):
     """
 
@@ -216,13 +230,12 @@ def extract_run_summary_from_mth5(mth5_obj, summary_type="run"):
         Table summarizing the available runs in the input mth5_obj
     """
     channel_summary_df = mth5_obj.channel_summary.to_dataframe()
-    #check that the mth5 has been summarized already
+    # check that the mth5 has been summarized already
     if len(channel_summary_df) < 2:
-        print("The channel summary may not have been initialized yet, at least 4 "
-              "channels are expected.")
+        print("Channel summary maybe not initialized yet, 3 or more channels expected.")
         mth5_obj.channel_summary.summarize()
         channel_summary_df = mth5_obj.channel_summary.to_dataframe()
-    if summary_type=="run":
+    if summary_type == "run":
         out_df = channel_summary_to_run_summary(channel_summary_df)
     else:
         out_df = channel_summary_df
@@ -265,17 +278,17 @@ def extract_run_summaries_from_mth5s(mth5_list, summary_type="run", deduplicate=
     for i, mth5_elt in enumerate(mth5_list):
         if isinstance(mth5_elt, mth5.mth5.MTH5):
             mth5_obj = mth5_elt
-        else:   #mth5_elt is a path or a string
+        else:  # mth5_elt is a path or a string
             mth5_obj = initialize_mth5(mth5_elt, mode="a")
 
         df = extract_run_summary_from_mth5(mth5_obj, summary_type=summary_type)
 
-        #close it back up if you opened it
+        # close it back up if you opened it
         if not isinstance(mth5_elt, mth5.mth5.MTH5):
             mth5_obj.close_mth5()
         dfs[i] = df
 
-    #merge all summaries into a super_summary
+    # merge all summaries into a super_summary
     super_summary = pd.concat(dfs)
     super_summary.reset_index(drop=True, inplace=True)
     if deduplicate:

@@ -18,10 +18,12 @@ from typing import Dict, Any
 from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 from mth5.utils.helpers import initialize_mth5
 
+
 def get_experiment_from_obspy_inventory(inventory):
     translator = XMLInventoryMTExperiment()
     experiment = translator.xml_to_mt(inventory_object=inventory)
     return experiment
+
 
 def mth5_from_experiment(experiment, h5_path=None):
     """
@@ -38,6 +40,7 @@ def mth5_from_experiment(experiment, h5_path=None):
     mth5_obj = initialize_mth5(h5_path)
     mth5_obj.from_experiment(experiment)
     return mth5_obj
+
 
 #
 # def dict_hash(dictionary: Dict[str, Any]) -> str:
@@ -197,8 +200,6 @@ def augment_streams(row, streams, client):
         + streams
     )
     return streams
-
-
 
 
 def get_trace_start_end_times(msstreams):

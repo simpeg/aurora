@@ -22,4 +22,4 @@ __all__ = [
     "Estimator",
     "DecimationLevel",
     "Processing",
-    ]
+]

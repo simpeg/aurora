@@ -23,6 +23,7 @@ from aurora.time_series.filters.filter_helpers import make_coefficient_filter
 
 random.seed(0)
 
+
 def make_filters(as_list=False):
     """
     Because the data from EMTF is already in mV/km and nT these filters are just
@@ -46,10 +47,12 @@ def make_filters(as_list=False):
         filters["0.1x"] = divide_by_10_filter
         return filters
 
+
 FILTERS = make_filters()
 
+
 class SyntheticRun(object):
-    def __init__(self, id,  **kwargs):
+    def __init__(self, id, **kwargs):
         self.id = id
         self.sample_rate = kwargs.get("sample_rate", 1.0)
         self.raw_data_path = kwargs.get("raw_data_path", None)
@@ -61,24 +64,25 @@ class SyntheticRun(object):
         if self.noise_scalars is None:
             self.noise_scalars = {}
             for channel in self.channels:
-                self.noise_scalars[channel] = 0.0 #np.random.rand(1)
+                self.noise_scalars[channel] = 0.0  # np.random.rand(1)
 
 
 class SyntheticStation(object):
-    def __init__(self, id,  **kwargs):
+    def __init__(self, id, **kwargs):
         self.id = id
         self.latitude = kwargs.get("latitude", 0.0)
         self.runs = []
-        self.mth5_path = kwargs.get("mth5_path", None) #not always used
+        self.mth5_path = kwargs.get("mth5_path", None)  # not always used
 
 
 def make_station_01():
     station = SyntheticStation("test1")
     station.mth5_path = DATA_PATH.joinpath("test1.h5")
 
-    run_001 = SyntheticRun("001",
-                           raw_data_path=DATA_PATH.joinpath("test1.asc"),
-                           )
+    run_001 = SyntheticRun(
+        "001",
+        raw_data_path=DATA_PATH.joinpath("test1.asc"),
+    )
     nan_indices = {}
     for ch in run_001.channels:
         nan_indices[ch] = []
@@ -92,17 +96,18 @@ def make_station_01():
     filters = {}
     for ch in run_001.channels:
         if ch in ["ex", "ey"]:
-            filters[ch] = [FILTERS["1x"].name,]
+            filters[ch] = [
+                FILTERS["1x"].name,
+            ]
         elif ch in ["hx", "hy", "hz"]:
             filters[ch] = [FILTERS["10x"].name, FILTERS["0.1x"].name]
     run_001.filters = filters
 
-    station.runs = [run_001,]
+    station.runs = [
+        run_001,
+    ]
 
     return station
-
-
-
 
 
 def make_station_02():
@@ -129,43 +134,49 @@ def make_station_03():
     filters = {}
     for ch in channels:
         if ch in ["ex", "ey"]:
-            filters[ch] = [FILTERS["1x"].name,]
+            filters[ch] = [
+                FILTERS["1x"].name,
+            ]
         elif ch in ["hx", "hy", "hz"]:
             filters[ch] = [FILTERS["10x"].name, FILTERS["0.1x"].name]
 
-    run_001 = SyntheticRun("001",
-                           raw_data_path=DATA_PATH.joinpath("test1.asc"),
-                           nan_indices=nan_indices,
-                           filters=filters,
-                           )
+    run_001 = SyntheticRun(
+        "001",
+        raw_data_path=DATA_PATH.joinpath("test1.asc"),
+        nan_indices=nan_indices,
+        filters=filters,
+    )
 
     noise_scalars = {}
     for ch in channels:
         noise_scalars[ch] = 2.0
-    run_002 = SyntheticRun("002",
-                           raw_data_path=DATA_PATH.joinpath("test1.asc"),
-                           noise_scalars=noise_scalars,
-                           nan_indices=nan_indices,
-                           filters=filters,
-                           )
+    run_002 = SyntheticRun(
+        "002",
+        raw_data_path=DATA_PATH.joinpath("test1.asc"),
+        noise_scalars=noise_scalars,
+        nan_indices=nan_indices,
+        filters=filters,
+    )
 
     for ch in channels:
         noise_scalars[ch] = 5.0
-    run_003 = SyntheticRun("003",
-                           raw_data_path=DATA_PATH.joinpath("test1.asc"),
-                           noise_scalars=noise_scalars,
-                           nan_indices=nan_indices,
-                           filters=filters,
-                           )
+    run_003 = SyntheticRun(
+        "003",
+        raw_data_path=DATA_PATH.joinpath("test1.asc"),
+        noise_scalars=noise_scalars,
+        nan_indices=nan_indices,
+        filters=filters,
+    )
 
     for ch in channels:
         noise_scalars[ch] = 10.0
-    run_004 = SyntheticRun("004",
-                           raw_data_path=DATA_PATH.joinpath("test1.asc"),
-                           noise_scalars=noise_scalars,
-                           nan_indices=nan_indices,
-                           filters=filters,
-                           )
+    run_004 = SyntheticRun(
+        "004",
+        raw_data_path=DATA_PATH.joinpath("test1.asc"),
+        noise_scalars=noise_scalars,
+        nan_indices=nan_indices,
+        filters=filters,
+    )
 
     run_001.filters = filters
     run_002.filters = filters

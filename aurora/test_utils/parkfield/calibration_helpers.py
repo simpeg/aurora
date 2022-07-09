@@ -156,7 +156,7 @@ def parkfield_sanity_check(
         n_smooth = 131  # use 1 for no smoothing
         show_raw = 0
         raw_spectral_density = fft_obj[key].data[:, 1:]
-        raw_spectral_density = (raw_spectral_density.squeeze())  # only 1 FFT window
+        raw_spectral_density = raw_spectral_density.squeeze()  # only 1 FFT window
         calibrated_data_pz = raw_spectral_density / pz_calibration_response
         smooth_calibrated_data_pz = medfilt(np.abs(calibrated_data_pz), n_smooth)
         if bf4:

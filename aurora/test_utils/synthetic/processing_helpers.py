@@ -4,8 +4,8 @@ from aurora.config.metadata.processing import Processing
 from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.process_mth5 import process_mth5
 
-def process_sythetic_data(processing_config, tfk_dataset, units="MT",
-                          z_file_path=""):
+
+def process_sythetic_data(processing_config, tfk_dataset, units="MT", z_file_path=""):
     """
 
     Parameters
@@ -26,8 +26,8 @@ def process_sythetic_data(processing_config, tfk_dataset, units="MT",
     """
     cond1 = isinstance(processing_config, str)
     cond2 = isinstance(processing_config, Path)
-    if (cond1 or cond2):
-        #load from a json path or string
+    if cond1 or cond2:
+        # load from a json path or string
         print("Not tested since implementation of new mt_metadata Processing object")
         config = initialize_config(processing_config)
     elif isinstance(processing_config, Processing):
@@ -36,6 +36,7 @@ def process_sythetic_data(processing_config, tfk_dataset, units="MT",
         print(f"processing_config has unexpected type {type(processing_config)}")
         raise Exception
 
-    tf_collection = process_mth5(config, tfk_dataset, units=units,
-                                 z_file_path=z_file_path)
+    tf_collection = process_mth5(
+        config, tfk_dataset, units=units, z_file_path=z_file_path
+    )
     return tf_collection

@@ -56,10 +56,8 @@ p.stations.from_dataset_dataframe(dd_df)
 import copy
 import pandas as pd
 
-import mth5
 
-
-class KernelDataset():
+class KernelDataset:
     """
     Could be called "ProcessableDataset", KernelDataset, InputDataset or something
     like that.  This class is intended to work with mth5-derived channel_summary or
@@ -111,6 +109,7 @@ class KernelDataset():
     # The user who doesn't want to modify in place can work with a clone.
 
     """
+
     def __init__(self, **kwargs):
         self.df = kwargs.get("df")
         self.local_station_id = kwargs.get("local_station_id")
@@ -123,14 +122,13 @@ class KernelDataset():
     def clone_dataframe(self):
         return copy.deepcopy(self.df)
 
-
-    def from_run_summary(self, run_summary,
-                         local_station_id,
-                         remote_station_id=None):
+    def from_run_summary(self, run_summary, local_station_id, remote_station_id=None):
         self.local_station_id = local_station_id
         self.remote_station_id = remote_station_id
 
-        station_ids = [local_station_id,]
+        station_ids = [
+            local_station_id,
+        ]
         if remote_station_id:
             station_ids.append(remote_station_id)
         df = restrict_to_station_list(run_summary.df, station_ids, inplace=False)
@@ -147,8 +145,7 @@ class KernelDataset():
 
     @property
     def add_duration(self):
-        """
-        """
+        """ """
         timedeltas = self.df.end - self.df.start
         durations = [x.total_seconds() for x in timedeltas]
         self.df["duration"] = durations
@@ -164,14 +161,10 @@ class KernelDataset():
         self.df.reset_index(drop=True, inplace=True)
         return
 
-
-
     def select_station_runs(self, station_runs_dict, keep_or_drop):
         df = select_station_runs(self.df, station_runs_dict, keep_or_drop)
         self.df = df
         return
-
-
 
     @property
     def is_single_station(self):
@@ -186,7 +179,6 @@ class KernelDataset():
     @property
     def is_remote_reference(self):
         raise NotImplementedError
-
 
     def restrict_run_intervals_to_simultaneous(self):
         """
@@ -207,22 +199,22 @@ class KernelDataset():
         output_sub_runs = []
         for i_local, local_row in local_df.iterrows():
             for i_remote, remote_row in remote_df.iterrows():
-                if intervals_overlap(local_row.start,
-                                     local_row.end,
-                                     remote_row.start,
-                                     remote_row.end):
+                if intervals_overlap(
+                    local_row.start, local_row.end, remote_row.start, remote_row.end
+                ):
                     print(f"OVERLAP {i_local}, {i_remote}")
-                    olap_start, olap_end = overlap(local_row.start,
-                                                   local_row.end,
-                                                   remote_row.start,
-                                                   remote_row.end)
-                    print(f"{olap_start} -- {olap_end}\n "
-                          f"{(olap_end-olap_start).seconds}s\n\n")
+                    olap_start, olap_end = overlap(
+                        local_row.start, local_row.end, remote_row.start, remote_row.end
+                    )
+                    print(
+                        f"{olap_start} -- {olap_end}\n "
+                        f"{(olap_end-olap_start).seconds}s\n\n"
+                    )
 
                     local_sub_run = local_row.copy(deep=True)
-                    #local_sub_run.drop("index", inplace=True)
+                    # local_sub_run.drop("index", inplace=True)
                     remote_sub_run = remote_row.copy(deep=True)
-                    #remote_sub_run.drop("index", inplace=True)
+                    # remote_sub_run.drop("index", inplace=True)
                     local_sub_run.start = olap_start
                     local_sub_run.end = olap_end
                     remote_sub_run.start = olap_start
@@ -249,18 +241,18 @@ class KernelDataset():
         -------
 
         """
-        #get a list of local runs:
+        # get a list of local runs:
         cond = self.df["station_id"] == local_station_id
         sub_df = self.df[cond]
         sub_df.drop_duplicates(subset="run_id", inplace=True)
 
-        #sanity check:
+        # sanity check:
         run_ids = sub_df.run_id.unique()
-        assert(len(run_ids) == len(sub_df))
+        assert len(run_ids) == len(sub_df)
 
         # iterate over these runs, packing metadata into
         station_metadata = None
-        for i,row in sub_df.iterrows():
+        for i, row in sub_df.iterrows():
             local_run_obj = row.run
             if station_metadata is None:
                 station_metadata = local_run_obj.station_group.metadata
@@ -268,7 +260,6 @@ class KernelDataset():
             run_metadata = local_run_obj.metadata
             station_metadata.add_run(run_metadata)
         return station_metadata
-
 
 
 def restrict_to_station_list(df, station_ids, inplace=True):
@@ -289,7 +280,9 @@ def restrict_to_station_list(df, station_ids, inplace=True):
         reduced dataframe with only stations associated with the station_ids
     """
     if isinstance(station_ids, str):
-        station_ids = [station_ids, ]
+        station_ids = [
+            station_ids,
+        ]
     if not inplace:
         df = copy.deepcopy(df)
     cond1 = ~df["station_id"].isin(station_ids)
@@ -298,7 +291,12 @@ def restrict_to_station_list(df, station_ids, inplace=True):
     return df
 
 
-def select_station_runs(df, station_runs_dict, keep_or_drop, overwrite=True,):
+def select_station_runs(
+    df,
+    station_runs_dict,
+    keep_or_drop,
+    overwrite=True,
+):
     """
     Drops all rows where station_id==station_id, and run_id is NOT in the provided
      list of keep_run_ids.  Operates on a deepcopy df if inplace=False
@@ -330,8 +328,10 @@ def select_station_runs(df, station_runs_dict, keep_or_drop, overwrite=True,):
         df = copy.deepcopy(df)
     for station_id, run_ids in station_runs_dict.items():
         if isinstance(run_ids, str):
-            run_ids = [run_ids, ]
-        cond1 = df["station_id"]==station_id
+            run_ids = [
+                run_ids,
+            ]
+        cond1 = df["station_id"] == station_id
         cond2 = df["run_id"].isin(run_ids)
         if keep_or_drop == "keep":
             drop_df = df[cond1 & ~cond2]
@@ -376,14 +376,14 @@ def overlap(t1start, t1end, t2start, t2end):
     -------
 
     """
-    if (t1start <= t2start <= t2end <= t1end):
-        return t2start,t2end
-    elif (t1start <= t2start <= t1end):
-        return t2start,t1end
-    elif (t1start <= t2end <= t1end):
-        return t1start,t2end
-    elif (t2start <= t1start <= t1end <= t2end):
-        return t1start,t1end
+    if t1start <= t2start <= t2end <= t1end:
+        return t2start, t2end
+    elif t1start <= t2start <= t1end:
+        return t2start, t1end
+    elif t1start <= t2end <= t1end:
+        return t1start, t2end
+    elif t2start <= t1start <= t1end <= t2end:
+        return t1start, t1end
     else:
         return None
 

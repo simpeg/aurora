@@ -19,8 +19,7 @@ class Band(Base):
     __doc__ = write_lines(attr_dict)
 
     def __init__(self, **kwargs):
-        
-        super().__init__(attr_dict=attr_dict, **kwargs)
-     
-    # should add properties to calculate index from frequency and vise-versa
 
+        super().__init__(attr_dict=attr_dict, **kwargs)
+
+    # should add properties to calculate index from frequency and vise-versa

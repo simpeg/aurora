@@ -378,6 +378,7 @@ class ZFile:
         if mode == "yx":
             return self.pyx
 
+
 def read_z_file(z_file_path):
     z_obj = ZFile(z_file_path)
     z_obj.load()

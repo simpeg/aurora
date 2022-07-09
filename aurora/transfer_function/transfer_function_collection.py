@@ -278,7 +278,7 @@ class TransferFunctionCollection(object):
         f.writelines(" **** IMPEDANCE IN MEASUREMENT COORDINATES ****\n")
         f.writelines(" ********** WITH FULL ERROR COVARINCE**********\n")
 
-        #processing scheme
+        # processing scheme
         try:
             processing_scheme = EMTF_REGRESSION_ENGINE_LABELS[
                 self.header.processing_scheme
@@ -327,7 +327,7 @@ class TransferFunctionCollection(object):
         out_str = f"{num_channels_str}   {num_frequencies_str}\n"
         f.writelines(out_str)
 
-        #Orientations and tilts
+        # Orientations and tilts
         print("Make the channel list be only the active channels for a z-file")
         assert self.total_number_of_channels == len(self.channel_list)
         ch_list = self.channel_list
@@ -337,7 +337,6 @@ class TransferFunctionCollection(object):
                 run_obj, channel_list=ch_list
             )
         f.writelines(orientation_strs)
-
 
         f.writelines("\n")
 
@@ -359,7 +358,7 @@ class TransferFunctionCollection(object):
             dec_level_config = tf.processing_config.decimations[i_dec]
 
             for band in tf.frequency_bands.bands(direction="increasing_period"):
-                #print(f"band {band}")
+                # print(f"band {band}")
                 line1 = f"period :      {band.center_period:.5f}    "
                 line1 += f"decimation level   {i_dec+1}     "
 
@@ -378,7 +377,6 @@ class TransferFunctionCollection(object):
                 line2 = f"number of data point    {int(num_segments)} "
                 line2 += f"sampling freq.   {sample_rate} Hz\n"
                 f.writelines(line2)
-
 
                 # write the tf:
                 # rows are output channels (hz, ex, ey),

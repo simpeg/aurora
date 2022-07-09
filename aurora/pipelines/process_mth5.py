@@ -38,6 +38,8 @@ from aurora.transfer_function.TTFZ import TTFZ
 
 from mt_metadata.transfer_functions.core import TF
 from mth5.mth5 import MTH5
+
+
 # =============================================================================
 def fix_time(tstmp):
     """
@@ -54,14 +56,16 @@ def fix_time(tstmp):
         The pandas timestamp as a datetime.datetime object
     """
     import datetime
+
     year = tstmp.year
     month = tstmp.month
     day = tstmp.day
     hour = tstmp.hour
     minute = tstmp.minute
     second = tstmp.second
-    out = datetime.datetime(year, month,day,hour,minute,second)
+    out = datetime.datetime(year, month, day, hour, minute, second)
     return out
+
 
 def initialize_pipeline(config):
     """
@@ -95,15 +99,16 @@ def initialize_pipeline(config):
     else:
         remote_mth5_obj = None
 
-    mth5_objs = {config.stations.local.id:local_mth5_obj}
+    mth5_objs = {config.stations.local.id: local_mth5_obj}
     if config.stations.remote:
         mth5_objs[config.stations.remote[0].id] = remote_mth5_obj
 
     return config, mth5_objs
 
 
-def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrts, units,
-                          station_id):
+def make_stft_objects(
+    processing_config, i_dec_level, run_obj, run_xrts, units, station_id
+):
     """
     Operates on a "per-run" basis
 
@@ -136,12 +141,14 @@ def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrts, units,
     stft_obj = run_ts_to_stft(stft_config, run_xrts)
     # stft_obj = run_ts_to_stft_scipy(stft_config, run_xrts)
     run_id = run_obj.metadata.id
-    if station_id==processing_config.stations.local.id:
+    if station_id == processing_config.stations.local.id:
         scale_factors = processing_config.stations.local.run_dict[
-            run_id].channel_scale_factors
-    elif station_id==processing_config.stations.remote[0].id:
-        scale_factors = processing_config.stations.remote[0].run_dict[
-            run_id].channel_scale_factors
+            run_id
+        ].channel_scale_factors
+    elif station_id == processing_config.stations.remote[0].id:
+        scale_factors = (
+            processing_config.stations.remote[0].run_dict[run_id].channel_scale_factors
+        )
 
     stft_obj = calibrate_stft_obj(
         stft_obj,
@@ -152,9 +159,9 @@ def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrts, units,
     return stft_obj
 
 
-def process_tf_decimation_level(config, i_dec_level, local_stft_obj,
-                                    remote_stft_obj,
-                                    units="MT"):
+def process_tf_decimation_level(
+    config, i_dec_level, local_stft_obj, remote_stft_obj, units="MT"
+):
     """
     Processing pipeline for a single decimation_level
 
@@ -191,6 +198,7 @@ def process_tf_decimation_level(config, i_dec_level, local_stft_obj,
 
     transfer_function_obj.apparent_resistivity(units=units)
     return transfer_function_obj
+
 
 def export_tf(tf_collection, station_metadata_dict={}, survey_dict={}):
     """
@@ -268,26 +276,27 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
 
     """
     if i_dec_level == 0:
-        #see Note 1 in this function doc notes
-        for i,row in dataset_df.iterrows():
-            run_dict = get_run_run_ts_from_mth5(row.mth5_obj,
-                                                row.station_id,
-                                                row.run_id,
-                                                config.decimation.sample_rate,
-                                                start=fix_time(row.start),
-                                                end=fix_time(row.end)
-                                                )
+        # see Note 1 in this function doc notes
+        for i, row in dataset_df.iterrows():
+            run_dict = get_run_run_ts_from_mth5(
+                row.mth5_obj,
+                row.station_id,
+                row.run_id,
+                config.decimation.sample_rate,
+                start=fix_time(row.start),
+                end=fix_time(row.end),
+            )
             dataset_df["run"].at[i] = run_dict["run"]
-            #see Note 2 in this function doc notes
+            # see Note 2 in this function doc notes
             dataset_df["run_dataarray"].at[i] = run_dict["mvts"].to_array("channel")
 
             # APPLY TIMING CORRECTIONS HERE
     else:
         # See Note 1 top of module
         # See Note 2 top of module
-        for i,row in dataset_df.iterrows():
+        for i, row in dataset_df.iterrows():
             run_xrts = row["run_dataarray"].to_dataset("channel")
-            input_dict = {"run":row["run"], "mvts":run_xrts}
+            input_dict = {"run": row["run"], "mvts": run_xrts}
             run_dict = prototype_decimate(config.decimation, input_dict)
             dataset_df["run"].loc[i] = run_dict["run"]
             dataset_df["run_dataarray"].loc[i] = run_dict["mvts"].to_array("channel")
@@ -313,13 +322,13 @@ def close_mths_objs(df):
 
 
 def process_mth5(
-        config,
-        tfk_dataset=None,
-        units="MT",
-        show_plot=False,
-        z_file_path=None,
-        return_collection=True,
-        ):
+    config,
+    tfk_dataset=None,
+    units="MT",
+    show_plot=False,
+    z_file_path=None,
+    return_collection=True,
+):
     """
     1. Read in the config and figure out how many decimation levels there are
     2. ToDo TFK: Based on the run durations, and sampling rates, determined which runs
@@ -357,9 +366,9 @@ def process_mth5(
     dataset_df = tfk_dataset.df
 
     # Here is where any checks that would be done by TF Kernel would be applied
-    #see notes labelled with ToDo TFK above
+    # see notes labelled with ToDo TFK above
 
-    #Assign additional columns to dataset_df, populate with mth5_objs
+    # Assign additional columns to dataset_df, populate with mth5_objs
     mth5_obj_column = len(dataset_df) * [None]
     for i, station_id in enumerate(dataset_df["station_id"]):
         mth5_obj_column[i] = mth5_objs[station_id]
@@ -368,38 +377,35 @@ def process_mth5(
     dataset_df["run_dataarray"] = None
     dataset_df["stft"] = None
 
-
-    print(f"Processing config indicates {len(processing_config.decimations)} "
-          f"decimation levels ")
+    print(
+        f"Processing config indicates {len(processing_config.decimations)} "
+        f"decimation levels "
+    )
 
     tf_dict = {}
 
     for i_dec_level, dec_level_config in enumerate(processing_config.decimations):
         dataset_df = populate_dataset_df(i_dec_level, dec_level_config, dataset_df)
-        #ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
+        # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
 
-        #TFK 1: get clock-zero from data if needed
+        # TFK 1: get clock-zero from data if needed
         if dec_level_config.window.clock_zero_type == "data start":
             dec_level_config.window.clock_zero = str(dataset_df.start.min())
 
         # Apply STFT to all runs
         local_stfts = []
         remote_stfts = []
-        for i,row in dataset_df.iterrows():
+        for i, row in dataset_df.iterrows():
             run_xrts = row["run_dataarray"].to_dataset("channel")
             run_obj = row["run"]
-            stft_obj = make_stft_objects(processing_config,
-                                         i_dec_level,
-                                         run_obj,
-                                         run_xrts,
-                                         units,
-                                         row.station_id)
+            stft_obj = make_stft_objects(
+                processing_config, i_dec_level, run_obj, run_xrts, units, row.station_id
+            )
 
             if row.station_id == processing_config.stations.local.id:
                 local_stfts.append(stft_obj)
             elif row.station_id == processing_config.stations.remote[0].id:
                 remote_stfts.append(stft_obj)
-
 
         # Merge STFTs
         local_merged_stft_obj = xr.concat(local_stfts, "time")
@@ -411,25 +417,25 @@ def process_mth5(
         else:
             remote_merged_stft_obj = None
 
-
         tf_obj = process_tf_decimation_level(
             processing_config,
             i_dec_level,
             local_merged_stft_obj,
             remote_merged_stft_obj,
-            units=units
+            units=units,
         )
 
         tf_dict[i_dec_level] = tf_obj
 
         if show_plot:
             from aurora.sandbox.plot_helpers import plot_tf_obj
+
             plot_tf_obj(tf_obj, out_filename="out")
 
     # TODO: Add run_obj to TransferFunctionCollection so it doesn't need header?
     tf_collection = TransferFunctionCollection(header=tf_obj.tf_header, tf_dict=tf_dict)
 
-    #local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
+    # local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
     local_run_obj = dataset_df["run"].iloc[0]
     if z_file_path:
         tf_collection.write_emtf_z_file(z_file_path, run_obj=local_run_obj)
@@ -443,22 +449,20 @@ def process_mth5(
         local_station_id = processing_config.stations.local.id
         station_metadata = tfk_dataset.get_station_metadata(local_station_id)
 
-        # Need to create an issue for this as well
+        # https://github.com/kujaku11/mt_metadata/issues/90 (Do we need if/else here?)
         if len(mth5_objs) == 1:
             key = list(mth5_objs.keys())[0]
             survey_dict = mth5_objs[key].survey_group.metadata.to_dict()
         else:
-            print("WARNING We do not currently handle multiple mth5 objs for "
-                  "non-tf_collection output")
+            print("WARN: Need test for multiple mth5 objs for non-tf_collection output")
             key = list(mth5_objs.keys())[0]
             survey_dict = mth5_objs[key].survey_group.metadata.to_dict()
-            #raise Exception
+            # raise Exception
 
-        print(station_metadata.run_list)
         tf_cls = export_tf(
             tf_collection,
             station_metadata_dict=station_metadata.to_dict(),
-            survey_dict=survey_dict
+            survey_dict=survey_dict,
         )
         close_mths_objs(dataset_df)
         return tf_cls
