@@ -11,8 +11,7 @@ with open("README.rst") as readme_file:
 #    history = history_file.read()
 
 requirements = [
-    "deprecated",
-    "matplotlib",
+    "deprecated",    "matplotlib",
     "mth5",
     "mt_metadata",
     "numpy",
