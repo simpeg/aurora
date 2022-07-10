@@ -1,7 +1,13 @@
 """
-This may be moved to single_station processing example
-2022-02-25
-Time to start setting up the TFKernel.  We already have a prototype config class.
+Now that we have a big mth5 (from 01_make_cas04_mth5.py)
+we can show examples of processing single and multistation.
+
+Desired Examples:
+
+1. Process Single Station
+2. Process Single Station with runlist
+3. Process Remote Reference
+3. Process Remote Reference with runlist
 
 Note 1: Functionality of RunSummary()
 1. User can see all possible ways of processing the data
@@ -33,6 +39,7 @@ orientations and tilts of each channel
 
 """
 # import matplotlib.pyplot as plt
+from collections import UserDict
 from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config.config_creator import ConfigCreator
 from aurora.general_helper_functions import TEST_PATH
@@ -47,10 +54,53 @@ CAS04_PATH = TEST_PATH.joinpath("cas04")
 CONFIG_PATH = CAS04_PATH.joinpath("config")
 CONFIG_PATH.mkdir(exist_ok=True)
 DATA_PATH = CAS04_PATH.joinpath("data")
-H5_PATH = DATA_PATH.joinpath("8P_CAS04.h5")
+H5_PATH = DATA_PATH.joinpath("8P_CAS04_CAV07_NVR11_REV06.h5")
 
 
-def process_runlist(run_list, return_collection=False):
+class StationRuns(UserDict):
+    """
+    Class that can be populated by a run summary.  Just a wya to track groups of runs
+    to process.
+    """
+
+    @property
+    def label(self):
+        station_run_strings = []
+        for station_id, run_list in self.items():
+            runs_str = "_".join(run_list)
+            station_run_string = "__".join([station_id, runs_str])
+            station_run_strings.append(station_run_string)
+        out_str = "-".join(station_run_strings)
+        return out_str
+
+    def restrict_to_stations(self, station_ids):
+        """
+        Return an instance of self
+        Parameters
+        ----------
+        station_ids
+
+        Returns
+        -------
+
+        """
+        new = self.copy()
+        [new.pop(k) for k in list(new.keys()) if k not in station_ids]
+        return new
+
+    @property
+    def z_file_name(self):
+        ext = "ss"
+        if len(self.keys()) > 1:
+            ext = "zrr"
+        z_file_name = f"{self.label}.{ext}"
+        return z_file_name
+
+
+def process_station_runs(
+    local_station_id, remote_station_id=None, station_runs={}, return_collection=False
+):
+
     # identify the h5 files that you will use
     relevant_h5_list = [
         H5_PATH,
@@ -62,11 +112,17 @@ def process_runlist(run_list, return_collection=False):
 
     # Pass the run_summary to a Dataset class
     kernel_dataset = KernelDataset()
-    kernel_dataset.from_run_summary(run_summary, "CAS04")
+    kernel_dataset.from_run_summary(run_summary, local_station_id, remote_station_id)
 
-    station_runs_dict = {}
-    station_runs_dict["CAS04"] = run_list
-    kernel_dataset.select_station_runs(station_runs_dict, "keep")
+    # reduce station_runs_dict to only relevant stations
+
+    relevant_stations = [
+        local_station_id,
+    ]
+    if remote_station_id:
+        relevant_stations.append(remote_station_id)
+    tmp_station_runs = station_runs.restrict_to_stations(relevant_stations)
+    kernel_dataset.select_station_runs(tmp_station_runs, "keep")
     print(kernel_dataset.df)
 
     cc = ConfigCreator()
@@ -76,7 +132,7 @@ def process_runlist(run_list, return_collection=False):
     )
     pc.stations.from_dataset_dataframe(kernel_dataset.df)
     pc.validate()
-    z_file_name = f"{'_'.join(run_list)}.zss"
+    z_file_name = tmp_station_runs.z_file_name
     tf_result = process_mth5(
         pc,
         kernel_dataset,
@@ -85,20 +141,18 @@ def process_runlist(run_list, return_collection=False):
         return_collection=return_collection,
     )
     if not return_collection:
-        xml_file_name = f"{'_'.join(run_list)}.xml"
+        xml_file_name = f"{tmp_station_runs.label}.xml"
         tf_result.write_tf_file(fn=xml_file_name, file_type="emtfxml")
     return tf_result
 
 
-def compare_results(run_list, z_file_name=None, aurora_label="aurora"):
+def compare_results(z_file_name, label="aurora"):
     emtf_file = "emtf_results/CAS04-CAS04bcd_REV06-CAS04bcd_NVR08.zmm"
-    if z_file_name is None:
-        z_file_name = f"{'_'.join(run_list)}.zss"
     compare_two_z_files(
         emtf_file,
         z_file_name,
         label1="emtf",
-        label2=aurora_label,
+        label2=label,
         scale_factor1=1,
         out_file="aab.png",
         markersize=3,
@@ -108,15 +162,15 @@ def compare_results(run_list, z_file_name=None, aurora_label="aurora"):
     )
 
 
-def process_all_runs_individually():
+def process_all_runs_individually(station_id="CAS04"):
     all_runs = ["a", "b", "c", "d"]
-    # all_runs = ["c",]
-    for run in all_runs:
-        run_list = [
-            run,
+    for run_id in all_runs:
+        station_runs = StationRuns()
+        station_runs[station_id] = [
+            run_id,
         ]
-        process_runlist(run_list)
-        compare_results(run_list)
+        process_station_runs(station_id, station_runs=station_runs)
+        compare_results(station_runs.z_file_name)
 
 
 def get_channel_summary(h5_path):
@@ -132,6 +186,19 @@ def get_channel_summary(h5_path):
 
 
 def get_run_summary(h5_path):
+    """
+    Use this method to take a look at what runs are available for processing
+
+    Parameters
+    ----------
+    h5_path: str or pathlib.Path
+        Target mth5 file
+
+    Returns
+    -------
+    run_summary: aurora.pipelines.run_summary.RunSummary
+        object that has the run summary
+    """
     run_summary = RunSummary()
     run_summary.from_mth5s(
         [
@@ -175,6 +242,29 @@ def process_with_remote(local, remote):
 
 
 def main():
+    process_all_runs_individually()
+    import pdb
+
+    pdb.set_trace()
+    srl = StationRuns()
+    srl["CAS04"] = [
+        "b",
+        "c",
+    ]
+    srl["NVR11"] = [
+        "a",
+        "c",
+        "d",
+    ]
+    print(srl.label)
+    srl2 = srl.restrict_to_stations(
+        [
+            "CAS04",
+        ]
+    )
+    print(srl2.label)
+    process_station_runs("CAS04", srl)
+
     # process_with_remote("CAS04", "CAV07")
     # TODO:
     #  1. Make Run Summary
@@ -194,16 +284,14 @@ def main():
         "d",
     ]
     # process_runlist(run_list)
+    srl = StationRuns()
+    srl["CAS04"] = ["b", "c", "d"]
     aurora_label = f"{'_'.join(run_list)}-SS"
-    compare_results(run_list, aurora_label=aurora_label)
+    compare_results(srl, label=aurora_label)
     aurora_label = "RR vs CAV07"
-    compare_results(
-        run_list, z_file_name="CAS04_RRCAV07.zrr", aurora_label=aurora_label
-    )
+    compare_results("CAS04_RRCAV07.zrr", label=aurora_label)
     aurora_label = "RR vs CAV07 coh"
-    compare_results(
-        run_list, z_file_name="CAS04_RRCAV07_coh.zrr", aurora_label=aurora_label
-    )
+    compare_results("CAS04_RRCAV07_coh.zrr", label=aurora_label)
     print("OK")
 
 

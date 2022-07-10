@@ -88,31 +88,36 @@ def make_all_stations(h5_path="all.h5", mth5_version="0.1.0", return_obj=False):
     -------
 
     """
+    # Initialize mth5_maker
     maker = MakeMTH5(mth5_version=mth5_version)
     maker.client = "IRIS"
 
+    # Make request list
     request_list = get_dataset_request_lists()
     print(f"Request List \n {request_list}")
+
     # Turn list into dataframe
     metadata_request_df = pd.DataFrame(request_list, columns=maker.column_names)
     print(f"metadata_request_df \n {metadata_request_df}")
 
     # Request the inventory information from IRIS
     inventory, streams = maker.get_inventory_from_df(metadata_request_df, data=False)
+
+    # convert the inventory information to an mth5
     translator = XMLInventoryMTExperiment()
     experiment = translator.xml_to_mt(inventory_object=inventory)
-
     mth5_obj = initialize_mth5(h5_path)  # mode="a")
     mth5_obj.from_experiment(experiment)
-    mth5_obj.channel_summary.summarize()
 
+    # get channel summary info
+    mth5_obj.channel_summary.summarize()
     summary_df = mth5_obj.channel_summary.to_dataframe()
 
     # Transform channel_summary into request_df
     request_df = channel_summary_to_make_mth5(summary_df, network=NETWORK)
-
     print(request_df)
 
+    # Build the big mth5 with data
     maker = MakeMTH5(mth5_version=mth5_version)
     mth5_obj = maker.make_mth5_from_fdsnclient(
         request_df, client="IRIS", path=DATA_PATH, interact=True
@@ -126,36 +131,27 @@ def make_all_stations(h5_path="all.h5", mth5_version="0.1.0", return_obj=False):
         return mth5_path
 
 
-def test_make_mth5():
+def test_make_mth5(mth5_version="0.1.0"):
     """
-    WARNING: The returned variable is ci
+
     Returns
     -------
-
+    mth5_path: string
+        Where the built mth5 lives
     """
-    mth5_path = make_all_stations()
-    print(f"ALL data in {mth5_path}")
+    mth5_path = make_all_stations(mth5_version=mth5_version)
 
     read_back_data(mth5_path, "CAS04", "a")
     read_back_data(mth5_path, "CAS04", "b")
     read_back_data(mth5_path, "CAS04", "c")
     read_back_data(mth5_path, "CAS04", "d")
-    print("WARNING: The path being returned is not the path to the XML-based mth5")
-    print("The metadata are coming from IRIS server - not the XML")
-    return mth5_path
 
-
-def run_tests():
-    make_mth5_from_scratch = True
-    if make_mth5_from_scratch:
-        mth5_path = test_make_mth5()
-    else:
-        mth5_path = DATA_PATH.joinpath("8P_CAS04.h5")  # ../backup/data/
     return mth5_path
 
 
 def main():
-    mth5_path = run_tests()
+    mth5_path = test_make_mth5(mth5_version="0.1.0")  # passes
+    # mth5_path = test_make_mth5(mth5_version="0.2.0") #fails 10 Jul 2022
     return mth5_path
 
 
