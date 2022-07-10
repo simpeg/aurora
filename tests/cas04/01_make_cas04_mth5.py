@@ -14,21 +14,11 @@ functionalities, including:
 
 First, an mth5 is created that summarizes available data.
 
-This is done  can be done via either
-1. Starting with a station.xml file (provided by Anna or Tim).
-This xml was being used in lieu of what is kept in the iris archive because what is
-in the archive had errors.  An alternative approach would be to get the inventory
-object from IRIS.
-2. Querying the IRIS metadata.
+This is done via querying the IRIS metadata, but could be done starting with a
+stationxml file in theory, and an example showing that workflow should be added in
+future.
 
-
-
-
-ToDo: DEBUG: Seem to be encountering an issue with mth5 not being 0.1.0
-ToDo: ISSUE: Consider the case where you have a station data locally, but you also
-have a candidate remote reference .. we want a tool that can load the RR metadata and
-identify time intervals that data are available simultaneously
-ToDo: CAV07, NVR11, REV06
+ToDo: Test make_all_stations() with mth5_version 0.1.0 and 0.2.0
 
 """
 
@@ -52,10 +42,15 @@ XML_PATH = CAS04_PATH.joinpath("cas04_from_tim_20211203.xml")
 
 # Define args for data getter
 NETWORK = "8P"
-CAS04_START = "2020-06-02T19:00:00"
-CAS04_END = "2020-07-13T19:00:00"
-STATION_LIST = ["CAS04", "CAV07", "NVR11", "REV06"]
-CHANNEL_LIST = [
+START = "2020-06-02T19:00:00"
+END = "2020-07-13T19:00:00"
+
+# Test cast wide net (passes)
+# START = "2000-06-02T19:00:00"
+# END = "2023-07-13T19:00:00"
+
+STATIONS = ["CAS04", "CAV07", "NVR11", "REV06"]
+CHANNELS = [
     "LQE",
     "LQN",
     "LFE",
@@ -69,20 +64,30 @@ def get_dataset_request_lists():
 
     Returns
     -------
-    dataset_request_lists: dict
+    request_list: list
 
     """
-    station_list = ["CAS04", "CAV07", "NVR11", "REV06"]
-    # dataset_request_lists = {}
     request_list = []
-    for station_id in station_list:
-        for channel_id in CHANNEL_LIST:
-            request = [NETWORK, station_id, "", channel_id, CAS04_START, CAS04_END]
+    for station_id in STATIONS:
+        for channel_id in CHANNELS:
+            request = [NETWORK, station_id, "", channel_id, START, END]
             request_list.append(request)
     return request_list
 
 
 def make_all_stations(h5_path="all.h5", mth5_version="0.1.0", return_obj=False):
+    """
+
+    Parameters
+    ----------
+    h5_path
+    mth5_version
+    return_obj
+
+    Returns
+    -------
+
+    """
     maker = MakeMTH5(mth5_version=mth5_version)
     maker.client = "IRIS"
 
@@ -93,7 +98,7 @@ def make_all_stations(h5_path="all.h5", mth5_version="0.1.0", return_obj=False):
     print(f"metadata_request_df \n {metadata_request_df}")
 
     # Request the inventory information from IRIS
-    inventory, traces = maker.get_inventory_from_df(metadata_request_df, data=False)
+    inventory, streams = maker.get_inventory_from_df(metadata_request_df, data=False)
     translator = XMLInventoryMTExperiment()
     experiment = translator.xml_to_mt(inventory_object=inventory)
 
@@ -103,15 +108,12 @@ def make_all_stations(h5_path="all.h5", mth5_version="0.1.0", return_obj=False):
 
     summary_df = mth5_obj.channel_summary.to_dataframe()
 
-    # TRANSFORM CHANNEL SUMMARY INTO REQUEST DF
+    # Transform channel_summary into request_df
     request_df = channel_summary_to_make_mth5(summary_df, network=NETWORK)
 
     print(request_df)
-    print("OK")
+
     maker = MakeMTH5(mth5_version=mth5_version)
-    # print("FAILED FOR 0.2.0 with some other error")
-    # inventory, streams = maker.get_inventory_from_df(request_df,
-    # data=False, client="IRIS")    # inventory==inventory0??
     mth5_obj = maker.make_mth5_from_fdsnclient(
         request_df, client="IRIS", path=DATA_PATH, interact=True
     )
