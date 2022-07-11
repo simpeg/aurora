@@ -98,8 +98,23 @@ class StationRuns(UserDict):
 
 
 def process_station_runs(
-    local_station_id, remote_station_id=None, station_runs={}, return_collection=False
+    local_station_id, remote_station_id="", station_runs={}, return_collection=False
 ):
+    """
+
+    Parameters
+    ----------
+    local_station_id: str
+        The label of the station to process
+    remote_station_id: str or None
+    station_runs: StationRuns
+        Dictionary keyed by station_id, values are run labels to process
+    return_collection
+
+    Returns
+    -------
+
+    """
 
     # identify the h5 files that you will use
     relevant_h5_list = [
@@ -121,8 +136,10 @@ def process_station_runs(
     ]
     if remote_station_id:
         relevant_stations.append(remote_station_id)
-    tmp_station_runs = station_runs.restrict_to_stations(relevant_stations)
-    kernel_dataset.select_station_runs(tmp_station_runs, "keep")
+    if station_runs:
+        tmp_station_runs = station_runs.restrict_to_stations(relevant_stations)
+        kernel_dataset.select_station_runs(tmp_station_runs, "keep")
+
     print(kernel_dataset.df)
 
     cc = ConfigCreator()
@@ -173,6 +190,13 @@ def process_all_runs_individually(station_id="CAS04"):
         compare_results(station_runs.z_file_name)
 
 
+def process_run_list(station_id, run_list):
+    station_runs = StationRuns()
+    station_runs[station_id] = run_list
+    process_station_runs(station_id, station_runs=station_runs)
+    compare_results(station_runs.z_file_name)
+
+
 def get_channel_summary(h5_path):
     h5_path = DATA_PATH.joinpath("8P_CAS04_CAV07_NVR11_REV06.h5")
     mth5_obj = initialize_mth5(
@@ -200,16 +224,34 @@ def get_run_summary(h5_path):
         object that has the run summary
     """
     run_summary = RunSummary()
-    run_summary.from_mth5s(
-        [
-            h5_path,
-        ]
-    )
+    h5_list = [
+        h5_path,
+    ]
+    run_summary.from_mth5s(h5_list)
     # print(run_summary.df)
     return run_summary
 
 
 def process_with_remote(local, remote):
+    """
+    How this works:
+    1. Make Run Summary
+    2. Select station to process and remote
+    3. Make a KernelDataset
+    4. Slice KernelDataset to Simultaneos data
+    5. (Optionally) Drop runs that are shorter than 15000s
+    6. Make a config
+    7. Process the data
+
+    Parameters
+    ----------
+    local: str
+    remote: str
+
+    Returns
+    -------
+
+    """
     h5_path = DATA_PATH.joinpath("8P_CAS04_CAV07_NVR11_REV06.h5")
     # channel_summary = get_channel_summary(h5_path)
     run_summary = get_run_summary(h5_path)
@@ -243,55 +285,25 @@ def process_with_remote(local, remote):
 
 def main():
     process_all_runs_individually()
-    import pdb
+    process_run_list("CAS04", ["b", "c", "d"])
+    process_with_remote("CAS04", "CAV07")
+    process_with_remote("CAS04", "NVR11")
+    process_with_remote("CAS04", "REV06")
 
-    pdb.set_trace()
-    srl = StationRuns()
-    srl["CAS04"] = [
-        "b",
-        "c",
-    ]
-    srl["NVR11"] = [
-        "a",
-        "c",
-        "d",
-    ]
-    print(srl.label)
-    srl2 = srl.restrict_to_stations(
-        [
-            "CAS04",
-        ]
-    )
-    print(srl2.label)
-    process_station_runs("CAS04", srl)
-
-    # process_with_remote("CAS04", "CAV07")
-    # TODO:
-    #  1. Make Run Summary
-    #  2. Drop runs that are shorter than X (1h?)
-    #  3. Select CAS04 as station to process
-    #  4. Give a list of reference stations
-    #  5. Selected reference station,
-    #  6. Generate a tfk_dataset obj that is "sliced" to the station-pair
-    #  7. Define Reference station
-    #  8 Create processing config
-    # 9. Process see what we get ...
-    # process_all_runs_individually()
-
-    run_list = [
-        "b",
-        "c",
-        "d",
-    ]
-    # process_runlist(run_list)
     srl = StationRuns()
     srl["CAS04"] = ["b", "c", "d"]
-    aurora_label = f"{'_'.join(run_list)}-SS"
-    compare_results(srl, label=aurora_label)
+    aurora_label = f"{srl.label}-SS"
+    compare_results(srl.z_file_name, label=aurora_label)
     aurora_label = "RR vs CAV07"
     compare_results("CAS04_RRCAV07.zrr", label=aurora_label)
     aurora_label = "RR vs CAV07 coh"
     compare_results("CAS04_RRCAV07_coh.zrr", label=aurora_label)
+    aurora_label = "RR vs NVR11"
+    compare_results("CAS04_RRNVR11.zrr", label=aurora_label)
+    aurora_label = "RR vs REV06"
+    compare_results("CAS04_RRREV06.zrr", label=aurora_label)
+    aurora_label = "RR vs REV06 coh"
+    compare_results("CAS04_RRREV06_coh.zrr", label=aurora_label)
     print("OK")
 
 
