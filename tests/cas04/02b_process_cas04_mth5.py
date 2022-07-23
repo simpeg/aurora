@@ -39,6 +39,8 @@ orientations and tilts of each channel
 
 """
 # import matplotlib.pyplot as plt
+import os
+import pathlib
 from collections import UserDict
 from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config.config_creator import ConfigCreator
@@ -55,6 +57,13 @@ CONFIG_PATH = CAS04_PATH.joinpath("config")
 CONFIG_PATH.mkdir(exist_ok=True)
 DATA_PATH = CAS04_PATH.joinpath("data")
 H5_PATH = DATA_PATH.joinpath("8P_CAS04_CAV07_NVR11_REV06.h5")
+DEFAULT_EMTF_FILE = "emtf_results/CAS04-CAS04bcd_REV06-CAS04bcd_NVR08.zmm"
+AURORA_RESULTS_PATH = CAS04_PATH.joinpath("aurora_results")
+EMTF_RESULTS_PATH = CAS04_PATH.joinpath("emtf_results")
+DEFAULT_EMTF_FILE = EMTF_RESULTS_PATH.joinpath(
+    "CAS04-CAS04bcd_REV06-CAS04bcd_NVR08.zmm"
+)
+AURORA_RESULTS_PATH.mkdir(exist_ok=True)
 
 
 class StationRuns(UserDict):
@@ -89,12 +98,19 @@ class StationRuns(UserDict):
         return new
 
     @property
-    def z_file_name(self):
+    def z_file_base(self):
         ext = "ss"
         if len(self.keys()) > 1:
             ext = "zrr"
-        z_file_name = f"{self.label}.{ext}"
-        return z_file_name
+        z_file_base = f"{self.label}.{ext}"
+        return z_file_base
+
+    def z_file_name(self, target_dir):
+        if isinstance(target_dir, pathlib.Path):
+            out_file = target_dir.joinpath(self.z_file_base)
+        elif isinstance(target_dir, str):
+            out_file = os.path.join(target_dir, self.z_file_base)
+        return out_file
 
 
 def process_station_runs(
@@ -149,7 +165,7 @@ def process_station_runs(
     )
     pc.stations.from_dataset_dataframe(kernel_dataset.df)
     pc.validate()
-    z_file_name = tmp_station_runs.z_file_name
+    z_file_name = tmp_station_runs.z_file_name(AURORA_RESULTS_PATH)
     tf_result = process_mth5(
         pc,
         kernel_dataset,
@@ -158,20 +174,22 @@ def process_station_runs(
         return_collection=return_collection,
     )
     if not return_collection:
-        xml_file_name = f"{tmp_station_runs.label}.xml"
+        xml_file_base = f"{tmp_station_runs.label}.xml"
+        xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
         tf_result.write_tf_file(fn=xml_file_name, file_type="emtfxml")
     return tf_result
 
 
-def compare_results(z_file_name, label="aurora"):
-    emtf_file = "emtf_results/CAS04-CAS04bcd_REV06-CAS04bcd_NVR08.zmm"
+def compare_results(
+    z_file_name, label="aurora", emtf_file=DEFAULT_EMTF_FILE, out_file="aab.png"
+):
     compare_two_z_files(
         emtf_file,
         z_file_name,
         label1="emtf",
         label2=label,
         scale_factor1=1,
-        out_file="aab.png",
+        out_file=out_file,
         markersize=3,
         # rho_ylims=[1e-20, 1e-6],
         # rho_ylims=[1e-8, 1e6],
@@ -187,14 +205,14 @@ def process_all_runs_individually(station_id="CAS04"):
             run_id,
         ]
         process_station_runs(station_id, station_runs=station_runs)
-        compare_results(station_runs.z_file_name)
+        compare_results(station_runs.z_file_name(AURORA_RESULTS_PATH))
 
 
 def process_run_list(station_id, run_list):
     station_runs = StationRuns()
     station_runs[station_id] = run_list
     process_station_runs(station_id, station_runs=station_runs)
-    compare_results(station_runs.z_file_name)
+    compare_results(station_runs.z_file_name(AURORA_RESULTS_PATH))
 
 
 def get_channel_summary(h5_path):
@@ -232,7 +250,7 @@ def get_run_summary(h5_path):
     return run_summary
 
 
-def process_with_remote(local, remote):
+def process_with_remote(local, remote, band_setup_file="band_setup_emtf_nims.txt"):
     """
     How this works:
     1. Make Run Summary
@@ -265,12 +283,15 @@ def process_with_remote(local, remote):
     sr = kernel_dataset.df.sample_rate.unique()
 
     cc = ConfigCreator()  # config_path=CONFIG_PATH)
+    band_setup_file = "band_setup_emtf_nims.txt"
+    band_setup_file = BANDS_DEFAULT_FILE
     config = cc.create_run_processing_object(
-        emtf_band_file=BANDS_DEFAULT_FILE, sample_rate=sr[0]
+        emtf_band_file=band_setup_file, sample_rate=sr[0]
     )
     config.stations.from_dataset_dataframe(kernel_dataset.df)
     show_plot = False
-    z_file_path = f"{local}_RR{remote}.zrr"
+    z_file_base = f"{local}_RR{remote}.zrr"
+    z_file_path = AURORA_RESULTS_PATH.joinpath(z_file_base)
     tf_cls = process_mth5(
         config,
         kernel_dataset,
@@ -283,28 +304,33 @@ def process_with_remote(local, remote):
     return
 
 
+def compare_aurora_vs_emtf(local_station_id, remote_station_id, coh=False):
+    emtf_file_base = f"{local_station_id}bcd_{remote_station_id}.zrr"
+    emtf_file = EMTF_RESULTS_PATH.joinpath(emtf_file_base)
+    aurora_label = f"{local_station_id} RR vs {remote_station_id}"
+    if coh:
+        z_file_base = f"{local_station_id}_RR{remote_station_id}_coh.zrr"
+    else:
+        z_file_base = f"{local_station_id}_RR{remote_station_id}.zrr"
+    aurora_z_file = AURORA_RESULTS_PATH.joinpath(z_file_base)
+    out_png = str(aurora_z_file)
+    out_png = out_png.replace("zrr", "png")
+    compare_results(
+        aurora_z_file, label=aurora_label, emtf_file=emtf_file, out_file=out_png
+    )
+    return
+
+
 def main():
     process_all_runs_individually()
     process_run_list("CAS04", ["b", "c", "d"])
     process_with_remote("CAS04", "CAV07")
-    process_with_remote("CAS04", "NVR11")
+    process_with_remote("CAS04", "NVR11", band_setup_file=BANDS_DEFAULT_FILE)
     process_with_remote("CAS04", "REV06")
 
-    srl = StationRuns()
-    srl["CAS04"] = ["b", "c", "d"]
-    aurora_label = f"{srl.label}-SS"
-    compare_results(srl.z_file_name, label=aurora_label)
-    aurora_label = "RR vs CAV07"
-    compare_results("CAS04_RRCAV07.zrr", label=aurora_label)
-    aurora_label = "RR vs CAV07 coh"
-    compare_results("CAS04_RRCAV07_coh.zrr", label=aurora_label)
-    aurora_label = "RR vs NVR11"
-    compare_results("CAS04_RRNVR11.zrr", label=aurora_label)
-    aurora_label = "RR vs REV06"
-    compare_results("CAS04_RRREV06.zrr", label=aurora_label)
-    aurora_label = "RR vs REV06 coh"
-    compare_results("CAS04_RRREV06_coh.zrr", label=aurora_label)
-    print("OK")
+    for RR in ["CAV07", "NVR11", "REV06"]:
+        compare_aurora_vs_emtf("CAS04", "CAV07", coh=False)
+        compare_aurora_vs_emtf("CAS04", "CAV07", coh=True)
 
 
 if __name__ == "__main__":
