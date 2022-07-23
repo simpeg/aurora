@@ -6,18 +6,28 @@ def channel_summary_to_make_mth5(df, network="", verbose=False):
     Context is say you have a station_xml that has come from somewhere and you want
     to make an mth5 from it, with all the relevant data.  Then you should use
     make_mth5.  But make_mth5 wants a df with a particular schema (which should be
-    written down somewhere!)
-
-    This returns a dataframe with the schema that MakeMTH5() expects.
+    written down somewhere!) This method returns a dataframe with the schema that
+    MakeMTH5() expects.  Specifically, there is one row for each channel-run
+    combination.
 
     TODO: This method could be an option for output format of mth5.channel_summary()
 
     Parameters
     ----------
-    df: the output from mth5_obj.channel_summary
+    df: pd.DataFrame
+        the output from mth5_obj.channel_summary
+    network: str
+        Usually two characters, the network code specifies the network on which
+        the data were acquired.
+    verbose: bool
+        Set to true to see some strings describing what is happening
+
 
     Returns
     -------
+    out_df: pd.DataFrame
+        The make_mth5 formatted dataframe
+
 
     """
     if not network:
