@@ -309,7 +309,8 @@ def close_mths_objs(df):
     Loop over all unique mth5_objs in the df and make sure they are closed
     Parameters
     ----------
-    df
+    df: pd.DataFrame
+
 
     Returns
     -------
@@ -360,6 +361,8 @@ def process_mth5(
     -------
     tf: TransferFunctionCollection or mt_metadata TF
         The transfer funtion object
+    tf_cls: mt_metadata.transfer_functions.TF
+        TF object
     """
 
     processing_config, mth5_objs = initialize_pipeline(config)

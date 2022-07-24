@@ -1,5 +1,8 @@
 aurora/sandbox/config
 aurora/sandbox/data
+tests/cas04/aurora_results/*
+tests/cas04/config/*
+tests/cas04/data/*
 tests/parkfield/*.png
 tests/parkfield/aurora_results/*
 tests/parkfield/config/*backup.json
@@ -10,11 +13,10 @@ tests/synthetic/backup/*
 tests/synthetic/config/*
 tests/synthetic/data/*h5
 tests/synthetic/out.png
-*.bak
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
-*.py[cod]
+*.py[codx]
 *$py.class
 *.bak
 
