@@ -15,7 +15,7 @@ def channel_summary_to_make_mth5(df, network="", verbose=False):
     Parameters
     ----------
     df: pd.DataFrame
-        the output from mth5_obj.channel_summary
+        Output from mth5_obj.channel_summary
     network: str
         Usually two characters, the network code specifies the network on which
         the data were acquired.

@@ -87,11 +87,11 @@ class StationRuns(UserDict):
         Return an instance of self
         Parameters
         ----------
-        station_ids
+        station_ids: list
 
         Returns
         -------
-
+        new: list
         """
         new = self.copy()
         [new.pop(k) for k in list(new.keys()) if k not in station_ids]
@@ -125,11 +125,12 @@ def process_station_runs(
     remote_station_id: str or None
     station_runs: StationRuns
         Dictionary keyed by station_id, values are run labels to process
-    return_collection
+    return_collection: bool
+        True means return TransferFunctionCollection, False is tf_cls from mt_metadata
 
     Returns
     -------
-
+    tf_result: TransferFunctionCollection or mt_metadata.transfer_fucntions.TF
     """
 
     # identify the h5 files that you will use
@@ -183,6 +184,20 @@ def process_station_runs(
 def compare_results(
     z_file_name, label="aurora", emtf_file=DEFAULT_EMTF_FILE, out_file="aab.png"
 ):
+    """
+
+    Parameters
+    ----------
+    z_file_name: str or pathlib.Path
+        Where is the tf info stored in a z-file
+    label: str
+        a tag that is put on the plot
+    emtf_file: str or pathlib.Path
+        Z-file from emtf to compare
+    out_file: str or pathlib.Path
+        png where plot is saved
+
+    """
     compare_two_z_files(
         emtf_file,
         z_file_name,
@@ -198,6 +213,14 @@ def compare_results(
 
 
 def process_all_runs_individually(station_id="CAS04"):
+    """
+
+    Parameters
+    ----------
+    station_id: str
+        The station to process (CAS04)
+
+    """
     all_runs = ["a", "b", "c", "d"]
     for run_id in all_runs:
         station_runs = StationRuns()
@@ -209,6 +232,16 @@ def process_all_runs_individually(station_id="CAS04"):
 
 
 def process_run_list(station_id, run_list):
+    """
+
+    Parameters
+    ----------
+    station_id: str
+        Name of the station to process (CAS04)
+    run_list:
+        list of runs to process drawn from [a,b,c,d]
+
+    """
     station_runs = StationRuns()
     station_runs[station_id] = run_list
     process_station_runs(station_id, station_runs=station_runs)
@@ -216,6 +249,19 @@ def process_run_list(station_id, run_list):
 
 
 def get_channel_summary(h5_path):
+    """
+
+    Parameters
+    ----------
+    h5_path: pathlib.Path
+        Where is the h5
+
+    Returns
+    -------
+    channel_summary_df: pd.DataFrame
+        channel summary from mth5
+    """
+
     h5_path = DATA_PATH.joinpath("8P_CAS04_CAV07_NVR11_REV06.h5")
     mth5_obj = initialize_mth5(
         h5_path=h5_path,
@@ -305,6 +351,21 @@ def process_with_remote(local, remote, band_setup_file="band_setup_emtf_nims.txt
 
 
 def compare_aurora_vs_emtf(local_station_id, remote_station_id, coh=False):
+    """
+
+    Parameters
+    ----------
+    local_station_id: str
+        The label of the local station (its CAS04 in this case)
+    remote_station_id: str
+        The label of the remote station, one of CAV07, NVR11, REV06
+    coh: bool
+        Was cohernece sorting applied?
+
+    Returns
+    -------
+
+    """
     emtf_file_base = f"{local_station_id}bcd_{remote_station_id}.zrr"
     emtf_file = EMTF_RESULTS_PATH.joinpath(emtf_file_base)
     aurora_label = f"{local_station_id} RR vs {remote_station_id}"

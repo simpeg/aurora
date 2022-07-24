@@ -23,10 +23,10 @@ def compare_two_z_files(
 
     Parameters
     ----------
-    z_path1
-    z_path2
-    label1
-    label2
+    z_path1: str or pathlib.Path
+    z_path2: str or pathlib.Path
+    label1: str
+    label2: str
     scale_factor1
     scale_factor2
 
