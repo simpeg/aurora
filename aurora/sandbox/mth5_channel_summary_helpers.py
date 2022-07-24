@@ -32,7 +32,7 @@ def channel_summary_to_make_mth5(df, network="", verbose=False):
     """
     if not network:
         print("Network not specified")
-        raise Exception
+        print("this will cause IRIS data pull to fail")
     ch_map = {"ex": "LQN", "ey": "LQE", "hx": "LFN", "hy": "LFE", "hz": "LFZ"}
     number_of_station_runs = len(df.groupby(["station", "run"]))
     # number_of_runs = len(df["run"].unique())

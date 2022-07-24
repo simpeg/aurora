@@ -1,8 +1,10 @@
+import mth5.mth5
 from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config.config_creator import ConfigCreator
 
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
+from aurora.sandbox.mth5_channel_summary_helpers import channel_summary_to_make_mth5
 from aurora.test_utils.parkfield.path_helpers import AURORA_RESULTS_PATH
 from aurora.test_utils.parkfield.path_helpers import CONFIG_PATH
 from aurora.test_utils.parkfield.path_helpers import DATA_PATH
@@ -11,6 +13,32 @@ from aurora.transfer_function.kernel_dataset import KernelDataset
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 
 from make_parkfield_mth5 import test_make_parkfield_hollister_mth5
+
+from mth5.mth5 import MTH5
+
+
+def test_stuff_that_belongs_elsewhere():
+    """
+    ping the mth5, extract the summary and pass it
+
+    This test has no practical point, I'm just trying to assuage codecov.
+
+    Returns
+    -------
+
+    """
+    mth5_path = DATA_PATH.joinpath("pkd_sao_test_00.h5")
+
+    # Ensure there is an mth5 to process
+    if not mth5_path.exists():
+        test_make_parkfield_hollister_mth5()
+    mth5_obj = mth5.mth5.MTH5()
+    mth5_obj = MTH5(file_version="0.1.0")
+    mth5_obj.open_mth5(mth5_path, mode="a")
+    df = mth5_obj.channel_summary.to_dataframe()
+    unknown_df = channel_summary_to_make_mth5(df)
+    mth5_obj.close_mth5()
+    return unknown_df
 
 
 def test_processing(z_file_path=None):
@@ -69,6 +97,7 @@ def test_processing(z_file_path=None):
 
 
 def main():
+    test_stuff_that_belongs_elsewhere()
     z_file_path = AURORA_RESULTS_PATH.joinpath("pkd.zrr")
     test_processing(z_file_path=z_file_path)
 

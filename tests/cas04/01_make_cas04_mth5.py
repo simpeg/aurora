@@ -114,6 +114,7 @@ def make_all_stations(h5_path="all.h5", mth5_version="0.1.0", return_obj=False):
     summary_df = mth5_obj.channel_summary.to_dataframe()
 
     # Transform channel_summary into request_df
+    # TODO: Make this function run in PKD testing...
     request_df = channel_summary_to_make_mth5(summary_df, network=NETWORK)
     print(request_df)
 
