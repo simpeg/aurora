@@ -86,10 +86,7 @@ def create_run_ts_from_synthetic_run(run, df):
 
 
 def create_mth5_synthetic_file(
-    station_cfgs,
-    mth5_path,
-    plot=False,
-    add_nan_values=False,
+    station_cfgs, mth5_path, plot=False, add_nan_values=False, file_version="0.1.0"
 ):
     """
 
@@ -111,11 +108,16 @@ def create_mth5_synthetic_file(
         mth5_path = Path(mth5_path.__str__().replace(".h5", "_nan.h5"))
 
     # open output h5
-    m = MTH5(file_version="0.1.0")
+    m = MTH5(file_version=file_version)
     m.open_mth5(mth5_path, mode="w")
-    # survey = Survey()
+    if file_version == "0.2.0":
+        survey_id = "EMTF Synthetic"
+        m.add_survey(survey_id)
+    else:
+        survey_id = None
+
     for station_cfg in station_cfgs:
-        station_group = m.add_station(station_cfg.id)
+        station_group = m.add_station(station_cfg.id, survey=survey_id)
         for run in station_cfg.runs:
 
             # read in data
@@ -147,13 +149,20 @@ def create_mth5_synthetic_file(
     # add filters
     active_filters = make_filters(as_list=True)
     for fltr in active_filters:
-        m.filters_group.add_filter(fltr)
+        if file_version == "0.1.0":
+            m.filters_group.add_filter(fltr)
+        elif file_version == "0.2.0":
+            survey = m.get_survey(survey_id)
+            survey.filters_group.add_filter(fltr)
+        else:
+            print(f"unexpected file_version = {file_version}")
+            raise NotImplementedError
 
     m.close_mth5()
     return mth5_path
 
 
-def create_test1_h5():
+def create_test1_h5(file_version="0.1.0"):
     station_01_params = make_station_01()
     mth5_path = station_01_params.mth5_path  # DATA_PATH.joinpath("test1.h5")
     mth5_path = create_mth5_synthetic_file(
@@ -162,11 +171,12 @@ def create_test1_h5():
         ],
         mth5_path,
         plot=False,
+        file_version=file_version,
     )
     return mth5_path
 
 
-def create_test2_h5():
+def create_test2_h5(file_version="0.1.0"):
     station_02_params = make_station_02()
     mth5_path = station_02_params.mth5_path
     mth5_path = create_mth5_synthetic_file(
@@ -175,11 +185,12 @@ def create_test2_h5():
         ],
         mth5_path,
         plot=False,
+        file_version=file_version,
     )
     return mth5_path
 
 
-def create_test1_h5_with_nan():
+def create_test1_h5_with_nan(file_version="0.1.0"):
     station_01_params = make_station_01()
     mth5_path = station_01_params.mth5_path  # DATA_PATH.joinpath("test1.h5")
     mth5_path = create_mth5_synthetic_file(
@@ -189,36 +200,42 @@ def create_test1_h5_with_nan():
         mth5_path,
         plot=False,
         add_nan_values=True,
+        file_version=file_version,
     )
     return mth5_path
 
 
-def create_test12rr_h5():
+def create_test12rr_h5(file_version="0.1.0"):
     station_01_params = make_station_01()
     station_02_params = make_station_02()
     station_params = [station_01_params, station_02_params]
     mth5_path = station_01_params.mth5_path.__str__().replace("test1.h5", "test12rr.h5")
-    mth5_path = create_mth5_synthetic_file(station_params, mth5_path)
+    mth5_path = create_mth5_synthetic_file(
+        station_params, mth5_path, file_version=file_version
+    )
     return mth5_path
 
 
-def create_test3_h5():
+def create_test3_h5(file_version="0.1.0"):
     station_params = make_station_03()
     mth5_path = create_mth5_synthetic_file(
         [
             station_params,
         ],
         station_params.mth5_path,
+        file_version=file_version,
     )
     return mth5_path
 
 
 def main():
-    create_test1_h5()
-    create_test1_h5_with_nan()
-    create_test2_h5()
-    create_test12rr_h5()
-    create_test3_h5()
+    file_version = "0.1.0"
+    # file_version="0.2.0"
+    create_test1_h5(file_version=file_version)
+    create_test1_h5_with_nan(file_version=file_version)
+    create_test2_h5(file_version=file_version)
+    create_test12rr_h5(file_version=file_version)
+    create_test3_h5(file_version=file_version)
 
 
 if __name__ == "__main__":

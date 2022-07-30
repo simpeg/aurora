@@ -99,7 +99,7 @@ class StationRuns(UserDict):
 
     @property
     def z_file_base(self):
-        ext = "ss"
+        ext = "zss"
         if len(self.keys()) > 1:
             ext = "zrr"
         z_file_base = f"{self.label}.{ext}"
@@ -212,7 +212,7 @@ def compare_results(
     )
 
 
-def process_all_runs_individually(station_id="CAS04"):
+def process_all_runs_individually(station_id="CAS04", reprocess=True):
     """
 
     Parameters
@@ -227,11 +227,12 @@ def process_all_runs_individually(station_id="CAS04"):
         station_runs[station_id] = [
             run_id,
         ]
-        process_station_runs(station_id, station_runs=station_runs)
+        if reprocess:
+            process_station_runs(station_id, station_runs=station_runs)
         compare_results(station_runs.z_file_name(AURORA_RESULTS_PATH))
 
 
-def process_run_list(station_id, run_list):
+def process_run_list(station_id, run_list, reprocess=True):
     """
 
     Parameters
@@ -244,7 +245,8 @@ def process_run_list(station_id, run_list):
     """
     station_runs = StationRuns()
     station_runs[station_id] = run_list
-    process_station_runs(station_id, station_runs=station_runs)
+    if reprocess:
+        process_station_runs(station_id, station_runs=station_runs)
     compare_results(station_runs.z_file_name(AURORA_RESULTS_PATH))
 
 
@@ -383,8 +385,8 @@ def compare_aurora_vs_emtf(local_station_id, remote_station_id, coh=False):
 
 
 def main():
-    process_all_runs_individually()
-    process_run_list("CAS04", ["b", "c", "d"])
+    process_all_runs_individually()  # reprocess=False)
+    process_run_list("CAS04", ["b", "c", "d"])  # , reprocess=False)
     process_with_remote("CAS04", "CAV07")
     process_with_remote("CAS04", "NVR11", band_setup_file=BANDS_DEFAULT_FILE)
     process_with_remote("CAS04", "REV06")

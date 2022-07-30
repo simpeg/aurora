@@ -16,6 +16,7 @@ station_metadata before packaging the tf for export. This could be worked around
 extracting the metadata at the start of this method. It would be a good idea in
 general to run a pre-check on the data that identifies which decimation levels are
 valid for each run. (see Issue #182)
+
 """
 # =============================================================================
 # Imports
@@ -285,6 +286,7 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
                 config.decimation.sample_rate,
                 start=fix_time(row.start),
                 end=fix_time(row.end),
+                survey=row.survey,
             )
             dataset_df["run"].at[i] = run_dict["run"]
             # see Note 2 in this function doc notes
@@ -298,8 +300,8 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
             run_xrts = row["run_dataarray"].to_dataset("channel")
             input_dict = {"run": row["run"], "mvts": run_xrts}
             run_dict = prototype_decimate(config.decimation, input_dict)
-            dataset_df["run"].loc[i] = run_dict["run"]
-            dataset_df["run_dataarray"].loc[i] = run_dict["mvts"].to_array("channel")
+            dataset_df["run"].at[i] = run_dict["run"]
+            dataset_df["run_dataarray"].at[i] = run_dict["mvts"].to_array("channel")
 
     return dataset_df
 
@@ -307,13 +309,11 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
 def close_mths_objs(df):
     """
     Loop over all unique mth5_objs in the df and make sure they are closed
+
     Parameters
     ----------
     df: pd.DataFrame
-
-
-    Returns
-    -------
+        usually this is the dataframe associated with an instance of KernelDataset
 
     """
     mth5_objs = df["mth5_obj"].unique()
@@ -453,11 +453,19 @@ def process_mth5(
         station_metadata = tfk_dataset.get_station_metadata(local_station_id)
 
         # https://github.com/kujaku11/mt_metadata/issues/90 (Do we need if/else here?)
+        #
+        # Also, assuming mth5 file versions are either 0.1.0 or 0.2.0, and not yet
+        # looking at mixe versions -- although that could happen.  That is something
+        # to check earlier, like when we populate data dataset_df
         if len(mth5_objs) == 1:
             key = list(mth5_objs.keys())[0]
-            survey_dict = mth5_objs[key].survey_group.metadata.to_dict()
+            if mth5_objs[key].file_version == "0.1.0":
+                survey_dict = mth5_objs[key].survey_group.metadata.to_dict()
+            elif mth5_objs[key].file_version == "0.2.0":
+                survey_dict = mth5_objs[key].surveys_group.metadata.to_dict()
         else:
             print("WARN: Need test for multiple mth5 objs for non-tf_collection output")
+            print("WARN: Also need to add handling of 0.1.0 vs 0.2.0 mth5 file_version")
             key = list(mth5_objs.keys())[0]
             survey_dict = mth5_objs[key].survey_group.metadata.to_dict()
             # raise Exception

@@ -562,3 +562,4 @@ class TransferFunctionCollection(object):
         plt.savefig(out_file)
         if show:
             plt.show()
+        plt.close(fig)

@@ -141,18 +141,21 @@ def test_make_mth5(mth5_version="0.1.0"):
         Where the built mth5 lives
     """
     mth5_path = make_all_stations(mth5_version=mth5_version)
-
-    read_back_data(mth5_path, "CAS04", "a")
-    read_back_data(mth5_path, "CAS04", "b")
-    read_back_data(mth5_path, "CAS04", "c")
-    read_back_data(mth5_path, "CAS04", "d")
+    if mth5_version == "0.1.0":
+        survey = None
+    else:
+        survey = "CONUS South"
+    read_back_data(mth5_path, "CAS04", "a", survey=survey)
+    read_back_data(mth5_path, "CAS04", "b", survey=survey)
+    read_back_data(mth5_path, "CAS04", "c", survey=survey)
+    read_back_data(mth5_path, "CAS04", "d", survey=survey)
 
     return mth5_path
 
 
 def main():
-    mth5_path = test_make_mth5(mth5_version="0.1.0")  # passes
-    # mth5_path = test_make_mth5(mth5_version="0.2.0") #fails 10 Jul 2022
+    # mth5_path = test_make_mth5(mth5_version="0.1.0")  # passes
+    mth5_path = test_make_mth5(mth5_version="0.2.0")  # passes 29 Jul 2022
     return mth5_path
 
 

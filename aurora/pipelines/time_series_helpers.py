@@ -266,7 +266,13 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
 
 
 def get_run_run_ts_from_mth5(
-    mth5_obj, station_id, run_id, expected_sample_rate, start=None, end=None
+    mth5_obj,
+    station_id,
+    run_id,
+    expected_sample_rate,
+    start=None,
+    end=None,
+    survey=None,
 ):
     """
     ToDo: Review if this method should be moved into mth5.
@@ -307,7 +313,7 @@ def get_run_run_ts_from_mth5(
         "mvts" maps to xarray.core.dataset.Dataset
 
     """
-    run_obj = mth5_obj.get_run(station_id, run_id)
+    run_obj = mth5_obj.get_run(station_id, run_id, survey=survey)
     run_ts = run_obj.to_runts(start=start, end=end)
     validate_sample_rate(run_ts, expected_sample_rate)
     run_run_ts = {"run": run_obj, "mvts": run_ts.dataset}
