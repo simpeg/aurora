@@ -152,7 +152,7 @@ def test_make_mth5(mth5_version="0.1.0"):
 
 def main():
     mth5_path = test_make_mth5(mth5_version="0.1.0")  # passes
-    # mth5_path = test_make_mth5(mth5_version="0.2.0") #fails 10 Jul 2022
+    mth5_path = test_make_mth5(mth5_version="0.2.0")  # passes 29 Jul 2022
     return mth5_path
 
 
