@@ -5,7 +5,9 @@ from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.process_mth5 import process_mth5
 
 
-def process_sythetic_data(processing_config, tfk_dataset, units="MT", z_file_path=""):
+def process_sythetic_data(
+    processing_config, tfk_dataset, units="MT", z_file_path="", return_collection=True
+):
     """
 
     Parameters
@@ -37,6 +39,10 @@ def process_sythetic_data(processing_config, tfk_dataset, units="MT", z_file_pat
         raise Exception
 
     tf_collection = process_mth5(
-        config, tfk_dataset, units=units, z_file_path=z_file_path
+        config,
+        tfk_dataset,
+        units=units,
+        z_file_path=z_file_path,
+        return_collection=return_collection,
     )
     return tf_collection

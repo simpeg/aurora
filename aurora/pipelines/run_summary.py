@@ -195,8 +195,8 @@ def channel_summary_to_run_summary(
     i = 0
     for group_values, group in grouper:
         group_info = dict(zip(group_by_columns, group_values))  # handy for debug
-        for k, v in group_info.items():
-            print(f"{k} = {v}")
+        # for k, v in group_info.items():
+        #     print(f"{k} = {v}")
         survey_ids[i] = group_info["survey"]
         station_ids[i] = group_info["station"]
         run_ids[i] = group_info["run"]

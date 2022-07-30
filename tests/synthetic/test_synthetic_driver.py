@@ -43,6 +43,7 @@ def process_synthetic_1(
     test_scale_factor=False,
     test_simultaneous_regression=False,
     file_version="0.1.0",
+    return_collection=True,
 ):
     """
 
@@ -58,7 +59,7 @@ def process_synthetic_1(
 
     Returns
     -------
-    tfc: TransferFunctionCollection
+    tf_result: TransferFunctionCollection or mt_metadata.transfer_functions.TF
         Should change so that it is mt_metadata.TF (see Issue #143)
     """
     mth5_path = create_test1_h5(file_version=file_version)
@@ -85,20 +86,26 @@ def process_synthetic_1(
         for decimation in processing_config.decimations:
             decimation.estimator.estimate_per_channel = False
 
-    tfc = process_sythetic_data(processing_config, tfk_dataset, z_file_path=z_file_path)
+    tf_result = process_sythetic_data(
+        processing_config,
+        tfk_dataset,
+        z_file_path=z_file_path,
+        return_collection=return_collection,
+    )
 
     z_figure_name = z_file_path.name.replace("zss", "png")
-    for xy_or_yx in ["xy", "yx"]:
-        ttl_str = f"{xy_or_yx} component, test_scale_factor = {test_scale_factor}"
-        out_png_name = f"{xy_or_yx}_{z_figure_name}"
-        tfc.rho_phi_plot(
-            xy_or_yx=xy_or_yx,
-            ttl_str=ttl_str,
-            show=False,
-            figure_basename=out_png_name,
-            figure_path=AURORA_RESULTS_PATH,
-        )
-    return tfc
+    if return_collection:
+        for xy_or_yx in ["xy", "yx"]:
+            ttl_str = f"{xy_or_yx} component, test_scale_factor = {test_scale_factor}"
+            out_png_name = f"{xy_or_yx}_{z_figure_name}"
+            tf_result.rho_phi_plot(
+                xy_or_yx=xy_or_yx,
+                ttl_str=ttl_str,
+                show=False,
+                figure_basename=out_png_name,
+                figure_path=AURORA_RESULTS_PATH,
+            )
+    return tf_result
 
 
 def process_synthetic_2():
@@ -153,17 +160,28 @@ def test_process_mth5():
     # process_synthetic_1_with_nans()
 
     z_file_path = AURORA_RESULTS_PATH.joinpath("syn1.zss")
-    # tfc = process_synthetic_1(z_file_path=z_file_path, file_version="0.1.0")
-    tfc = process_synthetic_1(z_file_path=z_file_path, file_version="0.2.0")
+    tf_collection = process_synthetic_1(z_file_path=z_file_path, file_version="0.1.0")
+    tf_cls = process_synthetic_1(
+        z_file_path=z_file_path, file_version="0.1.0", return_collection=False
+    )
+    xml_file_base = "syn1_mth5-010.xml"
+    xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
+    tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
+    tf_cls = process_synthetic_1(
+        z_file_path=z_file_path, file_version="0.2.0", return_collection=False
+    )
+    xml_file_base = "syn1_mth5-020.xml"
+    xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
+    tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
     z_file_path = AURORA_RESULTS_PATH.joinpath("syn1_scaled.zss")
-    tfc = process_synthetic_1(z_file_path=z_file_path, test_scale_factor=True)
+    tf_collection = process_synthetic_1(z_file_path=z_file_path, test_scale_factor=True)
     z_file_path = AURORA_RESULTS_PATH.joinpath("syn1_simultaneous_estimate.zss")
-    tfc = process_synthetic_1(
+    tf_collection = process_synthetic_1(
         z_file_path=z_file_path, test_simultaneous_regression=True
     )
-    tfc = process_synthetic_2()
-    tfc = process_synthetic_rr12()
-    return tfc
+    tf_collection = process_synthetic_2()
+    tf_collection = process_synthetic_rr12()
+    return tf_collection
 
 
 def main():

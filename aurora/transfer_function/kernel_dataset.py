@@ -136,7 +136,11 @@ class KernelDataset:
 
     @property
     def mini_summary(self):
-        print(self.df[self._mini_summary_columns])
+        return self.df[self._mini_summary_columns]
+
+    @property
+    def print_mini_summary(self):
+        print(self.mini_summary)
 
     @property
     def add_duration(self):
