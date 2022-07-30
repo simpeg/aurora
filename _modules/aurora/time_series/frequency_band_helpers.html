@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.time_series.frequency_band_helpers &mdash; aurora 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/plot_directive.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>aurora.time_series.frequency_band_helpers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.time_series.frequency_band_helpers</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">aurora.time_series.frequency_band</span> <span class="kn">import</span> <span class="n">FrequencyBands</span>
+
+
+<div class="viewcode-block" id="extract_band"><a class="viewcode-back" href="../../../api/time_series.html#aurora.time_series.frequency_band_helpers.extract_band">[docs]</a><span class="k">def</span> <span class="nf">extract_band</span><span class="p">(</span><span class="n">frequency_band</span><span class="p">,</span> <span class="n">fft_obj</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This may become a method of fft_obj, or frequency band.</span>
+<span class="sd">    For now leave as stand alone.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    frequency_band: aurora.interval.Interval()</span>
+<span class="sd">        interval corresponding to a frequency band</span>
+<span class="sd">    fft_obj: xr.DataArray</span>
+<span class="sd">        To be replaced with an fft_obj() class in future</span>
+<span class="sd">    epsilon: float</span>
+<span class="sd">        Use this when you are worried about missing a frequency due to</span>
+<span class="sd">        round off error.  This is in general not needed if we use a df/2 pad</span>
+<span class="sd">        around true harmonics.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    band: xr.DataArray</span>
+<span class="sd">        The frequencies within the band passed into this function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cond1</span> <span class="o">=</span> <span class="n">fft_obj</span><span class="o">.</span><span class="n">frequency</span> <span class="o">&gt;=</span> <span class="n">frequency_band</span><span class="o">.</span><span class="n">lower_bound</span> <span class="o">-</span> <span class="n">epsilon</span>
+    <span class="n">cond2</span> <span class="o">=</span> <span class="n">fft_obj</span><span class="o">.</span><span class="n">frequency</span> <span class="o">&lt;=</span> <span class="n">frequency_band</span><span class="o">.</span><span class="n">upper_bound</span> <span class="o">+</span> <span class="n">epsilon</span>
+
+    <span class="n">band</span> <span class="o">=</span> <span class="n">fft_obj</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cond1</span> <span class="o">&amp;</span> <span class="n">cond2</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">band</span></div>
+
+
+<div class="viewcode-block" id="frequency_band_edges"><a class="viewcode-back" href="../../../api/time_series.html#aurora.time_series.frequency_band_helpers.frequency_band_edges">[docs]</a><span class="k">def</span> <span class="nf">frequency_band_edges</span><span class="p">(</span>
+    <span class="n">f_lower_bound</span><span class="p">,</span> <span class="n">f_upper_bound</span><span class="p">,</span> <span class="n">num_bands_per_decade</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_bands</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Provides logarithmically spaced fenceposts acoss lowest and highest</span>
+<span class="sd">    frequencies. This is a lot like calling logspace.  The resultant gates</span>
+<span class="sd">    have constant  Q, i.e. deltaF/f_center=Q=constant.</span>
+<span class="sd">    where f_center is defined geometircally, i.e. sqrt(f2*f1) is the center freq</span>
+<span class="sd">    between f1 and f2.</span>
+
+<span class="sd">    TODO: Add a linear spacing option?</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f_lower_bound : float</span>
+<span class="sd">        lowest frequency under consideration</span>
+<span class="sd">    f_upper_bound : float</span>
+<span class="sd">        highest frequency under consideration</span>
+<span class="sd">    num_bands_per_decade : int (TODO test, float maybe ok also.. need to test)</span>
+<span class="sd">        number of bands per decade</span>
+<span class="sd">    num_bands : int</span>
+<span class="sd">        total number of bands.  This supercedes num_bands_per_decade if supplied</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fence_posts : array</span>
+<span class="sd">        logarithmically spaced fenceposts acoss lowest and highest</span>
+<span class="sd">        frequencies.  These partition the frequency domain between</span>
+<span class="sd">        f_lower_bound and f_upper_bound</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">num_bands</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">num_bands_per_decade</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Specify either number_of_bands or numnerbands_per_decade&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span>
+
+    <span class="k">if</span> <span class="n">num_bands</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">number_of_decades</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">f_upper_bound</span> <span class="o">/</span> <span class="n">f_lower_bound</span><span class="p">)</span>
+        <span class="c1"># The number of decades spanned (use log8 for octaves)</span>
+        <span class="n">num_bands</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span>
+            <span class="n">number_of_decades</span> <span class="o">*</span> <span class="n">num_bands_per_decade</span>
+        <span class="p">)</span>  <span class="c1"># floor or ceiling here?</span>
+
+    <span class="n">base</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">num_bands</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">f_upper_bound</span> <span class="o">/</span> <span class="n">f_lower_bound</span><span class="p">))</span>
+    <span class="c1"># log - NOT log10!</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;base = </span><span class="si">{</span><span class="n">base</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">bases</span> <span class="o">=</span> <span class="n">base</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">num_bands</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;bases = </span><span class="si">{</span><span class="n">bases</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">exponents</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_bands</span><span class="p">,</span> <span class="n">num_bands</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;exponents = </span><span class="si">{</span><span class="n">exponents</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">fence_posts</span> <span class="o">=</span> <span class="n">f_lower_bound</span> <span class="o">*</span> <span class="p">(</span><span class="n">bases</span> <span class="o">**</span> <span class="n">exponents</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;fence posts = </span><span class="si">{</span><span class="n">fence_posts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fence_posts</span></div>
+
+
+<div class="viewcode-block" id="configure_frequency_bands"><a class="viewcode-back" href="../../../api/time_series.html#aurora.time_series.frequency_band_helpers.configure_frequency_bands">[docs]</a><span class="k">def</span> <span class="nf">configure_frequency_bands</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    2022-05-30: This method was never put into production and will need to be</span>
+<span class="sd">    modified to use the new Processing class.</span>
+
+<span class="sd">    May want to make config a &quot;frequency band config object&quot;, but maybe not.</span>
+<span class="sd">    For now just using a flat config structure (per decimation level)</span>
+
+<span class="sd">    These methods could also be placed under FrequencyBands() class as</span>
+<span class="sd">    init_from_emtf()</span>
+<span class="sd">    init_from_bounds_array()</span>
+<span class="sd">    init_from_default()</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config : aurora.config.metadata.decimation_level.DecimationLevel</span>
+
+<span class="sd">        The configuration parameters for setting up the frequency bands.</span>
+
+<span class="sd">        If config[&quot;band_setup_style&quot;] is &quot;EMTF&quot; this will look for one of</span>
+<span class="sd">        Gary&#39;s &quot;band_setup&quot; files and parse it.  It will look for</span>
+<span class="sd">        config.emtf_band_setup_file.</span>
+
+<span class="sd">        Other options would be :</span>
+<span class="sd">        1. &quot;band_edges&quot;, accepts an array of lower_bound, upper_bound pairs</span>
+<span class="sd">        2. &quot;logarithmic range&quot;: could accept a lower_bound, and an</span>
+<span class="sd">        upper_bound, and a number of bands inbetween., or it could estimate</span>
+<span class="sd">        a)lower bound from a rule about the minimum number of cycles needed</span>
+<span class="sd">        for an estimate (say 5 or 10)</span>
+<span class="sd">        b) upper bound from a Nyquist rule, say 80% f_Nyquist</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    frequency_bands : aurora.time_series.frequency_band.FrequencyBands</span>
+<span class="sd">        a fully populated FrequencyBands object with all info needed to do</span>
+<span class="sd">        band averaging.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">frequency_bands</span> <span class="o">=</span> <span class="n">FrequencyBands</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;band_setup_style&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;EMTF&quot;</span><span class="p">:</span>
+        <span class="n">frequency_bands</span><span class="o">.</span><span class="n">from_emtf_band_setup</span><span class="p">(</span>
+            <span class="n">filepath</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">emtf_band_setup_file</span><span class="p">,</span>
+            <span class="n">sample_rate</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span>
+            <span class="n">decimation_level</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">decimation_level_id</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="n">num_samples_window</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">num_samples_window</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;band_setup_style&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;band edges&quot;</span><span class="p">:</span>
+        <span class="n">frequency_bands</span><span class="o">.</span><span class="n">band_edges</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;band_edges&quot;</span><span class="p">]</span>
+        <span class="c1"># &quot;Not Yet Supported&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+    <span class="k">elif</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;band_setup_style&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;logarithmic range&quot;</span><span class="p">:</span>
+        <span class="n">lower_bound</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;frequency_bands_lower_bound&quot;</span><span class="p">]</span>
+        <span class="n">upper_bound</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;frequency_bands_upper_bound&quot;</span><span class="p">]</span>
+        <span class="n">num_bands</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;num_frequency_bands&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">lower_bound</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">pass</span>
+            <span class="c1"># suggest lower_bound from a rule</span>
+        <span class="k">if</span> <span class="n">upper_bound</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">pass</span>
+            <span class="c1"># suggest upper_bound from a rule</span>
+        <span class="k">if</span> <span class="n">num_bands</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">pass</span>
+            <span class="c1"># suggest based on num_bands per octave or decade</span>
+        <span class="c1"># now call logspace(lower, upper, num_bands)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">return</span> <span class="n">frequency_bands</span></div>
+
+
+<div class="viewcode-block" id="df_from_bands"><a class="viewcode-back" href="../../../api/time_series.html#aurora.time_series.frequency_band_helpers.df_from_bands">[docs]</a><span class="k">def</span> <span class="nf">df_from_bands</span><span class="p">(</span><span class="n">band_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Note: The decimation_level here is +1 to agree with EMTF convention.</span>
+<span class="sd">    Not clear this is really necessary</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    band_list: list</span>
+<span class="sd">        obtained from aurora.config.metadata.decimation_level.DecimationLevel.bands</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    out_df: pd.Dataframe</span>
+<span class="sd">        Same format as that generated by EMTFBandSetupFile.get_decimation_level()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+    <span class="n">df_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;decimation_level&quot;</span><span class="p">,</span> <span class="s2">&quot;lower_bound_index&quot;</span><span class="p">,</span> <span class="s2">&quot;upper_bound_index&quot;</span><span class="p">]</span>
+    <span class="n">n_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">band_list</span><span class="p">)</span>
+    <span class="n">df_columns_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df_columns</span><span class="p">:</span>
+        <span class="n">df_columns_dict</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_rows</span> <span class="o">*</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i_band</span><span class="p">,</span> <span class="n">band</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">band_list</span><span class="p">):</span>
+        <span class="n">df_columns_dict</span><span class="p">[</span><span class="s2">&quot;decimation_level&quot;</span><span class="p">][</span><span class="n">i_band</span><span class="p">]</span> <span class="o">=</span> <span class="n">band</span><span class="o">.</span><span class="n">decimation_level</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">df_columns_dict</span><span class="p">[</span><span class="s2">&quot;lower_bound_index&quot;</span><span class="p">][</span><span class="n">i_band</span><span class="p">]</span> <span class="o">=</span> <span class="n">band</span><span class="o">.</span><span class="n">index_min</span>
+        <span class="n">df_columns_dict</span><span class="p">[</span><span class="s2">&quot;upper_bound_index&quot;</span><span class="p">][</span><span class="n">i_band</span><span class="p">]</span> <span class="o">=</span> <span class="n">band</span><span class="o">.</span><span class="n">index_max</span>
+    <span class="n">out_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df_columns_dict</span><span class="p">)</span>
+    <span class="n">out_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;lower_bound_index&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out_df</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

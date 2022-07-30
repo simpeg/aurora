@@ -1,0 +1,2525 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Build an MTH5 and Operate the Aurora Pipeline &mdash; aurora 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/plot_directive.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Build an MTH5 and Operate the Aurora Pipeline</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/operate_aurora.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+.jp-RenderedHTMLCommon thead,
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+.jp-RenderedHTMLCommon th,
+div.rendered_html th {
+  font-weight: bold;
+}
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+.jp-RenderedHTMLCommon tbody tr:hover,
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="Build-an-MTH5-and-Operate-the-Aurora-Pipeline">
+<h1>Build an MTH5 and Operate the Aurora Pipeline<a class="headerlink" href="#Build-an-MTH5-and-Operate-the-Aurora-Pipeline" title="Permalink to this heading">¶</a></h1>
+<p>This notebook pulls MT miniSEED data from the IRIS Dataselect web service and produces MTH5 out of it. It outlines the process of making an MTH5 file, generating a processing config, and running the Aurora processor.</p>
+<p>It assumes that aurora, mth5, and mt_metadata have all been installed.</p>
+<p>In this “new” version, the workflow has changed somewhat.</p>
+<ol class="arabic simple">
+<li><p>The process_mth5 call works with a dataset dataframe, rather than a single run_id</p></li>
+<li><p>The config object is now based on the mt_metadata.base Base class</p></li>
+<li><p>Remote reference processing is supported (at least in theory)</p></li>
+</ol>
+<section id="Flow-of-this-notebook">
+<h2>Flow of this notebook<a class="headerlink" href="#Flow-of-this-notebook" title="Permalink to this heading">¶</a></h2>
+<p>Section 1: Here we do imports and construct a table of the data that we will access to build the mth5. Note that there is no explanation here as to the table source – a future update can show how to create such a table from IRIS data_availability tools</p>
+<p>Seciton 2: the metadata and the data are accessed, and the mth5 is created and stored.</p>
+<p>Section 3: Aurora is used to process the data</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Use this for developing
+%load_ext autoreload
+%autoreload 2
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Required imports for the program.
+from pathlib import Path
+import pandas as pd
+import warnings
+
+from mth5.clients.make_mth5 import MakeMTH5
+from mth5 import mth5, timeseries
+from mth5.utils.helpers import initialize_mth5
+from mt_metadata.utils.mttime import get_now_utc, MTime
+from aurora.config import BANDS_DEFAULT_FILE
+from aurora.config.config_creator import ConfigCreator
+from aurora.pipelines.process_mth5 import process_mth5
+from aurora.transfer_function.kernel_dataset import KernelDataset
+from aurora.pipelines.run_summary import RunSummary
+
+warnings.filterwarnings(&#39;ignore&#39;)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2022-07-30 11:30:30,514 [line 135] mth5.setup_logger - INFO: Logging file can be found /home/kkappler/software/irismt/mth5/logs/mth5_debug.log
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Build-an-MTH5-file-from-information-extracted-by-IRIS">
+<h1>Build an MTH5 file from information extracted by IRIS<a class="headerlink" href="#Build-an-MTH5-file-from-information-extracted-by-IRIS" title="Permalink to this heading">¶</a></h1>
+<p>Set path so MTH5 file builds to current working directory.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>default_path = Path().cwd()
+default_path
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+PosixPath(&#39;/home/kkappler/software/irismt/aurora/docs/examples&#39;)
+</pre></div></div>
+</div>
+<p>Select mth5 file version</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># mth5_version = &#39;0.1.0&#39;
+mth5_version = &#39;0.2.0&#39;
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Initialize the Make MTH5 code.
+m = MakeMTH5(mth5_version=mth5_version)
+m.client = &quot;IRIS&quot;
+</pre></div>
+</div>
+</div>
+<section id="Specify-the-data-to-access-from-IRIS">
+<h2>Specify the data to access from IRIS<a class="headerlink" href="#Specify-the-data-to-access-from-IRIS" title="Permalink to this heading">¶</a></h2>
+<p>Note that here we explicitly prescribe the data, but this dataframe could be built from IRIS data availability tools in a programatic way</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Generate data frame of FDSN Network, Station, Location, Channel, Startime, Endtime codes of interest
+
+CAS04LQE = [&#39;8P&#39;, &#39;CAS04&#39;, &#39;&#39;, &#39;LQE&#39;, &#39;2020-06-02T19:00:00&#39;, &#39;2020-07-13T19:00:00&#39;]
+CAS04LQN = [&#39;8P&#39;, &#39;CAS04&#39;, &#39;&#39;, &#39;LQN&#39;, &#39;2020-06-02T19:00:00&#39;, &#39;2020-07-13T19:00:00&#39;]
+CAS04BFE = [&#39;8P&#39;, &#39;CAS04&#39;, &#39;&#39;, &#39;LFE&#39;, &#39;2020-06-02T19:00:00&#39;, &#39;2020-07-13T19:00:00&#39;]
+CAS04BFN = [&#39;8P&#39;, &#39;CAS04&#39;, &#39;&#39;, &#39;LFN&#39;, &#39;2020-06-02T19:00:00&#39;, &#39;2020-07-13T19:00:00&#39;]
+CAS04BFZ = [&#39;8P&#39;, &#39;CAS04&#39;, &#39;&#39;, &#39;LFZ&#39;, &#39;2020-06-02T19:00:00&#39;, &#39;2020-07-13T19:00:00&#39;]
+
+request_list = [CAS04LQE, CAS04LQN, CAS04BFE, CAS04BFN, CAS04BFZ]
+
+# Turn list into dataframe
+request_df =  pd.DataFrame(request_list, columns=m.column_names)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Inspect the dataframe
+print(request_df)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+  network station location channel                start                  end
+0      8P   CAS04              LQE  2020-06-02T19:00:00  2020-07-13T19:00:00
+1      8P   CAS04              LQN  2020-06-02T19:00:00  2020-07-13T19:00:00
+2      8P   CAS04              LFE  2020-06-02T19:00:00  2020-07-13T19:00:00
+3      8P   CAS04              LFN  2020-06-02T19:00:00  2020-07-13T19:00:00
+4      8P   CAS04              LFZ  2020-06-02T19:00:00  2020-07-13T19:00:00
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Request the inventory information from IRIS
+inventory = m.get_inventory_from_df(request_df, data=False)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Inspect the inventory
+inventory
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(Inventory created at 2022-07-30T18:30:35.613350Z
+        Created by: ObsPy 1.2.2
+                    https://www.obspy.org
+        Sending institution: MTH5
+        Contains:
+                Networks (1):
+                        8P
+                Stations (1):
+                        8P.CAS04 (Corral Hollow, CA, USA)
+                Channels (8):
+                        8P.CAS04..LFZ, 8P.CAS04..LFN, 8P.CAS04..LFE, 8P.CAS04..LQN (2x),
+                        8P.CAS04..LQE (3x),
+ 0 Trace(s) in Stream:
+)
+</pre></div></div>
+</div>
+<p>Builds an MTH5 file from the user defined database.</p>
+<p>With the mth5 object set, we are ready to actually request the data from the fdsn client (IRIS) and save it to an MTH5 file. This process builds an MTH5 file and can take some time depending on how much data is requested.</p>
+<p>Note: <code class="docutils literal notranslate"><span class="pre">interact</span></code> keeps the MTH5 open after it is done building</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>interact = True
+mth5_object = m.make_mth5_from_fdsnclient(request_df, interact=interact)
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2022-07-30 11:30:37,429 [line 591] mth5.mth5.MTH5.open_mth5 - WARNING: 8P_CAS04.h5 will be overwritten in &#39;w&#39; mode
+2022-07-30 11:30:37,847 [line 656] mth5.mth5.MTH5._initialize_file - INFO: Initialized MTH5 0.2.0 file /home/kkappler/software/irismt/aurora/docs/examples/8P_CAS04.h5 in mode w
+2022-07-30 11:30:47,546 [line 121] mt_metadata.base.metadata.station.add_run - WARNING: Run a is being overwritten with current information
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2022-07-30T11:30:47 [line 136] obspy_stages.create_filter_from_stage - INFO: Converting PoleZerosResponseStage electric_si_units to a CoefficientFilter
+2022-07-30T11:30:47 [line 136] obspy_stages.create_filter_from_stage - INFO: Converting PoleZerosResponseStage electric_dipole_92.000 to a CoefficientFilter
+2022-07-30T11:30:47 [line 136] obspy_stages.create_filter_from_stage - INFO: Converting PoleZerosResponseStage electric_si_units to a CoefficientFilter
+2022-07-30T11:30:47 [line 136] obspy_stages.create_filter_from_stage - INFO: Converting PoleZerosResponseStage electric_dipole_92.000 to a CoefficientFilter
+2022-07-30T11:30:47 [line 136] obspy_stages.create_filter_from_stage - INFO: Converting PoleZerosResponseStage electric_si_units to a CoefficientFilter
+2022-07-30T11:30:47 [line 136] obspy_stages.create_filter_from_stage - INFO: Converting PoleZerosResponseStage electric_dipole_92.000 to a CoefficientFilter
+2022-07-30T11:30:47 [line 136] obspy_stages.create_filter_from_stage - INFO: Converting PoleZerosResponseStage electric_si_units to a CoefficientFilter
+2022-07-30T11:30:47 [line 136] obspy_stages.create_filter_from_stage - INFO: Converting PoleZerosResponseStage electric_dipole_92.000 to a CoefficientFilter
+2022-07-30T11:30:47 [line 136] obspy_stages.create_filter_from_stage - INFO: Converting PoleZerosResponseStage electric_si_units to a CoefficientFilter
+2022-07-30T11:30:47 [line 136] obspy_stages.create_filter_from_stage - INFO: Converting PoleZerosResponseStage electric_dipole_92.000 to a CoefficientFilter
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2022-07-30 11:30:50,112 [line 746] mth5.groups.base.Station.add_run - INFO: run a already exists, returning existing group.
+2022-07-30 11:30:50,405 [line 224] mth5.timeseries.run_ts.RunTS.validate_metadata - WARNING: start time of dataset 2020-06-02T19:00:00+00:00 does not match metadata start 2020-06-02T18:41:43+00:00 updating metatdata value to 2020-06-02T19:00:00+00:00
+2022-07-30 11:30:57,074 [line 746] mth5.groups.base.Station.add_run - INFO: run b already exists, returning existing group.
+2022-07-30 11:31:05,704 [line 746] mth5.groups.base.Station.add_run - INFO: run c already exists, returning existing group.
+2022-07-30 11:31:15,744 [line 746] mth5.groups.base.Station.add_run - INFO: run d already exists, returning existing group.
+2022-07-30 11:31:16,946 [line 235] mth5.timeseries.run_ts.RunTS.validate_metadata - WARNING: end time of dataset 2020-07-13T19:00:00+00:00 does not match metadata end 2020-07-13T21:46:12+00:00 updating metatdata value to 2020-07-13T19:00:00+00:00
+</pre></div></div>
+</div>
+</section>
+<section id="Examine-and-Update-the-MTH5-object">
+<h2>Examine and Update the MTH5 object<a class="headerlink" href="#Examine-and-Update-the-MTH5-object" title="Permalink to this heading">¶</a></h2>
+<p>With the open MTH5 Object, we can start to examine what is in it. For example, retrieve the filename and file_version. You can additionally do things such as getting the station information and edit it by setting a new value, in this case the declination model.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>mth5_path = mth5_object.filename
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>mth5_object
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+/:
+====================
+    |- Group: Experiment
+    --------------------
+        |- Group: Reports
+        -----------------
+        |- Group: Standards
+        -------------------
+            --&gt; Dataset: summary
+            ......................
+        |- Group: Surveys
+        -----------------
+            |- Group: CONUS_South
+            ---------------------
+                |- Group: Filters
+                -----------------
+                    |- Group: coefficient
+                    ---------------------
+                        |- Group: electric_analog_to_digital
+                        ------------------------------------
+                        |- Group: electric_dipole_92.000
+                        --------------------------------
+                        |- Group: electric_si_units
+                        ---------------------------
+                        |- Group: magnetic_analog_to_digital
+                        ------------------------------------
+                    |- Group: fap
+                    -------------
+                    |- Group: fir
+                    -------------
+                    |- Group: time_delay
+                    --------------------
+                        |- Group: electric_time_offset
+                        ------------------------------
+                        |- Group: hx_time_offset
+                        ------------------------
+                        |- Group: hy_time_offset
+                        ------------------------
+                        |- Group: hz_time_offset
+                        ------------------------
+                    |- Group: zpk
+                    -------------
+                        |- Group: electric_butterworth_high_pass
+                        ----------------------------------------
+                            --&gt; Dataset: poles
+                            ....................
+                            --&gt; Dataset: zeros
+                            ....................
+                        |- Group: electric_butterworth_low_pass
+                        ---------------------------------------
+                            --&gt; Dataset: poles
+                            ....................
+                            --&gt; Dataset: zeros
+                            ....................
+                        |- Group: magnetic_butterworth_low_pass
+                        ---------------------------------------
+                            --&gt; Dataset: poles
+                            ....................
+                            --&gt; Dataset: zeros
+                            ....................
+                |- Group: Reports
+                -----------------
+                |- Group: Standards
+                -------------------
+                    --&gt; Dataset: summary
+                    ......................
+                |- Group: Stations
+                ------------------
+                    |- Group: CAS04
+                    ---------------
+                        |- Group: Transfer_Functions
+                        ----------------------------
+                        |- Group: a
+                        -----------
+                            --&gt; Dataset: ex
+                            .................
+                            --&gt; Dataset: ey
+                            .................
+                            --&gt; Dataset: hx
+                            .................
+                            --&gt; Dataset: hy
+                            .................
+                            --&gt; Dataset: hz
+                            .................
+                        |- Group: b
+                        -----------
+                            --&gt; Dataset: ex
+                            .................
+                            --&gt; Dataset: ey
+                            .................
+                            --&gt; Dataset: hx
+                            .................
+                            --&gt; Dataset: hy
+                            .................
+                            --&gt; Dataset: hz
+                            .................
+                        |- Group: c
+                        -----------
+                            --&gt; Dataset: ex
+                            .................
+                            --&gt; Dataset: ey
+                            .................
+                            --&gt; Dataset: hx
+                            .................
+                            --&gt; Dataset: hy
+                            .................
+                            --&gt; Dataset: hz
+                            .................
+                        |- Group: d
+                        -----------
+                            --&gt; Dataset: ex
+                            .................
+                            --&gt; Dataset: ey
+                            .................
+                            --&gt; Dataset: hx
+                            .................
+                            --&gt; Dataset: hy
+                            .................
+                            --&gt; Dataset: hz
+                            .................
+        --&gt; Dataset: channel_summary
+        ..............................
+        --&gt; Dataset: tf_summary
+        .........................
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>mth5_object.file_version
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#39;0.2.0&#39;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>mth5_object.close_mth5()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2022-07-30 11:31:44,070 [line 731] mth5.mth5.MTH5.close_mth5 - INFO: Flushing and closing /home/kkappler/software/irismt/aurora/docs/examples/8P_CAS04.h5
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>mth5_object = initialize_mth5(mth5_path)
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Need-documentation:">
+<h2>Need documentation:<a class="headerlink" href="#Need-documentation:" title="Permalink to this heading">¶</a></h2>
+<p>Is the cell below required? Or is it an example of some metadata specification?</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Edit and update the MTH5 metadata
+s = mth5_object.get_station(&quot;CAS04&quot;, survey=&quot;CONUS_South&quot;)
+print(s.metadata.location.declination.model)
+s.metadata.location.declination.model = &#39;IGRF&#39;
+print(s.metadata.location.declination.model)
+s.write_metadata()    # writes to file mth5_filename
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+IGRF-13
+IGRF
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Print some info about the mth5
+mth5_filename = mth5_object.filename
+version = mth5_object.file_version
+print(f&quot; Filename: {mth5_filename} \n Version: {version}&quot;)
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ Filename: /home/kkappler/software/irismt/aurora/docs/examples/8P_CAS04.h5
+ Version: 0.2.0
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Get the available stations and runs from the MTH5 object
+mth5_object.channel_summary.summarize()
+ch_summary = mth5_object.channel_summary.to_dataframe()
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="If-MTH5-file-already-exists-you-can-start-here">
+<h1>If MTH5 file already exists you can start here<a class="headerlink" href="#If-MTH5-file-already-exists-you-can-start-here" title="Permalink to this heading">¶</a></h1>
+<p>If you dont want to execute the previous code to get data again</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>interact = False
+if interact:
+    pass
+else:
+    h5_path = default_path.joinpath(&quot;8P_CAS04.h5&quot;)
+    mth5_object = initialize_mth5(h5_path, mode=&quot;a&quot;, file_version=mth5_version)
+    ch_summary = mth5_object.channel_summary.to_dataframe()
+<br/><br/></pre></div>
+</div>
+</div>
+<section id="Generate-an-Aurora-Configuration-file-using-MTH5-as-an-input">
+<h2>Generate an Aurora Configuration file using MTH5 as an input<a class="headerlink" href="#Generate-an-Aurora-Configuration-file-using-MTH5-as-an-input" title="Permalink to this heading">¶</a></h2>
+<p>Up to this point, we have used mth5 and mt_metadata, but haven’t yet used aurora. So we will use the MTH5 that we just created (and examined and updated) as input into Aurora.</p>
+</section>
+<section id="Channel-Summary">
+<h2>Channel Summary<a class="headerlink" href="#Channel-Summary" title="Permalink to this heading">¶</a></h2>
+<p>This is a very useful datastructure inside the mth5. It acts basically like an index of available data at the channel-run level, i.e. there is one row for every contiguous chunk of time-series recorded by an electric dipole or magnetometer</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>ch_summary
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survey</th>
+      <th>station</th>
+      <th>run</th>
+      <th>latitude</th>
+      <th>longitude</th>
+      <th>elevation</th>
+      <th>component</th>
+      <th>start</th>
+      <th>end</th>
+      <th>n_samples</th>
+      <th>sample_rate</th>
+      <th>measurement_type</th>
+      <th>azimuth</th>
+      <th>tilt</th>
+      <th>units</th>
+      <th>hdf5_reference</th>
+      <th>run_hdf5_reference</th>
+      <th>station_hdf5_reference</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>a</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>329.3875</td>
+      <td>ex</td>
+      <td>2020-06-02 19:00:00+00:00</td>
+      <td>2020-06-02 22:07:46+00:00</td>
+      <td>11267</td>
+      <td>1.0</td>
+      <td>electric</td>
+      <td>13.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>a</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>329.3875</td>
+      <td>ey</td>
+      <td>2020-06-02 19:00:00+00:00</td>
+      <td>2020-06-02 22:07:46+00:00</td>
+      <td>11267</td>
+      <td>1.0</td>
+      <td>electric</td>
+      <td>103.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>a</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>329.3875</td>
+      <td>hx</td>
+      <td>2020-06-02 19:00:00+00:00</td>
+      <td>2020-06-02 22:07:46+00:00</td>
+      <td>11267</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>13.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>a</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>329.3875</td>
+      <td>hy</td>
+      <td>2020-06-02 19:00:00+00:00</td>
+      <td>2020-06-02 22:07:46+00:00</td>
+      <td>11267</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>103.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>a</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>329.3875</td>
+      <td>hz</td>
+      <td>2020-06-02 19:00:00+00:00</td>
+      <td>2020-06-02 22:07:46+00:00</td>
+      <td>11267</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>0.0</td>
+      <td>90.0</td>
+      <td>digital counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>b</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>329.3875</td>
+      <td>ex</td>
+      <td>2020-06-02 22:24:55+00:00</td>
+      <td>2020-06-12 17:52:23+00:00</td>
+      <td>847649</td>
+      <td>1.0</td>
+      <td>electric</td>
+      <td>13.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>b</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>329.3875</td>
+      <td>ey</td>
+      <td>2020-06-02 22:24:55+00:00</td>
+      <td>2020-06-12 17:52:23+00:00</td>
+      <td>847649</td>
+      <td>1.0</td>
+      <td>electric</td>
+      <td>103.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>b</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>329.3875</td>
+      <td>hx</td>
+      <td>2020-06-02 22:24:55+00:00</td>
+      <td>2020-06-12 17:52:23+00:00</td>
+      <td>847649</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>13.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>b</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>329.3875</td>
+      <td>hy</td>
+      <td>2020-06-02 22:24:55+00:00</td>
+      <td>2020-06-12 17:52:23+00:00</td>
+      <td>847649</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>103.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>b</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>329.3875</td>
+      <td>hz</td>
+      <td>2020-06-02 22:24:55+00:00</td>
+      <td>2020-06-12 17:52:23+00:00</td>
+      <td>847649</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>0.0</td>
+      <td>90.0</td>
+      <td>digital counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>c</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>329.3875</td>
+      <td>ex</td>
+      <td>2020-06-12 18:32:17+00:00</td>
+      <td>2020-07-01 17:32:59+00:00</td>
+      <td>1638043</td>
+      <td>1.0</td>
+      <td>electric</td>
+      <td>13.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>c</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>329.3875</td>
+      <td>ey</td>
+      <td>2020-06-12 18:32:17+00:00</td>
+      <td>2020-07-01 17:32:59+00:00</td>
+      <td>1638043</td>
+      <td>1.0</td>
+      <td>electric</td>
+      <td>103.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>c</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>329.3875</td>
+      <td>hx</td>
+      <td>2020-06-12 18:32:17+00:00</td>
+      <td>2020-07-01 17:32:59+00:00</td>
+      <td>1638043</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>13.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>c</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>329.3875</td>
+      <td>hy</td>
+      <td>2020-06-12 18:32:17+00:00</td>
+      <td>2020-07-01 17:32:59+00:00</td>
+      <td>1638043</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>103.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>c</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>329.3875</td>
+      <td>hz</td>
+      <td>2020-06-12 18:32:17+00:00</td>
+      <td>2020-07-01 17:32:59+00:00</td>
+      <td>1638043</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>0.0</td>
+      <td>90.0</td>
+      <td>digital counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>d</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>329.3875</td>
+      <td>ex</td>
+      <td>2020-07-01 19:36:55+00:00</td>
+      <td>2020-07-13 19:00:00+00:00</td>
+      <td>1034586</td>
+      <td>1.0</td>
+      <td>electric</td>
+      <td>13.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>d</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>329.3875</td>
+      <td>ey</td>
+      <td>2020-07-01 19:36:55+00:00</td>
+      <td>2020-07-13 19:00:00+00:00</td>
+      <td>1034586</td>
+      <td>1.0</td>
+      <td>electric</td>
+      <td>103.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>d</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>329.3875</td>
+      <td>hx</td>
+      <td>2020-07-01 19:36:55+00:00</td>
+      <td>2020-07-13 19:00:00+00:00</td>
+      <td>1034586</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>13.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>d</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>329.3875</td>
+      <td>hy</td>
+      <td>2020-07-01 19:36:55+00:00</td>
+      <td>2020-07-13 19:00:00+00:00</td>
+      <td>1034586</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>103.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>d</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>329.3875</td>
+      <td>hz</td>
+      <td>2020-07-01 19:36:55+00:00</td>
+      <td>2020-07-13 19:00:00+00:00</td>
+      <td>1034586</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>0.0</td>
+      <td>90.0</td>
+      <td>digital counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>The Channel summary has a lot of uses, below we use it to check if the data have mixed sample rates, and to get a list of available stations</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>available_runs = ch_summary.run.unique()
+sr = ch_summary.sample_rate.unique()
+if len(sr) != 1:
+    print(&#39;Only one sample rate per run is available&#39;)
+
+available_stations = ch_summary.station.unique()
+print(f&quot;Available stations: {available_stations}&quot;)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Available stations: [&#39;CAS04&#39;]
+</pre></div></div>
+</div>
+</section>
+<section id="Run-Summary">
+<h2>Run Summary<a class="headerlink" href="#Run-Summary" title="Permalink to this heading">¶</a></h2>
+<p>A cousin of the channel summary is the Run Summary. This is a condensed version of the channel summary, with one row per continuous acquistion run at a station.</p>
+<p>The run summary can be accessed from an open mth5 object as in the example below</p>
+</section>
+<section id="Now,-we-condense-the-channel-summary-into-a-run_summary.">
+<h2>Now, we condense the channel summary into a run_summary.<a class="headerlink" href="#Now,-we-condense-the-channel-summary-into-a-run_summary." title="Permalink to this heading">¶</a></h2>
+<p>This method takes an iterable of mth5_objs or h5_paths</p>
+<p>Or it can be accessed by pointing at a file:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>mth5_run_summary = RunSummary()
+h5_path = default_path.joinpath(&quot;8P_CAS04.h5&quot;)
+mth5_run_summary.from_mth5s([h5_path,])
+run_summary = mth5_run_summary.clone()
+run_summary.df
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2022-07-30 12:10:04,120 [line 731] mth5.mth5.MTH5.close_mth5 - INFO: Flushing and closing /home/kkappler/software/irismt/aurora/docs/examples/8P_CAS04.h5
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survey</th>
+      <th>station_id</th>
+      <th>run_id</th>
+      <th>start</th>
+      <th>end</th>
+      <th>sample_rate</th>
+      <th>input_channels</th>
+      <th>output_channels</th>
+      <th>channel_scale_factors</th>
+      <th>mth5_path</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>a</td>
+      <td>2020-06-02 19:00:00+00:00</td>
+      <td>2020-06-02 22:07:46+00:00</td>
+      <td>1.0</td>
+      <td>[hx, hy]</td>
+      <td>[ex, ey, hz]</td>
+      <td>{'ex': 1.0, 'ey': 1.0, 'hx': 1.0, 'hy': 1.0, '...</td>
+      <td>/home/kkappler/software/irismt/aurora/docs/exa...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>b</td>
+      <td>2020-06-02 22:24:55+00:00</td>
+      <td>2020-06-12 17:52:23+00:00</td>
+      <td>1.0</td>
+      <td>[hx, hy]</td>
+      <td>[ex, ey, hz]</td>
+      <td>{'ex': 1.0, 'ey': 1.0, 'hx': 1.0, 'hy': 1.0, '...</td>
+      <td>/home/kkappler/software/irismt/aurora/docs/exa...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>c</td>
+      <td>2020-06-12 18:32:17+00:00</td>
+      <td>2020-07-01 17:32:59+00:00</td>
+      <td>1.0</td>
+      <td>[hx, hy]</td>
+      <td>[ex, ey, hz]</td>
+      <td>{'ex': 1.0, 'ey': 1.0, 'hx': 1.0, 'hy': 1.0, '...</td>
+      <td>/home/kkappler/software/irismt/aurora/docs/exa...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>d</td>
+      <td>2020-07-01 19:36:55+00:00</td>
+      <td>2020-07-13 19:00:00+00:00</td>
+      <td>1.0</td>
+      <td>[hx, hy]</td>
+      <td>[ex, ey, hz]</td>
+      <td>{'ex': 1.0, 'ey': 1.0, 'hx': 1.0, 'hy': 1.0, '...</td>
+      <td>/home/kkappler/software/irismt/aurora/docs/exa...</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Now we have a dataframe of the available runs to process from the MTH5</p>
+<p>Here are the columns available in the run summary</p>
+</section>
+<section id="If-the-mth5-file-is-closed,-you-can-get-the-run-summary-this-way">
+<h2>If the mth5 file is closed, you can get the run summary this way<a class="headerlink" href="#If-the-mth5-file-is-closed,-you-can-get-the-run-summary-this-way" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="Here-are-the-columns-to-look-at-to-get-a-sense-of-the-data-coverage">
+<h2>Here are the columns to look at to get a sense of the data coverage<a class="headerlink" href="#Here-are-the-columns-to-look-at-to-get-a-sense-of-the-data-coverage" title="Permalink to this heading">¶</a></h2>
+<p>Sometimes we just want to look at the survey, station, run, and time intervals we can for that we can call mini_summary</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>run_summary.mini_summary
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survey</th>
+      <th>station_id</th>
+      <th>run_id</th>
+      <th>start</th>
+      <th>end</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>a</td>
+      <td>2020-06-02 19:00:00+00:00</td>
+      <td>2020-06-02 22:07:46+00:00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>b</td>
+      <td>2020-06-02 22:24:55+00:00</td>
+      <td>2020-06-12 17:52:23+00:00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>c</td>
+      <td>2020-06-12 18:32:17+00:00</td>
+      <td>2020-07-01 17:32:59+00:00</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>d</td>
+      <td>2020-07-01 19:36:55+00:00</td>
+      <td>2020-07-13 19:00:00+00:00</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Kernel-Dataset">
+<h2>Kernel Dataset<a class="headerlink" href="#Kernel-Dataset" title="Permalink to this heading">¶</a></h2>
+<p>This is like a run summary, but for a single station or a pair of stations. It is used to specify the inputs to aurora processing.</p>
+<p>It takes a run_summary and a station name, and optionally, a remote reference station name</p>
+<p>It is made <em>based on the available data</em>.</p>
+<p>Syntax is kernel_dataset.from_run_summary(run_summary, local_station_id, reference_station_id)</p>
+</section>
+<section id="Here-are-the-columns-in-the-run-summary">
+<h2>Here are the columns in the run summary<a class="headerlink" href="#Here-are-the-columns-in-the-run-summary" title="Permalink to this heading">¶</a></h2>
+<p>By Default, all runs will be processed</p>
+<p>To restrict to processing a single run, or a list of runs, we can either tell KernelDataset to keep or drop a station_run dictionary.</p>
+<p>To restrict to processing a single run, or a list of runs, we can either tell KernelDataset to keep or drop a station_run dictionary.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(run_summary.df.columns)
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>coverage_short_list_columns = [&#39;station_id&#39;, &#39;run_id&#39;, &#39;start&#39;, &#39;end&#39;, ]
+print(run_summary.df[coverage_short_list_columns])
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[54]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>kernel_dataset = KernelDataset()
+kernel_dataset.from_run_summary(run_summary, &quot;CAS04&quot;)
+kernel_dataset.mini_summary
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[54]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survey</th>
+      <th>station_id</th>
+      <th>run_id</th>
+      <th>start</th>
+      <th>end</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>a</td>
+      <td>2020-06-02 19:00:00+00:00</td>
+      <td>2020-06-02 22:07:46+00:00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>b</td>
+      <td>2020-06-02 22:24:55+00:00</td>
+      <td>2020-06-12 17:52:23+00:00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>c</td>
+      <td>2020-06-12 18:32:17+00:00</td>
+      <td>2020-07-01 17:32:59+00:00</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>d</td>
+      <td>2020-07-01 19:36:55+00:00</td>
+      <td>2020-07-13 19:00:00+00:00</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+</section>
+<section id="Here-is-one-way-to-select-a-single-run:">
+<h1>Here is one way to select a single run:<a class="headerlink" href="#Here-is-one-way-to-select-a-single-run:" title="Permalink to this heading">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[55]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>station_runs_dict = {}
+station_runs_dict[&quot;CAS04&quot;] = [&quot;a&quot;, ]
+keep_or_drop = &quot;keep&quot;
+
+kernel_dataset.select_station_runs(station_runs_dict, keep_or_drop)
+print(kernel_dataset.df[coverage_short_list_columns])
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+  station_id run_id                     start                       end
+0      CAS04      a 2020-06-02 19:00:00+00:00 2020-06-02 22:07:46+00:00
+</pre></div></div>
+</div>
+</section>
+<section id="To-discard-runs-that-are-not-very-long">
+<h1>To discard runs that are not very long<a class="headerlink" href="#To-discard-runs-that-are-not-very-long" title="Permalink to this heading">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[56]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>kernel_dataset = KernelDataset()
+kernel_dataset.from_run_summary(run_summary, &quot;CAS04&quot;)
+cutoff_duration_in_seconds = 15000
+kernel_dataset.drop_runs_shorter_than(cutoff_duration_in_seconds)
+print(kernel_dataset.df[coverage_short_list_columns])
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+  station_id run_id                     start                       end
+0      CAS04      b 2020-06-02 22:24:55+00:00 2020-06-12 17:52:23+00:00
+1      CAS04      c 2020-06-12 18:32:17+00:00 2020-07-01 17:32:59+00:00
+2      CAS04      d 2020-07-01 19:36:55+00:00 2020-07-13 19:00:00+00:00
+</pre></div></div>
+</div>
+<section id="Select-only-runs-“b”-&amp;-“d”">
+<h2>Select only runs “b” &amp; “d”<a class="headerlink" href="#Select-only-runs-“b”-&-“d”" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[57]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>kernel_dataset = KernelDataset()
+kernel_dataset.from_run_summary(run_summary, &quot;CAS04&quot;)
+station_runs_dict = {}
+station_runs_dict[&quot;CAS04&quot;] = [&quot;b&quot;,&quot;d&quot;]
+keep_or_drop = &quot;keep&quot;
+kernel_dataset.select_station_runs(station_runs_dict, keep_or_drop)
+print(kernel_dataset.df[coverage_short_list_columns])
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+  station_id run_id                     start                       end
+0      CAS04      b 2020-06-02 22:24:55+00:00 2020-06-12 17:52:23+00:00
+1      CAS04      d 2020-07-01 19:36:55+00:00 2020-07-13 19:00:00+00:00
+</pre></div></div>
+</div>
+</section>
+<section id="The-same-result-can-be-obtained-by-excluding-runs-a-&amp;-c">
+<h2>The same result can be obtained by <em>excluding</em> runs a &amp; c<a class="headerlink" href="#The-same-result-can-be-obtained-by-excluding-runs-a-&-c" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[58]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>kernel_dataset = KernelDataset()
+kernel_dataset.from_run_summary(run_summary, &quot;CAS04&quot;)
+station_runs_dict = {}
+station_runs_dict[&quot;CAS04&quot;] = [&quot;a&quot;,&quot;c&quot;]
+keep_or_drop = &quot;drop&quot;
+kernel_dataset.select_station_runs(station_runs_dict, keep_or_drop)
+print(kernel_dataset.df[coverage_short_list_columns])
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+  station_id run_id                     start                       end
+0      CAS04      b 2020-06-02 22:24:55+00:00 2020-06-12 17:52:23+00:00
+1      CAS04      d 2020-07-01 19:36:55+00:00 2020-07-13 19:00:00+00:00
+</pre></div></div>
+</div>
+<p>Make an aurora configuration file (and then save that json file.)</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[59]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>cc = ConfigCreator()#config_path=CONFIG_PATH)
+config = cc.create_run_processing_object(emtf_band_file=BANDS_DEFAULT_FILE,
+                                    sample_rate=sr[0]
+                                    )
+config.stations.from_dataset_dataframe(kernel_dataset.df)
+for decimation in config.decimations:
+    decimation.estimator.engine = &quot;RME&quot;
+</pre></div>
+</div>
+</div>
+<p>Take a look at the config:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[60]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>config
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[60]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+    &#34;processing&#34;: {
+        &#34;decimations&#34;: [
+            {
+                &#34;decimation_level&#34;: {
+                    &#34;anti_alias_filter&#34;: &#34;default&#34;,
+                    &#34;bands&#34;: [
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 30,
+                                &#34;index_min&#34;: 25
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 24,
+                                &#34;index_min&#34;: 20
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 19,
+                                &#34;index_min&#34;: 16
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 15,
+                                &#34;index_min&#34;: 13
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 12,
+                                &#34;index_min&#34;: 10
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 9,
+                                &#34;index_min&#34;: 8
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 7,
+                                &#34;index_min&#34;: 6
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 5,
+                                &#34;index_min&#34;: 5
+                            }
+                        }
+                    ],
+                    &#34;decimation.factor&#34;: 1.0,
+                    &#34;decimation.level&#34;: 0,
+                    &#34;decimation.method&#34;: &#34;default&#34;,
+                    &#34;decimation.sample_rate&#34;: 1.0,
+                    &#34;estimator.engine&#34;: &#34;RME&#34;,
+                    &#34;estimator.estimate_per_channel&#34;: true,
+                    &#34;extra_pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;input_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;output_channels&#34;: [
+                        &#34;hz&#34;,
+                        &#34;ex&#34;,
+                        &#34;ey&#34;
+                    ],
+                    &#34;prewhitening_type&#34;: &#34;first difference&#34;,
+                    &#34;reference_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;regression.max_iterations&#34;: 10,
+                    &#34;regression.max_redescending_iterations&#34;: 2,
+                    &#34;regression.minimum_cycles&#34;: 10,
+                    &#34;window.clock_zero_type&#34;: &#34;ignore&#34;,
+                    &#34;window.num_samples&#34;: 128,
+                    &#34;window.overlap&#34;: 32,
+                    &#34;window.type&#34;: &#34;boxcar&#34;
+                }
+            },
+            {
+                &#34;decimation_level&#34;: {
+                    &#34;anti_alias_filter&#34;: &#34;default&#34;,
+                    &#34;bands&#34;: [
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 17,
+                                &#34;index_min&#34;: 14
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 13,
+                                &#34;index_min&#34;: 11
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 10,
+                                &#34;index_min&#34;: 9
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 8,
+                                &#34;index_min&#34;: 7
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 6,
+                                &#34;index_min&#34;: 6
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 5,
+                                &#34;index_min&#34;: 5
+                            }
+                        }
+                    ],
+                    &#34;decimation.factor&#34;: 4.0,
+                    &#34;decimation.level&#34;: 1,
+                    &#34;decimation.method&#34;: &#34;default&#34;,
+                    &#34;decimation.sample_rate&#34;: 0.25,
+                    &#34;estimator.engine&#34;: &#34;RME&#34;,
+                    &#34;estimator.estimate_per_channel&#34;: true,
+                    &#34;extra_pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;input_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;output_channels&#34;: [
+                        &#34;hz&#34;,
+                        &#34;ex&#34;,
+                        &#34;ey&#34;
+                    ],
+                    &#34;prewhitening_type&#34;: &#34;first difference&#34;,
+                    &#34;reference_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;regression.max_iterations&#34;: 10,
+                    &#34;regression.max_redescending_iterations&#34;: 2,
+                    &#34;regression.minimum_cycles&#34;: 10,
+                    &#34;window.clock_zero_type&#34;: &#34;ignore&#34;,
+                    &#34;window.num_samples&#34;: 128,
+                    &#34;window.overlap&#34;: 32,
+                    &#34;window.type&#34;: &#34;boxcar&#34;
+                }
+            },
+            {
+                &#34;decimation_level&#34;: {
+                    &#34;anti_alias_filter&#34;: &#34;default&#34;,
+                    &#34;bands&#34;: [
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 17,
+                                &#34;index_min&#34;: 14
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 13,
+                                &#34;index_min&#34;: 11
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 10,
+                                &#34;index_min&#34;: 9
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 8,
+                                &#34;index_min&#34;: 7
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 6,
+                                &#34;index_min&#34;: 6
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 5,
+                                &#34;index_min&#34;: 5
+                            }
+                        }
+                    ],
+                    &#34;decimation.factor&#34;: 4.0,
+                    &#34;decimation.level&#34;: 2,
+                    &#34;decimation.method&#34;: &#34;default&#34;,
+                    &#34;decimation.sample_rate&#34;: 0.0625,
+                    &#34;estimator.engine&#34;: &#34;RME&#34;,
+                    &#34;estimator.estimate_per_channel&#34;: true,
+                    &#34;extra_pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;input_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;output_channels&#34;: [
+                        &#34;hz&#34;,
+                        &#34;ex&#34;,
+                        &#34;ey&#34;
+                    ],
+                    &#34;prewhitening_type&#34;: &#34;first difference&#34;,
+                    &#34;reference_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;regression.max_iterations&#34;: 10,
+                    &#34;regression.max_redescending_iterations&#34;: 2,
+                    &#34;regression.minimum_cycles&#34;: 10,
+                    &#34;window.clock_zero_type&#34;: &#34;ignore&#34;,
+                    &#34;window.num_samples&#34;: 128,
+                    &#34;window.overlap&#34;: 32,
+                    &#34;window.type&#34;: &#34;boxcar&#34;
+                }
+            },
+            {
+                &#34;decimation_level&#34;: {
+                    &#34;anti_alias_filter&#34;: &#34;default&#34;,
+                    &#34;bands&#34;: [
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 22,
+                                &#34;index_min&#34;: 18
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 17,
+                                &#34;index_min&#34;: 14
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 13,
+                                &#34;index_min&#34;: 10
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 9,
+                                &#34;index_min&#34;: 7
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0,
+                                &#34;frequency_min&#34;: 0,
+                                &#34;index_max&#34;: 6,
+                                &#34;index_min&#34;: 5
+                            }
+                        }
+                    ],
+                    &#34;decimation.factor&#34;: 4.0,
+                    &#34;decimation.level&#34;: 3,
+                    &#34;decimation.method&#34;: &#34;default&#34;,
+                    &#34;decimation.sample_rate&#34;: 0.015625,
+                    &#34;estimator.engine&#34;: &#34;RME&#34;,
+                    &#34;estimator.estimate_per_channel&#34;: true,
+                    &#34;extra_pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;input_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;output_channels&#34;: [
+                        &#34;hz&#34;,
+                        &#34;ex&#34;,
+                        &#34;ey&#34;
+                    ],
+                    &#34;prewhitening_type&#34;: &#34;first difference&#34;,
+                    &#34;reference_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;regression.max_iterations&#34;: 10,
+                    &#34;regression.max_redescending_iterations&#34;: 2,
+                    &#34;regression.minimum_cycles&#34;: 10,
+                    &#34;window.clock_zero_type&#34;: &#34;ignore&#34;,
+                    &#34;window.num_samples&#34;: 128,
+                    &#34;window.overlap&#34;: 32,
+                    &#34;window.type&#34;: &#34;boxcar&#34;
+                }
+            }
+        ],
+        &#34;id&#34;: &#34;None-None&#34;,
+        &#34;stations.local.id&#34;: &#34;CAS04&#34;,
+        &#34;stations.local.mth5_path&#34;: &#34;/home/kkappler/software/irismt/aurora/docs/examples/8P_CAS04.h5&#34;,
+        &#34;stations.local.remote&#34;: false,
+        &#34;stations.local.runs&#34;: [
+            {
+                &#34;run&#34;: {
+                    &#34;id&#34;: &#34;b&#34;,
+                    &#34;input_channels&#34;: [
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hx&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hy&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        }
+                    ],
+                    &#34;output_channels&#34;: [
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;ex&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;ey&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hz&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        }
+                    ],
+                    &#34;sample_rate&#34;: 1.0,
+                    &#34;time_periods&#34;: [
+                        {
+                            &#34;time_period&#34;: {
+                                &#34;end&#34;: &#34;2020-06-12T17:52:23+00:00&#34;,
+                                &#34;start&#34;: &#34;2020-06-02T22:24:55+00:00&#34;
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                &#34;run&#34;: {
+                    &#34;id&#34;: &#34;d&#34;,
+                    &#34;input_channels&#34;: [
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hx&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hy&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        }
+                    ],
+                    &#34;output_channels&#34;: [
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;ex&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;ey&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hz&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        }
+                    ],
+                    &#34;sample_rate&#34;: 1.0,
+                    &#34;time_periods&#34;: [
+                        {
+                            &#34;time_period&#34;: {
+                                &#34;end&#34;: &#34;2020-07-13T19:00:00+00:00&#34;,
+                                &#34;start&#34;: &#34;2020-07-01T19:36:55+00:00&#34;
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        &#34;stations.remote&#34;: []
+    }
+}
+</pre></div></div>
+</div>
+<p>Run the Aurora Pipeline using the input MTh5 and Confiugration File</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[61]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>show_plot = True
+tf_cls = process_mth5(config,
+                    kernel_dataset,
+                    units=&quot;MT&quot;,
+                    show_plot=show_plot,
+                    z_file_path=None,
+                    return_collection=False
+                )
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Processing config indicates 4 decimation levels
+Processing band 25.728968s
+Processing band 19.929573s
+Processing band 15.164131s
+Processing band 11.746086s
+Processing band 9.195791s
+Processing band 7.362526s
+Processing band 5.856115s
+Processing band 4.682492s
+GET PLOTTER FROM MTpy
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_operate_aurora_65_1.png" src="../_images/examples_operate_aurora_65_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Processing band 102.915872s
+Processing band 85.631182s
+Processing band 68.881694s
+Processing band 54.195827s
+Processing band 43.003958s
+Processing band 33.310722s
+GET PLOTTER FROM MTpy
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_operate_aurora_65_3.png" src="../_images/examples_operate_aurora_65_3.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Processing band 411.663489s
+Processing band 342.524727s
+Processing band 275.526776s
+Processing band 216.783308s
+Processing band 172.015831s
+Processing band 133.242890s
+GET PLOTTER FROM MTpy
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_operate_aurora_65_5.png" src="../_images/examples_operate_aurora_65_5.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Processing band 1514.701336s
+Processing band 1042.488956s
+Processing band 723.371271s
+Processing band 532.971560s
+Processing band 412.837995s
+GET PLOTTER FROM MTpy
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_operate_aurora_65_7.png" src="../_images/examples_operate_aurora_65_7.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2022-07-30 12:35:17,270 [line 731] mth5.mth5.MTH5.close_mth5 - INFO: Flushing and closing /home/kkappler/software/irismt/aurora/docs/examples/8P_CAS04.h5
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[62]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span>type(tf_cls)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[62]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+mt_metadata.transfer_functions.core.TF
+</pre></div></div>
+</div>
+<p>Write the transfer functions generated by the Aurora pipeline</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[63]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span> tf_cls.write_tf_file(fn=&quot;emtfxml_test.xml&quot;, file_type=&quot;emtfxml&quot;)
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2022-07-30 12:36:04,678 [line 197] mt_metadata.transfer_functions.io.readwrite.write_file - INFO: Wrote emtfxml_test.xml
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[63]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+EMTFXML(station=&#39;CAS04&#39;, latitude=37.63, longitude=-121.47, elevation=329.39)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[64]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>tf_cls.write_tf_file(fn=&quot;emtfxml_test.xml&quot;, file_type=&quot;edi&quot;)
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2022-07-30 12:36:05,659 [line 197] mt_metadata.transfer_functions.io.readwrite.write_file - INFO: Wrote emtfxml_test.xml
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[64]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+EMTFXML(station=&#39;CAS04&#39;, latitude=37.63, longitude=-121.47, elevation=329.39)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[65]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span> tf_cls.write_tf_file(fn=&quot;emtfxml_test.xml&quot;, file_type=&quot;zmm&quot;)
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2022-07-30 12:36:06,223 [line 197] mt_metadata.transfer_functions.io.readwrite.write_file - INFO: Wrote emtfxml_test.xml
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[65]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+EMTFXML(station=&#39;CAS04&#39;, latitude=37.63, longitude=-121.47, elevation=329.39)
+</pre></div></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1752 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Time Series &mdash; aurora 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/plot_directive.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Transfer Function" href="transfer_function.html" />
+    <link rel="prev" title="API Reference" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Time Series</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-aurora.time_series.filters">Filters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-aurora.time_series.apodization_window">Apodization Window</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-aurora.time_series.decorators">Decorators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-aurora.time_series.frequency_band">Frequency Band</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-aurora.time_series.frequency_band_helpers">Frequency Band Helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-aurora.time_series.frequency_domain_helpers">Frequency Domain Helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-aurora.time_series.time_axis_helpers">Time Axis Helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-aurora.time_series.window_helpers">Window Helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-aurora.time_series.windowed_time_series">Windowed Time Series</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-aurora.time_series.windowing_scheme">Windowing Scheme</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="transfer_function.html">Transfer Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipelines.html">Pipelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interval.html">Interval</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general_helper_functions.html">General Helper Functions</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">API Reference</a> &raquo;</li>
+      <li>Time Series</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/time_series.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="time-series">
+<span id="id1"></span><h1>Time Series<a class="headerlink" href="#time-series" title="Permalink to this heading">¶</a></h1>
+<section id="module-aurora.time_series.filters">
+<span id="filters"></span><h2>Filters<a class="headerlink" href="#module-aurora.time_series.filters" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-aurora.time_series.apodization_window">
+<span id="apodization-window"></span><h2>Apodization Window<a class="headerlink" href="#module-aurora.time_series.apodization_window" title="Permalink to this heading">¶</a></h2>
+<p>&#64;author: kkappler</p>
+<p>Module to manage windowing prior to FFT.  Intended to support most
+apodization  windows available via scipy.signal.get_window()</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Supported Window types = [‘boxcar’, ‘triang’, ‘blackman’, ‘hamming’, ‘hann’,</dt><dd><p>‘bartlett’, ‘flattop’, ‘parzen’, ‘bohman’, ‘blackmanharris’,
+‘nuttall’, ‘barthann’, ‘kaiser’, ‘gaussian’, ‘general_gaussian’,
+‘slepian’, ‘chebwin’]</p>
+</dd>
+<dt>have_additional_args = {</dt><dd><p>‘kaiser’ : ‘beta’,
+‘gaussian’ : ‘std’,
+‘general_gaussian’ : (‘power’, ‘width’),
+‘slepian’ : ‘width’,
+‘chebwin’ : ‘attenuation’,</p>
+</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+<p>The Taper Config has 2 possible forms:
+1. Standard form for accessing scipy.signal:
+[“taper_family”, “num_samples_window”, “additional_args”]
+2. User-defined : for defining custom tapers</p>
+<p>Example 1 : Standard form
+“taper_family” = “hamming”
+“num_samples_window” = 128
+“additional_args” = {}</p>
+<p>Example 2 : Standard form
+“taper_family” = “kaiser”
+“num_samples_window” = 64
+“additional_args” = {“beta”:8}</p>
+<p>Examples 3 : User Defined
+2. user-defined: [“array”]
+In this case num_samples_window is defined by the array.
+“array” = [1, 2, 3, 4, 5, 4, 3, 2, 1]
+If “array” is non-empty then assume the user-defined case.</p>
+<p>It is a little bit unsatisfying that the args need to be ordered for
+scipy.signal.get_window().  Probably use OrderedDict()
+for any windows that have more than one additional args.</p>
+<p>For example
+“taper_family” = ‘general_gaussian’
+“additional_args” = OrderedDict(“power”:1.5, “sigma”:7)</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.time_series.apodization_window.ApodizationWindow">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.time_series.apodization_window.</span></span><span class="sig-name descname"><span class="pre">ApodizationWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/apodization_window.html#ApodizationWindow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.apodization_window.ApodizationWindow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Instantiate an apodization window object.  Example usages:
+apod_window = ApodizationWindow()
+taper=ApodizationWindow(taper_family=’hanning’, num_samples_window=55 )</p>
+<p>Window factors S1, S2, CG, ENBW are modelled after Heinzel et al. p12-14
+[1] Spectrum and spectral density estimation by the Discrete Fourier transform
+(DFT), including a comprehensive list of window functions and some new
+flat-top windows.  G. Heinzel, A. Roudiger and R. Schilling, Max-Planck
+Institut fur Gravitationsphysik (Albert-Einstein-Institut)
+Teilinstitut Hannover February 15, 2002
+See Also
+[2] Harris FJ. On the use of windows for harmonic analysis with the discrete
+Fourier transform. Proceedings of the IEEE. 1978 Jan;66(1):51-83.</p>
+<p>Nomenclature from Heinzel et al.
+ENBW: Effective Noise BandWidth, see Equation (22)
+NENBW Normalized Equivalent Noise BandWidth, see Equation (21)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>taper_family</strong><span class="classifier">string</span></dt><dd><p>Specify the taper type - boxcar, kaiser, hanning, etc</p>
+</dd>
+<dt><strong>num_samples_window</strong><span class="classifier">int</span></dt><dd><p>The number of samples in the taper</p>
+</dd>
+<dt><strong>taper</strong><span class="classifier">numpy array</span></dt><dd><p>The actual window coefficients themselves.  This can be passed if a
+particular custom window is desired.</p>
+</dd>
+<dt><strong>additional_args: dictionary</strong></dt><dd><p>These are any additional requirements scipy needs in order to
+generate the window.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference internal" href="#aurora.time_series.apodization_window.ApodizationWindow.S1" title="aurora.time_series.apodization_window.ApodizationWindow.S1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">S1</span></code></a></dt><dd><p>sum of the window coefficients</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.time_series.apodization_window.ApodizationWindow.S2" title="aurora.time_series.apodization_window.ApodizationWindow.S2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">S2</span></code></a></dt><dd><p>sum of squares of the window coefficients</p>
+</dd>
+<dt><strong>apodization_factor</strong></dt><dd></dd>
+<dt><a class="reference internal" href="#aurora.time_series.apodization_window.ApodizationWindow.coherent_gain" title="aurora.time_series.apodization_window.ApodizationWindow.coherent_gain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coherent_gain</span></code></a></dt><dd><p>DC gain of the window normalized by window length</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.time_series.apodization_window.ApodizationWindow.nenbw" title="aurora.time_series.apodization_window.ApodizationWindow.nenbw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nenbw</span></code></a></dt><dd><p>NENBW Normalized Equivalent Noise BandWidth, see Equation (21) in</p>
+</dd>
+<dt><strong>num_samples_window</strong></dt><dd></dd>
+<dt><a class="reference internal" href="#aurora.time_series.apodization_window.ApodizationWindow.summary" title="aurora.time_series.apodization_window.ApodizationWindow.summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">summary</span></code></a></dt><dd><p>Returns</p>
+</dd>
+<dt><strong>taper</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.time_series.apodization_window.ApodizationWindow.enbw" title="aurora.time_series.apodization_window.ApodizationWindow.enbw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">enbw</span></code></a>(fs)</p></td>
+<td><p>Notes that unlike NENBW, CG, S1, S2, this is not a pure property of the window -- but instead this is a property of the window combined with the sample rate.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.time_series.apodization_window.ApodizationWindow.make" title="aurora.time_series.apodization_window.ApodizationWindow.make"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make</span></code></a>()</p></td>
+<td><p>this is just a wrapper call to scipy.signal Note: see scipy.signal.get_window for a description of what is expected in args[1:].</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.time_series.apodization_window.ApodizationWindow.test_linear_spectral_density_factor" title="aurora.time_series.apodization_window.ApodizationWindow.test_linear_spectral_density_factor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_linear_spectral_density_factor</span></code></a>()</p></td>
+<td><p>This is just a test to verify some algebra Claim: The lsd_calibration factors A      (1./coherent_gain)*np.sqrt((2*dt)/(nenbw*N)) and B      np.sqrt(2/(sample_rate*self.S2)) are identical.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.time_series.apodization_window.ApodizationWindow.S1">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">S1</span></span><a class="headerlink" href="#aurora.time_series.apodization_window.ApodizationWindow.S1" title="Permalink to this definition">¶</a></dt>
+<dd><p>sum of the window coefficients</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.time_series.apodization_window.ApodizationWindow.S2">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">S2</span></span><a class="headerlink" href="#aurora.time_series.apodization_window.ApodizationWindow.S2" title="Permalink to this definition">¶</a></dt>
+<dd><p>sum of squares of the window coefficients</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.time_series.apodization_window.ApodizationWindow.apodization_factor">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">apodization_factor</span></span><a class="headerlink" href="#aurora.time_series.apodization_window.ApodizationWindow.apodization_factor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.time_series.apodization_window.ApodizationWindow.coherent_gain">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">coherent_gain</span></span><a class="headerlink" href="#aurora.time_series.apodization_window.ApodizationWindow.coherent_gain" title="Permalink to this definition">¶</a></dt>
+<dd><p>DC gain of the window normalized by window length</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.apodization_window.ApodizationWindow.enbw">
+<span class="sig-name descname"><span class="pre">enbw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/apodization_window.html#ApodizationWindow.enbw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.apodization_window.ApodizationWindow.enbw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Notes that unlike NENBW, CG, S1, S2, this is not a pure property of the
+window – but instead this is a property of the window combined with
+the sample rate.
+Parameters
+———-
+fs : sampling frequency (1/dt)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"></dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.apodization_window.ApodizationWindow.make">
+<span class="sig-name descname"><span class="pre">make</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/apodization_window.html#ApodizationWindow.make"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.apodization_window.ApodizationWindow.make" title="Permalink to this definition">¶</a></dt>
+<dd><p>this is just a wrapper call to scipy.signal
+Note: see scipy.signal.get_window for a description of what is
+expected in args[1:]. <a class="reference external" href="http://docs.scipy.org/doc/scipy/reference/">http://docs.scipy.org/doc/scipy/reference/</a>
+generated/scipy.signal.get_window.html</p>
+<p>note: this is just repackaging the args so that scipy.signal.get_window()
+accepts all cases.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.time_series.apodization_window.ApodizationWindow.nenbw">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nenbw</span></span><a class="headerlink" href="#aurora.time_series.apodization_window.ApodizationWindow.nenbw" title="Permalink to this definition">¶</a></dt>
+<dd><p>NENBW Normalized Equivalent Noise BandWidth, see Equation (21) in
+Heinzel et al 2002</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.time_series.apodization_window.ApodizationWindow.num_samples_window">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_samples_window</span></span><a class="headerlink" href="#aurora.time_series.apodization_window.ApodizationWindow.num_samples_window" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.time_series.apodization_window.ApodizationWindow.summary">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">summary</span></span><a class="headerlink" href="#aurora.time_series.apodization_window.ApodizationWindow.summary" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>out_str: str</dt><dd><p>String comprised of the taper_family, number_of_samples, and True/False
+if self.taper is not None</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.time_series.apodization_window.ApodizationWindow.taper">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">taper</span></span><a class="headerlink" href="#aurora.time_series.apodization_window.ApodizationWindow.taper" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.apodization_window.ApodizationWindow.test_linear_spectral_density_factor">
+<span class="sig-name descname"><span class="pre">test_linear_spectral_density_factor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/apodization_window.html#ApodizationWindow.test_linear_spectral_density_factor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.apodization_window.ApodizationWindow.test_linear_spectral_density_factor" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is just a test to verify some algebra
+Claim:
+The lsd_calibration factors
+A      (1./coherent_gain)*np.sqrt((2*dt)/(nenbw*N))
+and
+B      np.sqrt(2/(sample_rate*self.S2))
+are identical.</p>
+<p>Note sqrt(2*dt)==sqrt(2*sample_rate) so we can cancel these terms and
+A=B IFF
+(1./coherent_gain) * np.sqrt(1/(nenbw*N)) == 1/np.sqrt(S2)
+which I show in githib aurora issue #3 via .
+(CG**2) * NENBW <a href="#id2"><span class="problematic" id="id3">*</span></a>N   =  S2</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"></dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.apodization_window.main">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.apodization_window.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/apodization_window.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.apodization_window.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.apodization_window.test_can_inititalize_apodization_window">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.apodization_window.</span></span><span class="sig-name descname"><span class="pre">test_can_inititalize_apodization_window</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/apodization_window.html#test_can_inititalize_apodization_window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.apodization_window.test_can_inititalize_apodization_window" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"></dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-aurora.time_series.decorators">
+<span id="decorators"></span><h2>Decorators<a class="headerlink" href="#module-aurora.time_series.decorators" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.decorators.can_use_xr_dataarray">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.decorators.</span></span><span class="sig-name descname"><span class="pre">can_use_xr_dataarray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/decorators.html#can_use_xr_dataarray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.decorators.can_use_xr_dataarray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Intended as a decorator.  Most of the windowed time series methods are
+intended to work with xarray.Dataset class.  But I would like to be able
+to pass them xarray.DataArray objects.  This class casts a DataArray to a
+Dataset, runs it through func and casts back to a DataArray.</p>
+<p>A simuilar decorator should be written for numpy arrays.
+Parameters
+———-
+func</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"></dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.decorators.decorator">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.decorators.</span></span><span class="sig-name descname"><span class="pre">decorator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/decorators.html#decorator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.decorators.decorator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-aurora.time_series.frequency_band">
+<span id="frequency-band"></span><h2>Frequency Band<a class="headerlink" href="#module-aurora.time_series.frequency_band" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.time_series.frequency_band.FrequencyBand">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.time_series.frequency_band.</span></span><span class="sig-name descname"><span class="pre">FrequencyBand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/frequency_band.html#FrequencyBand"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.frequency_band.FrequencyBand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="interval.html#aurora.interval.Interval" title="aurora.interval.Interval"><code class="xref py py-class docutils literal notranslate"><span class="pre">Interval</span></code></a></p>
+<p>Extends the interval class.</p>
+<p>has a lower bound, an upper bound and a central frequency</p>
+<p>These are intervals
+an method for Fourier coefficient indices</p>
+<p>Some thoughts 20210617:</p>
+<p>TLDR:
+For simplicity, I’m going with Half open, df/2 intervals when they are
+perscribed by FC indexes, and half_open gates_and_fenceposts when they
+are not.  The gates and fenceposts can be converted to the percribed form by
+mapping to emtf_band_setup_form and then mapping to FCIndex form.
+A 3dB point correction etc maybe done in a later version.</p>
+<p>&lt;ON DEFAULT FREQUENCY BAND CONFIGURATIONS&gt;
+Because these are Interval()s there is a little complication:
+If we use closed intervals we can have an issue with the same Fourier
+coefficient being in more than one band [a,b],[b,c] if b corresponds to a harmonic.
+Honestly this is not a really big deal, but it feels sloppy. The default
+behaviour should partition the frequency axis, not break it into sets with
+non-zero overlap, even though the overlapping sets are of measure zero.</p>
+<p>On the other hand, it is common enough (at low frequency) to have bands
+which are only 1 Harmonic wide, and if we dont use closed intervals we
+can wind up with intervals like [a,a), which is the empty set.</p>
+<p>The best solution I can think of for now incorporates the fact that the
+harmonic frequencies we are going to interact with in digital processing
+will be a discrete collection, basically fftfreqs, which are separated by df.</p>
+<p>If we are given the context of df (= 1/(N*dt)) wher N is number of
+samples in the original time series and dt is the sample interval,
+then we can use half-open intervals with width df centered at the
+frequencies under consideration.</p>
+<p>I.e since the actual picking of Fourier coefficients and indexes will
+always occur in the context of a sampling rate and a frequency axis and
+we will know df and therefore we can pad the frequency bounds by +/-
+df/2.</p>
+<p>In that case we can use open, half open, or closed intervals, it really
+doesn’t matter, so we will choose half open
+[f_i-df/2, f_i+df/2) to get the satisfying property of covering the
+frequency axis completely but ensure no accidental double coverage.</p>
+<p>Notes that this is just a default convention.  There is no rule against
+using closed intervals, nor having overlapping bands.</p>
+<p>The df/2 trick also protects us from numeric roundoff errors resulting in
+edge frequencies landing in a bin other than that which is intended.</p>
+<p>There is one little oddity which accompanies this scheme.  Consider the
+case where you have a 1-harmonic wide band, say at 10Hz.  And df for
+arguments sake is 0.05 Hz.  The center frequency harmonically will not
+evaluate to 10Hz exactly, rather it will evaluate to sqrt((
+9.95*10.05))=9.9999874, and not 10.  This is a little bit unsatisfying
+but I take solace in two things:
+1. The user is welcome to use their own convention, [10.0, 10.0], or even
+[10.0-epsilon , 10.0+epsilon] if worried about numeric ghosts which
+asymptotes to 10.0
+2.  I’m not actually 100% sure that the geometric center frequency of the
+harmonic at 10Hz is truly 10.0.  Afterall a band has finite width even if
+the harmonic is a Dirac spike.</p>
+<p>At the end of the day we need to choose something, so its half-open,
+lower-closed intervals by default.</p>
+<p>Here’s a good webpage with formulas if we want to get really fancy with
+3dB band edges.
+<a class="reference external" href="http://www.sengpielaudio.com/calculator-cutoffFrequencies.htm">http://www.sengpielaudio.com/calculator-cutoffFrequencies.htm</a></p>
+<p>&lt;/ON DEFAULT FREQUENCY BAND CONFIGURATIONS&gt;</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>center_frequency</strong></dt><dd></dd>
+<dt><strong>center_period</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">adjacent_to</span></code>(other)</p></td>
+<td><p>Tells whether an Interval is adjacent to the object without overlap</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">all</span></code>()</p></td>
+<td><p>Returns an interval encompassing all values</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">between</span></code>(a, b[, closed])</p></td>
+<td><p>Returns an interval between two values</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">comes_before</span></code>(other)</p></td>
+<td><p>Tells whether an interval lies before the object</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">duration</span></code>()</p></td>
+<td><p>&#64;note: added 20140618 kkappler returns the duration of interval</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">equal_to</span></code>(a)</p></td>
+<td><p>Returns an point interval</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.time_series.frequency_band.FrequencyBand.fourier_coefficient_indices" title="aurora.time_series.frequency_band.FrequencyBand.fourier_coefficient_indices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fourier_coefficient_indices</span></code></a>(frequencies)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">greater_than</span></code>(a)</p></td>
+<td><p>Returns interval of all values greater than the given value</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">greater_than_or_equal_to</span></code>(a)</p></td>
+<td><p>Returns interval of all values greater than or equal to the given value</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.time_series.frequency_band.FrequencyBand.in_band_harmonics" title="aurora.time_series.frequency_band.FrequencyBand.in_band_harmonics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">in_band_harmonics</span></code></a>(frequencies)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">join</span></code>(other)</p></td>
+<td><p>Combines two continous Intervals</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">less_than</span></code>(a)</p></td>
+<td><p>Returns interval of all values less than the given value</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">less_than_or_equal_to</span></code>(a)</p></td>
+<td><p>Returns an interval containing the given values and everything less</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">none</span></code>()</p></td>
+<td><p>Returns an empty interval</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">overlaps</span></code>(other)</p></td>
+<td><p>Tells whether the given interval overlaps the object</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pad</span></code>(pad_width)</p></td>
+<td><p>&#64;note: added 20140618 kkappler returns a padded interval; Intent was to add a little so that open-intervals, or adjacent intervals would easily make an interval set</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.time_series.frequency_band.FrequencyBand.center_frequency">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">center_frequency</span></span><a class="headerlink" href="#aurora.time_series.frequency_band.FrequencyBand.center_frequency" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.time_series.frequency_band.FrequencyBand.center_period">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">center_period</span></span><a class="headerlink" href="#aurora.time_series.frequency_band.FrequencyBand.center_period" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.frequency_band.FrequencyBand.fourier_coefficient_indices">
+<span class="sig-name descname"><span class="pre">fourier_coefficient_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frequencies</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/frequency_band.html#FrequencyBand.fourier_coefficient_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.frequency_band.FrequencyBand.fourier_coefficient_indices" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>frequencies: numpy array</strong></dt><dd><p>Intended to represent the one-sided (positive) frequency axis of
+the data that has been FFT-ed</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"></dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.frequency_band.FrequencyBand.in_band_harmonics">
+<span class="sig-name descname"><span class="pre">in_band_harmonics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frequencies</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/frequency_band.html#FrequencyBand.in_band_harmonics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.frequency_band.FrequencyBand.in_band_harmonics" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>frequencies</strong></dt><dd></dd>
+<dt><strong>Returns: numpy array</strong></dt><dd><p>the actual harmonics or frequencies in band, rather than the indices.</p>
+</dd>
+<dt><strong>——-</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.time_series.frequency_band.FrequencyBands">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.time_series.frequency_band.</span></span><span class="sig-name descname"><span class="pre">FrequencyBands</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/frequency_band.html#FrequencyBands"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.frequency_band.FrequencyBands" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Use this as the core element for BandAveragingScheme
+This is just collection of frequency bands objects.</p>
+<p>If there was no decimation, this would basically be the BandAveragingScheme
+How does it differ from a bandaveraging scheme?
+It doesn’t support Decimation levels.</p>
+<p>Context: A band is an Interval().
+FrequencyBands can be represented as an IntervalSet()</p>
+<p>20210617: Unforunately, using a single “band_edges” array of fenceposts
+is not a general solution.  There is no reason to force the user to have
+bands that abutt one another.  Therefore, changing to stop supporting
+band_edges 1-D array.  band_edges will need to be a 2d array.  n_bands, 2</p>
+<p>20210720: In fact, it would be more general, and explicit to pass a
+vector of lower_bound_edges and upper_bound_edges.  Also, there should be
+other ways to populate this class, for example by passing it frequency_band
+objects, self.append(frequency_band).  However, that opens the door for
+overlapping frequency bands which in general are not well ordered without
+choosing an order operation (band center would be a good one - but then
+we may have non-unique band centers!)  However, this should be quite
+rare, and I am not actually sure it is possible to get the same center
+frequency if we are using logarithmic band centers.  The only issue with
+an append method is that after we append a band, we will need to perform
+an ordering/sorting on individual band edges.</p>
+<p>To add complexity, another use
+case maybe that we wish to support bands with gaps at certain harmonics,
+the way this is currently set up, all harmonics between the lower_bound
+and the upper bounds are considered to be part of the band, but if we
+have a known “bad harmonic” or several noisy harmoincs within a band
+there is currently no way using somple FrequencyBand objects that we can
+excise these harmonics.  We could add a “ignore” list of either
+frequencies, bands or harmonics, but that is for later.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>number_of_bands</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.time_series.frequency_band.FrequencyBands.band" title="aurora.time_series.frequency_band.FrequencyBands.band"><code class="xref py py-obj docutils literal notranslate"><span class="pre">band</span></code></a>(i_band)</p></td>
+<td><p>Decide to index bands from zero or one, i.e. Choosing 0 for now.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.time_series.frequency_band.FrequencyBands.band_centers" title="aurora.time_series.frequency_band.FrequencyBands.band_centers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">band_centers</span></code></a>([frequency_or_period])</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.time_series.frequency_band.FrequencyBands.bands" title="aurora.time_series.frequency_band.FrequencyBands.bands"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bands</span></code></a>([direction])</p></td>
+<td><p>make this a generator for iteration over bands Returns -------</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.time_series.frequency_band.FrequencyBands.from_decimation_object" title="aurora.time_series.frequency_band.FrequencyBands.from_decimation_object"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_decimation_object</span></code></a>(decimation_object)</p></td>
+<td><p>Convert band edges from a <code class="xref py py-class docutils literal notranslate"><span class="pre">aurora.config.Decimation</span></code> object, Which has all the information in it.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.time_series.frequency_band.FrequencyBands.from_emtf_band_setup" title="aurora.time_series.frequency_band.FrequencyBands.from_emtf_band_setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_emtf_band_setup</span></code></a>(filepath, ...)</p></td>
+<td><p>This converts between EMTF band_setup files to a frequency_bands object.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.time_series.frequency_band.FrequencyBands.validate" title="aurora.time_series.frequency_band.FrequencyBands.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>()</p></td>
+<td><p>placeholder for sanity checks.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 68%" />
+<col style="width: 32%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>from_emtf_band_df</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.frequency_band.FrequencyBands.band">
+<span class="sig-name descname"><span class="pre">band</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i_band</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/frequency_band.html#FrequencyBands.band"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.frequency_band.FrequencyBands.band" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decide to index bands from zero or one, i.e.  Choosing 0 for now.
+Parameters
+———-
+i_band: integer key for band</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"></dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.frequency_band.FrequencyBands.band_centers">
+<span class="sig-name descname"><span class="pre">band_centers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frequency_or_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'frequency'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/frequency_band.html#FrequencyBands.band_centers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.frequency_band.FrequencyBands.band_centers" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>frequency_or_period</strong><span class="classifier">str</span></dt><dd></dd>
+<dt><strong>“frequency” or “period” determines if the vector of band centers is</strong></dt><dd></dd>
+<dt><strong>returned in “Hz” or “s”</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>band_centers</strong><span class="classifier">numpy array</span></dt><dd><p>center frequencies of the bands in Hz or in s</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.frequency_band.FrequencyBands.bands">
+<span class="sig-name descname"><span class="pre">bands</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'increasing_frequency'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/frequency_band.html#FrequencyBands.bands"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.frequency_band.FrequencyBands.bands" title="Permalink to this definition">¶</a></dt>
+<dd><p>make this a generator for iteration over bands
+Returns
+——-</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.frequency_band.FrequencyBands.from_decimation_object">
+<span class="sig-name descname"><span class="pre">from_decimation_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decimation_object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/frequency_band.html#FrequencyBands.from_decimation_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.frequency_band.FrequencyBands.from_decimation_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert band edges from a <code class="xref py py-class docutils literal notranslate"><span class="pre">aurora.config.Decimation</span></code> object,
+Which has all the information in it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>decimation_object</strong> (<em>TYPE</em>) – DESCRIPTION</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>DESCRIPTION</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>TYPE</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.frequency_band.FrequencyBands.from_emtf_band_df">
+<span class="sig-name descname"><span class="pre">from_emtf_band_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">emtf_band_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decimation_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_samples_window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/frequency_band.html#FrequencyBands.from_emtf_band_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.frequency_band.FrequencyBands.from_emtf_band_df" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.frequency_band.FrequencyBands.from_emtf_band_setup">
+<span class="sig-name descname"><span class="pre">from_emtf_band_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decimation_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_samples_window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/frequency_band.html#FrequencyBands.from_emtf_band_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.frequency_band.FrequencyBands.from_emtf_band_setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>This converts between EMTF band_setup files to a frequency_bands object.
+The band_setup file is represented as a dataframe with
+columns for decimation_level, first_fc_index,
+last_fc_index.</p>
+<p>Notes:
+1. In EMTF, the the DC terms were not carried in the FC Files so the
+integer-index 1 mapped to the first harmonic.  In aurora, the DC-term is
+kept (for now) and thus, because the fortran arrays index from 1, and
+python from 0, we don’t need any modification to the Fourier coefficient
+indices here.If we wind up dropping the DC term from the STFT arrays we
+would need to add -1 to the upper and lower bound indices.
+2. EMTF band-setup files do not contain information about frequency.
+Frequecny was implicit in the processing scheme but not stated.  This
+leaves some ambuguity when reading in files with names like
+“bs_256.txt”.  Does 256 refer to the number of taps in the STFT
+window, or to the number of positive frequencies (and the window was
+512-length).  Personal communication with Egbert 2021-06-22 indicates
+that normally the integer number in a band-setup file name associates with
+the time-domain window length.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>filepath</strong><span class="classifier">str or pathlib.Path()</span></dt><dd><p>The full path to the band_setup file</p>
+</dd>
+<dt><strong>decimation_level</strong><span class="classifier">integer</span></dt><dd><p>Corresponds to the decimation level from the band setup file to
+create FrequecyBands from.</p>
+</dd>
+<dt><strong>sample_rate</strong><span class="classifier">float</span></dt><dd><p>The sampling rate of the data at decimation_level</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"></dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.time_series.frequency_band.FrequencyBands.number_of_bands">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">number_of_bands</span></span><a class="headerlink" href="#aurora.time_series.frequency_band.FrequencyBands.number_of_bands" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.frequency_band.FrequencyBands.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/frequency_band.html#FrequencyBands.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.frequency_band.FrequencyBands.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>placeholder for sanity checks.
+Main reason this is here is in anticipation of supporting an append()
+method to this class that accepts FrequencyBand objects.  In that
+case we would like to re-order the band edges
+Returns
+——-</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-aurora.time_series.frequency_band_helpers">
+<span id="frequency-band-helpers"></span><h2>Frequency Band Helpers<a class="headerlink" href="#module-aurora.time_series.frequency_band_helpers" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.frequency_band_helpers.configure_frequency_bands">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.frequency_band_helpers.</span></span><span class="sig-name descname"><span class="pre">configure_frequency_bands</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/frequency_band_helpers.html#configure_frequency_bands"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.frequency_band_helpers.configure_frequency_bands" title="Permalink to this definition">¶</a></dt>
+<dd><p>2022-05-30: This method was never put into production and will need to be
+modified to use the new Processing class.</p>
+<p>May want to make config a “frequency band config object”, but maybe not.
+For now just using a flat config structure (per decimation level)</p>
+<p>These methods could also be placed under FrequencyBands() class as
+init_from_emtf()
+init_from_bounds_array()
+init_from_default()</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>config</strong><span class="classifier">aurora.config.metadata.decimation_level.DecimationLevel</span></dt><dd><p>The configuration parameters for setting up the frequency bands.</p>
+<p>If config[“band_setup_style”] is “EMTF” this will look for one of
+Gary’s “band_setup” files and parse it.  It will look for
+config.emtf_band_setup_file.</p>
+<p>Other options would be :
+1. “band_edges”, accepts an array of lower_bound, upper_bound pairs
+2. “logarithmic range”: could accept a lower_bound, and an
+upper_bound, and a number of bands inbetween., or it could estimate
+a)lower bound from a rule about the minimum number of cycles needed
+for an estimate (say 5 or 10)
+b) upper bound from a Nyquist rule, say 80% f_Nyquist</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>frequency_bands</strong><span class="classifier">aurora.time_series.frequency_band.FrequencyBands</span></dt><dd><p>a fully populated FrequencyBands object with all info needed to do
+band averaging.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.frequency_band_helpers.df_from_bands">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.frequency_band_helpers.</span></span><span class="sig-name descname"><span class="pre">df_from_bands</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">band_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/frequency_band_helpers.html#df_from_bands"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.frequency_band_helpers.df_from_bands" title="Permalink to this definition">¶</a></dt>
+<dd><p>Note: The decimation_level here is +1 to agree with EMTF convention.
+Not clear this is really necessary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>band_list: list</strong></dt><dd><p>obtained from aurora.config.metadata.decimation_level.DecimationLevel.bands</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>out_df: pd.Dataframe</dt><dd><p>Same format as that generated by EMTFBandSetupFile.get_decimation_level()</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.frequency_band_helpers.extract_band">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.frequency_band_helpers.</span></span><span class="sig-name descname"><span class="pre">extract_band</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frequency_band</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fft_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-07</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/frequency_band_helpers.html#extract_band"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.frequency_band_helpers.extract_band" title="Permalink to this definition">¶</a></dt>
+<dd><p>This may become a method of fft_obj, or frequency band.
+For now leave as stand alone.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>frequency_band: aurora.interval.Interval()</strong></dt><dd><p>interval corresponding to a frequency band</p>
+</dd>
+<dt><strong>fft_obj: xr.DataArray</strong></dt><dd><p>To be replaced with an fft_obj() class in future</p>
+</dd>
+<dt><strong>epsilon: float</strong></dt><dd><p>Use this when you are worried about missing a frequency due to
+round off error.  This is in general not needed if we use a df/2 pad
+around true harmonics.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>band: xr.DataArray</dt><dd><p>The frequencies within the band passed into this function</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.frequency_band_helpers.frequency_band_edges">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.frequency_band_helpers.</span></span><span class="sig-name descname"><span class="pre">frequency_band_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_lower_bound</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_upper_bound</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_bands_per_decade</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_bands</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/frequency_band_helpers.html#frequency_band_edges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.frequency_band_helpers.frequency_band_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides logarithmically spaced fenceposts acoss lowest and highest
+frequencies. This is a lot like calling logspace.  The resultant gates
+have constant  Q, i.e. deltaF/f_center=Q=constant.
+where f_center is defined geometircally, i.e. sqrt(f2*f1) is the center freq
+between f1 and f2.</p>
+<p>TODO: Add a linear spacing option?</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>f_lower_bound</strong><span class="classifier">float</span></dt><dd><p>lowest frequency under consideration</p>
+</dd>
+<dt><strong>f_upper_bound</strong><span class="classifier">float</span></dt><dd><p>highest frequency under consideration</p>
+</dd>
+<dt><strong>num_bands_per_decade</strong><span class="classifier">int (TODO test, float maybe ok also.. need to test)</span></dt><dd><p>number of bands per decade</p>
+</dd>
+<dt><strong>num_bands</strong><span class="classifier">int</span></dt><dd><p>total number of bands.  This supercedes num_bands_per_decade if supplied</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>fence_posts</strong><span class="classifier">array</span></dt><dd><p>logarithmically spaced fenceposts acoss lowest and highest
+frequencies.  These partition the frequency domain between
+f_lower_bound and f_upper_bound</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-aurora.time_series.frequency_domain_helpers">
+<span id="frequency-domain-helpers"></span><h2>Frequency Domain Helpers<a class="headerlink" href="#module-aurora.time_series.frequency_domain_helpers" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.frequency_domain_helpers.get_fft_harmonics">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.frequency_domain_helpers.</span></span><span class="sig-name descname"><span class="pre">get_fft_harmonics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples_per_window</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">one_sided</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/frequency_domain_helpers.html#get_fft_harmonics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.frequency_domain_helpers.get_fft_harmonics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Works for odd and even number of points.
+Does not return Nyquist, does return DC component
+Could be midified with kwargs to support one_sided, two_sided, ignore_dc
+ignore_nyquist, and etc.  Could actally take FrequencyBands as an argument
+if we wanted as well.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>samples_per_window</strong></dt><dd></dd>
+<dt><strong>sample_rate</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"></dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-aurora.time_series.time_axis_helpers">
+<span id="time-axis-helpers"></span><h2>Time Axis Helpers<a class="headerlink" href="#module-aurora.time_series.time_axis_helpers" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.time_axis_helpers.decide_time_axis_method">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.time_axis_helpers.</span></span><span class="sig-name descname"><span class="pre">decide_time_axis_method</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/time_axis_helpers.html#decide_time_axis_method"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.time_axis_helpers.decide_time_axis_method" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.time_axis_helpers.do_some_tests">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.time_axis_helpers.</span></span><span class="sig-name descname"><span class="pre">do_some_tests</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/time_axis_helpers.html#do_some_tests"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.time_axis_helpers.do_some_tests" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.time_axis_helpers.fast_arange">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.time_axis_helpers.</span></span><span class="sig-name descname"><span class="pre">fast_arange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/time_axis_helpers.html#fast_arange"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.time_axis_helpers.fast_arange" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.time_axis_helpers.main">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.time_axis_helpers.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/time_axis_helpers.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.time_axis_helpers.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.time_axis_helpers.make_time_axis">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.time_axis_helpers.</span></span><span class="sig-name descname"><span class="pre">make_time_axis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/time_axis_helpers.html#make_time_axis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.time_axis_helpers.make_time_axis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.time_axis_helpers.slow_comprehension">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.time_axis_helpers.</span></span><span class="sig-name descname"><span class="pre">slow_comprehension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/time_axis_helpers.html#slow_comprehension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.time_axis_helpers.slow_comprehension" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.time_axis_helpers.test_generate_time_axis">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.time_axis_helpers.</span></span><span class="sig-name descname"><span class="pre">test_generate_time_axis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/time_axis_helpers.html#test_generate_time_axis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.time_axis_helpers.test_generate_time_axis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Two obvious ways to generate an axis of timestanps here. One method is slow and
+more precise, the other is fast but drops some nanoseconds due to integer
+roundoff error.</p>
+<dl class="simple">
+<dt>To see this, consider the example of say 3Hz, we are 333333333ns between samples,</dt><dd><p>which drops 1ns per second if we scale a nanoseconds=np.arange(N)</p>
+</dd>
+</dl>
+<p>The issue here is that the nanoseconds granularity forces a roundoff error,</p>
+<p>Probably will use logic like:
+if there_are_integer_ns_per_sample:</p>
+<blockquote>
+<div><p>time_stamps = do_it_the_fast_way()</p>
+</div></blockquote>
+<dl class="simple">
+<dt>else:</dt><dd><p>time_stamps = do_it_the_slow_way()</p>
+</dd>
+</dl>
+<p>return time_stamps</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>t0</strong></dt><dd></dd>
+<dt><strong>n_samples</strong></dt><dd></dd>
+<dt><strong>sample_rate</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"></dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-aurora.time_series.window_helpers">
+<span id="window-helpers"></span><h2>Window Helpers<a class="headerlink" href="#module-aurora.time_series.window_helpers" title="Permalink to this heading">¶</a></h2>
+<p>Notes in google doc:
+<a class="reference external" href="https://docs.google.com/document/d/1CsRhSLXsRG8HQxM4lKNqVj-V9KA9iUQAvCOtouVzFs0/edit?usp=sharing">https://docs.google.com/document/d/1CsRhSLXsRG8HQxM4lKNqVj-V9KA9iUQAvCOtouVzFs0/edit?usp=sharing</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.window_helpers.apply_fft_to_windowed_array">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.window_helpers.</span></span><span class="sig-name descname"><span class="pre">apply_fft_to_windowed_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">windowed_array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/window_helpers.html#apply_fft_to_windowed_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.window_helpers.apply_fft_to_windowed_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>This will operate row-wise as well
+Parameters
+———-
+windowed_array</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"></dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.window_helpers.available_number_of_windows_in_array">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.window_helpers.</span></span><span class="sig-name descname"><span class="pre">available_number_of_windows_in_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_samples_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples_window</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_advance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/window_helpers.html#available_number_of_windows_in_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.window_helpers.available_number_of_windows_in_array" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>n_samples_array: int</strong></dt><dd><p>The length of the time series</p>
+</dd>
+<dt><strong>n_samples_window: int</strong></dt><dd><p>The length of the window (in samples)</p>
+</dd>
+<dt><strong>n_advance: int</strong></dt><dd><p>The number of samples the window advances at each step</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>available_number_of_strides: int</dt><dd><p>The number of windows the time series will yield</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.window_helpers.check_all_sliding_window_functions_are_equivalent">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.window_helpers.</span></span><span class="sig-name descname"><span class="pre">check_all_sliding_window_functions_are_equivalent</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/window_helpers.html#check_all_sliding_window_functions_are_equivalent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.window_helpers.check_all_sliding_window_functions_are_equivalent" title="Permalink to this definition">¶</a></dt>
+<dd><p>simple sanity check that runs each sliding window function on a small array and
+confirms the results are numerically identical.
+Note that striding window will return int types where others return float.
+Returns
+——-</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.window_helpers.do_some_tests">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.window_helpers.</span></span><span class="sig-name descname"><span class="pre">do_some_tests</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/window_helpers.html#do_some_tests"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.window_helpers.do_some_tests" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.window_helpers.main">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.window_helpers.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/window_helpers.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.window_helpers.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.window_helpers.sliding_window_crude">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.window_helpers.</span></span><span class="sig-name descname"><span class="pre">sliding_window_crude</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_samples_window</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_samples_advance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_windows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/window_helpers.html#sliding_window_crude"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.window_helpers.sliding_window_crude" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data: np.ndarray</strong></dt><dd><p>The time series data to be windowed</p>
+</dd>
+<dt><strong>num_samples_window: int</strong></dt><dd><p>The length of the window (in samples)</p>
+</dd>
+<dt><strong>num_samples_advance: int</strong></dt><dd><p>The number of samples the window advances at each step</p>
+</dd>
+<dt><strong>num_windows: int</strong></dt><dd><p>The number of windows to “take”.  Must be less or equal to the number of
+available windows.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>output_array: numpy.ndarray</dt><dd><p>The windowed time series</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.window_helpers.sliding_window_numba">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.window_helpers.</span></span><span class="sig-name descname"><span class="pre">sliding_window_numba</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_samples_window</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_samples_advance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_windows</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/window_helpers.html#sliding_window_numba"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.window_helpers.sliding_window_numba" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data: np.ndarray</strong></dt><dd><p>The time series data to be windowed</p>
+</dd>
+<dt><strong>num_samples_window: int</strong></dt><dd><p>The length of the window (in samples)</p>
+</dd>
+<dt><strong>num_samples_advance: int</strong></dt><dd><p>The number of samples the window advances at each step</p>
+</dd>
+<dt><strong>num_windows: int</strong></dt><dd><p>The number of windows to “take”.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>output_array: numpy.ndarray</dt><dd><p>The windowed time series</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.window_helpers.striding_window">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.window_helpers.</span></span><span class="sig-name descname"><span class="pre">striding_window</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_samples_window</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_samples_advance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_windows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/window_helpers.html#striding_window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.window_helpers.striding_window" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies a striding window to an array.  We use 1D arrays here.
+Note that this method is extendable to N-dimensional arrays as was once shown
+at  <a class="reference external" href="http://www.johnvinyard.com/blog/?p=268">http://www.johnvinyard.com/blog/?p=268</a></p>
+<p>Karl has an implementation of this code but chose to restict to 1D here.
+This is becuase of several warnings encountered, on the notes of stride_tricks.py,
+as well as for example here:
+<a class="reference external" href="https://stackoverflow.com/questions/4936620/using-strides-for-an-efficient-moving-average-filter">https://stackoverflow.com/questions/4936620/using-strides-for-an-efficient-moving-average-filter</a></p>
+<p>While we can possibly setup Aurora so that no copies of the strided window are made
+downstream, we cannot guarantee that another user may not add methods that require
+copies.  For robustness we will use 1d implementation only for now.</p>
+<p>Another clean example of this method can be found in the razorback codes from brgm.</p>
+<p>result is 2d: result[i] is the i-th window</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sliding_window</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">15</span><span class="p">),</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="go">array([[0, 1, 2],</span>
+<span class="go">       [2, 3, 4],</span>
+<span class="go">       [4, 5, 6],</span>
+<span class="go">       [6, 7, 8]])</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data: np.ndarray</strong></dt><dd><p>The time series data to be windowed</p>
+</dd>
+<dt><strong>num_samples_window: int</strong></dt><dd><p>The length of the window (in samples)</p>
+</dd>
+<dt><strong>num_samples_advance: int</strong></dt><dd><p>The number of samples the window advances at each step</p>
+</dd>
+<dt><strong>num_windows: int</strong></dt><dd><p>The number of windows to “take”.  Must be less or equal to the number of
+available windows.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>strided_window: numpy.ndarray</dt><dd><p>The windowed time series</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.window_helpers.test_apply_taper">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.window_helpers.</span></span><span class="sig-name descname"><span class="pre">test_apply_taper</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/window_helpers.html#test_apply_taper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.window_helpers.test_apply_taper" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-aurora.time_series.windowed_time_series">
+<span id="windowed-time-series"></span><h2>Windowed Time Series<a class="headerlink" href="#module-aurora.time_series.windowed_time_series" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.time_series.windowed_time_series.WindowedTimeSeries">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.time_series.windowed_time_series.</span></span><span class="sig-name descname"><span class="pre">WindowedTimeSeries</span></span><a class="reference internal" href="../_modules/aurora/time_series/windowed_time_series.html#WindowedTimeSeries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.windowed_time_series.WindowedTimeSeries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Time series that has been chopped into (possibly) overlapping windows.</p>
+<p>This is a place where we can put methods that operate on these sorts of
+objects.</p>
+<p>The assumption is that we take xarrays keyed by “channel”</p>
+<dl>
+<dt>Specific methods:</dt><dd><p>Demean
+Detrend
+Prewhiten
+stft
+invert_prewhitening</p>
+<p>probably make these &#64;staticmethod s so we import WindowedTimeSeries
+and then call the static methods</p>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.time_series.windowed_time_series.WindowedTimeSeries.apply_stft" title="aurora.time_series.windowed_time_series.WindowedTimeSeries.apply_stft"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_stft</span></code></a>([data, sample_rate, ...])</p></td>
+<td><p>Only supports xr.Dataset at this point</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.time_series.windowed_time_series.WindowedTimeSeries.apply_taper" title="aurora.time_series.windowed_time_series.WindowedTimeSeries.apply_taper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_taper</span></code></a></p></td>
+<td><p>staticmethod(function) -&gt; method</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.time_series.windowed_time_series.WindowedTimeSeries.delay_correction" title="aurora.time_series.windowed_time_series.WindowedTimeSeries.delay_correction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">delay_correction</span></code></a>(dataset, run_obj)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.time_series.windowed_time_series.WindowedTimeSeries.detrend" title="aurora.time_series.windowed_time_series.WindowedTimeSeries.detrend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">detrend</span></code></a>([data, detrend_axis, detrend_type, ...])</p></td>
+<td><p>TODO: overwrite data=True probably best for most applications but</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.windowed_time_series.WindowedTimeSeries.apply_stft">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">apply_stft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detrend_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectral_density_calibration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fft_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/windowed_time_series.html#WindowedTimeSeries.apply_stft"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.windowed_time_series.WindowedTimeSeries.apply_stft" title="Permalink to this definition">¶</a></dt>
+<dd><p>Only supports xr.Dataset at this point</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data</strong></dt><dd></dd>
+<dt><strong>sample_rate</strong></dt><dd></dd>
+<dt><strong>detrend_type</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"></dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.windowed_time_series.WindowedTimeSeries.apply_taper">
+<span class="sig-name descname"><span class="pre">apply_taper</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aurora.time_series.windowed_time_series.WindowedTimeSeries.apply_taper" title="Permalink to this definition">¶</a></dt>
+<dd><p>staticmethod(function) -&gt; method</p>
+<p>Convert a function to be a static method.</p>
+<p>A static method does not receive an implicit first argument.
+To declare a static method, use this idiom:</p>
+<blockquote>
+<div><dl>
+<dt>class C:</dt><dd><p>&#64;staticmethod
+def f(arg1, arg2, …):</p>
+<blockquote>
+<div><p>…</p>
+</div></blockquote>
+</dd>
+</dl>
+</div></blockquote>
+<p>It can be called either on the class (e.g. C.f()) or on an instance
+(e.g. C().f()). Both the class and the instance are ignored, and
+neither is passed implicitly as the first argument to the method.</p>
+<p>Static methods in Python are similar to those found in Java or C++.
+For a more advanced concept, see the classmethod builtin.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.windowed_time_series.WindowedTimeSeries.delay_correction">
+<span class="sig-name descname"><span class="pre">delay_correction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/windowed_time_series.html#WindowedTimeSeries.delay_correction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.windowed_time_series.WindowedTimeSeries.delay_correction" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dataset</strong><span class="classifier">xr.Dataset</span></dt><dd></dd>
+<dt><strong>run_obj</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"></dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.windowed_time_series.WindowedTimeSeries.detrend">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">detrend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detrend_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detrend_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/windowed_time_series.html#WindowedTimeSeries.detrend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.windowed_time_series.WindowedTimeSeries.detrend" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>TODO: overwrite data=True probably best for most applications but</dt><dd><p>be careful with that.  Do we want to avoid this in general?
+could we be possibly overwriting stuff on MTH5 in future?
+Also, is overwrite even working how I think it is here?</p>
+</dd>
+</dl>
+<p>TODO: overwrite_data not working right in scipy.signal, dont use it
+for now
+Parameters
+———-
+data : xarray Dataset
+detrend_axis : string
+detrend_type : string</p>
+<blockquote>
+<div><p>“linear” or “constant”
+This argument is provided to scipy.signal.detrend</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"></dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.windowed_time_series.get_time_coordinate_axis">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.windowed_time_series.</span></span><span class="sig-name descname"><span class="pre">get_time_coordinate_axis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/windowed_time_series.html#get_time_coordinate_axis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.windowed_time_series.get_time_coordinate_axis" title="Permalink to this definition">¶</a></dt>
+<dd><p>It is common to pass an argument to scipy.signal methods axis=int
+where that integer specifies along which dimension we are applying the
+operator.  This method helps ensure that we have the correct axis.
+Parameters
+———-
+dataset : xarray.Dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"></dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.windowed_time_series.schur_product_windowed_data">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.windowed_time_series.</span></span><span class="sig-name descname"><span class="pre">schur_product_windowed_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ensemblized_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">taper</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/windowed_time_series.html#schur_product_windowed_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.windowed_time_series.schur_product_windowed_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>The axes are set up so that each window is tapered</p>
+<p>In particular, each “window” is a row of windowed_array.  Thus taper
+operates by multiplying, point-by-point (Schur) each row or windowed_array.</p>
+<p>TODO: either take an argument for which axis the taper applies along or
+make the calling function confirm that each row is a window and each
+column is a window-advance-delta-t</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"></dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.windowed_time_series.validate_coordinate_ordering_time_domain">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.windowed_time_series.</span></span><span class="sig-name descname"><span class="pre">validate_coordinate_ordering_time_domain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/windowed_time_series.html#validate_coordinate_ordering_time_domain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.windowed_time_series.validate_coordinate_ordering_time_domain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that the data dimensions are what you expect.  THis may evolve some
+but for now, I just want to make sure that we are operating along the
+correct axes when we demean, detrend, taper, etc.
+Parameters
+———-
+dataset : xarray.Dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"></dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-aurora.time_series.windowing_scheme">
+<span id="windowing-scheme"></span><h2>Windowing Scheme<a class="headerlink" href="#module-aurora.time_series.windowing_scheme" title="Permalink to this heading">¶</a></h2>
+<p>The windowing scheme defines the chunking and chopping of the time series for
+the Short Time Fourier Transform.  Often referred to as a “sliding window” or
+a “striding window”.  It is basically a taper with a rule to say how far to
+advance at each stride (or step).</p>
+<p>To generate an array of data-windows from a data series we only need the
+two parameters window_length (L) and window_overlap (V).  The parameter
+“window_advance” (L-V) can be used in lieu of overlap.  Sliding windows are
+normally described terms of overlap but it is cleaner to code in terms of
+advance.</p>
+<p>Choices L and V are usually made with some knowledge of time series sample
+rate, duration, and the frequency band of interest.  We can create a
+module that “suggests” L, V, based on these metadata to make the default
+processing configuration parameters.</p>
+<p>Note: In general we will need one instance of this class per decimation level,
+but in the current implementation we will probably leave the windowing scheme
+the same for each decimation level.</p>
+<p>This class is a key part of the “gateway” to frequency domain, so what
+frequency domain considerations do we want to think about here.. certainly
+the window length and the sampling rate define the frequency resolution, and as
+such should be considered in context of the “band averaging scheme”</p>
+<p>Indeed the frequencies come from this class if it has a sampling rate.  While
+sampling rate is a property of the data, and not the windowing scheme per se,
+it is good for this class to be aware of the sampling rate.  … or should we
+push the frequency stuffs to a combination of TS plus WindowingScheme?
+The latter feels more appropriate.</p>
+<p>&lt;20210510&gt;
+When 2D arrays are generated how should we index them?
+[[ 0  1  2]</p>
+<blockquote>
+<div><p>[ 2  3  4]
+[ 4  5  6]
+[ 6  7  8]
+[ 8  9 10]
+[10 11 12]
+[12 13 14]]</p>
+</div></blockquote>
+<p>In this example the rows are indexing the individual windows … and so they
+should be associated with the time of each window.  We will need to set a
+standard for this.  Obvious options are center_time of window and time_of_first
+sample. I prefer time_of_first sample.  This can always be transformed to
+center time or another standard later.  We can call this the “window time
+axis”.  The columns are indexing “steps of delta-t”.  The actual times are
+different for every row, so it would be best to use something like
+[0, dt, 2*dt] for that axis to keep it general.  We can call this the
+“within-window sample time axis”</p>
+<p>&lt;/20210510&gt;</p>
+<p>TODO: Regarding the optional time_vector input to self.apply_sliding_window()
+… this current implementation takes as input numpy array data.  We need to
+also allow for an xarray to be implemented. In the simplest case we would
+take an xarray in and extract its “time” axis as time vector</p>
+<p>&lt;20210529&gt;
+This class is going to be modified to only accept xarray as input data.
+We can force any incoming numpy arrays to be either xr.DataArray or xr.Dataset.
+Similarly, output will be only xr.DataArray or xr.Dataset
+&lt;/20210529&gt;</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.time_series.windowing_scheme.WindowingScheme">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.time_series.windowing_scheme.</span></span><span class="sig-name descname"><span class="pre">WindowingScheme</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/windowing_scheme.html#WindowingScheme"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.windowing_scheme.WindowingScheme" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#aurora.time_series.apodization_window.ApodizationWindow" title="aurora.time_series.apodization_window.ApodizationWindow"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApodizationWindow</span></code></a></p>
+<p>20210415: Casting window length, overlap, advance, etc. in terms of number
+of samples or “points” here as this is common signal processing the
+nomenclature.  We may provide an interface to define these things in terms
+of percent, duration in seconds etc. in a supporting module.</p>
+<p>Note that sample_rate is actually a property of the data and not of the
+window … still not sure if we want to make sample_rate an attr here
+or if its better to put properties like window_duration() as a method of
+some composition of time series and windowing scheme.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">S1</span></code></dt><dd><p>sum of the window coefficients</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">S2</span></code></dt><dd><p>sum of squares of the window coefficients</p>
+</dd>
+<dt><strong>apodization_factor</strong></dt><dd></dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">coherent_gain</span></code></dt><dd><p>DC gain of the window normalized by window length</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.time_series.windowing_scheme.WindowingScheme.dt" title="aurora.time_series.windowing_scheme.WindowingScheme.dt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dt</span></code></a></dt><dd><p>comes from data</p>
+</dd>
+<dt><strong>duration_advance</strong></dt><dd></dd>
+<dt><a class="reference internal" href="#aurora.time_series.windowing_scheme.WindowingScheme.linear_spectral_density_calibration_factor" title="aurora.time_series.windowing_scheme.WindowingScheme.linear_spectral_density_calibration_factor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">linear_spectral_density_calibration_factor</span></code></a></dt><dd><p>Returns ——- calibration_factor : float Following Hienzel et al 2002, Equations 24 and 25 for Linear Spectral Density correction for a single sided spectrum.</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">nenbw</span></code></dt><dd><p>NENBW Normalized Equivalent Noise BandWidth, see Equation (21) in</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.time_series.windowing_scheme.WindowingScheme.num_samples_advance" title="aurora.time_series.windowing_scheme.WindowingScheme.num_samples_advance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_samples_advance</span></code></a></dt><dd><p>A derived property.</p>
+</dd>
+<dt><strong>num_samples_window</strong></dt><dd></dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">summary</span></code></dt><dd><p>Returns</p>
+</dd>
+<dt><strong>taper</strong></dt><dd></dd>
+<dt><a class="reference internal" href="#aurora.time_series.windowing_scheme.WindowingScheme.window_duration" title="aurora.time_series.windowing_scheme.WindowingScheme.window_duration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_duration</span></code></a></dt><dd><p>units are SI seconds assuming dt is SI seconds</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.time_series.windowing_scheme.WindowingScheme.apply_fft" title="aurora.time_series.windowing_scheme.WindowingScheme.apply_fft"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_fft</span></code></a>(data[, ...])</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.time_series.windowing_scheme.WindowingScheme.apply_sliding_window" title="aurora.time_series.windowing_scheme.WindowingScheme.apply_sliding_window"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_sliding_window</span></code></a>(data[, time_vector, ...])</p></td>
+<td><p>I would like this method to support numpy arrays as well as xarrays.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.time_series.windowing_scheme.WindowingScheme.apply_spectral_density_calibration" title="aurora.time_series.windowing_scheme.WindowingScheme.apply_spectral_density_calibration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_spectral_density_calibration</span></code></a>(dataset)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.time_series.windowing_scheme.WindowingScheme.apply_taper" title="aurora.time_series.windowing_scheme.WindowingScheme.apply_taper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_taper</span></code></a>(data)</p></td>
+<td><p>modifies the data in place by applying a taper to each window TODO: consider adding an option to return a copy of the data without the taper applied</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.time_series.windowing_scheme.WindowingScheme.available_number_of_windows" title="aurora.time_series.windowing_scheme.WindowingScheme.available_number_of_windows"><code class="xref py py-obj docutils literal notranslate"><span class="pre">available_number_of_windows</span></code></a>(num_samples_data)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.time_series.windowing_scheme.WindowingScheme.cast_windowed_data_to_xarray" title="aurora.time_series.windowing_scheme.WindowingScheme.cast_windowed_data_to_xarray"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cast_windowed_data_to_xarray</span></code></a>(windowed_array, ...)</p></td>
+<td><p>TODO?: Factor this method to a standalone function in window_helpers?</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.time_series.windowing_scheme.WindowingScheme.compute_window_edge_indices" title="aurora.time_series.windowing_scheme.WindowingScheme.compute_window_edge_indices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_window_edge_indices</span></code></a>(num_samples_data)</p></td>
+<td><p>This has been useful in the past but maybe not needed here</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.time_series.windowing_scheme.WindowingScheme.downsample_time_axis" title="aurora.time_series.windowing_scheme.WindowingScheme.downsample_time_axis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">downsample_time_axis</span></code></a>(time_axis)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">enbw</span></code>(fs)</p></td>
+<td><p>Notes that unlike NENBW, CG, S1, S2, this is not a pure property of the window -- but instead this is a property of the window combined with the sample rate.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">make</span></code>()</p></td>
+<td><p>this is just a wrapper call to scipy.signal Note: see scipy.signal.get_window for a description of what is expected in args[1:].</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_linear_spectral_density_factor</span></code>()</p></td>
+<td><p>This is just a test to verify some algebra Claim: The lsd_calibration factors A      (1./coherent_gain)*np.sqrt((2*dt)/(nenbw*N)) and B      np.sqrt(2/(sample_rate*self.S2)) are identical.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 77%" />
+<col style="width: 23%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>clone</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>frequency_axis</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>left_hand_window_edge_indices</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.windowing_scheme.WindowingScheme.apply_fft">
+<span class="sig-name descname"><span class="pre">apply_fft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectral_density_correction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detrend_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/windowing_scheme.html#WindowingScheme.apply_fft"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.windowing_scheme.WindowingScheme.apply_fft" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data: xarray.core.dataset.Dataset</strong></dt><dd></dd>
+<dt><strong>spectral_density_correction: boolean</strong></dt><dd></dd>
+<dt><strong>detrend_type: string</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>spectral_ds:</dt><dd></dd>
+<dt>Assume we have already applied sliding window and taper.</dt><dd></dd>
+<dt>Things to think about:</dt><dd></dd>
+<dt>We want to assign the frequency axis during this method</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.windowing_scheme.WindowingScheme.apply_sliding_window">
+<span class="sig-name descname"><span class="pre">apply_sliding_window</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_vector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_xarray</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/windowing_scheme.html#WindowingScheme.apply_sliding_window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.windowing_scheme.WindowingScheme.apply_sliding_window" title="Permalink to this definition">¶</a></dt>
+<dd><p>I would like this method to support numpy arrays as well as xarrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data: 1D numpy array, xr.DataArray, xr.Dataset</strong></dt><dd><p>The data to break into ensembles.</p>
+</dd>
+<dt><strong>time_vector: 1D numpy array</strong></dt><dd><p>The time axis of the data.</p>
+</dd>
+<dt><strong>dt: float</strong></dt><dd><p>The sample interval of the data (reciprocal of sample_rate)</p>
+</dd>
+<dt><strong>return_xarray: boolean</strong></dt><dd><p>If True will return an xarray object, even if the input object was a
+numpy array</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>windowed_obj: arraylike</dt><dd><p>Normally an object of type xarray.core.dataarray.DataArray
+Could be numpy array as well.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.windowing_scheme.WindowingScheme.apply_spectral_density_calibration">
+<span class="sig-name descname"><span class="pre">apply_spectral_density_calibration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/windowing_scheme.html#WindowingScheme.apply_spectral_density_calibration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.windowing_scheme.WindowingScheme.apply_spectral_density_calibration" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dataset</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"></dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.windowing_scheme.WindowingScheme.apply_taper">
+<span class="sig-name descname"><span class="pre">apply_taper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/windowing_scheme.html#WindowingScheme.apply_taper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.windowing_scheme.WindowingScheme.apply_taper" title="Permalink to this definition">¶</a></dt>
+<dd><p>modifies the data in place by applying a taper to each window
+TODO: consider adding an option to return a copy of the data without
+the taper applied</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.windowing_scheme.WindowingScheme.available_number_of_windows">
+<span class="sig-name descname"><span class="pre">available_number_of_windows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_samples_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/windowing_scheme.html#WindowingScheme.available_number_of_windows"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.windowing_scheme.WindowingScheme.available_number_of_windows" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>num_samples_data</strong><span class="classifier">int</span></dt><dd><p>The number of samples in the time series to be windowed by self.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>number_of_windows</strong><span class="classifier">int</span></dt><dd><p>Count of the number of windows returned from time series of
+num_samples_data.  Only take as many windows as available without
+wrapping.  Start with one window for free, move forward by
+num_samples_advance and don’t walk over the cliff.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.windowing_scheme.WindowingScheme.cast_windowed_data_to_xarray">
+<span class="sig-name descname"><span class="pre">cast_windowed_data_to_xarray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">windowed_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_vector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/windowing_scheme.html#WindowingScheme.cast_windowed_data_to_xarray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.windowing_scheme.WindowingScheme.cast_windowed_data_to_xarray" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO?: Factor this method to a standalone function in window_helpers?</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>windowed_array</strong></dt><dd></dd>
+<dt><strong>time_vector</strong></dt><dd></dd>
+<dt><strong>dt</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"></dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.windowing_scheme.WindowingScheme.clone">
+<span class="sig-name descname"><span class="pre">clone</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/windowing_scheme.html#WindowingScheme.clone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.windowing_scheme.WindowingScheme.clone" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.windowing_scheme.WindowingScheme.compute_window_edge_indices">
+<span class="sig-name descname"><span class="pre">compute_window_edge_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_samples_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/windowing_scheme.html#WindowingScheme.compute_window_edge_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.windowing_scheme.WindowingScheme.compute_window_edge_indices" title="Permalink to this definition">¶</a></dt>
+<dd><p>This has been useful in the past but maybe not needed here</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.windowing_scheme.WindowingScheme.downsample_time_axis">
+<span class="sig-name descname"><span class="pre">downsample_time_axis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_axis</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/windowing_scheme.html#WindowingScheme.downsample_time_axis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.windowing_scheme.WindowingScheme.downsample_time_axis" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>time_axis</strong><span class="classifier">arraylike</span></dt><dd><p>This is the time axis associated with the time-series prior to
+the windowing operation.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>window_time_axis</strong><span class="classifier">array-like</span></dt><dd><p>This is a time axis for the windowed data.  Say that we had 1Hz
+data starting at t=0 and 100 samples.  Then we window,
+with window length 10, and advance 10, the window time axis is</p>
+<blockquote>
+<div><p>[0, 10, 20 , … 90].  Say the same window length, but now
+advance is 5.  Then [0, 5, 10, 15, … 90] is the result.</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.time_series.windowing_scheme.WindowingScheme.dt">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dt</span></span><a class="headerlink" href="#aurora.time_series.windowing_scheme.WindowingScheme.dt" title="Permalink to this definition">¶</a></dt>
+<dd><p>comes from data</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.time_series.windowing_scheme.WindowingScheme.duration_advance">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">duration_advance</span></span><a class="headerlink" href="#aurora.time_series.windowing_scheme.WindowingScheme.duration_advance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.windowing_scheme.WindowingScheme.frequency_axis">
+<span class="sig-name descname"><span class="pre">frequency_axis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/windowing_scheme.html#WindowingScheme.frequency_axis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.windowing_scheme.WindowingScheme.frequency_axis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.time_series.windowing_scheme.WindowingScheme.left_hand_window_edge_indices">
+<span class="sig-name descname"><span class="pre">left_hand_window_edge_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_samples_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/windowing_scheme.html#WindowingScheme.left_hand_window_edge_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.windowing_scheme.WindowingScheme.left_hand_window_edge_indices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.time_series.windowing_scheme.WindowingScheme.linear_spectral_density_calibration_factor">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">linear_spectral_density_calibration_factor</span></span><a class="headerlink" href="#aurora.time_series.windowing_scheme.WindowingScheme.linear_spectral_density_calibration_factor" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>calibration_factor</strong><span class="classifier">float</span></dt><dd><p>Following Hienzel et al 2002, Equations 24 and 25 for Linear
+Spectral Density correction for a single sided spectrum.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.time_series.windowing_scheme.WindowingScheme.num_samples_advance">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_samples_advance</span></span><a class="headerlink" href="#aurora.time_series.windowing_scheme.WindowingScheme.num_samples_advance" title="Permalink to this definition">¶</a></dt>
+<dd><p>A derived property.  If we made this a fundamental defined property
+then overlap would become a derived property.  Overlap is more
+conventional than advance in the literature however so we choose it as
+our property label.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.time_series.windowing_scheme.WindowingScheme.window_duration">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">window_duration</span></span><a class="headerlink" href="#aurora.time_series.windowing_scheme.WindowingScheme.window_duration" title="Permalink to this definition">¶</a></dt>
+<dd><p>units are SI seconds assuming dt is SI seconds</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.time_series.windowing_scheme.fft_xr_ds">
+<span class="sig-prename descclassname"><span class="pre">aurora.time_series.windowing_scheme.</span></span><span class="sig-name descname"><span class="pre">fft_xr_ds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detrend_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prewhitening</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/time_series/windowing_scheme.html#fft_xr_ds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.time_series.windowing_scheme.fft_xr_ds" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO: Add support for “first difference” prewhitening
+assume you have an xr.dataset or xr.DataArray.  It is 2D.
+This should call window_helpers.apply_fft_to_windowed_array
+or get moved to window_helpers.py</p>
+<p>The returned harmonics do not include the Nyquist frequency. To modify this
+add +1 to n_fft_harmonics.  Also, only 1-sided ffts are returned.</p>
+<p>For each channel within the Dataset, fft is applied along the
+within-window-time axis of the associated numpy array</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dataset</strong><span class="classifier">xr.Dataset</span></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"></dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="API Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="transfer_function.html" class="btn btn-neutral float-right" title="Transfer Function" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

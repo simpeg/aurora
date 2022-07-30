@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Problem Statement &mdash; aurora 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/plot_directive.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Problem Statement</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/examples/pole_zero_fitting/lemi_pole_zero_fitting_example.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+.jp-RenderedHTMLCommon thead,
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+.jp-RenderedHTMLCommon th,
+div.rendered_html th {
+  font-weight: bold;
+}
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+.jp-RenderedHTMLCommon tbody tr:hover,
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<h1><p>Poles/Zeros/Gain from Look-Up Tables (Prototyping)</p>
+</h1><section id="Problem-Statement">
+<h1>Problem Statement<a class="headerlink" href="#Problem-Statement" title="Permalink to this heading">¶</a></h1>
+<p>The IRIS metadata archiving process had a strong preference for pole-zero (‘zpk’) representations of analog filters. However, calibrations of many MT instruments are characterized in the form of frequency sweeps, and the manufacturers calibrations are often provided in terms of tables of frequency, with amplitude and phase responses (‘fap’).</p>
+<p>Thus we are faced with the problem of expressing a generic <em>fap</em> instrument resposne in the <em>zpk</em> format.</p>
+</section>
+<section id="Inverse-Problem-Setup">
+<h1>Inverse Problem Setup<a class="headerlink" href="#Inverse-Problem-Setup" title="Permalink to this heading">¶</a></h1>
+<p><span class="math notranslate nohighlight">\(\bf{d}\)</span>: The “data” in the the ‘fap’ table. This is simply a set of <span class="math notranslate nohighlight">\(N\)</span> ordered pairs, <span class="math notranslate nohighlight">\(\{(f_1, x_1), (f_2, x_2), ... (f_N, x_N)\}\)</span> where <span class="math notranslate nohighlight">\(f_i \in \mathbb{R}^+\)</span> and <span class="math notranslate nohighlight">\(x_i \in \mathbb{C}\)</span></p>
+<p><span class="math notranslate nohighlight">\(\bf{G}\)</span>: The function relating the data and the model can take on several parameterizations. One of the parameterizations is as a ratio of real valued polynomials:</p>
+<p>$ <span class="math">\displaystyle `h(s) = :nbsphinx-math:</span>frac{a_{m}s^m + a_{m-1}s^{m-1} + … + a_{1}s^{1} + a_{0}}{b_{n}s^{n} + b_{n-1}s^{n-1} + … + b_{1}s^{1} + b_{0}}` $</p>
+<p>Where the Laplace variable <em>s</em> = <em>j</em> <span class="math notranslate nohighlight">\(\omega\)</span></p>
+<p><span class="math notranslate nohighlight">\(\bf{m}\)</span>: Using the above parameterization <span class="math notranslate nohighlight">\(\bf{m}\)</span> would be the set of <span class="math notranslate nohighlight">\(m + n + 2\)</span> coefficients <span class="math notranslate nohighlight">\({a_0, a_1, ...a_m, b_0, b_1, ... b_n}\)</span> with <span class="math notranslate nohighlight">\(a_i, b_i \in \mathbb{R}\)</span></p>
+<p>The coefficients in the numerator and denominator polynomials in the Laplace domain representation of the filter are real. They typically correspond to values of circuit parameters resistance, capacitance, inductance, etc. in analog EE applications. This means that these polynomials factor completely over the complex plane and moreover, the roots are either real or occur in complex-conjugate pairs.</p>
+<p>Factoring <span class="math notranslate nohighlight">\(h(s)\)</span> on top and bottom yields the form:</p>
+<p>$ <span class="math">\displaystyle `h (s) = k :nbsphinx-math:</span>frac{(s-z_1)(s-z_2)…(s-z_m) }{(s-p_1)(s-p_2)…(s-p_n)}` $</p>
+<p>There are well defined transformations between these representations and they are available through <em>scipy.signal.tf2zpk</em> or <em>zpk2tf</em>.</p>
+<section id="Recent-Activity-in-PZ-fitting">
+<h2>Recent Activity in PZ-fitting<a class="headerlink" href="#Recent-Activity-in-PZ-fitting" title="Permalink to this heading">¶</a></h2>
+<p>Ben Murphy tried a variety of methods to solve this problem but invariably wound up encountering poles and zeros (roots) that did not obey the principle of complex-conjugate roots, and sometimes poles on the right hand side of the plane, and or k values that were complex-valued. The complex k values are particularly concerning because IRIS does not provide support for complex-valued k – it is just one double-precision number.</p>
+<p>The reason for these issues deserves some analysis but at a high level seems to be due to parameterizations that ultimately wound up searching complex-valued spaces for soltuions.</p>
+<p>Karl tried some variants on Ben’s methods which involved some regularization functions that penalized non-conjugate root pairs, and imaginary parts of k, but these never matured so their value is questionable.</p>
+<p>It seems like we should be able to use a numeric method to solve in the real valued form (even though the evaluation of the TF is Complex, the coefficients are real) and then extract the zpk afterwards. Following is an example of a numeric solution.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[60]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+# from matplotlib.gridspec import GridSpec
+from pathlib import Path
+from scipy import signal
+from scipy.optimize import minimize
+
+from mt_metadata.timeseries.filters.plotting_helpers import plot_response
+from aurora.sandbox.plot_helpers import plot_complex_response
+
+# from regularization_function_development import add_regularization_term
+# from regularization_function_development import get_pz_regularization
+
+# %matplotlib inline
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[46]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>DEG2RAD = np.pi/180
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="Load-the-data-from-data-repo">
+<h1>Load the data from data repo<a class="headerlink" href="#Load-the-data-from-data-repo" title="Permalink to this heading">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[47]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>calibration_file_path = Path(&quot;Lemi-039_N131BxByBz&quot;, &quot;Lemi-039_N131.cal&quot;)
+
+df = pd.read_csv(calibration_file_path, skiprows=3, delimiter=&#39;\t&#39;)
+column_labels = [&#39;frequency&#39;, &#39;amplitude_x&#39;, &#39;phase_x&#39;, &#39;amplitude_y&#39;, &#39;phase_y&#39;, &#39;amplitude_z&#39;, &#39;phase_z&#39;]
+columns_map = dict(zip(df.columns, column_labels))
+df = df.rename(columns=columns_map)
+print(df.columns)
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Index([&#39;frequency&#39;, &#39;amplitude_x&#39;, &#39;phase_x&#39;, &#39;amplitude_y&#39;, &#39;phase_y&#39;,
+       &#39;amplitude_z&#39;, &#39;phase_z&#39;],
+      dtype=&#39;object&#39;)
+</pre></div></div>
+</div>
+</section>
+<section id="Preliminary-Response-Curve">
+<h1>Preliminary Response Curve<a class="headerlink" href="#Preliminary-Response-Curve" title="Permalink to this heading">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>x_phase_radians = DEG2RAD*df[&#39;phase_x&#39;]
+x_phasor = np.exp(1.J*x_phase_radians) #(np.cos( x_phase_radians)+ 1.j*np.sin(x_phase_radians))
+x_complex_response = df[&#39;amplitude_x&#39;] * x_phasor
+X_COMPLEX_RESPONSE = x_complex_response #make it global for availabilty in objective functions
+frequencies = df[&#39;frequency&#39;].to_numpy()
+
+plot_complex_response(df[&#39;frequency&#39;], x_complex_response)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/examples_pole_zero_fitting_lemi_pole_zero_fitting_example_12_0.png" src="../../_images/examples_pole_zero_fitting_lemi_pole_zero_fitting_example_12_0.png" />
+</div>
+</div>
+</section>
+<section id="Estimate-the-response-amplitude-in-the-pass-band">
+<h1>Estimate the response amplitude in the pass band<a class="headerlink" href="#Estimate-the-response-amplitude-in-the-pass-band" title="Permalink to this heading">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[49]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>nominal_passband_response_amplitude = df[&#39;amplitude_x&#39;].iloc[10].mean()
+print(&#39;nominal_passband_response_amplitude&#39;, nominal_passband_response_amplitude)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+nominal_passband_response_amplitude 0.02847
+</pre></div></div>
+</div>
+</section>
+<section id="Express-in-units-of-deciBels-and-plot-on-semilog">
+<h1>Express in units of deciBels and plot on semilog<a class="headerlink" href="#Express-in-units-of-deciBels-and-plot-on-semilog" title="Permalink to this heading">¶</a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[50]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>amplitude_in_db = 20*np.log10(df[&#39;amplitude_x&#39;]/nominal_passband_response_amplitude)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[51]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.semilogx(df[&#39;frequency&#39;], amplitude_in_db)
+plt.semilogx(df[&#39;frequency&#39;], amplitude_in_db, &#39;r*&#39;)
+plt.grid(which=&#39;both&#39;)
+plt.title(&#39;Amplitude Response of Instrument in dB&#39;)
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[51]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Text(0.5, 1.0, &#39;Amplitude Response of Instrument in dB&#39;)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/examples_pole_zero_fitting_lemi_pole_zero_fitting_example_17_1.png" src="../../_images/examples_pole_zero_fitting_lemi_pole_zero_fitting_example_17_1.png" />
+</div>
+</div>
+</section>
+<section id="Note-that-the-decay-is-log-linear-after-about-5Hz">
+<h1>Note that the decay is log-linear after about 5Hz<a class="headerlink" href="#Note-that-the-decay-is-log-linear-after-about-5Hz" title="Permalink to this heading">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[53]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>#The last 13 points are approximately a straight line on the log plot
+n_asymptotic_log_linear = 13
+frq_line = df[&#39;frequency&#39;][-n_asymptotic_log_linear:]
+ampl_line = df[&#39;amplitude_x&#39;][-n_asymptotic_log_linear:]
+db_line = amplitude_in_db[-n_asymptotic_log_linear:]
+log_f = np.array(np.log10(frq_line))
+log_a = np.array(np.log10(ampl_line))
+db = np.array(db_line)
+db_per_decade = (db[-1]-db[0]) / (log_f[-1]-log_f[0])
+
+plt.plot(log_f, db_line)
+plt.xlabel(&#39;log$_{10}$ frequency&#39;)
+plt.ylabel(&#39;dB&#39;)
+plt.title(f&quot;db_per_decade: {db_per_decade:.2f}&quot;)
+plt.show()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/examples_pole_zero_fitting_lemi_pole_zero_fitting_example_19_0.png" src="../../_images/examples_pole_zero_fitting_lemi_pole_zero_fitting_example_19_0.png" />
+</div>
+</div>
+<section id="looks-like-approximately--20dB/decade,-which-theoretically-corresponds-to-a-single-pole.-We-obtain-a-decent-fit-with-one-pole,-but-a-better-fit-with-3poles-and-one-zero.">
+<h2>looks like approximately -20dB/decade, which theoretically corresponds to a single pole. We obtain a decent fit with one pole, but a better fit with 3poles and one zero.<a class="headerlink" href="#looks-like-approximately--20dB/decade,-which-theoretically-corresponds-to-a-single-pole.-We-obtain-a-decent-fit-with-one-pole,-but-a-better-fit-with-3poles-and-one-zero." title="Permalink to this heading">¶</a></h2>
+<p>If we want to optimize we need to add constraints however. In particular, a regulariization that forces 1: complex poles to be conjugates, and the ‘odd’ poles to be pure real. This means modifying the LLSQ process.</p>
+<p>If the roll off is ~20dB/ decade then we would expect a 1 pole filter, or at least a filter with one more pole than zeros</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[71]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>%%html
+&lt;iframe src=&quot;https://eng.libretexts.org/Bookshelves/Electrical_Engineering/Electronics/Operational_Amplifiers_and_Linear_Integrated_Circuits_-_Theory_and_Application_(Fiore)/11%3A_Active_Filters/11.04%3A_Section_4-&quot; width=&quot;1200&quot; height=&quot;1000&quot;&gt;&lt;/iframe&gt;
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<iframe src="https://eng.libretexts.org/Bookshelves/Electrical_Engineering/Electronics/Operational_Amplifiers_and_Linear_Integrated_Circuits_-_Theory_and_Application_(Fiore)/11%3A_Active_Filters/11.04%3A_Section_4-" width="1200" height="1000"></iframe></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[55]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># from tf_helpers import Fit_ZerosPolesGain_toFrequencyResponse_LLSQ
+# n_zeros = 2; n_poles = 3;
+# #n_zeros = 0; n_poles = 1;
+
+# print(&quot;PARAMETERIZATION: {} zeros, {} poles&quot;.format(n_zeros, n_poles))
+# w_obs = 2*np.pi*frequencies
+# resp_obs =  x_complex_response#df[&#39;amplitude_x&#39;]
+# LEMI_LM_ZPK = Fit_ZerosPolesGain_toFrequencyResponse_LLSQ(w_obs,
+#                                                         resp_obs,
+#                                                         n_zeros, n_poles, useSKiter=False,
+#                                                          regularize=False)
+# print(LEMI_LM_ZPK)
+
+# plot_response(resp_obs=resp_obs, w_obs=w_obs, x_units=&#39;frequency&#39;,
+#               zpk_pred=LEMI_LM_ZPK, w_values=w_obs)
+<br/></pre></div>
+</div>
+</div>
+</section>
+<section id="Lets-try-a-numerical-approach-using-scipy-optimize-and-some-regularization-that-penalizes-deviations-from-the-fundamental-theorem-of-algebra-solutions">
+<h2>Lets try a numerical approach using scipy optimize and some regularization that penalizes deviations from the fundamental theorem of algebra solutions<a class="headerlink" href="#Lets-try-a-numerical-approach-using-scipy-optimize-and-some-regularization-that-penalizes-deviations-from-the-fundamental-theorem-of-algebra-solutions" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[103]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>W = 2*np.pi*frequencies
+
+N_ZEROS = 0; N_POLES = 1 #Not great
+N_ZEROS = 1; N_POLES = 2#Good when seeded with 1
+#N_ZEROS = 2; N_POLES = 3#Good when seeded with 3
+#N_ZEROS = 3; N_POLES = 4#not so good
+np.random.seed(1)
+b0 = np.random.rand(N_ZEROS+1)
+a0 = np.random.rand(N_POLES+1)
+
+MODEL_VECTOR_0 = np.hstack((b0, a0))
+#print(&#39;MODEL_VECTOR_0&#39;,MODEL_VECTOR_0)
+
+
+def objective_function(model_vector, verbose=False):
+    #unpack the model vector
+    bb = model_vector[:N_ZEROS+1]
+    aa = model_vector[N_ZEROS+1:]
+
+    if verbose:
+        print(&#39;numerator &#39;, bb, N_ZEROS)
+        print(&#39;denominator&#39;, aa, N_POLES)
+    w, h = signal.freqs(bb, aa, worN=W)
+    residual = X_COMPLEX_RESPONSE - h
+    #print(residual)
+    misfit = np.sqrt(np.mean(np.abs(residual**2)))
+#    misfit = add_regularization_term(zeros, poles, k, misfit, aa=0.1)
+    if verbose:
+        print(&#39;misfit&#39;,misfit)
+    return misfit
+
+objective_function(MODEL_VECTOR_0, verbose=True)
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+numerator  [ 0.417022    0.72032449] 1
+denominator [  1.14374817e-04   3.02332573e-01   1.46755891e-01] 2
+misfit 2.46055330257
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[103]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2.4605533025729578
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[104]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>#method = &#39;nelder-mead&#39;
+method = &#39;Powell&#39;
+#method = &#39;CG&#39;
+#method = &#39;Newton-CG&#39; #needs Jacobian
+res = minimize(objective_function, MODEL_VECTOR_0, method=method, options={&#39;xatol&#39;: 1e-10, &#39;disp&#39;: True, })
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/kkappler/.local/lib/python3.6/site-packages/ipykernel_launcher.py:5: OptimizeWarning: Unknown solver options: xatol
+  &#34;&#34;&#34;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Optimization terminated successfully.
+         Current function value: 0.000202
+         Iterations: 14
+         Function evaluations: 1089
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[105]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>res.x
+bb = res.x[:N_ZEROS+1]
+aa = res.x[N_ZEROS+1:]
+zpk = signal.TransferFunction(bb, aa).to_zpk()
+#zpk = signal.tf2zpk(bb, aa)
+print(zpk)
+#print(type(zpk))
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ZerosPolesGainContinuous(
+array([-37.78764719]),
+array([-18.49867054+16.57300946j, -18.49867054-16.57300946j]),
+-0.4648829833859911,
+dt: None
+)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[106]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plot_response(resp_obs=resp_obs, w_obs=w_obs, x_units=&#39;frequency&#39;,
+              zpk_pred=zpk, w_values=w_obs)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/examples_pole_zero_fitting_lemi_pole_zero_fitting_example_28_0.png" src="../../_images/examples_pole_zero_fitting_lemi_pole_zero_fitting_example_28_0.png" />
+</div>
+</div>
+<p>what percent differences are we looking at here?</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[112]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>resp_obs
+frequencies
+w_pred, resp_pred = signal.freqresp(zpk, w=w_obs)
+np.abs((resp_pred-resp_obs)/resp_obs)*100
+
+(1./DEG2RAD)*(np.angle(resp_pred) - np.angle(resp_obs))/np.angle(resp_obs)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[112]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([  1.17108509e-01,  -8.15728192e-03,   8.01752757e-03,
+         4.71400215e-02,   3.37596502e-03,   7.12834007e-03,
+         6.71110507e-03,   1.74167859e-02,   9.65177288e-03,
+         4.83541843e-03,   5.07153821e-03,  -1.01671816e-02,
+        -7.34773273e-04,  -1.01214521e-02,   1.32071422e-03,
+        -1.38925629e-02,   1.55362896e-02,  -1.14290846e-03,
+         1.29174179e-02,  -2.86266283e-02,  -1.09777128e-02,
+         3.26699526e-03,  -1.59316504e-03,   1.97338839e-02,
+        -1.73524258e-02,   3.47419521e-04,   1.98501572e-02,
+         1.77932781e-02,   5.45075830e-02,   5.87195330e-02,
+         1.15844367e-01,   1.43397591e-01,   1.63482792e-01,
+         1.53176575e-01,   1.34203539e-01,   4.45630958e-02,
+        -2.04469810e-02,  -1.11298669e-01,  -4.75105695e-02,
+         1.52755963e-01,   4.38486018e-01,   8.40064153e-01,
+         1.48316739e+00,   2.17213577e+00,   3.13772873e+00,
+         3.86222759e+00,   4.70537812e+00,   6.19387338e+00,
+         7.59606740e+00,   9.24055597e+00])
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[102]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>frequencies[40]
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[102]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+10.007999999999999
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="So,-where-are-we?">
+<h1>So, where are we?<a class="headerlink" href="#So,-where-are-we?" title="Permalink to this heading">¶</a></h1>
+<p>We have a numeric method that works “pretty well” but could use some serious tuning 1. We have analytic expressions so lets get some Jacobians and Hessians and try some of the more classical approaches in scipy.minimize</p>
+<ol class="arabic" start="2">
+<li><div class="line-block">
+<div class="line">Lets try a bunch of seed values for each optimization and explore the sum RMS misfits.</div>
+</div>
+</li>
+<li><p>Do (2) above for a collection of n_poles, n_zeros controls</p></li>
+<li><p>Tidy up supporting codes and make some metrics/reports to use for these fits</p></li>
+<li><p>Move on</p></li>
+</ol>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<p>If you are interested in exploring more check out Ben Murphy’s ipynb in iris-mt-scratch repo</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[62]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from scipy.optimize import minimize
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[95]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from tf_helpers import Fit_ZerosPolesGain_toFrequencyResponse_LLSQ
+n_zeros = 2; n_poles = 3;
+#n_zeros = 1; n_poles = 2;
+#n_zeros = 0; n_poles = 1;
+
+print(&quot;PARAMETERIZATION: {} zeros, {} poles&quot;.format(n_zeros, n_poles))
+w_obs = 2*np.pi*frequencies
+resp_obs =  x_complex_response#df[&#39;amplitude_x&#39;]
+LEMI_LM_ZPK = Fit_ZerosPolesGain_toFrequencyResponse_LLSQ(w_obs,
+                                                        resp_obs,
+                                                        n_zeros, n_poles, useSKiter=False,
+                                                         regularize=False)
+print(LEMI_LM_ZPK)
+
+plot_response(resp_obs=resp_obs, w_obs=w_obs, x_units=&#39;frequency&#39;,
+              zpk_pred=LEMI_LM_ZPK, w_values=w_obs)
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+PARAMETERIZATION: 2 zeros, 3 poles
+ZerosPolesGainContinuous(
+array([-957.08603092+4.45450947j,  -34.98372872-2.28826934j]),
+array([-485.28932769+107.50895551j,  -17.26778927 -17.54658073j,
+        -18.34527168 +15.52113528j]),
+(-0.2446806069717897+0.046680268003547215j),
+dt: None
+)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/examples_pole_zero_fitting_lemi_pole_zero_fitting_example_41_1.png" src="../../_images/examples_pole_zero_fitting_lemi_pole_zero_fitting_example_41_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[113]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>w_pred, resp_pred = signal.freqresp(LEMI_LM_ZPK, w=w_obs)
+np.abs((resp_pred-resp_obs)/resp_obs)*100
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[113]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0     0.638158
+1     0.498207
+2     0.101776
+3     0.207398
+4     0.135960
+5     0.449954
+6     0.155934
+7     0.114567
+8     0.313557
+9     0.112989
+10    0.140235
+11    0.169018
+12    0.100383
+13    0.119354
+14    0.068533
+15    0.090453
+16    0.157084
+17    0.072294
+18    0.092330
+19    0.203936
+20    0.074840
+21    0.081134
+22    0.056017
+23    0.159542
+24    0.163991
+25    0.120231
+26    0.181844
+27    0.074201
+28    0.132750
+29    0.129995
+30    0.070027
+31    0.102507
+32    0.089862
+33    0.195729
+34    0.245377
+35    0.179085
+36    0.213835
+37    0.064805
+38    0.141571
+39    0.163369
+40    0.292033
+41    0.388454
+42    0.113458
+43    0.268236
+44    0.535032
+45    0.112583
+46    0.439616
+47    0.208596
+48    0.043306
+49    0.037117
+dtype: float64
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

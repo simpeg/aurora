@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.time_series.windowed_time_series &mdash; aurora 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/plot_directive.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>aurora.time_series.windowed_time_series</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.time_series.windowed_time_series</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">interp1d</span>
+<span class="kn">import</span> <span class="nn">scipy.signal</span> <span class="k">as</span> <span class="nn">ssig</span>
+<span class="kn">from</span> <span class="nn">aurora.time_series.decorators</span> <span class="kn">import</span> <span class="n">can_use_xr_dataarray</span>
+
+
+<div class="viewcode-block" id="schur_product_windowed_data"><a class="viewcode-back" href="../../../api/time_series.html#aurora.time_series.windowed_time_series.schur_product_windowed_data">[docs]</a><span class="k">def</span> <span class="nf">schur_product_windowed_data</span><span class="p">(</span><span class="n">ensemblized_data</span><span class="p">,</span> <span class="n">taper</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The axes are set up so that each window is tapered</span>
+
+<span class="sd">    In particular, each &quot;window&quot; is a row of windowed_array.  Thus taper</span>
+<span class="sd">    operates by multiplying, point-by-point (Schur) each row or windowed_array.</span>
+
+<span class="sd">    TODO: either take an argument for which axis the taper applies along or</span>
+<span class="sd">    make the calling function confirm that each row is a window and each</span>
+<span class="sd">    column is a window-advance-delta-t</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tapered_windowed_data</span> <span class="o">=</span> <span class="n">ensemblized_data</span> <span class="o">*</span> <span class="n">taper</span>  <span class="c1"># seems to do sparse diag mult</span>
+    <span class="c1"># time trial it against a few other methods</span>
+    <span class="k">return</span> <span class="n">tapered_windowed_data</span></div>
+
+
+<div class="viewcode-block" id="validate_coordinate_ordering_time_domain"><a class="viewcode-back" href="../../../api/time_series.html#aurora.time_series.windowed_time_series.validate_coordinate_ordering_time_domain">[docs]</a><span class="k">def</span> <span class="nf">validate_coordinate_ordering_time_domain</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check that the data dimensions are what you expect.  THis may evolve some</span>
+<span class="sd">    but for now, I just want to make sure that we are operating along the</span>
+<span class="sd">    correct axes when we demean, detrend, taper, etc.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dataset : xarray.Dataset</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">coordinate_labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">cond1</span> <span class="o">=</span> <span class="n">coordinate_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;within-window time&quot;</span>
+    <span class="n">cond2</span> <span class="o">=</span> <span class="n">coordinate_labels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;time&quot;</span>
+    <span class="k">if</span> <span class="n">cond1</span> <span class="o">&amp;</span> <span class="n">cond2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Uncertain that xarray coordinates are correctly ordered&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span></div>
+
+
+<div class="viewcode-block" id="get_time_coordinate_axis"><a class="viewcode-back" href="../../../api/time_series.html#aurora.time_series.windowed_time_series.get_time_coordinate_axis">[docs]</a><span class="k">def</span> <span class="nf">get_time_coordinate_axis</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    It is common to pass an argument to scipy.signal methods axis=int</span>
+<span class="sd">    where that integer specifies along which dimension we are applying the</span>
+<span class="sd">    operator.  This method helps ensure that we have the correct axis.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dataset : xarray.Dataset</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">coordinate_labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coordinate_labels</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning - Expected two distinct coordinates&quot;</span><span class="p">)</span>
+        <span class="c1"># raise Exception</span>
+
+    <span class="k">return</span> <span class="n">coordinate_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span></div>
+    <span class="c1"># time_coord_indices = [ndx for x, ndx in enumerate(coordinate_labels) if</span>
+    <span class="c1">#                                                   x==&quot;time&quot;]</span>
+    <span class="c1"># if len(time_coord_indices) == 1:</span>
+    <span class="c1">#     return time_coord_indices[0]</span>
+    <span class="c1"># else:</span>
+    <span class="c1">#     print(&quot;expected only one universal time coordinate&quot;)</span>
+    <span class="c1">#     raise Exception</span>
+
+
+<div class="viewcode-block" id="WindowedTimeSeries"><a class="viewcode-back" href="../../../api/time_series.html#aurora.time_series.windowed_time_series.WindowedTimeSeries">[docs]</a><span class="k">class</span> <span class="nc">WindowedTimeSeries</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Time series that has been chopped into (possibly) overlapping windows.</span>
+
+<span class="sd">    This is a place where we can put methods that operate on these sorts of</span>
+<span class="sd">    objects.</span>
+
+<span class="sd">    The assumption is that we take xarrays keyed by &quot;channel&quot;</span>
+
+<span class="sd">    Specific methods:</span>
+<span class="sd">        Demean</span>
+<span class="sd">        Detrend</span>
+<span class="sd">        Prewhiten</span>
+<span class="sd">        stft</span>
+<span class="sd">        invert_prewhitening</span>
+
+<span class="sd">        probably make these @staticmethod s so we import WindowedTimeSeries</span>
+<span class="sd">        and then call the static methods</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@can_use_xr_dataarray</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">apply_taper</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">taper</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Point by point multiplication of taper against time series.</span>
+<span class="sd">        xarray handles this very cleanly as a direct multiply operation.</span>
+<span class="sd">        tapered_obj = windowed_obj * windowing_scheme.taper</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span> <span class="o">*</span> <span class="n">taper</span>
+        <span class="k">return</span> <span class="n">data</span>
+
+<div class="viewcode-block" id="WindowedTimeSeries.detrend"><a class="viewcode-back" href="../../../api/time_series.html#aurora.time_series.windowed_time_series.WindowedTimeSeries.detrend">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">detrend</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">detrend_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">detrend_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        TODO: overwrite data=True probably best for most applications but</span>
+<span class="sd">            be careful with that.  Do we want to avoid this in general?</span>
+<span class="sd">            could we be possibly overwriting stuff on MTH5 in future?</span>
+<span class="sd">            Also, is overwrite even working how I think it is here?</span>
+<span class="sd">        TODO: overwrite_data not working right in scipy.signal, dont use it</span>
+<span class="sd">        for now</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : xarray Dataset</span>
+<span class="sd">        detrend_axis : string</span>
+<span class="sd">        detrend_type : string</span>
+<span class="sd">            &quot;linear&quot; or &quot;constant&quot;</span>
+<span class="sd">            This argument is provided to scipy.signal.detrend</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">detrend_axis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">detrend_axis</span> <span class="o">=</span> <span class="n">get_time_coordinate_axis</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+        <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+
+            <span class="c1"># windowed_array = data[key].data</span>
+            <span class="n">nanless_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">)</span>
+            <span class="n">ensembles</span> <span class="o">=</span> <span class="n">nanless_data</span><span class="o">.</span><span class="n">data</span>
+            <span class="k">if</span> <span class="n">detrend_type</span><span class="p">:</span>  <span class="c1"># neither False nor None</span>
+                <span class="n">ensembles</span> <span class="o">=</span> <span class="n">ssig</span><span class="o">.</span><span class="n">detrend</span><span class="p">(</span>
+                    <span class="n">ensembles</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">detrend_axis</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">detrend_type</span>
+                <span class="p">)</span>
+                <span class="c1"># overwrite_data=True</span>
+
+            <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nanless_data</span><span class="o">.</span><span class="n">time</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="p">):</span>
+                    <span class="n">data</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span><span class="o">.</span><span class="n">data</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                    <span class="n">data</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">nanless_data</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">ensembles</span>
+                    <span class="c1"># there must be a cute way to just assign all nan to just the</span>
+                    <span class="c1"># columns that had nan values in some places, rather than</span>
+                    <span class="c1"># assigning nan to the whole array and then overwriting the</span>
+                    <span class="c1"># ensembles .. something like</span>
+                    <span class="c1"># data[channel].loc[~nanless_data.time, :] = np.nan</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">data</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">ensembles</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="WindowedTimeSeries.apply_stft"><a class="viewcode-back" href="../../../api/time_series.html#aurora.time_series.windowed_time_series.WindowedTimeSeries.apply_stft">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">apply_stft</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">sample_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">detrend_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">spectral_density_calibration</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">fft_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Only supports xr.Dataset at this point</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data</span>
+<span class="sd">        sample_rate</span>
+<span class="sd">        detrend_type</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">aurora.time_series.windowing_scheme</span> <span class="kn">import</span> <span class="n">fft_xr_ds</span>
+
+        <span class="k">if</span> <span class="n">fft_axis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fft_axis</span> <span class="o">=</span> <span class="n">get_time_coordinate_axis</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">spectral_ds</span> <span class="o">=</span> <span class="n">fft_xr_ds</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">detrend_type</span><span class="o">=</span><span class="n">detrend_type</span><span class="p">)</span>
+        <span class="n">spectral_ds</span> <span class="o">*=</span> <span class="n">spectral_density_calibration</span>
+        <span class="k">return</span> <span class="n">spectral_ds</span></div>
+
+<div class="viewcode-block" id="WindowedTimeSeries.delay_correction"><a class="viewcode-back" href="../../../api/time_series.html#aurora.time_series.windowed_time_series.WindowedTimeSeries.delay_correction">[docs]</a>    <span class="k">def</span> <span class="nf">delay_correction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">run_obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dataset : xr.Dataset</span>
+<span class="sd">        run_obj :</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># &quot;NOT TESTED - PSEUDOCODE ONLY&quot;</span>
+        <span class="k">for</span> <span class="n">channel_id</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">mth5_channel</span> <span class="o">=</span> <span class="n">run_obj</span><span class="o">.</span><span class="n">get_channel</span><span class="p">(</span><span class="n">channel_id</span><span class="p">)</span>
+            <span class="n">channel_filter</span> <span class="o">=</span> <span class="n">mth5_channel</span><span class="o">.</span><span class="n">channel_response_filter</span>
+            <span class="n">delay_in_seconds</span> <span class="o">=</span> <span class="n">channel_filter</span><span class="o">.</span><span class="n">total_delay</span>
+            <span class="n">true_time_axis</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">delay_in_seconds</span>
+            <span class="n">interpolator</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span>
+                <span class="n">true_time_axis</span><span class="p">,</span> <span class="n">dataset</span><span class="p">[</span><span class="n">channel_id</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">assume_sorted</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="n">corrected_data</span> <span class="o">=</span> <span class="n">interpolator</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+            <span class="n">dataset</span><span class="p">[</span><span class="n">channel_id</span><span class="p">]</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">corrected_data</span>
+        <span class="k">return</span> <span class="n">dataset</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

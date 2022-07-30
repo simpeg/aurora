@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.time_series.frequency_band &mdash; aurora 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/plot_directive.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>aurora.time_series.frequency_band</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.time_series.frequency_band</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">aurora.interval</span> <span class="kn">import</span> <span class="n">Interval</span>
+<span class="kn">from</span> <span class="nn">aurora.sandbox.io_helpers.emtf_band_setup</span> <span class="kn">import</span> <span class="n">EMTFBandSetupFile</span>
+
+
+<div class="viewcode-block" id="FrequencyBand"><a class="viewcode-back" href="../../../api/time_series.html#aurora.time_series.frequency_band.FrequencyBand">[docs]</a><span class="k">class</span> <span class="nc">FrequencyBand</span><span class="p">(</span><span class="n">Interval</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extends the interval class.</span>
+
+<span class="sd">    has a lower bound, an upper bound and a central frequency</span>
+
+<span class="sd">    These are intervals</span>
+<span class="sd">    an method for Fourier coefficient indices</span>
+
+<span class="sd">    Some thoughts 20210617:</span>
+
+<span class="sd">    TLDR:</span>
+<span class="sd">    For simplicity, I&#39;m going with Half open, df/2 intervals when they are</span>
+<span class="sd">    perscribed by FC indexes, and half_open gates_and_fenceposts when they</span>
+<span class="sd">    are not.  The gates and fenceposts can be converted to the percribed form by</span>
+<span class="sd">    mapping to emtf_band_setup_form and then mapping to FCIndex form.</span>
+<span class="sd">    A 3dB point correction etc maybe done in a later version.</span>
+
+<span class="sd">    &lt;ON DEFAULT FREQUENCY BAND CONFIGURATIONS&gt;</span>
+<span class="sd">    Because these are Interval()s there is a little complication:</span>
+<span class="sd">    If we use closed intervals we can have an issue with the same Fourier</span>
+<span class="sd">    coefficient being in more than one band [a,b],[b,c] if b corresponds to a harmonic.</span>
+<span class="sd">    Honestly this is not a really big deal, but it feels sloppy. The default</span>
+<span class="sd">    behaviour should partition the frequency axis, not break it into sets with</span>
+<span class="sd">    non-zero overlap, even though the overlapping sets are of measure zero.</span>
+
+<span class="sd">    On the other hand, it is common enough (at low frequency) to have bands</span>
+<span class="sd">    which are only 1 Harmonic wide, and if we dont use closed intervals we</span>
+<span class="sd">    can wind up with intervals like [a,a), which is the empty set.</span>
+
+<span class="sd">    The best solution I can think of for now incorporates the fact that the</span>
+<span class="sd">    harmonic frequencies we are going to interact with in digital processing</span>
+<span class="sd">    will be a discrete collection, basically fftfreqs, which are separated by df.</span>
+
+<span class="sd">    If we are given the context of df (= 1/(N*dt)) wher N is number of</span>
+<span class="sd">    samples in the original time series and dt is the sample interval,</span>
+<span class="sd">    then we can use half-open intervals with width df centered at the</span>
+<span class="sd">    frequencies under consideration.</span>
+
+<span class="sd">    I.e since the actual picking of Fourier coefficients and indexes will</span>
+<span class="sd">    always occur in the context of a sampling rate and a frequency axis and</span>
+<span class="sd">    we will know df and therefore we can pad the frequency bounds by +/-</span>
+<span class="sd">    df/2.</span>
+
+<span class="sd">    In that case we can use open, half open, or closed intervals, it really</span>
+<span class="sd">    doesn&#39;t matter, so we will choose half open</span>
+<span class="sd">    [f_i-df/2, f_i+df/2) to get the satisfying property of covering the</span>
+<span class="sd">    frequency axis completely but ensure no accidental double coverage.</span>
+
+<span class="sd">    Notes that this is just a default convention.  There is no rule against</span>
+<span class="sd">    using closed intervals, nor having overlapping bands.</span>
+
+<span class="sd">    The df/2 trick also protects us from numeric roundoff errors resulting in</span>
+<span class="sd">    edge frequencies landing in a bin other than that which is intended.</span>
+
+<span class="sd">    There is one little oddity which accompanies this scheme.  Consider the</span>
+<span class="sd">    case where you have a 1-harmonic wide band, say at 10Hz.  And df for</span>
+<span class="sd">    arguments sake is 0.05 Hz.  The center frequency harmonically will not</span>
+<span class="sd">    evaluate to 10Hz exactly, rather it will evaluate to sqrt((</span>
+<span class="sd">    9.95*10.05))=9.9999874, and not 10.  This is a little bit unsatisfying</span>
+<span class="sd">    but I take solace in two things:</span>
+<span class="sd">    1. The user is welcome to use their own convention, [10.0, 10.0], or even</span>
+<span class="sd">    [10.0-epsilon , 10.0+epsilon] if worried about numeric ghosts which</span>
+<span class="sd">    asymptotes to 10.0</span>
+<span class="sd">    2.  I&#39;m not actually 100% sure that the geometric center frequency of the</span>
+<span class="sd">    harmonic at 10Hz is truly 10.0.  Afterall a band has finite width even if</span>
+<span class="sd">    the harmonic is a Dirac spike.</span>
+
+<span class="sd">    At the end of the day we need to choose something, so its half-open,</span>
+<span class="sd">    lower-closed intervals by default.</span>
+
+<span class="sd">    Here&#39;s a good webpage with formulas if we want to get really fancy with</span>
+<span class="sd">    3dB band edges.</span>
+<span class="sd">    http://www.sengpielaudio.com/calculator-cutoffFrequencies.htm</span>
+
+<span class="sd">    &lt;/ON DEFAULT FREQUENCY BAND CONFIGURATIONS&gt;</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">Interval</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;upper_closed&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">upper_closed</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="FrequencyBand.fourier_coefficient_indices"><a class="viewcode-back" href="../../../api/time_series.html#aurora.time_series.frequency_band.FrequencyBand.fourier_coefficient_indices">[docs]</a>    <span class="k">def</span> <span class="nf">fourier_coefficient_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frequencies</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        frequencies: numpy array</span>
+<span class="sd">            Intended to represent the one-sided (positive) frequency axis of</span>
+<span class="sd">            the data that has been FFT-ed</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower_closed</span><span class="p">:</span>
+            <span class="n">cond1</span> <span class="o">=</span> <span class="n">frequencies</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower_bound</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cond1</span> <span class="o">=</span> <span class="n">frequencies</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower_bound</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper_closed</span><span class="p">:</span>
+            <span class="n">cond2</span> <span class="o">=</span> <span class="n">frequencies</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper_bound</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cond2</span> <span class="o">=</span> <span class="n">frequencies</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper_bound</span>
+
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cond1</span> <span class="o">&amp;</span> <span class="n">cond2</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">indices</span></div>
+
+<div class="viewcode-block" id="FrequencyBand.in_band_harmonics"><a class="viewcode-back" href="../../../api/time_series.html#aurora.time_series.frequency_band.FrequencyBand.in_band_harmonics">[docs]</a>    <span class="k">def</span> <span class="nf">in_band_harmonics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frequencies</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        frequencies</span>
+
+<span class="sd">        Returns: numpy array</span>
+<span class="sd">            the actual harmonics or frequencies in band, rather than the indices.</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fourier_coefficient_indices</span><span class="p">(</span><span class="n">frequencies</span><span class="p">)</span>
+        <span class="n">harmonics</span> <span class="o">=</span> <span class="n">frequencies</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">harmonics</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">center_frequency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># return (self.lower_bound + self.upper_bound)/2</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lower_bound</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper_bound</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">center_period</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">center_frequency</span></div>
+
+
+<div class="viewcode-block" id="FrequencyBands"><a class="viewcode-back" href="../../../api/time_series.html#aurora.time_series.frequency_band.FrequencyBands">[docs]</a><span class="k">class</span> <span class="nc">FrequencyBands</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Use this as the core element for BandAveragingScheme</span>
+<span class="sd">    This is just collection of frequency bands objects.</span>
+
+<span class="sd">    If there was no decimation, this would basically be the BandAveragingScheme</span>
+<span class="sd">    How does it differ from a bandaveraging scheme?</span>
+<span class="sd">    It doesn&#39;t support Decimation levels.</span>
+
+<span class="sd">    Context: A band is an Interval().</span>
+<span class="sd">    FrequencyBands can be represented as an IntervalSet()</span>
+
+<span class="sd">    20210617: Unforunately, using a single &quot;band_edges&quot; array of fenceposts</span>
+<span class="sd">    is not a general solution.  There is no reason to force the user to have</span>
+<span class="sd">    bands that abutt one another.  Therefore, changing to stop supporting</span>
+<span class="sd">    band_edges 1-D array.  band_edges will need to be a 2d array.  n_bands, 2</span>
+
+<span class="sd">    20210720: In fact, it would be more general, and explicit to pass a</span>
+<span class="sd">    vector of lower_bound_edges and upper_bound_edges.  Also, there should be</span>
+<span class="sd">    other ways to populate this class, for example by passing it frequency_band</span>
+<span class="sd">    objects, self.append(frequency_band).  However, that opens the door for</span>
+<span class="sd">    overlapping frequency bands which in general are not well ordered without</span>
+<span class="sd">    choosing an order operation (band center would be a good one - but then</span>
+<span class="sd">    we may have non-unique band centers!)  However, this should be quite</span>
+<span class="sd">    rare, and I am not actually sure it is possible to get the same center</span>
+<span class="sd">    frequency if we are using logarithmic band centers.  The only issue with</span>
+<span class="sd">    an append method is that after we append a band, we will need to perform</span>
+<span class="sd">    an ordering/sorting on individual band edges.</span>
+
+
+<span class="sd">    To add complexity, another use</span>
+<span class="sd">    case maybe that we wish to support bands with gaps at certain harmonics,</span>
+<span class="sd">    the way this is currently set up, all harmonics between the lower_bound</span>
+<span class="sd">    and the upper bounds are considered to be part of the band, but if we</span>
+<span class="sd">    have a known &quot;bad harmonic&quot; or several noisy harmoincs within a band</span>
+<span class="sd">    there is currently no way using somple FrequencyBand objects that we can</span>
+<span class="sd">    excise these harmonics.  We could add a &quot;ignore&quot; list of either</span>
+<span class="sd">    frequencies, bands or harmonics, but that is for later.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kwargs</span>
+<span class="sd">        band_edges: 2d numpy array</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gates</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">band_edges</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;band_edges&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="c1"># self.bands = OrderedDict()</span>
+        <span class="c1"># frequencies ... can repeat (log spacing)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">number_of_bands</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">band_edges</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<div class="viewcode-block" id="FrequencyBands.validate"><a class="viewcode-back" href="../../../api/time_series.html#aurora.time_series.frequency_band.FrequencyBands.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        placeholder for sanity checks.</span>
+<span class="sd">        Main reason this is here is in anticipation of supporting an append()</span>
+<span class="sd">        method to this class that accepts FrequencyBand objects.  In that</span>
+<span class="sd">        case we would like to re-order the band edges</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">band_centers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">band_centers</span><span class="p">()</span>
+
+        <span class="c1"># check band centers are monotonically increasing</span>
+        <span class="n">monotone_condition</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">band_centers</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">&gt;</span> <span class="n">band_centers</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">monotone_condition</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;Band Centers are Not Monotonic.  This probably means that &quot;</span>
+                <span class="s2">&quot;the bands are being defined in an adhoc / on the fly way&quot;</span>
+            <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This condition untested 20210720&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Attempting to reorganize bands&quot;</span><span class="p">)</span>
+            <span class="c1"># use np.argsort to rorganize the bands</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">band_edges</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">band_edges</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">band_centers</span><span class="p">),</span> <span class="p">:]</span>
+
+        <span class="c1"># check other conditions?:</span>
+
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="FrequencyBands.bands"><a class="viewcode-back" href="../../../api/time_series.html#aurora.time_series.frequency_band.FrequencyBands.bands">[docs]</a>    <span class="k">def</span> <span class="nf">bands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;increasing_frequency&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        make this a generator for iteration over bands</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">band_indices</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_bands</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s2">&quot;increasing_period&quot;</span><span class="p">:</span>
+            <span class="n">band_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">band_indices</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band</span><span class="p">(</span><span class="n">i_band</span><span class="p">)</span> <span class="k">for</span> <span class="n">i_band</span> <span class="ow">in</span> <span class="n">band_indices</span><span class="p">)</span></div>
+        <span class="c1"># raise NotImplementedError</span>
+
+<div class="viewcode-block" id="FrequencyBands.band"><a class="viewcode-back" href="../../../api/time_series.html#aurora.time_series.frequency_band.FrequencyBands.band">[docs]</a>    <span class="k">def</span> <span class="nf">band</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i_band</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decide to index bands from zero or one, i.e.  Choosing 0 for now.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        i_band: integer key for band</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">frequency_band</span> <span class="o">=</span> <span class="n">FrequencyBand</span><span class="p">(</span>
+            <span class="n">lower_bound</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">band_edges</span><span class="p">[</span><span class="n">i_band</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="n">upper_bound</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">band_edges</span><span class="p">[</span><span class="n">i_band</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">frequency_band</span></div>
+
+<div class="viewcode-block" id="FrequencyBands.band_centers"><a class="viewcode-back" href="../../../api/time_series.html#aurora.time_series.frequency_band.FrequencyBands.band_centers">[docs]</a>    <span class="k">def</span> <span class="nf">band_centers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frequency_or_period</span><span class="o">=</span><span class="s2">&quot;frequency&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        frequency_or_period : str</span>
+<span class="sd">        &quot;frequency&quot; or &quot;period&quot; determines if the vector of band centers is</span>
+<span class="sd">        returned in &quot;Hz&quot; or &quot;s&quot;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        band_centers : numpy array</span>
+<span class="sd">            center frequencies of the bands in Hz or in s</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">band_centers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_bands</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i_band</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_bands</span><span class="p">):</span>
+            <span class="n">frequency_band</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">band</span><span class="p">(</span><span class="n">i_band</span><span class="p">)</span>
+            <span class="n">band_centers</span><span class="p">[</span><span class="n">i_band</span><span class="p">]</span> <span class="o">=</span> <span class="n">frequency_band</span><span class="o">.</span><span class="n">center_frequency</span>
+        <span class="k">if</span> <span class="n">frequency_or_period</span> <span class="o">==</span> <span class="s2">&quot;period&quot;</span><span class="p">:</span>
+            <span class="n">band_centers</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">band_centers</span>
+        <span class="k">return</span> <span class="n">band_centers</span></div>
+
+<div class="viewcode-block" id="FrequencyBands.from_emtf_band_setup"><a class="viewcode-back" href="../../../api/time_series.html#aurora.time_series.frequency_band.FrequencyBands.from_emtf_band_setup">[docs]</a>    <span class="k">def</span> <span class="nf">from_emtf_band_setup</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">decimation_level</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">num_samples_window</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This converts between EMTF band_setup files to a frequency_bands object.</span>
+<span class="sd">        The band_setup file is represented as a dataframe with</span>
+<span class="sd">        columns for decimation_level, first_fc_index,</span>
+<span class="sd">        last_fc_index.</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">        1. In EMTF, the the DC terms were not carried in the FC Files so the</span>
+<span class="sd">        integer-index 1 mapped to the first harmonic.  In aurora, the DC-term is</span>
+<span class="sd">        kept (for now) and thus, because the fortran arrays index from 1, and</span>
+<span class="sd">        python from 0, we don&#39;t need any modification to the Fourier coefficient</span>
+<span class="sd">        indices here.If we wind up dropping the DC term from the STFT arrays we</span>
+<span class="sd">        would need to add -1 to the upper and lower bound indices.</span>
+<span class="sd">        2. EMTF band-setup files do not contain information about frequency.</span>
+<span class="sd">        Frequecny was implicit in the processing scheme but not stated.  This</span>
+<span class="sd">        leaves some ambuguity when reading in files with names like</span>
+<span class="sd">        &quot;bs_256.txt&quot;.  Does 256 refer to the number of taps in the STFT</span>
+<span class="sd">        window, or to the number of positive frequencies (and the window was</span>
+<span class="sd">        512-length).  Personal communication with Egbert 2021-06-22 indicates</span>
+<span class="sd">        that normally the integer number in a band-setup file name associates with</span>
+<span class="sd">        the time-domain window length.</span>
+
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filepath : str or pathlib.Path()</span>
+<span class="sd">            The full path to the band_setup file</span>
+<span class="sd">        decimation_level : integer</span>
+<span class="sd">            Corresponds to the decimation level from the band setup file to</span>
+<span class="sd">            create FrequecyBands from.</span>
+<span class="sd">        sample_rate : float</span>
+<span class="sd">            The sampling rate of the data at decimation_level</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">emtf_band_setup</span> <span class="o">=</span> <span class="n">EMTFBandSetupFile</span><span class="p">(</span><span class="n">filepath</span><span class="o">=</span><span class="n">filepath</span><span class="p">)</span>
+        <span class="n">emtf_band_df</span> <span class="o">=</span> <span class="n">emtf_band_setup</span><span class="o">.</span><span class="n">get_decimation_level</span><span class="p">(</span><span class="n">decimation_level</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">from_emtf_band_df</span><span class="p">(</span>
+            <span class="n">emtf_band_df</span><span class="p">,</span> <span class="n">decimation_level</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">num_samples_window</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="FrequencyBands.from_emtf_band_df"><a class="viewcode-back" href="../../../api/time_series.html#aurora.time_series.frequency_band.FrequencyBands.from_emtf_band_df">[docs]</a>    <span class="k">def</span> <span class="nf">from_emtf_band_df</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">emtf_band_df</span><span class="p">,</span> <span class="n">decimation_level</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">num_samples_window</span>
+    <span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">sample_rate</span> <span class="o">/</span> <span class="p">(</span><span class="n">num_samples_window</span><span class="p">)</span>
+        <span class="n">half_df</span> <span class="o">=</span> <span class="n">df</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="c1"># half_df /=100</span>
+        <span class="n">lower_edges</span> <span class="o">=</span> <span class="p">(</span><span class="n">emtf_band_df</span><span class="o">.</span><span class="n">lower_bound_index</span> <span class="o">*</span> <span class="n">df</span><span class="p">)</span> <span class="o">-</span> <span class="n">half_df</span>
+        <span class="n">upper_edges</span> <span class="o">=</span> <span class="p">(</span><span class="n">emtf_band_df</span><span class="o">.</span><span class="n">upper_bound_index</span> <span class="o">*</span> <span class="n">df</span><span class="p">)</span> <span class="o">+</span> <span class="n">half_df</span>
+        <span class="n">band_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">lower_edges</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">upper_edges</span><span class="o">.</span><span class="n">values</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">band_edges</span> <span class="o">=</span> <span class="n">band_edges</span>
+
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="FrequencyBands.from_decimation_object"><a class="viewcode-back" href="../../../api/time_series.html#aurora.time_series.frequency_band.FrequencyBands.from_decimation_object">[docs]</a>    <span class="k">def</span> <span class="nf">from_decimation_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">decimation_object</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert band edges from a :class:`aurora.config.Decimation` object,</span>
+<span class="sd">        Which has all the information in it.</span>
+
+<span class="sd">        :param decimation_object: DESCRIPTION</span>
+<span class="sd">        :type decimation_object: TYPE</span>
+<span class="sd">        :return: DESCRIPTION</span>
+<span class="sd">        :rtype: TYPE</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># replace below with decimation_object.delta_frequency ?</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">decimation_object</span><span class="o">.</span><span class="n">decimation</span><span class="o">.</span><span class="n">sample_rate</span>
+            <span class="o">/</span> <span class="n">decimation_object</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">num_samples</span>
+        <span class="p">)</span>
+        <span class="n">half_df</span> <span class="o">=</span> <span class="n">df</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="c1"># half_df /=100</span>
+        <span class="n">lower_edges</span> <span class="o">=</span> <span class="p">(</span><span class="n">decimation_object</span><span class="o">.</span><span class="n">lower_bounds</span> <span class="o">*</span> <span class="n">df</span><span class="p">)</span> <span class="o">-</span> <span class="n">half_df</span>
+        <span class="n">upper_edges</span> <span class="o">=</span> <span class="p">(</span><span class="n">decimation_object</span><span class="o">.</span><span class="n">upper_bounds</span> <span class="o">*</span> <span class="n">df</span><span class="p">)</span> <span class="o">+</span> <span class="n">half_df</span>
+        <span class="n">band_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">lower_edges</span><span class="p">,</span> <span class="n">upper_edges</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">band_edges</span> <span class="o">=</span> <span class="n">band_edges</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

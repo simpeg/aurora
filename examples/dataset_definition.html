@@ -1,0 +1,2290 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dataset Definition DataFrame &mdash; aurora 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/plot_directive.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Dataset Definition DataFrame</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/dataset_definition.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+.jp-RenderedHTMLCommon thead,
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+.jp-RenderedHTMLCommon th,
+div.rendered_html th {
+  font-weight: bold;
+}
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+.jp-RenderedHTMLCommon tbody tr:hover,
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="Dataset-Definition-DataFrame">
+<h1>Dataset Definition DataFrame<a class="headerlink" href="#Dataset-Definition-DataFrame" title="Permalink to this heading">¶</a></h1>
+<p>For easier interaction a user can input a dataframe of runs to process, this is a simple example of how to do that.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import pandas as pd
+from aurora.config import Processing
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>starts = [&quot;2020-01-01T00:00:00&quot;, &quot;2020-02-02T00:00:00&quot;]
+ends = [&quot;2020-01-31T12:00:00&quot;, &quot;2020-02-28T12:00:00&quot;]
+
+data_list = []
+
+for ii in range(3):
+    for start, end in zip(starts, ends):
+        entry = {
+            &quot;station_id&quot;: &quot;mt01&quot;,
+            &quot;run_id&quot;: f&quot;{ii:03}&quot;,
+            &quot;start&quot;: start,
+            &quot;end&quot;: end,
+            &quot;mth5_path&quot;: r&quot;/home/mth5_path.h5&quot; ,
+            &quot;sample_rate&quot;: 10,
+            &quot;input_channels&quot;: [&quot;hx&quot;, &quot;hy&quot;],
+            &quot;output_channels&quot;: [&quot;hz&quot;, &quot;ex&quot;, &quot;ey&quot;],
+            &quot;remote&quot;: False
+        }
+
+        data_list.append(entry)
+
+        rr_entry_01 = {
+            &quot;station_id&quot;: &quot;rr01&quot;,
+            &quot;run_id&quot;: f&quot;{ii:03}&quot;,
+            &quot;start&quot;: start,
+            &quot;end&quot;: end,
+            &quot;mth5_path&quot;: r&quot;/home/mth5_path.h5&quot; ,
+            &quot;sample_rate&quot;: 10,
+            &quot;input_channels&quot;: [&quot;hx&quot;, &quot;hy&quot;],
+            &quot;output_channels&quot;: [&quot;hz&quot;, &quot;ex&quot;, &quot;ey&quot;],
+            &quot;remote&quot;: True
+        }
+        data_list.append(rr_entry_01)
+
+        rr_entry_02 = {
+            &quot;station_id&quot;: &quot;rr02&quot;,
+            &quot;run_id&quot;: f&quot;{ii:03}&quot;,
+            &quot;start&quot;: start,
+            &quot;end&quot;: end,
+            &quot;mth5_path&quot;: r&quot;/home/mth5_path.h5&quot; ,
+            &quot;sample_rate&quot;: 10,
+            &quot;input_channels&quot;: [&quot;hx&quot;, &quot;hy&quot;],
+            &quot;output_channels&quot;: [&quot;hz&quot;, &quot;ex&quot;, &quot;ey&quot;],
+            &quot;remote&quot;: True
+        }
+        data_list.append(rr_entry_02)
+
+
+sdf = pd.DataFrame(data_list)
+sdf.start = pd.to_datetime(sdf.start)
+sdf.end = pd.to_datetime(sdf.end)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>sdf
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>station_id</th>
+      <th>run_id</th>
+      <th>start</th>
+      <th>end</th>
+      <th>mth5_path</th>
+      <th>sample_rate</th>
+      <th>input_channels</th>
+      <th>output_channels</th>
+      <th>remote</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>mt01</td>
+      <td>000</td>
+      <td>2020-01-01</td>
+      <td>2020-01-31 12:00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>rr01</td>
+      <td>000</td>
+      <td>2020-01-01</td>
+      <td>2020-01-31 12:00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>rr02</td>
+      <td>000</td>
+      <td>2020-01-01</td>
+      <td>2020-01-31 12:00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>mt01</td>
+      <td>000</td>
+      <td>2020-02-02</td>
+      <td>2020-02-28 12:00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>rr01</td>
+      <td>000</td>
+      <td>2020-02-02</td>
+      <td>2020-02-28 12:00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>rr02</td>
+      <td>000</td>
+      <td>2020-02-02</td>
+      <td>2020-02-28 12:00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>mt01</td>
+      <td>001</td>
+      <td>2020-01-01</td>
+      <td>2020-01-31 12:00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>rr01</td>
+      <td>001</td>
+      <td>2020-01-01</td>
+      <td>2020-01-31 12:00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>rr02</td>
+      <td>001</td>
+      <td>2020-01-01</td>
+      <td>2020-01-31 12:00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>mt01</td>
+      <td>001</td>
+      <td>2020-02-02</td>
+      <td>2020-02-28 12:00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>rr01</td>
+      <td>001</td>
+      <td>2020-02-02</td>
+      <td>2020-02-28 12:00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>rr02</td>
+      <td>001</td>
+      <td>2020-02-02</td>
+      <td>2020-02-28 12:00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>mt01</td>
+      <td>002</td>
+      <td>2020-01-01</td>
+      <td>2020-01-31 12:00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>rr01</td>
+      <td>002</td>
+      <td>2020-01-01</td>
+      <td>2020-01-31 12:00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>rr02</td>
+      <td>002</td>
+      <td>2020-01-01</td>
+      <td>2020-01-31 12:00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>mt01</td>
+      <td>002</td>
+      <td>2020-02-02</td>
+      <td>2020-02-28 12:00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>rr01</td>
+      <td>002</td>
+      <td>2020-02-02</td>
+      <td>2020-02-28 12:00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>rr02</td>
+      <td>002</td>
+      <td>2020-02-02</td>
+      <td>2020-02-28 12:00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>p = Processing()
+p.stations.from_dataset_dataframe(sdf)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>p
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+    &#34;processing&#34;: {
+        &#34;decimations&#34;: [],
+        &#34;id&#34;: null,
+        &#34;stations.local.id&#34;: &#34;mt01&#34;,
+        &#34;stations.local.mth5_path&#34;: &#34;/home/mth5_path.h5&#34;,
+        &#34;stations.local.remote&#34;: false,
+        &#34;stations.local.runs&#34;: [
+            {
+                &#34;run&#34;: {
+                    &#34;id&#34;: &#34;000&#34;,
+                    &#34;input_channels&#34;: [
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hx&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hy&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        }
+                    ],
+                    &#34;output_channels&#34;: [
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hz&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;ex&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;ey&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        }
+                    ],
+                    &#34;sample_rate&#34;: 10.0,
+                    &#34;time_periods&#34;: [
+                        {
+                            &#34;time_period&#34;: {
+                                &#34;end&#34;: &#34;2020-01-31T12:00:00+00:00&#34;,
+                                &#34;start&#34;: &#34;2020-01-01T00:00:00+00:00&#34;
+                            }
+                        },
+                        {
+                            &#34;time_period&#34;: {
+                                &#34;end&#34;: &#34;2020-02-28T12:00:00+00:00&#34;,
+                                &#34;start&#34;: &#34;2020-02-02T00:00:00+00:00&#34;
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                &#34;run&#34;: {
+                    &#34;id&#34;: &#34;001&#34;,
+                    &#34;input_channels&#34;: [
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hx&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hy&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        }
+                    ],
+                    &#34;output_channels&#34;: [
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hz&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;ex&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;ey&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        }
+                    ],
+                    &#34;sample_rate&#34;: 10.0,
+                    &#34;time_periods&#34;: [
+                        {
+                            &#34;time_period&#34;: {
+                                &#34;end&#34;: &#34;2020-01-31T12:00:00+00:00&#34;,
+                                &#34;start&#34;: &#34;2020-01-01T00:00:00+00:00&#34;
+                            }
+                        },
+                        {
+                            &#34;time_period&#34;: {
+                                &#34;end&#34;: &#34;2020-02-28T12:00:00+00:00&#34;,
+                                &#34;start&#34;: &#34;2020-02-02T00:00:00+00:00&#34;
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                &#34;run&#34;: {
+                    &#34;id&#34;: &#34;002&#34;,
+                    &#34;input_channels&#34;: [
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hx&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hy&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        }
+                    ],
+                    &#34;output_channels&#34;: [
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hz&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;ex&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;ey&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        }
+                    ],
+                    &#34;sample_rate&#34;: 10.0,
+                    &#34;time_periods&#34;: [
+                        {
+                            &#34;time_period&#34;: {
+                                &#34;end&#34;: &#34;2020-01-31T12:00:00+00:00&#34;,
+                                &#34;start&#34;: &#34;2020-01-01T00:00:00+00:00&#34;
+                            }
+                        },
+                        {
+                            &#34;time_period&#34;: {
+                                &#34;end&#34;: &#34;2020-02-28T12:00:00+00:00&#34;,
+                                &#34;start&#34;: &#34;2020-02-02T00:00:00+00:00&#34;
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        &#34;stations.remote&#34;: [
+            {
+                &#34;station&#34;: {
+                    &#34;id&#34;: &#34;rr01&#34;,
+                    &#34;mth5_path&#34;: &#34;/home/mth5_path.h5&#34;,
+                    &#34;remote&#34;: true,
+                    &#34;runs&#34;: [
+                        {
+                            &#34;run&#34;: {
+                                &#34;id&#34;: &#34;000&#34;,
+                                &#34;input_channels&#34;: [
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hx&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hy&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    }
+                                ],
+                                &#34;output_channels&#34;: [
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hz&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;ex&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;ey&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    }
+                                ],
+                                &#34;sample_rate&#34;: 10.0,
+                                &#34;time_periods&#34;: [
+                                    {
+                                        &#34;time_period&#34;: {
+                                            &#34;end&#34;: &#34;2020-01-31T12:00:00+00:00&#34;,
+                                            &#34;start&#34;: &#34;2020-01-01T00:00:00+00:00&#34;
+                                        }
+                                    },
+                                    {
+                                        &#34;time_period&#34;: {
+                                            &#34;end&#34;: &#34;2020-02-28T12:00:00+00:00&#34;,
+                                            &#34;start&#34;: &#34;2020-02-02T00:00:00+00:00&#34;
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            &#34;run&#34;: {
+                                &#34;id&#34;: &#34;001&#34;,
+                                &#34;input_channels&#34;: [
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hx&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hy&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    }
+                                ],
+                                &#34;output_channels&#34;: [
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hz&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;ex&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;ey&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    }
+                                ],
+                                &#34;sample_rate&#34;: 10.0,
+                                &#34;time_periods&#34;: [
+                                    {
+                                        &#34;time_period&#34;: {
+                                            &#34;end&#34;: &#34;2020-01-31T12:00:00+00:00&#34;,
+                                            &#34;start&#34;: &#34;2020-01-01T00:00:00+00:00&#34;
+                                        }
+                                    },
+                                    {
+                                        &#34;time_period&#34;: {
+                                            &#34;end&#34;: &#34;2020-02-28T12:00:00+00:00&#34;,
+                                            &#34;start&#34;: &#34;2020-02-02T00:00:00+00:00&#34;
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            &#34;run&#34;: {
+                                &#34;id&#34;: &#34;002&#34;,
+                                &#34;input_channels&#34;: [
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hx&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hy&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    }
+                                ],
+                                &#34;output_channels&#34;: [
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hz&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;ex&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;ey&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    }
+                                ],
+                                &#34;sample_rate&#34;: 10.0,
+                                &#34;time_periods&#34;: [
+                                    {
+                                        &#34;time_period&#34;: {
+                                            &#34;end&#34;: &#34;2020-01-31T12:00:00+00:00&#34;,
+                                            &#34;start&#34;: &#34;2020-01-01T00:00:00+00:00&#34;
+                                        }
+                                    },
+                                    {
+                                        &#34;time_period&#34;: {
+                                            &#34;end&#34;: &#34;2020-02-28T12:00:00+00:00&#34;,
+                                            &#34;start&#34;: &#34;2020-02-02T00:00:00+00:00&#34;
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                &#34;station&#34;: {
+                    &#34;id&#34;: &#34;rr02&#34;,
+                    &#34;mth5_path&#34;: &#34;/home/mth5_path.h5&#34;,
+                    &#34;remote&#34;: true,
+                    &#34;runs&#34;: [
+                        {
+                            &#34;run&#34;: {
+                                &#34;id&#34;: &#34;000&#34;,
+                                &#34;input_channels&#34;: [
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hx&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hy&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    }
+                                ],
+                                &#34;output_channels&#34;: [
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hz&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;ex&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;ey&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    }
+                                ],
+                                &#34;sample_rate&#34;: 10.0,
+                                &#34;time_periods&#34;: [
+                                    {
+                                        &#34;time_period&#34;: {
+                                            &#34;end&#34;: &#34;2020-01-31T12:00:00+00:00&#34;,
+                                            &#34;start&#34;: &#34;2020-01-01T00:00:00+00:00&#34;
+                                        }
+                                    },
+                                    {
+                                        &#34;time_period&#34;: {
+                                            &#34;end&#34;: &#34;2020-02-28T12:00:00+00:00&#34;,
+                                            &#34;start&#34;: &#34;2020-02-02T00:00:00+00:00&#34;
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            &#34;run&#34;: {
+                                &#34;id&#34;: &#34;001&#34;,
+                                &#34;input_channels&#34;: [
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hx&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hy&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    }
+                                ],
+                                &#34;output_channels&#34;: [
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hz&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;ex&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;ey&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    }
+                                ],
+                                &#34;sample_rate&#34;: 10.0,
+                                &#34;time_periods&#34;: [
+                                    {
+                                        &#34;time_period&#34;: {
+                                            &#34;end&#34;: &#34;2020-01-31T12:00:00+00:00&#34;,
+                                            &#34;start&#34;: &#34;2020-01-01T00:00:00+00:00&#34;
+                                        }
+                                    },
+                                    {
+                                        &#34;time_period&#34;: {
+                                            &#34;end&#34;: &#34;2020-02-28T12:00:00+00:00&#34;,
+                                            &#34;start&#34;: &#34;2020-02-02T00:00:00+00:00&#34;
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            &#34;run&#34;: {
+                                &#34;id&#34;: &#34;002&#34;,
+                                &#34;input_channels&#34;: [
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hx&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hy&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    }
+                                ],
+                                &#34;output_channels&#34;: [
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hz&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;ex&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;ey&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    }
+                                ],
+                                &#34;sample_rate&#34;: 10.0,
+                                &#34;time_periods&#34;: [
+                                    {
+                                        &#34;time_period&#34;: {
+                                            &#34;end&#34;: &#34;2020-01-31T12:00:00+00:00&#34;,
+                                            &#34;start&#34;: &#34;2020-01-01T00:00:00+00:00&#34;
+                                        }
+                                    },
+                                    {
+                                        &#34;time_period&#34;: {
+                                            &#34;end&#34;: &#34;2020-02-28T12:00:00+00:00&#34;,
+                                            &#34;start&#34;: &#34;2020-02-02T00:00:00+00:00&#34;
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>df2 = p.stations.to_dataset_dataframe()
+df2
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>index</th>
+      <th>station_id</th>
+      <th>run_id</th>
+      <th>start</th>
+      <th>end</th>
+      <th>mth5_path</th>
+      <th>sample_rate</th>
+      <th>input_channels</th>
+      <th>output_channels</th>
+      <th>remote</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>mt01</td>
+      <td>000</td>
+      <td>2020-01-01 00:00:00+00:00</td>
+      <td>2020-01-31 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>mt01</td>
+      <td>000</td>
+      <td>2020-02-02 00:00:00+00:00</td>
+      <td>2020-02-28 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2</td>
+      <td>mt01</td>
+      <td>001</td>
+      <td>2020-01-01 00:00:00+00:00</td>
+      <td>2020-01-31 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3</td>
+      <td>mt01</td>
+      <td>001</td>
+      <td>2020-02-02 00:00:00+00:00</td>
+      <td>2020-02-28 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>4</td>
+      <td>mt01</td>
+      <td>002</td>
+      <td>2020-01-01 00:00:00+00:00</td>
+      <td>2020-01-31 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>5</td>
+      <td>mt01</td>
+      <td>002</td>
+      <td>2020-02-02 00:00:00+00:00</td>
+      <td>2020-02-28 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>0</td>
+      <td>rr01</td>
+      <td>000</td>
+      <td>2020-01-01 00:00:00+00:00</td>
+      <td>2020-01-31 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1</td>
+      <td>rr01</td>
+      <td>000</td>
+      <td>2020-02-02 00:00:00+00:00</td>
+      <td>2020-02-28 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>2</td>
+      <td>rr01</td>
+      <td>001</td>
+      <td>2020-01-01 00:00:00+00:00</td>
+      <td>2020-01-31 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>3</td>
+      <td>rr01</td>
+      <td>001</td>
+      <td>2020-02-02 00:00:00+00:00</td>
+      <td>2020-02-28 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>4</td>
+      <td>rr01</td>
+      <td>002</td>
+      <td>2020-01-01 00:00:00+00:00</td>
+      <td>2020-01-31 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>5</td>
+      <td>rr01</td>
+      <td>002</td>
+      <td>2020-02-02 00:00:00+00:00</td>
+      <td>2020-02-28 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>0</td>
+      <td>rr02</td>
+      <td>000</td>
+      <td>2020-01-01 00:00:00+00:00</td>
+      <td>2020-01-31 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>1</td>
+      <td>rr02</td>
+      <td>000</td>
+      <td>2020-02-02 00:00:00+00:00</td>
+      <td>2020-02-28 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>2</td>
+      <td>rr02</td>
+      <td>001</td>
+      <td>2020-01-01 00:00:00+00:00</td>
+      <td>2020-01-31 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>3</td>
+      <td>rr02</td>
+      <td>001</td>
+      <td>2020-02-02 00:00:00+00:00</td>
+      <td>2020-02-28 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>4</td>
+      <td>rr02</td>
+      <td>002</td>
+      <td>2020-01-01 00:00:00+00:00</td>
+      <td>2020-01-31 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>5</td>
+      <td>rr02</td>
+      <td>002</td>
+      <td>2020-02-02 00:00:00+00:00</td>
+      <td>2020-02-28 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>df2.reset_index()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>level_0</th>
+      <th>index</th>
+      <th>station_id</th>
+      <th>run_id</th>
+      <th>start</th>
+      <th>end</th>
+      <th>mth5_path</th>
+      <th>sample_rate</th>
+      <th>input_channels</th>
+      <th>output_channels</th>
+      <th>remote</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>0</td>
+      <td>mt01</td>
+      <td>000</td>
+      <td>2020-01-01 00:00:00+00:00</td>
+      <td>2020-01-31 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>1</td>
+      <td>mt01</td>
+      <td>000</td>
+      <td>2020-02-02 00:00:00+00:00</td>
+      <td>2020-02-28 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2</td>
+      <td>2</td>
+      <td>mt01</td>
+      <td>001</td>
+      <td>2020-01-01 00:00:00+00:00</td>
+      <td>2020-01-31 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3</td>
+      <td>3</td>
+      <td>mt01</td>
+      <td>001</td>
+      <td>2020-02-02 00:00:00+00:00</td>
+      <td>2020-02-28 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>4</td>
+      <td>4</td>
+      <td>mt01</td>
+      <td>002</td>
+      <td>2020-01-01 00:00:00+00:00</td>
+      <td>2020-01-31 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>5</td>
+      <td>5</td>
+      <td>mt01</td>
+      <td>002</td>
+      <td>2020-02-02 00:00:00+00:00</td>
+      <td>2020-02-28 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>6</td>
+      <td>0</td>
+      <td>rr01</td>
+      <td>000</td>
+      <td>2020-01-01 00:00:00+00:00</td>
+      <td>2020-01-31 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>7</td>
+      <td>1</td>
+      <td>rr01</td>
+      <td>000</td>
+      <td>2020-02-02 00:00:00+00:00</td>
+      <td>2020-02-28 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>8</td>
+      <td>2</td>
+      <td>rr01</td>
+      <td>001</td>
+      <td>2020-01-01 00:00:00+00:00</td>
+      <td>2020-01-31 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>9</td>
+      <td>3</td>
+      <td>rr01</td>
+      <td>001</td>
+      <td>2020-02-02 00:00:00+00:00</td>
+      <td>2020-02-28 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>10</td>
+      <td>4</td>
+      <td>rr01</td>
+      <td>002</td>
+      <td>2020-01-01 00:00:00+00:00</td>
+      <td>2020-01-31 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>11</td>
+      <td>5</td>
+      <td>rr01</td>
+      <td>002</td>
+      <td>2020-02-02 00:00:00+00:00</td>
+      <td>2020-02-28 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>12</td>
+      <td>0</td>
+      <td>rr02</td>
+      <td>000</td>
+      <td>2020-01-01 00:00:00+00:00</td>
+      <td>2020-01-31 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>13</td>
+      <td>1</td>
+      <td>rr02</td>
+      <td>000</td>
+      <td>2020-02-02 00:00:00+00:00</td>
+      <td>2020-02-28 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>14</td>
+      <td>2</td>
+      <td>rr02</td>
+      <td>001</td>
+      <td>2020-01-01 00:00:00+00:00</td>
+      <td>2020-01-31 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>15</td>
+      <td>3</td>
+      <td>rr02</td>
+      <td>001</td>
+      <td>2020-02-02 00:00:00+00:00</td>
+      <td>2020-02-28 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>16</td>
+      <td>4</td>
+      <td>rr02</td>
+      <td>002</td>
+      <td>2020-01-01 00:00:00+00:00</td>
+      <td>2020-01-31 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>17</td>
+      <td>5</td>
+      <td>rr02</td>
+      <td>002</td>
+      <td>2020-02-02 00:00:00+00:00</td>
+      <td>2020-02-28 12:00:00+00:00</td>
+      <td>/home/mth5_path.h5</td>
+      <td>10.0</td>
+      <td>[hx, hy]</td>
+      <td>[hz, ex, ey]</td>
+      <td>True</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from mth5.mth5 import MTH5
+from mt_metadata import MT_EXPERIMENT_MULTIPLE_RUNS
+from mt_metadata.timeseries import Experiment
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>experiment = Experiment()
+experiment.from_xml(MT_EXPERIMENT_MULTIPLE_RUNS)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>m = MTH5()
+m.open_mth5(&quot;test_dataset_definition.h5&quot;, &quot;w&quot;)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2022-03-25 14:58:56,559 [line 604] mth5.mth5.MTH5.open_mth5 - WARNING: test_dataset_definition.h5 will be overwritten in &#39;w&#39; mode
+2022-03-25 14:58:56,899 [line 687] mth5.mth5.MTH5._initialize_file - INFO: Initialized MTH5 0.2.0 file test_dataset_definition.h5 in mode w
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>m.from_experiment(experiment)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>m.channel_summary.clear_table()
+m.channel_summary.summarize()
+channel_df = m.channel_summary.to_dataframe()
+channel_df
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survey</th>
+      <th>station</th>
+      <th>run</th>
+      <th>latitude</th>
+      <th>longitude</th>
+      <th>elevation</th>
+      <th>component</th>
+      <th>start</th>
+      <th>end</th>
+      <th>n_samples</th>
+      <th>sample_rate</th>
+      <th>measurement_type</th>
+      <th>azimuth</th>
+      <th>tilt</th>
+      <th>units</th>
+      <th>hdf5_reference</th>
+      <th>run_hdf5_reference</th>
+      <th>station_hdf5_reference</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>CONUS South</td>
+      <td>UTS14</td>
+      <td>a</td>
+      <td>37.563198</td>
+      <td>-113.301663</td>
+      <td>2490.775</td>
+      <td>ex</td>
+      <td>2020-07-05 23:19:41+00:00</td>
+      <td>2020-07-06 00:11:55+00:00</td>
+      <td>3134</td>
+      <td>1.0</td>
+      <td>electric</td>
+      <td>11.193362</td>
+      <td>0.0</td>
+      <td>counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>CONUS South</td>
+      <td>UTS14</td>
+      <td>a</td>
+      <td>37.563198</td>
+      <td>-113.301663</td>
+      <td>2490.775</td>
+      <td>ey</td>
+      <td>2020-07-05 23:19:41+00:00</td>
+      <td>2020-07-06 00:11:55+00:00</td>
+      <td>3134</td>
+      <td>1.0</td>
+      <td>electric</td>
+      <td>101.193362</td>
+      <td>0.0</td>
+      <td>counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>CONUS South</td>
+      <td>UTS14</td>
+      <td>a</td>
+      <td>37.563198</td>
+      <td>-113.301663</td>
+      <td>2490.775</td>
+      <td>hx</td>
+      <td>2020-07-05 23:19:41+00:00</td>
+      <td>2020-07-06 00:11:55+00:00</td>
+      <td>3134</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>11.193362</td>
+      <td>0.0</td>
+      <td>counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>CONUS South</td>
+      <td>UTS14</td>
+      <td>a</td>
+      <td>37.563198</td>
+      <td>-113.301663</td>
+      <td>2490.775</td>
+      <td>hy</td>
+      <td>2020-07-05 23:19:41+00:00</td>
+      <td>2020-07-06 00:11:55+00:00</td>
+      <td>3134</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>101.193362</td>
+      <td>0.0</td>
+      <td>counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>CONUS South</td>
+      <td>UTS14</td>
+      <td>a</td>
+      <td>37.563198</td>
+      <td>-113.301663</td>
+      <td>2490.775</td>
+      <td>hz</td>
+      <td>2020-07-05 23:19:41+00:00</td>
+      <td>2020-07-06 00:11:55+00:00</td>
+      <td>3134</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>0.000000</td>
+      <td>90.0</td>
+      <td>counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>CONUS South</td>
+      <td>UTS14</td>
+      <td>b</td>
+      <td>37.563198</td>
+      <td>-113.301663</td>
+      <td>2490.775</td>
+      <td>ex</td>
+      <td>2020-07-06 00:32:41+00:00</td>
+      <td>2020-07-20 17:43:45+00:00</td>
+      <td>1271464</td>
+      <td>1.0</td>
+      <td>electric</td>
+      <td>11.193368</td>
+      <td>0.0</td>
+      <td>counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>CONUS South</td>
+      <td>UTS14</td>
+      <td>b</td>
+      <td>37.563198</td>
+      <td>-113.301663</td>
+      <td>2490.775</td>
+      <td>ey</td>
+      <td>2020-07-06 00:32:41+00:00</td>
+      <td>2020-07-20 17:43:45+00:00</td>
+      <td>1271464</td>
+      <td>1.0</td>
+      <td>electric</td>
+      <td>101.193368</td>
+      <td>0.0</td>
+      <td>counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>CONUS South</td>
+      <td>UTS14</td>
+      <td>b</td>
+      <td>37.563198</td>
+      <td>-113.301663</td>
+      <td>2490.775</td>
+      <td>hx</td>
+      <td>2020-07-06 00:32:41+00:00</td>
+      <td>2020-07-20 17:43:45+00:00</td>
+      <td>1271464</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>11.193368</td>
+      <td>0.0</td>
+      <td>counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>CONUS South</td>
+      <td>UTS14</td>
+      <td>b</td>
+      <td>37.563198</td>
+      <td>-113.301663</td>
+      <td>2490.775</td>
+      <td>hy</td>
+      <td>2020-07-06 00:32:41+00:00</td>
+      <td>2020-07-20 17:43:45+00:00</td>
+      <td>1271464</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>101.193368</td>
+      <td>0.0</td>
+      <td>counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>CONUS South</td>
+      <td>UTS14</td>
+      <td>b</td>
+      <td>37.563198</td>
+      <td>-113.301663</td>
+      <td>2490.775</td>
+      <td>hz</td>
+      <td>2020-07-06 00:32:41+00:00</td>
+      <td>2020-07-20 17:43:45+00:00</td>
+      <td>1271464</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>0.000000</td>
+      <td>90.0</td>
+      <td>counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>CONUS South</td>
+      <td>UTS14</td>
+      <td>c</td>
+      <td>37.563198</td>
+      <td>-113.301663</td>
+      <td>2490.775</td>
+      <td>ex</td>
+      <td>2020-07-20 18:54:26+00:00</td>
+      <td>2020-07-28 16:38:25+00:00</td>
+      <td>683039</td>
+      <td>1.0</td>
+      <td>electric</td>
+      <td>11.193367</td>
+      <td>0.0</td>
+      <td>counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>CONUS South</td>
+      <td>UTS14</td>
+      <td>c</td>
+      <td>37.563198</td>
+      <td>-113.301663</td>
+      <td>2490.775</td>
+      <td>ey</td>
+      <td>2020-07-20 18:54:26+00:00</td>
+      <td>2020-07-28 16:38:25+00:00</td>
+      <td>683039</td>
+      <td>1.0</td>
+      <td>electric</td>
+      <td>101.193367</td>
+      <td>0.0</td>
+      <td>counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>CONUS South</td>
+      <td>UTS14</td>
+      <td>c</td>
+      <td>37.563198</td>
+      <td>-113.301663</td>
+      <td>2490.775</td>
+      <td>hx</td>
+      <td>2020-07-20 18:54:26+00:00</td>
+      <td>2020-07-28 16:38:25+00:00</td>
+      <td>683039</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>11.193367</td>
+      <td>0.0</td>
+      <td>counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>CONUS South</td>
+      <td>UTS14</td>
+      <td>c</td>
+      <td>37.563198</td>
+      <td>-113.301663</td>
+      <td>2490.775</td>
+      <td>hy</td>
+      <td>2020-07-20 18:54:26+00:00</td>
+      <td>2020-07-28 16:38:25+00:00</td>
+      <td>683039</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>101.193367</td>
+      <td>0.0</td>
+      <td>counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>CONUS South</td>
+      <td>UTS14</td>
+      <td>c</td>
+      <td>37.563198</td>
+      <td>-113.301663</td>
+      <td>2490.775</td>
+      <td>hz</td>
+      <td>2020-07-20 18:54:26+00:00</td>
+      <td>2020-07-28 16:38:25+00:00</td>
+      <td>683039</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>0.000000</td>
+      <td>90.0</td>
+      <td>counts</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>m.close_mth5()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2022-03-25 14:58:50,716 [line 747] mth5.mth5.MTH5.close_mth5 - INFO: Flushing and closing test_dataset_definition.h5
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

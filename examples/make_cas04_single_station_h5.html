@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>&lt;no title&gt; &mdash; aurora 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/plot_directive.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>&lt;no title&gt;</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/make_cas04_single_station_h5.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+.jp-RenderedHTMLCommon thead,
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+.jp-RenderedHTMLCommon th,
+div.rendered_html th {
+  font-weight: bold;
+}
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+.jp-RenderedHTMLCommon tbody tr:hover,
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<p>Here is a notebook that shows you how to build some simple mth5 files from one staiton.</p>
+<p>Multistation archives are very similar and will be addressed in another ipynb.</p>
+<p>In this case we focus on station “CAS04”. This example is being ported from aurora/tests/cas04/01_make_cas04_mth5.py</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>#Imports
+import pandas as pd
+from aurora.sandbox.mth5_channel_summary_helpers import channel_summary_to_make_mth5
+from mth5.clients.make_mth5 import MakeMTH5
+from mth5.utils.helpers import initialize_mth5
+from mth5.utils.helpers import read_back_data
+from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import logging, sys
+logging.disable(sys.maxsize)
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>#placeholder for controlling which acquistions runs to request
+#Leave it empty to get all of them
+active_runs = []
+#active_runs = [&quot;a&quot;,]
+#active_runs = [&quot;b&quot;, &quot;c&quot;, &quot;d&quot;]
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>maker = MakeMTH5(mth5_version=&quot;0.1.0&quot;)
+maker.client = &quot;IRIS&quot;
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Generate data frame of FDSN
+# Network, Station, Location, Channel, Startime, Endtime codes of interest
+network = &quot;8P&quot;
+station = &quot;CAS04&quot;
+channels = [&quot;LQE&quot;, &quot;LQN&quot;, &quot;LFE&quot;, &quot;LFN&quot;, &quot;LFZ&quot;, ]
+start = &quot;2020-06-02T19:00:00&quot;
+end = &quot;2020-07-13T19:00:00&quot;
+
+request_list = []
+for channel in channels:
+    request = [network, station, &quot;&quot;, channel, start, end]
+    request_list.append(request)
+
+print(f&quot;Request List \n {request_list}&quot;)
+
+# Turn list into dataframe
+metadata_request_df = pd.DataFrame(request_list, columns=maker.column_names)
+print(f&quot;\n\n metadata_request_df \n {metadata_request_df}&quot;)
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Request List
+ [[&#39;8P&#39;, &#39;CAS04&#39;, &#39;&#39;, &#39;LQE&#39;, &#39;2020-06-02T19:00:00&#39;, &#39;2020-07-13T19:00:00&#39;], [&#39;8P&#39;, &#39;CAS04&#39;, &#39;&#39;, &#39;LQN&#39;, &#39;2020-06-02T19:00:00&#39;, &#39;2020-07-13T19:00:00&#39;], [&#39;8P&#39;, &#39;CAS04&#39;, &#39;&#39;, &#39;LFE&#39;, &#39;2020-06-02T19:00:00&#39;, &#39;2020-07-13T19:00:00&#39;], [&#39;8P&#39;, &#39;CAS04&#39;, &#39;&#39;, &#39;LFN&#39;, &#39;2020-06-02T19:00:00&#39;, &#39;2020-07-13T19:00:00&#39;], [&#39;8P&#39;, &#39;CAS04&#39;, &#39;&#39;, &#39;LFZ&#39;, &#39;2020-06-02T19:00:00&#39;, &#39;2020-07-13T19:00:00&#39;]]
+
+
+ metadata_request_df
+   network station location channel                start                  end
+0      8P   CAS04              LQE  2020-06-02T19:00:00  2020-07-13T19:00:00
+1      8P   CAS04              LQN  2020-06-02T19:00:00  2020-07-13T19:00:00
+2      8P   CAS04              LFE  2020-06-02T19:00:00  2020-07-13T19:00:00
+3      8P   CAS04              LFN  2020-06-02T19:00:00  2020-07-13T19:00:00
+4      8P   CAS04              LFZ  2020-06-02T19:00:00  2020-07-13T19:00:00
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Request the inventory information from IRIS
+inventory, traces = maker.get_inventory_from_df(metadata_request_df, data=False)
+translator = XMLInventoryMTExperiment()
+experiment = translator.xml_to_mt(inventory_object=inventory)
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>h5_path = &quot;tmp.h5&quot;
+mth5_obj = initialize_mth5(h5_path)  # mode=&quot;a&quot;)
+mth5_obj.from_experiment(experiment)
+mth5_obj.channel_summary.summarize()
+
+summary_df = mth5_obj.channel_summary.to_dataframe()
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(summary_df)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+         survey station run   latitude   longitude  elevation component  \
+0   CONUS South   CAS04   a  37.633351 -121.468382   329.3875        ex
+1   CONUS South   CAS04   a  37.633351 -121.468382   329.3875        ey
+2   CONUS South   CAS04   a  37.633351 -121.468382   329.3875        hx
+3   CONUS South   CAS04   a  37.633351 -121.468382   329.3875        hy
+4   CONUS South   CAS04   a  37.633351 -121.468382   329.3875        hz
+5   CONUS South   CAS04   b  37.633351 -121.468382   329.3875        ex
+6   CONUS South   CAS04   b  37.633351 -121.468382   329.3875        ey
+7   CONUS South   CAS04   b  37.633351 -121.468382   329.3875        hx
+8   CONUS South   CAS04   b  37.633351 -121.468382   329.3875        hy
+9   CONUS South   CAS04   b  37.633351 -121.468382   329.3875        hz
+10  CONUS South   CAS04   c  37.633351 -121.468382   329.3875        ex
+11  CONUS South   CAS04   c  37.633351 -121.468382   329.3875        ey
+12  CONUS South   CAS04   c  37.633351 -121.468382   329.3875        hx
+13  CONUS South   CAS04   c  37.633351 -121.468382   329.3875        hy
+14  CONUS South   CAS04   c  37.633351 -121.468382   329.3875        hz
+15  CONUS South   CAS04   d  37.633351 -121.468382   329.3875        ex
+16  CONUS South   CAS04   d  37.633351 -121.468382   329.3875        ey
+17  CONUS South   CAS04   d  37.633351 -121.468382   329.3875        hx
+18  CONUS South   CAS04   d  37.633351 -121.468382   329.3875        hy
+19  CONUS South   CAS04   d  37.633351 -121.468382   329.3875        hz
+
+                       start                       end  n_samples  \
+0  2020-06-02 18:41:43+00:00 2020-06-02 22:07:46+00:00      12363
+1  2020-06-02 18:41:43+00:00 2020-06-02 22:07:46+00:00      12363
+2  2020-06-02 18:41:43+00:00 2020-06-02 22:07:46+00:00      12363
+3  2020-06-02 18:41:43+00:00 2020-06-02 22:07:46+00:00      12363
+4  2020-06-02 18:41:43+00:00 2020-06-02 22:07:46+00:00      12363
+5  2020-06-02 22:24:55+00:00 2020-06-12 17:52:23+00:00     847648
+6  2020-06-02 22:24:55+00:00 2020-06-12 17:52:23+00:00     847648
+7  2020-06-02 22:24:55+00:00 2020-06-12 17:52:23+00:00     847648
+8  2020-06-02 22:24:55+00:00 2020-06-12 17:52:23+00:00     847648
+9  2020-06-02 22:24:55+00:00 2020-06-12 17:52:23+00:00     847648
+10 2020-06-12 18:32:17+00:00 2020-07-01 17:32:59+00:00    1638042
+11 2020-06-12 18:32:17+00:00 2020-07-01 17:32:59+00:00    1638042
+12 2020-06-12 18:32:17+00:00 2020-07-01 17:32:59+00:00    1638042
+13 2020-06-12 18:32:17+00:00 2020-07-01 17:32:59+00:00    1638042
+14 2020-06-12 18:32:17+00:00 2020-07-01 17:32:59+00:00    1638042
+15 2020-07-01 19:36:55+00:00 2020-07-13 21:46:12+00:00    1044557
+16 2020-07-01 19:36:55+00:00 2020-07-13 21:46:12+00:00    1044557
+17 2020-07-01 19:36:55+00:00 2020-07-13 21:46:12+00:00    1044557
+18 2020-07-01 19:36:55+00:00 2020-07-13 21:46:12+00:00    1044557
+19 2020-07-01 19:36:55+00:00 2020-07-13 21:46:12+00:00    1044557
+
+    sample_rate measurement_type  azimuth  tilt           units  \
+0           1.0         electric     13.2   0.0  digital counts
+1           1.0         electric    103.2   0.0  digital counts
+2           1.0         magnetic     13.2   0.0  digital counts
+3           1.0         magnetic    103.2   0.0  digital counts
+4           1.0         magnetic      0.0  90.0  digital counts
+5           1.0         electric     13.2   0.0  digital counts
+6           1.0         electric    103.2   0.0  digital counts
+7           1.0         magnetic     13.2   0.0  digital counts
+8           1.0         magnetic    103.2   0.0  digital counts
+9           1.0         magnetic      0.0  90.0  digital counts
+10          1.0         electric     13.2   0.0  digital counts
+11          1.0         electric    103.2   0.0  digital counts
+12          1.0         magnetic     13.2   0.0  digital counts
+13          1.0         magnetic    103.2   0.0  digital counts
+14          1.0         magnetic      0.0  90.0  digital counts
+15          1.0         electric     13.2   0.0  digital counts
+16          1.0         electric    103.2   0.0  digital counts
+17          1.0         magnetic     13.2   0.0  digital counts
+18          1.0         magnetic    103.2   0.0  digital counts
+19          1.0         magnetic      0.0  90.0  digital counts
+
+             hdf5_reference       run_hdf5_reference   station_hdf5_reference
+0   &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;
+1   &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;
+2   &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;
+3   &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;
+4   &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;
+5   &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;
+6   &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;
+7   &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;
+8   &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;
+9   &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;
+10  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;
+11  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;
+12  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;
+13  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;
+14  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;
+15  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;
+16  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;
+17  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;
+18  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;
+19  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># &lt;TRANSFORM CHANNEL SUMMARY INTO REQUEST DF&gt;
+if active_runs:
+    summary_df = summary_df[summary_df[&quot;run&quot;].isin(active_runs)]  # summary_df[0:5]
+request_df = channel_summary_to_make_mth5(summary_df, network=network, verbose=True)
+print(f&quot;\n\n {request_df}&quot;)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(&#39;CAS04&#39;, &#39;a&#39;), from 2020-06-02 18:41:43+00:00, to 2020-06-02 22:07:46+00:00
+(&#39;CAS04&#39;, &#39;b&#39;), from 2020-06-02 22:24:55+00:00, to 2020-06-12 17:52:23+00:00
+(&#39;CAS04&#39;, &#39;c&#39;), from 2020-06-12 18:32:17+00:00, to 2020-07-01 17:32:59+00:00
+(&#39;CAS04&#39;, &#39;d&#39;), from 2020-07-01 19:36:55+00:00, to 2020-07-13 21:46:12+00:00
+
+
+    network station location channel                     start  \
+0       8P   CAS04              LQN 2020-06-02 18:41:43+00:00
+1       8P   CAS04              LQE 2020-06-02 18:41:43+00:00
+2       8P   CAS04              LFN 2020-06-02 18:41:43+00:00
+3       8P   CAS04              LFE 2020-06-02 18:41:43+00:00
+4       8P   CAS04              LFZ 2020-06-02 18:41:43+00:00
+5       8P   CAS04              LQN 2020-06-02 22:24:55+00:00
+6       8P   CAS04              LQE 2020-06-02 22:24:55+00:00
+7       8P   CAS04              LFN 2020-06-02 22:24:55+00:00
+8       8P   CAS04              LFE 2020-06-02 22:24:55+00:00
+9       8P   CAS04              LFZ 2020-06-02 22:24:55+00:00
+10      8P   CAS04              LQN 2020-06-12 18:32:17+00:00
+11      8P   CAS04              LQE 2020-06-12 18:32:17+00:00
+12      8P   CAS04              LFN 2020-06-12 18:32:17+00:00
+13      8P   CAS04              LFE 2020-06-12 18:32:17+00:00
+14      8P   CAS04              LFZ 2020-06-12 18:32:17+00:00
+15      8P   CAS04              LQN 2020-07-01 19:36:55+00:00
+16      8P   CAS04              LQE 2020-07-01 19:36:55+00:00
+17      8P   CAS04              LFN 2020-07-01 19:36:55+00:00
+18      8P   CAS04              LFE 2020-07-01 19:36:55+00:00
+19      8P   CAS04              LFZ 2020-07-01 19:36:55+00:00
+
+                         end
+0  2020-06-02 22:07:46+00:00
+1  2020-06-02 22:07:46+00:00
+2  2020-06-02 22:07:46+00:00
+3  2020-06-02 22:07:46+00:00
+4  2020-06-02 22:07:46+00:00
+5  2020-06-12 17:52:23+00:00
+6  2020-06-12 17:52:23+00:00
+7  2020-06-12 17:52:23+00:00
+8  2020-06-12 17:52:23+00:00
+9  2020-06-12 17:52:23+00:00
+10 2020-07-01 17:32:59+00:00
+11 2020-07-01 17:32:59+00:00
+12 2020-07-01 17:32:59+00:00
+13 2020-07-01 17:32:59+00:00
+14 2020-07-01 17:32:59+00:00
+15 2020-07-13 21:46:12+00:00
+16 2020-07-13 21:46:12+00:00
+17 2020-07-13 21:46:12+00:00
+18 2020-07-13 21:46:12+00:00
+19 2020-07-13 21:46:12+00:00
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>mth5_version = &quot;0.1.0&quot;
+interact = False
+#mth5_version = &quot;0.2.0&quot;
+maker = MakeMTH5(mth5_version=mth5_version)
+# print(&quot;FAILED FOR 0.2.0 with some other error&quot;)
+# inventory, streams = maker.get_inventory_from_df(request_df, data=False, client=&quot;IRIS&quot;)    # inventory==inventory0??
+mth5_obj = maker.make_mth5_from_fdsnclient(request_df, client=&quot;IRIS&quot;, path=&quot;&quot;, interact=interact)
+mth5_path = mth5_obj.filename
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+More or less runs have been requested by the user than are defined in the metadata. Runs will be defined but only the requested run extents contain time series data based on the users request.
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>if interact:
+    mth5_obj.close_mth5()
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>for run in active_runs:
+    read_back_data(mth5_path, &quot;CAS04&quot;, run)
+</pre></div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interval &mdash; aurora 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/plot_directive.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="General Helper Functions" href="general_helper_functions.html" />
+    <link rel="prev" title="Pipelines" href="pipelines.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="time_series.html">Time Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transfer_function.html">Transfer Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipelines.html">Pipelines</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Interval</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general_helper_functions.html">General Helper Functions</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">API Reference</a> &raquo;</li>
+      <li>Interval</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/interval.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="interval">
+<span id="id1"></span><h1>Interval<a class="headerlink" href="#interval" title="Permalink to this heading">¶</a></h1>
+<span class="target" id="module-aurora.interval"></span><p>Source <a class="reference external" href="https://github.com/internetarchive/analyze_ocr/blob/master/interval.py">https://github.com/internetarchive/analyze_ocr/blob/master/interval.py</a>
+Liscence Not Specified</p>
+<p>Provides the Interval and IntervalSet classes</p>
+<p>The interval module provides the Interval and IntervalSet data types.
+Intervals describe continuous ranges that can be open, closed, half-open,
+or infinite.  IntervalSets contain zero to many disjoint sets of
+Intervals.</p>
+<p>Intervals don’t have to pertain to numbers.  They can contain any data
+that is comparable via the Python operators &lt;, &lt;=, ==, &gt;=, and &gt;.  Here’s
+an example of how strings can be used with Intervals:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">volume1</span> <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;Foe&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">volume2</span> <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="s2">&quot;Fog&quot;</span><span class="p">,</span> <span class="s2">&quot;McAfee&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">volume3</span> <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="s2">&quot;McDonalds&quot;</span><span class="p">,</span> <span class="s2">&quot;Space&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">volume4</span> <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="s2">&quot;Spade&quot;</span><span class="p">,</span> <span class="s2">&quot;Zygote&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">encyclopedia</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="p">([</span><span class="n">volume1</span><span class="p">,</span> <span class="n">volume2</span><span class="p">,</span> <span class="n">volume3</span><span class="p">,</span> <span class="n">volume4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mySet</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="p">([</span><span class="n">volume1</span><span class="p">,</span> <span class="n">volume3</span><span class="p">,</span> <span class="n">volume4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;Meteor&quot;</span> <span class="ow">in</span> <span class="n">encyclopedia</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;Goose&quot;</span> <span class="ow">in</span> <span class="n">encyclopedia</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;Goose&quot;</span> <span class="ow">in</span> <span class="n">mySet</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">volume2</span> <span class="ow">in</span> <span class="p">(</span><span class="n">encyclopedia</span> <span class="o">^</span> <span class="n">mySet</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>Here’s an example of how times can be used with Intervals:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">officeHours</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="s2">&quot;08:00&quot;</span><span class="p">,</span> <span class="s2">&quot;17:00&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">myLunch</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="s2">&quot;11:30&quot;</span><span class="p">,</span> <span class="s2">&quot;12:30&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">myHours</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="s2">&quot;08:30&quot;</span><span class="p">,</span> <span class="s2">&quot;19:30&quot;</span><span class="p">)</span> <span class="o">-</span> <span class="n">myLunch</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">myHours</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">officeHours</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;12:00&quot;</span> <span class="ow">in</span> <span class="n">myHours</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;15:30&quot;</span> <span class="ow">in</span> <span class="n">myHours</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inOffice</span> <span class="o">=</span> <span class="n">officeHours</span> <span class="o">&amp;</span> <span class="n">myHours</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">inOffice</span>
+<span class="go">[&#39;08:30&#39;..&#39;11:30&#39;),(&#39;12:30&#39;..&#39;17:00&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">overtime</span> <span class="o">=</span> <span class="n">myHours</span> <span class="o">-</span> <span class="n">officeHours</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">overtime</span>
+<span class="go">(&#39;17:00&#39;..&#39;19:30&#39;]</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.interval.BaseIntervalSet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.interval.</span></span><span class="sig-name descname"><span class="pre">BaseIntervalSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">items</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#BaseIntervalSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.BaseIntervalSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Base class for IntervalSet and FrozenIntervalSet.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.interval.BaseIntervalSet.all" title="aurora.interval.BaseIntervalSet.all"><code class="xref py py-obj docutils literal notranslate"><span class="pre">all</span></code></a>()</p></td>
+<td><p>Returns an interval set containing all values</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.interval.BaseIntervalSet.between" title="aurora.interval.BaseIntervalSet.between"><code class="xref py py-obj docutils literal notranslate"><span class="pre">between</span></code></a>(a, b[, closed])</p></td>
+<td><p>Returns an IntervalSet of all values between a and b.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.interval.BaseIntervalSet.bounds" title="aurora.interval.BaseIntervalSet.bounds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bounds</span></code></a>()</p></td>
+<td><p>Returns an interval that encompasses the entire BaseIntervalSet</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.interval.BaseIntervalSet.copy" title="aurora.interval.BaseIntervalSet.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
+<td><p>Returns a copy of the object</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.interval.BaseIntervalSet.difference" title="aurora.interval.BaseIntervalSet.difference"><code class="xref py py-obj docutils literal notranslate"><span class="pre">difference</span></code></a>(other)</p></td>
+<td><p>Returns the difference between the object and the given object</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.interval.BaseIntervalSet.empty" title="aurora.interval.BaseIntervalSet.empty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">empty</span></code></a>()</p></td>
+<td><p>Returns an interval set containing no values.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.interval.BaseIntervalSet.greater_than" title="aurora.interval.BaseIntervalSet.greater_than"><code class="xref py py-obj docutils literal notranslate"><span class="pre">greater_than</span></code></a>(n)</p></td>
+<td><p>Returns an IntervalSet containing values greater than the given value</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.interval.BaseIntervalSet.greater_than_or_equal_to" title="aurora.interval.BaseIntervalSet.greater_than_or_equal_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">greater_than_or_equal_to</span></code></a>(n)</p></td>
+<td><p>Returns an IntervalSet containing values greater than or equal to the given value</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.interval.BaseIntervalSet.intersection" title="aurora.interval.BaseIntervalSet.intersection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">intersection</span></code></a>(other)</p></td>
+<td><p>Returns the intersection between the object and the given value</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.interval.BaseIntervalSet.issubset" title="aurora.interval.BaseIntervalSet.issubset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">issubset</span></code></a>(other)</p></td>
+<td><p>Tells if the given object is a subset of the object</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.interval.BaseIntervalSet.issuperset" title="aurora.interval.BaseIntervalSet.issuperset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">issuperset</span></code></a>(other)</p></td>
+<td><p>Tells whether the given object is a superset of the object</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.interval.BaseIntervalSet.less_than" title="aurora.interval.BaseIntervalSet.less_than"><code class="xref py py-obj docutils literal notranslate"><span class="pre">less_than</span></code></a>(n)</p></td>
+<td><p>Returns an IntervalSet containing values less than the given value</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.interval.BaseIntervalSet.less_than_or_equal_to" title="aurora.interval.BaseIntervalSet.less_than_or_equal_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">less_than_or_equal_to</span></code></a>(n[, closed])</p></td>
+<td><p>Returns an IntervalSet containing values less than or equal to the given value</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.interval.BaseIntervalSet.lower_bound" title="aurora.interval.BaseIntervalSet.lower_bound"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lower_bound</span></code></a>()</p></td>
+<td><p>Returns the lower boundary of the BaseIntervalSet</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.interval.BaseIntervalSet.lower_closed" title="aurora.interval.BaseIntervalSet.lower_closed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lower_closed</span></code></a>()</p></td>
+<td><p>Returns a boolean telling whether the lower bound is closed or not</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.interval.BaseIntervalSet.not_equal_to" title="aurora.interval.BaseIntervalSet.not_equal_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">not_equal_to</span></code></a>(n)</p></td>
+<td><p>Returns an IntervalSet of all values not equal to n</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.interval.BaseIntervalSet.symmetric_difference" title="aurora.interval.BaseIntervalSet.symmetric_difference"><code class="xref py py-obj docutils literal notranslate"><span class="pre">symmetric_difference</span></code></a>(other)</p></td>
+<td><p>Returns the exclusive or of the given value with the object</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.interval.BaseIntervalSet.union" title="aurora.interval.BaseIntervalSet.union"><code class="xref py py-obj docutils literal notranslate"><span class="pre">union</span></code></a>(other)</p></td>
+<td><p>Returns the union of the given value with the object</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.interval.BaseIntervalSet.upper_bound" title="aurora.interval.BaseIntervalSet.upper_bound"><code class="xref py py-obj docutils literal notranslate"><span class="pre">upper_bound</span></code></a>()</p></td>
+<td><p>Returns the upper boundary of the BaseIntervalSet</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.interval.BaseIntervalSet.upper_closed" title="aurora.interval.BaseIntervalSet.upper_closed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">upper_closed</span></code></a>()</p></td>
+<td><p>Returns a boolean telling whether the upper bound is closed or not</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.BaseIntervalSet.all">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#BaseIntervalSet.all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.BaseIntervalSet.all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an interval set containing all values</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="go">(...)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.BaseIntervalSet.between">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">between</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">closed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#BaseIntervalSet.between"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.BaseIntervalSet.between" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an IntervalSet of all values between a and b.</p>
+<p>If closed is True, then the endpoints are included; otherwise, they
+aren’t.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="go">[0..100]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="go">[-1..1]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.BaseIntervalSet.bounds">
+<span class="sig-name descname"><span class="pre">bounds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#BaseIntervalSet.bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.BaseIntervalSet.bounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an interval that encompasses the entire BaseIntervalSet</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">IntervalSet</span><span class="p">([</span><span class="n">Interval</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">12</span><span class="p">])</span><span class="o">.</span><span class="n">bounds</span><span class="p">()</span>
+<span class="go">[2..12]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">IntervalSet</span><span class="p">()</span><span class="o">.</span><span class="n">bounds</span><span class="p">()</span>
+<span class="go">&lt;Empty&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">bounds</span><span class="p">()</span>
+<span class="go">(...)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.BaseIntervalSet.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#BaseIntervalSet.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.BaseIntervalSet.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a copy of the object</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">Interval</span><span class="o">.</span><span class="n">greater_than</span><span class="p">(</span><span class="mi">3</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s2</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">==</span> <span class="n">s2</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">FrozenIntervalSet</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">Interval</span><span class="o">.</span><span class="n">greater_than</span><span class="p">(</span><span class="mi">3</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s2</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">==</span> <span class="n">s2</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.BaseIntervalSet.difference">
+<span class="sig-name descname"><span class="pre">difference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#BaseIntervalSet.difference"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.BaseIntervalSet.difference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the difference between the object and the given object</p>
+<p>Returns all values of self minus all matching values in other.  It
+is identical to the - operator, only it accepts any iterable as
+the operand.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">negatives</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">positives</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">greater_than</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">naturals</span>  <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">greater_than_or_equal_to</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">evens</span>     <span class="o">=</span> <span class="n">IntervalSet</span><span class="p">([</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zero</span>      <span class="o">=</span> <span class="n">IntervalSet</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nonzero</span>   <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">not_equal_to</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">empty</span>     <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">empty</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">all</span>       <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">evens</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">nonzero</span><span class="p">)</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">empty</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">naturals</span><span class="p">)</span>
+<span class="go">&lt;Empty&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">zero</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">naturals</span><span class="p">)</span>
+<span class="go">&lt;Empty&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">positives</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">zero</span><span class="p">)</span>
+<span class="go">(0...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">naturals</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">negatives</span><span class="p">)</span>
+<span class="go">[0...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="nb">all</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">zero</span><span class="p">)</span>
+<span class="go">(...0),(0...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">all</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">zero</span><span class="p">)</span> <span class="o">==</span> <span class="n">nonzero</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">naturals</span><span class="o">.</span><span class="n">difference</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="n">positives</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.BaseIntervalSet.empty">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">empty</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#BaseIntervalSet.empty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.BaseIntervalSet.empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an interval set containing no values.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">empty</span><span class="p">()</span>
+<span class="go">&lt;Empty&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.BaseIntervalSet.greater_than">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">greater_than</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#BaseIntervalSet.greater_than"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.BaseIntervalSet.greater_than" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an IntervalSet containing values greater than the given value</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">greater_than</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">(0...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">greater_than</span><span class="p">(</span><span class="o">-</span><span class="mi">23</span><span class="p">)</span>
+<span class="go">(-23...)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.BaseIntervalSet.greater_than_or_equal_to">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">greater_than_or_equal_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#BaseIntervalSet.greater_than_or_equal_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.BaseIntervalSet.greater_than_or_equal_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an IntervalSet containing values greater than or equal to
+the given value</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">greater_than_or_equal_to</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">[0...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">greater_than_or_equal_to</span><span class="p">(</span><span class="o">-</span><span class="mi">23</span><span class="p">)</span>
+<span class="go">[-23...)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.BaseIntervalSet.intersection">
+<span class="sig-name descname"><span class="pre">intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#BaseIntervalSet.intersection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.BaseIntervalSet.intersection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the intersection between the object and the given value</p>
+<p>This function returns the intersection of self and other.  It is
+identical to the &amp; operator, except this function accepts any
+iterable as an operand, and &amp; accepts only another
+BaseIntervalSet.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">negatives</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">positives</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">greater_than</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">naturals</span>  <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">greater_than_or_equal_to</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">evens</span>     <span class="o">=</span> <span class="n">IntervalSet</span><span class="p">([</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zero</span>      <span class="o">=</span> <span class="n">IntervalSet</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nonzero</span>   <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">not_equal_to</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">empty</span>     <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">empty</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">naturals</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">naturals</span><span class="p">)</span>
+<span class="go">[0...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">evens</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">zero</span><span class="p">)</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">negatives</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">zero</span><span class="p">)</span>
+<span class="go">&lt;Empty&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">nonzero</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">positives</span><span class="p">)</span>
+<span class="go">(0...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">empty</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">zero</span><span class="p">)</span>
+<span class="go">&lt;Empty&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.BaseIntervalSet.issubset">
+<span class="sig-name descname"><span class="pre">issubset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#BaseIntervalSet.issubset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.BaseIntervalSet.issubset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tells if the given object is a subset of the object</p>
+<p>Returns true if self is a subset of other.  other can be any
+iterable object.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">zero</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">positives</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">greater_than</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">naturals</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">greater_than_or_equal_to</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">negatives</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r2</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zero</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">positives</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zero</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">naturals</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">positives</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">zero</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">zero</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">positives</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">positives</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">negatives</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">IntervalSet</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r2</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">negatives</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">negatives</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">positives</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zero</span><span class="o">.</span><span class="n">issubset</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.BaseIntervalSet.issuperset">
+<span class="sig-name descname"><span class="pre">issuperset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#BaseIntervalSet.issuperset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.BaseIntervalSet.issuperset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tells whether the given object is a superset of the object</p>
+<p>Returns true if self is a superset of other.  other can be any
+iterable object.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">zero</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">positives</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">greater_than</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">naturals</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">greater_than_or_equal_to</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">negatives</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r2</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zero</span><span class="o">.</span><span class="n">issuperset</span><span class="p">(</span><span class="n">positives</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zero</span><span class="o">.</span><span class="n">issuperset</span><span class="p">(</span><span class="n">naturals</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">positives</span><span class="o">.</span><span class="n">issuperset</span><span class="p">(</span><span class="n">zero</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">issuperset</span><span class="p">(</span><span class="n">zero</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">issuperset</span><span class="p">(</span><span class="n">positives</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">positives</span><span class="o">.</span><span class="n">issuperset</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">negatives</span><span class="o">.</span><span class="n">issuperset</span><span class="p">(</span><span class="n">IntervalSet</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r2</span><span class="o">.</span><span class="n">issuperset</span><span class="p">(</span><span class="n">negatives</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">negatives</span><span class="o">.</span><span class="n">issuperset</span><span class="p">(</span><span class="n">positives</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">negatives</span><span class="o">.</span><span class="n">issuperset</span><span class="p">([</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">632</span><span class="p">])</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.BaseIntervalSet.less_than">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">less_than</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#BaseIntervalSet.less_than"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.BaseIntervalSet.less_than" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an IntervalSet containing values less than the given value</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">(...0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="o">-</span><span class="mi">23</span><span class="p">)</span>
+<span class="go">(...-23)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.BaseIntervalSet.less_than_or_equal_to">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">less_than_or_equal_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">closed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#BaseIntervalSet.less_than_or_equal_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.BaseIntervalSet.less_than_or_equal_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an IntervalSet containing values less than or equal to the
+given value</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">less_than_or_equal_to</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">(...0]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">less_than_or_equal_to</span><span class="p">(</span><span class="o">-</span><span class="mi">23</span><span class="p">)</span>
+<span class="go">(...-23]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.BaseIntervalSet.lower_bound">
+<span class="sig-name descname"><span class="pre">lower_bound</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#BaseIntervalSet.lower_bound"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.BaseIntervalSet.lower_bound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the lower boundary of the BaseIntervalSet</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">IntervalSet</span><span class="p">([</span><span class="n">Interval</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">12</span><span class="p">])</span><span class="o">.</span><span class="n">lower_bound</span><span class="p">()</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">IntervalSet</span><span class="p">()</span><span class="o">.</span><span class="n">lower_bound</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+    <span class="o">...</span>
+<span class="gr">IndexError</span>: <span class="n">The BaseIntervalSet is empty</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">IntervalSet</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">lower_bound</span><span class="p">()</span>
+<span class="go">-Inf</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.BaseIntervalSet.lower_closed">
+<span class="sig-name descname"><span class="pre">lower_closed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#BaseIntervalSet.lower_closed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.BaseIntervalSet.lower_closed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a boolean telling whether the lower bound is closed or not</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">IntervalSet</span><span class="p">([</span><span class="n">Interval</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">12</span><span class="p">])</span><span class="o">.</span><span class="n">lower_closed</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">IntervalSet</span><span class="p">()</span><span class="o">.</span><span class="n">lower_closed</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+    <span class="o">...</span>
+<span class="gr">IndexError</span>: <span class="n">The BaseIntervalSet is empty</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">IntervalSet</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">lower_closed</span><span class="p">()</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.BaseIntervalSet.not_equal_to">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">not_equal_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#BaseIntervalSet.not_equal_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.BaseIntervalSet.not_equal_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an IntervalSet of all values not equal to n</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">not_equal_to</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">(...0),(0...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">not_equal_to</span><span class="p">(</span><span class="o">-</span><span class="mi">23</span><span class="p">)</span>
+<span class="go">(...-23),(-23...)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.BaseIntervalSet.symmetric_difference">
+<span class="sig-name descname"><span class="pre">symmetric_difference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#BaseIntervalSet.symmetric_difference"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.BaseIntervalSet.symmetric_difference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the exclusive or of the given value with the object</p>
+<p>This function returns the exclusive or of two IntervalSets.
+It is identical to the ^ operator, except it accepts any iterable
+object for the operand.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">negatives</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">positives</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">greater_than</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">naturals</span>  <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">greater_than_or_equal_to</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">evens</span>     <span class="o">=</span> <span class="n">IntervalSet</span><span class="p">([</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zero</span>      <span class="o">=</span> <span class="n">IntervalSet</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nonzero</span>   <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">not_equal_to</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">empty</span>     <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">empty</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">nonzero</span><span class="o">.</span><span class="n">symmetric_difference</span><span class="p">(</span><span class="n">naturals</span><span class="p">)</span>
+<span class="go">(...0]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">zero</span><span class="o">.</span><span class="n">symmetric_difference</span><span class="p">(</span><span class="n">negatives</span><span class="p">)</span>
+<span class="go">(...0]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">positives</span><span class="o">.</span><span class="n">symmetric_difference</span><span class="p">(</span><span class="n">empty</span><span class="p">)</span>
+<span class="go">(0...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">evens</span><span class="o">.</span><span class="n">symmetric_difference</span><span class="p">(</span><span class="n">zero</span><span class="p">)</span>
+<span class="go">-8,-6,-4,-2,2,4,6,8</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">evens</span><span class="o">.</span><span class="n">symmetric_difference</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="go">-8,-6,-4,-2</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.BaseIntervalSet.union">
+<span class="sig-name descname"><span class="pre">union</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#BaseIntervalSet.union"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.BaseIntervalSet.union" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the union of the given value with the object</p>
+<p>This function returns the union of a BaseIntervalSet and an
+iterable object.  It is identical to the | operator, except that
+| only accepts a BaseIntervalSet operand and union accepts any
+iterable.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">negatives</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">positives</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">greater_than</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">naturals</span>  <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">greater_than_or_equal_to</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">evens</span>     <span class="o">=</span> <span class="n">IntervalSet</span><span class="p">([</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zero</span>      <span class="o">=</span> <span class="n">IntervalSet</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nonzero</span>   <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">not_equal_to</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">empty</span>     <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">empty</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">all</span>       <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">evens</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">positives</span><span class="p">)</span>
+<span class="go">-8,-6,-4,-2,[0...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">negatives</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">zero</span><span class="p">)</span>
+<span class="go">(...0]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">empty</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">negatives</span><span class="p">)</span>
+<span class="go">(...0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">empty</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">naturals</span><span class="p">)</span>
+<span class="go">[0...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">nonzero</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">evens</span><span class="p">)</span>
+<span class="go">(...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">negatives</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="go">(...0],1,2,3,4</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.BaseIntervalSet.upper_bound">
+<span class="sig-name descname"><span class="pre">upper_bound</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#BaseIntervalSet.upper_bound"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.BaseIntervalSet.upper_bound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the upper boundary of the BaseIntervalSet</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">IntervalSet</span><span class="p">([</span><span class="n">Interval</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">12</span><span class="p">])</span><span class="o">.</span><span class="n">upper_bound</span><span class="p">()</span>
+<span class="go">12</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">IntervalSet</span><span class="p">()</span><span class="o">.</span><span class="n">upper_bound</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+    <span class="o">...</span>
+<span class="gr">IndexError</span>: <span class="n">The BaseIntervalSet is empty</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">IntervalSet</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">upper_bound</span><span class="p">()</span>
+<span class="go">Inf</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.BaseIntervalSet.upper_closed">
+<span class="sig-name descname"><span class="pre">upper_closed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#BaseIntervalSet.upper_closed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.BaseIntervalSet.upper_closed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a boolean telling whether the upper bound is closed or not</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">IntervalSet</span><span class="p">([</span><span class="n">Interval</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">12</span><span class="p">])</span><span class="o">.</span><span class="n">upper_closed</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">IntervalSet</span><span class="p">()</span><span class="o">.</span><span class="n">upper_closed</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+    <span class="o">...</span>
+<span class="gr">IndexError</span>: <span class="n">The BaseIntervalSet is empty</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">IntervalSet</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">upper_closed</span><span class="p">()</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.interval.FrozenIntervalSet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.interval.</span></span><span class="sig-name descname"><span class="pre">FrozenIntervalSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">items</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#FrozenIntervalSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.FrozenIntervalSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#aurora.interval.BaseIntervalSet" title="aurora.interval.BaseIntervalSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseIntervalSet</span></code></a></p>
+<p>An immutable version of BaseIntervalSet</p>
+<p>FrozenIntervalSet is like IntervalSet, only add and remove are not
+implemented, and hashes can be generated.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">FrozenIntervalSet</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  <span class="c">...</span>
+<span class="gr">AttributeError</span>: <span class="n">&#39;FrozenIntervalSet&#39; object has no attribute &#39;add&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  <span class="c">...</span>
+<span class="gr">AttributeError</span>: <span class="n">&#39;FrozenIntervalSet&#39; object has no attribute &#39;remove&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+  <span class="c">...</span>
+<span class="gr">AttributeError</span>: <span class="n">&#39;FrozenIntervalSet&#39; object has no attribute &#39;clear&#39;</span>
+</pre></div>
+</div>
+<p>Because FrozenIntervalSets are immutable, they can be used as a
+dictionary key.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span>
+<span class="gp">... </span>  <span class="n">FrozenIntervalSet</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">66</span><span class="p">])</span> <span class="p">:</span> <span class="mi">52</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">FrozenIntervalSet</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
+</pre></div>
+</div>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">all</span></code>()</p></td>
+<td><p>Returns an interval set containing all values</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">between</span></code>(a, b[, closed])</p></td>
+<td><p>Returns an IntervalSet of all values between a and b.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bounds</span></code>()</p></td>
+<td><p>Returns an interval that encompasses the entire BaseIntervalSet</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.interval.FrozenIntervalSet.copy" title="aurora.interval.FrozenIntervalSet.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
+<td><p>Duplicates the object</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">difference</span></code>(other)</p></td>
+<td><p>Returns the difference between the object and the given object</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">empty</span></code>()</p></td>
+<td><p>Returns an interval set containing no values.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">greater_than</span></code>(n)</p></td>
+<td><p>Returns an IntervalSet containing values greater than the given value</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">greater_than_or_equal_to</span></code>(n)</p></td>
+<td><p>Returns an IntervalSet containing values greater than or equal to the given value</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">intersection</span></code>(other)</p></td>
+<td><p>Returns the intersection between the object and the given value</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">issubset</span></code>(other)</p></td>
+<td><p>Tells if the given object is a subset of the object</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">issuperset</span></code>(other)</p></td>
+<td><p>Tells whether the given object is a superset of the object</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">less_than</span></code>(n)</p></td>
+<td><p>Returns an IntervalSet containing values less than the given value</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">less_than_or_equal_to</span></code>(n[, closed])</p></td>
+<td><p>Returns an IntervalSet containing values less than or equal to the given value</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">lower_bound</span></code>()</p></td>
+<td><p>Returns the lower boundary of the BaseIntervalSet</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">lower_closed</span></code>()</p></td>
+<td><p>Returns a boolean telling whether the lower bound is closed or not</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">not_equal_to</span></code>(n)</p></td>
+<td><p>Returns an IntervalSet of all values not equal to n</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">symmetric_difference</span></code>(other)</p></td>
+<td><p>Returns the exclusive or of the given value with the object</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">union</span></code>(other)</p></td>
+<td><p>Returns the union of the given value with the object</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">upper_bound</span></code>()</p></td>
+<td><p>Returns the upper boundary of the BaseIntervalSet</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">upper_closed</span></code>()</p></td>
+<td><p>Returns a boolean telling whether the upper bound is closed or not</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.FrozenIntervalSet.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#FrozenIntervalSet.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.FrozenIntervalSet.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Duplicates the object</p>
+<p>For FrozenIntervalSet objects, since they’re immutable, a
+reference, not a copy, of self is returned.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">FrozenIntervalSet</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">Interval</span><span class="o">.</span><span class="n">greater_than</span><span class="p">(</span><span class="mi">3</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s2</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">==</span> <span class="n">s2</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">id</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">==</span> <span class="nb">id</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.interval.Interval">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.interval.</span></span><span class="sig-name descname"><span class="pre">Interval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lower_bound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-Inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_bound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Inf</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#Interval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.Interval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Represents a continuous range of values</p>
+<p>An Interval is composed of the lower bound, a closed lower bound
+flag, an upper bound, and a closed upper bound flag.  The attributes
+are called lower_bound, lower_closed, upper_bound, and upper_closed,
+respectively.  For an infinite interval, the bound is set to inf or
+-inf.  IntervalSets are composed of zero to many Intervals.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.interval.Interval.adjacent_to" title="aurora.interval.Interval.adjacent_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">adjacent_to</span></code></a>(other)</p></td>
+<td><p>Tells whether an Interval is adjacent to the object without overlap</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.interval.Interval.all" title="aurora.interval.Interval.all"><code class="xref py py-obj docutils literal notranslate"><span class="pre">all</span></code></a>()</p></td>
+<td><p>Returns an interval encompassing all values</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.interval.Interval.between" title="aurora.interval.Interval.between"><code class="xref py py-obj docutils literal notranslate"><span class="pre">between</span></code></a>(a, b[, closed])</p></td>
+<td><p>Returns an interval between two values</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.interval.Interval.comes_before" title="aurora.interval.Interval.comes_before"><code class="xref py py-obj docutils literal notranslate"><span class="pre">comes_before</span></code></a>(other)</p></td>
+<td><p>Tells whether an interval lies before the object</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.interval.Interval.duration" title="aurora.interval.Interval.duration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">duration</span></code></a>()</p></td>
+<td><p>&#64;note: added 20140618 kkappler returns the duration of interval</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.interval.Interval.equal_to" title="aurora.interval.Interval.equal_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">equal_to</span></code></a>(a)</p></td>
+<td><p>Returns an point interval</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.interval.Interval.greater_than" title="aurora.interval.Interval.greater_than"><code class="xref py py-obj docutils literal notranslate"><span class="pre">greater_than</span></code></a>(a)</p></td>
+<td><p>Returns interval of all values greater than the given value</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.interval.Interval.greater_than_or_equal_to" title="aurora.interval.Interval.greater_than_or_equal_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">greater_than_or_equal_to</span></code></a>(a)</p></td>
+<td><p>Returns interval of all values greater than or equal to the given value</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.interval.Interval.join" title="aurora.interval.Interval.join"><code class="xref py py-obj docutils literal notranslate"><span class="pre">join</span></code></a>(other)</p></td>
+<td><p>Combines two continous Intervals</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.interval.Interval.less_than" title="aurora.interval.Interval.less_than"><code class="xref py py-obj docutils literal notranslate"><span class="pre">less_than</span></code></a>(a)</p></td>
+<td><p>Returns interval of all values less than the given value</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.interval.Interval.less_than_or_equal_to" title="aurora.interval.Interval.less_than_or_equal_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">less_than_or_equal_to</span></code></a>(a)</p></td>
+<td><p>Returns an interval containing the given values and everything less</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.interval.Interval.none" title="aurora.interval.Interval.none"><code class="xref py py-obj docutils literal notranslate"><span class="pre">none</span></code></a>()</p></td>
+<td><p>Returns an empty interval</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.interval.Interval.overlaps" title="aurora.interval.Interval.overlaps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">overlaps</span></code></a>(other)</p></td>
+<td><p>Tells whether the given interval overlaps the object</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.interval.Interval.pad" title="aurora.interval.Interval.pad"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pad</span></code></a>(pad_width)</p></td>
+<td><p>&#64;note: added 20140618 kkappler returns a padded interval; Intent was to add a little so that open-intervals, or adjacent intervals would easily make an interval set</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.Interval.adjacent_to">
+<span class="sig-name descname"><span class="pre">adjacent_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#Interval.adjacent_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.Interval.adjacent_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tells whether an Interval is adjacent to the object without overlap</p>
+<p>Returns True if self is adjacent to other, meaning that if they
+were joined, there would be no discontinuity.  They cannot
+overlap.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">r1</span>  <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r2</span>  <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">less_than_or_equal_to</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r3</span>  <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r4</span>  <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">less_than_or_equal_to</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r5</span>  <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r6</span>  <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r7</span>  <span class="o">=</span> <span class="n">Interval</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">lower_closed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r8</span>  <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">greater_than</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r9</span>  <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">equal_to</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r10</span> <span class="o">=</span> <span class="n">Interval</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">upper_closed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r11</span> <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r12</span> <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">greater_than_or_equal_to</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r13</span> <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">greater_than</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r14</span> <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">equal_to</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r15</span> <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">greater_than_or_equal_to</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r1</span><span class="o">.</span><span class="n">adjacent_to</span><span class="p">(</span><span class="n">r6</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r6</span><span class="o">.</span><span class="n">adjacent_to</span><span class="p">(</span><span class="n">r11</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r7</span><span class="o">.</span><span class="n">adjacent_to</span><span class="p">(</span><span class="n">r9</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r3</span><span class="o">.</span><span class="n">adjacent_to</span><span class="p">(</span><span class="n">r10</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r5</span><span class="o">.</span><span class="n">adjacent_to</span><span class="p">(</span><span class="n">r14</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r6</span><span class="o">.</span><span class="n">adjacent_to</span><span class="p">(</span><span class="n">r15</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r1</span><span class="o">.</span><span class="n">adjacent_to</span><span class="p">(</span><span class="n">r8</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r12</span><span class="o">.</span><span class="n">adjacent_to</span><span class="p">(</span><span class="n">r14</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r6</span><span class="o">.</span><span class="n">adjacent_to</span><span class="p">(</span><span class="n">r13</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r2</span><span class="o">.</span><span class="n">adjacent_to</span><span class="p">(</span><span class="n">r15</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r1</span><span class="o">.</span><span class="n">adjacent_to</span><span class="p">(</span><span class="n">r4</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.Interval.all">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#Interval.all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.Interval.all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an interval encompassing all values</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">Interval</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="go">(...)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.Interval.between">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">between</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">closed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#Interval.between"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.Interval.between" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an interval between two values</p>
+<p>Returns an interval between values a and b.  If closed is True,
+then the endpoints are included.  Otherwise, the endpoints are
+excluded.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">Interval</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="go">[2..4]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">Interval</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="go">(2..4)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.Interval.comes_before">
+<span class="sig-name descname"><span class="pre">comes_before</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#Interval.comes_before"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.Interval.comes_before" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tells whether an interval lies before the object</p>
+<p>self comes before other when sorted if its lower bound is less
+than other’s smallest value.  If the smallest value is the same,
+then the Interval with the smallest upper bound comes first.
+Otherwise, they are equal.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Interval</span><span class="o">.</span><span class="n">equal_to</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">comes_before</span><span class="p">(</span><span class="n">Interval</span><span class="o">.</span><span class="n">equal_to</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Interval</span><span class="o">.</span><span class="n">less_than_or_equal_to</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">comes_before</span><span class="p">(</span><span class="n">Interval</span><span class="o">.</span><span class="n">equal_to</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Interval</span><span class="o">.</span><span class="n">less_than_or_equal_to</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">comes_before</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">Interval</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Interval</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">comes_before</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">Interval</span><span class="o">.</span><span class="n">less_than_or_equal_to</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Interval</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">comes_before</span><span class="p">(</span><span class="n">Interval</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.Interval.duration">
+<span class="sig-name descname"><span class="pre">duration</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#Interval.duration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.Interval.duration" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;note: added 20140618 kkappler
+returns the duration of interval</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.Interval.equal_to">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">equal_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#Interval.equal_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.Interval.equal_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an point interval</p>
+<p>Returns an interval containing only a.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">Interval</span><span class="o">.</span><span class="n">equal_to</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+<span class="go">32</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.Interval.greater_than">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">greater_than</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#Interval.greater_than"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.Interval.greater_than" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns interval of all values greater than the given value</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">Interval</span><span class="o">.</span><span class="n">greater_than</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+<span class="go">(32...)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.Interval.greater_than_or_equal_to">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">greater_than_or_equal_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#Interval.greater_than_or_equal_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.Interval.greater_than_or_equal_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns interval of all values greater than or equal to the given value</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">Interval</span><span class="o">.</span><span class="n">greater_than_or_equal_to</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+<span class="go">[32...)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.Interval.join">
+<span class="sig-name descname"><span class="pre">join</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#Interval.join"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.Interval.join" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combines two continous Intervals</p>
+<p>Combines two continuous Intervals into one Interval.  If the two
+Intervals are disjoint, then an exception is raised.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">r1</span>  <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r2</span>  <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">less_than_or_equal_to</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r3</span>  <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r4</span>  <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">less_than_or_equal_to</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r5</span>  <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r6</span>  <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r7</span>  <span class="o">=</span> <span class="n">Interval</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">lower_closed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r8</span>  <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">greater_than</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r9</span>  <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">equal_to</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r10</span> <span class="o">=</span> <span class="n">Interval</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">upper_closed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r11</span> <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r12</span> <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">greater_than_or_equal_to</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r13</span> <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">greater_than</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r14</span> <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">equal_to</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r15</span> <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">greater_than_or_equal_to</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r13</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">r15</span><span class="p">)</span>
+<span class="go">[100...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r7</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">r6</span><span class="p">)</span>
+<span class="go">(-100..100]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r11</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">r2</span><span class="p">)</span>
+<span class="go">(...100]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r4</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">r15</span><span class="p">)</span>
+<span class="go">(...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r8</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">r8</span><span class="p">)</span>
+<span class="go">(-100...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r3</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">r7</span><span class="p">)</span>
+<span class="go">(...100]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r5</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">r10</span><span class="p">)</span>
+<span class="go">(...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r9</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">r1</span><span class="p">)</span>
+<span class="go">(...-100]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r12</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">r5</span><span class="p">)</span>
+<span class="go">(...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r13</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">r1</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ArithmeticError</span>: <span class="n">The Intervals are disjoint.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r14</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">r2</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ArithmeticError</span>: <span class="n">The Intervals are disjoint.</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.Interval.less_than">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">less_than</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#Interval.less_than"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.Interval.less_than" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns interval of all values less than the given value</p>
+<p>Returns an interval containing all values less than a.  If closed
+is True, then all values less than or equal to a are returned.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">Interval</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+<span class="go">(...32)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.Interval.less_than_or_equal_to">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">less_than_or_equal_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#Interval.less_than_or_equal_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.Interval.less_than_or_equal_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an interval containing the given values and everything less</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">Interval</span><span class="o">.</span><span class="n">less_than_or_equal_to</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+<span class="go">(...32]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.Interval.none">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">none</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#Interval.none"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.Interval.none" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an empty interval</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">Interval</span><span class="o">.</span><span class="n">none</span><span class="p">()</span>
+<span class="go">&lt;Empty&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.Interval.overlaps">
+<span class="sig-name descname"><span class="pre">overlaps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#Interval.overlaps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.Interval.overlaps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tells whether the given interval overlaps the object</p>
+<p>Returns True if the one Interval overlaps another.  If they are
+immediately adjacent, then this returns False.  Use the adjacent_to
+function for testing for adjacent Intervals.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">r1</span>  <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r2</span>  <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">less_than_or_equal_to</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r3</span>  <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r4</span>  <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">less_than_or_equal_to</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r5</span>  <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r6</span>  <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r7</span>  <span class="o">=</span> <span class="n">Interval</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">lower_closed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r8</span>  <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">greater_than</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r9</span>  <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">equal_to</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r10</span> <span class="o">=</span> <span class="n">Interval</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">upper_closed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r11</span> <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r12</span> <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">greater_than_or_equal_to</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r13</span> <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">greater_than</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r14</span> <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">equal_to</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r15</span> <span class="o">=</span> <span class="n">Interval</span><span class="o">.</span><span class="n">greater_than_or_equal_to</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r8</span><span class="o">.</span><span class="n">overlaps</span><span class="p">(</span><span class="n">r9</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r12</span><span class="o">.</span><span class="n">overlaps</span><span class="p">(</span><span class="n">r6</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r7</span><span class="o">.</span><span class="n">overlaps</span><span class="p">(</span><span class="n">r8</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r8</span><span class="o">.</span><span class="n">overlaps</span><span class="p">(</span><span class="n">r4</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r14</span><span class="o">.</span><span class="n">overlaps</span><span class="p">(</span><span class="n">r11</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r10</span><span class="o">.</span><span class="n">overlaps</span><span class="p">(</span><span class="n">r13</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r5</span><span class="o">.</span><span class="n">overlaps</span><span class="p">(</span><span class="n">r1</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r5</span><span class="o">.</span><span class="n">overlaps</span><span class="p">(</span><span class="n">r2</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r15</span><span class="o">.</span><span class="n">overlaps</span><span class="p">(</span><span class="n">r6</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r3</span><span class="o">.</span><span class="n">overlaps</span><span class="p">(</span><span class="n">r1</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.Interval.pad">
+<span class="sig-name descname"><span class="pre">pad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pad_width</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#Interval.pad"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.Interval.pad" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;note: added 20140618 kkappler
+returns a padded interval;
+Intent was to add a little so that open-intervals, or adjacent
+intervals would easily make an interval set</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.interval.IntervalSet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.interval.</span></span><span class="sig-name descname"><span class="pre">IntervalSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">items</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#IntervalSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.IntervalSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#aurora.interval.BaseIntervalSet" title="aurora.interval.BaseIntervalSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseIntervalSet</span></code></a></p>
+<p>The mutable version of BaseIntervalSet</p>
+<p>IntervalSet is a class representing sets of continuous values, as
+opposed to a discrete set, which is already implemented by the set
+type in Python.</p>
+<p>IntervalSets can be bounded, unbounded, and non-continuous.  They were
+designed to accomodate any sort of mathematical set dealing with
+continuous values.  This will usually mean numbers, but any Python
+type that has valid comparison operations can be used in an
+IntervalSet.</p>
+<p>Because IntervalSets are mutable, it cannot be used as a dictionary
+key.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">{</span><span class="n">IntervalSet</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">66</span><span class="p">])</span> <span class="p">:</span> <span class="mi">52</span><span class="p">}</span>
+<span class="gt">Traceback (most recent call last):</span>
+    <span class="o">...</span>
+<span class="gr">TypeError</span>: <span class="n">unhashable instance</span>
+</pre></div>
+</div>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.interval.IntervalSet.add" title="aurora.interval.IntervalSet.add"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add</span></code></a>(obj)</p></td>
+<td><p>Adds an Interval or discrete value to the object</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">all</span></code>()</p></td>
+<td><p>Returns an interval set containing all values</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">between</span></code>(a, b[, closed])</p></td>
+<td><p>Returns an IntervalSet of all values between a and b.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bounds</span></code>()</p></td>
+<td><p>Returns an interval that encompasses the entire BaseIntervalSet</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.interval.IntervalSet.clear" title="aurora.interval.IntervalSet.clear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code></a>()</p></td>
+<td><p>Removes all Intervals from the object</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>()</p></td>
+<td><p>Returns a copy of the object</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">difference</span></code>(other)</p></td>
+<td><p>Returns the difference between the object and the given object</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.interval.IntervalSet.difference_update" title="aurora.interval.IntervalSet.difference_update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">difference_update</span></code></a>(other)</p></td>
+<td><p>Removes any elements in the given value from the object</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.interval.IntervalSet.discard" title="aurora.interval.IntervalSet.discard"><code class="xref py py-obj docutils literal notranslate"><span class="pre">discard</span></code></a>(obj)</p></td>
+<td><p>Removes a value from the object</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">empty</span></code>()</p></td>
+<td><p>Returns an interval set containing no values.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">greater_than</span></code>(n)</p></td>
+<td><p>Returns an IntervalSet containing values greater than the given value</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">greater_than_or_equal_to</span></code>(n)</p></td>
+<td><p>Returns an IntervalSet containing values greater than or equal to the given value</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">intersection</span></code>(other)</p></td>
+<td><p>Returns the intersection between the object and the given value</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.interval.IntervalSet.intersection_update" title="aurora.interval.IntervalSet.intersection_update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">intersection_update</span></code></a>(other)</p></td>
+<td><p>Removes values not found in the parameter</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">issubset</span></code>(other)</p></td>
+<td><p>Tells if the given object is a subset of the object</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">issuperset</span></code>(other)</p></td>
+<td><p>Tells whether the given object is a superset of the object</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">less_than</span></code>(n)</p></td>
+<td><p>Returns an IntervalSet containing values less than the given value</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">less_than_or_equal_to</span></code>(n[, closed])</p></td>
+<td><p>Returns an IntervalSet containing values less than or equal to the given value</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">lower_bound</span></code>()</p></td>
+<td><p>Returns the lower boundary of the BaseIntervalSet</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">lower_closed</span></code>()</p></td>
+<td><p>Returns a boolean telling whether the lower bound is closed or not</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">not_equal_to</span></code>(n)</p></td>
+<td><p>Returns an IntervalSet of all values not equal to n</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.interval.IntervalSet.pop" title="aurora.interval.IntervalSet.pop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code></a>()</p></td>
+<td><p>Returns and discards an Interval or value from the IntervalSet</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.interval.IntervalSet.remove" title="aurora.interval.IntervalSet.remove"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove</span></code></a>(obj)</p></td>
+<td><p>Removes a value from the object</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">symmetric_difference</span></code>(other)</p></td>
+<td><p>Returns the exclusive or of the given value with the object</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.interval.IntervalSet.symmetric_difference_update" title="aurora.interval.IntervalSet.symmetric_difference_update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">symmetric_difference_update</span></code></a>(other)</p></td>
+<td><p>Updates the object as though doing an xor with the parameter</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">union</span></code>(other)</p></td>
+<td><p>Returns the union of the given value with the object</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.interval.IntervalSet.update" title="aurora.interval.IntervalSet.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>(other)</p></td>
+<td><p>Adds elements from the given value to the object</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">upper_bound</span></code>()</p></td>
+<td><p>Returns the upper boundary of the BaseIntervalSet</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">upper_closed</span></code>()</p></td>
+<td><p>Returns a boolean telling whether the upper bound is closed or not</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.IntervalSet.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#IntervalSet.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.IntervalSet.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds an Interval or discrete value to the object</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Interval</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="mi">39</span><span class="p">,</span> <span class="n">lower_closed</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r</span>
+<span class="go">4,(23..39]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Interval</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="mi">25</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r</span>
+<span class="go">(...39]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.IntervalSet.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#IntervalSet.clear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.IntervalSet.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes all Intervals from the object</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="n">Interval</span><span class="o">.</span><span class="n">greater_than</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">34</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">s</span>
+<span class="go">2,6,7,(8...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">s</span>
+<span class="go">&lt;Empty&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.IntervalSet.difference_update">
+<span class="sig-name descname"><span class="pre">difference_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#IntervalSet.difference_update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.IntervalSet.difference_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes any elements in the given value from the object</p>
+<p>This function removes the elements in other from self.  other can
+be any iterable object.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">difference_update</span><span class="p">([</span><span class="mi">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r</span>
+<span class="go">(...4),(4...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">difference_update</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">IntervalSet</span><span class="p">([</span><span class="n">Interval</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="mi">39</span><span class="p">,</span> <span class="n">lower_closed</span><span class="o">=</span><span class="kc">False</span><span class="p">)]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r</span>
+<span class="go">(...4),(4..23],(39...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">difference_update</span><span class="p">(</span><span class="n">IntervalSet</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="mi">25</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r</span>
+<span class="go">(39...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r2</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">difference_update</span><span class="p">(</span><span class="n">r2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r</span>
+<span class="go">&lt;Empty&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.IntervalSet.discard">
+<span class="sig-name descname"><span class="pre">discard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#IntervalSet.discard"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.IntervalSet.discard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a value from the object</p>
+<p>This function removes an Interval or discrete value from an
+IntervalSet.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r</span>
+<span class="go">(...4),(4...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">Interval</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="mi">39</span><span class="p">,</span> <span class="n">lower_closed</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r</span>
+<span class="go">(...4),(4..23],(39...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">Interval</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="mi">25</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r</span>
+<span class="go">(39...)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.IntervalSet.intersection_update">
+<span class="sig-name descname"><span class="pre">intersection_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#IntervalSet.intersection_update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.IntervalSet.intersection_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes values not found in the parameter</p>
+<p>Removes elements not found in other.  other can be any iterable
+object</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">intersection_update</span><span class="p">([</span><span class="mi">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">intersection_update</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">IntervalSet</span><span class="p">([</span><span class="n">Interval</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="mi">39</span><span class="p">,</span> <span class="n">lower_closed</span><span class="o">=</span><span class="kc">False</span><span class="p">)]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r</span>
+<span class="go">(23..39]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">intersection_update</span><span class="p">(</span><span class="n">IntervalSet</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="mi">25</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r</span>
+<span class="go">(23..25)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r2</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">intersection_update</span><span class="p">(</span><span class="n">r2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r</span>
+<span class="go">(23..25)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.IntervalSet.pop">
+<span class="sig-name descname"><span class="pre">pop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#IntervalSet.pop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.IntervalSet.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns and discards an Interval or value from the IntervalSet</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="p">([</span><span class="mi">7</span><span class="p">,</span> <span class="n">Interval</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">pop</span><span class="p">()))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">pop</span><span class="p">()))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;(...2)&quot;</span> <span class="ow">in</span> <span class="n">l</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;(...2]&quot;</span> <span class="ow">in</span> <span class="n">l</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;7&quot;</span> <span class="ow">in</span> <span class="n">l</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">s</span>
+<span class="go">&lt;Empty&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">i</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+    <span class="o">...</span>
+<span class="gr">KeyError</span>: <span class="n">&#39;pop from an empty IntervalSet&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.IntervalSet.remove">
+<span class="sig-name descname"><span class="pre">remove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#IntervalSet.remove"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.IntervalSet.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a value from the object</p>
+<p>This function removes an Interval, discrete value, or set
+from an IntervalSet.  If the object is not in the set, a KeyError
+is raised.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r</span>
+<span class="go">(...4),(4...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">Interval</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="mi">39</span><span class="p">,</span> <span class="n">lower_closed</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r</span>
+<span class="go">(...4),(4..23],(39...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">Interval</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="mi">25</span><span class="p">))</span>
+<span class="gt">Traceback (most recent call last):</span>
+    <span class="o">...</span>
+<span class="gr">KeyError</span>: <span class="n">&#39;(...25)&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.IntervalSet.symmetric_difference_update">
+<span class="sig-name descname"><span class="pre">symmetric_difference_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#IntervalSet.symmetric_difference_update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.IntervalSet.symmetric_difference_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the object as though doing an xor with the parameter</p>
+<p>Removes elements found in other and adds elements in other that
+are not in self.  other can be any iterable object.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">empty</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">symmetric_difference_update</span><span class="p">([</span><span class="mi">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">symmetric_difference_update</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">IntervalSet</span><span class="p">([</span><span class="n">Interval</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="mi">39</span><span class="p">,</span> <span class="n">lower_closed</span><span class="o">=</span><span class="kc">False</span><span class="p">)]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r</span>
+<span class="go">4,(23..39]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">symmetric_difference_update</span><span class="p">(</span><span class="n">IntervalSet</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="mi">25</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r</span>
+<span class="go">(...4),(4..23],[25..39]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r2</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">symmetric_difference_update</span><span class="p">(</span><span class="n">r2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r</span>
+<span class="go">4,(23..25),(39...)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.IntervalSet.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#IntervalSet.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.IntervalSet.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds elements from the given value to the object</p>
+<p>Adds elements from other to self.  other can be any iterable
+object.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">update</span><span class="p">([</span><span class="mi">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">IntervalSet</span><span class="p">([</span><span class="n">Interval</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="mi">39</span><span class="p">,</span> <span class="n">lower_closed</span><span class="o">=</span><span class="kc">False</span><span class="p">)]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r</span>
+<span class="go">4,(23..39]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">IntervalSet</span><span class="o">.</span><span class="n">less_than</span><span class="p">(</span><span class="mi">25</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r</span>
+<span class="go">(...39]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r2</span> <span class="o">=</span> <span class="n">IntervalSet</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">r2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">r</span>
+<span class="go">(...)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.interval.Largest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.interval.</span></span><span class="sig-name descname"><span class="pre">Largest</span></span><a class="reference internal" href="../_modules/aurora/interval.html#Largest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.Largest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class representing the universal largest value</p>
+<p>This type doesn’t do much; it implements a pseudo-value that’s larger
+than everything but itself.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">infinity</span> <span class="o">=</span> <span class="n">Largest</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">greatest</span> <span class="o">=</span> <span class="n">Largest</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="mi">6234</span> <span class="o">&lt;</span> <span class="n">infinity</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="mi">6234</span> <span class="o">==</span> <span class="n">infinity</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="mi">6234</span> <span class="o">&gt;</span> <span class="n">infinity</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">infinity</span> <span class="o">&gt;</span> <span class="n">infinity</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">infinity</span> <span class="o">==</span> <span class="n">greatest</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.interval.Smallest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.interval.</span></span><span class="sig-name descname"><span class="pre">Smallest</span></span><a class="reference internal" href="../_modules/aurora/interval.html#Smallest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.Smallest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Represents the smallest value</p>
+<p>This type doesn’t do much; it implements a pseudo-value that’s smaller
+than everything but itself.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">negInf</span> <span class="o">=</span> <span class="n">Smallest</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">smallest</span> <span class="o">=</span> <span class="n">Smallest</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">-</span><span class="mi">264</span> <span class="o">&lt;</span> <span class="n">negInf</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">-</span><span class="mi">264</span> <span class="o">==</span> <span class="n">negInf</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">-</span><span class="mi">264</span> <span class="o">&gt;</span> <span class="n">negInf</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">negInf</span> <span class="o">&lt;</span> <span class="n">negInf</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">negInf</span> <span class="o">==</span> <span class="n">smallest</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.interval.TimePeriod">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.interval.</span></span><span class="sig-name descname"><span class="pre">TimePeriod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#TimePeriod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.TimePeriod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#aurora.interval.Interval" title="aurora.interval.Interval"><code class="xref py py-class docutils literal notranslate"><span class="pre">Interval</span></code></a></p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">adjacent_to</span></code>(other)</p></td>
+<td><p>Tells whether an Interval is adjacent to the object without overlap</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">all</span></code>()</p></td>
+<td><p>Returns an interval encompassing all values</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">between</span></code>(a, b[, closed])</p></td>
+<td><p>Returns an interval between two values</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">comes_before</span></code>(other)</p></td>
+<td><p>Tells whether an interval lies before the object</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">equal_to</span></code>(a)</p></td>
+<td><p>Returns an point interval</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">greater_than</span></code>(a)</p></td>
+<td><p>Returns interval of all values greater than the given value</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">greater_than_or_equal_to</span></code>(a)</p></td>
+<td><p>Returns interval of all values greater than or equal to the given value</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">join</span></code>(other)</p></td>
+<td><p>Combines two continous Intervals</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">less_than</span></code>(a)</p></td>
+<td><p>Returns interval of all values less than the given value</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">less_than_or_equal_to</span></code>(a)</p></td>
+<td><p>Returns an interval containing the given values and everything less</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">none</span></code>()</p></td>
+<td><p>Returns an empty interval</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">overlaps</span></code>(other)</p></td>
+<td><p>Tells whether the given interval overlaps the object</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pad</span></code>(pad_width)</p></td>
+<td><p>&#64;note: added 20140618 kkappler returns a padded interval; Intent was to add a little so that open-intervals, or adjacent intervals would easily make an interval set</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 55%" />
+<col style="width: 45%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>duration</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.interval.TimePeriod.duration">
+<span class="sig-name descname"><span class="pre">duration</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#TimePeriod.duration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.TimePeriod.duration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.interval.generate_interval_list">
+<span class="sig-prename descclassname"><span class="pre">aurora.interval.</span></span><span class="sig-name descname"><span class="pre">generate_interval_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">startTime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endTime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#generate_interval_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.generate_interval_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>generic function used for specifying timeintervals to load
+probably place in gmi.core.interval</p>
+<p>Ideally would support endtime, number of segments or other</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.interval.merge_interval_list">
+<span class="sig-prename descclassname"><span class="pre">aurora.interval.</span></span><span class="sig-name descname"><span class="pre">merge_interval_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interval_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/interval.html#merge_interval_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.interval.merge_interval_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Can think of a stack of unassembled parts.  Put the first part in your
+left hand, then draw the next part in your right.  Check if the pieces
+mate, if so, attach and keep in your left hand, draw the next piece,
+and so on.  Once a piece does not fit, place the assembled piece in
+the left hand down and transfer the new ‘no-fit’ piece from your
+right to your left hand and contine …</p>
+<p>KEY: This assumes the interval list is sorted.  If the intervals are not sorted
+then you need to use set union.  This is way faster though.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pipelines.html" class="btn btn-neutral float-left" title="Pipelines" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="general_helper_functions.html" class="btn btn-neutral float-right" title="General Helper Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
