@@ -69,10 +69,10 @@ class RunSummary:
     """
 
     def __init__(self, **kwargs):
-        self.columns = ["station_id", "run_id", "start", "end"]
         self.column_dtypes = [str, str, pd.Timestamp, pd.Timestamp]
         self._input_dict = kwargs.get("input_dict", None)
         self.df = kwargs.get("df", None)
+        self._mini_summary_columns = ["survey", "station_id", "run_id", "start", "end"]
 
     def clone(self):
         return copy.deepcopy(self)
@@ -80,6 +80,14 @@ class RunSummary:
     def from_mth5s(self, mth5_list):
         run_summary_df = extract_run_summaries_from_mth5s(mth5_list)
         self.df = run_summary_df
+
+    @property
+    def mini_summary(self):
+        return self.df[self._mini_summary_columns]
+
+    @property
+    def print_mini_summary(self):
+        print(self.mini_summary)
 
     def add_duration(self, df=None):
         """
