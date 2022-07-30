@@ -26,21 +26,26 @@ MT_METADATA_DATA = Path(mt_metadata_init).parent.parent.joinpath("data")
 
 def count_lines(file_name):
     """
+    acts like wc -l in unix,
+    raise FileNotFoundError: if file_name does not exist.
 
     Parameters
     ----------
-    fileName
+    file_name: str or pathlib.Path
+        The file to apply line counting to
 
     Returns
     -------
-    integer: Number of lines present in fileName or -1 if file does not exist
-    acts like wc -l in unix, raise IOError: if file_name does not exist.
+    num_lines: int
+        Number of lines present in fileName or -1 if file does not exist
+
     """
     i = -1
     with open(file_name) as f:
         for i, l in enumerate(f):
             pass
-    return i + 1
+    num_lines = i + 1
+    return num_lines
 
 
 def execute_subprocess(cmd, **kwargs):

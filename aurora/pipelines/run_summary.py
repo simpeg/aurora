@@ -172,8 +172,10 @@ def channel_summary_to_run_summary(
         ch_summary_df = ch_summary.to_dataframe()
     elif isinstance(ch_summary, pd.DataFrame):
         ch_summary_df = ch_summary
-    grouper = ch_summary_df.groupby(["station", "run"])
+    group_by_columns = ["survey", "station", "run"]
+    grouper = ch_summary_df.groupby(group_by_columns)
     n_station_runs = len(grouper)
+    survey_ids = n_station_runs * [None]
     station_ids = n_station_runs * [None]
     run_ids = n_station_runs * [None]
     start_times = n_station_runs * [None]
@@ -183,11 +185,13 @@ def channel_summary_to_run_summary(
     output_channels = n_station_runs * [None]
     channel_scale_factors = n_station_runs * [None]
     i = 0
-    for (station_id, run_id), group in grouper:
-        # print(f"{i} {station_id} {run_id}")
-        # print(group)
-        station_ids[i] = station_id
-        run_ids[i] = run_id
+    for group_values, group in grouper:
+        group_info = dict(zip(group_by_columns, group_values))  # handy for debug
+        # for k,v in group_info.items:
+        #     print(f"{k}" = {v})
+        survey_ids[i] = group_info["survey"]
+        station_ids[i] = group_info["station"]
+        run_ids[i] = group_info["run"]
         start_times[i] = group.start.iloc[0]
         end_times[i] = group.end.iloc[0]
         sample_rates[i] = group.sample_rate.iloc[0]
@@ -199,6 +203,7 @@ def channel_summary_to_run_summary(
         i += 1
 
     data_dict = {}
+    data_dict["survey"] = survey_ids
     data_dict["station_id"] = station_ids
     data_dict["run_id"] = run_ids
     data_dict["start"] = start_times
