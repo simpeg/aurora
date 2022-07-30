@@ -39,7 +39,10 @@ from aurora.transfer_function.kernel_dataset import KernelDataset
 
 
 def process_synthetic_1(
-    z_file_path="", test_scale_factor=False, test_simultaneous_regression=False
+    z_file_path="",
+    test_scale_factor=False,
+    test_simultaneous_regression=False,
+    file_version="0.1.0",
 ):
     """
 
@@ -58,7 +61,7 @@ def process_synthetic_1(
     tfc: TransferFunctionCollection
         Should change so that it is mt_metadata.TF (see Issue #143)
     """
-    mth5_path = create_test1_h5()
+    mth5_path = create_test1_h5(file_version=file_version)
     run_summary = RunSummary()
     run_summary.from_mth5s(
         [
@@ -125,6 +128,7 @@ def process_synthetic_rr12():
     tfk_dataset.from_run_summary(run_summary, "test1", "test2")
     processing_config = create_test_run_config("test1r2", tfk_dataset.df)
     tfc = process_sythetic_data(processing_config, tfk_dataset)
+    return tfc
 
 
 def test_process_mth5():
@@ -149,7 +153,8 @@ def test_process_mth5():
     # process_synthetic_1_with_nans()
 
     z_file_path = AURORA_RESULTS_PATH.joinpath("syn1.zss")
-    tfc = process_synthetic_1(z_file_path=z_file_path)
+    # tfc = process_synthetic_1(z_file_path=z_file_path, file_version="0.1.0")
+    tfc = process_synthetic_1(z_file_path=z_file_path, file_version="0.2.0")
     z_file_path = AURORA_RESULTS_PATH.joinpath("syn1_scaled.zss")
     tfc = process_synthetic_1(z_file_path=z_file_path, test_scale_factor=True)
     z_file_path = AURORA_RESULTS_PATH.joinpath("syn1_simultaneous_estimate.zss")
@@ -158,6 +163,7 @@ def test_process_mth5():
     )
     tfc = process_synthetic_2()
     tfc = process_synthetic_rr12()
+    return tfc
 
 
 def main():

@@ -113,10 +113,9 @@ def create_mth5_synthetic_file(
     if file_version == "0.2.0":
         survey_id = "EMTF Synthetic"
         m.add_survey(survey_id)
-        print("Add a survey here")
     else:
         survey_id = None
-    # survey = Survey()
+
     for station_cfg in station_cfgs:
         station_group = m.add_station(station_cfg.id, survey=survey_id)
         for run in station_cfg.runs:

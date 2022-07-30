@@ -285,6 +285,7 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
                 config.decimation.sample_rate,
                 start=fix_time(row.start),
                 end=fix_time(row.end),
+                survey=row.survey,
             )
             dataset_df["run"].at[i] = run_dict["run"]
             # see Note 2 in this function doc notes
