@@ -69,9 +69,12 @@ def process_synthetic_1(
             mth5_path,
         ]
     )
+    # next two lines purely for codecov
+    run_summary.print_mini_summary
+    run_summary_clone = run_summary.clone()
     # run_summary.drop_runs_shorter_than(100000)
     tfk_dataset = KernelDataset()
-    tfk_dataset.from_run_summary(run_summary, "test1")
+    tfk_dataset.from_run_summary(run_summary_clone, "test1")
 
     # Test that channel_scale_factors column is optional
     if test_scale_factor:
