@@ -6,6 +6,9 @@ import numpy as np
 
 from aurora.transfer_function.base import TransferFunction
 
+# from mt_metadata.transfer_functions.channel_nomenclature import map_channels
+from aurora.channel_nomenclature import map_channels
+
 
 class TTFZ(TransferFunction):
     """
@@ -23,7 +26,7 @@ class TTFZ(TransferFunction):
     def __init__(self, *args, **kwargs):
         super(TTFZ, self).__init__(*args, **kwargs)
 
-    def apparent_resistivity(self, units="SI"):
+    def apparent_resistivity(self, units="SI", channel_nomenclature="default"):
         """
         ap_res(...) : computes app. res., phase, errors, given imped., cov.
         %USAGE: [rho,rho_se,ph,ph_se] = ap_res(z,sig_s,sig_e,periods) ;
@@ -31,23 +34,29 @@ class TTFZ(TransferFunction):
         % sig_s = inverse signal covariance matrix (from Z_****** file)
         % sig_e = residual covariance matrix (from Z_****** file)
         % periods = array of periods (sec)
-        Returns
-        -------
+
+        Parameters
+        ----------
+        units: str
+            one of ["MT","SI"]
+        channel_nomenclature: str
+            free form, but normally the mt_acquisition system ["MT","SI"]
 
         """
 
+        ex, ey, hx, hy, hz = map_channels(channel_nomenclature)
         rad_deg = 180 / np.pi
         # off - diagonal impedances
         self.rho = np.zeros((self.num_bands, 2))
         self.rho_se = np.zeros((self.num_bands, 2))
         self.phi = np.zeros((self.num_bands, 2))
         self.phi_se = np.zeros((self.num_bands, 2))
-        Zxy = self.tf.loc["ex", "hy", :].data
-        Zyx = self.tf.loc["ey", "hx", :].data
+        Zxy = self.tf.loc[ex, hy, :].data
+        Zyx = self.tf.loc[ey, hx, :].data
 
         # standard deviation of real and imaginary parts of impedance
-        Zxy_se = self.standard_error().loc["ex", "hy", :].data / np.sqrt(2)
-        Zyx_se = self.standard_error().loc["ey", "hx", :].data / np.sqrt(2)
+        Zxy_se = self.standard_error().loc[ex, hy, :].data / np.sqrt(2)
+        Zyx_se = self.standard_error().loc[ey, hx, :].data / np.sqrt(2)
 
         if units == "SI":
             rxy = 2e-7 * self.periods * (abs(Zxy) ** 2)
