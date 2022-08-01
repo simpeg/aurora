@@ -20,5 +20,16 @@
         "alias": [],
         "example": "0",
 		"default": null
+    },
+    "channel_nomenclature": {
+        "type": "string",
+        "required": true,
+        "style": "free form",
+        "units": null,
+        "description": "key to a dict of how channels are named",
+        "options": [],
+        "alias": [],
+        "example": "LEMI12",
+        "default": "default"
     }
 }
