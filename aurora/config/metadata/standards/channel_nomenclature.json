@@ -1,0 +1,57 @@
+{
+    "ex": {
+        "type": "string",
+        "required": true,
+        "style": "controlled vocabulary",
+        "units": null,
+        "description": "label for the X electric field channel, X is assumed to be North",
+        "options": ["ex", "e1", "e2", "e3", "e4"],
+        "alias": [],
+        "example": "ex",
+		"default": "ex"
+    },
+    "ey": {
+        "type": "string",
+        "required": true,
+        "style": "controlled vocabulary",
+        "units": null,
+        "description": "label for the Y electric field channel, Y is assumed to be East",
+        "options": ["ey", "e1", "e2", "e3", "e4"],
+        "alias": [],
+        "example": "ey",
+        "default": "ey"
+    },
+    "hx": {
+        "type": "string",
+        "required": true,
+        "style": "controlled vocabulary",
+        "units": null,
+        "description": "label for the X magnetic field channel, X is assumed to be North",
+        "options": ["bx", "hx", "h1", "h2", "h3"],
+        "alias": [],
+        "example": "hx",
+        "default": "hx"
+    },
+    "hy": {
+        "type": "string",
+        "required": true,
+        "style": "controlled vocabulary",
+        "units": null,
+        "description": "label for the Y magnetic field channel, Y is assumed to be East",
+        "options": ["by", "hy", "h1", "h2", "h3"],
+        "alias": [],
+        "example": "hy",
+        "default": "hy"
+    },
+    "hz": {
+        "type": "string",
+        "required": true,
+        "style": "controlled vocabulary",
+        "units": null,
+        "description": "label for the Z magnetic field channel, Z is assumed to be vertical Down",
+        "options": ["bz", "hz", "h1", "h2", "h3"],
+        "alias": [],
+        "example": "hz",
+        "default": "hz"
+    }
+}
