@@ -20,7 +20,6 @@ from aurora.transfer_function.emtf_z_file_helpers import (
 from aurora.transfer_function.plot.rho_phi_helpers import plot_phi
 from aurora.transfer_function.plot.rho_phi_helpers import plot_rho
 
-
 EMTF_REGRESSION_ENGINE_LABELS = {}
 EMTF_REGRESSION_ENGINE_LABELS["RME"] = "Robust Single station"
 
@@ -90,11 +89,10 @@ class TransferFunctionCollection(object):
     def number_of_decimation_levels(self):
         return len(self.tf_dict)
 
-    def get_merged_dict(self):
+    def get_merged_dict(self, channel_nomenclature):
         output = {}
         self._merge_decimation_levels()
-        self.check_all_channels_present()
-        # self.relabel_merged_decimation_levels_for_export()
+        self.check_all_channels_present(channel_nomenclature)
         output["tf"] = self.merged_tf
         output["tf_xarray"] = self.labelled_tf
         output["cov_ss_inv"] = self.merged_cov_ss_inv
@@ -153,11 +151,19 @@ class TransferFunctionCollection(object):
 
         return
 
-    def check_all_channels_present(self):
-        if "hz" not in self.merged_tf.output_channel.data.tolist():
+    def check_all_channels_present(self, channel_nomenclature):
+        """
+
+        Parameters
+        ----------
+        channel_nomenclature: aurora.config.metadata.channel_nomenclature.ChannelNomenclature
+            Scheme according to how channels are named
+        """
+        ex, ey, hx, hy, hz = channel_nomenclature.unpack()
+        if hz not in self.merged_tf.output_channel.data.tolist():
             output_channels_original = self.merged_tf.output_channel.data.tolist()
             output_channels = [f"tmp___{x}" for x in output_channels_original]
-            output_channels[0] = "hz"
+            output_channels[0] = hz
             tmp = self.merged_tf.copy(deep=True)
             tmp = tmp.assign_coords({"output_channel": output_channels})
             tmp.data *= np.nan
@@ -196,50 +202,6 @@ class TransferFunctionCollection(object):
                     except KeyError:
                         pass
             self.merged_cov_nn = cov_nn
-
-    def relabel_merged_decimation_levels_for_export(self):
-        """
-        This method was specifcally related to issue #93, but may not be needed afterall
-        Returns
-        -------
-
-        """
-
-        if self.merged_tf is None:
-            self._merge_decimation_levels()
-
-        # <MAKE XARRAY WITH tzx, tzy, zxx, zxy, zyx, zyy NOMENCLATURE>
-        tmp_tipper = self.merged_tf.sel(output_channel="hz")
-        tmp_tipper = tmp_tipper.reset_coords(drop="output_channel")
-        tmp_tipper = tmp_tipper.to_dataset("input_channel")
-        tf_xarray = tmp_tipper.rename({"hx": "tzx", "hy": "tzy"})
-
-        zxx = self.merged_tf.sel(output_channel="ex", input_channel="hx")
-        zxx = zxx.reset_coords(drop=["input_channel", "output_channel"])
-        zxx = zxx.to_dataset(name="zxx")
-        if tf_xarray:
-            tf_xarray = tf_xarray.merge(zxx)
-        else:
-            tf_xarray = zxx
-        zxy = self.merged_tf.sel(output_channel="ex", input_channel="hy")
-        zxy = zxy.reset_coords(drop=["input_channel", "output_channel"])
-        zxy = zxy.to_dataset(name="zxy")
-        tf_xarray = tf_xarray.merge(zxy)
-
-        zyx = self.merged_tf.sel(output_channel="ey", input_channel="hx")
-        zyx = zyx.reset_coords(drop=["input_channel", "output_channel"])
-        zyx = zyx.to_dataset(name="zyx")
-        tf_xarray = tf_xarray.merge(zyx)
-
-        zyy = self.merged_tf.sel(output_channel="ey", input_channel="hy")
-        zyy = zyy.reset_coords(drop=["input_channel", "output_channel"])
-        zyy = zyy.to_dataset(name="zyy")
-        tf_xarray = tf_xarray.merge(zyy)
-        self.labelled_tf = tf_xarray
-
-        # </MAKE XARRAY WITH tzx, tzy, zxx, zxy, zyx, zyy NOMENCLATURE>
-
-        return
 
     def write_emtf_z_file(self, z_file_path, run_obj=None, orientation_strs=None):
         """

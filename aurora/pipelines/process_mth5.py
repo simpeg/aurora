@@ -197,11 +197,15 @@ def process_tf_decimation_level(
         config, i_dec_level, local_stft_obj, remote_stft_obj, transfer_function_obj
     )
 
-    transfer_function_obj.apparent_resistivity(units=units)
     return transfer_function_obj
 
 
-def export_tf(tf_collection, station_metadata_dict={}, survey_dict={}):
+def export_tf(
+    tf_collection,
+    channel_nomenclature,
+    station_metadata_dict={},
+    survey_dict={},
+):
     """
     This method may wind up being embedded in the TF class
     Assign transfer_function, residual_covariance, inverse_signal_power, station, survey
@@ -218,9 +222,9 @@ def export_tf(tf_collection, station_metadata_dict={}, survey_dict={}):
     tf_cls: mt_metadata.transfer_functions.core.TF
         Transfer function container
     """
-    merged_tf_dict = tf_collection.get_merged_dict()
-    tf_cls = TF()
-    # Transfer Function
+    merged_tf_dict = tf_collection.get_merged_dict(channel_nomenclature)
+    channel_nomenclature_dict = channel_nomenclature.to_dict()["channel_nomenclature"]
+    tf_cls = TF(channel_nomenclature=channel_nomenclature_dict)
     renamer_dict = {"output_channel": "output", "input_channel": "input"}
     tmp = merged_tf_dict["tf"].rename(renamer_dict)
     tf_cls.transfer_function = tmp
@@ -425,9 +429,8 @@ def process_mth5(
             i_dec_level,
             local_merged_stft_obj,
             remote_merged_stft_obj,
-            units=units,
         )
-
+        tf_obj.apparent_resistivity(processing_config.channel_nomenclature, units=units)
         tf_dict[i_dec_level] = tf_obj
 
         if show_plot:
@@ -472,6 +475,7 @@ def process_mth5(
 
         tf_cls = export_tf(
             tf_collection,
+            processing_config.channel_nomenclature,
             station_metadata_dict=station_metadata.to_dict(),
             survey_dict=survey_dict,
         )

@@ -13,21 +13,21 @@ where array has 2 stations.
 
 import numpy as np
 from pathlib import Path
-from random import seed
+
 import pandas as pd
 from mth5.timeseries import ChannelTS, RunTS
 from mth5.mth5 import MTH5
 
+from aurora.config.metadata.channel_nomenclature import ChannelNomenclature
 from aurora.test_utils.synthetic.synthetic_station_config import make_filters
 from aurora.test_utils.synthetic.synthetic_station_config import make_station_01
 from aurora.test_utils.synthetic.synthetic_station_config import make_station_02
 from aurora.test_utils.synthetic.synthetic_station_config import make_station_03
 
+np.random.seed(0)
 
-seed(0)
 
-
-def create_run_ts_from_synthetic_run(run, df):
+def create_run_ts_from_synthetic_run(run, df, channel_nomenclature="default"):
     """
     Loop over stations and make ChannelTS objects.
     Need to add a tag in the channels
@@ -44,11 +44,14 @@ def create_run_ts_from_synthetic_run(run, df):
     -------
 
     """
+    channel_nomenclature_obj = ChannelNomenclature()
+    channel_nomenclature_obj.keyword = channel_nomenclature
+    EX, EY, HX, HY, HZ = channel_nomenclature_obj.unpack()
     ch_list = []
     for col in df.columns:
         data = df[col].values
 
-        if col in ["ex", "ey"]:
+        if col in [EX, EY]:
             meta_dict = {
                 "component": col,
                 "sample_rate": run.sample_rate,
@@ -59,10 +62,10 @@ def create_run_ts_from_synthetic_run(run, df):
             )
             # add metadata to the channel here
             chts.channel_metadata.dipole_length = 50
-            if col == "ey":
+            if col == EY:
                 chts.channel_metadata.measurement_azimuth = 90.0
 
-        elif col in ["hx", "hy", "hz"]:
+        elif col in [HX, HY, HZ]:
             meta_dict = {
                 "component": col,
                 "sample_rate": run.sample_rate,
@@ -71,7 +74,7 @@ def create_run_ts_from_synthetic_run(run, df):
             chts = ChannelTS(
                 channel_type="magnetic", data=data, channel_metadata=meta_dict
             )
-            if col == "hy":
+            if col == HY:
                 chts.channel_metadata.measurement_azimuth = 90.0
 
         ch_list.append(chts)
@@ -86,7 +89,12 @@ def create_run_ts_from_synthetic_run(run, df):
 
 
 def create_mth5_synthetic_file(
-    station_cfgs, mth5_path, plot=False, add_nan_values=False, file_version="0.1.0"
+    station_cfgs,
+    mth5_path,
+    plot=False,
+    add_nan_values=False,
+    file_version="0.1.0",
+    channel_nomenclature="default",
 ):
     """
 
@@ -135,7 +143,9 @@ def create_mth5_synthetic_file(
                         df[col].loc[ndx : ndx + num_nan] = np.nan
 
             # cast to run_ts
-            runts = create_run_ts_from_synthetic_run(run, df)
+            runts = create_run_ts_from_synthetic_run(
+                run, df, channel_nomenclature=channel_nomenclature
+            )
             runts.station_metadata.id = station_cfg.id
 
             # plot the data
@@ -162,8 +172,8 @@ def create_mth5_synthetic_file(
     return mth5_path
 
 
-def create_test1_h5(file_version="0.1.0"):
-    station_01_params = make_station_01()
+def create_test1_h5(file_version="0.1.0", channel_nomenclature="default"):
+    station_01_params = make_station_01(channel_nomenclature=channel_nomenclature)
     mth5_path = station_01_params.mth5_path  # DATA_PATH.joinpath("test1.h5")
     mth5_path = create_mth5_synthetic_file(
         [
@@ -172,12 +182,13 @@ def create_test1_h5(file_version="0.1.0"):
         mth5_path,
         plot=False,
         file_version=file_version,
+        channel_nomenclature=channel_nomenclature,
     )
     return mth5_path
 
 
-def create_test2_h5(file_version="0.1.0"):
-    station_02_params = make_station_02()
+def create_test2_h5(file_version="0.1.0", channel_nomenclature="default"):
+    station_02_params = make_station_02(channel_nomenclature=channel_nomenclature)
     mth5_path = station_02_params.mth5_path
     mth5_path = create_mth5_synthetic_file(
         [
@@ -190,8 +201,8 @@ def create_test2_h5(file_version="0.1.0"):
     return mth5_path
 
 
-def create_test1_h5_with_nan(file_version="0.1.0"):
-    station_01_params = make_station_01()
+def create_test1_h5_with_nan(file_version="0.1.0", channel_nomenclature="default"):
+    station_01_params = make_station_01(channel_nomenclature=channel_nomenclature)
     mth5_path = station_01_params.mth5_path  # DATA_PATH.joinpath("test1.h5")
     mth5_path = create_mth5_synthetic_file(
         [
@@ -205,19 +216,22 @@ def create_test1_h5_with_nan(file_version="0.1.0"):
     return mth5_path
 
 
-def create_test12rr_h5(file_version="0.1.0"):
-    station_01_params = make_station_01()
-    station_02_params = make_station_02()
+def create_test12rr_h5(file_version="0.1.0", channel_nomenclature="default"):
+    station_01_params = make_station_01(channel_nomenclature=channel_nomenclature)
+    station_02_params = make_station_02(channel_nomenclature=channel_nomenclature)
     station_params = [station_01_params, station_02_params]
     mth5_path = station_01_params.mth5_path.__str__().replace("test1.h5", "test12rr.h5")
     mth5_path = create_mth5_synthetic_file(
-        station_params, mth5_path, file_version=file_version
+        station_params,
+        mth5_path,
+        file_version=file_version,
+        channel_nomenclature=channel_nomenclature,
     )
     return mth5_path
 
 
-def create_test3_h5(file_version="0.1.0"):
-    station_params = make_station_03()
+def create_test3_h5(file_version="0.1.0", channel_nomenclature="default"):
+    station_params = make_station_03(channel_nomenclature=channel_nomenclature)
     mth5_path = create_mth5_synthetic_file(
         [
             station_params,

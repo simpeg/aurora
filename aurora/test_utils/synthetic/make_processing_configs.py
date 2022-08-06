@@ -5,7 +5,13 @@ from aurora.test_utils.synthetic.paths import CONFIG_PATH
 from aurora.test_utils.synthetic.paths import DATA_PATH
 
 
-def create_test_run_config(test_case_id, ds_df, matlab_or_fortran="", save="json"):
+def create_test_run_config(
+    test_case_id,
+    ds_df,
+    matlab_or_fortran="",
+    save="json",
+    channel_nomenclature="default",
+):
     """
     Use config creator to generate a processing config file for the synthetic data.
 
@@ -24,15 +30,13 @@ def create_test_run_config(test_case_id, ds_df, matlab_or_fortran="", save="json
     estimation_engine = "RME"
     local_station_id = test_case_id
     remote_station_id = ""
-    reference_channels = []
+
     if test_case_id == "test1r2":
         estimation_engine = "RME_RR"
-        reference_channels = ["hx", "hy"]
         local_station_id = "test1"
         remote_station_id = "test2"
     if test_case_id == "test2r1":
         estimation_engine = "RME_RR"
-        reference_channels = ["hx", "hy"]
         local_station_id = "test2"
         remote_station_id = "test1"
 
@@ -55,32 +59,33 @@ def create_test_run_config(test_case_id, ds_df, matlab_or_fortran="", save="json
     cc = ConfigCreator(config_path=CONFIG_PATH)
 
     if test_case_id in ["test1", "test2"]:
-        p = cc.create_run_processing_object(emtf_band_file=emtf_band_setup_file)
+        p = cc.create_run_processing_object(
+            emtf_band_file=emtf_band_setup_file,
+        )
         p.id = config_id
-        p.stations.from_dataset_dataframe(ds_df)
-
-        for decimation in p.decimations:
-            decimation.estimator.engine = estimation_engine
-            decimation.window.type = "hamming"
-            decimation.window.num_samples = num_samples_window
-            decimation.window.overlap = num_samples_overlap
-            decimation.regression.max_redescending_iterations = 2
-
+        p.channel_nomenclature.keyword = channel_nomenclature
+        p.set_default_input_output_channels()
         p.drop_reference_channels()
+        p.stations.from_dataset_dataframe(ds_df)
 
     elif test_case_id in ["test2r1", "test1r2"]:
         config_id = f"{config_id}-RR{remote_station_id}"
-        p = cc.create_run_processing_object(emtf_band_file=emtf_band_setup_file)
+        p = cc.create_run_processing_object(
+            emtf_band_file=emtf_band_setup_file,
+        )
         p.id = config_id
+        p.id = config_id
+        p.channel_nomenclature.keyword = channel_nomenclature
+        p.set_default_input_output_channels()
+        p.set_default_reference_channels()
         p.stations.from_dataset_dataframe(ds_df)
 
-        for decimation in p.decimations:
-            decimation.estimator.engine = estimation_engine
-            decimation.window.type = "hamming"
-            decimation.window.num_samples = num_samples_window
-            decimation.window.overlap = num_samples_overlap
-            decimation.regression.max_redescending_iterations = 2
-            decimation.reference_channels = reference_channels
+    for decimation in p.decimations:
+        decimation.estimator.engine = estimation_engine
+        decimation.window.type = "hamming"
+        decimation.window.num_samples = num_samples_window
+        decimation.window.overlap = num_samples_overlap
+        decimation.regression.max_redescending_iterations = 2
 
     if save == "json":
         cc.to_json(p)
