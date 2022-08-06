@@ -6,9 +6,6 @@ import numpy as np
 
 from aurora.transfer_function.base import TransferFunction
 
-# from mt_metadata.transfer_functions.channel_nomenclature import map_channels
-from aurora.channel_nomenclature import map_channels
-
 
 class TTFZ(TransferFunction):
     """
@@ -26,7 +23,7 @@ class TTFZ(TransferFunction):
     def __init__(self, *args, **kwargs):
         super(TTFZ, self).__init__(*args, **kwargs)
 
-    def apparent_resistivity(self, units="SI", channel_nomenclature="default"):
+    def apparent_resistivity(self, channel_nomenclature, units="SI"):
         """
         ap_res(...) : computes app. res., phase, errors, given imped., cov.
         %USAGE: [rho,rho_se,ph,ph_se] = ap_res(z,sig_s,sig_e,periods) ;
@@ -39,12 +36,12 @@ class TTFZ(TransferFunction):
         ----------
         units: str
             one of ["MT","SI"]
-        channel_nomenclature: str
-            free form, but normally the mt_acquisition system ["MT","SI"]
+        channel_nomenclature:
+        aurora.config.metadata.channel_nomenclature.ChannelNomenclature
+            has a dict that you
 
         """
-
-        ex, ey, hx, hy, hz = map_channels(channel_nomenclature)
+        ex, ey, hx, hy, hz = channel_nomenclature.unpack()
         rad_deg = 180 / np.pi
         # off - diagonal impedances
         self.rho = np.zeros((self.num_bands, 2))

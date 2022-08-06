@@ -18,11 +18,9 @@ Run level: 'sample_rate', 1.0
 import numpy as np
 import random
 
+from aurora.config.metadata.channel_nomenclature import ChannelNomenclature
 from aurora.test_utils.synthetic.paths import DATA_PATH
 from aurora.time_series.filters.filter_helpers import make_coefficient_filter
-
-from aurora.channel_nomenclature import get_channel_map
-from aurora.channel_nomenclature import map_channels
 
 random.seed(0)
 
@@ -61,7 +59,13 @@ class SyntheticRun(object):
         self.id = id
         self.sample_rate = kwargs.get("sample_rate", 1.0)
         self.raw_data_path = kwargs.get("raw_data_path", None)
-        self.channel_nomenclature = kwargs.get("channel_nomenclature", "default")
+
+        # set channel_map
+        self._channel_map = None
+        self.channel_nomemclature_keyword = kwargs.get(
+            "channel_nomenclature", "default"
+        )
+        self.set_channel_map()
         self.channels = kwargs.get("channels", list(self.channel_map.values()))
         self.noise_scalars = kwargs.get("noise_scalars", None)
         self.nan_indices = kwargs.get("nan_indices", {})
@@ -74,7 +78,15 @@ class SyntheticRun(object):
 
     @property
     def channel_map(self):
-        return get_channel_map(self.channel_nomenclature)
+        return self._channel_map
+
+    def set_channel_map(self):
+        channel_nomenclature = ChannelNomenclature()
+        channel_nomenclature.keyword = self.channel_nomemclature_keyword
+        channel_map = channel_nomenclature.get_channel_map(
+            self.channel_nomemclature_keyword
+        )
+        self._channel_map = channel_map
 
 
 class SyntheticStation(object):
@@ -92,7 +104,9 @@ class SyntheticStation(object):
 
 
 def make_station_01(channel_nomenclature="default"):
-    EX, EY, HX, HY, HZ = map_channels(channel_nomenclature)
+    channel_nomenclature_obj = ChannelNomenclature()
+    channel_nomenclature_obj.keyword = channel_nomenclature
+    EX, EY, HX, HY, HZ = channel_nomenclature_obj.unpack()
     station = SyntheticStation("test1")
     station.mth5_path = DATA_PATH.joinpath("test1.h5")
 
@@ -141,10 +155,12 @@ def make_station_02(channel_nomenclature="default"):
 
 
 def make_station_03(channel_nomenclature="default"):
-    EX, EY, HX, HY, HZ = map_channels(channel_nomenclature)
+    channel_nomenclature_obj = ChannelNomenclature()
+    channel_nomenclature_obj.keyword = channel_nomenclature
+    EX, EY, HX, HY, HZ = channel_nomenclature_obj.unpack()
     station = SyntheticStation("test3")
     station.mth5_path = DATA_PATH.joinpath("test3.h5")
-    channels = list(get_channel_map(channel_nomenclature).values())
+    channels = channel_nomenclature_obj.channels
 
     nan_indices = {}
     for ch in channels:

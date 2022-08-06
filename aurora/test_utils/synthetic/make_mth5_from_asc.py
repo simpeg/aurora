@@ -18,7 +18,7 @@ import pandas as pd
 from mth5.timeseries import ChannelTS, RunTS
 from mth5.mth5 import MTH5
 
-from aurora.channel_nomenclature import map_channels
+from aurora.config.metadata.channel_nomenclature import ChannelNomenclature
 from aurora.test_utils.synthetic.synthetic_station_config import make_filters
 from aurora.test_utils.synthetic.synthetic_station_config import make_station_01
 from aurora.test_utils.synthetic.synthetic_station_config import make_station_02
@@ -44,7 +44,9 @@ def create_run_ts_from_synthetic_run(run, df, channel_nomenclature="default"):
     -------
 
     """
-    EX, EY, HX, HY, HZ = map_channels(channel_nomenclature)
+    channel_nomenclature_obj = ChannelNomenclature()
+    channel_nomenclature_obj.keyword = channel_nomenclature
+    EX, EY, HX, HY, HZ = channel_nomenclature_obj.unpack()
     ch_list = []
     for col in df.columns:
         data = df[col].values

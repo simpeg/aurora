@@ -202,9 +202,9 @@ def process_tf_decimation_level(
 
 def export_tf(
     tf_collection,
+    channel_nomenclature,
     station_metadata_dict={},
     survey_dict={},
-    channel_nomenclature="default",
 ):
     """
     This method may wind up being embedded in the TF class
@@ -429,9 +429,7 @@ def process_mth5(
             local_merged_stft_obj,
             remote_merged_stft_obj,
         )
-        tf_obj.apparent_resistivity(
-            units=units, channel_nomenclature=processing_config.channel_nomenclature
-        )
+        tf_obj.apparent_resistivity(processing_config.channel_nomenclature, units=units)
         tf_dict[i_dec_level] = tf_obj
 
         if show_plot:
@@ -476,9 +474,9 @@ def process_mth5(
 
         tf_cls = export_tf(
             tf_collection,
+            processing_config.channel_nomenclature,
             station_metadata_dict=station_metadata.to_dict(),
             survey_dict=survey_dict,
-            channel_nomenclature=processing_config.channel_nomenclature,
         )
         close_mths_objs(dataset_df)
         return tf_cls

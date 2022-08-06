@@ -1,4 +1,3 @@
-from aurora.channel_nomenclature import map_channels
 from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config import BANDS_256_FILE
 from aurora.config.config_creator import ConfigCreator
@@ -28,21 +27,16 @@ def create_test_run_config(
 
 
     """
-    EX, EY, HX, HY, HZ = map_channels(channel_nomenclature)
     estimation_engine = "RME"
     local_station_id = test_case_id
     remote_station_id = ""
-    reference_channels = []
-    input_channels = [HX, HY]
-    output_channels = [HZ, EX, EY]
+
     if test_case_id == "test1r2":
         estimation_engine = "RME_RR"
-        reference_channels = [HX, HY]
         local_station_id = "test1"
         remote_station_id = "test2"
     if test_case_id == "test2r1":
         estimation_engine = "RME_RR"
-        reference_channels = [HX, HY]
         local_station_id = "test2"
         remote_station_id = "test1"
 
@@ -67,40 +61,31 @@ def create_test_run_config(
     if test_case_id in ["test1", "test2"]:
         p = cc.create_run_processing_object(
             emtf_band_file=emtf_band_setup_file,
-            input_channels=input_channels,
-            output_channels=output_channels,
         )
         p.id = config_id
-        p.channel_nomenclature = channel_nomenclature
-        p.stations.from_dataset_dataframe(ds_df)
-
-        for decimation in p.decimations:
-            decimation.estimator.engine = estimation_engine
-            decimation.window.type = "hamming"
-            decimation.window.num_samples = num_samples_window
-            decimation.window.overlap = num_samples_overlap
-            decimation.regression.max_redescending_iterations = 2
-
+        p.channel_nomenclature.keyword = channel_nomenclature
+        p.set_default_input_output_channels()
         p.drop_reference_channels()
+        p.stations.from_dataset_dataframe(ds_df)
 
     elif test_case_id in ["test2r1", "test1r2"]:
         config_id = f"{config_id}-RR{remote_station_id}"
         p = cc.create_run_processing_object(
             emtf_band_file=emtf_band_setup_file,
-            input_channels=input_channels,
-            output_channels=output_channels,
         )
         p.id = config_id
-        p.channel_nomenclature = channel_nomenclature
+        p.id = config_id
+        p.channel_nomenclature.keyword = channel_nomenclature
+        p.set_default_input_output_channels()
+        p.set_default_reference_channels()
         p.stations.from_dataset_dataframe(ds_df)
 
-        for decimation in p.decimations:
-            decimation.estimator.engine = estimation_engine
-            decimation.window.type = "hamming"
-            decimation.window.num_samples = num_samples_window
-            decimation.window.overlap = num_samples_overlap
-            decimation.regression.max_redescending_iterations = 2
-            decimation.reference_channels = reference_channels
+    for decimation in p.decimations:
+        decimation.estimator.engine = estimation_engine
+        decimation.window.type = "hamming"
+        decimation.window.num_samples = num_samples_window
+        decimation.window.overlap = num_samples_overlap
+        decimation.regression.max_redescending_iterations = 2
 
     if save == "json":
         cc.to_json(p)

@@ -20,9 +20,6 @@ from aurora.transfer_function.emtf_z_file_helpers import (
 from aurora.transfer_function.plot.rho_phi_helpers import plot_phi
 from aurora.transfer_function.plot.rho_phi_helpers import plot_rho
 
-# from mt_metadata.transfer_functions.channel_nomenclature import map_channels
-from aurora.channel_nomenclature import map_channels
-
 EMTF_REGRESSION_ENGINE_LABELS = {}
 EMTF_REGRESSION_ENGINE_LABELS["RME"] = "Robust Single station"
 
@@ -159,14 +156,10 @@ class TransferFunctionCollection(object):
 
         Parameters
         ----------
-        channel_nomenclature: str
-            How channels are named
-
-        Returns
-        -------
-
+        channel_nomenclature: aurora.config.metadata.channel_nomenclature.ChannelNomenclature
+            Scheme according to how channels are named
         """
-        ex, ey, hx, hy, hz = map_channels(channel_nomenclature)
+        ex, ey, hx, hy, hz = channel_nomenclature.unpack()
         if hz not in self.merged_tf.output_channel.data.tolist():
             output_channels_original = self.merged_tf.output_channel.data.tolist()
             output_channels = [f"tmp___{x}" for x in output_channels_original]

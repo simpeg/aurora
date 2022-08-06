@@ -13,12 +13,14 @@ from mt_metadata.base.helpers import write_lines
 from mt_metadata.base import get_schema, Base
 from .standards import SCHEMA_FN_PATHS
 
-from . import DecimationLevel, Stations, Band
+from . import DecimationLevel, Stations, Band, ChannelNomenclature
 
 
 # =============================================================================
 attr_dict = get_schema("processing", SCHEMA_FN_PATHS)
 attr_dict.add_dict(Stations()._attr_dict, "stations")
+attr_dict.add_dict(ChannelNomenclature()._attr_dict, "channel_nomenclature")
+
 
 # =============================================================================
 class Processing(Base):
@@ -28,6 +30,7 @@ class Processing(Base):
 
         self.stations = Stations()
         self._decimations = []
+        self.channel_nomenclature = ChannelNomenclature()
 
         super().__init__(attr_dict=attr_dict, **kwargs)
 
@@ -178,6 +181,27 @@ class Processing(Base):
         for decimation in self.decimations:
             decimation.reference_channels = []
         return
+
+    def set_input_channels(self, channels):
+        for decimation in self.decimations:
+            decimation.input_channels = channels
+
+    def set_output_channels(self, channels):
+        for decimation in self.decimations:
+            decimation.output_channels = channels
+
+    def set_reference_channels(self, channels):
+        for decimation in self.decimations:
+            decimation.reference_channels = channels
+
+    def set_default_input_output_channels(self):
+        self.set_input_channels(self.channel_nomenclature.default_input_channels)
+        self.set_output_channels(self.channel_nomenclature.default_output_channels)
+
+    def set_default_reference_channels(self):
+        self.set_reference_channels(
+            self.channel_nomenclature.default_reference_channels
+        )
 
     def validate(self):
         """
