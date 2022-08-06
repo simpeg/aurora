@@ -223,7 +223,8 @@ def export_tf(
         Transfer function container
     """
     merged_tf_dict = tf_collection.get_merged_dict(channel_nomenclature)
-    tf_cls = TF(channel_nomenclature=channel_nomenclature)
+    channel_nomenclature_dict = channel_nomenclature.to_dict()["channel_nomenclature"]
+    tf_cls = TF(channel_nomenclature=channel_nomenclature_dict)
     renamer_dict = {"output_channel": "output", "input_channel": "input"}
     tmp = merged_tf_dict["tf"].rename(renamer_dict)
     tf_cls.transfer_function = tmp
