@@ -50,7 +50,7 @@ def can_use_xr_dataarray(func):
             processed_obj = func(*args, **kwargs)
 
         if input_was_dataarray:
-            processed_obj = processed_obj.to_dataarray()
+            processed_obj = processed_obj.to_array("channel")
         return processed_obj
 
     return wrapper_decorator

@@ -196,11 +196,21 @@ class TestWindowingScheme(unittest.TestCase):
         windowing_scheme = get_windowing_scheme(
             num_samples_window=128, num_samples_overlap=96, sample_rate=sample_rate
         )
+
+        # Test with xr.Dataset
         ds = get_xarray_dataset(N=10000, sps=sample_rate)
         windowed_dataset = windowing_scheme.apply_sliding_window(ds)
         tapered_windowed_dataset = windowing_scheme.apply_taper(windowed_dataset)
         stft = windowing_scheme.apply_fft(tapered_windowed_dataset)
         assert isinstance(stft, xr.Dataset)
+
+        # Test with xr.DataArray
+        da = ds.to_array("channel")
+        windowed_dataset = windowing_scheme.apply_sliding_window(da)
+        tapered_windowed_dataset = windowing_scheme.apply_taper(windowed_dataset)
+        stft = windowing_scheme.apply_fft(tapered_windowed_dataset)
+        assert isinstance(stft, xr.DataArray)
+
         # import matplotlib.pyplot as plt
         # plt.plot(stft.frequency.data, np.abs(stft["hx"].data.mean(axis=0)))
         # plt.show()
