@@ -3,8 +3,8 @@
 """
 The windowing scheme defines the chunking and chopping of the time series for
 the Short Time Fourier Transform.  Often referred to as a "sliding window" or
-a "striding window".  It is basically a taper with a rule to say how far to
-advance at each stride (or step).
+a "striding window".  Iin its most basic form it is a taper with a rule to
+say how far to advance at each stride (or step).
 
 To generate an array of data-windows from a data series we only need the
 two parameters window_length (L) and window_overlap (V).  The parameter
@@ -13,26 +13,22 @@ normally described terms of overlap but it is cleaner to code in terms of
 advance.
 
 Choices L and V are usually made with some knowledge of time series sample
-rate, duration, and the frequency band of interest.  We can create a
-module that "suggests" L, V, based on these metadata to make the default
-processing configuration parameters.
+rate, duration, and the frequency band of interest.  In aurora because this is used
+to prep for STFT, L is typically a power of 2.
 
-Note: In general we will need one instance of this class per decimation level,
-but in the current implementation we will probably leave the windowing scheme
-the same for each decimation level.
+In general we will need one instance of this class per decimation level,
+but in practice often leave the windowing scheme the same for each decimation level.
 
-This class is a key part of the "gateway" to frequency domain, so what
-frequency domain considerations do we want to think about here.. certainly
-the window length and the sampling rate define the frequency resolution, and as
-such should be considered in context of the "band averaging scheme"
+This class is a key part of the "gateway" to frequency domain, so it has been given
+a sampling_rate attribute.  While sampling rate is a property of the data, and not
+the windowing scheme per se, it is good for this class to be aware of the sampling
+rate.
 
-Indeed the frequencies come from this class if it has a sampling rate.  While
-sampling rate is a property of the data, and not the windowing scheme per se,
-it is good for this class to be aware of the sampling rate.  ... or should we
-push the frequency stuffs to a combination of TS plus WindowingScheme?
-The latter feels more appropriate.
+Future modifications could involve:
+- binding this class with a time series.
+- Making a subclass with only L, V, and then having an extension with sample_rate
 
-<20210510>
+
 When 2D arrays are generated how should we index them?
 [[ 0  1  2]
  [ 2  3  4]
@@ -50,8 +46,6 @@ axis".  The columns are indexing "steps of delta-t".  The actual times are
 different for every row, so it would be best to use something like
 [0, dt, 2*dt] for that axis to keep it general.  We can call this the
 "within-window sample time axis"
-
-</20210510>
 
 
 TODO: Regarding the optional time_vector input to self.apply_sliding_window()

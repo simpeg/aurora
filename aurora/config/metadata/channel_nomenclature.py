@@ -38,14 +38,6 @@ LEMI_CHANNEL_MAP_34 = {
     "ey": "e4",
 }
 
-THE_BEATLES = {
-    "hx": "john",
-    "hy": "paul",
-    "hz": "george",
-    "ex": "ringo",
-    "ey": "the fifth beatle",
-}
-
 
 # =============================================================================
 class ChannelNomenclature(Base):
@@ -104,15 +96,13 @@ class ChannelNomenclature(Base):
         self._update_by_keyword(keyword)
 
     def get_channel_map(self, keyword):
-        if keyword == "LEMI12":
+        if keyword == "default":
+            channel_map = DEFAULT_CHANNEL_MAP
+        elif keyword == "LEMI12":
             channel_map = LEMI_CHANNEL_MAP_12
         elif keyword == "LEMI34":
             channel_map = LEMI_CHANNEL_MAP_34
         elif keyword == "NIMS":
-            channel_map = DEFAULT_CHANNEL_MAP
-        elif keyword == "beatles":
-            channel_map = THE_BEATLES
-        elif keyword == "default":
             channel_map = DEFAULT_CHANNEL_MAP
         else:
             print(f"whoops mt_system {keyword} unknown")
