@@ -83,6 +83,11 @@ def apply_recoloring(decimation_obj, stft_obj):
         if prewhitening_correction[0] == 0.0:
             cond = stft_obj.frequency != 0.0
             stft_obj = stft_obj.where(cond, complex(0.0))
+    # elif decimation_obj.prewhitening_type == "ARMA":
+    #     from statsmodels.tsa.arima.model import ARIMA
+    #     AR = 3 # add this to processing config
+    #     MA = 4 # add this to processing config
+
     else:
         print(f"{decimation_obj.prewhitening_type} recoloring not yet implemented")
         raise NotImplementedError

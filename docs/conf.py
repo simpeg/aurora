@@ -100,7 +100,7 @@ intersphinx_mapping = {
 sphinx_gallery_conf = {
     # path to your examples scripts
     "examples_dirs": [
-        "../examples",
+        "../tutorials",
     ],
     "gallery_dirs": [
         "examples",
