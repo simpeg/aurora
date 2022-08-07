@@ -93,12 +93,12 @@ class WindowedTimeSeries(object):
     @staticmethod
     def detrend(data=None, detrend_axis=None, detrend_type=None, inplace=True):
         """
-        TODO: overwrite data=True probably best for most applications but
-            be careful with that.  Do we want to avoid this in general?
-            could we be possibly overwriting stuff on MTH5 in future?
-            Also, is overwrite even working how I think it is here?
-        TODO: overwrite_data not working right in scipy.signal, dont use it
-        for now
+        Notes: overwrite data=True probably best for most applications but be careful
+         with that.  Do we want to avoid this in general? Could we be possibly
+         overwriting stuff on MTH5 in future?
+         Also, is overwrite even working how I think it is here?
+         Overwrite_data not working right in scipy.signal, dont use it for now
+
         Parameters
         ----------
         data : xarray Dataset

@@ -185,7 +185,6 @@ class TestWindowingScheme(unittest.TestCase):
         )
         ds = get_xarray_dataset()
         wds = windowing_scheme.apply_sliding_window(ds, return_xarray=True)
-        # print(wds)
         return wds
 
     def test_fourier_transform(self):
