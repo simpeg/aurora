@@ -397,8 +397,7 @@ class WindowingScheme(ApodizationWindow):
 
 def fft_xr_ds(dataset, sample_rate, detrend_type=None, prewhitening=None):
     """
-    TODO: Add support for "first difference" prewhitening
-    assume you have an xr.dataset or xr.DataArray.  It is 2D.
+    Assume you have an xr.dataset or xr.DataArray.  It is 2D.
     This should call window_helpers.apply_fft_to_windowed_array
     or get moved to window_helpers.py
 
@@ -416,7 +415,6 @@ def fft_xr_ds(dataset, sample_rate, detrend_type=None, prewhitening=None):
     -------
 
     """
-    # TODO:
     from aurora.time_series.frequency_domain_helpers import get_fft_harmonics
 
     # TODO: Modify this so that demeaning and detrending
@@ -431,9 +429,8 @@ def fft_xr_ds(dataset, sample_rate, detrend_type=None, prewhitening=None):
     # harmonic_frequencies = np.fft.fftfreq(samples_per_window, d=1./sample_rate)
     # harmonic_frequencies = harmonic_frequencies[0:n_fft_harmonics]
 
-    # <CORE METHOD>
+    # CORE METHOD
     output_ds = xr.Dataset()
-    # operation_axis = 1  # make this pick the "time" axis from xarray
     time_coordinate_index = list(dataset.coords.keys()).index("time")
     if detrend_type:  # neither False nor None
         dataset = WindowedTimeSeries.detrend(
@@ -451,5 +448,5 @@ def fft_xr_ds(dataset, sample_rate, detrend_type=None, prewhitening=None):
             coords={"frequency": harmonic_frequencies, "time": dataset.time.data},
         )
         output_ds.update({channel_id: xrd})
-    # </CORE METHOD>
+
     return output_ds

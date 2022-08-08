@@ -72,7 +72,14 @@ class RunSummary:
         self.column_dtypes = [str, str, pd.Timestamp, pd.Timestamp]
         self._input_dict = kwargs.get("input_dict", None)
         self.df = kwargs.get("df", None)
-        self._mini_summary_columns = ["survey", "station_id", "run_id", "start", "end"]
+        self._mini_summary_columns = [
+            "survey",
+            "station_id",
+            "run_id",
+            "start",
+            "end",
+            "sample_rate",
+        ]
 
     def clone(self):
         return copy.deepcopy(self)

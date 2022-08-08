@@ -47,8 +47,24 @@ def apply_prewhitening(decimation_obj, run_xrts_input):
         prewhitened time series
 
     """
+    # from statsmodels.graphics.tsaplots import plot_predict
+
     if decimation_obj.prewhitening_type == "first difference":
         run_xrts = run_xrts_input.differentiate("time")
+    elif decimation_obj.prewhitening_type == "ARMA":
+        from statsmodels.tsa.arima.model import ARIMA
+
+        ar_order = decimation_obj.prewhitening_ar_order  # = 3
+        ma_order = decimation_obj.prewhitening_ma_order  # = 4
+        run_xrts = run_xrts_input.copy(deep=True)
+        for channel_id in run_xrts_input.data_vars:
+            channel_data = run_xrts_input[channel_id].data
+            arma_mod = ARIMA(channel_data, order=(ar_order, 0, ma_order), trend="n")
+            arma_res = arma_mod.fit()
+            new_data = arma_res.predict()
+            run_xrts[channel_id].data = new_data
+            run_xrts[channel_id].attrs["ar_params"] = arma_res.arparams
+            run_xrts[channel_id].attrs["ma_params"] = arma_res.maparams
     else:
         print(f"{decimation_obj.prewhitening_type} prehitening not yet implemented")
         raise NotImplementedError
@@ -83,14 +99,14 @@ def apply_recoloring(decimation_obj, stft_obj):
         if prewhitening_correction[0] == 0.0:
             cond = stft_obj.frequency != 0.0
             stft_obj = stft_obj.where(cond, complex(0.0))
-    # elif decimation_obj.prewhitening_type == "ARMA":
-    #     from statsmodels.tsa.arima.model import ARIMA
-    #     AR = 3 # add this to processing config
-    #     MA = 4 # add this to processing config
+    elif decimation_obj.prewhitening_type == "ARMA":
+        # back out the ARMA filter
+        raise NotImplementedError
 
     else:
         print(f"{decimation_obj.prewhitening_type} recoloring not yet implemented")
-        raise NotImplementedError
+        # raise NotImplementedError
+        return stft_obj
 
     return stft_obj
 
@@ -194,7 +210,10 @@ def truncate_to_clock_zero(decimation_obj, run_xrts):
 
 def run_ts_to_stft(decimation_obj, run_xrts_orig):
     """
-
+    2022-08-07: Prewhitening comes in two flavors:
+        1. Apply to the whole time series
+        2. Apply on a window-by-window basis
+        For type 1 we
     Parameters
     ----------
     decimation_obj : aurora.config.metadata.decimation_level.DecimationLevel
@@ -209,13 +228,22 @@ def run_ts_to_stft(decimation_obj, run_xrts_orig):
         recoloring. This really doesn't matter since we don't use the DC harmonic for
         anything.
     """
-    run_xrts = apply_prewhitening(decimation_obj, run_xrts_orig)
+    if decimation_obj.prewhitening_position == "before windowing":
+        run_xrts = apply_prewhitening(decimation_obj, run_xrts_orig)
+
     run_xrts = truncate_to_clock_zero(decimation_obj, run_xrts)
     windowing_scheme = decimation_obj.windowing_scheme
     windowed_obj = windowing_scheme.apply_sliding_window(
         run_xrts, dt=1.0 / decimation_obj.decimation.sample_rate
     )
+    if decimation_obj.prewhitening_position == "after windowing":
+        windowed_obj = apply_prewhitening(decimation_obj, windowed_obj)
+
     windowed_obj = WindowedTimeSeries.detrend(data=windowed_obj, detrend_type="linear")
+
+    if decimation_obj.prewhitening_position == "after detrending":
+        windowed_obj = apply_prewhitening(decimation_obj, windowed_obj)
+
     tapered_obj = windowed_obj * windowing_scheme.taper
     # stft_obj = WindowedTimeSeries.apply_stft(data=tapered_obj,
     #                                          sample_rate=windowing_scheme.sample_rate,

@@ -21,6 +21,39 @@
         "example": "first difference",
 		"default": "first difference"
     },
+    "prewhitening_position": {
+        "type": "string",
+        "required": true,
+        "style": "controlled vocabulary",
+        "units": null,
+        "description": "Position in processing pipeline where prewhitening is applied",
+        "options": ["before windowing", "after windowing", "after detrending"],
+        "alias": [],
+        "example": "before windowing",
+        "default": "before windowing"
+    },
+    "prewhitening_ar_order": {
+        "type": "integer",
+        "required": false,
+        "style": "number",
+        "units": null,
+        "description": "Order of the autoregressive fit",
+        "options": [],
+        "alias": [],
+        "example": "3",
+        "default": 3
+    },
+    "prewhitening_ma_order": {
+        "type": "integer",
+        "required": false,
+        "style": "number",
+        "units": null,
+        "description": "Order of the moving average fit",
+        "options": [],
+        "alias": [],
+        "example": "4",
+        "default": 4
+    },
 	"extra_pre_fft_detrend_type": {
         "type": "string",
         "required": true,
