@@ -4,30 +4,6 @@ import scipy.signal as ssig
 from aurora.time_series.decorators import can_use_xr_dataarray
 
 
-def schur_product_windowed_data(ensemblized_data, taper):
-    """
-    The axes are set up so that each window is tapered
-
-    In particular, each "window" is a row of windowed_array.  Thus taper
-    operates by multiplying, point-by-point (Schur) each row or windowed_array.
-
-    TODO: either take an argument for which axis the taper applies along or
-    make the calling function confirm that each row is a window and each
-    column is a window-advance-delta-t
-
-    Parameters
-    ----------
-    data
-
-    Returns
-    -------
-
-    """
-    tapered_windowed_data = ensemblized_data * taper  # seems to do sparse diag mult
-    # time trial it against a few other methods
-    return tapered_windowed_data
-
-
 def validate_coordinate_ordering_time_domain(dataset):
     """
     Check that the data dimensions are what you expect.  THis may evolve some
@@ -117,12 +93,12 @@ class WindowedTimeSeries(object):
     @staticmethod
     def detrend(data=None, detrend_axis=None, detrend_type=None, inplace=True):
         """
-        TODO: overwrite data=True probably best for most applications but
-            be careful with that.  Do we want to avoid this in general?
-            could we be possibly overwriting stuff on MTH5 in future?
-            Also, is overwrite even working how I think it is here?
-        TODO: overwrite_data not working right in scipy.signal, dont use it
-        for now
+        Notes: overwrite data=True probably best for most applications but be careful
+         with that.  Do we want to avoid this in general? Could we be possibly
+         overwriting stuff on MTH5 in future?
+         Also, is overwrite even working how I think it is here?
+         Overwrite_data not working right in scipy.signal, dont use it for now
+
         Parameters
         ----------
         data : xarray Dataset
