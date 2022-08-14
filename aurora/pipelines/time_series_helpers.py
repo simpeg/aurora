@@ -7,7 +7,7 @@ from aurora.time_series.frequency_domain_helpers import get_fft_harmonics
 from aurora.time_series.windowed_time_series import WindowedTimeSeries
 
 
-def validate_sample_rate(run_ts, expected_sample_rate):
+def validate_sample_rate(run_ts, expected_sample_rate, tol=1e-4):
     """
 
     Parameters
@@ -24,7 +24,10 @@ def validate_sample_rate(run_ts, expected_sample_rate):
             f"sample rate in run time series {run_ts.sample_rate} and "
             f"processing decimation_obj {expected_sample_rate} do not match"
         )
-        raise Exception
+        delta = run_ts.sample_rate - expected_sample_rate
+        if np.abs(delta) > tol:
+            print(f"Delta sample rate {delta} > {tol} tolerance")
+            raise Exception
 
 
 def apply_prewhitening(decimation_obj, run_xrts_input):
