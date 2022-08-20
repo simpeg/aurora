@@ -48,7 +48,9 @@ def test_processing(return_collection=False, z_file_path=None, test_clock_zero=F
 
     cc = ConfigCreator(config_path=CONFIG_PATH)
     config = cc.create_run_processing_object(
-        emtf_band_file=BANDS_DEFAULT_FILE, sample_rate=40.0, estimator={"engine": "RME"}
+        emtf_band_file=BANDS_DEFAULT_FILE,
+        sample_rate=tfk_dataset.sample_rate,
+        estimator={"engine": "RME"},
     )
 
     if test_clock_zero:
