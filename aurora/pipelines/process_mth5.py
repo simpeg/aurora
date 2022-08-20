@@ -73,7 +73,7 @@ def initialize_mth5s(config):
     Prepare to process data, get mth5 objects open in read mode and processing_config
     initialized if needed.
 
-    ToDo: Review dict.  Theoretically, you could get namespace clashes here.
+    ToDo: Review mth5_objs dict.  Theoretically, you could get namespace clashes here.
     Could key by survey-station, but also just use the keys "local" and "remote"
 
     Parameters
