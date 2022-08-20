@@ -27,6 +27,7 @@ def validate_sample_rate(run_ts, expected_sample_rate, tol=1e-4):
         delta = run_ts.sample_rate - expected_sample_rate
         if np.abs(delta) > tol:
             print(f"Delta sample rate {delta} > {tol} tolerance")
+            print("TOL should be a percentage")
             raise Exception
 
 
