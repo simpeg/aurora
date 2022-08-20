@@ -1,3 +1,6 @@
+import pathlib
+import unittest
+
 from aurora.pipelines.run_summary import RunSummary
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test2_h5
@@ -7,33 +10,116 @@ from aurora.test_utils.synthetic.paths import AURORA_RESULTS_PATH
 from aurora.test_utils.synthetic.processing_helpers import process_sythetic_data
 from aurora.transfer_function.kernel_dataset import KernelDataset
 
-# def process_synthetic_1_underdetermined():
-#     """
-#     Just like process_synthetic_1, but the window is ridiculously long so that we
-#     encounter the underdetermined problem. We actually pass that test but in testing
-#     I found that at the next band over, which has more data because there are multipe
-#     FCs the sigma in TRME comes out as negative. see issue #4 and issue #55.
-#     Returns
-#     -------
-#
-#     """
-#     test_config = CONFIG_PATH.joinpath("test1_run_config_underdetermined.json")
-#     # test_config = Path("config", "test1_run_config_underdetermined.json")
-#     run_id = "001"
-#     process_sythetic_data(test_config, run_id, units="MT")
-#
-#
-# def process_synthetic_1_with_nans():
-#     """
-#
-#     Returns
-#     -------
-#
-#     """
-#     test_config = CONFIG_PATH.joinpath("test1_run_config_nan.json")
-#     #    test_config = Path("config", "test1_run_config_nan.json")
-#     run_id = "001"
-#     process_sythetic_data(test_config, run_id, units="MT")
+
+# =============================================================================
+#  Tests
+# =============================================================================
+
+
+class TestSyntheticProcessing(unittest.TestCase):
+    """
+    Runs several synthetic processing tests from config creation to tf_collection.
+
+    """
+
+    def setUp(self):
+        self.file_version = "0.1.0"
+
+    @property
+    def z_file_path(self):
+        return AURORA_RESULTS_PATH.joinpath(self.z_file_base)
+
+    def test_can_output_tf_collection(self):
+        z_file_path = AURORA_RESULTS_PATH.joinpath("syn1.zss")
+        tf_collection = process_synthetic_1(
+            z_file_path=z_file_path, file_version=self.file_version
+        )
+        assert tf_collection.tf_dict is not None
+
+    def test_can_output_tf_class_and_write_tf_xml(self):
+        tf_cls = process_synthetic_1(
+            file_version=self.file_version, return_collection=False
+        )
+        xml_file_base = "syn1_mth5-010.xml"
+        xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
+        tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
+
+    def test_can_use_channel_nomenclature(self):
+        channel_nomencalture = "LEMI12"
+        z_file_path = AURORA_RESULTS_PATH.joinpath(f"syn1-{channel_nomencalture}.zss")
+        tf_cls = process_synthetic_1(
+            z_file_path=z_file_path,
+            file_version=self.file_version,
+            return_collection=False,
+            channel_nomenclature=channel_nomencalture,
+        )
+        xml_file_base = f"syn1_mth5-{self.file_version}_{channel_nomencalture}.xml"
+        xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
+        tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
+
+    def test_can_use_mth5_file_version_020(self):
+        file_version = "0.2.0"
+        z_file_path = AURORA_RESULTS_PATH.joinpath(f"syn1-{file_version}.zss")
+        tf_cls = process_synthetic_1(
+            z_file_path=z_file_path, file_version=file_version, return_collection=False
+        )
+        xml_file_base = f"syn1_mth5v{file_version}.xml"
+        xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
+        tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
+
+    def test_can_use_scale_factor_dictionary(self):
+        """
+        2022-05-13: Added a duplicate run of process_synthetic_1, which is intended to
+        test the channel_scale_factors in the new mt_metadata processing class.
+        Expected outputs are four .png:
+
+        xy_syn1.png : Shows expected 100 Ohm-m resisitivity
+        xy_syn1-scaled.png : Overestimates by 4x for 300 Ohm-m resistivity
+        yx_syn1.png : Shows expected 100 Ohm-m resisitivity
+        yx_syn1-scaled.png : Underestimates by 4x for 25 Ohm-m resistivity
+        These .png are stores in aurora_results folder
+
+        """
+        z_file_path = AURORA_RESULTS_PATH.joinpath("syn1-scaled.zss")
+        tf_collection = process_synthetic_1(
+            z_file_path=z_file_path, return_collection=True, test_scale_factor=True
+        )
+        assert tf_collection.tf_dict is not None
+
+    def test_simultaneos_regression(self):
+        z_file_path = AURORA_RESULTS_PATH.joinpath("syn1_simultaneous_estimate.zss")
+        tf_collection = process_synthetic_1(
+            z_file_path=z_file_path, test_simultaneous_regression=True
+        )
+        assert tf_collection.tf_dict is not None
+
+    def test_can_process_other_station(self):
+        tf_collection = process_synthetic_2()
+        assert tf_collection.tf_dict is not None
+
+    def test_can_process_remote_reference_data_to_tf_collection(self):
+        tf_collection = process_synthetic_rr12()
+        assert tf_collection.tf_dict is not None
+
+    def test_can_process_remote_reference_data_to_tf_class(self):
+        tf_cls = process_synthetic_rr12(
+            channel_nomenclature="default", return_collection=False
+        )
+        xml_file_base = "syn12rr_mth5-010.xml"
+        xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
+        tf_cls.write_tf_file(
+            fn=xml_file_name, file_type="emtfxml", channel_nomenclature="default"
+        )
+
+    def test_can_process_remote_reference_data_with_channel_nomenclature(self):
+        tf_cls = process_synthetic_rr12(
+            channel_nomenclature="LEMI34", return_collection=False
+        )
+        xml_file_base = "syn12rr_mth5-010_LEMI34.xml"
+        xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
+        tf_cls.write_tf_file(
+            fn=xml_file_name, file_type="emtfxml", channel_nomenclature="LEMI34"
+        )
 
 
 def process_synthetic_1(
@@ -99,8 +185,8 @@ def process_synthetic_1(
         return_collection=return_collection,
     )
 
-    z_figure_name = z_file_path.name.replace("zss", "png")
     if return_collection:
+        z_figure_name = z_file_path.name.replace("zss", "png")
         for xy_or_yx in ["xy", "yx"]:
             ttl_str = f"{xy_or_yx} component, test_scale_factor = {test_scale_factor}"
             out_png_name = f"{xy_or_yx}_{z_figure_name}"
@@ -150,98 +236,41 @@ def process_synthetic_rr12(channel_nomenclature="default", return_collection=Tru
     return tfc
 
 
-def test():
+def main():
     """
-    Runs several synthetic processing tests from config creation to tf_collection.
-
-    2022-05-13: Added a duplicate run of process_synthetic_1, which is intended to
-    test the channel_scale_factors in the new mt_metadata processing class.  Expected
-    outputs are four .png:
-    xy_syn1.png : Shows expected 100 Ohm-m resisitivity
-    xy_syn1_scaled.png : Overestimates by 4x for 300 Ohm-m resistivity
-    yx_syn1.png : Shows expected 100 Ohm-m resisitivity
-    yx_syn1_scaled.png : Underestimates by 4x for 25 Ohm-m resistivity
-    These .png are stores in aurora_results folder
-
+    Testing the processing of synthetic data
     """
-    # process_synthetic_1_underdetermined()
-    # process_synthetic_1_with_nans()
-
-    z_file_path = AURORA_RESULTS_PATH.joinpath("syn1.zss")
-
-    # Test can output a tf_collection
-    tf_collection = process_synthetic_1(z_file_path=z_file_path, file_version="0.1.0")
-
-    # Test can output a tf_class, and write a tf_xml
-    tf_cls = process_synthetic_1(
-        z_file_path=z_file_path, file_version="0.1.0", return_collection=False
-    )
-    xml_file_base = "syn1_mth5-010.xml"
-    xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
-    tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
-
-    # Test can use channel_nomenclature
-    tf_collection = process_synthetic_1(
-        z_file_path=z_file_path, file_version="0.1.0", channel_nomenclature="LEMI12"
-    )
-
-    tf_cls = process_synthetic_1(
-        z_file_path=z_file_path,
-        file_version="0.1.0",
-        return_collection=False,
-        channel_nomenclature="LEMI12",
-    )
-    xml_file_base = "syn1_mth5-010_LEMI.xml"
-    xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
-    tf_cls.write_tf_file(
-        fn=xml_file_name, file_type="emtfxml", channel_nomenclature="LEMI12"
-    )
-
-    # Test can use file_version 0.2.0
-    tf_cls = process_synthetic_1(
-        z_file_path=z_file_path, file_version="0.2.0", return_collection=False
-    )
-    xml_file_base = "syn1_mth5-020.xml"
-    xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
-    tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
-
-    # Test can use scale_factor dictionary
-    z_file_path = AURORA_RESULTS_PATH.joinpath("syn1_scaled.zss")
-    tf_collection = process_synthetic_1(z_file_path=z_file_path, test_scale_factor=True)
-
-    # Test simultaneos regression
-    z_file_path = AURORA_RESULTS_PATH.joinpath("syn1_simultaneous_estimate.zss")
-    tf_collection = process_synthetic_1(
-        z_file_path=z_file_path, test_simultaneous_regression=True
-    )
-
-    # Test can process other station
-    tf_collection = process_synthetic_2()
-
-    # Test can process remote reference data to tf_collection
-    tf_collection = process_synthetic_rr12()
-
-    # Test can process remote reference data to TF class
-    tf_cls = process_synthetic_rr12(
-        channel_nomenclature="default", return_collection=False
-    )
-    xml_file_base = "syn12rr_mth5-010.xml"
-    xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
-    tf_cls.write_tf_file(
-        fn=xml_file_name, file_type="emtfxml", channel_nomenclature="default"
-    )
-
-    # Test can process remote reference data with channel_nomenclature
-    tf_cls = process_synthetic_rr12(
-        channel_nomenclature="LEMI34", return_collection=False
-    )
-    xml_file_base = "syn12rr_mth5-010_LEMI34.xml"
-    xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
-    tf_cls.write_tf_file(
-        fn=xml_file_name, file_type="emtfxml", channel_nomenclature="LEMI34"
-    )
-    return tf_collection
+    unittest.main()
 
 
 if __name__ == "__main__":
-    test()
+    main()
+
+
+# def process_synthetic_1_underdetermined():
+#     """
+#     Just like process_synthetic_1, but the window is ridiculously long so that we
+#     encounter the underdetermined problem. We actually pass that test but in testing
+#     I found that at the next band over, which has more data because there are multipe
+#     FCs the sigma in TRME comes out as negative. see issue #4 and issue #55.
+#     Returns
+#     -------
+#
+#     """
+#     test_config = CONFIG_PATH.joinpath("test1_run_config_underdetermined.json")
+#     # test_config = Path("config", "test1_run_config_underdetermined.json")
+#     run_id = "001"
+#     process_sythetic_data(test_config, run_id, units="MT")
+#
+#
+# def process_synthetic_1_with_nans():
+#     """
+#
+#     Returns
+#     -------
+#
+#     """
+#     test_config = CONFIG_PATH.joinpath("test1_run_config_nan.json")
+#     #    test_config = Path("config", "test1_run_config_nan.json")
+#     run_id = "001"
+#     process_sythetic_data(test_config, run_id, units="MT")
