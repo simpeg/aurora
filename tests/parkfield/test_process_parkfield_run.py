@@ -47,6 +47,7 @@ def test_processing(return_collection=False, z_file_path=None, test_clock_zero=F
     tfk_dataset.from_run_summary(run_summary, "PKD")
 
     cc = ConfigCreator(config_path=CONFIG_PATH)
+    # config = cc.create_from_kernel_dataset(tfk_dataset, estimator={"engine": "RME"})
     config = cc.create_run_processing_object(
         emtf_band_file=BANDS_DEFAULT_FILE,
         sample_rate=tfk_dataset.sample_rate,
