@@ -28,6 +28,7 @@ def aurora_vs_emtf(
     use_subtitle=True,
 ):
     """
+
     ToDo: Consider storing the processing config for this case as a json file,
     committed with the code.
 
@@ -55,18 +56,14 @@ def aurora_vs_emtf(
         against the python aurora output
     z_file_base: str
         This is the z_file that aurora will write its output to
-    ds_df
+    tfk_dataset: aurora.transfer_function.kernel_dataset.KernelDataset
+        Info about the data to process
     make_rho_phi_plot: bool
     show_rho_phi_plot: bool
     use_subtitle: bool
-
-
-    Returns
-    -------
-
     """
     processing_config = create_test_run_config(
-        test_case_id, tfk_dataset.df, matlab_or_fortran=emtf_version
+        test_case_id, tfk_dataset, matlab_or_fortran=emtf_version
     )
 
     expected_rms_misfit = get_expected_rms_misfit(test_case_id, emtf_version)

@@ -26,7 +26,7 @@ def test_stft_methods_agree():
     tfk_dataset = KernelDataset()
     tfk_dataset.from_run_summary(run_summary, "test1")
 
-    processing_config = create_test_run_config("test1", tfk_dataset.df)
+    processing_config = create_test_run_config("test1", tfk_dataset)
 
     mth5_obj = MTH5(file_version="0.1.0")
     mth5_obj.open_mth5(mth5_path, mode="a")
