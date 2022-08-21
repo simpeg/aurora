@@ -7,7 +7,7 @@ from aurora.test_utils.synthetic.paths import DATA_PATH
 
 def create_test_run_config(
     test_case_id,
-    ds_df,
+    kernel_dataset,
     matlab_or_fortran="",
     save="json",
     channel_nomenclature="default",
@@ -59,26 +59,25 @@ def create_test_run_config(
     cc = ConfigCreator(config_path=CONFIG_PATH)
 
     if test_case_id in ["test1", "test2"]:
-        p = cc.create_run_processing_object(
+        p = cc.create_from_kernel_dataset(
+            kernel_dataset,
             emtf_band_file=emtf_band_setup_file,
         )
         p.id = config_id
         p.channel_nomenclature.keyword = channel_nomenclature
         p.set_default_input_output_channels()
         p.drop_reference_channels()
-        p.stations.from_dataset_dataframe(ds_df)
 
     elif test_case_id in ["test2r1", "test1r2"]:
         config_id = f"{config_id}-RR{remote_station_id}"
-        p = cc.create_run_processing_object(
+        p = cc.create_from_kernel_dataset(
+            kernel_dataset,
             emtf_band_file=emtf_band_setup_file,
         )
-        p.id = config_id
         p.id = config_id
         p.channel_nomenclature.keyword = channel_nomenclature
         p.set_default_input_output_channels()
         p.set_default_reference_channels()
-        p.stations.from_dataset_dataframe(ds_df)
 
     for decimation in p.decimations:
         decimation.estimator.engine = estimation_engine

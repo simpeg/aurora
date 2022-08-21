@@ -171,7 +171,7 @@ def process_synthetic_1(
         tfk_dataset.df.drop(columns=["channel_scale_factors"], inplace=True)
 
     processing_config = create_test_run_config(
-        "test1", tfk_dataset.df, channel_nomenclature=channel_nomenclature
+        "test1", tfk_dataset, channel_nomenclature=channel_nomenclature
     )
 
     if test_simultaneous_regression:
@@ -210,7 +210,7 @@ def process_synthetic_2():
     )
     tfk_dataset = KernelDataset()
     tfk_dataset.from_run_summary(run_summary, "test2")
-    processing_config = create_test_run_config("test2", tfk_dataset.df)
+    processing_config = create_test_run_config("test2", tfk_dataset)
     tfc = process_sythetic_data(processing_config, tfk_dataset)
     return tfc
 
@@ -226,7 +226,7 @@ def process_synthetic_rr12(channel_nomenclature="default", return_collection=Tru
     tfk_dataset = KernelDataset()
     tfk_dataset.from_run_summary(run_summary, "test1", "test2")
     processing_config = create_test_run_config(
-        "test1r2", tfk_dataset.df, channel_nomenclature=channel_nomenclature
+        "test1r2", tfk_dataset, channel_nomenclature=channel_nomenclature
     )
     tfc = process_sythetic_data(
         processing_config,
