@@ -48,7 +48,7 @@ def plot_tf_obj(tf_obj, out_filename=None, show=True):
     tf_obj: aurora.transfer_function.TTFZ.TTFZ
         The transfer function values packed into an object
     out_filename: string
-        WHere to samve the file.  No png is saved if this is False
+        Where to save the file.  No png is saved if this is False
 
     """
     from aurora.transfer_function.plot.rho_plot import RhoPlot
