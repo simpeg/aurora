@@ -38,6 +38,14 @@ LEMI_CHANNEL_MAP_34 = {
     "ey": "e4",
 }
 
+PHOENIX_CHANNEL_MAP_123 = {
+    "hx": "h1",
+    "hy": "h2",
+    "hz": "h3",
+    "ex": "e1",
+    "ey": "e2",
+}
+
 
 # =============================================================================
 class ChannelNomenclature(Base):
@@ -104,6 +112,8 @@ class ChannelNomenclature(Base):
             channel_map = LEMI_CHANNEL_MAP_34
         elif keyword == "NIMS":
             channel_map = DEFAULT_CHANNEL_MAP
+        elif keyword == "PHOENIX123":
+            channel_map = PHOENIX_CHANNEL_MAP_123
         else:
             print(f"whoops mt_system {keyword} unknown")
             raise NotImplementedError

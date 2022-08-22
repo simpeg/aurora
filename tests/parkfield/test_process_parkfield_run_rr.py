@@ -75,12 +75,10 @@ def test_processing(z_file_path=None):
     tfk_dataset.from_run_summary(run_summary, "PKD", "SAO")
 
     cc = ConfigCreator(config_path=CONFIG_PATH)
-    config = cc.create_run_processing_object(
-        emtf_band_file=BANDS_DEFAULT_FILE,
-        sample_rate=40.0,
+    config = cc.create_from_kernel_dataset(
+        tfk_dataset,
         output_channels=["ex", "ey"],
     )
-    config.stations.from_dataset_dataframe(tfk_dataset.df)
 
     show_plot = False
     tf_cls = process_mth5(

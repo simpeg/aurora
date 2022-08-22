@@ -38,8 +38,19 @@ def plot_complex_response(frequency, complex_response, **kwargs):
         plt.show()
 
 
-def plot_tf_obj(tf_obj, out_filename=None):
-    print("GET PLOTTER FROM MTpy")
+def plot_tf_obj(tf_obj, out_filename=None, show=True):
+    """
+    To Do: Get plotter from MTpy or elsewhere.
+    See Issue #209
+    https://github.com/simpeg/aurora/issues/209
+    Parameters
+    ----------
+    tf_obj: aurora.transfer_function.TTFZ.TTFZ
+        The transfer function values packed into an object
+    out_filename: string
+        Where to save the file.  No png is saved if this is False
+
+    """
     from aurora.transfer_function.plot.rho_plot import RhoPlot
     import matplotlib.pyplot as plt
 
@@ -50,4 +61,5 @@ def plot_tf_obj(tf_obj, out_filename=None):
     plotter.phase_sub_plot(axs[1], ttl_str=ttl_str)
     if out_filename:
         plt.savefig(f"{out_filename}.png")
-    plt.show()
+    if show:
+        plt.show()

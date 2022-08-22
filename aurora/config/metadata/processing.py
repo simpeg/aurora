@@ -170,6 +170,30 @@ class Processing(Base):
                     new_level.add_band(band)
                     self.add_decimation_level(new_level)
 
+    def assign_decimation_level_data_emtf(self, sample_rate):
+        """
+
+        Warning: This does not actually tell us how many samples we are decimating down
+        at each level.  That is assumed to be 4 but we need a way to bookkeep this in general
+
+        Parameters
+        ----------
+        sample_rate: float
+            The initial sampling rate of the data before any decimation
+
+        """
+        for key in sorted(self.decimations_dict.keys()):
+            if key in [0, "0"]:
+                d = 1
+                sr = sample_rate
+            else:
+                # careful with this hardcoded assumption of decimation by 4
+                d = 4
+                sr = sample_rate / (d ** int(key))
+            decimation_obj = self.decimations_dict[key]
+            decimation_obj.decimation.factor = d
+            decimation_obj.decimation.sample_rate = sr
+
     def json_fn(self):
         json_fn = self.id + "_processing_config.json"
         return json_fn

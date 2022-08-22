@@ -260,6 +260,18 @@ class KernelDataset:
             station_metadata.add_run(run_metadata)
         return station_metadata
 
+    @property
+    def num_sample_rates(self):
+        return len(self.df.sample_rate.unique())
+
+    @property
+    def sample_rate(self):
+        if self.num_sample_rates != 1:
+            print("Aurora does not yet process data from mixed sample rates")
+            raise NotImplementedError
+        sample_rate = self.df.sample_rate.unique()[0]
+        return sample_rate
+
 
 def restrict_to_station_list(df, station_ids, inplace=True):
     """

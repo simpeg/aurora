@@ -68,12 +68,12 @@ def fix_time(tstmp):
     return out
 
 
-def initialize_pipeline(config):
+def initialize_mth5s(config):
     """
     Prepare to process data, get mth5 objects open in read mode and processing_config
     initialized if needed.
 
-    ToDo: Review dict.  Theoretically, you could get namespace clashes here.
+    ToDo: Review mth5_objs dict.  Theoretically, you could get namespace clashes here.
     Could key by survey-station, but also just use the keys "local" and "remote"
 
     Parameters
@@ -84,7 +84,6 @@ def initialize_pipeline(config):
 
     Returns
     -------
-    config : aurora.config.metadata.processing.Processing
     mth5_objs : dict
         Keyed by station_ids.
         local_mth5_obj : mth5.mth5.MTH5
@@ -104,7 +103,7 @@ def initialize_pipeline(config):
     if config.stations.remote:
         mth5_objs[config.stations.remote[0].id] = remote_mth5_obj
 
-    return config, mth5_objs
+    return mth5_objs
 
 
 def make_stft_objects(
@@ -368,9 +367,12 @@ def process_mth5(
     tf_cls: mt_metadata.transfer_functions.TF
         TF object
     """
-
-    processing_config, mth5_objs = initialize_pipeline(config)
+    # Initialize config and mth5s
+    processing_config = initialize_config(config)
     dataset_df = tfk_dataset.df
+    if processing_config.stations.local.id is None:
+        processing_config.stations.from_dataset_dataframe(dataset_df)
+    mth5_objs = initialize_mth5s(config)
 
     # Here is where any checks that would be done by TF Kernel would be applied
     # see notes labelled with ToDo TFK above

@@ -16,6 +16,37 @@ class ConfigCreator:
         default_config_path = Path("config")
         self.config_path = kwargs.get("config_path", default_config_path)
 
+    def create_from_kernel_dataset(
+        self,
+        kernel_dataset,
+        emtf_band_file=BANDS_DEFAULT_FILE,
+        input_channels=["hx", "hy"],
+        output_channels=["hz", "ex", "ey"],
+        estimator=None,
+        **kwargs,
+    ):
+
+        processing_id = (
+            f"{kernel_dataset.local_station_id}-{kernel_dataset.remote_station_id}"
+        )
+        processing_obj = Processing(id=processing_id, **kwargs)
+        processing_obj.stations.from_dataset_dataframe(kernel_dataset.df)
+        # runs = []
+        # PACK RUNS HERE
+        if emtf_band_file is not None:
+            processing_obj.read_emtf_bands(emtf_band_file)
+            processing_obj.assign_decimation_level_data_emtf(kernel_dataset.sample_rate)
+        for key, decimation_obj in processing_obj.decimations_dict.items():
+            decimation_obj.input_channels = input_channels
+            decimation_obj.output_channels = output_channels
+            # set estimator if provided as kwarg
+            if estimator:
+                try:
+                    decimation_obj.estimator.engine = estimator["engine"]
+                except KeyError:
+                    pass
+        return processing_obj
+
     def create_run_processing_object(
         self,
         station_id=None,
@@ -57,25 +88,17 @@ class ConfigCreator:
         processing_obj.stations.local = station_obj
         if emtf_band_file is not None:
             processing_obj.read_emtf_bands(emtf_band_file)
-
-            for key in sorted(processing_obj.decimations_dict.keys()):
-                if key in [0, "0"]:
-                    d = 1
-                    sr = sample_rate
-                else:
-                    d = 4
-                    sr = sample_rate / (d ** int(key))
-                decimation_obj = processing_obj.decimations_dict[key]
-                decimation_obj.decimation.factor = d
-                decimation_obj.decimation.sample_rate = sr
-                decimation_obj.input_channels = input_channels
-                decimation_obj.output_channels = output_channels
-                # set estimator if provided as kwarg
-                if estimator:
-                    try:
-                        decimation_obj.estimator.engine = estimator["engine"]
-                    except KeyError:
-                        pass
+            processing_obj.assign_decimation_level_data_emtf(sample_rate)
+        for key in sorted(processing_obj.decimations_dict.keys()):
+            decimation_obj = processing_obj.decimations_dict[key]
+            decimation_obj.input_channels = input_channels
+            decimation_obj.output_channels = output_channels
+            # set estimator if provided as kwarg
+            if estimator:
+                try:
+                    decimation_obj.estimator.engine = estimator["engine"]
+                except KeyError:
+                    pass
         return processing_obj
 
     def to_json(self, processing_obj, path=None, nested=True, required=False):
