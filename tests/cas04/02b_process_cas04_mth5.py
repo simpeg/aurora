@@ -332,11 +332,13 @@ def process_with_remote(local, remote, band_setup_file="band_setup_emtf_nims.txt
 
     cc = ConfigCreator()  # config_path=CONFIG_PATH)
     band_setup_file = "band_setup_emtf_nims.txt"
-    band_setup_file = BANDS_DEFAULT_FILE
+    # band_setup_file = BANDS_DEFAULT_FILE
     config = cc.create_run_processing_object(
         emtf_band_file=band_setup_file, sample_rate=sr[0]
     )
     config.stations.from_dataset_dataframe(kernel_dataset.df)
+    for decimation in config.decimations:
+        decimation.window.type = "hamming"
     show_plot = False
     z_file_base = f"{local}_RR{remote}.zrr"
     z_file_path = AURORA_RESULTS_PATH.joinpath(z_file_base)
@@ -392,8 +394,8 @@ def main():
     process_with_remote("CAS04", "REV06")
 
     for RR in ["CAV07", "NVR11", "REV06"]:
-        compare_aurora_vs_emtf("CAS04", "CAV07", coh=False)
-        compare_aurora_vs_emtf("CAS04", "CAV07", coh=True)
+        compare_aurora_vs_emtf("CAS04", RR, coh=False)
+        compare_aurora_vs_emtf("CAS04", RR, coh=True)
 
 
 if __name__ == "__main__":

@@ -25,6 +25,7 @@ ToDo: Test make_all_stations() with mth5_version 0.1.0 and 0.2.0
 import pandas as pd
 
 from aurora.general_helper_functions import TEST_PATH
+from aurora.general_helper_functions import execute_subprocess
 from aurora.sandbox.mth5_channel_summary_helpers import channel_summary_to_make_mth5
 from mth5.utils.helpers import initialize_mth5
 from mth5.utils.helpers import read_back_data
@@ -142,19 +143,26 @@ def test_make_mth5(mth5_version="0.1.0"):
     """
     mth5_path = make_all_stations(mth5_version=mth5_version)
     if mth5_version == "0.1.0":
+        new_filepath = str(mth5_path).replace(".h5", "_v1.h5")
+    elif mth5_version == "0.2.0":
+        new_filepath = str(mth5_path).replace(".h5", "_v2.h5")
+    cmd = f"cp {mth5_path} {new_filepath}"
+    execute_subprocess(cmd)
+
+    if mth5_version == "0.1.0":
         survey = None
     else:
         survey = "CONUS South"
-    read_back_data(mth5_path, "CAS04", "a", survey=survey)
-    read_back_data(mth5_path, "CAS04", "b", survey=survey)
-    read_back_data(mth5_path, "CAS04", "c", survey=survey)
-    read_back_data(mth5_path, "CAS04", "d", survey=survey)
+    read_back_data(new_filepath, "CAS04", "a", survey=survey)
+    read_back_data(new_filepath, "CAS04", "b", survey=survey)
+    read_back_data(new_filepath, "CAS04", "c", survey=survey)
+    read_back_data(new_filepath, "CAS04", "d", survey=survey)
 
-    return mth5_path
+    return new_filepath
 
 
 def main():
-    # mth5_path = test_make_mth5(mth5_version="0.1.0")  # passes
+    mth5_path = test_make_mth5(mth5_version="0.1.0")  # passes
     mth5_path = test_make_mth5(mth5_version="0.2.0")  # passes 29 Jul 2022
     return mth5_path
 
