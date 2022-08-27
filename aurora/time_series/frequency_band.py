@@ -17,18 +17,19 @@ class FrequencyBand(Interval):
 
     TLDR:
     For simplicity, I'm going with Half open, df/2 intervals when they are
-    perscribed by FC indexes, and half_open gates_and_fenceposts when they
-    are not.  The gates and fenceposts can be converted to the percribed form by
+    prscribed by FC indexes, and half_open gates_and_fenceposts when they
+    are not.  The gates and fenceposts can be converted to the precribed form by
     mapping to emtf_band_setup_form and then mapping to FCIndex form.
     A 3dB point correction etc maybe done in a later version.
 
-    <ON DEFAULT FREQUENCY BAND CONFIGURATIONS>
+    ON DEFAULT FREQUENCY BAND CONFIGURATIONS
     Because these are Interval()s there is a little complication:
     If we use closed intervals we can have an issue with the same Fourier
     coefficient being in more than one band [a,b],[b,c] if b corresponds to a harmonic.
     Honestly this is not a really big deal, but it feels sloppy. The default
     behaviour should partition the frequency axis, not break it into sets with
-    non-zero overlap, even though the overlapping sets are of measure zero.
+    non-zero overlap, even though the overlapping sets are of measure zero
+    analytically, in digital land this matters.
 
     On the other hand, it is common enough (at low frequency) to have bands
     which are only 1 Harmonic wide, and if we dont use closed intervals we
@@ -79,7 +80,7 @@ class FrequencyBand(Interval):
     3dB band edges.
     http://www.sengpielaudio.com/calculator-cutoffFrequencies.htm
 
-    </ON DEFAULT FREQUENCY BAND CONFIGURATIONS>
+
 
 
     """

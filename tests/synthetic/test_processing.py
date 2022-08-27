@@ -93,7 +93,7 @@ class TestSyntheticProcessing(unittest.TestCase):
         tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
 
     def test_can_process_other_station(self):
-        tf_cls = process_synthetic_2(return_collection=True)
+        tf_cls = process_synthetic_2()
         xml_file_name = AURORA_RESULTS_PATH.joinpath("syn2.xml")
         tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
 
