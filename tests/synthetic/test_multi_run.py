@@ -43,8 +43,10 @@ def test_each_run_individually():
             units="MT",
             show_plot=show_plot,
             z_file_path=z_file_path,
-            return_collection=False,
         )
+        xml_file_base = f"syn3_{run_id}.xml"
+        xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
+        tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
 
 
 def test_all_runs():
@@ -70,13 +72,10 @@ def test_all_runs():
     show_plot = False  # True
     z_file_path = AURORA_RESULTS_PATH.joinpath("syn3_all.zss")
     tf_cls = process_mth5(
-        config,
-        kernel_dataset,
-        units="MT",
-        show_plot=show_plot,
-        z_file_path=z_file_path,
-        return_collection=False,
+        config, kernel_dataset, units="MT", show_plot=show_plot, z_file_path=z_file_path
     )
+    xml_file_name = AURORA_RESULTS_PATH.joinpath("syn3_all.xml")
+    tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
 
 
 def test():

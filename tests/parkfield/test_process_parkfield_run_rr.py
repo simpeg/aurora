@@ -45,18 +45,12 @@ def test_processing(z_file_path=None):
     """
     Parameters
     ----------
-    return_collection: bool
-        Controls dtype of returned object
     z_file_path: str or Path or None
         Where to store zfile
 
     Returns
     -------
-    tf_cls: TF object,
-        if  return_collection is True:
-        aurora.transfer_function.transfer_function_collection.TransferFunctionCollection
-        if  return_collection is False:
-        mt_metadata.transfer_functions.core.TF
+    tf_cls: TF object mt_metadata.transfer_functions.core.TF
     """
 
     mth5_path = DATA_PATH.joinpath("pkd_sao_test_00.h5")
@@ -87,7 +81,6 @@ def test_processing(z_file_path=None):
         units="MT",
         show_plot=show_plot,
         z_file_path=z_file_path,
-        return_collection=True,
     )
 
     # tf_cls.write_tf_file(fn="emtfxml_test.xml", file_type="emtfxml")

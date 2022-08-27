@@ -331,7 +331,7 @@ def process_mth5(
     units="MT",
     show_plot=False,
     z_file_path=None,
-    return_collection=True,
+    return_collection=False,
 ):
     """
     1. Read in the config and figure out how many decimation levels there are
@@ -359,6 +359,8 @@ def process_mth5(
         Target path for a z_file output if desired
     return_collection : boolean
         return_collection=False will return an mt_metadata TF object
+        return_collection=True will return
+        aurora.transfer_function.transfer_function_collection.TransferFunctionCollection
 
     Returns
     -------
@@ -452,8 +454,6 @@ def process_mth5(
         close_mths_objs(dataset_df)
         return tf_collection
     else:
-        # intended to be the default in future (return tf_cls, not tf_collection)
-
         local_station_id = processing_config.stations.local.id
         station_metadata = tfk_dataset.get_station_metadata(local_station_id)
 

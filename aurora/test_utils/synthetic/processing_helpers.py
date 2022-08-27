@@ -5,8 +5,8 @@ from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.process_mth5 import process_mth5
 
 
-def process_sythetic_data(
-    processing_config, tfk_dataset, units="MT", z_file_path="", return_collection=True
+def process_synthetic_data(
+    processing_config, tfk_dataset, units="MT", z_file_path="", return_collection=False
 ):
     """
 
