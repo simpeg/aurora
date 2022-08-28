@@ -1,34 +1,33 @@
 import numpy as np
+import pandas as pd
 
-from aurora.interval import Interval
 from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
 
 
-class FrequencyBand(Interval):
+class FrequencyBand(pd.Interval):
     """
     Extends the interval class.
 
-    has a lower bound, an upper bound and a central frequency
-
-    These are intervals
-    an method for Fourier coefficient indices
+    has a lower_bound, upper_bound, central_frequency and method for Fourier
+    coefficient indices
 
     Some thoughts 20210617:
 
     TLDR:
     For simplicity, I'm going with Half open, df/2 intervals when they are
-    perscribed by FC indexes, and half_open gates_and_fenceposts when they
-    are not.  The gates and fenceposts can be converted to the percribed form by
+    prscribed by FC indexes, and half_open gates_and_fenceposts when they
+    are not.  The gates and fenceposts can be converted to the precribed form by
     mapping to emtf_band_setup_form and then mapping to FCIndex form.
     A 3dB point correction etc maybe done in a later version.
 
-    <ON DEFAULT FREQUENCY BAND CONFIGURATIONS>
+    ON DEFAULT FREQUENCY BAND CONFIGURATIONS
     Because these are Interval()s there is a little complication:
     If we use closed intervals we can have an issue with the same Fourier
     coefficient being in more than one band [a,b],[b,c] if b corresponds to a harmonic.
     Honestly this is not a really big deal, but it feels sloppy. The default
     behaviour should partition the frequency axis, not break it into sets with
-    non-zero overlap, even though the overlapping sets are of measure zero.
+    non-zero overlap, even though the overlapping sets are of measure zero
+    analytically, in digital land this matters.
 
     On the other hand, it is common enough (at low frequency) to have bands
     which are only 1 Harmonic wide, and if we dont use closed intervals we
@@ -79,15 +78,21 @@ class FrequencyBand(Interval):
     3dB band edges.
     http://www.sengpielaudio.com/calculator-cutoffFrequencies.htm
 
-    </ON DEFAULT FREQUENCY BAND CONFIGURATIONS>
+
 
 
     """
 
-    def __init__(self, **kwargs):
-        Interval.__init__(self, **kwargs)
-        if kwargs.get("upper_closed") is None:
-            self.upper_closed = False
+    def __init__(self, left, right, closed="left", **kwargs):
+        pd.Interval.__init__(self, left, right, **kwargs)
+        self.lower_bound = self.left
+        self.upper_bound = self.right
+
+    def lower_closed(self):
+        return self.closed_left
+
+    def upper_closed(self):
+        return self.closed_right
 
     def fourier_coefficient_indices(self, frequencies):
         """
@@ -100,7 +105,9 @@ class FrequencyBand(Interval):
 
         Returns
         -------
-
+        indices: numpy array of integers
+            Integer indices of the fourier coefficients associated with the
+            frequecies passed as input argument
         """
         if self.lower_closed:
             cond1 = frequencies >= self.lower_bound
@@ -119,7 +126,7 @@ class FrequencyBand(Interval):
 
         Parameters
         ----------
-        frequencies
+        frequencies: array-like, floating poirt
 
         Returns: numpy array
             the actual harmonics or frequencies in band, rather than the indices.
@@ -132,6 +139,15 @@ class FrequencyBand(Interval):
 
     @property
     def center_frequency(self):
+        """
+        ToDo: add an entry to the processing config metadata that allows user to
+        specify if geometric or arithmetic mean is to be used for center frequency
+
+        Returns
+        -------
+        center_frequency: float
+            The frequency associated with the band center.
+        """
         # return (self.lower_bound + self.upper_bound)/2
         return np.sqrt(self.lower_bound * self.upper_bound)
 
@@ -203,8 +219,7 @@ class FrequencyBands(object):
         Main reason this is here is in anticipation of supporting an append()
         method to this class that accepts FrequencyBand objects.  In that
         case we would like to re-order the band edges
-        Returns
-        -------
+
 
         """
         band_centers = self.band_centers()
@@ -252,8 +267,8 @@ class FrequencyBands(object):
 
         """
         frequency_band = FrequencyBand(
-            lower_bound=self.band_edges[i_band, 0],
-            upper_bound=self.band_edges[i_band, 1],
+            self.band_edges[i_band, 0],
+            self.band_edges[i_band, 1],
         )
 
         return frequency_band

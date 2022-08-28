@@ -129,8 +129,6 @@ class TransferFunctionCollection(object):
         -------
 
         """
-
-        # <MERGE DECIMATION LEVELS>
         n_dec = self.number_of_decimation_levels
 
         tmp = [self.tf_dict[i].tf.to_dataset("period") for i in range(n_dec)]
@@ -147,7 +145,6 @@ class TransferFunctionCollection(object):
         merged_cov_nn = xr.combine_by_coords(tmp)
         merged_cov_nn = merged_cov_nn.to_array("period")
         self.merged_cov_nn = merged_cov_nn
-        # </MERGE DECIMATION LEVELS>
 
         return
 

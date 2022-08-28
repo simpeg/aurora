@@ -311,6 +311,7 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
 
 def close_mths_objs(df):
     """
+    ToDo: Move this into a method of KernelDataset
     Loop over all unique mth5_objs in the df and make sure they are closed
 
     Parameters
@@ -331,7 +332,7 @@ def process_mth5(
     units="MT",
     show_plot=False,
     z_file_path=None,
-    return_collection=True,
+    return_collection=False,
 ):
     """
     1. Read in the config and figure out how many decimation levels there are
@@ -359,6 +360,8 @@ def process_mth5(
         Target path for a z_file output if desired
     return_collection : boolean
         return_collection=False will return an mt_metadata TF object
+        return_collection=True will return
+        aurora.transfer_function.transfer_function_collection.TransferFunctionCollection
 
     Returns
     -------
@@ -449,18 +452,17 @@ def process_mth5(
         tf_collection.write_emtf_z_file(z_file_path, run_obj=local_run_obj)
 
     if return_collection:
+        # this is now really only to be used for debugging and may be deprecated soon
         close_mths_objs(dataset_df)
         return tf_collection
     else:
-        # intended to be the default in future (return tf_cls, not tf_collection)
-
         local_station_id = processing_config.stations.local.id
         station_metadata = tfk_dataset.get_station_metadata(local_station_id)
 
         # https://github.com/kujaku11/mt_metadata/issues/90 (Do we need if/else here?)
         #
         # Also, assuming mth5 file versions are either 0.1.0 or 0.2.0, and not yet
-        # looking at mixe versions -- although that could happen.  That is something
+        # looking at mixed versions -- although that could happen.  That is something
         # to check earlier, like when we populate data dataset_df
         if len(mth5_objs) == 1:
             key = list(mth5_objs.keys())[0]

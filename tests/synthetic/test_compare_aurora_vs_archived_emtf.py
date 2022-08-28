@@ -6,7 +6,7 @@ from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
 from aurora.test_utils.synthetic.make_processing_configs import create_test_run_config
 from aurora.test_utils.synthetic.paths import AURORA_RESULTS_PATH
 from aurora.test_utils.synthetic.paths import EMTF_OUTPUT_PATH
-from aurora.test_utils.synthetic.processing_helpers import process_sythetic_data
+from aurora.test_utils.synthetic.processing_helpers import process_synthetic_data
 from aurora.test_utils.synthetic.rms_helpers import assert_rms_misfit_ok
 from aurora.test_utils.synthetic.rms_helpers import compute_rms
 from aurora.test_utils.synthetic.rms_helpers import get_expected_rms_misfit
@@ -69,8 +69,8 @@ def aurora_vs_emtf(
     expected_rms_misfit = get_expected_rms_misfit(test_case_id, emtf_version)
     z_file_path = AURORA_RESULTS_PATH.joinpath(z_file_base)
 
-    tf_collection = process_sythetic_data(
-        processing_config, tfk_dataset, z_file_path=z_file_path
+    tf_collection = process_synthetic_data(
+        processing_config, tfk_dataset, z_file_path=z_file_path, return_collection=True
     )
 
     aux_data = read_z_file(auxilliary_z_file)

@@ -113,9 +113,7 @@ class StationRuns(UserDict):
         return out_file
 
 
-def process_station_runs(
-    local_station_id, remote_station_id="", station_runs={}, return_collection=False
-):
+def process_station_runs(local_station_id, remote_station_id="", station_runs={}):
     """
 
     Parameters
@@ -125,8 +123,6 @@ def process_station_runs(
     remote_station_id: str or None
     station_runs: StationRuns
         Dictionary keyed by station_id, values are run labels to process
-    return_collection: bool
-        True means return TransferFunctionCollection, False is tf_cls from mt_metadata
 
     Returns
     -------
@@ -172,12 +168,10 @@ def process_station_runs(
         kernel_dataset,
         show_plot=False,
         z_file_path=z_file_name,
-        return_collection=return_collection,
     )
-    if not return_collection:
-        xml_file_base = f"{tmp_station_runs.label}.xml"
-        xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
-        tf_result.write_tf_file(fn=xml_file_name, file_type="emtfxml")
+    xml_file_base = f"{tmp_station_runs.label}.xml"
+    xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
+    tf_result.write_tf_file(fn=xml_file_name, file_type="emtfxml")
     return tf_result
 
 
@@ -348,7 +342,6 @@ def process_with_remote(local, remote, band_setup_file="band_setup_emtf_nims.txt
         units="MT",
         show_plot=show_plot,
         z_file_path=z_file_path,
-        return_collection=False,
     )
     print(f"{tf_cls}")
     return
