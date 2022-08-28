@@ -23,6 +23,7 @@ class ConfigCreator:
         input_channels=["hx", "hy"],
         output_channels=["hz", "ex", "ey"],
         estimator=None,
+        band_edges=None,
         **kwargs,
     ):
 
@@ -33,9 +34,11 @@ class ConfigCreator:
         processing_obj.stations.from_dataset_dataframe(kernel_dataset.df)
         # runs = []
         # PACK RUNS HERE
-        if emtf_band_file is not None:
-            processing_obj.read_emtf_bands(emtf_band_file)
-            processing_obj.assign_decimation_level_data_emtf(kernel_dataset.sample_rate)
+        processing_obj.set_frequency_bands(
+            emtf_band_file=emtf_band_file,
+            band_edges=band_edges,
+            sample_rate=kernel_dataset.sample_rate,
+        )
         for key, decimation_obj in processing_obj.decimations_dict.items():
             decimation_obj.input_channels = input_channels
             decimation_obj.output_channels = output_channels
@@ -57,14 +60,29 @@ class ConfigCreator:
         output_channels=["hz", "ex", "ey"],
         estimator=None,
         emtf_band_file=BANDS_DEFAULT_FILE,
+        band_edges=None,
         **kwargs,
     ):
         """
         Create a default processing object
 
-        :return: DESCRIPTION
-        :rtype: TYPE
+        ToDo: Consider deprecating this method in lieu of create_from_kernel_dataset
 
+        Parameters
+        ----------
+        station_id
+        run_id
+        mth5_path
+        sample_rate
+        input_channels
+        output_channels
+        estimator
+        emtf_band_file
+        kwargs
+
+        Returns
+        -------
+        processing_obj: aurora.config.metadata.processing.Processing
         """
         processing_id = f"{station_id}-{run_id}"
         processing_obj = Processing(id=processing_id, **kwargs)
@@ -86,9 +104,11 @@ class ConfigCreator:
         station_obj.runs = runs
 
         processing_obj.stations.local = station_obj
-        if emtf_band_file is not None:
-            processing_obj.read_emtf_bands(emtf_band_file)
-            processing_obj.assign_decimation_level_data_emtf(sample_rate)
+        processing_obj.set_frequency_bands(
+            emtf_band_file=emtf_band_file,
+            band_edges=band_edges,
+            sample_rate=sample_rate,
+        )
         for key in sorted(processing_obj.decimations_dict.keys()):
             decimation_obj = processing_obj.decimations_dict[key]
             decimation_obj.input_channels = input_channels

@@ -1,3 +1,4 @@
+from deprecated import deprecated
 import numpy as np
 from aurora.time_series.frequency_band import FrequencyBands
 
@@ -79,11 +80,12 @@ def frequency_band_edges(
     print(f"bases = {bases}")
     exponents = np.linspace(0, num_bands, num_bands + 1)
     print(f"exponents = {exponents}")
-    fence_posts = f_lower_bound * (bases ** exponents)
+    fence_posts = f_lower_bound * (bases**exponents)
     print(f"fence posts = {fence_posts}")
     return fence_posts
 
 
+@deprecated(version="0.0.3", reason="metadata processing config will handle this")
 def configure_frequency_bands(config):
     """
     2022-05-30: This method was never put into production and will need to be

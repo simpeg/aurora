@@ -158,19 +158,14 @@ class FrequencyBand(pd.Interval):
 
 class FrequencyBands(object):
     """
-    Use this as the core element for BandAveragingScheme
     This is just collection of frequency bands objects.
-
     If there was no decimation, this would basically be the BandAveragingScheme
-    How does it differ from a bandaveraging scheme?
-    It doesn't support Decimation levels.
 
     Context: A band is an Interval().
     FrequencyBands can be represented as an IntervalSet()
 
-    20210617: Unforunately, using a single "band_edges" array of fenceposts
-    is not a general solution.  There is no reason to force the user to have
-    bands that abutt one another.  Therefore, changing to stop supporting
+    Using a single "band_edges" array of fenceposts is not a general solution. There
+    is no reason to force the bands to be adjacent.  Therefore, will stop supporting
     band_edges 1-D array.  band_edges will need to be a 2d array.  n_bands, 2
 
     20210720: In fact, it would be more general, and explicit to pass a
@@ -178,17 +173,13 @@ class FrequencyBands(object):
     other ways to populate this class, for example by passing it frequency_band
     objects, self.append(frequency_band).  However, that opens the door for
     overlapping frequency bands which in general are not well ordered without
-    choosing an order operation (band center would be a good one - but then
-    we may have non-unique band centers!)  However, this should be quite
-    rare, and I am not actually sure it is possible to get the same center
-    frequency if we are using logarithmic band centers.  The only issue with
-    an append method is that after we append a band, we will need to perform
-    an ordering/sorting on individual band edges.
+    choosing an order operation (band center would be a good one - but caution here,
+    band centers may not be unique!)  However, that should be extremely rare.  The
+    only issue with an append method is that after we append a band, we will need to
+    perform an ordering/sorting on individual band edges.
 
-
-    To add complexity, another use
-    case maybe that we wish to support bands with gaps at certain harmonics,
-    the way this is currently set up, all harmonics between the lower_bound
+    To add complexity, another use case maybe to support bands with gaps at certain
+    harmonics, the way this is currently set up, all harmonics between the lower_bound
     and the upper bounds are considered to be part of the band, but if we
     have a known "bad harmonic" or several noisy harmoincs within a band
     there is currently no way using somple FrequencyBand objects that we can
@@ -257,14 +248,15 @@ class FrequencyBands(object):
 
     def band(self, i_band):
         """
-        Decide to index bands from zero or one, i.e.  Choosing 0 for now.
+        ToDO: Decide whether to index bands from zero or one, i.e.  Choosing 0 for now.
+
         Parameters
         ----------
         i_band: integer key for band
 
         Returns
         -------
-
+        frequency_band: FrequencyBand() object
         """
         frequency_band = FrequencyBand(
             self.band_edges[i_band, 0],

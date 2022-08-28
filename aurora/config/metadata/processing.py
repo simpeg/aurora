@@ -142,6 +142,37 @@ class Processing(Base):
 
         self._decimations.append(obj)
 
+    def set_frequency_bands(
+        self, emtf_band_file=None, band_edges=None, sample_rate=None
+    ):
+        """
+        Placeholder function that will be needed to address issue #150
+
+        Creating a separate method so that we dont need to same logic repeated in
+        both create_from_kernel_dataset and create_run_processing_object.
+
+        Parameters
+        ----------
+        emtf_band_file
+        band_edges
+
+        """
+        if (emtf_band_file is None) & (band_edges is None):
+            print("Bands not defined")
+            raise Exception
+        if (emtf_band_file is not None) & (band_edges is not None):
+            print("Bands defined twice, and possibly inconsistantly")
+            raise Exception
+        if band_edges is not None:
+            raise NotImplementedError
+        elif emtf_band_file is not None:
+            self.read_emtf_bands(emtf_band_file)
+            self.assign_decimation_level_data_emtf(sample_rate)
+        else:
+            # some unrecognized way to specify bands is being used
+            raise NotImplementedError
+        return
+
     def read_emtf_bands(self, emtf_fn):
         """
         Read an emtf style file for defining the bands
