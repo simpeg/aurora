@@ -311,6 +311,7 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
 
 def close_mths_objs(df):
     """
+    ToDo: Move this into a method of KernelDataset
     Loop over all unique mth5_objs in the df and make sure they are closed
 
     Parameters
@@ -451,6 +452,7 @@ def process_mth5(
         tf_collection.write_emtf_z_file(z_file_path, run_obj=local_run_obj)
 
     if return_collection:
+        # this is now really only to be used for debugging and may be deprecated soon
         close_mths_objs(dataset_df)
         return tf_collection
     else:
@@ -460,7 +462,7 @@ def process_mth5(
         # https://github.com/kujaku11/mt_metadata/issues/90 (Do we need if/else here?)
         #
         # Also, assuming mth5 file versions are either 0.1.0 or 0.2.0, and not yet
-        # looking at mixe versions -- although that could happen.  That is something
+        # looking at mixed versions -- although that could happen.  That is something
         # to check earlier, like when we populate data dataset_df
         if len(mth5_objs) == 1:
             key = list(mth5_objs.keys())[0]

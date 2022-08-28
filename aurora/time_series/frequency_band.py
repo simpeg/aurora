@@ -8,10 +8,8 @@ class FrequencyBand(pd.Interval):
     """
     Extends the interval class.
 
-    has a lower bound, an upper bound and a central frequency
-
-    These are intervals
-    an method for Fourier coefficient indices
+    has a lower_bound, upper_bound, central_frequency and method for Fourier
+    coefficient indices
 
     Some thoughts 20210617:
 
@@ -107,7 +105,9 @@ class FrequencyBand(pd.Interval):
 
         Returns
         -------
-
+        indices: numpy array of integers
+            Integer indices of the fourier coefficients associated with the
+            frequecies passed as input argument
         """
         if self.lower_closed:
             cond1 = frequencies >= self.lower_bound
@@ -139,6 +139,15 @@ class FrequencyBand(pd.Interval):
 
     @property
     def center_frequency(self):
+        """
+        ToDo: add an entry to the processing config metadata that allows user to
+        specify if geometric or arithmetic mean is to be used for center frequency
+
+        Returns
+        -------
+        center_frequency: float
+            The frequency associated with the band center.
+        """
         # return (self.lower_bound + self.upper_bound)/2
         return np.sqrt(self.lower_bound * self.upper_bound)
 
