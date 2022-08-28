@@ -1,10 +1,10 @@
 import numpy as np
+import pandas as pd
 
-from aurora.interval import Interval
 from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
 
 
-class FrequencyBand(Interval):
+class FrequencyBand(pd.Interval):
     """
     Extends the interval class.
 
@@ -85,10 +85,16 @@ class FrequencyBand(Interval):
 
     """
 
-    def __init__(self, **kwargs):
-        Interval.__init__(self, **kwargs)
-        if kwargs.get("upper_closed") is None:
-            self.upper_closed = False
+    def __init__(self, left, right, closed="left", **kwargs):
+        pd.Interval.__init__(self, left, right, **kwargs)
+        self.lower_bound = self.left
+        self.upper_bound = self.right
+
+    def lower_closed(self):
+        return self.closed_left
+
+    def upper_closed(self):
+        return self.closed_right
 
     def fourier_coefficient_indices(self, frequencies):
         """
@@ -120,7 +126,7 @@ class FrequencyBand(Interval):
 
         Parameters
         ----------
-        frequencies
+        frequencies: array-like, floating poirt
 
         Returns: numpy array
             the actual harmonics or frequencies in band, rather than the indices.
@@ -204,8 +210,7 @@ class FrequencyBands(object):
         Main reason this is here is in anticipation of supporting an append()
         method to this class that accepts FrequencyBand objects.  In that
         case we would like to re-order the band edges
-        Returns
-        -------
+
 
         """
         band_centers = self.band_centers()
@@ -253,8 +258,8 @@ class FrequencyBands(object):
 
         """
         frequency_band = FrequencyBand(
-            lower_bound=self.band_edges[i_band, 0],
-            upper_bound=self.band_edges[i_band, 1],
+            self.band_edges[i_band, 0],
+            self.band_edges[i_band, 1],
         )
 
         return frequency_band
