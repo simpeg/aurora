@@ -458,24 +458,17 @@ def process_mth5(
     else:
         local_station_id = processing_config.stations.local.id
         station_metadata = tfk_dataset.get_station_metadata(local_station_id)
+        local_mth5_obj = mth5_objs[local_station_id]
 
-        # https://github.com/kujaku11/mt_metadata/issues/90 (Do we need if/else here?)
-        #
-        # Also, assuming mth5 file versions are either 0.1.0 or 0.2.0, and not yet
-        # looking at mixed versions -- although that could happen.  That is something
-        # to check earlier, like when we populate data dataset_df
-        if len(mth5_objs) == 1:
-            key = list(mth5_objs.keys())[0]
-            if mth5_objs[key].file_version == "0.1.0":
-                survey_dict = mth5_objs[key].survey_group.metadata.to_dict()
-            elif mth5_objs[key].file_version == "0.2.0":
-                survey_dict = mth5_objs[key].surveys_group.metadata.to_dict()
-        else:
-            print("WARN: Need test for multiple mth5 objs for non-tf_collection output")
-            print("WARN: Also need to add handling of 0.1.0 vs 0.2.0 mth5 file_version")
-            key = list(mth5_objs.keys())[0]
-            survey_dict = mth5_objs[key].survey_group.metadata.to_dict()
-            # raise Exception
+        if local_mth5_obj.file_version == "0.1.0":
+            survey_dict = local_mth5_obj.survey_group.metadata.to_dict()
+        elif local_mth5_obj.file_version == "0.2.0":
+            # this could be a method of tf_kernel.get_survey_dict()
+            survey_id = dataset_df[
+                dataset_df["station_id"] == local_station_id
+            ].survey.unique()[0]
+            survey_obj = local_mth5_obj.get_survey(survey_id)
+            survey_dict = survey_obj.metadata.to_dict()
 
         tf_cls = export_tf(
             tf_collection,
