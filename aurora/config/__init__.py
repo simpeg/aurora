@@ -1,6 +1,8 @@
-from aurora.config.emtf_band_setup import BANDS_DEFAULT_FILE
-from aurora.config.emtf_band_setup import BANDS_256_26_FILE
-from aurora.config.emtf_band_setup import BANDS_256_29_FILE
+from aurora.config.emtf_band_setup import (
+    BANDS_DEFAULT_FILE,
+    BANDS_256_26_FILE,
+    BANDS_256_29_FILE,
+)
 
 from .metadata import (
     Window,
