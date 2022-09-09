@@ -23,6 +23,7 @@ attr_dict.add_dict(get_schema("window", SCHEMA_FN_PATHS), "window")
 attr_dict.add_dict(get_schema("regression", SCHEMA_FN_PATHS), "regression")
 attr_dict.add_dict(get_schema("estimator", SCHEMA_FN_PATHS), "estimator")
 
+
 # =============================================================================
 class DecimationLevel(Base):
     __doc__ = write_lines(attr_dict)
@@ -141,6 +142,14 @@ class DecimationLevel(Base):
             sample_rate=self.decimation.sample_rate,
         )
         return windowing_scheme
+
+    @property
+    def fft_frequecies(self):
+        freqs = np.fft.fftfreq(
+            self.window.num_samples, 1.0 / self.decimation.sample_rate
+        )
+        freqs = freqs[0 : int(self.window.num_samples / 2)]
+        return freqs
 
     # def to_stft_config_dict(self):
     #     """

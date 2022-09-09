@@ -1,5 +1,5 @@
 from aurora.config import BANDS_DEFAULT_FILE
-from aurora.config import BANDS_256_FILE
+from aurora.config import BANDS_256_29_FILE
 from aurora.config.config_creator import ConfigCreator
 from aurora.test_utils.synthetic.paths import CONFIG_PATH
 from aurora.test_utils.synthetic.paths import DATA_PATH
@@ -41,7 +41,7 @@ def create_test_run_config(
         remote_station_id = "test1"
 
     if matlab_or_fortran == "matlab":
-        emtf_band_setup_file = BANDS_256_FILE
+        emtf_band_setup_file = BANDS_256_29_FILE
         num_samples_window = 256
         num_samples_overlap = 64
         config_id = f"{local_station_id}-{matlab_or_fortran}"

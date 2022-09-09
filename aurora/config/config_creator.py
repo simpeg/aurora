@@ -6,7 +6,6 @@ change.
 
 
 """
-from deprecated import deprecated
 from pathlib import Path
 
 from aurora.config import Processing, Station, Run, BANDS_DEFAULT_FILE
@@ -16,6 +15,7 @@ class ConfigCreator:
     def __init__(self, **kwargs):
         default_config_path = Path("config")
         self.config_path = kwargs.get("config_path", default_config_path)
+        self._band_specification_style = None
 
     def processing_id(self, kernel_dataset):
         """
@@ -41,14 +41,42 @@ class ConfigCreator:
         id = f"{kernel_dataset.local_station_id}-{kernel_dataset.remote_station_id}"
         return id
 
+    @property
+    def band_specification_style(self):
+        return self._band_specification_style
+
+    def determine_band_specification_style(self):
+        """
+        ? Should emtf_band_file path be stored in config?
+
+        Parameters
+        ----------
+        emtf_band_file
+        band_edges
+
+        """
+
+        if (self._emtf_band_file is None) & (self._band_edges is None):
+            print("Bands not defined; setting to EMTF BANDS_DEFAULT_FILE")
+            self._emtf_band_file = BANDS_DEFAULT_FILE
+            self._band_specification_style = "EMTF"
+        elif (self._emtf_band_file is not None) & (self._band_edges is not None):
+            print("Bands defined twice, and possibly inconsistantly")
+            raise Exception
+        elif self._band_edges is not None:
+            self._band_specification_style = "band_edges"
+        elif self._emtf_band_file is not None:
+            self._band_specification_style = "EMTF"
+        else:
+            print("method of band specifciation is unrecognized")
+            raise NotImplementedError
+
     def create_from_kernel_dataset(
         self,
         kernel_dataset,
-        emtf_band_file=BANDS_DEFAULT_FILE,
         input_channels=["hx", "hy"],
         output_channels=["hz", "ex", "ey"],
         estimator=None,
-        band_edges=None,
         **kwargs,
     ):
         """
@@ -57,7 +85,9 @@ class ConfigCreator:
         Parameters
         ----------
         kernel_dataset
-        emtf_band_file
+        emtf_band_file: while the default here is None, it will get assigned the
+        value BANDS_DEFAULT_FILE in the set_frequecy_bands method if band edges is
+        also None.
         input_channels
         output_channels
         estimator
@@ -75,14 +105,39 @@ class ConfigCreator:
         # pack station and run info into processing object
         processing_obj.stations.from_dataset_dataframe(kernel_dataset.df)
 
-        processing_obj.set_frequency_bands(
-            emtf_band_file=emtf_band_file,
-            band_edges=band_edges,
-            sample_rate=kernel_dataset.sample_rate,
-        )
+        # Unpack kwargs
+        self._emtf_band_file = kwargs.get("emtf_band_file", None)
+        self._band_edges = kwargs.get("band_edges", None)
+        decimation_factors = kwargs.get("decimation_factors", None)
+        num_samples_window = kwargs.get("num_samples_window", None)
+
+        # Determine if band_setup or edges dict is to be used for bands
+        self.determine_band_specification_style()
+
+        # Set Frequency Bands
+        if self.band_specification_style == "EMTF":
+            processing_obj.read_emtf_bands(self._emtf_band_file)
+            processing_obj.assign_decimation_level_data_emtf(kernel_dataset.sample_rate)
+        elif self.band_specification_style == "band_edges":
+            processing_obj.assign_bands(
+                self._band_edges,
+                kernel_dataset.sample_rate,
+                decimation_factors,
+                num_samples_window,
+            )
+
+        # if num_samples_window is not None:
+        #     if isinstance(num_samples_window, int):
+        #
+        #         print("")
+        #         #num_samples_window = dict(zip(processing_obj.num_decimation_levels()
+        #         #                              * [num_samples_window]
+
         for key, decimation_obj in processing_obj.decimations_dict.items():
             decimation_obj.input_channels = input_channels
             decimation_obj.output_channels = output_channels
+            if num_samples_window is not None:
+                decimation_obj.window.num_samples = num_samples_window[key]
             # set estimator if provided as kwarg
             if estimator:
                 try:
@@ -90,78 +145,6 @@ class ConfigCreator:
                 except KeyError:
                     pass
         return processing_obj
-
-    # @deprecated
-    # def create_run_processing_object(
-    #     self,
-    #     station_id=None,
-    #     run_id=None,
-    #     mth5_path=None,
-    #     sample_rate=1,
-    #     input_channels=["hx", "hy"],
-    #     output_channels=["hz", "ex", "ey"],
-    #     estimator=None,
-    #     emtf_band_file=BANDS_DEFAULT_FILE,
-    #     band_edges=None,
-    #     **kwargs,
-    # ):
-    #     """
-    #     Create a default processing object
-    #
-    #     ToDo: Consider deprecating this method in lieu of create_from_kernel_dataset
-    #
-    #     Parameters
-    #     ----------
-    #     station_id
-    #     run_id: string or list of strings.
-    #     mth5_path
-    #     sample_rate
-    #     input_channels
-    #     output_channels
-    #     estimator
-    #     emtf_band_file
-    #     kwargs
-    #
-    #     Returns
-    #     -------
-    #     processing_obj: aurora.config.metadata.processing.Processing
-    #     """
-    #     processing_id = f"{station_id}-{run_id}"
-    #     processing_obj = Processing(id=processing_id, **kwargs)
-    #
-    #     if not isinstance(run_id, list):
-    #         run_id = [run_id]
-    #
-    #     runs = []
-    #     for run in run_id:
-    #         run_obj = Run(
-    #             id=run_id,
-    #             input_channels=input_channels,
-    #             output_channels=output_channels,
-    #             sample_rate=sample_rate,
-    #         )
-    #         runs.append(run_obj)
-    #
-    #     station_obj = Station(id=station_id, mth5_path=mth5_path)
-    #     station_obj.runs = runs
-    #
-    #     processing_obj.stations.local = station_obj
-    #     processing_obj.set_frequency_bands(
-    #         emtf_band_file=emtf_band_file,
-    #         band_edges=band_edges,
-    #         sample_rate=sample_rate,
-    #     )
-    #     for key in sorted(processing_obj.decimations_dict.keys()):
-    #         decimation_obj = processing_obj.decimations_dict[key]
-    #         decimation_obj.input_channels = input_channels
-    #         decimation_obj.output_channels = output_channels
-    #         # set estimator if provided as kwarg
-    #         if estimator:
-    #             try:
-    #                 decimation_obj.estimator.engine = estimator["engine"]
-    #             except KeyError:
-    #                 pass
-    #     return processing_obj
 
     def to_json(self, processing_obj, path=None, nested=True, required=False):
         """

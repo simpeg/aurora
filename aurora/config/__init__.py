@@ -1,4 +1,6 @@
-from aurora.general_helper_functions import BAND_SETUP_PATH
+from aurora.config.emtf_band_setup import BANDS_DEFAULT_FILE
+from aurora.config.emtf_band_setup import BANDS_256_26_FILE
+from aurora.config.emtf_band_setup import BANDS_256_29_FILE
 
 from .metadata import (
     Window,
@@ -27,6 +29,3 @@ __all__ = [
     "DecimationLevel",
     "Processing",
 ]
-
-BANDS_DEFAULT_FILE = BAND_SETUP_PATH.joinpath("bs_test.cfg")
-BANDS_256_FILE = BAND_SETUP_PATH.joinpath("bs_256_26.cfg")

@@ -7,6 +7,7 @@ Created on Thu Feb 17 14:15:20 2022
 # =============================================================================
 # Imports
 # =============================================================================
+import numpy as np
 from pathlib import Path
 
 from mt_metadata.base.helpers import write_lines
@@ -14,7 +15,8 @@ from mt_metadata.base import get_schema, Base
 from .standards import SCHEMA_FN_PATHS
 
 from . import DecimationLevel, Stations, Band, ChannelNomenclature
-
+from aurora.config import BANDS_DEFAULT_FILE
+from aurora.time_series.frequency_band import FrequencyBand
 
 # =============================================================================
 attr_dict = get_schema("processing", SCHEMA_FN_PATHS)
@@ -142,34 +144,6 @@ class Processing(Base):
 
         self._decimations.append(obj)
 
-    def set_frequency_bands(
-        self, emtf_band_file=None, band_edges=None, sample_rate=None
-    ):
-        """
-        Placeholder function that will be needed to address issue #150
-
-        Parameters
-        ----------
-        emtf_band_file
-        band_edges
-
-        """
-        if (emtf_band_file is None) & (band_edges is None):
-            print("Bands not defined")
-            raise Exception
-        if (emtf_band_file is not None) & (band_edges is not None):
-            print("Bands defined twice, and possibly inconsistantly")
-            raise Exception
-        if band_edges is not None:
-            raise NotImplementedError
-        elif emtf_band_file is not None:
-            self.read_emtf_bands(emtf_band_file)
-            self.assign_decimation_level_data_emtf(sample_rate)
-        else:
-            # some unrecognized way to specify bands is being used
-            raise NotImplementedError
-        return
-
     def read_emtf_bands(self, emtf_fn):
         """
         Read an emtf style file for defining the bands
@@ -222,6 +196,61 @@ class Processing(Base):
             decimation_obj.decimation.factor = d
             decimation_obj.decimation.sample_rate = sr
 
+    def assign_bands(
+        self, band_edges_dict, sample_rate, decimation_factors, num_samples_window
+    ):
+        """
+
+        Warning: This does not actually tell us how many samples we are decimating down
+        at each level.  That is assumed to be 4 but we need a way to bookkeep this in general
+
+        Parameters
+        ----------
+        band_edges: dict
+            keys are integers, starting with 0, values are arrays of edges
+
+        """
+        num_decimation_levels = len(band_edges_dict)
+        if isinstance(num_samples_window, int):
+            num_samples_window = num_decimation_levels * [num_samples_window]
+
+        for i_level in sorted(band_edges_dict.keys()):
+            band_edges = band_edges_dict[i_level]
+            if i_level in [0, "0"]:
+                d = decimation_factors[i_level]  # 1
+                sr = sample_rate
+            else:
+                # careful with this hardcoded assumption of decimation by 4
+                d = d = decimation_factors[i_level]  # 4
+                sr = 1.0 * sample_rate / (d ** int(i_level))
+            decimation_obj = DecimationLevel()
+            decimation_obj.decimation.level = int(i_level)  # self.decimations_dict[key]
+            decimation_obj.decimation.factor = d
+            decimation_obj.decimation.sample_rate = sr
+            decimation_obj.window.num_samples = num_samples_window[i_level]
+            frequencies = decimation_obj.fft_frequecies
+
+            for low, high in band_edges:
+                fb = FrequencyBand(left=low, right=high)
+                indices = fb.fourier_coefficient_indices(frequencies)
+                try:
+                    band = Band(
+                        decimation_level=i_level,
+                        frequency_min=low,
+                        frequency_max=high,
+                        index_min=indices[0],
+                        index_max=indices[-1],
+                    )
+                except IndexError:
+                    print("WHAAAAAAA?")
+                # now refine frequency edges based on "canonical" or "exact"
+                # self.decimations_dict[i_level].add_band(band)
+                decimation_obj.add_band(band)
+            self.add_decimation_level(decimation_obj)
+        #            self.decimations_dict[i_level] = decimation_obj
+        print("OK")
+
+    #
     def json_fn(self):
         json_fn = self.id + "_processing_config.json"
         return json_fn

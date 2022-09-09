@@ -9,7 +9,7 @@ import scipy.io as sio
 
 from aurora.config.metadata.decimation_level import DecimationLevel
 from aurora.config.metadata.processing import Processing
-from aurora.general_helper_functions import BAND_SETUP_PATH
+from aurora.config.emtf_band_setup import BANDS_256_29_FILE
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.time_series.frequency_band import FrequencyBands
 from aurora.transfer_function.emtf_z_file_helpers import clip_bands_from_z_file
@@ -26,7 +26,7 @@ from aurora.transfer_function.TTFZ import TTFZ
 def test_matlab_zfile_reader():
     print("??")
     CASE = "IAK34ss"  # synthetic"
-    bs_file = BAND_SETUP_PATH.joinpath("bs_256.cfg")
+    bs_file = BANDS_256_29_FILE
     if CASE == "synthetic":
         n_periods_clip = 3  # for synthetic case
         z_mat = "TS1zss20210831.mat"
