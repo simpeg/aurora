@@ -48,6 +48,7 @@ class ConfigCreator:
     def determine_band_specification_style(self):
         """
         ? Should emtf_band_file path be stored in config?
+        It would support reproducability.
 
         Parameters
         ----------
