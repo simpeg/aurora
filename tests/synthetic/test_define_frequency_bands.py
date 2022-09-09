@@ -4,6 +4,7 @@ import pdb
 from aurora.config.config_creator import ConfigCreator
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
+from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
 from aurora.transfer_function.kernel_dataset import KernelDataset
 
 
@@ -52,6 +53,9 @@ def test_can_declare_frequencies_directly_in_config():
     file_base = "test1.h5"
 
     mth5_path = DATA_DIR.joinpath(file_base)
+    if not mth5_path.exists():
+        create_test1_h5()
+
     run_summary = RunSummary()
     run_summary.from_mth5s(
         [
