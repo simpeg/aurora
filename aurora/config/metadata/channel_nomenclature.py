@@ -13,8 +13,8 @@ from .standards import SCHEMA_FN_PATHS
 # =============================================================================
 attr_dict = get_schema("channel_nomenclature", SCHEMA_FN_PATHS)
 
-
-DEFAULT_CHANNEL_MAP = {
+CHANNEL_MAPS = {}
+CHANNEL_MAPS["default"] = {
     "hx": "hx",
     "hy": "hy",
     "hz": "hz",
@@ -105,13 +105,13 @@ class ChannelNomenclature(Base):
 
     def get_channel_map(self, keyword):
         if keyword == "default":
-            channel_map = DEFAULT_CHANNEL_MAP
+            channel_map = CHANNEL_MAPS["default"]
         elif keyword == "LEMI12":
             channel_map = LEMI_CHANNEL_MAP_12
         elif keyword == "LEMI34":
             channel_map = LEMI_CHANNEL_MAP_34
         elif keyword == "NIMS":
-            channel_map = DEFAULT_CHANNEL_MAP
+            channel_map = CHANNEL_MAPS["default"]
         elif keyword == "PHOENIX123":
             channel_map = PHOENIX_CHANNEL_MAP_123
         else:

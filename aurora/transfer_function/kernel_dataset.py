@@ -42,8 +42,7 @@ c) restrict start/end times of the local runs so that they DO intersect with rem
 8. This is now a TFKernel Dataset Definition (ish).  Initialize a default
 processing object and pass it this df:
 cc = ConfigCreator(config_path=CONFIG_PATH)
-p = cc.create_run_processing_object(emtf_band_file=emtf_band_setup_file)
-p.stations.from_dataset_dataframe(dd_df)
+p = cc.create_from_kernel_dataset(kernel_dataset, emtf_band_file=emtf_band_setup_file)
 9. Edit the Processing appropriately,
 
 """
