@@ -148,9 +148,6 @@ class Processing(Base):
         """
         Placeholder function that will be needed to address issue #150
 
-        Creating a separate method so that we dont need to same logic repeated in
-        both create_from_kernel_dataset and create_run_processing_object.
-
         Parameters
         ----------
         emtf_band_file
