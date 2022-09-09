@@ -100,7 +100,7 @@ class ConfigCreator:
         """
 
         processing_id = self.processing_id(kernel_dataset)
-        processing_obj = Processing(id=processing_id, **kwargs)
+        processing_obj = Processing(id=processing_id)  # , **kwargs)
 
         # pack station and run info into processing object
         processing_obj.stations.from_dataset_dataframe(kernel_dataset.df)
