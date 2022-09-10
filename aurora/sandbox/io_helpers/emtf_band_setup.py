@@ -75,8 +75,8 @@ class EMTFBandSetupFile:
 
         """
         band_edges = {}
-        lower_edges = pd.Series(index=self.df.index)
-        upper_edges = pd.Series(index=self.df.index)
+        lower_edges = pd.Series(index=self.df.index, dtype="float64")
+        upper_edges = pd.Series(index=self.df.index, dtype="float64")
         if not self.sample_rate:
             print("cannot define frequencies of sample rate undefined")
             raise Exception

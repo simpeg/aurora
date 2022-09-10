@@ -158,6 +158,9 @@ def configure_frequency_bands(config):
 
 def df_from_bands(band_list):
     """
+    This is just a utility function that transforms a list of bands into a dataframe
+    ToDo: Mkae this a method of Bands()
+
     Note: The decimation_level here is +1 to agree with EMTF convention.
     Not clear this is really necessary
 
@@ -173,7 +176,13 @@ def df_from_bands(band_list):
     """
     import pandas as pd
 
-    df_columns = ["decimation_level", "lower_bound_index", "upper_bound_index"]
+    df_columns = [
+        "decimation_level",
+        "lower_bound_index",
+        "upper_bound_index",
+        "frequency_min",
+        "frequency_max",
+    ]
     n_rows = len(band_list)
     df_columns_dict = {}
     for col in df_columns:
@@ -182,6 +191,8 @@ def df_from_bands(band_list):
         df_columns_dict["decimation_level"][i_band] = band.decimation_level + 1
         df_columns_dict["lower_bound_index"][i_band] = band.index_min
         df_columns_dict["upper_bound_index"][i_band] = band.index_max
+        df_columns_dict["frequency_min"][i_band] = band.frequency_min
+        df_columns_dict["frequency_max"][i_band] = band.frequency_max
     out_df = pd.DataFrame(data=df_columns_dict)
     out_df.sort_values(by="lower_bound_index", inplace=True)
     return out_df

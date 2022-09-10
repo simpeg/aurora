@@ -165,6 +165,10 @@ class FrequencyBands(object):
     Context: A band is an Interval().
     FrequencyBands can be represented as an IntervalSet()
 
+    The core underlying variable is "band_edges", which is a 2D array, with one row
+    per frequency band and two columns, one for the left-hand (lower bound) of the
+    frequency band and one for the right-hand (upper bound).
+
     Using a single "band_edges" array of fenceposts is not a general solution. There
     is no reason to force the bands to be adjacent.  Therefore, will stop supporting
     band_edges 1-D array.  band_edges will need to be a 2d array.  n_bands, 2
@@ -198,8 +202,6 @@ class FrequencyBands(object):
         """
         self.gates = None
         self.band_edges = kwargs.get("band_edges", None)
-        # self.bands = OrderedDict()
-        # frequencies ... can repeat (log spacing)
 
     @property
     def number_of_bands(self):
@@ -341,6 +343,20 @@ class FrequencyBands(object):
     def from_emtf_band_df(
         self, emtf_band_df, decimation_level, sample_rate, num_samples_window
     ):
+        """
+        There is some duplication of calculation here ... this definition of edges
+        from emtf_band_df is also done in
+        Parameters
+        ----------
+        emtf_band_df
+        decimation_level
+        sample_rate
+        num_samples_window
+
+        Returns
+        -------
+
+        """
         df = sample_rate / (num_samples_window)
         half_df = df / 2.0
         # half_df /=100
