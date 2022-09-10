@@ -152,35 +152,6 @@ class Processing(Base):
             band_edges_dict[i_dec] = decimation.band_edges
         return band_edges_dict
 
-    @deprecated(version="0.0.4", reason="use band_edges method of emtf_band_setup_file")
-    def read_emtf_bands(self, emtf_fn):
-        """
-        Read an emtf style file for defining the bands
-
-        :param emtf_fn: full path to emtf band file
-        :type emtf_fn: string or Path
-
-        """
-
-        emtf_fn = Path(emtf_fn)
-
-        if not emtf_fn.exists():
-            raise IOError(f"Could not find {emtf_fn}")
-
-        for line in emtf_fn.read_text().split("\n")[1:]:
-            if len(line) >= 3:
-                level, low, high = [int(ii.strip()) for ii in line.split()]
-                # python starts from 0
-                level = int(level) - 1
-                band = Band(decimation_level=level, index_min=low, index_max=high)
-                try:
-                    self.decimations_dict[level].add_band(band)
-                except KeyError:
-                    new_level = DecimationLevel()
-                    new_level.decimation.level = int(level)
-                    new_level.add_band(band)
-                    self.add_decimation_level(new_level)
-
     def assign_decimation_level_data_emtf(self, sample_rate):
         """
 

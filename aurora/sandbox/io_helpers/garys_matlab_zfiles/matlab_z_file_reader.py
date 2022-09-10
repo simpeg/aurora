@@ -27,12 +27,21 @@ from aurora.transfer_function.TTFZ import TTFZ
 
 def test_matlab_zfile_reader(make_plot=False):
     """
+    Takes a stored matlab file: "IAK34_struct_zss.mat", reads it in, and packs
+    a z-file from it.
+
+    There is a stored version of the z-file from July 2022 (archived in git in Sept
+    2022) that we assert equality with to pass the test.
+
+    Parameters
+    ----------
+    make_plot: bool
+        Set to True when debugging
 
     Returns
     -------
 
     """
-    print("??")
     CASE = "IAK34ss"  # synthetic"
     bs_file = BANDS_256_29_FILE
     if CASE == "synthetic":
