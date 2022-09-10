@@ -1,3 +1,4 @@
+from deprecated import deprecated
 import numpy as np
 import pandas as pd
 
@@ -35,7 +36,7 @@ class FrequencyBand(pd.Interval):
 
     The best solution I can think of for now incorporates the fact that the
     harmonic frequencies we are going to interact with in digital processing
-    will be a discrete collection, basically fftfreqs, which are separated by df.
+    will be a discrete collection separated by df.
 
     If we are given the context of df (= 1/(N*dt)) wher N is number of
     samples in the original time series and dt is the sample interval,
@@ -287,6 +288,7 @@ class FrequencyBands(object):
             band_centers = 1.0 / band_centers
         return band_centers
 
+    @deprecated
     def from_emtf_band_setup(
         self, filepath, decimation_level, sample_rate, num_samples_window
     ):
@@ -335,6 +337,7 @@ class FrequencyBands(object):
 
         return
 
+    @deprecated
     def from_emtf_band_df(
         self, emtf_band_df, decimation_level, sample_rate, num_samples_window
     ):

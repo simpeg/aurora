@@ -64,6 +64,7 @@ import copy
 import numpy as np
 import xarray as xr
 
+from aurora.time_series.frequency_domain_helpers import get_fft_harmonics
 from aurora.time_series.apodization_window import ApodizationWindow
 
 from aurora.time_series.window_helpers import available_number_of_windows_in_array
@@ -305,8 +306,8 @@ class WindowingScheme(ApodizationWindow):
         return data
 
     def frequency_axis(self, dt):
-        np.fft.fftfreq(self.num_samples_window, d=dt)
-        pass
+        fft_harmonics = get_fft_harmonics(self.num_samples_window, 1.0 / dt)
+        return fft_harmonics
 
     def apply_fft(self, data, spectral_density_correction=True, detrend_type="linear"):
         """
@@ -416,20 +417,12 @@ def fft_xr_ds(dataset, sample_rate, detrend_type=None, prewhitening=None):
     -------
 
     """
-    # TODO:
-    from aurora.time_series.frequency_domain_helpers import get_fft_harmonics
-
-    # TODO: Modify this so that demeaning and detrending
-    # is happening before the application of the tapering
-    # window.  Add a second demean right "
-    # before the FFT
+    # TODO: Modify this so that demeaning and detrending is happening before
+    # application of the tapering window.  Add a second demean right before the FFT
 
     samples_per_window = len(dataset.coords["within-window time"])
     n_fft_harmonics = int(samples_per_window / 2)  # no bin at Nyquist,
     harmonic_frequencies = get_fft_harmonics(samples_per_window, sample_rate)
-    # works for odd and even
-    # harmonic_frequencies = np.fft.fftfreq(samples_per_window, d=1./sample_rate)
-    # harmonic_frequencies = harmonic_frequencies[0:n_fft_harmonics]
 
     # <CORE METHOD>
     output_ds = xr.Dataset()

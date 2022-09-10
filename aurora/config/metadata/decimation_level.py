@@ -15,6 +15,7 @@ from .standards import SCHEMA_FN_PATHS
 
 from . import Window, Decimation, Band, Regression, Estimator
 
+from aurora.time_series.frequency_domain_helpers import get_fft_harmonics
 
 # =============================================================================
 attr_dict = get_schema("decimation_level", SCHEMA_FN_PATHS)
@@ -145,10 +146,7 @@ class DecimationLevel(Base):
 
     @property
     def fft_frequecies(self):
-        freqs = np.fft.fftfreq(
-            self.window.num_samples, 1.0 / self.decimation.sample_rate
-        )
-        freqs = freqs[0 : int(self.window.num_samples / 2)]
+        freqs = get_fft_harmonics(self.window.num_samples, self.decimation.sample_rate)
         return freqs
 
     # def to_stft_config_dict(self):

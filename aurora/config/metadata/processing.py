@@ -7,6 +7,7 @@ Created on Thu Feb 17 14:15:20 2022
 # =============================================================================
 # Imports
 # =============================================================================
+from deprecated import deprecated
 import numpy as np
 from pathlib import Path
 
@@ -144,6 +145,7 @@ class Processing(Base):
 
         self._decimations.append(obj)
 
+    @deprecated(version="0.0.4", reason="use band_edges method of emtf_band_setup_file")
     def read_emtf_bands(self, emtf_fn):
         """
         Read an emtf style file for defining the bands

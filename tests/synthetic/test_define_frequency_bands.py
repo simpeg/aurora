@@ -10,6 +10,12 @@ from aurora.transfer_function.kernel_dataset import KernelDataset
 
 
 def test_can_declare_frequencies_directly_in_config():
+    """
+
+    Returns
+    -------
+
+    """
     # Default Band edges, corresponds to DEFAULT_BANDS_FILE
     band_edges = {}
     band_edges[0] = [
