@@ -154,6 +154,8 @@ class ConfigCreator:
             if num_samples_window is None:
                 default_window = Window()
                 num_samples_window = num_decimations * [default_window.num_samples]
+            elif isinstance(num_samples_window, int):
+                num_samples_window = num_decimations * [num_samples_window]
             # now you can define the frequency bands
             band_edges = emtf_band_setup_file.compute_band_edges(
                 decimation_factors, num_samples_window
