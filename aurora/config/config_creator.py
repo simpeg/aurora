@@ -168,7 +168,9 @@ class ConfigCreator:
             decimation_factors,
             num_samples_window,
         )
-
+        processing_obj.band_specification_style = self.band_specification_style
+        if self.band_specification_style == "EMTF":
+            processing_obj.band_setup_file = str(self._emtf_band_file)
         for key, decimation_obj in processing_obj.decimations_dict.items():
             decimation_obj.input_channels = input_channels
             decimation_obj.output_channels = output_channels
