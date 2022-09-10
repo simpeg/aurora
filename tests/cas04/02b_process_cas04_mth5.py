@@ -157,10 +157,7 @@ def process_station_runs(local_station_id, remote_station_id="", station_runs={}
 
     cc = ConfigCreator()
     cc = ConfigCreator(config_path=CONFIG_PATH)
-    pc = cc.create_run_processing_object(
-        emtf_band_file=BANDS_DEFAULT_FILE, sample_rate=1.0
-    )
-    pc.stations.from_dataset_dataframe(kernel_dataset.df)
+    pc = cc.create_from_kernel_dataset(kernel_dataset)
     pc.validate()
     z_file_name = tmp_station_runs.z_file_name(AURORA_RESULTS_PATH)
     tf_result = process_mth5(
@@ -322,15 +319,11 @@ def process_with_remote(local, remote, band_setup_file="band_setup_emtf_nims.txt
     kernel_dataset.drop_runs_shorter_than(15000)
 
     # Add a method to ensure all samplintg rates are the same
-    sr = kernel_dataset.df.sample_rate.unique()
 
-    cc = ConfigCreator()  # config_path=CONFIG_PATH)
-    band_setup_file = "band_setup_emtf_nims.txt"
-    # band_setup_file = BANDS_DEFAULT_FILE
-    config = cc.create_run_processing_object(
-        emtf_band_file=band_setup_file, sample_rate=sr[0]
+    cc = ConfigCreator()
+    config = cc.create_from_kernel_dataset(
+        kernel_dataset, emtf_band_file=band_setup_file
     )
-    config.stations.from_dataset_dataframe(kernel_dataset.df)
     for decimation in config.decimations:
         decimation.window.type = "hamming"
     show_plot = False

@@ -42,8 +42,7 @@ c) restrict start/end times of the local runs so that they DO intersect with rem
 8. This is now a TFKernel Dataset Definition (ish).  Initialize a default
 processing object and pass it this df:
 cc = ConfigCreator(config_path=CONFIG_PATH)
-p = cc.create_run_processing_object(emtf_band_file=emtf_band_setup_file)
-p.stations.from_dataset_dataframe(dd_df)
+p = cc.create_from_kernel_dataset(kernel_dataset, emtf_band_file=emtf_band_setup_file)
 9. Edit the Processing appropriately,
 
 """
@@ -118,6 +117,21 @@ class KernelDataset:
         return copy.deepcopy(self.df)
 
     def from_run_summary(self, run_summary, local_station_id, remote_station_id=None):
+        """
+
+        Parameters
+        ----------
+        run_summary: aurora.pipelines.run_summary.RunSummary
+            Summary of available data for processing from one or more stations
+        local_station_id: string
+            Label of the station for which an estimate will be computed
+        remote_station_id: string
+            Label of the remote reference station
+
+        Returns
+        -------
+
+        """
         self.local_station_id = local_station_id
         self.remote_station_id = remote_station_id
 
@@ -133,6 +147,9 @@ class KernelDataset:
             df.remote = cond
 
         self.df = df
+        if remote_station_id:
+            self.restrict_run_intervals_to_simultaneous()
+        self._add_duration_column()
 
     @property
     def mini_summary(self):
@@ -142,8 +159,7 @@ class KernelDataset:
     def print_mini_summary(self):
         print(self.mini_summary)
 
-    @property
-    def add_duration(self):
+    def _add_duration_column(self):
         """ """
         timedeltas = self.df.end - self.df.start
         durations = [x.total_seconds() for x in timedeltas]
@@ -151,10 +167,21 @@ class KernelDataset:
         return
 
     def drop_runs_shorter_than(self, duration, units="s"):
+        """
+        This needs to have duration refreshed before hand
+        Parameters
+        ----------
+        duration
+        units
+
+        Returns
+        -------
+
+        """
         if units != "s":
             raise NotImplementedError
         if "duration" not in self.df.columns:
-            self.add_duration
+            self._add_duration_column()
         drop_cond = self.df.duration < duration
         self.df.drop(self.df[drop_cond].index, inplace=True)
         self.df.reset_index(drop=True, inplace=True)
@@ -201,19 +228,17 @@ class KernelDataset:
                 if intervals_overlap(
                     local_row.start, local_row.end, remote_row.start, remote_row.end
                 ):
-                    print(f"OVERLAP {i_local}, {i_remote}")
+                    # print(f"OVERLAP {i_local}, {i_remote}")
                     olap_start, olap_end = overlap(
                         local_row.start, local_row.end, remote_row.start, remote_row.end
                     )
-                    print(
-                        f"{olap_start} -- {olap_end}\n "
-                        f"{(olap_end-olap_start).seconds}s\n\n"
-                    )
+                    # print(
+                    #     f"{olap_start} -- {olap_end}\n "
+                    #     f"{(olap_end-olap_start).seconds}s\n\n"
+                    # )
 
                     local_sub_run = local_row.copy(deep=True)
-                    # local_sub_run.drop("index", inplace=True)
                     remote_sub_run = remote_row.copy(deep=True)
-                    # remote_sub_run.drop("index", inplace=True)
                     local_sub_run.start = olap_start
                     local_sub_run.end = olap_end
                     remote_sub_run.start = olap_start
@@ -221,7 +246,8 @@ class KernelDataset:
                     output_sub_runs.append(local_sub_run)
                     output_sub_runs.append(remote_sub_run)
                 else:
-                    print(f"NOVERLAP {i_local}, {i_remote}")
+                    pass
+                    # print(f"NOVERLAP {i_local}, {i_remote}")
         df = pd.DataFrame(output_sub_runs)
         df = df.reset_index(drop=True)
         self.df = df

@@ -10,6 +10,28 @@
         "example": "0",
 		"default": null
     },
+    "band_specification_style": {
+        "type": "string",
+        "required": false,
+        "style": "controlled vocabulary",
+        "units": null,
+        "description": "describes how bands were sourced",
+        "options": ["EMTF", "band_edges"],
+        "alias": [],
+        "example": "EMTF",
+        "default": null
+    },
+    "band_setup_file": {
+        "type": "string",
+        "required": false,
+        "style": "free form",
+        "units": null,
+        "description": "the band setup file used to define bands",
+        "options": [],
+        "alias": [],
+        "example": "/home/user/bs_test.cfg",
+        "default": null
+    },
 	"id": {
         "type": "string",
         "required": true,

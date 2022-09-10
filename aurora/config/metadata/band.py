@@ -14,6 +14,7 @@ from .standards import SCHEMA_FN_PATHS
 # =============================================================================
 attr_dict = get_schema("band", SCHEMA_FN_PATHS)
 
+
 # =============================================================================
 class Band(Base):
     __doc__ = write_lines(attr_dict)
@@ -23,3 +24,4 @@ class Band(Base):
         super().__init__(attr_dict=attr_dict, **kwargs)
 
     # should add properties to calculate index from frequency and vise-versa
+    # which is pretty much what is in FrequencyBand

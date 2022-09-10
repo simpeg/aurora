@@ -13,32 +13,29 @@ from .standards import SCHEMA_FN_PATHS
 # =============================================================================
 attr_dict = get_schema("channel_nomenclature", SCHEMA_FN_PATHS)
 
-
-DEFAULT_CHANNEL_MAP = {
+CHANNEL_MAPS = {}
+CHANNEL_MAPS["default"] = {
     "hx": "hx",
     "hy": "hy",
     "hz": "hz",
     "ex": "ex",
     "ey": "ey",
 }
-
-LEMI_CHANNEL_MAP_12 = {
+CHANNEL_MAPS["lemi12"] = {
     "hx": "bx",
     "hy": "by",
     "hz": "bz",
     "ex": "e1",
     "ey": "e2",
 }
-
-LEMI_CHANNEL_MAP_34 = {
+CHANNEL_MAPS["lemi34"] = {
     "hx": "bx",
     "hy": "by",
     "hz": "bz",
     "ex": "e3",
     "ey": "e4",
 }
-
-PHOENIX_CHANNEL_MAP_123 = {
+CHANNEL_MAPS["phoenix123"] = {
     "hx": "h1",
     "hy": "h2",
     "hz": "h3",
@@ -105,15 +102,15 @@ class ChannelNomenclature(Base):
 
     def get_channel_map(self, keyword):
         if keyword == "default":
-            channel_map = DEFAULT_CHANNEL_MAP
-        elif keyword == "LEMI12":
-            channel_map = LEMI_CHANNEL_MAP_12
-        elif keyword == "LEMI34":
-            channel_map = LEMI_CHANNEL_MAP_34
-        elif keyword == "NIMS":
-            channel_map = DEFAULT_CHANNEL_MAP
-        elif keyword == "PHOENIX123":
-            channel_map = PHOENIX_CHANNEL_MAP_123
+            channel_map = CHANNEL_MAPS["default"]
+        elif keyword.upper() == "LEMI12":
+            channel_map = CHANNEL_MAPS["lemi12"]
+        elif keyword.upper() == "LEMI34":
+            channel_map = CHANNEL_MAPS["lemi34"]
+        elif keyword.upper() == "NIMS":
+            channel_map = CHANNEL_MAPS["default"]
+        elif keyword.upper() == "PHOENIX123":
+            channel_map = CHANNEL_MAPS["phoenix123"]
         else:
             print(f"whoops mt_system {keyword} unknown")
             raise NotImplementedError

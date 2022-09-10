@@ -11,14 +11,19 @@ def get_fft_harmonics(samples_per_window, sample_rate, one_sided=True):
 
     Parameters
     ----------
-    samples_per_window
-    sample_rate
+    samples_per_window: integer
+        Number of samples in a window that will be Fourier transformed.
+    sample_rate: float
+            Inverse of time step between samples,
+            Samples per second
 
     Returns
     -------
-
+    harmonic_frequencies: numpy array
+        The frequencies that the fft will be computed
     """
     n_fft_harmonics = int(samples_per_window / 2)  # no bin at Nyquist,
-    harmonic_frequencies = np.fft.fftfreq(samples_per_window, d=1.0 / sample_rate)
+    delta_t = 1.0 / sample_rate
+    harmonic_frequencies = np.fft.fftfreq(samples_per_window, d=delta_t)
     harmonic_frequencies = harmonic_frequencies[0:n_fft_harmonics]
     return harmonic_frequencies

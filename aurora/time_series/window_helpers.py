@@ -4,11 +4,10 @@ https://docs.google.com/document/d/1CsRhSLXsRG8HQxM4lKNqVj-V9KA9iUQAvCOtouVzFs0/
 
 
 """
-
 import numpy as np
 from numpy.lib.stride_tricks import as_strided
-import time
 from numba import jit
+import time
 
 
 # Window-to-timeseries relationshp

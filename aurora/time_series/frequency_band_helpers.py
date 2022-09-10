@@ -79,83 +79,16 @@ def frequency_band_edges(
     print(f"bases = {bases}")
     exponents = np.linspace(0, num_bands, num_bands + 1)
     print(f"exponents = {exponents}")
-    fence_posts = f_lower_bound * (bases ** exponents)
+    fence_posts = f_lower_bound * (bases**exponents)
     print(f"fence posts = {fence_posts}")
     return fence_posts
 
 
-def configure_frequency_bands(config):
-    """
-    2022-05-30: This method was never put into production and will need to be
-    modified to use the new Processing class.
-
-    May want to make config a "frequency band config object", but maybe not.
-    For now just using a flat config structure (per decimation level)
-
-    These methods could also be placed under FrequencyBands() class as
-    init_from_emtf()
-    init_from_bounds_array()
-    init_from_default()
-
-
-    Parameters
-    ----------
-    config : aurora.config.metadata.decimation_level.DecimationLevel
-
-        The configuration parameters for setting up the frequency bands.
-
-        If config["band_setup_style"] is "EMTF" this will look for one of
-        Gary's "band_setup" files and parse it.  It will look for
-        config.emtf_band_setup_file.
-
-        Other options would be :
-        1. "band_edges", accepts an array of lower_bound, upper_bound pairs
-        2. "logarithmic range": could accept a lower_bound, and an
-        upper_bound, and a number of bands inbetween., or it could estimate
-        a)lower bound from a rule about the minimum number of cycles needed
-        for an estimate (say 5 or 10)
-        b) upper bound from a Nyquist rule, say 80% f_Nyquist
-
-
-    Returns
-    -------
-    frequency_bands : aurora.time_series.frequency_band.FrequencyBands
-        a fully populated FrequencyBands object with all info needed to do
-        band averaging.
-    """
-    frequency_bands = FrequencyBands()
-    if config["band_setup_style"] == "EMTF":
-        frequency_bands.from_emtf_band_setup(
-            filepath=config.emtf_band_setup_file,
-            sample_rate=config.sample_rate,
-            decimation_level=config.decimation_level_id + 1,
-            num_samples_window=config.num_samples_window,
-        )
-    elif config["band_setup_style"] == "band edges":
-        frequency_bands.band_edges = config["band_edges"]
-        # "Not Yet Supported"
-        raise NotImplementedError
-    elif config["band_setup_style"] == "logarithmic range":
-        lower_bound = config["frequency_bands_lower_bound"]
-        upper_bound = config["frequency_bands_upper_bound"]
-        num_bands = config["num_frequency_bands"]
-        if lower_bound is None:
-            pass
-            # suggest lower_bound from a rule
-        if upper_bound is None:
-            pass
-            # suggest upper_bound from a rule
-        if num_bands is None:
-            pass
-            # suggest based on num_bands per octave or decade
-        # now call logspace(lower, upper, num_bands)
-        raise NotImplementedError
-
-    return frequency_bands
-
-
 def df_from_bands(band_list):
     """
+    This is just a utility function that transforms a list of bands into a dataframe
+    ToDo: Mkae this a method of Bands()
+
     Note: The decimation_level here is +1 to agree with EMTF convention.
     Not clear this is really necessary
 
@@ -171,7 +104,13 @@ def df_from_bands(band_list):
     """
     import pandas as pd
 
-    df_columns = ["decimation_level", "lower_bound_index", "upper_bound_index"]
+    df_columns = [
+        "decimation_level",
+        "lower_bound_index",
+        "upper_bound_index",
+        "frequency_min",
+        "frequency_max",
+    ]
     n_rows = len(band_list)
     df_columns_dict = {}
     for col in df_columns:
@@ -180,6 +119,8 @@ def df_from_bands(band_list):
         df_columns_dict["decimation_level"][i_band] = band.decimation_level + 1
         df_columns_dict["lower_bound_index"][i_band] = band.index_min
         df_columns_dict["upper_bound_index"][i_band] = band.index_max
+        df_columns_dict["frequency_min"][i_band] = band.frequency_min
+        df_columns_dict["frequency_max"][i_band] = band.frequency_max
     out_df = pd.DataFrame(data=df_columns_dict)
     out_df.sort_values(by="lower_bound_index", inplace=True)
     return out_df

@@ -7,9 +7,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.io as sio
 
+
 from aurora.config.metadata.decimation_level import DecimationLevel
 from aurora.config.metadata.processing import Processing
-from aurora.general_helper_functions import BAND_SETUP_PATH
+from aurora.config.emtf_band_setup import BANDS_256_29_FILE
+from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.time_series.frequency_band import FrequencyBands
 from aurora.transfer_function.emtf_z_file_helpers import clip_bands_from_z_file
@@ -23,10 +25,25 @@ from aurora.transfer_function.transfer_function_collection import (
 from aurora.transfer_function.TTFZ import TTFZ
 
 
-def test_matlab_zfile_reader():
-    print("??")
+def test_matlab_zfile_reader(make_plot=False):
+    """
+    Takes a stored matlab file: "IAK34_struct_zss.mat", reads it in, and packs
+    a z-file from it.
+
+    There is a stored version of the z-file from July 2022 (archived in git in Sept
+    2022) that we assert equality with to pass the test.
+
+    Parameters
+    ----------
+    make_plot: bool
+        Set to True when debugging
+
+    Returns
+    -------
+
+    """
     CASE = "IAK34ss"  # synthetic"
-    bs_file = BAND_SETUP_PATH.joinpath("bs_256.cfg")
+    bs_file = BANDS_256_29_FILE
     if CASE == "synthetic":
         n_periods_clip = 3  # for synthetic case
         z_mat = "TS1zss20210831.mat"
@@ -41,14 +58,14 @@ def test_matlab_zfile_reader():
     tf_dict = {}
 
     p = Processing()
+    emtf_band_setup = EMTFBandSetupFile(filepath=bs_file, sample_rate=sample_rate)
+    num_samples_window = 256
+    band_edges = emtf_band_setup.compute_band_edges(
+        decimation_factors=[1, 4, 4, 4], num_samples_window=4 * [num_samples_window]
+    )
     for i_dec in range(4):
-        frequency_bands = FrequencyBands()
-        frequency_bands.from_emtf_band_setup(
-            filepath=bs_file,
-            sample_rate=sample_rate,
-            decimation_level=i_dec + 1,
-            num_samples_window=256,
-        )
+        edges = np.flipud(band_edges[i_dec])
+        frequency_bands = FrequencyBands(band_edges=edges)
         transfer_function_header = TransferFunctionHeader(
             processing_scheme="RME",
             local_station_id="test1",
@@ -65,7 +82,7 @@ def test_matlab_zfile_reader():
 
         dec_level_cfg = DecimationLevel()
         dec_level_cfg.decimation.sample_rate = sample_rate
-        dec_level_cfg.window.num_samples = 256
+        dec_level_cfg.window.num_samples = num_samples_window
         p.add_decimation_level(dec_level_cfg)
         tf_obj.processing_config = p
 
@@ -134,49 +151,58 @@ def test_matlab_zfile_reader():
     if n_periods_clip:
         clip_bands_from_z_file(z_file_path, n_periods_clip, n_sensors=5)
 
+    archived_z_file_path = "archived_from_matlab.zss"
+
     zfile = read_z_file(z_file_path)
+    archived_zfile = read_z_file(archived_z_file_path)
 
     zfile.apparent_resistivity(angle=0)
+    archived_zfile.apparent_resistivity(angle=0)
+    assert (zfile.rxy == archived_zfile.rxy).all()
+    assert (zfile.ryx == archived_zfile.ryx).all()
+    assert (zfile.pxy == archived_zfile.pxy).all()
+    assert (zfile.pyx == archived_zfile.pyx).all()
 
-    scl = 1.0
-    fig, axs = plt.subplots(nrows=2, figsize=(11, 8.5), dpi=300, sharex=True)
-    markersize = 1
-    plot_rho(
-        axs[0],
-        zfile.periods,
-        zfile.rxy * scl,
-        label="rxy",
-        markersize=markersize,
-        color="red",
-    )
-    plot_rho(
-        axs[0],
-        zfile.periods,
-        zfile.ryx * scl,
-        label="ryx",
-        markersize=markersize,
-        color="blue",
-    )
-    axs[0].legend()
-    plot_phi(
-        axs[1],
-        zfile.periods,
-        zfile.pxy,
-        label="pxy",
-        markersize=markersize,
-        color="red",
-    )
-    plot_phi(
-        axs[1],
-        zfile.periods,
-        zfile.pyx,
-        label="pyx",
-        markersize=markersize,
-        color="blue",
-    )
-    axs[0].set_ylim(1, 1000)
-    axs[0].set_xlim(1, 10000)
-    plt.show()
+    if make_plot:
+        scl = 1.0
+        fig, axs = plt.subplots(nrows=2, figsize=(11, 8.5), dpi=300, sharex=True)
+        markersize = 1
+        plot_rho(
+            axs[0],
+            zfile.periods,
+            zfile.rxy * scl,
+            label="rxy",
+            markersize=markersize,
+            color="red",
+        )
+        plot_rho(
+            axs[0],
+            zfile.periods,
+            zfile.ryx * scl,
+            label="ryx",
+            markersize=markersize,
+            color="blue",
+        )
+        axs[0].legend()
+        plot_phi(
+            axs[1],
+            zfile.periods,
+            zfile.pxy,
+            label="pxy",
+            markersize=markersize,
+            color="red",
+        )
+        plot_phi(
+            axs[1],
+            zfile.periods,
+            zfile.pyx,
+            label="pyx",
+            markersize=markersize,
+            color="blue",
+        )
+        axs[0].set_ylim(1, 1000)
+        axs[0].set_xlim(1, 10000)
+        plt.show()
     print("success!")
 
 

@@ -87,6 +87,8 @@ def coherence_weights_v00(x, y, threshold=0.95):  # 975):#0.98
 
 def compute_coherence_weights(X, Y, RR, coh_type="local"):
     """
+    2022-09-09: This method is not yet supported.  It needs to be made
+    tolerant of channel_nomenclature.
 
     Parameters
     ----------

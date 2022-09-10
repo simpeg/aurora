@@ -14,6 +14,7 @@ import xarray as xr
 
 from pathlib import Path
 
+from aurora.time_series.frequency_domain_helpers import get_fft_harmonics
 from aurora.transfer_function.emtf_z_file_helpers import (
     make_orientation_block_of_z_file,
 )
@@ -323,7 +324,7 @@ class TransferFunctionCollection(object):
 
                 sample_rate = dec_level_config.decimation.sample_rate
                 num_samples_window = dec_level_config.window.num_samples
-                freqs = np.fft.fftfreq(num_samples_window, 1.0 / sample_rate)
+                freqs = get_fft_harmonics(num_samples_window, sample_rate)
                 fc_indices = band.fourier_coefficient_indices(freqs)
                 fc_indices_str = f"{fc_indices[0]} to   {fc_indices[-1]}"
                 line1 += f"freq. band from   {fc_indices_str}\n"

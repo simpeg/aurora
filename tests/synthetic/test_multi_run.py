@@ -26,13 +26,9 @@ def test_each_run_individually():
         ]
         keep_or_drop = "keep"
         kernel_dataset.select_station_runs(station_runs_dict, keep_or_drop)
-        print(kernel_dataset.df)
         cc = ConfigCreator()
-        sample_rate = kernel_dataset.df.sample_rate.iloc[0]
-        config = cc.create_run_processing_object(
-            emtf_band_file=BANDS_DEFAULT_FILE, sample_rate=sample_rate
-        )
-        config.stations.from_dataset_dataframe(kernel_dataset.df)
+        config = cc.create_from_kernel_dataset(kernel_dataset)
+
         for decimation in config.decimations:
             decimation.estimator.engine = "RME"
         show_plot = False  # True
@@ -62,13 +58,8 @@ def test_all_runs():
     kernel_dataset = KernelDataset()
     kernel_dataset.from_run_summary(run_summary, "test3")
     cc = ConfigCreator()
-    sample_rate = kernel_dataset.df.sample_rate.iloc[0]
-    config = cc.create_run_processing_object(
-        emtf_band_file=BANDS_DEFAULT_FILE, sample_rate=sample_rate
-    )
-    config.stations.from_dataset_dataframe(kernel_dataset.df)
-    for decimation in config.decimations:
-        decimation.estimator.engine = "RME"
+    config = cc.create_from_kernel_dataset(kernel_dataset, estimator={"engine": "RME"})
+
     show_plot = False  # True
     z_file_path = AURORA_RESULTS_PATH.joinpath("syn3_all.zss")
     tf_cls = process_mth5(

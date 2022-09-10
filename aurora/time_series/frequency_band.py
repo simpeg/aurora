@@ -35,7 +35,7 @@ class FrequencyBand(pd.Interval):
 
     The best solution I can think of for now incorporates the fact that the
     harmonic frequencies we are going to interact with in digital processing
-    will be a discrete collection, basically fftfreqs, which are separated by df.
+    will be a discrete collection separated by df.
 
     If we are given the context of df (= 1/(N*dt)) wher N is number of
     samples in the original time series and dt is the sample interval,
@@ -158,19 +158,18 @@ class FrequencyBand(pd.Interval):
 
 class FrequencyBands(object):
     """
-    Use this as the core element for BandAveragingScheme
     This is just collection of frequency bands objects.
-
     If there was no decimation, this would basically be the BandAveragingScheme
-    How does it differ from a bandaveraging scheme?
-    It doesn't support Decimation levels.
 
     Context: A band is an Interval().
     FrequencyBands can be represented as an IntervalSet()
 
-    20210617: Unforunately, using a single "band_edges" array of fenceposts
-    is not a general solution.  There is no reason to force the user to have
-    bands that abutt one another.  Therefore, changing to stop supporting
+    The core underlying variable is "band_edges", which is a 2D array, with one row
+    per frequency band and two columns, one for the left-hand (lower bound) of the
+    frequency band and one for the right-hand (upper bound).
+
+    Using a single "band_edges" array of fenceposts is not a general solution. There
+    is no reason to force the bands to be adjacent.  Therefore, will stop supporting
     band_edges 1-D array.  band_edges will need to be a 2d array.  n_bands, 2
 
     20210720: In fact, it would be more general, and explicit to pass a
@@ -178,17 +177,13 @@ class FrequencyBands(object):
     other ways to populate this class, for example by passing it frequency_band
     objects, self.append(frequency_band).  However, that opens the door for
     overlapping frequency bands which in general are not well ordered without
-    choosing an order operation (band center would be a good one - but then
-    we may have non-unique band centers!)  However, this should be quite
-    rare, and I am not actually sure it is possible to get the same center
-    frequency if we are using logarithmic band centers.  The only issue with
-    an append method is that after we append a band, we will need to perform
-    an ordering/sorting on individual band edges.
+    choosing an order operation (band center would be a good one - but caution here,
+    band centers may not be unique!)  However, that should be extremely rare.  The
+    only issue with an append method is that after we append a band, we will need to
+    perform an ordering/sorting on individual band edges.
 
-
-    To add complexity, another use
-    case maybe that we wish to support bands with gaps at certain harmonics,
-    the way this is currently set up, all harmonics between the lower_bound
+    To add complexity, another use case maybe to support bands with gaps at certain
+    harmonics, the way this is currently set up, all harmonics between the lower_bound
     and the upper bounds are considered to be part of the band, but if we
     have a known "bad harmonic" or several noisy harmoincs within a band
     there is currently no way using somple FrequencyBand objects that we can
@@ -206,8 +201,6 @@ class FrequencyBands(object):
         """
         self.gates = None
         self.band_edges = kwargs.get("band_edges", None)
-        # self.bands = OrderedDict()
-        # frequencies ... can repeat (log spacing)
 
     @property
     def number_of_bands(self):
@@ -257,14 +250,15 @@ class FrequencyBands(object):
 
     def band(self, i_band):
         """
-        Decide to index bands from zero or one, i.e.  Choosing 0 for now.
+        ToDO: Decide whether to index bands from zero or one, i.e.  Choosing 0 for now.
+
         Parameters
         ----------
         i_band: integer key for band
 
         Returns
         -------
-
+        frequency_band: FrequencyBand() object
         """
         frequency_band = FrequencyBand(
             self.band_edges[i_band, 0],
@@ -294,67 +288,6 @@ class FrequencyBands(object):
         if frequency_or_period == "period":
             band_centers = 1.0 / band_centers
         return band_centers
-
-    def from_emtf_band_setup(
-        self, filepath, decimation_level, sample_rate, num_samples_window
-    ):
-        """
-        This converts between EMTF band_setup files to a frequency_bands object.
-        The band_setup file is represented as a dataframe with
-        columns for decimation_level, first_fc_index,
-        last_fc_index.
-
-        Notes:
-        1. In EMTF, the the DC terms were not carried in the FC Files so the
-        integer-index 1 mapped to the first harmonic.  In aurora, the DC-term is
-        kept (for now) and thus, because the fortran arrays index from 1, and
-        python from 0, we don't need any modification to the Fourier coefficient
-        indices here.If we wind up dropping the DC term from the STFT arrays we
-        would need to add -1 to the upper and lower bound indices.
-        2. EMTF band-setup files do not contain information about frequency.
-        Frequecny was implicit in the processing scheme but not stated.  This
-        leaves some ambuguity when reading in files with names like
-        "bs_256.txt".  Does 256 refer to the number of taps in the STFT
-        window, or to the number of positive frequencies (and the window was
-        512-length).  Personal communication with Egbert 2021-06-22 indicates
-        that normally the integer number in a band-setup file name associates with
-        the time-domain window length.
-
-
-        Parameters
-        ----------
-        filepath : str or pathlib.Path()
-            The full path to the band_setup file
-        decimation_level : integer
-            Corresponds to the decimation level from the band setup file to
-            create FrequecyBands from.
-        sample_rate : float
-            The sampling rate of the data at decimation_level
-
-        Returns
-        -------
-
-        """
-        emtf_band_setup = EMTFBandSetupFile(filepath=filepath)
-        emtf_band_df = emtf_band_setup.get_decimation_level(decimation_level)
-        self.from_emtf_band_df(
-            emtf_band_df, decimation_level, sample_rate, num_samples_window
-        )
-
-        return
-
-    def from_emtf_band_df(
-        self, emtf_band_df, decimation_level, sample_rate, num_samples_window
-    ):
-        df = sample_rate / (num_samples_window)
-        half_df = df / 2.0
-        # half_df /=100
-        lower_edges = (emtf_band_df.lower_bound_index * df) - half_df
-        upper_edges = (emtf_band_df.upper_bound_index * df) + half_df
-        band_edges = np.vstack((lower_edges.values, upper_edges.values)).T
-        self.band_edges = band_edges
-
-        return
 
     def from_decimation_object(self, decimation_object):
         """

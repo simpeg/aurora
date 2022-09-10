@@ -19,7 +19,7 @@
         "options": [],
         "alias": [],
         "example": "10",
-		"default": 5
+		"default": 0
     },
     "index_min": {
         "type": "integer",
@@ -30,28 +30,28 @@
         "options": [],
         "alias": [],
         "example": "10",
-		"default": 5
+		"default": 0
     },
     "frequency_max": {
-        "type": "integer",
+        "type": "float",
         "required": true,
         "style": "number",
-        "units": "samples per second",
+        "units": "Hertz",
         "description": "maximum band frequency",
         "options": [],
         "alias": [],
-        "example": "10",
-		"default": 0
+        "example": "0.04296875",
+		"default": 0.0
     },
     "frequency_min": {
-        "type": "integer",
+        "type": "float",
         "required": true,
         "style": "number",
-        "units": "samples per second",
+        "units": "Hertz",
         "description": "minimum band frequency",
         "options": [],
         "alias": [],
-        "example": "10",
-		"default": 0
+        "example": "0.03515625",
+		"default": 0.0
     }
 }
