@@ -144,6 +144,14 @@ class DecimationLevel(Base):
         bands_df = df_from_bands(self.bands)
         return bands_df
 
+    @property
+    def band_edges(self):
+        bands_df = self.bands_dataframe
+        band_edges = np.vstack(
+            (bands_df.frequency_min.values, bands_df.frequency_max.values)
+        ).T
+        return band_edges
+
     def frequency_bands_obj(self):
         """
         Gets a FrequencyBands object that is used as input to processing.
@@ -156,11 +164,7 @@ class DecimationLevel(Base):
         """
         from aurora.time_series.frequency_band import FrequencyBands
 
-        bands_df = self.bands_dataframe
-        band_edges = np.vstack(
-            (bands_df.frequency_min.values, bands_df.frequency_max.values)
-        ).T
-        frequency_bands = FrequencyBands(band_edges=band_edges)
+        frequency_bands = FrequencyBands(band_edges=self.band_edges)
         return frequency_bands
 
     @property

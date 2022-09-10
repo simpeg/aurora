@@ -145,6 +145,13 @@ class Processing(Base):
 
         self._decimations.append(obj)
 
+    @property
+    def band_edges_dict(self):
+        band_edges_dict = {}
+        for i_dec, decimation in enumerate(self.decimations):
+            band_edges_dict[i_dec] = decimation.band_edges
+        return band_edges_dict
+
     @deprecated(version="0.0.4", reason="use band_edges method of emtf_band_setup_file")
     def read_emtf_bands(self, emtf_fn):
         """

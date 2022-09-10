@@ -16,44 +16,6 @@ def test_can_declare_frequencies_directly_in_config():
     -------
 
     """
-    # Default Band edges, corresponds to DEFAULT_BANDS_FILE
-    band_edges = {}
-    band_edges[0] = [
-        [0.03515625, 0.04296875],
-        [0.04296875, 0.05859375],
-        [0.05859375, 0.07421875],
-        [0.07421875, 0.09765625],
-        [0.09765625, 0.12109375],
-        [0.12109375, 0.15234375],
-        [0.15234375, 0.19140625],
-        [0.19140625, 0.23828125],
-    ]
-
-    band_edges[1] = [
-        [0.00878906, 0.01074219],
-        [0.01074219, 0.01269531],
-        [0.01269531, 0.01660156],
-        [0.01660156, 0.02050781],
-        [0.02050781, 0.02636719],
-        [0.02636719, 0.03417969],
-    ]
-
-    band_edges[2] = [
-        [0.00219727, 0.00268555],
-        [0.00268555, 0.00317383],
-        [0.00317383, 0.00415039],
-        [0.00415039, 0.00512695],
-        [0.00512695, 0.0065918],
-        [0.0065918, 0.00854492],
-    ]
-
-    band_edges[3] = [
-        [0.00054932, 0.00079346],
-        [0.00079346, 0.00115967],
-        [0.00115967, 0.00164795],
-        [0.00164795, 0.00213623],
-        [0.00213623, 0.00274658],
-    ]
     decimation_factors = [1, 4, 4, 4]
 
     file_base = "test1.h5"
@@ -75,6 +37,8 @@ def test_can_declare_frequencies_directly_in_config():
     cc = ConfigCreator()
     cfg1 = cc.create_from_kernel_dataset(kernel_dataset, estimator={"engine": "RME"})
 
+    # Default Band edges, corresponds to DEFAULT_BANDS_FILE
+    band_edges = cfg1.band_edges_dict
     cfg2 = cc.create_from_kernel_dataset(
         kernel_dataset,
         estimator={"engine": "RME"},
@@ -87,7 +51,6 @@ def test_can_declare_frequencies_directly_in_config():
     tf_cls1.write_tf_file(fn="cfg1.xml", file_type="emtfxml")
     tf_cls2 = process_mth5(cfg2, kernel_dataset)
     tf_cls2.write_tf_file(fn="cfg2.xml", file_type="emtfxml")
-    # OK, Now we need a way to assert equality between these tfs
     assert tf_cls2 == tf_cls1
 
 
