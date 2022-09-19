@@ -80,6 +80,22 @@ def assert_rms_misfit_ok(
     expected_rms_phi = expected_rms_misfit["phi"][xy_or_yx]
     print(f"expected_rms_rho_{xy_or_yx} {expected_rms_rho}")
     print(f"expected_rms_phi_{xy_or_yx} {expected_rms_phi}")
-    assert np.isclose(rho_rms_aurora - expected_rms_rho, 0, atol=rho_tol)
-    assert np.isclose(phi_rms_aurora - expected_rms_phi, 0, atol=phi_tol)
+    if not np.isclose(rho_rms_aurora - expected_rms_rho, 0, atol=rho_tol):
+        print("==== AURORA ====\n")
+        print(rho_rms_aurora)
+        print("==== EXPECTED ====\n")
+        print(expected_rms_rho)
+        print("==== DIFFERENCE ====\n")
+        print(rho_rms_aurora - expected_rms_rho)
+        raise AssertionError("Expected misfit for resistivity is not correct")
+        
+    if not np.isclose(phi_rms_aurora - expected_rms_phi, 0, atol=rho_tol):
+        print("==== AURORA ====\n")
+        print(phi_rms_aurora)
+        print("==== EXPECTED ====\n")
+        print(expected_rms_phi)
+        print("==== DIFFERENCE ====\n")
+        print(phi_rms_aurora - expected_rms_phi)
+        raise AssertionError("Expected misfit for phase is not correct")
+
     return
