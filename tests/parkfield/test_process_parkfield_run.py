@@ -13,7 +13,9 @@ from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 from make_parkfield_mth5 import test_make_parkfield_mth5
 
 
-def test_processing(return_collection=False, z_file_path=None, test_clock_zero=False):
+def test_processing(
+    return_collection=False, z_file_path=None, test_clock_zero=False
+):
     """
     Parameters
     ----------
@@ -47,7 +49,9 @@ def test_processing(return_collection=False, z_file_path=None, test_clock_zero=F
     tfk_dataset.from_run_summary(run_summary, "PKD")
 
     cc = ConfigCreator(config_path=CONFIG_PATH)
-    config = cc.create_from_kernel_dataset(tfk_dataset, estimator={"engine": "RME"})
+    config = cc.create_from_kernel_dataset(
+        tfk_dataset, estimator={"engine": "RME"}
+    )
 
     if test_clock_zero:
         for dec_lvl_cfg in config.decimations:
@@ -74,6 +78,11 @@ def test_processing(return_collection=False, z_file_path=None, test_clock_zero=F
 
 
 def test():
+    import logging
+
+    logging.getLogger("matplotlib.font_manager").disabled = True
+    logging.getLogger("matplotlib.ticker").disabled = True
+
     z_file_path = AURORA_RESULTS_PATH.joinpath("pkd.zss")
     test_processing(return_collection=True, z_file_path=z_file_path)
     test_processing(

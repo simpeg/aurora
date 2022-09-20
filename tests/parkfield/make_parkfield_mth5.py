@@ -7,7 +7,10 @@ dataset_id
 """
 from aurora.test_utils.dataset_definitions import TEST_DATA_SET_CONFIGS
 from mth5.utils.helpers import read_back_data
-from aurora.sandbox.io_helpers.make_mth5_helpers import create_from_server_multistation
+from mth5.helpers import close_open_files
+from aurora.sandbox.io_helpers.make_mth5_helpers import (
+    create_from_server_multistation,
+)
 from aurora.test_utils.parkfield.path_helpers import DATA_PATH
 
 # create_from_server DEPRECATED 2021-09-18
@@ -54,6 +57,8 @@ from aurora.test_utils.parkfield.path_helpers import DATA_PATH
 
 
 def test_make_parkfield_mth5():
+    close_open_files()
+
     dataset_id = "pkd_test_00"
     dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
     create_from_server_multistation(
@@ -67,6 +72,8 @@ def test_make_parkfield_mth5():
 
 
 def test_make_parkfield_hollister_mth5():
+    close_open_files()
+
     dataset_id = "pkd_sao_test_00"
     dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
     create_from_server_multistation(

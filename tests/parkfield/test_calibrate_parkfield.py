@@ -1,11 +1,15 @@
 from aurora.general_helper_functions import TEST_PATH
 from aurora.time_series.windowing_scheme import WindowingScheme
 from mth5.mth5 import MTH5
-from aurora.test_utils.parkfield.calibration_helpers import parkfield_sanity_check
+from aurora.test_utils.parkfield.calibration_helpers import (
+    parkfield_sanity_check,
+)
 from aurora.test_utils.parkfield.path_helpers import AURORA_RESULTS_PATH
 
 
-def validate_bulk_spectra_have_correct_units(run_obj, run_ts_obj, show_spectra=False):
+def validate_bulk_spectra_have_correct_units(
+    run_obj, run_ts_obj, show_spectra=False
+):
     """
 
     Parameters
@@ -62,9 +66,16 @@ def validate_bulk_spectra_have_correct_units(run_obj, run_ts_obj, show_spectra=F
 
 
 def test():
+    import logging
+
+    logging.getLogger("matplotlib.font_manager").disabled = True
+    logging.getLogger("matplotlib.ticker").disabled = True
+
     run_id = "001"
     station_id = "PKD"
-    parkfield_h5_path = TEST_PATH.joinpath("parkfield", "data", "pkd_test_00.h5")
+    parkfield_h5_path = TEST_PATH.joinpath(
+        "parkfield", "data", "pkd_test_00.h5"
+    )
     if not parkfield_h5_path.exists():
         from make_parkfield_mth5 import test_make_parkfield_mth5
 
@@ -74,7 +85,10 @@ def test():
     m.open_mth5(parkfield_h5_path, mode="r")
     run_obj = m.get_run(station_id, run_id)
     run_ts_obj = run_obj.to_runts()
-    validate_bulk_spectra_have_correct_units(run_obj, run_ts_obj, show_spectra=True)
+    validate_bulk_spectra_have_correct_units(
+        run_obj, run_ts_obj, show_spectra=True
+    )
+    m.close_mth5()
 
 
 def main():

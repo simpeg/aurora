@@ -4,7 +4,9 @@ from aurora.config.config_creator import ConfigCreator
 
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
-from aurora.sandbox.mth5_channel_summary_helpers import channel_summary_to_make_mth5
+from aurora.sandbox.mth5_channel_summary_helpers import (
+    channel_summary_to_make_mth5,
+)
 from aurora.test_utils.parkfield.path_helpers import AURORA_RESULTS_PATH
 from aurora.test_utils.parkfield.path_helpers import CONFIG_PATH
 from aurora.test_utils.parkfield.path_helpers import DATA_PATH
@@ -88,6 +90,13 @@ def test_processing(z_file_path=None):
 
 
 def main():
+
+    import logging
+    from mth5.helpers import close_open_files
+
+    logging.getLogger("matplotlib.font_manager").disabled = True
+    logging.getLogger("matplotlib.ticker").disabled = True
+
     test_stuff_that_belongs_elsewhere()
     z_file_path = AURORA_RESULTS_PATH.joinpath("pkd.zrr")
     test_processing(z_file_path=z_file_path)
@@ -105,6 +114,8 @@ def main():
         rho_ylims=[1e0, 1e3],
         xlims=[0.05, 500],
     )
+
+    close_open_files()
 
 
 if __name__ == "__main__":
