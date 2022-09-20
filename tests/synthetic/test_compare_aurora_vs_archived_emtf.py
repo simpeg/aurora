@@ -19,6 +19,7 @@ from aurora.transfer_function.emtf_z_file_helpers import (
 )
 from aurora.transfer_function.kernel_dataset import KernelDataset
 from plot_helpers_synthetic import plot_rho_phi
+from mth5.helpers import close_open_files
 
 
 def aurora_vs_emtf(
@@ -195,6 +196,8 @@ def test_pipeline(merged=True):
     -------
 
     """
+    close_open_files()
+
     mth5_paths = make_mth5s(merged=merged)
     run_summary = RunSummary()
     run_summary.from_mth5s(mth5_paths)

@@ -17,6 +17,7 @@ from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 from make_parkfield_mth5 import test_make_parkfield_hollister_mth5
 
 from mth5.mth5 import MTH5
+from mth5.helpers import close_open_files
 
 
 def test_stuff_that_belongs_elsewhere():
@@ -29,6 +30,7 @@ def test_stuff_that_belongs_elsewhere():
     -------
 
     """
+    close_open_files()
     mth5_path = DATA_PATH.joinpath("pkd_sao_test_00.h5")
 
     # Ensure there is an mth5 to process
@@ -55,6 +57,7 @@ def test_processing(z_file_path=None):
     tf_cls: TF object mt_metadata.transfer_functions.core.TF
     """
 
+    close_open_files()
     mth5_path = DATA_PATH.joinpath("pkd_sao_test_00.h5")
 
     # Ensure there is an mth5 to process
