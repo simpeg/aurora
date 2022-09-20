@@ -14,6 +14,7 @@ from aurora.test_utils.synthetic.processing_helpers import (
     process_synthetic_data,
 )
 from aurora.transfer_function.kernel_dataset import KernelDataset
+from mth5.helpers import close_open_files
 
 
 # =============================================================================
@@ -28,6 +29,7 @@ class TestSyntheticProcessing(unittest.TestCase):
     """
 
     def setUp(self):
+        close_open_files()
         self.file_version = "0.1.0"
         logging.getLogger("matplotlib.font_manager").disabled = True
         logging.getLogger("matplotlib.ticker").disabled = True

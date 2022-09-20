@@ -5,9 +5,12 @@ from aurora.pipelines.run_summary import RunSummary
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test3_h5
 from aurora.test_utils.synthetic.paths import AURORA_RESULTS_PATH
 from aurora.transfer_function.kernel_dataset import KernelDataset
+from mth5.helpers import close_open_files
 
 
 def test_each_run_individually():
+    close_open_files()
+
     mth5_path = create_test3_h5()
     run_summary = RunSummary()
     run_summary.from_mth5s(
@@ -46,6 +49,7 @@ def test_each_run_individually():
 
 
 def test_all_runs():
+    close_open_files()
     mth5_path = create_test3_h5()
     run_summary = RunSummary()
     run_summary.from_mth5s(
@@ -58,12 +62,18 @@ def test_all_runs():
     kernel_dataset = KernelDataset()
     kernel_dataset.from_run_summary(run_summary, "test3")
     cc = ConfigCreator()
-    config = cc.create_from_kernel_dataset(kernel_dataset, estimator={"engine": "RME"})
+    config = cc.create_from_kernel_dataset(
+        kernel_dataset, estimator={"engine": "RME"}
+    )
 
     show_plot = False  # True
     z_file_path = AURORA_RESULTS_PATH.joinpath("syn3_all.zss")
     tf_cls = process_mth5(
-        config, kernel_dataset, units="MT", show_plot=show_plot, z_file_path=z_file_path
+        config,
+        kernel_dataset,
+        units="MT",
+        show_plot=show_plot,
+        z_file_path=z_file_path,
     )
     xml_file_name = AURORA_RESULTS_PATH.joinpath("syn3_all.xml")
     tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
