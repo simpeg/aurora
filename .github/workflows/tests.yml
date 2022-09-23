@@ -44,7 +44,7 @@ jobs:
 
     - name: Run Tests
       run: |
-        pytest -s -v /tests/parkfield/test_process_parkfield_run.py --cov=./ --cov-report=xml --cov=aurora
+        pytest -s -v tests/parkfield/test_process_parkfield_run.py --cov=./ --cov-report=xml --cov=aurora
 
     - name: "Upload coverage to Codecov"
       uses: codecov/codecov-action@v1
