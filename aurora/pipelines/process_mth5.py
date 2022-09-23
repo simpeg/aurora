@@ -301,27 +301,19 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
         # See Note 1 top of module
         # See Note 2 top of module
         for i, row in dataset_df.iterrows():
-            print("GETTING run_xrts")
             run_xrts = row["run_dataarray"].to_dataset("channel")
-            print("HAVE run_xrts")
-            print("INPUT DICT")
             input_dict = {"run": row["run"], "mvts": run_xrts}
-            print("ABOUT TO DECIMATE")
             run_dict = prototype_decimate(config.decimation, input_dict)
-            print("DECIMATED")
             print("PACKING RUN")
             print("HERE is teh dtype of the zero-decimation level run column")
             type(dataset_df.iloc[0].run)
             print("ANd the new one")
+            print(type(run_dict["run"]))
             import pandas as pd
 
             print(pd.__version__)
-            print(type(run_dict["run"]))
             dataset_df["run"].at[i] = run_dict["run"]
-            print("PACKING MVTS")
             dataset_df["run_dataarray"].at[i] = run_dict["mvts"].to_array("channel")
-    print("OK OK OK")
-    print("OK OK OK")
     print("OK OK OK")
     return dataset_df
 

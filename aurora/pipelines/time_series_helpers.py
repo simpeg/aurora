@@ -351,14 +351,7 @@ def prototype_decimate(config, run_run_ts):
     """
     run_obj = run_run_ts["run"]
     run_xrts = run_run_ts["mvts"]
-    print("SR input RUN (to decimate)")
-    print(run_obj.metadata.sample_rate)
     run_obj.metadata.sample_rate = config.sample_rate
-    print("SR after overwrite")
-    print(run_obj.metadata.sample_rate)
-    run_obj.write_metadata()
-    print("SR after write metadata")
-    print(run_obj.metadata.sample_rate)
     slicer = slice(None, None, int(config.factor))  # decimation.factor
     downsampled_time_axis = run_xrts.time.data[slicer]
 

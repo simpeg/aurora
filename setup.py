@@ -18,7 +18,7 @@ requirements = [
     "numpy",
     "numba",
     "obspy",
-    "pandas<1.5.0",
+    "pandas<1.5",
     "scipy",
     "xarray",
     "fortranformat",
