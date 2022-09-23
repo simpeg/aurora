@@ -371,5 +371,8 @@ def prototype_decimate(config, run_run_ts):
 
     xr_ds = xr_da.to_dataset("channel")
     result = {"run": run_obj, "mvts": xr_ds}
-
+    print("RUN OBJECT")
+    print(run_obj)
+    print("XRDS")
+    print(xr_ds)
     return result
