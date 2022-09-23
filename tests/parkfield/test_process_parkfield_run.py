@@ -12,10 +12,10 @@ from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 
 from make_parkfield_mth5 import test_make_parkfield_mth5
 
+from mth5.helpers import close_open_files
 
-def test_processing(
-    return_collection=False, z_file_path=None, test_clock_zero=False
-):
+
+def test_processing(return_collection=False, z_file_path=None, test_clock_zero=False):
     """
     Parameters
     ----------
@@ -32,7 +32,7 @@ def test_processing(
         if  return_collection is False:
         mt_metadata.transfer_functions.core.TF
     """
-
+    close_open_files()
     mth5_path = DATA_PATH.joinpath("pkd_test_00.h5")
 
     # Ensure there is an mth5 to process
@@ -49,9 +49,7 @@ def test_processing(
     tfk_dataset.from_run_summary(run_summary, "PKD")
 
     cc = ConfigCreator(config_path=CONFIG_PATH)
-    config = cc.create_from_kernel_dataset(
-        tfk_dataset, estimator={"engine": "RME"}
-    )
+    config = cc.create_from_kernel_dataset(tfk_dataset, estimator={"engine": "RME"})
 
     if test_clock_zero:
         for dec_lvl_cfg in config.decimations:
