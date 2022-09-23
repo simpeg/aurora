@@ -310,9 +310,13 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
             run_dict = prototype_decimate(config.decimation, input_dict)
             print("DECIMATED")
             print("PACKING RUN")
+            print("HERE is teh dtype of the zero-decimation level run column")
+            type(dataset_df.iloc[0].run)
+            print("ANd the new one")
             import pandas as pd
 
             print(pd.__version__)
+            print(type(run_dict["run"]))
             dataset_df["run"].at[i] = run_dict["run"]
             print("PACKING MVTS")
             dataset_df["run_dataarray"].at[i] = run_dict["mvts"].to_array("channel")
