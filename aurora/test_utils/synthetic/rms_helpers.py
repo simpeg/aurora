@@ -44,10 +44,10 @@ def get_expected_rms_misfit(test_case_id, emtf_version=None):
             expected_rms_misfit["rho"]["yx"] = 3.658614
             expected_rms_misfit["phi"]["yx"] = 0.844645
         elif emtf_version == "matlab":
-            expected_rms_misfit["rho"]["xy"] = 2.713543
-            expected_rms_misfit["phi"]["xy"] = 0.784464
-            expected_rms_misfit["rho"]["yx"] = 3.74120
-            expected_rms_misfit["phi"]["yx"] = 1.375335
+            expected_rms_misfit["rho"]["xy"] = 2.706098
+            expected_rms_misfit["phi"]["xy"] = 0.784228
+            expected_rms_misfit["rho"]["yx"] = 3.745279
+            expected_rms_misfit["phi"]["yx"] = 1.374937
 
     elif test_case_id == "test2r1":
         expected_rms_misfit["rho"]["xy"] = 3.971313
