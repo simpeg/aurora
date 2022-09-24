@@ -92,7 +92,7 @@ def test_processing(z_file_path=None):
     return tf_cls
 
 
-def main():
+def test():
 
     import logging
     from mth5.helpers import close_open_files
@@ -122,4 +122,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    test()
