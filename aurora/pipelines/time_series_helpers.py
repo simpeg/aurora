@@ -352,7 +352,6 @@ def prototype_decimate(config, run_run_ts):
     run_obj = run_run_ts["run"]
     run_xrts = run_run_ts["mvts"]
     run_obj.metadata.sample_rate = config.sample_rate
-
     slicer = slice(None, None, int(config.factor))  # decimation.factor
     downsampled_time_axis = run_xrts.time.data[slicer]
 
@@ -371,5 +370,8 @@ def prototype_decimate(config, run_run_ts):
 
     xr_ds = xr_da.to_dataset("channel")
     result = {"run": run_obj, "mvts": xr_ds}
-
+    print("RUN OBJECT")
+    print(run_obj)
+    print("XRDS")
+    print(xr_ds)
     return result
