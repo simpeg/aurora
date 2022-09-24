@@ -20,9 +20,15 @@ from mth5.mth5 import MTH5
 
 from aurora.config.metadata.channel_nomenclature import ChannelNomenclature
 from aurora.test_utils.synthetic.synthetic_station_config import make_filters
-from aurora.test_utils.synthetic.synthetic_station_config import make_station_01
-from aurora.test_utils.synthetic.synthetic_station_config import make_station_02
-from aurora.test_utils.synthetic.synthetic_station_config import make_station_03
+from aurora.test_utils.synthetic.synthetic_station_config import (
+    make_station_01,
+)
+from aurora.test_utils.synthetic.synthetic_station_config import (
+    make_station_02,
+)
+from aurora.test_utils.synthetic.synthetic_station_config import (
+    make_station_03,
+)
 
 np.random.seed(0)
 
@@ -134,7 +140,9 @@ def create_mth5_synthetic_file(
             # add noise
             for col in run.channels:
                 if run.noise_scalars[col]:
-                    df[col] += run.noise_scalars[col] * np.random.randn(len(df))
+                    df[col] += run.noise_scalars[col] * np.random.randn(
+                        len(df)
+                    )
 
             # add nan
             if add_nan_values:
@@ -173,7 +181,9 @@ def create_mth5_synthetic_file(
 
 
 def create_test1_h5(file_version="0.1.0", channel_nomenclature="default"):
-    station_01_params = make_station_01(channel_nomenclature=channel_nomenclature)
+    station_01_params = make_station_01(
+        channel_nomenclature=channel_nomenclature
+    )
     mth5_path = station_01_params.mth5_path  # DATA_PATH.joinpath("test1.h5")
     mth5_path = create_mth5_synthetic_file(
         [
@@ -188,7 +198,9 @@ def create_test1_h5(file_version="0.1.0", channel_nomenclature="default"):
 
 
 def create_test2_h5(file_version="0.1.0", channel_nomenclature="default"):
-    station_02_params = make_station_02(channel_nomenclature=channel_nomenclature)
+    station_02_params = make_station_02(
+        channel_nomenclature=channel_nomenclature
+    )
     mth5_path = station_02_params.mth5_path
     mth5_path = create_mth5_synthetic_file(
         [
@@ -201,8 +213,12 @@ def create_test2_h5(file_version="0.1.0", channel_nomenclature="default"):
     return mth5_path
 
 
-def create_test1_h5_with_nan(file_version="0.1.0", channel_nomenclature="default"):
-    station_01_params = make_station_01(channel_nomenclature=channel_nomenclature)
+def create_test1_h5_with_nan(
+    file_version="0.1.0", channel_nomenclature="default"
+):
+    station_01_params = make_station_01(
+        channel_nomenclature=channel_nomenclature
+    )
     mth5_path = station_01_params.mth5_path  # DATA_PATH.joinpath("test1.h5")
     mth5_path = create_mth5_synthetic_file(
         [
@@ -217,10 +233,16 @@ def create_test1_h5_with_nan(file_version="0.1.0", channel_nomenclature="default
 
 
 def create_test12rr_h5(file_version="0.1.0", channel_nomenclature="default"):
-    station_01_params = make_station_01(channel_nomenclature=channel_nomenclature)
-    station_02_params = make_station_02(channel_nomenclature=channel_nomenclature)
+    station_01_params = make_station_01(
+        channel_nomenclature=channel_nomenclature
+    )
+    station_02_params = make_station_02(
+        channel_nomenclature=channel_nomenclature
+    )
     station_params = [station_01_params, station_02_params]
-    mth5_path = station_01_params.mth5_path.__str__().replace("test1.h5", "test12rr.h5")
+    mth5_path = station_01_params.mth5_path.__str__().replace(
+        "test1.h5", "test12rr.h5"
+    )
     mth5_path = create_mth5_synthetic_file(
         station_params,
         mth5_path,

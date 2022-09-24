@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
+# from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
 
 
 class FrequencyBand(pd.Interval):
