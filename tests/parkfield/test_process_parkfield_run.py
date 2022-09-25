@@ -12,6 +12,8 @@ from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 
 from make_parkfield_mth5 import test_make_parkfield_mth5
 
+from mth5.helpers import close_open_files
+
 
 def test_processing(return_collection=False, z_file_path=None, test_clock_zero=False):
     """
@@ -30,7 +32,7 @@ def test_processing(return_collection=False, z_file_path=None, test_clock_zero=F
         if  return_collection is False:
         mt_metadata.transfer_functions.core.TF
     """
-
+    close_open_files()
     mth5_path = DATA_PATH.joinpath("pkd_test_00.h5")
 
     # Ensure there is an mth5 to process
@@ -74,6 +76,11 @@ def test_processing(return_collection=False, z_file_path=None, test_clock_zero=F
 
 
 def test():
+    import logging
+
+    logging.getLogger("matplotlib.font_manager").disabled = True
+    logging.getLogger("matplotlib.ticker").disabled = True
+
     z_file_path = AURORA_RESULTS_PATH.joinpath("pkd.zss")
     test_processing(return_collection=True, z_file_path=z_file_path)
     test_processing(

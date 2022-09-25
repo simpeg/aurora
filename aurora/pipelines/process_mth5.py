@@ -297,15 +297,24 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
 
             # APPLY TIMING CORRECTIONS HERE
     else:
+        print(f"DECIMATION LEVEL {i_dec_level}")
         # See Note 1 top of module
         # See Note 2 top of module
         for i, row in dataset_df.iterrows():
             run_xrts = row["run_dataarray"].to_dataset("channel")
             input_dict = {"run": row["run"], "mvts": run_xrts}
             run_dict = prototype_decimate(config.decimation, input_dict)
+            print("PACKING RUN")
+            print("HERE is teh dtype of the zero-decimation level run column")
+            type(dataset_df.iloc[0].run)
+            print("ANd the new one")
+            print(type(run_dict["run"]))
+            import pandas as pd
+
+            print(pd.__version__)
             dataset_df["run"].at[i] = run_dict["run"]
             dataset_df["run_dataarray"].at[i] = run_dict["mvts"].to_array("channel")
-
+    print("OK OK OK")
     return dataset_df
 
 
@@ -399,7 +408,9 @@ def process_mth5(
     for i_dec_level, dec_level_config in enumerate(processing_config.decimations):
         dataset_df = populate_dataset_df(i_dec_level, dec_level_config, dataset_df)
         # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
-
+        print("DATASET DF POPULATED")
+        print("DATASET DF POPULATED")
+        print("DATASET DF POPULATED")
         # TFK 1: get clock-zero from data if needed
         if dec_level_config.window.clock_zero_type == "data start":
             dec_level_config.window.clock_zero = str(dataset_df.start.min())

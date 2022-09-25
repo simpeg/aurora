@@ -44,10 +44,10 @@ def get_expected_rms_misfit(test_case_id, emtf_version=None):
             expected_rms_misfit["rho"]["yx"] = 3.658614
             expected_rms_misfit["phi"]["yx"] = 0.844645
         elif emtf_version == "matlab":
-            expected_rms_misfit["rho"]["xy"] = 2.713543
-            expected_rms_misfit["phi"]["xy"] = 0.784464
-            expected_rms_misfit["rho"]["yx"] = 3.74120
-            expected_rms_misfit["phi"]["yx"] = 1.375335
+            expected_rms_misfit["rho"]["xy"] = 2.706098
+            expected_rms_misfit["phi"]["xy"] = 0.784228
+            expected_rms_misfit["rho"]["yx"] = 3.745279
+            expected_rms_misfit["phi"]["yx"] = 1.374937
 
     elif test_case_id == "test2r1":
         expected_rms_misfit["rho"]["xy"] = 3.971313
@@ -80,6 +80,22 @@ def assert_rms_misfit_ok(
     expected_rms_phi = expected_rms_misfit["phi"][xy_or_yx]
     print(f"expected_rms_rho_{xy_or_yx} {expected_rms_rho}")
     print(f"expected_rms_phi_{xy_or_yx} {expected_rms_phi}")
-    assert np.isclose(rho_rms_aurora - expected_rms_rho, 0, atol=rho_tol)
-    assert np.isclose(phi_rms_aurora - expected_rms_phi, 0, atol=phi_tol)
+    if not np.isclose(rho_rms_aurora - expected_rms_rho, 0, atol=rho_tol):
+        print("==== AURORA ====\n")
+        print(rho_rms_aurora)
+        print("==== EXPECTED ====\n")
+        print(expected_rms_rho)
+        print("==== DIFFERENCE ====\n")
+        print(rho_rms_aurora - expected_rms_rho)
+        raise AssertionError("Expected misfit for resistivity is not correct")
+        
+    if not np.isclose(phi_rms_aurora - expected_rms_phi, 0, atol=rho_tol):
+        print("==== AURORA ====\n")
+        print(phi_rms_aurora)
+        print("==== EXPECTED ====\n")
+        print(expected_rms_phi)
+        print("==== DIFFERENCE ====\n")
+        print(phi_rms_aurora - expected_rms_phi)
+        raise AssertionError("Expected misfit for phase is not correct")
+
     return

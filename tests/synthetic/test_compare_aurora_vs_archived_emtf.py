@@ -3,10 +3,14 @@ from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test2_h5
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
-from aurora.test_utils.synthetic.make_processing_configs import create_test_run_config
+from aurora.test_utils.synthetic.make_processing_configs import (
+    create_test_run_config,
+)
 from aurora.test_utils.synthetic.paths import AURORA_RESULTS_PATH
 from aurora.test_utils.synthetic.paths import EMTF_OUTPUT_PATH
-from aurora.test_utils.synthetic.processing_helpers import process_synthetic_data
+from aurora.test_utils.synthetic.processing_helpers import (
+    process_synthetic_data,
+)
 from aurora.test_utils.synthetic.rms_helpers import assert_rms_misfit_ok
 from aurora.test_utils.synthetic.rms_helpers import compute_rms
 from aurora.test_utils.synthetic.rms_helpers import get_expected_rms_misfit
@@ -15,6 +19,7 @@ from aurora.transfer_function.emtf_z_file_helpers import (
 )
 from aurora.transfer_function.kernel_dataset import KernelDataset
 from plot_helpers_synthetic import plot_rho_phi
+from mth5.helpers import close_open_files
 
 
 def aurora_vs_emtf(
@@ -70,11 +75,16 @@ def aurora_vs_emtf(
     z_file_path = AURORA_RESULTS_PATH.joinpath(z_file_base)
 
     tf_collection = process_synthetic_data(
-        processing_config, tfk_dataset, z_file_path=z_file_path, return_collection=True
+        processing_config,
+        tfk_dataset,
+        z_file_path=z_file_path,
+        return_collection=True,
     )
 
     aux_data = read_z_file(auxilliary_z_file)
-    aurora_rho_phi = merge_tf_collection_to_match_z_file(aux_data, tf_collection)
+    aurora_rho_phi = merge_tf_collection_to_match_z_file(
+        aux_data, tf_collection
+    )
 
     for xy_or_yx in ["xy", "yx"]:
         aurora_rho = aurora_rho_phi["rho"][xy_or_yx]
@@ -127,7 +137,9 @@ def run_test1(emtf_version, ds_df):
     test_case_id = "test1"
     auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test1.zss")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zss"
-    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df)
+    aurora_vs_emtf(
+        test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df
+    )
     return
 
 
@@ -184,6 +196,8 @@ def test_pipeline(merged=True):
     -------
 
     """
+    close_open_files()
+
     mth5_paths = make_mth5s(merged=merged)
     run_summary = RunSummary()
     run_summary.from_mth5s(mth5_paths)
@@ -199,6 +213,11 @@ def test_pipeline(merged=True):
 
 
 def test():
+    import logging
+
+    logging.getLogger("matplotlib.font_manager").disabled = True
+    logging.getLogger("matplotlib.ticker").disabled = True
+
     test_pipeline(merged=False)
     test_pipeline(merged=True)
 
