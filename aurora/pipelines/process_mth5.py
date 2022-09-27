@@ -56,16 +56,17 @@ def fix_time(tstmp):
     out: datetime.datetime
         The pandas timestamp as a datetime.datetime object
     """
-    import datetime
-
-    year = tstmp.year
-    month = tstmp.month
-    day = tstmp.day
-    hour = tstmp.hour
-    minute = tstmp.minute
-    second = tstmp.second
-    out = datetime.datetime(year, month, day, hour, minute, second)
-    return out
+    return tstmp
+    # import datetime
+    #
+    # year = tstmp.year
+    # month = tstmp.month
+    # day = tstmp.day
+    # hour = tstmp.hour
+    # minute = tstmp.minute
+    # second = tstmp.second
+    # out = datetime.datetime(year, month, day, hour, minute, second)
+    # return out
 
 
 def initialize_mth5s(config):
