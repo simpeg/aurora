@@ -42,31 +42,6 @@ from mth5.mth5 import MTH5
 
 
 # =============================================================================
-def fix_time(tstmp):
-    """
-    One-off temporary workaround for mt_metadata issue #86
-
-    Parameters
-    ----------
-    tstmp: pd.Timestamp
-        Timestamp with a format that is resulting in ValueError: Time zone must be UTC
-
-    Returns
-    -------
-    out: datetime.datetime
-        The pandas timestamp as a datetime.datetime object
-    """
-    return tstmp
-    # import datetime
-    #
-    # year = tstmp.year
-    # month = tstmp.month
-    # day = tstmp.day
-    # hour = tstmp.hour
-    # minute = tstmp.minute
-    # second = tstmp.second
-    # out = datetime.datetime(year, month, day, hour, minute, second)
-    # return out
 
 
 def initialize_mth5s(config):
@@ -288,8 +263,8 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
                 row.station_id,
                 row.run_id,
                 config.decimation.sample_rate,
-                start=fix_time(row.start),
-                end=fix_time(row.end),
+                start=row.start,
+                end=row.end,
                 survey=row.survey,
             )
             dataset_df["run"].at[i] = run_dict["run"]
