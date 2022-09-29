@@ -357,22 +357,27 @@ def process_mth5(
     """
     # Initialize config and mth5s
     processing_config = initialize_config(config)
-    dataset_df = tfk_dataset.df
+
     if processing_config.stations.local.id is None:
-        processing_config.stations.from_dataset_dataframe(dataset_df)
+        processing_config.stations.from_dataset_dataframe(tfk_dataset.df)
     mth5_objs = initialize_mth5s(config)
+
+    # Assign additional columns to dataset_df, populate with mth5_objs
+    tfk_dataset.add_columns_for_processing(mth5_objs)
+    dataset_df = tfk_dataset.df
 
     # Here is where any checks that would be done by TF Kernel would be applied
     # see notes labelled with ToDo TFK above
 
-    # Assign additional columns to dataset_df, populate with mth5_objs
-    mth5_obj_column = len(dataset_df) * [None]
-    for i, station_id in enumerate(dataset_df["station_id"]):
-        mth5_obj_column[i] = mth5_objs[station_id]
-    dataset_df["mth5_obj"] = mth5_obj_column
-    dataset_df["run"] = None
-    dataset_df["run_dataarray"] = None
-    dataset_df["stft"] = None
+    # # Assign additional columns to dataset_df, populate with mth5_objs
+    # # 2022-09-29: Will move the addition of these columns to kernel_dataset
+    # mth5_obj_column = len(dataset_df) * [None]
+    # for i, station_id in enumerate(dataset_df["station_id"]):
+    #     mth5_obj_column[i] = mth5_objs[station_id]
+    # dataset_df["mth5_obj"] = mth5_obj_column
+    # dataset_df["run"] = None
+    # dataset_df["run_dataarray"] = None
+    # dataset_df["stft"] = None
 
     print(
         f"Processing config indicates {len(processing_config.decimations)} "
@@ -384,8 +389,6 @@ def process_mth5(
     for i_dec_level, dec_level_config in enumerate(processing_config.decimations):
         dataset_df = populate_dataset_df(i_dec_level, dec_level_config, dataset_df)
         # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
-        print("DATASET DF POPULATED")
-        print("DATASET DF POPULATED")
         print("DATASET DF POPULATED")
         # TFK 1: get clock-zero from data if needed
         if dec_level_config.window.clock_zero_type == "data start":

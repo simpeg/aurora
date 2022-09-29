@@ -298,6 +298,30 @@ class KernelDataset:
         sample_rate = self.df.sample_rate.unique()[0]
         return sample_rate
 
+    def add_columns_for_processing(self, mth5_objs):
+        """
+        Moving this into kernel_dataset from processing_pipeline
+
+        Question: Should mth5_objs be keyed by survey-station?
+
+        Parameters
+        ----------
+        mth5_objs: dict,  keyed by station
+
+
+        Returns
+        -------
+
+        """
+
+        mth5_obj_column = len(self.df) * [None]
+        for i, station_id in enumerate(self.df["station_id"]):
+            mth5_obj_column[i] = mth5_objs[station_id]
+        self.df["mth5_obj"] = mth5_obj_column
+        self.df["run"] = None
+        self.df["run_dataarray"] = None
+        self.df["stft"] = None
+
 
 def restrict_to_station_list(df, station_ids, inplace=True):
     """
