@@ -1,3 +1,4 @@
+from deprecated import deprecated
 import numpy as np
 import pandas as pd
 import scipy.signal as ssig
@@ -276,6 +277,7 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
     return stft_obj
 
 
+@deprecated
 def get_run_run_ts_from_mth5(
     mth5_obj,
     station_id,
@@ -331,7 +333,7 @@ def get_run_run_ts_from_mth5(
     return run_run_ts
 
 
-def prototype_decimate(config, run_run_ts):
+def prototype_decimate(config, run_xrts):
     """
     Consider:
     1. Moving this function into time_series/decimate.py
@@ -349,9 +351,6 @@ def prototype_decimate(config, run_run_ts):
     -------
     dict: same structure as run_run_ts
     """
-    run_obj = run_run_ts["run"]
-    run_xrts = run_run_ts["mvts"]
-    run_obj.metadata.sample_rate = config.sample_rate
     slicer = slice(None, None, int(config.factor))  # decimation.factor
     downsampled_time_axis = run_xrts.time.data[slicer]
 
@@ -367,11 +366,12 @@ def prototype_decimate(config, run_run_ts):
         dims=["time", "channel"],
         coords={"time": downsampled_time_axis, "channel": channel_labels},
     )
-
+    attr_dict = run_xrts.attrs
+    attr_dict["sample_rate"] = config.sample_rate
+    xr_da.attrs = attr_dict
+    print("DONT FORGET TO RESET THE SAMPLE RATE")
+    print("DONT FORGET TO RESET THE SAMPLE RATE")
+    print("!!!Sort of correct usage of sample_rate and decimated_sample_rate also!!!")
+    print("XARRAY RESAMPLE")
     xr_ds = xr_da.to_dataset("channel")
-    result = {"run": run_obj, "mvts": xr_ds}
-    print("RUN OBJECT")
-    print(run_obj)
-    print("XRDS")
-    print(xr_ds)
-    return result
+    return xr_ds

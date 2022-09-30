@@ -26,7 +26,6 @@ import xarray as xr
 
 from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
-from aurora.pipelines.time_series_helpers import get_run_run_ts_from_mth5
 from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.transfer_function_helpers import process_transfer_functions
@@ -50,7 +49,7 @@ def initialize_mth5s(config):
     initialized if needed.
 
     ToDo: Review mth5_objs dict.  Theoretically, you could get namespace clashes here.
-    Could key by survey-station, but also just use the keys "local" and "remote"
+    Could key by survey-station, but also just use the keys "local" and "remote".
 
     Parameters
     ----------
@@ -258,18 +257,14 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
     if i_dec_level == 0:
         # see Note 1 in this function doc notes
         for i, row in dataset_df.iterrows():
-            run_dict = get_run_run_ts_from_mth5(
-                row.mth5_obj,
-                row.station_id,
-                row.run_id,
-                config.decimation.sample_rate,
-                start=row.start,
-                end=row.end,
-                survey=row.survey,
+            run_obj = row.mth5_obj.get_run(
+                row.station_id, row.run_id, survey=row.survey
             )
-            dataset_df["run"].at[i] = run_dict["run"]
-            # see Note 2 in this function doc notes
-            dataset_df["run_dataarray"].at[i] = run_dict["mvts"].to_array("channel")
+            dataset_df["run_reference"].at[i] = run_obj.hdf5_group.ref
+            run_ts = run_obj.to_runts(start=row.start, end=row.end)
+            xr_ds = run_ts.dataset
+            # # see Note 2 in this function doc notes
+            dataset_df["run_dataarray"].at[i] = xr_ds.to_array("channel")
 
             # APPLY TIMING CORRECTIONS HERE
     else:
@@ -277,20 +272,10 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
         # See Note 1 top of module
         # See Note 2 top of module
         for i, row in dataset_df.iterrows():
-            run_xrts = row["run_dataarray"].to_dataset("channel")
-            input_dict = {"run": row["run"], "mvts": run_xrts}
-            run_dict = prototype_decimate(config.decimation, input_dict)
-            print("PACKING RUN")
-            print("HERE is teh dtype of the zero-decimation level run column")
-            type(dataset_df.iloc[0].run)
-            print("ANd the new one")
-            print(type(run_dict["run"]))
-            import pandas as pd
+            run_xrds = row["run_dataarray"].to_dataset("channel")
+            decimated_run_xrts = prototype_decimate(config.decimation, run_xrds)
+            dataset_df["run_dataarray"].at[i] = decimated_run_xrts.to_array("channel")
 
-            print(pd.__version__)
-            dataset_df["run"].at[i] = run_dict["run"]
-            dataset_df["run_dataarray"].at[i] = run_dict["mvts"].to_array("channel")
-    print("OK OK OK")
     return dataset_df
 
 
@@ -369,16 +354,6 @@ def process_mth5(
     # Here is where any checks that would be done by TF Kernel would be applied
     # see notes labelled with ToDo TFK above
 
-    # # Assign additional columns to dataset_df, populate with mth5_objs
-    # # 2022-09-29: Will move the addition of these columns to kernel_dataset
-    # mth5_obj_column = len(dataset_df) * [None]
-    # for i, station_id in enumerate(dataset_df["station_id"]):
-    #     mth5_obj_column[i] = mth5_objs[station_id]
-    # dataset_df["mth5_obj"] = mth5_obj_column
-    # dataset_df["run"] = None
-    # dataset_df["run_dataarray"] = None
-    # dataset_df["stft"] = None
-
     print(
         f"Processing config indicates {len(processing_config.decimations)} "
         f"decimation levels "
@@ -399,7 +374,7 @@ def process_mth5(
         remote_stfts = []
         for i, row in dataset_df.iterrows():
             run_xrts = row["run_dataarray"].to_dataset("channel")
-            run_obj = row["run"]
+            run_obj = row.mth5_obj.from_reference(row.run_reference)
             stft_obj = make_stft_objects(
                 processing_config, i_dec_level, run_obj, run_xrts, units, row.station_id
             )
@@ -437,7 +412,8 @@ def process_mth5(
     tf_collection = TransferFunctionCollection(header=tf_obj.tf_header, tf_dict=tf_dict)
 
     # local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
-    local_run_obj = dataset_df["run"].iloc[0]
+    local_run_obj = tfk_dataset.get_run_object(0)
+
     if z_file_path:
         tf_collection.write_emtf_z_file(z_file_path, run_obj=local_run_obj)
 

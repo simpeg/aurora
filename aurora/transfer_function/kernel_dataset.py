@@ -302,25 +302,42 @@ class KernelDataset:
         """
         Moving this into kernel_dataset from processing_pipeline
 
-        Question: Should mth5_objs be keyed by survey-station?
+        Q: Should mth5_objs be keyed by survey-station?
+        A: Yes, and ...
+        since the KernelDataset dataframe will be iterated over we should probably
+        write an iterator method.  This can iterate over survey-station tuples
+        for multiple station processing.
 
         Parameters
         ----------
-        mth5_objs: dict,  keyed by station
+        mth5_objs: dict,  keyed by station_id
 
+        """
+        columns_to_add = ["run_dataarray", "stft", "run_reference"]
+        mth5_obj_column = len(self.df) * [None]
+        for i, station_id in enumerate(self.df["station_id"]):
+            mth5_obj_column[i] = mth5_objs[station_id]
+        self.df["mth5_obj"] = mth5_obj_column
+        for column_name in columns_to_add:
+            self.df[column_name] = None
+
+    def get_run_object(self, index_or_row):
+        """
+
+        Parameters
+        ----------
+        index_or_row: integer index of df, or pd.Series object
 
         Returns
         -------
 
         """
-
-        mth5_obj_column = len(self.df) * [None]
-        for i, station_id in enumerate(self.df["station_id"]):
-            mth5_obj_column[i] = mth5_objs[station_id]
-        self.df["mth5_obj"] = mth5_obj_column
-        self.df["run"] = None
-        self.df["run_dataarray"] = None
-        self.df["stft"] = None
+        if isinstance(index_or_row, int):
+            row = self.df.loc[index_or_row]
+        else:
+            row = index_or_row
+        run_obj = row.mth5_obj.from_reference(row.run_reference)
+        return run_obj
 
 
 def restrict_to_station_list(df, station_ids, inplace=True):
