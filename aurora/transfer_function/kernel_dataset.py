@@ -278,7 +278,7 @@ class KernelDataset:
         # iterate over these runs, packing metadata into
         station_metadata = None
         for i, row in sub_df.iterrows():
-            local_run_obj = row.run
+            local_run_obj = self.get_run_object(row)
             if station_metadata is None:
                 station_metadata = local_run_obj.station_group.metadata
                 station_metadata._runs = []
