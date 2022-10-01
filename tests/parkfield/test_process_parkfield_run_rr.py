@@ -24,7 +24,9 @@ def test_stuff_that_belongs_elsewhere():
     """
     ping the mth5, extract the summary and pass it
 
-    This test has no practical point, I'm just trying to assuage codecov.
+    This test was created so that codecov would see channel_summary_to_make_mth5().
+    ToDo: channel_summary_to_make_mth5() method should be moved into mth5 and removed
+    from aurora, including this test.
 
     Returns
     -------
@@ -40,9 +42,9 @@ def test_stuff_that_belongs_elsewhere():
     mth5_obj = MTH5(file_version="0.1.0")
     mth5_obj.open_mth5(mth5_path, mode="a")
     df = mth5_obj.channel_summary.to_dataframe()
-    unknown_df = channel_summary_to_make_mth5(df)
+    make_mth5_df = channel_summary_to_make_mth5(df)
     mth5_obj.close_mth5()
-    return unknown_df
+    return make_mth5_df
 
 
 def test_processing(z_file_path=None):
