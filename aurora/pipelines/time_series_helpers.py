@@ -333,7 +333,7 @@ def get_run_run_ts_from_mth5(
     return run_run_ts
 
 
-def prototype_decimate(config, run_xrts):
+def prototype_decimate(config, run_xrds):
     """
     Consider:
     1. Moving this function into time_series/decimate.py
@@ -343,35 +343,32 @@ def prototype_decimate(config, run_xrts):
     Parameters
     ----------
     config : aurora.config.metadata.decimation.Decimation
-    run_run_ts: dict keyed by "run" and "mvts"
-    out_dict["run"] is mth5.groups.master_station_run_channel.RunGroup
-    out_dict["mvts"] is mth5.timeseries.run_ts.RunTS
+    run_xrds: xr.Dataset
+        Originally from mth5.timeseries.run_ts.RunTS.dataset, but possibly decimated
+        multiple times
 
     Returns
     -------
-    dict: same structure as run_run_ts
+    xr_ds: xr.Dataset
+        Decimated version of the input run_xrds
     """
     slicer = slice(None, None, int(config.factor))  # decimation.factor
-    downsampled_time_axis = run_xrts.time.data[slicer]
+    downsampled_time_axis = run_xrds.time.data[slicer]
 
     num_observations = len(downsampled_time_axis)
-    channel_labels = list(run_xrts.data_vars.keys())  # run_ts.channels
+    channel_labels = list(run_xrds.data_vars.keys())  # run_ts.channels
     num_channels = len(channel_labels)
     new_data = np.full((num_observations, num_channels), np.nan)
     for i_ch, ch_label in enumerate(channel_labels):
-        new_data[:, i_ch] = ssig.decimate(run_xrts[ch_label], int(config.factor))
+        new_data[:, i_ch] = ssig.decimate(run_xrds[ch_label], int(config.factor))
 
     xr_da = xr.DataArray(
         new_data,
         dims=["time", "channel"],
         coords={"time": downsampled_time_axis, "channel": channel_labels},
     )
-    attr_dict = run_xrts.attrs
+    attr_dict = run_xrds.attrs
     attr_dict["sample_rate"] = config.sample_rate
     xr_da.attrs = attr_dict
-    print("DONT FORGET TO RESET THE SAMPLE RATE")
-    print("DONT FORGET TO RESET THE SAMPLE RATE")
-    print("!!!Sort of correct usage of sample_rate and decimated_sample_rate also!!!")
-    print("XARRAY RESAMPLE")
     xr_ds = xr_da.to_dataset("channel")
     return xr_ds
