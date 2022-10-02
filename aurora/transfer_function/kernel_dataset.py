@@ -291,6 +291,31 @@ class KernelDataset:
         sample_rate = self.df.sample_rate.unique()[0]
         return sample_rate
 
+    def initialize_dataframe_for_processing(self, mth5_objs):
+        """
+        Adds extra columns needed for processing, populates them with mth5 objects,
+        run_reference, and xr.Datasets.
+
+        When assigning xarrays to dataframe cells, df dislikes xr.Dataset,
+        so we convert to xr.DataArray before packing df
+
+        Parameters
+        ----------
+        mth5_objs: dict,  keyed by station_id
+        """
+
+        self.add_columns_for_processing(mth5_objs)
+
+        for i, row in self.df.iterrows():
+            run_obj = row.mth5_obj.get_run(
+                row.station_id, row.run_id, survey=row.survey
+            )
+            self.df["run_reference"].at[i] = run_obj.hdf5_group.ref
+            run_ts = run_obj.to_runts(start=row.start, end=row.end)
+            xr_ds = run_ts.dataset
+            self.df["run_dataarray"].at[i] = xr_ds.to_array("channel")
+        print("DATASET DF POPULATED")
+
     def add_columns_for_processing(self, mth5_objs):
         """
         Moving this into kernel_dataset from processing_pipeline

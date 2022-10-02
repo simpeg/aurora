@@ -219,9 +219,14 @@ def export_tf(
     return tf_cls
 
 
-def populate_dataset_df(i_dec_level, config, dataset_df):
+def update_dataset_df(i_dec_level, config, dataset_df):
     """
-    Move this into a method of TFKDataset, self.populate_with_data()
+    This function has two different modes.  The first mode, initializes values in the
+    array, and could be placed into TFKDataset.initialize_time_series_data()
+    The second mode, decimates. Becasue it calls time series operations, I prefer
+    to keep it in pipelines.  Maybe name it update_dataset_df().
+
+    self.populate_with_data()
 
     Notes:
     1. When iterating over dataframe, (i)ndex must run from 0 to len(df), otherwise
@@ -230,14 +235,8 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
     only the runs to be processed for this specific TF?
     2. When assigning xarrays to dataframe cells, df dislikes xr.Dataset,
     so we convert to DataArray before assignment
-    3.  Dataset_df should be easy to generate from the local_station_id,
-    remote_station_id, local_run_list, remote_run_list, but allows specification of
-    time_intervals.  This is important in the case where aquisition_runs are
-    non-overlapping between local and remote.  Although,  theoretically, merging on
-    the FCs should make nans in the places where there is no overlapping data,
-    and this should be dropped in the TF portion of the code.  However,
-    time-intervals where the data do not have coverage at both stations can be
-    identified in a method before GET TIME SERIES in a future version.
+    3.
+
 
     Parameters
     ----------
@@ -255,18 +254,10 @@ def populate_dataset_df(i_dec_level, config, dataset_df):
 
     """
     if i_dec_level == 0:
-        # see Note 1 in this function doc notes
-        for i, row in dataset_df.iterrows():
-            run_obj = row.mth5_obj.get_run(
-                row.station_id, row.run_id, survey=row.survey
-            )
-            dataset_df["run_reference"].at[i] = run_obj.hdf5_group.ref
-            run_ts = run_obj.to_runts(start=row.start, end=row.end)
-            xr_ds = run_ts.dataset
-            # # see Note 2 in this function doc notes
-            dataset_df["run_dataarray"].at[i] = xr_ds.to_array("channel")
+        pass
+        # replaced with kernel_dataset.initialize_dataframe_for_processing()
 
-            # APPLY TIMING CORRECTIONS HERE
+        # APPLY TIMING CORRECTIONS HERE
     else:
         print(f"DECIMATION LEVEL {i_dec_level}")
         # See Note 1 top of module
@@ -347,8 +338,9 @@ def process_mth5(
         processing_config.stations.from_dataset_dataframe(tfk_dataset.df)
     mth5_objs = initialize_mth5s(config)
 
-    # Assign additional columns to dataset_df, populate with mth5_objs
-    tfk_dataset.add_columns_for_processing(mth5_objs)
+    # Assign additional columns to dataset_df, populate with mth5_objs and xr_ts
+    # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
+    tfk_dataset.initialize_dataframe_for_processing(mth5_objs)
     dataset_df = tfk_dataset.df
 
     # Here is where any checks that would be done by TF Kernel would be applied
@@ -362,9 +354,8 @@ def process_mth5(
     tf_dict = {}
 
     for i_dec_level, dec_level_config in enumerate(processing_config.decimations):
-        dataset_df = populate_dataset_df(i_dec_level, dec_level_config, dataset_df)
-        # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
-        print("DATASET DF POPULATED")
+        dataset_df = update_dataset_df(i_dec_level, dec_level_config, dataset_df)
+        print("DATASET DF UPDATED")
         # TFK 1: get clock-zero from data if needed
         if dec_level_config.window.clock_zero_type == "data start":
             dec_level_config.window.clock_zero = str(dataset_df.start.min())
