@@ -22,7 +22,7 @@ The run_summary provides options for the local and possibly remote reference sta
  and the problematic runs can be addressed.
 
 The user can interact with the run_summary_df, selecting sub dataframes via querying,
-and in future maybe via some GUI (or a spreadsheet!).
+and in future maybe via some GUI (or a spreadsheet).
 
 
 The process looks like this:
@@ -43,7 +43,7 @@ c) restrict start/end times of the local runs so that they DO intersect with rem
 processing object and pass it this df:
 cc = ConfigCreator(config_path=CONFIG_PATH)
 p = cc.create_from_kernel_dataset(kernel_dataset, emtf_band_file=emtf_band_setup_file)
-9. Edit the Processing appropriately,
+9. Edit the Processing Config appropriately,
 
 """
 
@@ -53,8 +53,7 @@ import pandas as pd
 
 class KernelDataset:
     """
-    Could be called "ProcessableDataset", InputDataset or something like that.  This
-    class is intended to work with mth5-derived channel_summary or run_summary
+    This class is intended to work with mth5-derived channel_summary or run_summary
     dataframes, that specify time series intervals.
 
     This class is closely related to (may actually be an extension of) RunSummary
@@ -89,12 +88,6 @@ class KernelDataset:
 
     (b) is really just the case of considering pairs of tables like (a)
 
-
-
-    2022-03-11:
-    Following notes in Issue #118, want to get a fully populated dataframe from an mth5.
-    If I pass a station_id, then get all runs, if I pass a (station_id, run_id),
-    then just get the run start and end times.
 
     Question: To return a copy or modify in-place when querying.  Need to decide on
     standards and syntax.  Handling this in general is messy because every function
