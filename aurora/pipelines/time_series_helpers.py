@@ -372,3 +372,60 @@ def prototype_decimate(config, run_xrds):
     xr_da.attrs = attr_dict
     xr_ds = xr_da.to_dataset("channel")
     return xr_ds
+
+
+def prototype_decimate_2(config, run_xrds):
+    """
+    Uses the built-in xarray coarsen method.   Not clear what AAF effects are.
+    Method is fast.  Might be non-linear.  Seems to give similar performance to
+    prototype_decimate for synthetic data.
+
+    N.B. config.factor must be integer valued
+
+    Parameters
+    ----------
+    config : aurora.config.metadata.decimation.Decimation
+    run_xrds: xr.Dataset
+        Originally from mth5.timeseries.run_ts.RunTS.dataset, but possibly decimated
+        multiple times
+
+    Returns
+    -------
+    xr_ds: xr.Dataset
+        Decimated version of the input run_xrds
+    """
+    new_xr_ds = run_xrds.coarsen(time=int(config.factor), boundary="trim").mean()
+    attr_dict = run_xrds.attrs
+    attr_dict["sample_rate"] = config.sample_rate
+    new_xr_ds.attrs = attr_dict
+    return new_xr_ds
+
+
+def prototype_decimate_3(config, run_xrds):
+    """
+    Uses the built-in xarray coarsen method.   Not clear what AAF effects are.
+    Method is fast.  Might be non-linear.  Seems to give similar performance to
+    prototype_decimate for synthetic data.
+
+    N.B. config.factor must be integer valued
+
+    Parameters
+    ----------
+    config : aurora.config.metadata.decimation.Decimation
+    run_xrds: xr.Dataset
+        Originally from mth5.timeseries.run_ts.RunTS.dataset, but possibly decimated
+        multiple times
+
+    Returns
+    -------
+    xr_ds: xr.Dataset
+        Decimated version of the input run_xrds
+    """
+    dt = run_xrds.time.diff(dim="time").median().values
+    dt_new = config.factor * dt
+    dt_new = dt_new.__str__().replace("nanoseconds", "ns")
+    new_xr_ds = run_xrds.resample(time=dt_new).mean(dim="time")
+    attr_dict = run_xrds.attrs
+    attr_dict["sample_rate"] = config.sample_rate
+    new_xr_ds.attrs = attr_dict
+    return new_xr_ds

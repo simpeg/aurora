@@ -235,7 +235,6 @@ def update_dataset_df(i_dec_level, config, dataset_df):
     only the runs to be processed for this specific TF?
     2. When assigning xarrays to dataframe cells, df dislikes xr.Dataset,
     so we convert to DataArray before assignment
-    3.
 
 
     Parameters
@@ -266,7 +265,7 @@ def update_dataset_df(i_dec_level, config, dataset_df):
             run_xrds = row["run_dataarray"].to_dataset("channel")
             decimated_run_xrts = prototype_decimate(config.decimation, run_xrds)
             dataset_df["run_dataarray"].at[i] = decimated_run_xrts.to_array("channel")
-
+    print("DATASET DF UPDATED")
     return dataset_df
 
 
@@ -301,11 +300,7 @@ def process_mth5(
     are valid for which decimation levels, or for which effective sample rates.  This
     action should be taken before we get here.  The tfk_dataset should already
     be trimmed to exactly what will be processed.
-    3. ToDo TFK Check that data coverage is the same in both local and RR data
-    # if config.remote_station_id:
-    #    local_run_xrts = local_run_xrts.where(local_run_xrts.time <=
-    #                                          remote_run_xrts.time[-1]).dropna(
-    #                                          dim="time")
+
 
     Parameters
     ----------
@@ -334,8 +329,11 @@ def process_mth5(
     # Initialize config and mth5s
     processing_config = initialize_config(config)
 
+    # ToDo: tfk_dataset.validate_processing(config) # (see Issue #182)
+    # Move this check (below) into the method above.
     if processing_config.stations.local.id is None:
         processing_config.stations.from_dataset_dataframe(tfk_dataset.df)
+
     mth5_objs = initialize_mth5s(config)
 
     # Assign additional columns to dataset_df, populate with mth5_objs and xr_ts
@@ -355,7 +353,7 @@ def process_mth5(
 
     for i_dec_level, dec_level_config in enumerate(processing_config.decimations):
         dataset_df = update_dataset_df(i_dec_level, dec_level_config, dataset_df)
-        print("DATASET DF UPDATED")
+
         # TFK 1: get clock-zero from data if needed
         if dec_level_config.window.clock_zero_type == "data start":
             dec_level_config.window.clock_zero = str(dataset_df.start.min())
