@@ -304,6 +304,12 @@ def extract_run_summaries_from_mth5s(mth5_list, summary_type="run", deduplicate=
     # merge all summaries into a super_summary
     super_summary = pd.concat(dfs)
     super_summary.reset_index(drop=True, inplace=True)
+
+    # drop rows that correspond to TFs:
+    run_rows = super_summary.sample_rate != 0
+    super_summary = super_summary[run_rows]
+    super_summary.reset_index(drop=True, inplace=True)
+
     if deduplicate:
         keep_indices = super_summary.astype(str).drop_duplicates().index
         super_summary = super_summary.loc[keep_indices]
