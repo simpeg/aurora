@@ -37,7 +37,7 @@
         "required": true,
         "style": "number",
         "units": "samples per second",
-        "description": "Initial sample rate of the data.",
+        "description": "Sample rate of the data after decimation.",
         "options": [],
         "alias": [],
         "example": "256",

@@ -22,7 +22,7 @@ The run_summary provides options for the local and possibly remote reference sta
  and the problematic runs can be addressed.
 
 The user can interact with the run_summary_df, selecting sub dataframes via querying,
-and in future maybe via some GUI (or a spreadsheet!).
+and in future maybe via some GUI (or a spreadsheet).
 
 
 The process looks like this:
@@ -43,7 +43,7 @@ c) restrict start/end times of the local runs so that they DO intersect with rem
 processing object and pass it this df:
 cc = ConfigCreator(config_path=CONFIG_PATH)
 p = cc.create_from_kernel_dataset(kernel_dataset, emtf_band_file=emtf_band_setup_file)
-9. Edit the Processing appropriately,
+9. Edit the Processing Config appropriately,
 
 """
 
@@ -53,8 +53,7 @@ import pandas as pd
 
 class KernelDataset:
     """
-    Could be called "ProcessableDataset", InputDataset or something like that.  This
-    class is intended to work with mth5-derived channel_summary or run_summary
+    This class is intended to work with mth5-derived channel_summary or run_summary
     dataframes, that specify time series intervals.
 
     This class is closely related to (may actually be an extension of) RunSummary
@@ -89,12 +88,6 @@ class KernelDataset:
 
     (b) is really just the case of considering pairs of tables like (a)
 
-
-
-    2022-03-11:
-    Following notes in Issue #118, want to get a fully populated dataframe from an mth5.
-    If I pass a station_id, then get all runs, if I pass a (station_id, run_id),
-    then just get the run start and end times.
 
     Question: To return a copy or modify in-place when querying.  Need to decide on
     standards and syntax.  Handling this in general is messy because every function
@@ -278,7 +271,7 @@ class KernelDataset:
         # iterate over these runs, packing metadata into
         station_metadata = None
         for i, row in sub_df.iterrows():
-            local_run_obj = row.run
+            local_run_obj = self.get_run_object(row)
             if station_metadata is None:
                 station_metadata = local_run_obj.station_group.metadata
                 station_metadata._runs = []
@@ -297,6 +290,72 @@ class KernelDataset:
             raise NotImplementedError
         sample_rate = self.df.sample_rate.unique()[0]
         return sample_rate
+
+    def initialize_dataframe_for_processing(self, mth5_objs):
+        """
+        Adds extra columns needed for processing, populates them with mth5 objects,
+        run_reference, and xr.Datasets.
+
+        When assigning xarrays to dataframe cells, df dislikes xr.Dataset,
+        so we convert to xr.DataArray before packing df
+
+        Parameters
+        ----------
+        mth5_objs: dict,  keyed by station_id
+        """
+
+        self.add_columns_for_processing(mth5_objs)
+
+        for i, row in self.df.iterrows():
+            run_obj = row.mth5_obj.get_run(
+                row.station_id, row.run_id, survey=row.survey
+            )
+            self.df["run_reference"].at[i] = run_obj.hdf5_group.ref
+            run_ts = run_obj.to_runts(start=row.start, end=row.end)
+            xr_ds = run_ts.dataset
+            self.df["run_dataarray"].at[i] = xr_ds.to_array("channel")
+        print("DATASET DF POPULATED")
+
+    def add_columns_for_processing(self, mth5_objs):
+        """
+        Moving this into kernel_dataset from processing_pipeline
+
+        Q: Should mth5_objs be keyed by survey-station?
+        A: Yes, and ...
+        since the KernelDataset dataframe will be iterated over we should probably
+        write an iterator method.  This can iterate over survey-station tuples
+        for multiple station processing.
+
+        Parameters
+        ----------
+        mth5_objs: dict,  keyed by station_id
+
+        """
+        columns_to_add = ["run_dataarray", "stft", "run_reference"]
+        mth5_obj_column = len(self.df) * [None]
+        for i, station_id in enumerate(self.df["station_id"]):
+            mth5_obj_column[i] = mth5_objs[station_id]
+        self.df["mth5_obj"] = mth5_obj_column
+        for column_name in columns_to_add:
+            self.df[column_name] = None
+
+    def get_run_object(self, index_or_row):
+        """
+
+        Parameters
+        ----------
+        index_or_row: integer index of df, or pd.Series object
+
+        Returns
+        -------
+
+        """
+        if isinstance(index_or_row, int):
+            row = self.df.loc[index_or_row]
+        else:
+            row = index_or_row
+        run_obj = row.mth5_obj.from_reference(row.run_reference)
+        return run_obj
 
 
 def restrict_to_station_list(df, station_ids, inplace=True):

@@ -5,7 +5,6 @@ method returns the same array as scipy.signal.spectrogram
 import numpy as np
 
 from aurora.pipelines.run_summary import RunSummary
-from aurora.pipelines.time_series_helpers import get_run_run_ts_from_mth5
 from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
@@ -28,22 +27,24 @@ def test_stft_methods_agree():
     run_summary = RunSummary()
     run_summary.from_mth5s(mth5_paths)
     tfk_dataset = KernelDataset()
-    tfk_dataset.from_run_summary(run_summary, "test1")
+    station_id = "test1"
+    run_id = "001"
+    tfk_dataset.from_run_summary(run_summary, station_id)
 
-    processing_config = create_test_run_config("test1", tfk_dataset)
+    processing_config = create_test_run_config(station_id, tfk_dataset)
 
     mth5_obj = MTH5(file_version="0.1.0")
     mth5_obj.open_mth5(mth5_path, mode="a")
 
-    run_id = "001"
     for dec_level_id, dec_config in enumerate(processing_config.decimations):
 
         if dec_level_id == 0:
-            run_dict = get_run_run_ts_from_mth5(mth5_obj, "test1", run_id, 1.0)
+            run_obj = mth5_obj.get_run(station_id, run_id, survey=None)
+            run_ts = run_obj.to_runts(start=None, end=None)
+            local_run_xrts = run_ts.dataset
         else:
-            run_dict = prototype_decimate(dec_config.decimation, run_dict)
+            local_run_xrts = prototype_decimate(dec_config.decimation, local_run_xrts)
 
-        local_run_xrts = run_dict["mvts"]
         dec_config.extra_pre_fft_detrend_type = ""
         local_stft_obj = run_ts_to_stft(dec_config, local_run_xrts)
         local_stft_obj2 = run_ts_to_stft_scipy(dec_config, local_run_xrts)

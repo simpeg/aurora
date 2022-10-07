@@ -31,6 +31,15 @@ def get_windowing_scheme(
 def get_xarray_dataset(N=1000, sps=50.0):
     """
     make a few xarrays, then bind them into a dataset
+    ToDo: Consider moving this method into test_utils/
+    ToDo: Add a test that confirms we get an AttributeError when we try
+    to overwrite attrs of xarray (
+    try:
+        ds.sample_rate=10
+        print("was not expecting to be able to overwrite attr of xarray")
+        assert(False)
+    except AttributeError:
+        assert(True)
     """
     t0 = np.datetime64("1977-03-02 12:34:56")
     time_vector = make_time_axis(t0, N, sps)
@@ -51,8 +60,11 @@ def get_xarray_dataset(N=1000, sps=50.0):
         },
         coords={
             "time": time_vector,
+        },
+        attrs={
             "some random info": "dogs",
             "some more random info": "cats",
+            "sample_rate": sps,
         },
     )
     return ds
@@ -68,6 +80,18 @@ class TestWindowingScheme(unittest.TestCase):
         self.defaut_num_samples_data = 10000
         self.defaut_num_samples_window = 64
         self.default_num_samples_overlap = 50
+
+    def test_cant_write_xarray_attrs(self):
+        """
+        This could go into a separate module for testing xarray stuff
+        """
+        ds = get_xarray_dataset()
+        try:
+            ds.sample_rate = 10
+            print("was not expecting to be able to overwrite attr of xarray")
+            assert False
+        except AttributeError:
+            assert True
 
     def test_instantiate_windowing_scheme(self):
         num_samples_window = 128
@@ -162,6 +186,7 @@ class TestWindowingScheme(unittest.TestCase):
             taper_family="hamming",
         )
         ds = get_xarray_dataset()
+
         windowed_dataset = windowing_scheme.apply_sliding_window(ds, return_xarray=True)
         if plot:
             fig, ax = plt.subplots()

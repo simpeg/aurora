@@ -1,3 +1,4 @@
+from deprecated import deprecated
 import numpy as np
 import pandas as pd
 import scipy.signal as ssig
@@ -276,6 +277,7 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
     return stft_obj
 
 
+@deprecated
 def get_run_run_ts_from_mth5(
     mth5_obj,
     station_id,
@@ -331,7 +333,7 @@ def get_run_run_ts_from_mth5(
     return run_run_ts
 
 
-def prototype_decimate(config, run_run_ts):
+def prototype_decimate(config, run_xrds):
     """
     Consider:
     1. Moving this function into time_series/decimate.py
@@ -341,37 +343,89 @@ def prototype_decimate(config, run_run_ts):
     Parameters
     ----------
     config : aurora.config.metadata.decimation.Decimation
-    run_run_ts: dict keyed by "run" and "mvts"
-    out_dict["run"] is mth5.groups.master_station_run_channel.RunGroup
-    out_dict["mvts"] is mth5.timeseries.run_ts.RunTS
+    run_xrds: xr.Dataset
+        Originally from mth5.timeseries.run_ts.RunTS.dataset, but possibly decimated
+        multiple times
 
     Returns
     -------
-    dict: same structure as run_run_ts
+    xr_ds: xr.Dataset
+        Decimated version of the input run_xrds
     """
-    run_obj = run_run_ts["run"]
-    run_xrts = run_run_ts["mvts"]
-    run_obj.metadata.sample_rate = config.sample_rate
     slicer = slice(None, None, int(config.factor))  # decimation.factor
-    downsampled_time_axis = run_xrts.time.data[slicer]
+    downsampled_time_axis = run_xrds.time.data[slicer]
 
     num_observations = len(downsampled_time_axis)
-    channel_labels = list(run_xrts.data_vars.keys())  # run_ts.channels
+    channel_labels = list(run_xrds.data_vars.keys())  # run_ts.channels
     num_channels = len(channel_labels)
     new_data = np.full((num_observations, num_channels), np.nan)
     for i_ch, ch_label in enumerate(channel_labels):
-        new_data[:, i_ch] = ssig.decimate(run_xrts[ch_label], int(config.factor))
+        new_data[:, i_ch] = ssig.decimate(run_xrds[ch_label], int(config.factor))
 
     xr_da = xr.DataArray(
         new_data,
         dims=["time", "channel"],
         coords={"time": downsampled_time_axis, "channel": channel_labels},
     )
-
+    attr_dict = run_xrds.attrs
+    attr_dict["sample_rate"] = config.sample_rate
+    xr_da.attrs = attr_dict
     xr_ds = xr_da.to_dataset("channel")
-    result = {"run": run_obj, "mvts": xr_ds}
-    print("RUN OBJECT")
-    print(run_obj)
-    print("XRDS")
-    print(xr_ds)
-    return result
+    return xr_ds
+
+
+def prototype_decimate_2(config, run_xrds):
+    """
+    Uses the built-in xarray coarsen method.   Not clear what AAF effects are.
+    Method is fast.  Might be non-linear.  Seems to give similar performance to
+    prototype_decimate for synthetic data.
+
+    N.B. config.factor must be integer valued
+
+    Parameters
+    ----------
+    config : aurora.config.metadata.decimation.Decimation
+    run_xrds: xr.Dataset
+        Originally from mth5.timeseries.run_ts.RunTS.dataset, but possibly decimated
+        multiple times
+
+    Returns
+    -------
+    xr_ds: xr.Dataset
+        Decimated version of the input run_xrds
+    """
+    new_xr_ds = run_xrds.coarsen(time=int(config.factor), boundary="trim").mean()
+    attr_dict = run_xrds.attrs
+    attr_dict["sample_rate"] = config.sample_rate
+    new_xr_ds.attrs = attr_dict
+    return new_xr_ds
+
+
+def prototype_decimate_3(config, run_xrds):
+    """
+    Uses the built-in xarray coarsen method.   Not clear what AAF effects are.
+    Method is fast.  Might be non-linear.  Seems to give similar performance to
+    prototype_decimate for synthetic data.
+
+    N.B. config.factor must be integer valued
+
+    Parameters
+    ----------
+    config : aurora.config.metadata.decimation.Decimation
+    run_xrds: xr.Dataset
+        Originally from mth5.timeseries.run_ts.RunTS.dataset, but possibly decimated
+        multiple times
+
+    Returns
+    -------
+    xr_ds: xr.Dataset
+        Decimated version of the input run_xrds
+    """
+    dt = run_xrds.time.diff(dim="time").median().values
+    dt_new = config.factor * dt
+    dt_new = dt_new.__str__().replace("nanoseconds", "ns")
+    new_xr_ds = run_xrds.resample(time=dt_new).mean(dim="time")
+    attr_dict = run_xrds.attrs
+    attr_dict["sample_rate"] = config.sample_rate
+    new_xr_ds.attrs = attr_dict
+    return new_xr_ds
