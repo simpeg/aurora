@@ -54,7 +54,16 @@ def handle_nan(X, Y, RR, drop_dim=""):
     RR = RR.rename(data_var_add_label_mapper)
 
     merged_xr = X.merge(Y, join="exact")
-    merged_xr = merged_xr.merge(RR, join="exact")
+    # Workaround for issue #228
+    # merged_xr = merged_xr.merge(RR, join="exact")
+    try:
+        merged_xr = merged_xr.merge(RR, join="exact")
+    except ValueError:
+        print("Coordinate alignment mismatch -- see aurora issue #228 ")
+        merged_xr = merged_xr.merge(RR, join="left")
+        for ch in list(RR.keys()):
+            merged_xr[ch].values = RR[ch].values
+
     merged_xr = merged_xr.dropna(dim=drop_dim)
     merged_xr = merged_xr.to_array(dim="channel")
     X = merged_xr.sel(channel=input_channels)

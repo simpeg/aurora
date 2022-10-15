@@ -18,11 +18,11 @@ class RegressionEstimator(object):
 
     Many of the robust transfer estimation methods we will use repeat the
     model of solving Y = X*b +epsilon for b.  X is variously called the "input",
-    "predictor", "explanatory", "confounding", "independent" variable(s) or the
-    "design matrix", "model matrix" or "regressor matrix".
+    "predictor", "explanatory", "confounding", "independent" "exogenous", variable(s)
+    or the "design matrix", "model matrix" or "regressor matrix".
     Y are variously called the the "output", "predicted", "outcome",
-    "response",  or "dependent" variable.  I will try to use input and
-    output.
+    "response", "endogenous", "regressand", or "dependent" variable.  I will try to
+    use input and output.
 
     When we "regress Y on X", we use the values of variable X to predict
     those of Y.
