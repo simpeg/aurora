@@ -60,6 +60,8 @@ def handle_nan(X, Y, RR, drop_dim=""):
         merged_xr = merged_xr.merge(RR, join="exact")
     except ValueError:
         print("Coordinate alignment mismatch -- see aurora issue #228 ")
+        print(f"X.time.[0]: {X.time[0].values}")
+        print(f"RR.time.[0]: {RR.time[0].values}")
         merged_xr = merged_xr.merge(RR, join="left")
         for ch in list(RR.keys()):
             merged_xr[ch].values = RR[ch].values
