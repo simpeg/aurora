@@ -101,7 +101,14 @@ class KernelDataset:
         self.df = kwargs.get("df")
         self.local_station_id = kwargs.get("local_station_id")
         self.remote_station_id = kwargs.get("remote_station_id")
-        self._mini_summary_columns = ["survey", "station_id", "run_id", "start", "end"]
+        self._mini_summary_columns = [
+            "survey",
+            "station_id",
+            "run_id",
+            "start",
+            "end",
+            "duration",
+        ]
 
     def clone(self):
         return copy.deepcopy(self)
