@@ -52,10 +52,14 @@ def apply_prewhitening(decimation_obj, run_xrts_input):
         prewhitened time series
 
     """
+    if not decimation_obj.prewhitening_type:
+        return run_xrts_input
+
     if decimation_obj.prewhitening_type == "first difference":
         run_xrts = run_xrts_input.differentiate("time")
+
     else:
-        print(f"{decimation_obj.prewhitening_type} prehitening not yet implemented")
+        print(f"{decimation_obj.prewhitening_type} pre-whitening not implemented")
         raise NotImplementedError
     return run_xrts
 
@@ -75,6 +79,9 @@ def apply_recoloring(decimation_obj, stft_obj):
     stft_obj : xarray.core.dataset.Dataset
         Recolored time series of Fourier coefficients
     """
+    if not decimation_obj.prewhitening_type:
+        return stft_obj
+
     if decimation_obj.prewhitening_type == "first difference":
         # replace below with decimation_obj.get_fft_harmonics() ?
         freqs = get_fft_harmonics(
