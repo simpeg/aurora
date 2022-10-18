@@ -1,4 +1,4 @@
-.. image:: figures/aurora_logo.png
+.. image:: http://simpeg.xyz/aurora/_images/aurora_logo.png
    :width: 900
    :alt: AURORA
 
