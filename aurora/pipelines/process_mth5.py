@@ -76,7 +76,7 @@ def initialize_mth5s(config):
     # local_mth5_obj = MTH5(file_version="0.1.0")
     # local_mth5_obj.open_mth5(config.stations.local.mth5_path, mode="r")
     if config.stations.remote:
-        remote_mth5_obj = initialize_mth5(config.stations.local.mth5_path, mode="r")
+        remote_mth5_obj = initialize_mth5(config.stations.remote[0].mth5_path, mode="r")
         # remote_mth5_obj = MTH5(file_version="0.1.0")
         # remote_mth5_obj.open_mth5(config.stations.remote[0].mth5_path, mode="r")
     else:
