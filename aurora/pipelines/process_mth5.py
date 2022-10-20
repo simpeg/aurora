@@ -43,7 +43,7 @@ from mt_metadata.transfer_functions.core import TF
 
 
 def make_stft_objects(
-    processing_config, i_dec_level, run_obj, run_xrts, units, station_id
+    processing_config, i_dec_level, run_obj, run_xrds, units, station_id
 ):
     """
     Operates on a "per-run" basis
@@ -60,7 +60,7 @@ def make_stft_objects(
         The decimation level to process
     run_obj: mth5.groups.master_station_run_channel.RunGroup
         The run to transform to stft
-    run_xrts: xarray.core.dataset.Dataset
+    run_xrds: xarray.core.dataset.Dataset
         The data time series from the run to transform
     units: str
         expects "MT".  May change so that this is the only accepted set of units
@@ -74,8 +74,8 @@ def make_stft_objects(
         Time series of calibrated Fourier coefficients per each channel in the run
     """
     stft_config = processing_config.get_decimation_level(i_dec_level)
-    stft_obj = run_ts_to_stft(stft_config, run_xrts)
-    # stft_obj = run_ts_to_stft_scipy(stft_config, run_xrts)
+    stft_obj = run_ts_to_stft(stft_config, run_xrds)
+    # stft_obj = run_ts_to_stft_scipy(stft_config, run_xrds)
     run_id = run_obj.metadata.id
     if station_id == processing_config.stations.local.id:
         scale_factors = processing_config.stations.local.run_dict[
@@ -228,8 +228,8 @@ def update_dataset_df(i_dec_level, config, dataset_df):
         # See Note 2 top of module
         for i, row in dataset_df.iterrows():
             run_xrds = row["run_dataarray"].to_dataset("channel")
-            decimated_run_xrts = prototype_decimate(config.decimation, run_xrds)
-            dataset_df["run_dataarray"].at[i] = decimated_run_xrts.to_array("channel")
+            decimated_run_xrds = prototype_decimate(config.decimation, run_xrds)
+            dataset_df["run_dataarray"].at[i] = decimated_run_xrds.to_array("channel")
     print("DATASET DF UPDATED")
     return dataset_df
 
@@ -305,10 +305,10 @@ def process_mth5(
         local_stfts = []
         remote_stfts = []
         for i, row in dataset_df.iterrows():
-            run_xrts = row["run_dataarray"].to_dataset("channel")
+            run_xrds = row["run_dataarray"].to_dataset("channel")
             run_obj = row.mth5_obj.from_reference(row.run_reference)
             stft_obj = make_stft_objects(
-                processing_config, i_dec_level, run_obj, run_xrts, units, row.station_id
+                processing_config, i_dec_level, run_obj, run_xrds, units, row.station_id
             )
 
             if row.station_id == processing_config.stations.local.id:
