@@ -37,56 +37,9 @@ from aurora.transfer_function.transfer_function_collection import (
 from aurora.transfer_function.TTFZ import TTFZ
 
 from mt_metadata.transfer_functions.core import TF
-from mth5.mth5 import MTH5
-from mth5.utils.helpers import initialize_mth5
 
 
 # =============================================================================
-
-
-def initialize_mth5s(config):
-    """
-    Prepare to process data, get mth5 objects open in read mode and processing_config
-    initialized if needed.
-
-    ToDo: Review mth5_objs dict.  Theoretically, you could get namespace clashes here.
-    Could key by survey-station, but also just use the keys "local" and "remote".
-
-    ToDo: This could be made a method of the Processing() class
-    ToDo: Note the hard-coding of version="0.1.0".  Should we not be taking the
-    version from the h5 archive, and initializing based on the actual file version?
-    ToDo: Import initialize_mth5 from mth5 and use that, rather than the open_mth5
-
-    Parameters
-    ----------
-    config : str, pathlib.Path, or aurora.config.metadata.processing.Processing object
-        If str or Path is provided, this will read in the config and return it as a
-        Processing object.
-
-    Returns
-    -------
-    mth5_objs : dict
-        Keyed by station_ids.
-        local_mth5_obj : mth5.mth5.MTH5
-        remote_mth5_obj: mth5.mth5.MTH5
-    """
-    config = initialize_config(config)
-
-    local_mth5_obj = initialize_mth5(config.stations.local.mth5_path, mode="r")
-    # local_mth5_obj = MTH5(file_version="0.1.0")
-    # local_mth5_obj.open_mth5(config.stations.local.mth5_path, mode="r")
-    if config.stations.remote:
-        remote_mth5_obj = initialize_mth5(config.stations.remote[0].mth5_path, mode="r")
-        # remote_mth5_obj = MTH5(file_version="0.1.0")
-        # remote_mth5_obj.open_mth5(config.stations.remote[0].mth5_path, mode="r")
-    else:
-        remote_mth5_obj = None
-
-    mth5_objs = {config.stations.local.id: local_mth5_obj}
-    if config.stations.remote:
-        mth5_objs[config.stations.remote[0].id] = remote_mth5_obj
-
-    return mth5_objs
 
 
 def make_stft_objects(
@@ -336,13 +289,8 @@ def process_mth5(
     """
     # Initialize config and mth5s
     processing_config = initialize_config(config)
-
-    # ToDo: tfk_dataset.validate_processing(config) # (see Issue #182)
-    # Move this check (below) into the method above.
-    if processing_config.stations.local.id is None:
-        processing_config.stations.from_dataset_dataframe(tfk_dataset.df)
-
-    mth5_objs = initialize_mth5s(config)
+    processing_config.validate_processing(tfk_dataset)
+    mth5_objs = processing_config.initialize_mth5s(config)
 
     # Assign additional columns to dataset_df, populate with mth5_objs and xr_ts
     # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE

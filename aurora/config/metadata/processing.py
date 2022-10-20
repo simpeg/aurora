@@ -11,13 +11,15 @@ from deprecated import deprecated
 import numpy as np
 from pathlib import Path
 
-from mt_metadata.base.helpers import write_lines
-from mt_metadata.base import get_schema, Base
-from .standards import SCHEMA_FN_PATHS
-
-from . import DecimationLevel, Stations, Band, ChannelNomenclature
 from aurora.config import BANDS_DEFAULT_FILE
 from aurora.time_series.frequency_band import FrequencyBand
+from mt_metadata.base.helpers import write_lines
+from mt_metadata.base import get_schema, Base
+from mth5.utils.helpers import initialize_mth5
+
+from .standards import SCHEMA_FN_PATHS
+from . import DecimationLevel, Stations, Band, ChannelNomenclature
+
 
 # =============================================================================
 attr_dict = get_schema("processing", SCHEMA_FN_PATHS)
@@ -264,22 +266,50 @@ class Processing(Base):
             self.channel_nomenclature.default_reference_channels
         )
 
-    def validate(self):
+    def validate_processing(self, kernel_dataset):
         """
         Placeholder.  Some of the checks and methods here maybe better placed in
         TFKernel, which would validate the dataset against the processing config.
 
-        The reason the validator is being created is that the default estimation
-        engine from the json file is "RME_RR", which is fine (we expect to in general
-        do more RR processing than SS) but if there is only one station (no remote)
-        then the RME_RR should be replaced by default with "RME".
+        Things that are validated:
+        1. The default estimation engine from the json file is "RME_RR", which is fine (
+        we expect to in general to do more RR processing than SS) but if there is only
+        one station (no remote)then the RME_RR should be replaced by default with "RME".
 
-        Returns
-        -------
-
+        2. make sure local station id is defined (correctly from kernel dataset)
         """
+
         # Make sure a RR method is not being called for a SS config
         if not self.stations.remote:
             for decimation in self.decimations:
                 if decimation.estimator.engine == "RME_RR":
+                    print("No RR station specified, switching RME_RR to RME")
                     decimation.estimator.engine = "RME"
+
+        # Make sure that a local station is defined
+        if not self.stations.local.id:
+            print("WARNING: Local station not specified")
+            print("Local station should be set from Kernel Dataset")
+            self.stations.from_dataset_dataframe(kernel_dataset.df)
+
+    def initialize_mth5s(self):
+        """
+
+        Returns
+        -------
+        mth5_objs : dict
+            Keyed by station_ids.
+            local station id : mth5.mth5.MTH5
+            remote station id: mth5.mth5.MTH5
+        """
+        local_mth5_obj = initialize_mth5(self.stations.local.mth5_path, mode="r")
+        if self.stations.remote:
+            remote_mth5_obj = initialize_mth5(self.stations.remote.mth5_path, mode="r")
+        else:
+            remote_mth5_obj = None
+
+        mth5_objs = {self.stations.local.id: local_mth5_obj}
+        if self.stations.remote:
+            mth5_objs[self.stations.remote[0].id] = remote_mth5_obj
+
+        return mth5_objs
