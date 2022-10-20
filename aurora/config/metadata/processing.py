@@ -304,7 +304,9 @@ class Processing(Base):
         """
         local_mth5_obj = initialize_mth5(self.stations.local.mth5_path, mode="r")
         if self.stations.remote:
-            remote_mth5_obj = initialize_mth5(self.stations.remote.mth5_path, mode="r")
+            remote_mth5_obj = initialize_mth5(
+                self.stations.remote[0].mth5_path, mode="r"
+            )
         else:
             remote_mth5_obj = None
 
