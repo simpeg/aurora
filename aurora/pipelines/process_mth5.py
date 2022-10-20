@@ -290,14 +290,14 @@ def process_mth5(
     # Initialize config and mth5s
     processing_config = initialize_config(config)
     processing_config.validate_processing(tfk_dataset)
-    mth5_objs = processing_config.initialize_mth5s(config)
+    mth5_objs = processing_config.initialize_mth5s()
 
     # Assign additional columns to dataset_df, populate with mth5_objs and xr_ts
     # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
     tfk_dataset.initialize_dataframe_for_processing(mth5_objs)
     dataset_df = tfk_dataset.df
 
-    # Here is where any checks that would be done by TF Kernel would be applied
+    # Place checks that would be done by TF Kernel here
     # see notes labelled with ToDo TFK above
 
     print(
