@@ -186,8 +186,12 @@ def update_dataset_df(i_dec_level, config, dataset_df):
     array, and could be placed into TFKDataset.initialize_time_series_data()
     The second mode, decimates. Becasue it calls time series operations, I prefer
     to keep it in pipelines.  Maybe name it update_dataset_df().
-
-    self.populate_with_data()
+    Although, there are other ways to approach this:
+        Say we had a dictionary of decimation_methods (kind of like the dictionary of
+        regression_engines), then one could call TFKernel.update_dataset_df(), where
+        the argument was the method to do the decimation.
+        In this way, the workflow management could stay inside TFKernel, but the math
+        could be done via the data container ...
 
     Notes:
     1. When iterating over dataframe, (i)ndex must run from 0 to len(df), otherwise
@@ -228,23 +232,6 @@ def update_dataset_df(i_dec_level, config, dataset_df):
             dataset_df["run_dataarray"].at[i] = decimated_run_xrts.to_array("channel")
     print("DATASET DF UPDATED")
     return dataset_df
-
-
-def close_mths_objs(df):
-    """
-    ToDo: Move this into a method of KernelDataset
-    Loop over all unique mth5_objs in the df and make sure they are closed
-
-    Parameters
-    ----------
-    df: pd.DataFrame
-        usually this is the dataframe associated with an instance of KernelDataset
-
-    """
-    mth5_objs = df["mth5_obj"].unique()
-    for mth5_obj in mth5_objs:
-        mth5_obj.close_mth5()
-    return
 
 
 def process_mth5(
@@ -364,7 +351,7 @@ def process_mth5(
 
     if return_collection:
         # this is now really only to be used for debugging and may be deprecated soon
-        close_mths_objs(dataset_df)
+        tfk_dataset.close_mths_objs()
         return tf_collection
     else:
         local_station_id = processing_config.stations.local.id
@@ -387,5 +374,5 @@ def process_mth5(
             station_metadata_dict=station_metadata.to_dict(),
             survey_dict=survey_dict,
         )
-        close_mths_objs(dataset_df)
+        tfk_dataset.close_mths_objs()
         return tf_cls
