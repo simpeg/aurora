@@ -75,6 +75,11 @@ class RunSummary:
         self._mini_summary_columns = ["survey", "station_id", "run_id", "start", "end"]
 
     def clone(self):
+        """
+        2022-10-20:
+        Cloning may be causing issues with extra instances of open h5 files ...
+
+        """
         return copy.deepcopy(self)
 
     def from_mth5s(self, mth5_list):
