@@ -37,52 +37,13 @@ from aurora.transfer_function.transfer_function_collection import (
 from aurora.transfer_function.TTFZ import TTFZ
 
 from mt_metadata.transfer_functions.core import TF
-from mth5.mth5 import MTH5
 
 
 # =============================================================================
 
 
-def initialize_mth5s(config):
-    """
-    Prepare to process data, get mth5 objects open in read mode and processing_config
-    initialized if needed.
-
-    ToDo: Review mth5_objs dict.  Theoretically, you could get namespace clashes here.
-    Could key by survey-station, but also just use the keys "local" and "remote".
-
-    Parameters
-    ----------
-    config : str, pathlib.Path, or aurora.config.metadata.processing.Processing object
-        If str or Path is provided, this will read in the config and return it as a
-        Processing object.
-
-    Returns
-    -------
-    mth5_objs : dict
-        Keyed by station_ids.
-        local_mth5_obj : mth5.mth5.MTH5
-        remote_mth5_obj: mth5.mth5.MTH5
-    """
-    config = initialize_config(config)
-
-    local_mth5_obj = MTH5(file_version="0.1.0")
-    local_mth5_obj.open_mth5(config.stations.local.mth5_path, mode="r")
-    if config.stations.remote:
-        remote_mth5_obj = MTH5(file_version="0.1.0")
-        remote_mth5_obj.open_mth5(config.stations.remote[0].mth5_path, mode="r")
-    else:
-        remote_mth5_obj = None
-
-    mth5_objs = {config.stations.local.id: local_mth5_obj}
-    if config.stations.remote:
-        mth5_objs[config.stations.remote[0].id] = remote_mth5_obj
-
-    return mth5_objs
-
-
 def make_stft_objects(
-    processing_config, i_dec_level, run_obj, run_xrts, units, station_id
+    processing_config, i_dec_level, run_obj, run_xrds, units, station_id
 ):
     """
     Operates on a "per-run" basis
@@ -99,7 +60,7 @@ def make_stft_objects(
         The decimation level to process
     run_obj: mth5.groups.master_station_run_channel.RunGroup
         The run to transform to stft
-    run_xrts: xarray.core.dataset.Dataset
+    run_xrds: xarray.core.dataset.Dataset
         The data time series from the run to transform
     units: str
         expects "MT".  May change so that this is the only accepted set of units
@@ -113,8 +74,8 @@ def make_stft_objects(
         Time series of calibrated Fourier coefficients per each channel in the run
     """
     stft_config = processing_config.get_decimation_level(i_dec_level)
-    stft_obj = run_ts_to_stft(stft_config, run_xrts)
-    # stft_obj = run_ts_to_stft_scipy(stft_config, run_xrts)
+    stft_obj = run_ts_to_stft(stft_config, run_xrds)
+    # stft_obj = run_ts_to_stft_scipy(stft_config, run_xrds)
     run_id = run_obj.metadata.id
     if station_id == processing_config.stations.local.id:
         scale_factors = processing_config.stations.local.run_dict[
@@ -225,8 +186,12 @@ def update_dataset_df(i_dec_level, config, dataset_df):
     array, and could be placed into TFKDataset.initialize_time_series_data()
     The second mode, decimates. Becasue it calls time series operations, I prefer
     to keep it in pipelines.  Maybe name it update_dataset_df().
-
-    self.populate_with_data()
+    Although, there are other ways to approach this:
+        Say we had a dictionary of decimation_methods (kind of like the dictionary of
+        regression_engines), then one could call TFKernel.update_dataset_df(), where
+        the argument was the method to do the decimation.
+        In this way, the workflow management could stay inside TFKernel, but the math
+        could be done via the data container ...
 
     Notes:
     1. When iterating over dataframe, (i)ndex must run from 0 to len(df), otherwise
@@ -263,27 +228,10 @@ def update_dataset_df(i_dec_level, config, dataset_df):
         # See Note 2 top of module
         for i, row in dataset_df.iterrows():
             run_xrds = row["run_dataarray"].to_dataset("channel")
-            decimated_run_xrts = prototype_decimate(config.decimation, run_xrds)
-            dataset_df["run_dataarray"].at[i] = decimated_run_xrts.to_array("channel")
+            decimated_run_xrds = prototype_decimate(config.decimation, run_xrds)
+            dataset_df["run_dataarray"].at[i] = decimated_run_xrds.to_array("channel")
     print("DATASET DF UPDATED")
     return dataset_df
-
-
-def close_mths_objs(df):
-    """
-    ToDo: Move this into a method of KernelDataset
-    Loop over all unique mth5_objs in the df and make sure they are closed
-
-    Parameters
-    ----------
-    df: pd.DataFrame
-        usually this is the dataframe associated with an instance of KernelDataset
-
-    """
-    mth5_objs = df["mth5_obj"].unique()
-    for mth5_obj in mth5_objs:
-        mth5_obj.close_mth5()
-    return
 
 
 def process_mth5(
@@ -328,20 +276,15 @@ def process_mth5(
     """
     # Initialize config and mth5s
     processing_config = initialize_config(config)
-
-    # ToDo: tfk_dataset.validate_processing(config) # (see Issue #182)
-    # Move this check (below) into the method above.
-    if processing_config.stations.local.id is None:
-        processing_config.stations.from_dataset_dataframe(tfk_dataset.df)
-
-    mth5_objs = initialize_mth5s(config)
+    processing_config.validate_processing(tfk_dataset)
+    mth5_objs = processing_config.initialize_mth5s()
 
     # Assign additional columns to dataset_df, populate with mth5_objs and xr_ts
     # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
     tfk_dataset.initialize_dataframe_for_processing(mth5_objs)
     dataset_df = tfk_dataset.df
 
-    # Here is where any checks that would be done by TF Kernel would be applied
+    # Place checks that would be done by TF Kernel here
     # see notes labelled with ToDo TFK above
 
     print(
@@ -362,10 +305,10 @@ def process_mth5(
         local_stfts = []
         remote_stfts = []
         for i, row in dataset_df.iterrows():
-            run_xrts = row["run_dataarray"].to_dataset("channel")
+            run_xrds = row["run_dataarray"].to_dataset("channel")
             run_obj = row.mth5_obj.from_reference(row.run_reference)
             stft_obj = make_stft_objects(
-                processing_config, i_dec_level, run_obj, run_xrts, units, row.station_id
+                processing_config, i_dec_level, run_obj, run_xrds, units, row.station_id
             )
 
             if row.station_id == processing_config.stations.local.id:
@@ -408,7 +351,7 @@ def process_mth5(
 
     if return_collection:
         # this is now really only to be used for debugging and may be deprecated soon
-        close_mths_objs(dataset_df)
+        tfk_dataset.close_mths_objs()
         return tf_collection
     else:
         local_station_id = processing_config.stations.local.id
@@ -431,5 +374,5 @@ def process_mth5(
             station_metadata_dict=station_metadata.to_dict(),
             survey_dict=survey_dict,
         )
-        close_mths_objs(dataset_df)
+        tfk_dataset.close_mths_objs()
         return tf_cls

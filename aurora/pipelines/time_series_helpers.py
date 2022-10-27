@@ -32,7 +32,7 @@ def validate_sample_rate(run_ts, expected_sample_rate, tol=1e-4):
             raise Exception
 
 
-def apply_prewhitening(decimation_obj, run_xrts_input):
+def apply_prewhitening(decimation_obj, run_xrds_input):
     """
     Applys prewhitening to time series to avoid spectral leakage when FFT is applied.
 
@@ -43,25 +43,25 @@ def apply_prewhitening(decimation_obj, run_xrts_input):
     ----------
     decimation_obj : aurora.config.metadata.decimation_level.DecimationLevel
         Information about how the decimation level is to be processed
-    run_xrts_input : xarray.core.dataset.Dataset
+    run_xrds_input : xarray.core.dataset.Dataset
         Time series to be prewhitened
 
     Returns
     -------
-    run_xrts : xarray.core.dataset.Dataset
+    run_xrds : xarray.core.dataset.Dataset
         prewhitened time series
 
     """
     if not decimation_obj.prewhitening_type:
-        return run_xrts_input
+        return run_xrds_input
 
     if decimation_obj.prewhitening_type == "first difference":
-        run_xrts = run_xrts_input.differentiate("time")
+        run_xrds = run_xrds_input.differentiate("time")
 
     else:
         print(f"{decimation_obj.prewhitening_type} pre-whitening not implemented")
         raise NotImplementedError
-    return run_xrts
+    return run_xrds
 
 
 def apply_recoloring(decimation_obj, stft_obj):
@@ -107,13 +107,13 @@ def apply_recoloring(decimation_obj, stft_obj):
     return stft_obj
 
 
-def run_ts_to_stft_scipy(decimation_obj, run_xrts_orig):
+def run_ts_to_stft_scipy(decimation_obj, run_xrds_orig):
     """
     Parameters
     ----------
     decimation_obj : aurora.config.metadata.decimation_level.DecimationLevel
         Information about how the decimation level is to be processed
-    run_xrts : : xarray.core.dataset.Dataset
+    run_xrds_orig : : xarray.core.dataset.Dataset
         Time series to be processed
 
     Returns
@@ -121,13 +121,13 @@ def run_ts_to_stft_scipy(decimation_obj, run_xrts_orig):
     stft_obj : xarray.core.dataset.Dataset
         Time series of Fourier coefficients
     """
-    run_xrts = apply_prewhitening(decimation_obj, run_xrts_orig)
+    run_xrds = apply_prewhitening(decimation_obj, run_xrds_orig)
     windowing_scheme = decimation_obj.windowing_scheme
 
     stft_obj = xr.Dataset()
-    for channel_id in run_xrts.data_vars:
+    for channel_id in run_xrds.data_vars:
         ff, tt, specgm = ssig.spectrogram(
-            run_xrts[channel_id].data,
+            run_xrds[channel_id].data,
             fs=decimation_obj.decimation.sample_rate,
             window=windowing_scheme.taper,
             nperseg=decimation_obj.window.num_samples,
@@ -145,7 +145,7 @@ def run_ts_to_stft_scipy(decimation_obj, run_xrts_orig):
         # make time_axis
         tt = tt - tt[0]
         tt *= decimation_obj.decimation.sample_rate
-        time_axis = run_xrts.time.data[tt.astype(int)]
+        time_axis = run_xrds.time.data[tt.astype(int)]
 
         xrd = xr.DataArray(
             specgm.T,
@@ -159,7 +159,7 @@ def run_ts_to_stft_scipy(decimation_obj, run_xrts_orig):
     return stft_obj
 
 
-def truncate_to_clock_zero(decimation_obj, run_xrts):
+def truncate_to_clock_zero(decimation_obj, run_xrds):
     """
     Compute the time interval between the first data sample and the clockzero
     Identify the first sample in the xarray time series that corresponds to a
@@ -169,13 +169,13 @@ def truncate_to_clock_zero(decimation_obj, run_xrts):
     ----------
     decimation_obj: aurora.config.metadata.decimation_level.DecimationLevel
         Information about how the decimation level is to be processed
-    run_xrts : xarray.core.dataset.Dataset
+    run_xrds : xarray.core.dataset.Dataset
         normally extracted from mth5.RunTS
 
 
     Returns
     -------
-    run_xrts : xarray.core.dataset.Dataset
+    run_xrds : xarray.core.dataset.Dataset
         same as the input time series, but possibly slightly shortened
     """
     if decimation_obj.window.clock_zero_type == "ignore":
@@ -183,7 +183,7 @@ def truncate_to_clock_zero(decimation_obj, run_xrts):
     else:
         clock_zero = pd.Timestamp(decimation_obj.window.clock_zero)
         clock_zero = clock_zero.to_datetime64()
-        delta_t = clock_zero - run_xrts.time[0]
+        delta_t = clock_zero - run_xrds.time[0]
         assert delta_t.dtype == "<m8[ns]"  # expected in nanoseconds
         delta_t_seconds = int(delta_t) / 1e9
         if delta_t_seconds == 0:
@@ -194,17 +194,17 @@ def truncate_to_clock_zero(decimation_obj, run_xrts):
             n_partial_steps = number_of_steps - np.floor(number_of_steps)
             n_clip = n_partial_steps * windowing_scheme.num_samples_advance
             n_clip = int(np.round(n_clip))
-            t_clip = run_xrts.time[n_clip]
-            cond1 = run_xrts.time >= t_clip
+            t_clip = run_xrds.time[n_clip]
+            cond1 = run_xrds.time >= t_clip
             print(
                 f"dropping {n_clip} samples to agree with "
                 f"{decimation_obj.window.clock_zero_type} clock zero {clock_zero}"
             )
-            run_xrts = run_xrts.where(cond1, drop=True)
-    return run_xrts
+            run_xrds = run_xrds.where(cond1, drop=True)
+    return run_xrds
 
 
-def run_ts_to_stft(decimation_obj, run_xrts_orig):
+def run_ts_to_stft(decimation_obj, run_xrds_orig):
     """
 
     Parameters
@@ -221,11 +221,11 @@ def run_ts_to_stft(decimation_obj, run_xrts_orig):
         recoloring. This really doesn't matter since we don't use the DC harmonic for
         anything.
     """
-    run_xrts = apply_prewhitening(decimation_obj, run_xrts_orig)
-    run_xrts = truncate_to_clock_zero(decimation_obj, run_xrts)
+    run_xrds = apply_prewhitening(decimation_obj, run_xrds_orig)
+    run_xrds = truncate_to_clock_zero(decimation_obj, run_xrds)
     windowing_scheme = decimation_obj.windowing_scheme
     windowed_obj = windowing_scheme.apply_sliding_window(
-        run_xrts, dt=1.0 / decimation_obj.decimation.sample_rate
+        run_xrds, dt=1.0 / decimation_obj.decimation.sample_rate
     )
     windowed_obj = WindowedTimeSeries.detrend(data=windowed_obj, detrend_type="linear")
     tapered_obj = windowed_obj * windowing_scheme.taper
