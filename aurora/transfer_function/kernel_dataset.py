@@ -49,6 +49,7 @@ p = cc.create_from_kernel_dataset(kernel_dataset, emtf_band_file=emtf_band_setup
 
 import copy
 import pandas as pd
+from mt_metadata.utils.list_dict import ListDict
 
 
 class KernelDataset:
@@ -116,7 +117,9 @@ class KernelDataset:
     def clone_dataframe(self):
         return copy.deepcopy(self.df)
 
-    def from_run_summary(self, run_summary, local_station_id, remote_station_id=None):
+    def from_run_summary(
+        self, run_summary, local_station_id, remote_station_id=None
+    ):
         """
 
         Parameters
@@ -140,7 +143,9 @@ class KernelDataset:
         ]
         if remote_station_id:
             station_ids.append(remote_station_id)
-        df = restrict_to_station_list(run_summary.df, station_ids, inplace=False)
+        df = restrict_to_station_list(
+            run_summary.df, station_ids, inplace=False
+        )
         df["remote"] = False
         if remote_station_id:
             cond = df.station_id == remote_station_id
@@ -226,11 +231,17 @@ class KernelDataset:
         for i_local, local_row in local_df.iterrows():
             for i_remote, remote_row in remote_df.iterrows():
                 if intervals_overlap(
-                    local_row.start, local_row.end, remote_row.start, remote_row.end
+                    local_row.start,
+                    local_row.end,
+                    remote_row.start,
+                    remote_row.end,
                 ):
                     # print(f"OVERLAP {i_local}, {i_remote}")
                     olap_start, olap_end = overlap(
-                        local_row.start, local_row.end, remote_row.start, remote_row.end
+                        local_row.start,
+                        local_row.end,
+                        remote_row.start,
+                        remote_row.end,
                     )
                     # print(
                     #     f"{olap_start} -- {olap_end}\n "
@@ -281,7 +292,7 @@ class KernelDataset:
             local_run_obj = self.get_run_object(row)
             if station_metadata is None:
                 station_metadata = local_run_obj.station_group.metadata
-                station_metadata._runs = []
+                station_metadata.runs = ListDict()
             run_metadata = local_run_obj.metadata
             station_metadata.add_run(run_metadata)
         return station_metadata
