@@ -101,12 +101,13 @@ class EstimateTransferFunction:
         """
 
         if band_file_path is not None:
-            band_file_path = Path(band_file_path)
+            if isinstance(band_file_path, (str, Path)):
+                band_file_path = Path(band_file_path)
             if not band_file_path.exists():
                 raise IOError(f"Could not find {band_file_path}, check path.")
             self._band_file_path = band_file_path
         else:
-            self._band_file_path = BANDS_DEFAULT_FILE
+            self._band_file_path = Path(BANDS_DEFAULT_FILE)
 
     @property
     def run_summary(self):
