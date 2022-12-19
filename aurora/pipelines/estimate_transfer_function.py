@@ -192,6 +192,24 @@ class EstimateTransferFunction:
             self.kernel_dataset, emtf_band_file=self.bands_file_path
         )
 
+    def _save_tf_in_mth5(self, tf_obj):
+        """
+        save TransferFunction object in the local MTH5 file
+
+        :param tf_obj: DESCRIPTION
+        :type tf_obj: TYPE
+        :return: DESCRIPTION
+        :rtype: TYPE
+
+        """
+
+        from mth5.mth5 import MTH5
+
+        m = MTH5()
+        m.open_mth5(self.local_mth5_path)
+        m.add_tf(tf_obj)
+        m.close_mth5()
+
     def estimate_tf(self, show_plot=True, save_in_mth5=False):
         """
 
@@ -206,7 +224,7 @@ class EstimateTransferFunction:
         if self.config is None:
             self.create_configuration_object()
 
-        tf_cls = process_mth5(
+        tf_object = process_mth5(
             self.config,
             self.kernel_dataset,
             units="MT",
@@ -215,7 +233,6 @@ class EstimateTransferFunction:
         )
 
         if save_in_mth5:
-            # save in MTH5
-            pass
+            self._save_tf_in_mth5(tf_object)
 
-        return tf_cls
+        return tf_object
