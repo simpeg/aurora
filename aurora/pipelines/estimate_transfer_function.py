@@ -23,9 +23,7 @@ warnings.filterwarnings("ignore")
 
 
 class EstimateTransferFunction:
-    """
-    convenience class to process MT data
-    """
+    """convenience class to process MT data"""
 
     def __init__(self, **kwargs):
         self.local_mth5_path = None
@@ -47,11 +45,22 @@ class EstimateTransferFunction:
 
     @property
     def local_mth5_path(self):
+        """ """
         return self._local_mth5_path
 
     @local_mth5_path.setter
     def local_mth5_path(self, local_path):
-        """local MTH5 path, make sure its a :class:`pathlib.Path` object"""
+        """local MTH5 path, make sure its a :class:`pathlib.Path` object
+
+        Parameters
+        ----------
+        local_path :
+
+
+        Returns
+        -------
+
+        """
 
         if local_path is None:
             self._local_mth5_path = None
@@ -65,11 +74,22 @@ class EstimateTransferFunction:
 
     @property
     def remote_mth5_path(self):
+        """ """
         return self._remote_mth5_path
 
     @remote_mth5_path.setter
     def remote_mth5_path(self, remote_path):
-        """remote MTH5 path, make sure its a :class:`pathlib.Path` object"""
+        """remote MTH5 path, make sure its a :class:`pathlib.Path` object
+
+        Parameters
+        ----------
+        remote_path :
+
+
+        Returns
+        -------
+
+        """
 
         if remote_path is None:
             self._remote_mth5_path = None
@@ -83,20 +103,20 @@ class EstimateTransferFunction:
 
     @property
     def bands_file_path(self):
+        """ """
         return self._band_file_path
 
     @bands_file_path.setter
     def bands_file_path(self, band_file_path):
-        """
-        set band file path
+        """set band file path
 
         check to make sure it exists
 
         If none use BANDS_DEFAULT_FILE
-        :param band_file_path: DESCRIPTION
-        :type band_file_path: TYPE
-        :return: DESCRIPTION
-        :rtype: TYPE
+
+        Parameters
+        ----------
+        band_file_path : path to bands file
 
         """
 
@@ -111,10 +131,15 @@ class EstimateTransferFunction:
 
     @property
     def run_summary(self):
-        """
-        create a run summary of the local mth5
-        :return: DESCRIPTION
-        :rtype: TYPE
+        """create a run summary of the local mth5
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        run_summary: RunSummary object
+
 
         """
 
@@ -136,11 +161,14 @@ class EstimateTransferFunction:
 
     @property
     def kernel_dataset(self):
-        """
-        create a kernel dataset
+        """create a kernel dataset
 
-        :return: DESCRIPTION
-        :rtype: TYPE
+        Parameters
+        ----------
+
+        Returns
+        -------
+        kernel_dataset: KernelDataset Object
 
         """
 
@@ -166,8 +194,16 @@ class EstimateTransferFunction:
     def _get_station_runs_dict(self, runs):
         """
         get a dictionary of runs to process
-        :return: DESCRIPTION
-        :rtype: TYPE
+
+        Parameters
+        ----------
+        runs : list of runs to process or skip
+
+
+        Returns
+        -------
+        dictionary
+            dictionary for each station of which runs to process
 
         """
 
@@ -181,9 +217,15 @@ class EstimateTransferFunction:
 
     def create_configuration_object(self):
         """
-        create configuration object
-        :return: DESCRIPTION
-        :rtype: TYPE
+        create configuration object as an attribute
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        config object
+            Configuration on how to run Aurora
 
         """
 
@@ -196,10 +238,10 @@ class EstimateTransferFunction:
         """
         save TransferFunction object in the local MTH5 file
 
-        :param tf_obj: DESCRIPTION
-        :type tf_obj: TYPE
-        :return: DESCRIPTION
-        :rtype: TYPE
+        Parameters
+        ----------
+        tf_obj : TF Object
+            Transfer Function object
 
         """
 
@@ -213,12 +255,17 @@ class EstimateTransferFunction:
     def estimate_tf(self, show_plot=True, save_in_mth5=False):
         """
 
-        :param show_plot: DESCRIPTION, defaults to True
-        :type show_plot: TYPE, optional
-        :param save_in_mth5: DESCRIPTION, defaults to False
-        :type save_in_mth5: TYPE, optional
-        :return: DESCRIPTION
-        :rtype: TYPE
+        Parameters
+        ----------
+        show_plot : bool, optional
+            True to show plots False to not, defaults to True
+        save_in_mth5 : bool, optional
+            True to save TF in local MTH5 file, defaults to False
+
+        Returns
+        -------
+        TF object
+            Transfer Function object
 
         """
         if self.config is None:
