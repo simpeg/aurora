@@ -33,8 +33,10 @@ class EstimateTransferFunction:
         self.remote_station = None
 
         self.minimum_run_duration_in_seconds = 10000
-        self.runs_to_process = None
-        self.runs_to_drop = None
+        self.local_runs_to_process = None
+        self.local_runs_to_drop = None
+        self.remote_runs_to_process = None
+        self.remote_runs_to_drop = None
 
         self.bands_file_path = None
 
@@ -173,25 +175,48 @@ class EstimateTransferFunction:
         """
 
         kernel_dataset = KernelDataset()
-        kernel_dataset.from_run_summary(self.run_summary, self.local_station)
+        kernel_dataset.from_run_summary(
+            self.run_summary, self.local_station, self.remote_station
+        )
 
         if self.minimum_run_duration_in_seconds is not None:
             kernel_dataset.drop_runs_shorter_than(
                 self.minimum_run_duration_in_seconds
             )
 
-        if self.runs_to_process is not None:
+        if self.local_runs_to_process is not None:
             kernel_dataset.select_station_runs(
-                self._get_station_runs_dict(self.runs_to_process), "keep"
+                self._get_station_runs_dict(
+                    self.local_station, self.local_runs_to_process
+                ),
+                "keep",
             )
-        if self.runs_to_drop is not None:
+        if self.local_runs_to_drop is not None:
             kernel_dataset.select_station_runs(
-                self._get_station_runs_dict(self.runs_to_drop), "drop"
+                self._get_station_runs_dict(
+                    self.local_station, self.local_runs_to_drop
+                ),
+                "drop",
+            )
+
+        if self.remote_runs_to_process is not None:
+            kernel_dataset.select_station_runs(
+                self._get_station_runs_dict(
+                    self.remote_station, self.remote_runs_to_process
+                ),
+                "keep",
+            )
+        if self.remote_runs_to_drop is not None:
+            kernel_dataset.select_station_runs(
+                self._get_station_runs_dict(
+                    self.local_station, self.remote_runs_to_drop
+                ),
+                "drop",
             )
 
         return kernel_dataset
 
-    def _get_station_runs_dict(self, runs):
+    def _get_station_runs_dict(self, station, runs):
         """
         get a dictionary of runs to process
 
@@ -209,9 +234,9 @@ class EstimateTransferFunction:
 
         if runs is not None:
             if isinstance(runs, (str)):
-                return {self.local_station: [runs]}
+                return {station: [runs]}
             elif isinstance(runs, (list, tuple)):
-                return {self.local_station: list(runs)}
+                return {station: list(runs)}
             else:
                 raise TypeError("runs must be a string or list of strings")
 
