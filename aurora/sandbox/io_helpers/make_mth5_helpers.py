@@ -39,10 +39,14 @@ def create_from_server_multistation(
     """
 
     # <GET EXPERIMENT>
-    inventory = dataset_config.get_inventory_from_client(
-        ensure_inventory_stages_are_named=True,
-        base_url=data_source,
-    )
+    try:
+        inventory = dataset_config.get_inventory_from_client(
+            ensure_inventory_stages_are_named=True,
+            base_url=data_source,
+        )
+    except obspy.clients.fdsn.header.FDSNNoServiceException:
+        raise ValueError("NCEDC is Down, cannot build data")
+
     translator = XMLInventoryMTExperiment()
     experiment = translator.xml_to_mt(inventory_object=inventory)
     # </GET EXPERIMENT>
@@ -76,7 +80,9 @@ def create_from_server_multistation(
     station_groups = {}
     # NEED TO ITERATE OVER RUNS HERE - THIS IS NOT ROBUST
     for i_station, station_id in enumerate(mth5_obj.station_list):
-        station_traces = [tr for tr in streams.traces if tr.stats.station == station_id]
+        station_traces = [
+            tr for tr in streams.traces if tr.stats.station == station_id
+        ]
         streams_dict[station_id] = obspy.core.Stream(station_traces)
         station_groups[station_id] = mth5_obj.get_station(station_id)
 
