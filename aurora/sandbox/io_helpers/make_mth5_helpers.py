@@ -1,5 +1,5 @@
 import obspy
-
+from obspy.clients.fdsn.header import FDSNNoServiceException
 from pathlib import Path
 
 from aurora.sandbox.obspy_helpers import align_streams
@@ -44,8 +44,8 @@ def create_from_server_multistation(
             ensure_inventory_stages_are_named=True,
             base_url=data_source,
         )
-    except obspy.clients.fdsn.header.FDSNNoServiceException:
-        raise ValueError("NCEDC is Down, cannot build data")
+    except FDSNNoServiceException:
+        raise IOError("NCEDC is Down, cannot build data")
 
     translator = XMLInventoryMTExperiment()
     experiment = translator.xml_to_mt(inventory_object=inventory)
