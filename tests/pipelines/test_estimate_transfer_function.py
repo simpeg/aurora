@@ -74,18 +74,23 @@ class TestEstimateTransferFunction(unittest.TestCase):
 
         self.assertRaises(ValueError, get_kernel_dataset)
 
-    def test_get_station_euns_dict(self):
+    def test_get_station_runs_dict(self):
         self.etf.local_station = "mt001"
         with self.subTest("list input"):
-            rd = self.etf._get_station_runs_dict(["a"])
+            rd = self.etf._get_station_runs_dict(self.etf.local_station, ["a"])
             self.assertDictEqual({"mt001": ["a"]}, rd)
 
         with self.subTest("string input"):
-            rd = self.etf._get_station_runs_dict("a")
+            rd = self.etf._get_station_runs_dict(self.etf.local_station, "a")
             self.assertDictEqual({"mt001": ["a"]}, rd)
 
         with self.subTest("fail"):
-            self.assertRaises(TypeError, self.etf._get_station_runs_dict, 10)
+            self.assertRaises(
+                TypeError,
+                self.etf._get_station_runs_dict,
+                self.etf.local_station,
+                10,
+            )
 
 
 # =============================================================================
