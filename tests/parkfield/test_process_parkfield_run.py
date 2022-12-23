@@ -39,10 +39,15 @@ def test_processing(return_collection=False, z_file_path=None, test_clock_zero=F
     if not parkfield_h5_path.exists():
         try:
             make_parkfield_mth5()
-        except ValueError:
+            assert parkfield_h5_path.exists()
+        except:
             print("NCEDC Likley Down")
             print("Skipping this test")
+            print(f"PKD H5 exists: {parkfield_h5_path.exists()}")
             return
+    else:
+        print("Parkfield h5 exists!!!!??!")
+        print(f"PKD H5 exists: {parkfield_h5_path.exists()}")
 
     run_summary = RunSummary()
     run_summary.from_mth5s(

@@ -57,7 +57,7 @@ from aurora.test_utils.parkfield.path_helpers import DATA_PATH
 
 
 def make_parkfield_mth5():
-    close_open_files()
+    # close_open_files()
 
     dataset_id = "pkd_test_00"
     dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
