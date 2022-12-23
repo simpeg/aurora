@@ -77,11 +77,12 @@ def test():
 
         try:
             make_parkfield_mth5()
-        except ValueError:
+        except:  # ValueError
             print("NCEDC Likley Down")
             print("Skipping this test")
             return
-
+    else:
+        print("HOW CAN the H5 exist at this point???")
     m = MTH5(file_version="0.1.0")
     m.open_mth5(parkfield_h5_path, mode="r")
     run_obj = m.get_run(station_id, run_id)
