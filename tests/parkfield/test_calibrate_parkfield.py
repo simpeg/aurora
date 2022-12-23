@@ -73,10 +73,10 @@ def test():
     station_id = "PKD"
     parkfield_h5_path = TEST_PATH.joinpath("parkfield", "data", "pkd_test_00.h5")
     if not parkfield_h5_path.exists():
-        from make_parkfield_mth5 import test_make_parkfield_mth5
+        from make_parkfield_mth5 import make_parkfield_mth5
 
         try:
-            test_make_parkfield_mth5()
+            make_parkfield_mth5()
         except ValueError:
             print("NCEDC Likley Down")
             print("Skipping this test")

@@ -56,7 +56,7 @@ from aurora.test_utils.parkfield.path_helpers import DATA_PATH
 #     return
 
 
-def test_make_parkfield_mth5():
+def make_parkfield_mth5():
     close_open_files()
 
     dataset_id = "pkd_test_00"
@@ -71,7 +71,7 @@ def test_make_parkfield_mth5():
     read_back_data(h5_path, "PKD", "001")
 
 
-def test_make_parkfield_hollister_mth5():
+def make_parkfield_hollister_mth5():
     close_open_files()
 
     dataset_id = "pkd_sao_test_00"
@@ -109,9 +109,9 @@ def test_make_parkfield_hollister_mth5():
 
 
 def main():
-    test_make_parkfield_mth5()
+    make_parkfield_mth5()
     # test_make_hollister_mth5()
-    test_make_parkfield_hollister_mth5()
+    make_parkfield_hollister_mth5()
 
 
 if __name__ == "__main__":
