@@ -52,7 +52,7 @@ def create_from_server_multistation(
             ensure_inventory_stages_are_named=True,
             base_url=data_source,
         )
-    except FDSNException:
+    except:  # FDSNException:
         # raise ValueError("NCEDC is Down, cannot build data")
         return
     translator = XMLInventoryMTExperiment()
