@@ -63,17 +63,18 @@ def make_parkfield_mth5():
     dataset_id = "pkd_test_00"
     print(f" 1 makeparkfield_h5_path.exists() {makeparkfield_h5_path.exists()}")
     dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
+    print(f" 2 makeparkfield_h5_path.exists() {makeparkfield_h5_path.exists()}")
     create_from_server_multistation(
         dataset_config,
         data_source="NCEDC",
         target_folder=DATA_PATH,
         triage_units="V/m to mV/km",
     )
-    print(f" 2 makeparkfield_h5_path.exists() {makeparkfield_h5_path.exists()}")
-    h5_path = DATA_PATH.joinpath(dataset_config.h5_filebase)
     print(f" 3 makeparkfield_h5_path.exists() {makeparkfield_h5_path.exists()}")
-    read_back_data(h5_path, "PKD", "001")
+    h5_path = DATA_PATH.joinpath(dataset_config.h5_filebase)
     print(f" 4 makeparkfield_h5_path.exists() {makeparkfield_h5_path.exists()}")
+    read_back_data(h5_path, "PKD", "001")
+    print(f" 5 makeparkfield_h5_path.exists() {makeparkfield_h5_path.exists()}")
 
 
 def make_parkfield_hollister_mth5():

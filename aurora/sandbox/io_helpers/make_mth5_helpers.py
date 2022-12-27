@@ -46,6 +46,7 @@ def create_from_server_multistation(
         )
     except FDSNException:
         raise ValueError("NCEDC is Down, cannot build data")
+        return
 
     translator = XMLInventoryMTExperiment()
     experiment = translator.xml_to_mt(inventory_object=inventory)
