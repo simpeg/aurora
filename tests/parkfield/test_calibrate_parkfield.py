@@ -1,10 +1,10 @@
-from aurora.general_helper_functions import TEST_PATH
 from aurora.time_series.windowing_scheme import WindowingScheme
 from mth5.mth5 import MTH5
 from aurora.test_utils.parkfield.calibration_helpers import (
     parkfield_sanity_check,
 )
 from aurora.test_utils.parkfield.path_helpers import AURORA_RESULTS_PATH
+from aurora.test_utils.parkfield.path_helpers import DATA_PATH
 
 
 def validate_bulk_spectra_have_correct_units(run_obj, run_ts_obj, show_spectra=False):
@@ -71,10 +71,12 @@ def test():
 
     run_id = "001"
     station_id = "PKD"
-    parkfield_h5_path = TEST_PATH.joinpath("parkfield", "data", "pkd_test_00.h5")
+    parkfield_h5_path = DATA_PATH.joinpath("pkd_test_00.h5")
     if not parkfield_h5_path.exists():
+        print(f"-2 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
         from make_parkfield_mth5 import make_parkfield_mth5
 
+        print(f"-1 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
         try:
             make_parkfield_mth5()
         except:  # ValueError

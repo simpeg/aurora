@@ -58,7 +58,9 @@ from aurora.test_utils.parkfield.path_helpers import DATA_PATH
 
 def make_parkfield_mth5():
     # close_open_files()
-
+    print(
+        f" 0 DATA_PATH.joinpath('pkd_test_00.h5').exists() {DATA_PATH.joinpath('pkd_test_00.h5').exists()}"
+    )
     dataset_id = "pkd_test_00"
     dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
     create_from_server_multistation(
