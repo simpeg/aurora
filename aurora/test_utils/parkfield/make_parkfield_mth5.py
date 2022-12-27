@@ -58,10 +58,10 @@ from aurora.test_utils.parkfield.path_helpers import DATA_PATH
 
 def make_parkfield_mth5():
     # close_open_files()
-    print(
-        f" 0 DATA_PATH.joinpath('pkd_test_00.h5').exists() {DATA_PATH.joinpath('pkd_test_00.h5').exists()}"
-    )
+    makeparkfield_h5_path = DATA_PATH.joinpath("pkd_test_00.h5")
+    print(f" 0 makeparkfield_h5_path.exists() {makeparkfield_h5_path.exists()}")
     dataset_id = "pkd_test_00"
+    print(f" 1 makeparkfield_h5_path.exists() {makeparkfield_h5_path.exists()}")
     dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
     create_from_server_multistation(
         dataset_config,
@@ -69,8 +69,11 @@ def make_parkfield_mth5():
         target_folder=DATA_PATH,
         triage_units="V/m to mV/km",
     )
+    print(f" 2 makeparkfield_h5_path.exists() {makeparkfield_h5_path.exists()}")
     h5_path = DATA_PATH.joinpath(dataset_config.h5_filebase)
+    print(f" 3 makeparkfield_h5_path.exists() {makeparkfield_h5_path.exists()}")
     read_back_data(h5_path, "PKD", "001")
+    print(f" 4 makeparkfield_h5_path.exists() {makeparkfield_h5_path.exists()}")
 
 
 def make_parkfield_hollister_mth5():
