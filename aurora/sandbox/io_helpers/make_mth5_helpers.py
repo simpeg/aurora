@@ -39,14 +39,14 @@ def create_from_server_multistation(
     """
 
     # <GET EXPERIMENT>
-    try:
-        inventory = dataset_config.get_inventory_from_client(
-            ensure_inventory_stages_are_named=True,
-            base_url=data_source,
-        )
-    except FDSNException:
-        raise ValueError("NCEDC is Down, cannot build data")
-        return
+    inventory = dataset_config.get_inventory_from_client(
+        ensure_inventory_stages_are_named=True,
+        base_url=data_source,
+    )
+    if inventory is None:
+        print("Inventory Access Failed - NCEDC may be down")
+        raise TypeError("None returned instead of Inventory")
+        return None
 
     translator = XMLInventoryMTExperiment()
     experiment = translator.xml_to_mt(inventory_object=inventory)
