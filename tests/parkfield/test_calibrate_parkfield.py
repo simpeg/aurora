@@ -3,6 +3,7 @@ from mth5.mth5 import MTH5
 from aurora.test_utils.parkfield.calibration_helpers import (
     parkfield_sanity_check,
 )
+from aurora.test_utils.parkfield.make_parkfield_mth5 import make_parkfield_mth5
 from aurora.test_utils.parkfield.path_helpers import AURORA_RESULTS_PATH
 from aurora.test_utils.parkfield.path_helpers import DATA_PATH
 
@@ -73,9 +74,6 @@ def test():
     station_id = "PKD"
     parkfield_h5_path = DATA_PATH.joinpath("pkd_test_00.h5")
     if not parkfield_h5_path.exists():
-        print(f"-2 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
-        from make_parkfield_mth5 import make_parkfield_mth5
-
         print(f"-1 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
         try:
             make_parkfield_mth5()
