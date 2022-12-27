@@ -80,15 +80,23 @@ def test():
         except:  # ValueError
             print("NCEDC Likley Down")
             print("Skipping this test")
+            print(f"0 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
             return
     else:
         print("HOW CAN the H5 exist at this point???")
+    print(f"1 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
     m = MTH5(file_version="0.1.0")
+    print(f"2 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
     m.open_mth5(parkfield_h5_path, mode="r")
+    print(f"3 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
     run_obj = m.get_run(station_id, run_id)
+    print(f"4 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
     run_ts_obj = run_obj.to_runts()
+    print(f"5 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
     validate_bulk_spectra_have_correct_units(run_obj, run_ts_obj, show_spectra=True)
+    print(f"6 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
     m.close_mth5()
+    print(f"7 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
 
 
 def main():
