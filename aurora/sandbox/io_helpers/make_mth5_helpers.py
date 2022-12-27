@@ -20,7 +20,7 @@ def create_from_server_multistation(
     force_align_streams=True,
     triage_units=None,
     triage_missing_coil=False,
-    **kwargs
+    **kwargs,
 ):
     """
 
@@ -52,7 +52,12 @@ def create_from_server_multistation(
             ensure_inventory_stages_are_named=True,
             base_url=data_source,
         )
-    except:  # FDSNException:
+    except Exception as e:  # FDSNException:
+        print(f"Exception {e}")
+        print(f"Exception {e}")
+        print(f"Exception {e}")
+        print(f"Exception {e}")
+        print(f"Exception {e}")
         # raise ValueError("NCEDC is Down, cannot build data")
         return
     translator = XMLInventoryMTExperiment()
