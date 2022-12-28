@@ -95,7 +95,9 @@ def create_from_server_multistation(
     streams_dict = {}
     station_groups = {}
     # NEED TO ITERATE OVER RUNS HERE - THIS IS NOT ROBUST
+    print("Begin iteration over stations, packing runs with data")
     for i_station, station_id in enumerate(mth5_obj.station_list):
+        print(f"i_station {i_station}, {station_id}")
         station_traces = [tr for tr in streams.traces if tr.stats.station == station_id]
         streams_dict[station_id] = obspy.core.Stream(station_traces)
         station_groups[station_id] = mth5_obj.get_station(station_id)
