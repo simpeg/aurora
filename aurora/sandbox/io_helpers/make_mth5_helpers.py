@@ -52,6 +52,9 @@ def create_from_server_multistation(
             ensure_inventory_stages_are_named=True,
             base_url=data_source,
         )
+        print("Inventory access successful")
+        print(inventory)
+        print("Inventory access successful \n")
     except Exception as e:  # FDSNException:
         print(f"Exception {e}")
         print(f"Exception {e}")

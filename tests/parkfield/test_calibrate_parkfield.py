@@ -77,7 +77,8 @@ def test():
         print(f"-1 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
         try:
             make_parkfield_mth5()
-        except:  # ValueError
+        except Exception as e:  # ValueError
+            print(f"Exception {e} encountered")
             print("NCEDC Likley Down")
             print("Skipping this test")
             print(f"0 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
