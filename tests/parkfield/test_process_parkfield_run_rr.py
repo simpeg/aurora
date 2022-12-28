@@ -40,7 +40,8 @@ def test_stuff_that_belongs_elsewhere():
     if not parkfield_h5_path.exists():
         try:
             make_parkfield_hollister_mth5()
-        except ValueError:
+        except Exception as e:  # ValueError:
+            print(f"Exception {e}")
             print("NCEDC Likley Down")
             print("Skipping this test")
             return
@@ -73,7 +74,8 @@ def test_processing(z_file_path=None):
     if not parkfield_h5_path.exists():
         try:
             make_parkfield_hollister_mth5()
-        except ValueError:
+        except Exception as e:  # ValueError:
+            print(f"Exception {e}")
             print("NCEDC Likley Down")
             print("Skipping this test")
             return
