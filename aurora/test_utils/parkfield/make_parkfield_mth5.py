@@ -47,11 +47,10 @@ def make_parkfield_hollister_mth5():
         triage_units="V/m to mV/km",
     )
     h5_path = DATA_PATH.joinpath(dataset_config.h5_filebase)
-    pkd_run_obj, pkd_run_ts = read_back_data(h5_path, "PKD", "001")
-    sao_run_obj, sao_run_ts = read_back_data(h5_path, "SAO", "001")
-    print(pkd_run_obj)
-    print(sao_run_obj)
-    print("OK")
+    pkd_result = read_back_data(h5_path, "PKD", "001")
+    sao_result = read_back_data(h5_path, "SAO", "001")
+    print(pkd_result)
+    print(sao_result)
 
 
 # def test_make_hollister_mth5():
