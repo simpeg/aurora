@@ -3,7 +3,7 @@ from mth5.mth5 import MTH5
 from aurora.test_utils.parkfield.calibration_helpers import (
     parkfield_sanity_check,
 )
-from aurora.test_utils.parkfield.make_parkfield_mth5 import make_parkfield_mth5
+from aurora.test_utils.parkfield.make_parkfield_mth5 import make_pkdsao_mth5
 from aurora.test_utils.parkfield.path_helpers import AURORA_RESULTS_PATH
 from aurora.test_utils.parkfield.path_helpers import DATA_PATH
 
@@ -72,11 +72,12 @@ def test():
 
     run_id = "001"
     station_id = "PKD"
-    parkfield_h5_path = DATA_PATH.joinpath("pkd_test_00.h5")
+    dataset_id = "pkd_test_00"
+    parkfield_h5_path = DATA_PATH.joinpath(f"{dataset_id}.h5")
     if not parkfield_h5_path.exists():
         print(f"-1 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
         try:
-            make_parkfield_mth5()
+            make_pkdsao_mth5(dataset_id)
         except Exception as e:  # ValueError
             print(f"Exception {e} encountered")
             print("NCEDC Likley Down")
@@ -89,15 +90,10 @@ def test():
     m = MTH5(file_version="0.1.0")
     print(f"2 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
     m.open_mth5(parkfield_h5_path, mode="r")
-    print(f"3 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
     run_obj = m.get_run(station_id, run_id)
-    print(f"4 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
     run_ts_obj = run_obj.to_runts()
-    print(f"5 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
     validate_bulk_spectra_have_correct_units(run_obj, run_ts_obj, show_spectra=True)
-    print(f"6 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
     m.close_mth5()
-    print(f"7 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
 
 
 def main():

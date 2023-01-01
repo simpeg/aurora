@@ -13,32 +13,21 @@ from aurora.sandbox.io_helpers.make_mth5_helpers import (
 )
 from aurora.test_utils.parkfield.path_helpers import DATA_PATH
 
-PKDSAO_DATA_SOURCE = "https://service.ncedc.org/"  # "NCEDC"
+PKDSAO_DATA_SOURCE = "https://service.ncedc.org/"
+# Add alternate source: "NCEDC",
 
 
-def make_parkfield_mth5():
+def make_pkdsao_mth5(dataset_id):
+    """
+
+    Parameters
+    ----------
+    dataset_id: str
+        Either "pkd_test_00" or "pkd_sao_test_00".  Specifies the h5 to build,
+        single station or remote reference
+
+    """
     close_open_files()
-    makeparkfield_h5_path = DATA_PATH.joinpath("pkd_test_00.h5")
-    dataset_id = "pkd_test_00"
-    print(f" 1 makeparkfield_h5_path.exists() {makeparkfield_h5_path.exists()}")
-    dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
-    create_from_server_multistation(
-        dataset_config,
-        data_source=PKDSAO_DATA_SOURCE,
-        target_folder=DATA_PATH,
-        triage_units="V/m to mV/km",
-    )
-    print(f" 2 makeparkfield_h5_path.exists() {makeparkfield_h5_path.exists()}")
-    h5_path = DATA_PATH.joinpath(dataset_config.h5_filebase)
-    print(f" 3 makeparkfield_h5_path.exists() {makeparkfield_h5_path.exists()}")
-    read_back_data(h5_path, "PKD", "001")
-    print(f" 4 makeparkfield_h5_path.exists() {makeparkfield_h5_path.exists()}")
-
-
-def make_parkfield_hollister_mth5():
-    close_open_files()
-
-    dataset_id = "pkd_sao_test_00"
     dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
     create_from_server_multistation(
         dataset_config,
@@ -47,24 +36,14 @@ def make_parkfield_hollister_mth5():
         triage_units="V/m to mV/km",
     )
     h5_path = DATA_PATH.joinpath(dataset_config.h5_filebase)
-    pkd_result = read_back_data(h5_path, "PKD", "001")
-    sao_result = read_back_data(h5_path, "SAO", "001")
-    print(pkd_result)
-    print(sao_result)
-
-
-# def test_make_hollister_mth5():
-#     dataset_id = "sao_test_00"
-#     create_from_server(dataset_id, data_source="NCEDC")
-#     h5_path = DATA_PATH.joinpath(f"{dataset_id}.h5")
-#     run, runts = read_back_data(h5_path, "SAO", "001")
-#     print("hello")
+    for station in dataset_config.station.split(","):
+        read_back_data(h5_path, station, "001")
 
 
 def main():
-    make_parkfield_mth5()
-    # test_make_hollister_mth5()
-    make_parkfield_hollister_mth5()
+    dataset_ids = ["pkd_test_00", "pkd_sao_test_00"]
+    for dataset_id in dataset_ids:
+        make_pkdsao_mth5(dataset_id)
 
 
 if __name__ == "__main__":
