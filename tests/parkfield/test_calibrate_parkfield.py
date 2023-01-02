@@ -85,7 +85,7 @@ def test():
             print(f"0 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
             return
     else:
-        print("HOW CAN the H5 exist at this point???")
+        print("Skipping make_pkdsao_mth5 --  H5 exists already")
     print(f"1 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
     m = MTH5(file_version="0.1.0")
     print(f"2 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
