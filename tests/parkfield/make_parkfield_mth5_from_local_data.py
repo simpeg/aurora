@@ -30,9 +30,7 @@ def create_from_local_data(dataset_id, run_id):
 
     """
     dataset_config = TEST_DATA_SET_CONFIGS[dataset_id]
-    inventory = dataset_config.get_inventory_from_client(
-        ensure_inventory_stages_are_named=True
-    )
+    inventory = dataset_config.get_inventory(ensure_inventory_stages_are_named=True)
     experiment = get_experiment_from_obspy_inventory(inventory)
     run_metadata = experiment.surveys[0].stations[0].runs[0]
     station_id = "PKD"
