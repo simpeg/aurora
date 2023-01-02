@@ -45,9 +45,9 @@ def align_streams(streams, clock_start):
             f"{len(stream.data)}  startime {stream.stats.starttime}"
         )
         dt_seconds = stream.stats.starttime - clock_start
-        print(f"dt_seconds {dt_seconds}")
+        print(f"stream offset seconds {dt_seconds}")
         dt = datetime.timedelta(seconds=dt_seconds)
-        print(f"dt = {dt}")
+        print(f"stream timedelta {dt}")
         stream.stats.starttime = stream.stats.starttime - dt
     return streams
 

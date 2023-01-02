@@ -24,42 +24,6 @@ from obspy import UTCDateTime
 from obspy import read_inventory
 
 
-def get_response_inventory_from_server(
-    network=None,
-    station=None,
-    channel=None,
-    starttime=None,
-    endtime=None,
-    level="response",
-    base_url="IRIS",
-):
-    """
-
-    Parameters
-    ----------
-    network     network = "BK"
-    station
-    channel     channel = "LQ2,LQ3,LT1,LT2".  If None it will get all channels
-    starttime
-    endtime
-    station_id
-
-    Returns
-    -------
-
-    """
-    client = Client(base_url=base_url, force_redirect=True)
-    inventory = client.get_stations(
-        network=network,
-        station=station,
-        channel=channel,
-        starttime=starttime,
-        endtime=endtime,
-        level=level,
-    )
-    return inventory
-
-
 def test_get_example_em_xml_from_iris_via_web():
     print("test_get_example_em_xml_from_iris_via_web")
     client = Client(base_url="IRIS", force_redirect=True)
@@ -77,64 +41,6 @@ def test_get_example_xml_inventory():
     test_file_name = "fdsn-station_2021-03-09T04_44_51.xml"
     inventory = read_inventory(test_file_name)
     iterate_through_mtml(inventory)
-    print("ok")
-
-
-def describe_inventory_stages(inventory, assign_names=False, verbose=False):
-    """
-    Scans inventory looking for stages.  Has option to assign names to stages,
-    these names are used as keys in MTH5. Modifies inventory in place.
-
-    Parameters
-    ----------
-    inventory
-    assign_names
-
-    Returns
-    -------
-
-    """
-    new_names_were_assigned = False
-    networks = inventory.networks
-    for network in networks:
-        for station in network:
-            for channel in station:
-                response = channel.response
-                stages = response.response_stages
-                if verbose:
-                    info = (
-                        f"{network.code}-{station.code}-{channel.code}"
-                        f" {len(stages)}-stage response"
-                    )
-                    print(info)
-
-                for i, stage in enumerate(stages):
-                    if verbose:
-                        print(f"stagename {stage.name}")
-                    if stage.name is None:
-                        if assign_names:
-                            new_names_were_assigned = True
-                            new_name = f"{station.code}_{channel.code}_{i}"
-                            stage.name = new_name
-                            if verbose:
-                                print(f"ASSIGNING stage {stage}, name {stage.name}")
-                    if hasattr(stage, "symmetry"):
-                        pass
-                        # import matplotlib.pyplot as plt
-                        # print(f"symmetry: {stage.symmetry}")
-                        # plt.figure()
-                        # plt.clf()
-                        # plt.plot(stage.coefficients)
-                        # plt.ylabel("Filter Amplitude")
-                        # plt.xlabel("Filter 'Tap'")
-                        # plt.title(f"{stage.name}; symmetry: {stage.symmetry}")
-                        # plt.savefig(FIGURES_BUCKET.joinpath(f
-                        # "{stage.name}.png"))
-                        # plt.show()
-    if new_names_were_assigned:
-        inventory.networks = networks
-        print("Inventory Networks Reassigned")
-    return
 
 
 def iterate_through_mtml(networks):
