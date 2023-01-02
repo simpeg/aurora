@@ -1,4 +1,9 @@
+"""
+
+
+"""
 import scipy.signal as ssig
+from aurora.time_series.frequency_domain_helpers import get_fft_harmonics
 
 
 def butter_bandpass(low_cut, high_cut, sample_rate, order=5):
@@ -30,3 +35,36 @@ def butter_lowpass(cutoff, fs, order=5):
     normal_cutoff = cutoff / nyq
     b, a = ssig.butter(order, normal_cutoff, btype="low", analog=False)
     return b, a
+
+
+def butter_highpass_by_harmonic_index(
+    num_samples=128,
+    sample_rate=1.0,
+    n_harmonic_cutoff=3,
+    filter_order=11,
+):
+    """
+    application of the sos filter created could use for example:
+    for ch in local["mvts"].keys():
+        local["mvts"][ch].data = ssig.sosfilt(sos, local["mvts"][ch].data)
+
+    Parameters
+    ----------
+    num_samples_window
+    sample_rate
+    n_harmonic_cutoff
+    filter_order
+
+    Returns
+    -------
+
+    """
+    freqs = get_fft_harmonics(num_samples, sample_rate)
+    sos = ssig.butter(
+        filter_order,
+        freqs[n_harmonic_cutoff],
+        btype="highpass",
+        fs=sample_rate,
+        output="sos",
+    )
+    return sos
