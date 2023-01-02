@@ -1,6 +1,5 @@
 from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config.config_creator import ConfigCreator
-
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
 from aurora.test_utils.parkfield.make_parkfield_mth5 import make_pkdsao_mth5
