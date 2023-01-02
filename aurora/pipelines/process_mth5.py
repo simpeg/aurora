@@ -318,13 +318,13 @@ def process_mth5(
 
         # Merge STFTs
         local_merged_stft_obj = xr.concat(local_stfts, "time")
-        # Could mute bad FCs here - Not implemented yet.
-        # RETURN FC_OBJECT
 
         if processing_config.stations.remote:
             remote_merged_stft_obj = xr.concat(remote_stfts, "time")
         else:
             remote_merged_stft_obj = None
+
+        # Could mute bad FCs here - Not implemented yet.
 
         tf_obj = process_tf_decimation_level(
             processing_config,
