@@ -7,14 +7,13 @@ from aurora.pipelines.run_summary import RunSummary
 from aurora.sandbox.mth5_channel_summary_helpers import (
     channel_summary_to_make_mth5,
 )
+from aurora.test_utils.parkfield.make_parkfield_mth5 import make_pkdsao_mth5
 from aurora.test_utils.parkfield.path_helpers import AURORA_RESULTS_PATH
 from aurora.test_utils.parkfield.path_helpers import CONFIG_PATH
 from aurora.test_utils.parkfield.path_helpers import DATA_PATH
 from aurora.test_utils.parkfield.path_helpers import EMTF_RESULTS_PATH
 from aurora.transfer_function.kernel_dataset import KernelDataset
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
-
-from make_parkfield_mth5 import test_make_parkfield_hollister_mth5
 
 from mth5.mth5 import MTH5
 from mth5.helpers import close_open_files
@@ -38,8 +37,9 @@ def test_stuff_that_belongs_elsewhere():
     # Ensure there is an mth5 to process
     if not parkfield_h5_path.exists():
         try:
-            test_make_parkfield_hollister_mth5()
-        except ValueError:
+            make_pkdsao_mth5("pkd_sao_test_00")
+        except Exception as e:  # ValueError:
+            print(f"Exception {e}")
             print("NCEDC Likley Down")
             print("Skipping this test")
             return
@@ -71,8 +71,9 @@ def test_processing(z_file_path=None):
     # Ensure there is an mth5 to process
     if not parkfield_h5_path.exists():
         try:
-            test_make_parkfield_hollister_mth5()
-        except ValueError:
+            make_pkdsao_mth5("pkd_sao_test_00")
+        except Exception as e:  # ValueError:
+            print(f"Exception {e}")
             print("NCEDC Likley Down")
             print("Skipping this test")
             return

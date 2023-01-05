@@ -1,15 +1,15 @@
 from obspy import UTCDateTime
-from aurora.sandbox.io_helpers.fdsn_dataset_config import FDSNDatasetConfig
+from aurora.sandbox.io_helpers.fdsn_dataset import FDSNDataset
 
 
 def make_pkd_test_00_config(minitest=False):
     """
-    Populate a FDSNDatasetConfig() object for 2h of 40Hz data
+    Populate a FDSNDataset() object for 2h of 40Hz data
     Returns
     -------
-
+    test_data_set: aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset
     """
-    test_data_set = FDSNDatasetConfig()
+    test_data_set = FDSNDataset()
     test_data_set.dataset_id = "pkd_test_00"
     test_data_set.network = "BK"
     test_data_set.station = "PKD"
@@ -24,7 +24,7 @@ def make_pkd_test_00_config(minitest=False):
 
 
 def make_sao_test_00_config():
-    test_data_set = FDSNDatasetConfig()
+    test_data_set = FDSNDataset()
     test_data_set.dataset_id = "sao_test_00"
     test_data_set.network = "BK"
     test_data_set.station = "SAO"
@@ -40,7 +40,7 @@ def make_sao_test_00_config():
 
 
 def make_pkdsao_test_00_config():
-    test_data_set = FDSNDatasetConfig()
+    test_data_set = FDSNDataset()
     test_data_set.dataset_id = "pkd_sao_test_00"
     test_data_set.network = "BK"
     test_data_set.station = "PKD,SAO"
@@ -56,7 +56,7 @@ def make_pkdsao_test_00_config():
 
 
 def make_cas04_nvr08_test_00_config():
-    test_data_set = FDSNDatasetConfig()
+    test_data_set = FDSNDataset()
     test_data_set.dataset_id = "cas_nvr_test_00"
     test_data_set.network = "ZU"
     test_data_set.station = "CAS04,NVR08"
@@ -78,7 +78,7 @@ def make_cas04_nvr08_test_00_config():
 
 
 def make_iak34_test_00_config():
-    test_data_set = FDSNDatasetConfig()
+    test_data_set = FDSNDataset()
     test_data_set.dataset_id = "iak34_test_00"
     test_data_set.network = "EM"
     test_data_set.station = "IAK34"
@@ -96,7 +96,7 @@ def make_iak34_test_00_config():
 
 
 def make_iak34_test_01_config():
-    test_data_set = FDSNDatasetConfig()
+    test_data_set = FDSNDataset()
     test_data_set.dataset_id = "iak34_test_01_long_ss"
     test_data_set.network = "EM"
     test_data_set.station = "IAK34"
@@ -113,7 +113,7 @@ def make_iak34_test_01_config():
 
 
 def make_iak34_test_02_config():
-    test_data_set = FDSNDatasetConfig()
+    test_data_set = FDSNDataset()
     test_data_set.dataset_id = "iak34_test_02_long_rr"
     test_data_set.network = "EM"
     test_data_set.station = "IAK34,NEK33"
@@ -130,7 +130,7 @@ def make_iak34_test_02_config():
 
 
 def make_iak34_test_03_config():
-    test_data_set = FDSNDatasetConfig()
+    test_data_set = FDSNDataset()
     test_data_set.dataset_id = "iak34_test_03_long_rr"
     test_data_set.network = "EM"
     test_data_set.station = "IAK34,NEK33"
@@ -147,7 +147,7 @@ def make_iak34_test_03_config():
 
 
 def make_iak34_test_04_config():
-    test_data_set = FDSNDatasetConfig()
+    test_data_set = FDSNDataset()
     test_data_set.dataset_id = "iak34_test_04_rr"
     test_data_set.network = "EM"
     test_data_set.station = "IAK34,NEN34"  # NEK33
@@ -164,7 +164,7 @@ def make_iak34_test_04_config():
 
 
 # def make_iak34_nen34_test_00_config():
-#     test_data_set = FDSNDatasetConfig()
+#     test_data_set = FDSNDataset()
 #     test_data_set.dataset_id = "iak34_nen34_test_00"
 #     test_data_set.network = "ZU"
 #     test_data_set.station = "IAK34,NEN34"

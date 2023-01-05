@@ -1,16 +1,14 @@
 from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config.config_creator import ConfigCreator
-
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
+from aurora.test_utils.parkfield.make_parkfield_mth5 import make_pkdsao_mth5
 from aurora.test_utils.parkfield.path_helpers import AURORA_RESULTS_PATH
 from aurora.test_utils.parkfield.path_helpers import CONFIG_PATH
 from aurora.test_utils.parkfield.path_helpers import DATA_PATH
 from aurora.test_utils.parkfield.path_helpers import EMTF_RESULTS_PATH
 from aurora.transfer_function.kernel_dataset import KernelDataset
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
-
-from make_parkfield_mth5 import test_make_parkfield_mth5
 
 from mth5.helpers import close_open_files
 
@@ -38,11 +36,18 @@ def test_processing(return_collection=False, z_file_path=None, test_clock_zero=F
     # Ensure there is an mth5 to process
     if not parkfield_h5_path.exists():
         try:
-            test_make_parkfield_mth5()
-        except ValueError:
+            make_pkdsao_mth5("pkd_test_00")
+            assert parkfield_h5_path.exists()
+        except:
             print("NCEDC Likley Down")
             print("Skipping this test")
+            print(f"PKD H5 exists: {parkfield_h5_path.exists()}")
             return
+    else:
+        print(f"PKD H5 exists: {parkfield_h5_path.exists()}")
+        print(f"{parkfield_h5_path.stat()}")
+        print(f"{parkfield_h5_path.stat().st_size}")
+        close_open_files()
 
     run_summary = RunSummary()
     run_summary.from_mth5s(

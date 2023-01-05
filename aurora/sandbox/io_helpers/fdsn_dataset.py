@@ -1,11 +1,9 @@
-from obspy.clients import fdsn
-
+from aurora.sandbox.io_helpers.inventory_review import describe_inventory_stages
 from aurora.sandbox.io_helpers.inventory_review import scan_inventory_for_nonconformity
-from aurora.sandbox.xml_sandbox import describe_inventory_stages
-from aurora.sandbox.xml_sandbox import get_response_inventory_from_server
+from obspy.clients.fdsn import Client
 
 
-class FDSNDatasetConfig(object):
+class FDSNDataset(object):
     """
     This class contains the information needed to uniquely specify a
     dataset that will be accessed from IRIS, NCEDC, or other FDSN client.
@@ -21,55 +19,47 @@ class FDSNDatasetConfig(object):
     def __init__(self):
         self.network = None
         self.station = None
-        self.channels = None
+        self.channel_codes = None
         self.starttime = None
         self.endtime = None
 
         self.description = None
         self.dataset_id = None
         self.components_list = None  #
+        self.data_source = "IRIS"
 
-    # @classmethod
-    # def from_df_row(cls, row):
-    #     qq = cls.__init__()
-    #     qq.station = row.station
-    #     qq.startime = row.startime
-    #     etc...
+        self._client = None
 
-    def get_inventory_from_client(
-        self, base_url="IRIS", ensure_inventory_stages_are_named=True
-    ):
+    @property
+    def client(self):
+        if self._client is None:
+            self.initialize_client()
+        return self._client
 
-        inventory = get_response_inventory_from_server(
+    def initialize_client(self):
+        self._client = Client(base_url=self.data_source, force_redirect=True)
+
+    def get_inventory(self, ensure_inventory_stages_are_named=True, level="response"):
+
+        inventory = self.client.get_stations(
             network=self.network,
             station=self.station,
             channel=self.channel_codes,
             starttime=self.starttime,
             endtime=self.endtime,
-            base_url=base_url,
+            level=level,
         )
         inventory = scan_inventory_for_nonconformity(inventory)
         if ensure_inventory_stages_are_named:
             describe_inventory_stages(inventory, assign_names=True)
-
         return inventory
 
     def get_data_via_rover(self):
-        """
-        Need to know where does the rover-ed file end up?
-        that path needs to be accessible to load the data after it is generated.
-        See example in ipython notebook in ulf_geoE repo
-        Returns
-        -------
+        """ """
+        raise NotImplementedError
 
-        """
-
-        pass
-
-    def get_data_via_fdsn_client(self, data_source="IRIS"):
-        client = fdsn.Client(data_source)
-
-        streams = client.get_waveforms(
+    def get_data_via_fdsn_client(self):
+        streams = self.client.get_waveforms(
             self.network,
             self.station,
             None,
@@ -79,15 +69,8 @@ class FDSNDatasetConfig(object):
         )
         return streams
 
-    def get_station_xml_filename(self, tag=""):
-        """
-        DEPRECATED
-        """
-        print("get_station_xml_filename DEPRECATED")
-        raise Exception
-
     def describe(self):
-        print(f"station_id = {self.station}")  # station_id in mth5_obj.station_list
+        print(f"station_id = {self.station}")
         print(f"network_id = {self.network}")
         print(f"channel_ids = {self.channel_codes}")
 
