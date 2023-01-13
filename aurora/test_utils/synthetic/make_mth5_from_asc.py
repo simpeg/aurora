@@ -140,9 +140,7 @@ def create_mth5_synthetic_file(
             # add noise
             for col in run.channels:
                 if run.noise_scalars[col]:
-                    df[col] += run.noise_scalars[col] * np.random.randn(
-                        len(df)
-                    )
+                    df[col] += run.noise_scalars[col] * np.random.randn(len(df))
 
             # add nan
             if add_nan_values:

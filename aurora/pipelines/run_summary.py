@@ -1,12 +1,13 @@
 """
 
 Note 1: Functionality of RunSummary()
-1. User can get a list of local_station options (unique station_ids)
+1. User can get a list of local_station options, which correspond to unique pairs
+of values: (survey_id,  station_id)
 
-2. User can see all possible ways of processing the data
-(one list per station in run_summary)
+2. User can see all possible ways of processing the data:
+- one list per (survey_id,  station_id) pair in the run_summary
 
-Some of these may live in KernelDataset:
+Some of the following functionalities may end up in KernelDataset:
 3. User can select local_station
 -this can trigger a reduction of runs to only those that are from the local staion
 and simultaneous runs at other stations

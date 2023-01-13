@@ -122,10 +122,22 @@ class WindowedTimeSeries(object):
             nanless_data = data[channel].dropna(dim="time")
             ensembles = nanless_data.data
             if detrend_type:  # neither False nor None
-                ensembles = ssig.detrend(
-                    ensembles, axis=detrend_axis, type=detrend_type
-                )
-                # overwrite_data=True
+                try:
+                    ensembles = ssig.detrend(
+                        ensembles, axis=detrend_axis, type=detrend_type
+                    )
+                    # overwrite_data=True
+                except ValueError as error:
+                    msg = (
+                        "Could not detrend "
+                        f"{channel} in time range "
+                        f"{data[channel].coords.indexes['time'][0].isoformat()} to "
+                        f"{data[channel].coords.indexes['time'][-1].isoformat()}."
+                    )
+                    if ensembles.size == 0:
+                        print(msg + " NO DATA")
+                    else:
+                        print(msg + "UNKOWN REASON:" + error)
 
             if inplace:
                 if len(nanless_data.time) < len(data[channel].time):
