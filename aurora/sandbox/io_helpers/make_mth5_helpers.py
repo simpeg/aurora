@@ -38,7 +38,9 @@ def create_from_server_multistation(
 
     # Get Experiement
     try:
-        inventory = fdsn_dataset.get_inventory(ensure_inventory_stages_are_named=True)
+        inventory = fdsn_dataset.get_inventory(
+            ensure_inventory_stages_are_named=True
+        )
     # if inventory is None:
     #     print("Inventory Access Failed - NCEDC may be down")
     #     raise TypeError("None returned instead of Inventory")
