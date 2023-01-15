@@ -3,6 +3,7 @@ import unittest
 import logging
 
 from aurora.pipelines.run_summary import RunSummary
+from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test2_h5
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
@@ -38,13 +39,10 @@ class TestSyntheticProcessing(unittest.TestCase):
     def z_file_path(self):
         return AURORA_RESULTS_PATH.joinpath(self.z_file_base)
 
-    def test_can_output_tf_collection(self):
-        z_file_path = AURORA_RESULTS_PATH.joinpath("syn1.zss")
-        tf_collection = process_synthetic_1(
-            z_file_path=z_file_path,
-            file_version=self.file_version,
-            return_collection=True,
-        )
+    def test_transfer_function_kernel(self):
+        z_file_path = AURORA_RESULTS_PATH.joinpath("syn1_tfk.zss")
+        # tf_collection = process_synthetic_1_tfk(z_file_path=z_file_path)
+        tf_collection = process_synthetic_1r2_tfk(z_file_path=z_file_path)
         assert tf_collection.tf_dict is not None
 
     def test_can_output_tf_class_and_write_tf_xml(self):
@@ -55,26 +53,20 @@ class TestSyntheticProcessing(unittest.TestCase):
 
     def test_can_use_channel_nomenclature(self):
         channel_nomencalture = "LEMI12"
-        z_file_path = AURORA_RESULTS_PATH.joinpath(
-            f"syn1-{channel_nomencalture}.zss"
-        )
+        z_file_path = AURORA_RESULTS_PATH.joinpath(f"syn1-{channel_nomencalture}.zss")
         tf_cls = process_synthetic_1(
             z_file_path=z_file_path,
             file_version=self.file_version,
             channel_nomenclature=channel_nomencalture,
         )
-        xml_file_base = (
-            f"syn1_mth5-{self.file_version}_{channel_nomencalture}.xml"
-        )
+        xml_file_base = f"syn1_mth5-{self.file_version}_{channel_nomencalture}.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
         tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
 
     def test_can_use_mth5_file_version_020(self):
         file_version = "0.2.0"
         z_file_path = AURORA_RESULTS_PATH.joinpath(f"syn1-{file_version}.zss")
-        tf_cls = process_synthetic_1(
-            z_file_path=z_file_path, file_version=file_version
-        )
+        tf_cls = process_synthetic_1(z_file_path=z_file_path, file_version=file_version)
         xml_file_base = f"syn1_mth5v{file_version}.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
         tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
@@ -101,9 +93,7 @@ class TestSyntheticProcessing(unittest.TestCase):
         assert tf_collection.tf_dict is not None
 
     def test_simultaneos_regression(self):
-        z_file_path = AURORA_RESULTS_PATH.joinpath(
-            "syn1_simultaneous_estimate.zss"
-        )
+        z_file_path = AURORA_RESULTS_PATH.joinpath("syn1_simultaneous_estimate.zss")
         tf_cls = process_synthetic_1(
             z_file_path=z_file_path, test_simultaneous_regression=True
         )
@@ -117,11 +107,11 @@ class TestSyntheticProcessing(unittest.TestCase):
         tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
 
     def test_can_process_remote_reference_data_to_tf_collection(self):
-        tf_collection = process_synthetic_rr12(return_collection=True)
+        tf_collection = process_synthetic_1r2(return_collection=True)
         assert tf_collection.tf_dict is not None
 
     def test_can_process_remote_reference_data_to_tf_class(self):
-        tf_cls = process_synthetic_rr12(channel_nomenclature="default")
+        tf_cls = process_synthetic_1r2(channel_nomenclature="default")
         xml_file_base = "syn12rr_mth5-010.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
         tf_cls.write_tf_file(
@@ -131,7 +121,7 @@ class TestSyntheticProcessing(unittest.TestCase):
         )
 
     def test_can_process_remote_reference_data_with_channel_nomenclature(self):
-        tf_cls = process_synthetic_rr12(channel_nomenclature="LEMI34")
+        tf_cls = process_synthetic_1r2(channel_nomenclature="LEMI34")
         xml_file_base = "syn12rr_mth5-010_LEMI34.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
         tf_cls.write_tf_file(
@@ -225,6 +215,60 @@ def process_synthetic_1(
     return tf_result
 
 
+def process_synthetic_1_tfk(z_file_path=""):
+    mth5_path = create_test1_h5()
+    run_summary = RunSummary()
+    run_summary.from_mth5s(
+        [
+            mth5_path,
+        ]
+    )
+    tfk_dataset = KernelDataset()
+    tfk_dataset.from_run_summary(run_summary, "test1")
+    processing_config = create_test_run_config("test1_tfk", tfk_dataset)
+
+    print("Now make the two commented lines below executable, by creating TKF")
+    tfk = TransferFunctionKernel(dataset=tfk_dataset, config=processing_config)
+    tfk.make_processing_summary()
+    tfk.validate()
+
+    tfc = process_synthetic_data(
+        processing_config, tfk_dataset, z_file_path=z_file_path
+    )
+    return tfc
+
+
+def process_synthetic_1r2_tfk(z_file_path=""):
+    mth5_path = create_test12rr_h5()
+    run_summary = RunSummary()
+    run_summary.from_mth5s(
+        [
+            mth5_path,
+        ]
+    )
+    tfk_dataset = KernelDataset()
+    tfk_dataset.from_run_summary(run_summary, "test1", "test2")
+    processing_config = create_test_run_config("test1r2_tfk", tfk_dataset)
+    tfk = TransferFunctionKernel(dataset=tfk_dataset, config=processing_config)
+    tfk.make_processing_summary()
+    tfk.validate()
+
+    tfc = process_synthetic_data(processing_config, tfk_dataset)
+    return tfc
+
+    processing_config = create_test_run_config("test1_tfk", tfk_dataset)
+
+    print("Now make the two commented lines below executable, by creating TKF")
+    tfk = TransferFunctionKernel(dataset=tfk_dataset, config=processing_config)
+    tfk.make_processing_summary()
+    tfk.validate()
+
+    tfc = process_synthetic_data(
+        processing_config, tfk_dataset, z_file_path=z_file_path
+    )
+    return tfc
+
+
 def process_synthetic_2():
     mth5_path = create_test2_h5()
     run_summary = RunSummary()
@@ -240,9 +284,7 @@ def process_synthetic_2():
     return tfc
 
 
-def process_synthetic_rr12(
-    channel_nomenclature="default", return_collection=False
-):
+def process_synthetic_1r2(channel_nomenclature="default", return_collection=False):
     mth5_path = create_test12rr_h5(channel_nomenclature=channel_nomenclature)
     run_summary = RunSummary()
     run_summary.from_mth5s(
@@ -267,6 +309,9 @@ def main():
     """
     Testing the processing of synthetic data
     """
+    tmp = TestSyntheticProcessing()
+    tmp.setUp()
+    tmp.test_transfer_function_kernel()
     unittest.main()
 
 

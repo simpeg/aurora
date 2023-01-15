@@ -31,7 +31,7 @@ def create_test_run_config(
     local_station_id = test_case_id
     remote_station_id = ""
 
-    if test_case_id == "test1r2":
+    if test_case_id in ["test1r2", "test1r2_tfk"]:
         estimation_engine = "RME_RR"
         local_station_id = "test1"
         remote_station_id = "test2"
@@ -71,6 +71,22 @@ def create_test_run_config(
 
     elif test_case_id in ["test2r1", "test1r2"]:
         config_id = f"{config_id}-RR{remote_station_id}"
+        p = cc.create_from_kernel_dataset(
+            kernel_dataset,
+            emtf_band_file=emtf_band_setup_file,
+            num_samples_window=num_samples_window,
+        )
+        p.id = config_id
+        p.channel_nomenclature.keyword = channel_nomenclature
+        p.set_default_input_output_channels()
+        p.set_default_reference_channels()
+
+    elif test_case_id in ["test1_tfk", "test1r2_tfk"]:
+        from aurora.general_helper_functions import BAND_SETUP_PATH
+
+        emtf_band_setup_file = BAND_SETUP_PATH.joinpath("bs_six_level.cfg")
+        if test_case_id == "test1r2_tfk":
+            config_id = f"{config_id}-RR{remote_station_id}_tfk"
         p = cc.create_from_kernel_dataset(
             kernel_dataset,
             emtf_band_file=emtf_band_setup_file,

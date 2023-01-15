@@ -7,6 +7,7 @@ Created on Thu Feb 17 14:15:20 2022
 # =============================================================================
 # Imports
 # =============================================================================
+import pandas as pd
 from deprecated import deprecated
 import numpy as np
 from pathlib import Path
@@ -314,3 +315,36 @@ class Processing(Base):
             mth5_objs[self.stations.remote[0].id] = remote_mth5_obj
 
         return mth5_objs
+
+    def window_scheme(self, as_type="df"):
+        """
+        Make a dataframe of processing parameters one row per decimation level.
+        Returns
+        -------
+
+        """
+        window_schemes = [x.windowing_scheme for x in self.decimations]
+        data_dict = {}
+        data_dict["sample_rate"] = [x.sample_rate for x in window_schemes]
+        data_dict["window_duration"] = [x.window_duration for x in window_schemes]
+        data_dict["num_samples_window"] = [x.num_samples_window for x in window_schemes]
+        data_dict["num_samples_overlap"] = [
+            x.num_samples_overlap for x in window_schemes
+        ]
+        data_dict["num_samples_advance"] = [
+            x.num_samples_advance for x in window_schemes
+        ]
+        if as_type == "dict":
+            return data_dict
+        elif as_type == "df":
+            df = pd.DataFrame(data=data_dict)
+            return df
+        else:
+            print(f"unexpected rtype for window_scheme {as_type}")
+            raise TypeError
+
+    def decimation_info(self):
+        decimation_ids = [x.decimation.level for x in self.decimations]
+        decimation_factors = [x.decimation.factor for x in self.decimations]
+        decimation_info = dict(zip(decimation_ids, decimation_factors))
+        return decimation_info
