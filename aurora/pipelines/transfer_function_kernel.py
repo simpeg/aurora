@@ -64,12 +64,10 @@ class TransferFunctionKernel(object):
         for group, df in grouper:
             print(group)
             print(df)
-            assert (
-                df.dec_level.diff()[1:] == 1
-            ).all()  # dec levels are incrementing by 1
+            assert (df.dec_level.diff()[1:] == 1).all()  # dec levels increment by 1
             assert df.dec_factor.iloc[0] == 1
             assert df.dec_level.iloc[0] == 0
-            # df.sample_rate /= np.cumprod(df.dec_factor)  # better to take from processing config
+            # df.sample_rate /= np.cumprod(df.dec_factor)  # better to take from config
             window_params_df = self.config.window_scheme(as_type="df")
             df.reset_index(inplace=True, drop=True)
             df = df.join(window_params_df)
@@ -105,33 +103,32 @@ class TransferFunctionKernel(object):
         Determine if there exist (one or more) runs that will yield decimated datasets
         that have too few samples to be passed to the STFT algorithm.
 
+        Strategy for handling this:
+        We will mark as invlaid any rows of the processing summary that do not yield
+        enough time series.
+
+        WCGW: If the runs are "chunked" we could encounter a situation where the
+        chunk fails to yield a deep decimation level, yet the level could be produced
+        if the chunk size were larger.
+        In general, handling this seems a bit complicated.  We will ignore this for
+        now and assume that the user will select a chunk size that is appropriate to
+        the decimation scheme, i.e. use large chunks for deep decimations.
+
+
 
         If there are any such runs, we should also look at strategies for handling this.
 
-        Cases:
-        1. There is only one run
-        If the decimation scheme is fine, ok, if not, suggest removing last N levels.
-
-        2. If there is more than one run:
-        For each run we can treat as above.  Note that in this case, we may hove some
-        long runs that don't encounter the issue at all, and some runs that do.
+        We may hove some long runs that don't encounter the issue at all, and some
+        runs that do.
         If we have this mixed situation, the best solution (since the user did ask
         for the decimated frequency bands) is to return them the decimated runs when
-        available, and skip the ones that are not ... This is quite general but
-        requires a different approach to the one I was considering ...
+        available, and skip the ones that are not
 
         This makes it seem like a general solution would be to return a sort of log
         that tells the user about each run and decimation level ... how many
         STFT-windows it yielded at each decimation level.
 
         This conjures the notion of (run, decimation_level) pairs
-        With this we can handle unacceptable runs at a fixed case 2 by adding some
-        degenerate value to the stft concatenation, but then we
-        only nee
-
-        This can be approached a few ways ...
-
-        One way is to start at
         -------
 
         """
@@ -139,5 +136,29 @@ class TransferFunctionKernel(object):
             self.processing_summary.num_stft_windows >= min_num_stft_windows
         )
 
+    def validate_processing(self):
+        """
+        Things that are validated:
+        1. The default estimation engine from the json file is "RME_RR", which is fine (
+        we expect to in general to do more RR processing than SS) but if there is only
+        one station (no remote)then the RME_RR should be replaced by default with "RME".
+
+        2. make sure local station id is defined (correctly from kernel dataset)
+        """
+
+        # Make sure a RR method is not being called for a SS config
+        if not self.config.stations.remote:
+            for decimation in self.config.decimations:
+                if decimation.estimator.engine == "RME_RR":
+                    print("No RR station specified, switching RME_RR to RME")
+                    decimation.estimator.engine = "RME"
+
+        # Make sure that a local station is defined
+        if not self.config.stations.local.id:
+            print("WARNING: Local station not specified")
+            print("Setting local station from Kernel Dataset")
+            self.config.stations.from_dataset_dataframe(self.kernel_dataset.df)
+
     def validate(self):
+        self.validate_processing()
         self.validate_decimation_scheme_and_dataset_compatability()

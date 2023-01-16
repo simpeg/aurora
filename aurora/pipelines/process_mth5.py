@@ -30,6 +30,7 @@ from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.transfer_function_helpers import process_transfer_functions
 from aurora.pipelines.transfer_function_helpers import tf_header_from_config
+from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
 
 from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
@@ -276,7 +277,9 @@ def process_mth5(
     """
     # Initialize config and mth5s
     processing_config = initialize_config(config)
-    processing_config.validate_processing(tfk_dataset)
+    tfk = TransferFunctionKernel(dataset=tfk_dataset, config=processing_config)
+    tfk.make_processing_summary()
+    tfk.validate()
     mth5_objs = processing_config.initialize_mth5s()
 
     # Assign additional columns to dataset_df, populate with mth5_objs and xr_ts
