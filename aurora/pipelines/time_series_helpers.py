@@ -227,6 +227,9 @@ def run_ts_to_stft(decimation_obj, run_xrds_orig):
     windowed_obj = windowing_scheme.apply_sliding_window(
         run_xrds, dt=1.0 / decimation_obj.decimation.sample_rate
     )
+    if not np.prod(windowed_obj.to_array().data.shape):
+        raise ValueError
+
     windowed_obj = WindowedTimeSeries.detrend(data=windowed_obj, detrend_type="linear")
     tapered_obj = windowed_obj * windowing_scheme.taper
     # stft_obj = WindowedTimeSeries.apply_stft(data=tapered_obj,
