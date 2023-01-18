@@ -41,9 +41,11 @@ class TestSyntheticProcessing(unittest.TestCase):
 
     def test_transfer_function_kernel(self):
         z_file_path = AURORA_RESULTS_PATH.joinpath("syn1_tfk.zss")
-        # tf_collection = process_synthetic_1_tfk(z_file_path=z_file_path)
-        tf_collection = process_synthetic_1r2_tfk(z_file_path=z_file_path)
-        assert tf_collection.tf_dict is not None
+        xml_file_base = "syn_tfk.xml"
+        xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
+        # tf_cls = process_synthetic_1_tfk(z_file_path=z_file_path)
+        tf_cls = process_synthetic_1r2_tfk(z_file_path=z_file_path)
+        tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
 
     def test_can_output_tf_class_and_write_tf_xml(self):
         tf_cls = process_synthetic_1(file_version=self.file_version)
