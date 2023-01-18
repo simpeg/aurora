@@ -2,12 +2,14 @@ import numpy as np
 import pandas as pd
 
 from aurora.config.metadata.processing import Processing
+from aurora.pipelines.helpers import initialize_config
 from aurora.transfer_function.kernel_dataset import KernelDataset
 
 
 class TransferFunctionKernel(object):
     def __init__(self, dataset=None, config=None):
-        self._config = config
+        processing_config = initialize_config(config)
+        self._config = processing_config
         self._dataset = dataset
 
     @property
@@ -78,10 +80,7 @@ class TransferFunctionKernel(object):
                     num_samples_window=row.num_samples_window,
                     num_samples_overlap=row.num_samples_overlap,
                 )
-                try:
-                    num_windows[i] = ws.available_number_of_windows(row.num_samples)
-                except:
-                    pass  # probably not enough data
+                num_windows[i] = ws.available_number_of_windows(row.num_samples)
             df["num_stft_windows"] = num_windows
             groups.append(df)
 
@@ -162,3 +161,19 @@ class TransferFunctionKernel(object):
     def validate(self):
         self.validate_processing()
         self.validate_decimation_scheme_and_dataset_compatability()
+
+    def valid_decimations(self):
+        """
+
+        Returns
+        -------
+
+        """
+        # identify valid rows of processing summary
+        tmp = self.processing_summary[self.processing_summary.valid]
+        valid_levels = tmp.dec_level.unique()
+
+        dec_levels = [x for x in self.config.decimations]
+        dec_levels = [x for x in dec_levels if x.decimation.level in valid_levels]
+        print(f"After validation there are {len(dec_levels)} valid decimation levels")
+        return dec_levels

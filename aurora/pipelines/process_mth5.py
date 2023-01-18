@@ -24,7 +24,6 @@ valid for each run. (see Issue #182)
 
 import xarray as xr
 
-from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
@@ -76,6 +75,9 @@ def make_stft_objects(
     """
     stft_config = processing_config.get_decimation_level(i_dec_level)
     stft_obj = run_ts_to_stft(stft_config, run_xrds)
+    # if stft_obj is None:
+    #    # not enough data to FFT
+    #    return stft_obj
     # stft_obj = run_ts_to_stft_scipy(stft_config, run_xrds)
     run_id = run_obj.metadata.id
     if station_id == processing_config.stations.local.id:
@@ -181,7 +183,7 @@ def export_tf(
     return tf_cls
 
 
-def update_dataset_df(i_dec_level, config, dataset_df):
+def update_dataset_df(i_dec_level, config, dataset_df, tfk=None):
     """
     This function has two different modes.  The first mode, initializes values in the
     array, and could be placed into TFKDataset.initialize_time_series_data()
@@ -276,11 +278,10 @@ def process_mth5(
         TF object
     """
     # Initialize config and mth5s
-    processing_config = initialize_config(config)
-    tfk = TransferFunctionKernel(dataset=tfk_dataset, config=processing_config)
+    tfk = TransferFunctionKernel(dataset=tfk_dataset, config=config)
     tfk.make_processing_summary()
     tfk.validate()
-    mth5_objs = processing_config.initialize_mth5s()
+    mth5_objs = tfk.config.initialize_mth5s()
 
     # Assign additional columns to dataset_df, populate with mth5_objs and xr_ts
     # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
@@ -291,13 +292,13 @@ def process_mth5(
     # see notes labelled with ToDo TFK above
 
     print(
-        f"Processing config indicates {len(processing_config.decimations)} "
+        f"Processing config indicates {len(tfk.config.decimations)} "
         f"decimation levels "
     )
 
     tf_dict = {}
 
-    for i_dec_level, dec_level_config in enumerate(processing_config.decimations):
+    for i_dec_level, dec_level_config in enumerate(tfk.valid_decimations()):
         dataset_df = update_dataset_df(i_dec_level, dec_level_config, dataset_df)
 
         # TFK 1: get clock-zero from data if needed
@@ -311,18 +312,18 @@ def process_mth5(
             run_xrds = row["run_dataarray"].to_dataset("channel")
             run_obj = row.mth5_obj.from_reference(row.run_reference)
             stft_obj = make_stft_objects(
-                processing_config, i_dec_level, run_obj, run_xrds, units, row.station_id
+                tfk.config, i_dec_level, run_obj, run_xrds, units, row.station_id
             )
 
-            if row.station_id == processing_config.stations.local.id:
+            if row.station_id == tfk.config.stations.local.id:
                 local_stfts.append(stft_obj)
-            elif row.station_id == processing_config.stations.remote[0].id:
+            elif row.station_id == tfk.config.stations.remote[0].id:
                 remote_stfts.append(stft_obj)
 
         # Merge STFTs
         local_merged_stft_obj = xr.concat(local_stfts, "time")
 
-        if processing_config.stations.remote:
+        if tfk.config.stations.remote:
             remote_merged_stft_obj = xr.concat(remote_stfts, "time")
         else:
             remote_merged_stft_obj = None
@@ -330,12 +331,12 @@ def process_mth5(
         # Could mute bad FCs here - Not implemented yet.
 
         tf_obj = process_tf_decimation_level(
-            processing_config,
+            tfk.config,
             i_dec_level,
             local_merged_stft_obj,
             remote_merged_stft_obj,
         )
-        tf_obj.apparent_resistivity(processing_config.channel_nomenclature, units=units)
+        tf_obj.apparent_resistivity(tfk.config.channel_nomenclature, units=units)
         tf_dict[i_dec_level] = tf_obj
 
         if show_plot:
@@ -357,7 +358,7 @@ def process_mth5(
         tfk_dataset.close_mths_objs()
         return tf_collection
     else:
-        local_station_id = processing_config.stations.local.id
+        local_station_id = tfk.config.stations.local.id
         station_metadata = tfk_dataset.get_station_metadata(local_station_id)
         local_mth5_obj = mth5_objs[local_station_id]
 
@@ -373,7 +374,7 @@ def process_mth5(
 
         tf_cls = export_tf(
             tf_collection,
-            processing_config.channel_nomenclature,
+            tfk.config.channel_nomenclature,
             station_metadata_dict=station_metadata.to_dict(),
             survey_dict=survey_dict,
         )
