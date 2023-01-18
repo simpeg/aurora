@@ -19,6 +19,7 @@ def create_test_run_config(
     ----------
     test_case_id: string
         "test1", "test2", "test12rr"
+    kernel_dataset: aurora.transfer_function.kernel_dataset.KernelDataset
     matlab_or_fortran: str
         "", "matlab", "fortran"
 
@@ -56,7 +57,7 @@ def create_test_run_config(
         num_samples_overlap = 32
         config_id = f"{local_station_id}"
 
-    cc = ConfigCreator(config_path=CONFIG_PATH)
+    cc = ConfigCreator()
 
     if test_case_id in ["test1", "test2"]:
         p = cc.create_from_kernel_dataset(
@@ -105,7 +106,8 @@ def create_test_run_config(
         decimation.regression.max_redescending_iterations = 2
 
     if save == "json":
-        cc.to_json(p)
+        filename = CONFIG_PATH.joinpath(p.json_fn())
+        p.save_as_json(filename=filename)
 
     return p
 
@@ -124,7 +126,7 @@ def test_to_from_json():
     """
     import pandas as pd
     from aurora.config.metadata import Processing
-    from aurora.tf_kernel.dataset import RUN_SUMMARY_COLUMNS
+    from aurora.pipelines.run_summary import RUN_SUMMARY_COLUMNS
 
     # Specify path to mth5
     data_path = DATA_PATH.joinpath("test1.h5")
@@ -159,6 +161,7 @@ def test_to_from_json():
     json_fn = CONFIG_PATH.joinpath(p.json_fn())
     p2 = Processing()
     p2.from_json(json_fn)
+    print("Assert equal needed here")
     return
 
 

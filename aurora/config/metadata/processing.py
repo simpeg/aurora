@@ -230,13 +230,6 @@ class Processing(Base):
                 # self.decimations_dict[i_level].add_band(band)
                 decimation_obj.add_band(band)
             self.add_decimation_level(decimation_obj)
-        #            self.decimations_dict[i_level] = decimation_obj
-        print("OK")
-
-    #
-    def json_fn(self):
-        json_fn = self.id + "_processing_config.json"
-        return json_fn
 
     def num_decimation_levels(self):
         return len(self.decimations)
@@ -348,3 +341,14 @@ class Processing(Base):
         decimation_factors = [x.decimation.factor for x in self.decimations]
         decimation_info = dict(zip(decimation_ids, decimation_factors))
         return decimation_info
+
+    def json_fn(self, file_id=None):
+        json_fn = f"{self.id}_processing_config.json"
+        return json_fn
+
+    def save_as_json(self, filename=None, nested=True, required=False):
+        if filename is None:
+            filename = self.json_fn()
+        json_str = self.to_json(nested=nested, required=required)
+        with open(filename, "w") as f:
+            f.write(json_str)
