@@ -23,22 +23,6 @@ def make_pkd_test_00_config(minitest=False):
     return test_data_set
 
 
-def make_sao_test_00_config():
-    test_data_set = FDSNDataset()
-    test_data_set.dataset_id = "sao_test_00"
-    test_data_set.network = "BK"
-    test_data_set.station = "SAO"
-    test_data_set.starttime = UTCDateTime("2004-09-28T00:00:00.000000Z")
-    test_data_set.endtime = UTCDateTime("2004-09-28T01:59:59.975000Z")
-    # test_data_set.starttime = UTCDateTime("2004-09-28T00:00:00")
-    # test_data_set.endtime = UTCDateTime("2004-09-28T23:59:59")
-    # test_data_set.channel_codes = "LQ2,LQ3,LT1,LT2"
-    test_data_set.channel_codes = "BQ2,BQ3,BT1,BT2"
-    test_data_set.description = "2h of SAO data for 2004-09-28 midnight UTC until 0200"
-    test_data_set.components_list = ["ex", "ey", "hx", "hy"]
-    return test_data_set
-
-
 def make_pkdsao_test_00_config():
     test_data_set = FDSNDataset()
     test_data_set.dataset_id = "pkd_sao_test_00"
@@ -188,27 +172,19 @@ def make_iak34_test_04_config():
 def make_test_configs():
     test_data_set_configs = {}
 
-    # <PARKFIELD pkd_test_00 Single station>
+    # PARKFIELD pkd_test_00 Single station
     test_data_set = make_pkd_test_00_config()
     test_data_set_configs[test_data_set.dataset_id] = test_data_set
-    # </PARKFIELD pkd_test_00 Single station>
 
-    # <HOLLISTER sao_test_00 Single station>
-    test_data_set = make_sao_test_00_config()
-    test_data_set_configs[test_data_set.dataset_id] = test_data_set
-    # </HOLLISTER sao_test_00 Single station>
-
-    # <pkd_sao_test_00 Remote Reference>
+    # pkd_sao_test_00 Remote Reference
     test_data_set = make_pkdsao_test_00_config()
     test_data_set_configs[test_data_set.dataset_id] = test_data_set
-    # </pkd_sao_test_00 Remote Reference>
 
-    # <cas_nvr_test_00 Remote Reference>
+    # cas_nvr_test_00 Remote Reference
     test_data_set = make_cas04_nvr08_test_00_config()
     test_data_set_configs[test_data_set.dataset_id] = test_data_set
-    # </cas_nvr_test_00 Remote Reference>
 
-    # <IAK34SS>
+    # IAK34SS
     test_data_set = make_iak34_test_00_config()
     test_data_set_configs[test_data_set.dataset_id] = test_data_set
     test_data_set = make_iak34_test_01_config()
@@ -219,7 +195,6 @@ def make_test_configs():
     test_data_set_configs[test_data_set.dataset_id] = test_data_set
     test_data_set = make_iak34_test_04_config()
     test_data_set_configs[test_data_set.dataset_id] = test_data_set
-    # </IAK34SS>
 
     return test_data_set_configs
 
