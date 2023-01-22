@@ -13,6 +13,10 @@ class TransferFunctionKernel(object):
         self._dataset = dataset
 
     @property
+    def dataset(self):
+        return self._dataset
+
+    @property
     def kernel_dataset(self):
         return self._dataset
 

@@ -285,8 +285,8 @@ def process_mth5(
 
     # Assign additional columns to dataset_df, populate with mth5_objs and xr_ts
     # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
-    tfk_dataset.initialize_dataframe_for_processing(mth5_objs)
-    dataset_df = tfk_dataset.df
+    tfk.dataset.initialize_dataframe_for_processing(mth5_objs)
+    dataset_df = tfk.dataset.df
 
     # Place checks that would be done by TF Kernel here
     # see notes labelled with ToDo TFK above
