@@ -31,11 +31,11 @@ def make_pkdsao_test_00_config():
     test_data_set.starttime = UTCDateTime("2004-09-28T00:00:00.000000Z")
     test_data_set.endtime = UTCDateTime("2004-09-28T01:59:59.975000Z")
     # test_data_set.endtime = UTCDateTime("2004-09-28T00:01:59.999000Z") #small test
-    test_data_set.channel_codes = "BQ2,BQ3,BT1,BT2"
+    test_data_set.channel_codes = "BQ2,BQ3,BT1,BT2,BT3"
     test_data_set.description = (
         "2h of PKD,SAO data for 2004-09-28 midnight UTC until 0200"
     )
-    test_data_set.components_list = ["ex", "ey", "hx", "hy"]
+    test_data_set.components_list = ["ex", "ey", "hx", "hy", "hz"]
     return test_data_set
 
 
