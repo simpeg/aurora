@@ -9,9 +9,6 @@ from aurora.sandbox.mth5_channel_summary_helpers import (
 )
 from aurora.test_utils.parkfield.make_parkfield_mth5 import ensure_h5_exists
 from aurora.test_utils.parkfield.path_helpers import AURORA_RESULTS_PATH
-
-# from aurora.test_utils.parkfield.path_helpers import CONFIG_PATH
-from aurora.test_utils.parkfield.path_helpers import DATA_PATH
 from aurora.test_utils.parkfield.path_helpers import EMTF_RESULTS_PATH
 from aurora.transfer_function.kernel_dataset import KernelDataset
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
