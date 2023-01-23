@@ -35,16 +35,18 @@ class TestSyntheticProcessing(unittest.TestCase):
         logging.getLogger("matplotlib.font_manager").disabled = True
         logging.getLogger("matplotlib.ticker").disabled = True
 
-    @property
-    def z_file_path(self):
-        return AURORA_RESULTS_PATH.joinpath(self.z_file_base)
-
-    def test_transfer_function_kernel(self):
+    def test_no_crash_with_too_many_decimations(self):
         z_file_path = AURORA_RESULTS_PATH.joinpath("syn1_tfk.zss")
-        xml_file_base = "syn_tfk.xml"
+        xml_file_base = "syn1_tfk.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
-        # tf_cls = process_synthetic_1_tfk(z_file_path=z_file_path)
-        tf_cls = process_synthetic_1r2_tfk(z_file_path=z_file_path)
+        tf_cls = process_synthetic_1(
+            config_keyword="test1_tfk", z_file_path=z_file_path
+        )
+        tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
+
+        xml_file_base = "syn1r2_tfk.xml"
+        xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
+        tf_cls = process_synthetic_1r2(config_keyword="test1r2_tfk")
         tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
 
     def test_can_output_tf_class_and_write_tf_xml(self):
@@ -134,6 +136,7 @@ class TestSyntheticProcessing(unittest.TestCase):
 
 
 def process_synthetic_1(
+    config_keyword="test1",
     z_file_path="",
     test_scale_factor=False,
     test_simultaneous_regression=False,
@@ -188,7 +191,7 @@ def process_synthetic_1(
         tfk_dataset.df.drop(columns=["channel_scale_factors"], inplace=True)
 
     processing_config = create_test_run_config(
-        "test1", tfk_dataset, channel_nomenclature=channel_nomenclature
+        config_keyword, tfk_dataset, channel_nomenclature=channel_nomenclature
     )
 
     if test_simultaneous_regression:
@@ -217,68 +220,13 @@ def process_synthetic_1(
     return tf_result
 
 
-def process_synthetic_1_tfk(z_file_path=""):
-    mth5_path = create_test1_h5()
-    run_summary = RunSummary()
-    run_summary.from_mth5s(
-        [
-            mth5_path,
-        ]
-    )
-    tfk_dataset = KernelDataset()
-    tfk_dataset.from_run_summary(run_summary, "test1")
-    processing_config = create_test_run_config("test1_tfk", tfk_dataset)
-
-    print("Now make the two commented lines below executable, by creating TKF")
-    tfk = TransferFunctionKernel(dataset=tfk_dataset, config=processing_config)
-    tfk.make_processing_summary()
-    tfk.validate()
-
-    tfc = process_synthetic_data(
-        processing_config, tfk_dataset, z_file_path=z_file_path
-    )
-    return tfc
-
-
-def process_synthetic_1r2_tfk(z_file_path=""):
-    mth5_path = create_test12rr_h5()
-    run_summary = RunSummary()
-    run_summary.from_mth5s(
-        [
-            mth5_path,
-        ]
-    )
-    tfk_dataset = KernelDataset()
-    tfk_dataset.from_run_summary(run_summary, "test1", "test2")
-    processing_config = create_test_run_config("test1r2_tfk", tfk_dataset)
-    tfk = TransferFunctionKernel(dataset=tfk_dataset, config=processing_config)
-    tfk.make_processing_summary()
-    tfk.validate()
-
-    tfc = process_synthetic_data(processing_config, tfk_dataset)
-    return tfc
-
-    processing_config = create_test_run_config("test1_tfk", tfk_dataset)
-
-    print("Now make the two commented lines below executable, by creating TKF")
-    tfk = TransferFunctionKernel(dataset=tfk_dataset, config=processing_config)
-    tfk.make_processing_summary()
-    tfk.validate()
-
-    tfc = process_synthetic_data(
-        processing_config, tfk_dataset, z_file_path=z_file_path
-    )
-    return tfc
-
-
 def process_synthetic_2():
     mth5_path = create_test2_h5()
+    mth5_paths = [
+        mth5_path,
+    ]
     run_summary = RunSummary()
-    run_summary.from_mth5s(
-        [
-            mth5_path,
-        ]
-    )
+    run_summary.from_mth5s(mth5_paths)
     tfk_dataset = KernelDataset()
     tfk_dataset.from_run_summary(run_summary, "test2")
     processing_config = create_test_run_config("test2", tfk_dataset)
@@ -286,18 +234,19 @@ def process_synthetic_2():
     return tfc
 
 
-def process_synthetic_1r2(channel_nomenclature="default", return_collection=False):
+def process_synthetic_1r2(
+    config_keyword="test1r2", channel_nomenclature="default", return_collection=False
+):
     mth5_path = create_test12rr_h5(channel_nomenclature=channel_nomenclature)
+    mth5_paths = [
+        mth5_path,
+    ]
     run_summary = RunSummary()
-    run_summary.from_mth5s(
-        [
-            mth5_path,
-        ]
-    )
+    run_summary.from_mth5s(mth5_paths)
     tfk_dataset = KernelDataset()
     tfk_dataset.from_run_summary(run_summary, "test1", "test2")
     processing_config = create_test_run_config(
-        "test1r2", tfk_dataset, channel_nomenclature=channel_nomenclature
+        config_keyword, tfk_dataset, channel_nomenclature=channel_nomenclature
     )
     tfc = process_synthetic_data(
         processing_config,
@@ -311,9 +260,9 @@ def main():
     """
     Testing the processing of synthetic data
     """
-    tmp = TestSyntheticProcessing()
-    tmp.setUp()
-    tmp.test_transfer_function_kernel()
+    # tmp = TestSyntheticProcessing()
+    # tmp.setUp()
+    # tmp.test_no_crash_with_too_many_decimations()
     unittest.main()
 
 

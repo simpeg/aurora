@@ -6,7 +6,7 @@ Survey level: 'mth5_path', Path to output h5
 Station level: 'station_id', name of the station
 Station level:'latitude':17.996
 
-Run level:'columns', :channel names as a list; ["hx", "hy", "hz", "ex", "ey"]
+Run level: 'columns', :channel names as a list; ["hx", "hy", "hz", "ex", "ey"]
 Run level: 'raw_data_path', Path to ascii data source
 Run level: 'noise_scalars', dict keyed by channel, default is zero,
 Run level: 'nan_indices', iterable of integers, where to put nan [
@@ -62,7 +62,7 @@ class SyntheticRun(object):
 
         # set channel_map
         self._channel_map = None
-        self.channel_nomemclature_keyword = kwargs.get(
+        self.channel_nomenclature_keyword = kwargs.get(
             "channel_nomenclature", "default"
         )
         self.set_channel_map()
@@ -82,9 +82,9 @@ class SyntheticRun(object):
 
     def set_channel_map(self):
         channel_nomenclature = ChannelNomenclature()
-        channel_nomenclature.keyword = self.channel_nomemclature_keyword
+        channel_nomenclature.keyword = self.channel_nomenclature_keyword
         channel_map = channel_nomenclature.get_channel_map(
-            self.channel_nomemclature_keyword
+            self.channel_nomenclature_keyword
         )
         self._channel_map = channel_map
 
