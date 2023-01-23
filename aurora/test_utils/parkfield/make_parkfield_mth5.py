@@ -8,7 +8,9 @@ from mth5.helpers import close_open_files
 from aurora.sandbox.io_helpers.make_mth5_helpers import create_from_server_multistation
 from aurora.test_utils.parkfield.path_helpers import DATA_PATH
 
-PKDSAO_DATA_SOURCES = ["NCEDC", "https://service.ncedc.org/"]
+DATA_SOURCES = ["NCEDC", "https://service.ncedc.org/"]
+DATASET_ID = "pkd_sao_test_00"
+FDSN_DATASET = TEST_DATA_SET_CONFIGS[DATASET_ID]
 
 
 def select_data_source():
@@ -16,7 +18,7 @@ def select_data_source():
 
     ok = False
     while not ok:
-        for data_source in PKDSAO_DATA_SOURCES:
+        for data_source in DATA_SOURCES:
             try:
                 Client(base_url=data_source, force_redirect=True)
                 ok = True
@@ -30,31 +32,41 @@ def select_data_source():
         return data_source
 
 
-def make_pkdsao_mth5(dataset_id="pkd_sao_test_00"):
-    """
-
-    Parameters
-    ----------
-    dataset_id: str
-        "pkd_sao_test_00".  Specifies the dataset.
-        This argument may be deprecated in future - there used to be two choices for
-        PKD datasets, single station and remote reference, now there is only one config.
-
-
-    """
+def make_pkdsao_mth5(fdsn_dataset):
+    """ """
     close_open_files()
-    fdsn_dataset = TEST_DATA_SET_CONFIGS[dataset_id]
     fdsn_dataset.data_source = select_data_source()
     fdsn_dataset.initialize_client()
-    create_from_server_multistation(
+    h5_path = create_from_server_multistation(
         fdsn_dataset,
         target_folder=DATA_PATH,
         triage_units="V/m to mV/km",
     )
-    h5_path = DATA_PATH.joinpath(fdsn_dataset.h5_filebase)
+
     for station in fdsn_dataset.station.split(","):
         print(station)
         read_back_data(h5_path, station, "001")
+    return h5_path
+
+
+def ensure_h5_exists():
+    """
+
+    Returns
+    -------
+
+    """
+    h5_path = DATA_PATH.joinpath(FDSN_DATASET.h5_filebase)
+    if h5_path.exists():
+        return h5_path
+
+    try:
+        h5_path = make_pkdsao_mth5(FDSN_DATASET)
+        return h5_path
+    except Exception as e:
+        print(f"Encountered {e} Exception - make_pkdsao_mth5 failed")
+        print("Check data server connection")
+        raise IOError
 
 
 def main():

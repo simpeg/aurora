@@ -38,9 +38,7 @@ def create_from_server_multistation(
 
     # Get Experiement
     try:
-        inventory = fdsn_dataset.get_inventory(
-            ensure_inventory_stages_are_named=True
-        )
+        inventory = fdsn_dataset.get_inventory(ensure_inventory_stages_are_named=True)
     # if inventory is None:
     #     print("Inventory Access Failed - NCEDC may be down")
     #     raise TypeError("None returned instead of Inventory")
@@ -79,9 +77,7 @@ def create_from_server_multistation(
     station_groups = {}
     # Iterate over stations, packing runs with data (not robust)
     for i_station, station_id in enumerate(mth5_obj.station_list):
-        station_traces = [
-            tr for tr in streams.traces if tr.stats.station == station_id
-        ]
+        station_traces = [tr for tr in streams.traces if tr.stats.station == station_id]
         streams_dict[station_id] = obspy.core.Stream(station_traces)
         station_groups[station_id] = mth5_obj.get_station(station_id)
         run_metadata = experiment.surveys[0].stations[i_station].runs[0]
@@ -91,4 +87,4 @@ def create_from_server_multistation(
         run_group = station_groups[station_id].add_run(run_id)
         run_group.from_runts(run_ts_obj)
     mth5_obj.close_mth5()
-    return
+    return h5_path

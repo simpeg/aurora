@@ -17,14 +17,7 @@ from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
 
 
 class ConfigCreator:
-    """
-    ToDo: Deprecate config_path
-        - The Config creator will not save the config, the config object can do that.
-    """
-
     def __init__(self, **kwargs):
-        default_config_path = Path("config")
-        self.config_path = kwargs.get("config_path", default_config_path)
         self._band_specification_style = None
 
     def processing_id(self, kernel_dataset):
