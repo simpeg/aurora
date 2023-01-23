@@ -19,7 +19,7 @@ from mth5.helpers import close_open_files
 
 def test_stuff_that_belongs_elsewhere():
     """
-    ping the mth5, extract the summary and pass it
+    ping the mth5, extract the summary and pass it to channel_summary_to_make_mth5
 
     This test was created so that codecov would see channel_summary_to_make_mth5().
     ToDo: channel_summary_to_make_mth5() method should be moved into mth5 and removed
