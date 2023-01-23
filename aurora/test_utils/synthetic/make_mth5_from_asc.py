@@ -5,30 +5,30 @@ Created on Fri Jun 25 16:03:21 2021
 @author: jpeacock
 
 This module is concerned with creating mth5 files from the synthetic test data
- that origianlly came from EMTF.
+ that originally came from EMTF.
 
-Want to create a station1.h5, station2.h5 and array.h5
-where array has 2 stations.
+Mirroring the original ascii files are:
+data/test1.h5
+data/test2.h5
+data/test12rr.h5
+
+Also created are some files with the same data but other channel_nomenclature schemes:
+data/test12rr_LEMI34.h5
+data/test1_LEMI12.h5
+
 """
 
 import numpy as np
+import pandas as pd
 from pathlib import Path
 
-import pandas as pd
+from aurora.config.metadata.channel_nomenclature import ChannelNomenclature
+from aurora.test_utils.synthetic.station_config import make_filters
+from aurora.test_utils.synthetic.station_config import make_station_01
+from aurora.test_utils.synthetic.station_config import make_station_02
+from aurora.test_utils.synthetic.station_config import make_station_03
 from mth5.timeseries import ChannelTS, RunTS
 from mth5.mth5 import MTH5
-
-from aurora.config.metadata.channel_nomenclature import ChannelNomenclature
-from aurora.test_utils.synthetic.synthetic_station_config import make_filters
-from aurora.test_utils.synthetic.synthetic_station_config import (
-    make_station_01,
-)
-from aurora.test_utils.synthetic.synthetic_station_config import (
-    make_station_02,
-)
-from aurora.test_utils.synthetic.synthetic_station_config import (
-    make_station_03,
-)
 
 np.random.seed(0)
 
@@ -105,15 +105,16 @@ def create_mth5_synthetic_file(
 
     Parameters
     ----------
-    station_cfg: dict
-        one-off data structure used to hold information mth5 needs to initialize
-        Specifically sample_rate, filters,
+    station_cfgs: list of dicts
+        The dicts are one-off data structure used to hold information mth5 needs to
+        initialize, specifically sample_rate, filters, etc.
     plot : bool
         set to false unless you want to look at a plot of the time series
 
     Returns
     -------
-
+    mth5_path: pathlib.Path
+        The path to the stored h5 file.
     """
 
     # set name for output h5 file
@@ -184,10 +185,11 @@ def create_mth5_synthetic_file(
 def create_test1_h5(file_version="0.1.0", channel_nomenclature="default"):
     station_01_params = make_station_01(channel_nomenclature=channel_nomenclature)
     mth5_path = station_01_params.mth5_path
+    station_params = [
+        station_01_params,
+    ]
     mth5_path = create_mth5_synthetic_file(
-        [
-            station_01_params,
-        ],
+        station_params,
         mth5_path,
         plot=False,
         file_version=file_version,
@@ -199,10 +201,11 @@ def create_test1_h5(file_version="0.1.0", channel_nomenclature="default"):
 def create_test2_h5(file_version="0.1.0", channel_nomenclature="default"):
     station_02_params = make_station_02(channel_nomenclature=channel_nomenclature)
     mth5_path = station_02_params.mth5_path
+    station_params = [
+        station_02_params,
+    ]
     mth5_path = create_mth5_synthetic_file(
-        [
-            station_02_params,
-        ],
+        station_params,
         mth5_path,
         plot=False,
         file_version=file_version,
@@ -213,10 +216,11 @@ def create_test2_h5(file_version="0.1.0", channel_nomenclature="default"):
 def create_test1_h5_with_nan(file_version="0.1.0", channel_nomenclature="default"):
     station_01_params = make_station_01(channel_nomenclature=channel_nomenclature)
     mth5_path = station_01_params.mth5_path  # DATA_PATH.joinpath("test1.h5")
+    station_params = [
+        station_01_params,
+    ]
     mth5_path = create_mth5_synthetic_file(
-        [
-            station_01_params,
-        ],
+        station_params,
         mth5_path,
         plot=False,
         add_nan_values=True,
@@ -241,10 +245,11 @@ def create_test12rr_h5(file_version="0.1.0", channel_nomenclature="default"):
 
 def create_test3_h5(file_version="0.1.0", channel_nomenclature="default"):
     station_params = make_station_03(channel_nomenclature=channel_nomenclature)
+    station_params = [
+        station_params,
+    ]
     mth5_path = create_mth5_synthetic_file(
-        [
-            station_params,
-        ],
+        station_params,
         station_params.mth5_path,
         file_version=file_version,
     )
