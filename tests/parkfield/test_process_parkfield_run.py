@@ -31,12 +31,12 @@ def test_processing(return_collection=False, z_file_path=None, test_clock_zero=F
         mt_metadata.transfer_functions.core.TF
     """
     close_open_files()
-    parkfield_h5_path = DATA_PATH.joinpath("pkd_test_00.h5")
+    parkfield_h5_path = DATA_PATH.joinpath("pkd_sao_test_00.h5")
 
     # Ensure there is an mth5 to process
     if not parkfield_h5_path.exists():
         try:
-            make_pkdsao_mth5("pkd_test_00")
+            make_pkdsao_mth5("pkd_sao_test_00")
             assert parkfield_h5_path.exists()
         except:
             print("NCEDC Likley Down")

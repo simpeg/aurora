@@ -2,39 +2,30 @@ from obspy import UTCDateTime
 from aurora.sandbox.io_helpers.fdsn_dataset import FDSNDataset
 
 
-def make_pkd_test_00_config(minitest=False):
+def make_pkdsao_test_00_config(minitest=False):
     """
     Populate a FDSNDataset() object for 2h of 40Hz data
+
+    Parameters
+    ----------
+    minitest: bool
+        Used for debugging, when set to True, it will just get a minute of data
+
     Returns
     -------
     test_data_set: aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset
+
     """
-    test_data_set = FDSNDataset()
-    test_data_set.dataset_id = "pkd_test_00"
-    test_data_set.network = "BK"
-    test_data_set.station = "PKD"
-    test_data_set.starttime = UTCDateTime("2004-09-28T00:00:00.000000Z")
-    test_data_set.endtime = UTCDateTime("2004-09-28T01:59:59.975000Z")
-    if minitest:
-        test_data_set.endtime = UTCDateTime("2004-09-28T00:01:00")  # 1 min
-    test_data_set.channel_codes = "BQ2,BQ3,BT1,BT2,BT3"
-    test_data_set.description = "2h of PKD data for 2004-09-28 midnight UTC until 0200"
-    test_data_set.components_list = ["ex", "ey", "hx", "hy", "hz"]
-    return test_data_set
-
-
-def make_pkdsao_test_00_config():
     test_data_set = FDSNDataset()
     test_data_set.dataset_id = "pkd_sao_test_00"
     test_data_set.network = "BK"
     test_data_set.station = "PKD,SAO"
     test_data_set.starttime = UTCDateTime("2004-09-28T00:00:00.000000Z")
     test_data_set.endtime = UTCDateTime("2004-09-28T01:59:59.975000Z")
-    # test_data_set.endtime = UTCDateTime("2004-09-28T00:01:59.999000Z") #small test
+    if minitest:
+        test_data_set.endtime = UTCDateTime("2004-09-28T00:01:00")  # 1 min
     test_data_set.channel_codes = "BQ2,BQ3,BT1,BT2,BT3"
-    test_data_set.description = (
-        "2h of PKD,SAO data for 2004-09-28 midnight UTC until 0200"
-    )
+    test_data_set.description = "2h of PKD,SAO data for 2004-09-28 0000-0200 UTC"
     test_data_set.components_list = ["ex", "ey", "hx", "hy", "hz"]
     return test_data_set
 
@@ -171,10 +162,6 @@ def make_iak34_test_04_config():
 
 def make_test_configs():
     test_data_set_configs = {}
-
-    # PARKFIELD pkd_test_00 Single station
-    test_data_set = make_pkd_test_00_config()
-    test_data_set_configs[test_data_set.dataset_id] = test_data_set
 
     # pkd_sao_test_00 Remote Reference
     test_data_set = make_pkdsao_test_00_config()

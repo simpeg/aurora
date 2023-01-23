@@ -30,19 +30,21 @@ def select_data_source():
         return data_source
 
 
-def make_pkdsao_mth5(dataset_id):
+def make_pkdsao_mth5(dataset_id="pkd_sao_test_00"):
     """
 
     Parameters
     ----------
     dataset_id: str
-        Either "pkd_test_00" or "pkd_sao_test_00".  Specifies the h5 to build,
-        single station or remote reference
+        "pkd_sao_test_00".  Specifies the dataset.
+        This argument may be deprecated in future - there used to be two choices for
+        PKD datasets, single station and remote reference, now there is only one config.
+
 
     """
     close_open_files()
     fdsn_dataset = TEST_DATA_SET_CONFIGS[dataset_id]
-    fdsn_dataset.data_source = select_data_source()  # PKDSAO_DATA_SOURCE
+    fdsn_dataset.data_source = select_data_source()
     fdsn_dataset.initialize_client()
     create_from_server_multistation(
         fdsn_dataset,
@@ -56,9 +58,7 @@ def make_pkdsao_mth5(dataset_id):
 
 
 def main():
-    dataset_ids = ["pkd_test_00", "pkd_sao_test_00"]
-    for dataset_id in dataset_ids:
-        make_pkdsao_mth5(dataset_id)
+    make_pkdsao_mth5()
 
 
 if __name__ == "__main__":

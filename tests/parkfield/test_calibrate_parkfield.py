@@ -72,7 +72,7 @@ def test():
 
     run_id = "001"
     station_id = "PKD"
-    dataset_id = "pkd_test_00"
+    dataset_id = "pkd_sao_test_00"
     parkfield_h5_path = DATA_PATH.joinpath(f"{dataset_id}.h5")
     if not parkfield_h5_path.exists():
         print(f"-1 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
