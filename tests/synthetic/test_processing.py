@@ -96,10 +96,10 @@ class TestSyntheticProcessing(unittest.TestCase):
         )
         assert tf_collection.tf_dict is not None
 
-    def test_simultaneos_regression(self):
+    def test_simultaneous_regression(self):
         z_file_path = AURORA_RESULTS_PATH.joinpath("syn1_simultaneous_estimate.zss")
         tf_cls = process_synthetic_1(
-            z_file_path=z_file_path, test_simultaneous_regression=True
+            z_file_path=z_file_path, simultaneous_regression=True
         )
         xml_file_base = "syn1_simultaneous_estimate.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
@@ -139,23 +139,28 @@ def process_synthetic_1(
     config_keyword="test1",
     z_file_path="",
     test_scale_factor=False,
-    test_simultaneous_regression=False,
+    simultaneous_regression=False,
     file_version="0.1.0",
     return_collection=False,
     channel_nomenclature="default",
+    reload_config=False,
 ):
     """
 
     Parameters
     ----------
+    config_keyword: str
+        "test1", "test1_tfk", this is an argument passed to the create_test_run_config
+        as test_case_id.
     z_file_path: str or path
         Where the z-file will be output
     test_scale_factor: bool
         If true, will assign scale factors to the channels
-    test_simultaneous_regression: bool
+    simultaneous_regression: bool
         If True will do regression all outut channels in one step, rather than the
         usual, channel-by-channel method
-
+    file_version: str
+        one of ["0.1.0", "0.2.0"]
     Returns
     -------
     tf_result: TransferFunctionCollection or mt_metadata.transfer_functions.TF
@@ -193,8 +198,16 @@ def process_synthetic_1(
     processing_config = create_test_run_config(
         config_keyword, tfk_dataset, channel_nomenclature=channel_nomenclature
     )
+    # Relates to issue #172
+    # reload_config = True
+    # if reload_config:
+    #     from aurora.config.metadata import Processing
+    #     p = Processing()
+    #     config_path = pathlib.Path("config")
+    #     json_fn = config_path.joinpath(processing_config.json_fn())
+    #     p.from_json(json_fn)
 
-    if test_simultaneous_regression:
+    if simultaneous_regression:
         for decimation in processing_config.decimations:
             decimation.estimator.estimate_per_channel = False
 
