@@ -11,6 +11,7 @@ import scipy.io as sio
 from aurora.config.metadata.decimation_level import DecimationLevel
 from aurora.config.metadata.processing import Processing
 from aurora.config.emtf_band_setup import BANDS_256_29_FILE
+from aurora.general_helper_functions import TEST_PATH
 from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.time_series.frequency_band import FrequencyBands
@@ -57,7 +58,7 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
         z_file_path = "from_matlab.zss"
     elif case_id == "IAK34ss":
         n_periods_clip = 3
-        z_mat = "IAK34_struct_zss.mat"
+        z_mat = TEST_PATH.joinpath("io").joinpath("IAK34_struct_zss.mat")
         archived_z_file_path = "archived_from_matlab.zss"
         z_file_path = "from_matlab.zss"
 
