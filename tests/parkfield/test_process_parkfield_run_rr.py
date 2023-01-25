@@ -36,7 +36,7 @@ def test_stuff_that_belongs_elsewhere():
     mth5_obj = MTH5(file_version="0.1.0")
     mth5_obj.open_mth5(h5_path, mode="a")
     df = mth5_obj.channel_summary.to_dataframe()
-    make_mth5_df = channel_summary_to_make_mth5(df)
+    make_mth5_df = channel_summary_to_make_mth5(df, network="NCEDC")
     mth5_obj.close_mth5()
     return make_mth5_df
 

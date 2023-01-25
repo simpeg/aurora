@@ -244,13 +244,13 @@ def create_test12rr_h5(file_version="0.1.0", channel_nomenclature="default"):
 
 
 def create_test3_h5(file_version="0.1.0", channel_nomenclature="default"):
-    station_params = make_station_03(channel_nomenclature=channel_nomenclature)
+    station_03_params = make_station_03(channel_nomenclature=channel_nomenclature)
     station_params = [
-        station_params,
+        station_03_params,
     ]
     mth5_path = create_mth5_synthetic_file(
         station_params,
-        station_params.mth5_path,
+        station_params[0].mth5_path,
         file_version=file_version,
     )
     return mth5_path
