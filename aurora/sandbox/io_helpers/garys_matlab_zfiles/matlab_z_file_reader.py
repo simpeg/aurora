@@ -25,31 +25,39 @@ from aurora.transfer_function.transfer_function_collection import (
 from aurora.transfer_function.TTFZ import TTFZ
 
 
-def test_matlab_zfile_reader(make_plot=False):
+def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
     """
+
+    Parameters
+    ----------
+    case_id: string
+        one of ["IAK34ss", "synthetic"]
+        currently only IAK34ss is supported
+    make_plot: bool
+        Set to True when debugging
+    case
+
     Takes a stored matlab file: "IAK34_struct_zss.mat", reads it in, and packs
     a z-file from it.
 
     There is a stored version of the z-file from July 2022 (archived in git in Sept
     2022) that we assert equality with to pass the test.
 
-    Parameters
-    ----------
-    make_plot: bool
-        Set to True when debugging
-
     Returns
     -------
 
     """
-    CASE = "IAK34ss"  # synthetic"
     bs_file = BANDS_256_29_FILE
-    if CASE == "synthetic":
+    if case_id == "synthetic":
         n_periods_clip = 3  # for synthetic case
         z_mat = "TS1zss20210831.mat"
-    elif CASE == "IAK34ss":
+        archived_z_file_path = None
+        z_file_path = "from_matlab.zss"
+    elif case_id == "IAK34ss":
         n_periods_clip = 3
         z_mat = "IAK34_struct_zss.mat"
+        archived_z_file_path = "archived_from_matlab.zss"
+        z_file_path = "from_matlab.zss"
 
     orientation_strs = get_default_orientation_block()
 
@@ -90,9 +98,9 @@ def test_matlab_zfile_reader(make_plot=False):
         sample_rate /= 4.0
 
     tmp = sio.loadmat(z_mat)
-    if CASE == "synthetic":
+    if case_id == "synthetic":
         stuff = tmp["temp"][0][0].tolist()
-    elif CASE == "IAK34ss":
+    elif case_id == "IAK34ss":
         stuff = tmp["TFstruct"][0][0].tolist()
     TF = stuff[4]
     periods = stuff[5]
@@ -109,9 +117,9 @@ def test_matlab_zfile_reader(make_plot=False):
             nan_cov_nn.append(i)
             print(f"NAN {i}")
 
-    if CASE == "synthetic":
+    if case_id == "synthetic":
         cov_nn[:, :, 28] = cov_nn[:, :, 27]
-    elif CASE == "IAK34ss":
+    elif case_id == "IAK34ss":
         for i in range(12):
             cov_nn[:, :, i] = cov_nn[:, :, 12]
 
@@ -145,13 +153,10 @@ def test_matlab_zfile_reader(make_plot=False):
         tf_dict[i_dec].tf.data = tf_dict[i_dec].tf.data
 
     tfc = TransferFunctionCollection(header=tf_obj.tf_header, tf_dict=tf_dict)
-    z_file_path = "from_matlab.zss"
     tfc.write_emtf_z_file(z_file_path, orientation_strs=orientation_strs)
 
     if n_periods_clip:
         clip_bands_from_z_file(z_file_path, n_periods_clip, n_sensors=5)
-
-    archived_z_file_path = "archived_from_matlab.zss"
 
     zfile = read_z_file(z_file_path)
     archived_zfile = read_z_file(archived_z_file_path)
@@ -204,7 +209,3 @@ def test_matlab_zfile_reader(make_plot=False):
         axs[0].set_xlim(1, 10000)
         plt.show()
     print("success!")
-
-
-if __name__ == "__main__":
-    test_matlab_zfile_reader()
