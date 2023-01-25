@@ -1,3 +1,5 @@
+*ignore*
+*fix_issue*
 aurora/sandbox/config
 aurora/sandbox/data
 tests/cas04/aurora_results/*
