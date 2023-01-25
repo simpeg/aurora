@@ -35,7 +35,6 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
         currently only IAK34ss is supported
     make_plot: bool
         Set to True when debugging
-    case
 
     Takes a stored matlab file: "IAK34_struct_zss.mat", reads it in, and packs
     a z-file from it.
@@ -43,8 +42,11 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
     There is a stored version of the z-file from July 2022 (archived in git in Sept
     2022) that we assert equality with to pass the test.
 
-    Returns
-    -------
+    ToDo: There is another stored mat file:"TS1zss20210831.mat"
+    this appears to be synthetic station test1, processed with BANDS_256_29_FILE
+    The output z-file from this can be compared to test1_aurora_matlab.zss.
+    The results should agree approximately.
+
 
     """
     bs_file = BANDS_256_29_FILE
