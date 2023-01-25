@@ -50,6 +50,7 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
 
 
     """
+    test_dir_path = TEST_PATH.joinpath("io")
     bs_file = BANDS_256_29_FILE
     if case_id == "synthetic":
         n_periods_clip = 3  # for synthetic case
@@ -58,9 +59,9 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
         z_file_path = "from_matlab.zss"
     elif case_id == "IAK34ss":
         n_periods_clip = 3
-        z_mat = TEST_PATH.joinpath("io").joinpath("IAK34_struct_zss.mat")
-        archived_z_file_path = "archived_from_matlab.zss"
-        z_file_path = "from_matlab.zss"
+        z_mat = test_dir_path.joinpath("IAK34_struct_zss.mat")
+        archived_z_file_path = test_dir_path.joinpath("archived_from_matlab.zss")
+        z_file_path = test_dir_path.joinpath("from_matlab.zss")
 
     orientation_strs = get_default_orientation_block()
 
