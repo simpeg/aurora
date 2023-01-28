@@ -183,20 +183,15 @@ def export_tf(
     return tf_cls
 
 
-def update_dataset_df(i_dec_level, config, dataset_df, tfk=None):
+def update_dataset_df(i_dec_level, config, tfk=None):
     """
     2023-01-28: if tfk argument is provided, dataset_df is not needed.
 
     This function has two different modes.  The first mode, initializes values in the
     array, and could be placed into TFKDataset.initialize_time_series_data()
     The second mode, decimates. Becasue it calls time series operations, I prefer
-    to keep it in pipelines.  Maybe name it update_dataset_df().
-    Although, there are other ways to approach this:
-        Say we had a dictionary of decimation_methods (kind of like the dictionary of
-        regression_engines), then one could call TFKernel.update_dataset_df(), where
-        the argument was the method to do the decimation.
-        In this way, the workflow management could stay inside TFKernel, but the math
-        could be done via the data container ...
+    to keep it in pipelines.
+
 
     Notes:
     1. When iterating over dataframe, (i)ndex must run from 0 to len(df), otherwise
@@ -213,7 +208,6 @@ def update_dataset_df(i_dec_level, config, dataset_df, tfk=None):
         decimation level id, indexed from zero
     config: aurora.config.metadata.decimation_level.DecimationLevel
         decimation level config
-    dataset_df: pd.DataFrame
 
     Returns
     -------
@@ -231,15 +225,17 @@ def update_dataset_df(i_dec_level, config, dataset_df, tfk=None):
         print(f"DECIMATION LEVEL {i_dec_level}")
         # See Note 1 top of module
         # See Note 2 top of module
-        for i, row in dataset_df.iterrows():
+        for i, row in tfk.dataset_df.iterrows():
             valid = tfk.is_valid_dataset(row, i_dec_level)
             if not valid:
                 continue
             run_xrds = row["run_dataarray"].to_dataset("channel")
             decimated_run_xrds = prototype_decimate(config.decimation, run_xrds)
-            dataset_df["run_dataarray"].at[i] = decimated_run_xrds.to_array("channel")
+            tfk.dataset_df["run_dataarray"].at[i] = decimated_run_xrds.to_array(
+                "channel"
+            )
     print("DATASET DF UPDATED")
-    return dataset_df
+    return
 
 
 def process_mth5(
@@ -291,7 +287,6 @@ def process_mth5(
     # Assign additional columns to dataset_df, populate with mth5_objs and xr_ts
     # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
     tfk.dataset.initialize_dataframe_for_processing(mth5_objs)
-    dataset_df = tfk.dataset.df
 
     # Place checks that would be done by TF Kernel here
     # see notes labelled with ToDo TFK above
@@ -305,18 +300,16 @@ def process_mth5(
 
     for i_dec_level, dec_level_config in enumerate(tfk.valid_decimations()):
 
-        dataset_df = update_dataset_df(
-            i_dec_level, dec_level_config, dataset_df, tfk=tfk
-        )
+        update_dataset_df(i_dec_level, dec_level_config, tfk=tfk)
 
         # TFK 1: get clock-zero from data if needed
         if dec_level_config.window.clock_zero_type == "data start":
-            dec_level_config.window.clock_zero = str(dataset_df.start.min())
+            dec_level_config.window.clock_zero = str(tfk.dataset_df.start.min())
 
         # Apply STFT to all runs
         local_stfts = []
         remote_stfts = []
-        for i, row in dataset_df.iterrows():
+        for i, row in tfk.dataset_df.iterrows():
             # Check that this row is valid
             valid = tfk.is_valid_dataset(row, i_dec_level)
             if not valid:
@@ -379,8 +372,8 @@ def process_mth5(
             survey_dict = local_mth5_obj.survey_group.metadata.to_dict()
         elif local_mth5_obj.file_version == "0.2.0":
             # this could be a method of tf_kernel.get_survey_dict()
-            survey_id = dataset_df[
-                dataset_df["station_id"] == local_station_id
+            survey_id = tfk.dataset_df[
+                tfk.dataset_df["station_id"] == local_station_id
             ].survey.unique()[0]
             survey_obj = local_mth5_obj.get_survey(survey_id)
             survey_dict = survey_obj.metadata.to_dict()
