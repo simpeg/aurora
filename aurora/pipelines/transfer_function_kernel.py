@@ -21,6 +21,10 @@ class TransferFunctionKernel(object):
         return self._dataset
 
     @property
+    def dataset_df(self):
+        return self._dataset.df
+
+    @property
     def processing_config(self):
         return self._config
 
@@ -181,3 +185,28 @@ class TransferFunctionKernel(object):
         dec_levels = [x for x in dec_levels if x.decimation.level in valid_levels]
         print(f"After validation there are {len(dec_levels)} valid decimation levels")
         return dec_levels
+
+    def is_valid_dataset(self, row, i_dec):
+        """
+        Given a row form the RunSummary, will this decimation level yield a valid
+        dataset?
+
+        Parameters
+        ----------
+        row: a row of the self._dataset_df (corresponding to a run that will be
+        processed
+        i_dec: integer - refers to decimation level
+
+        Returns
+        -------
+
+        """
+        # Query processing on survey, station, run, decimation
+        cond1 = self.processing_summary.survey == row.survey
+        cond2 = self.processing_summary.station_id == row.station_id
+        cond3 = self.processing_summary.run_id == row.run_id
+        cond4 = self.processing_summary.dec_level == i_dec
+        cond = cond1 & cond2 & cond3 & cond4
+        processing_row = self.processing_summary[cond]
+        assert len(processing_row) == 1
+        return processing_row.valid.iloc[0]
