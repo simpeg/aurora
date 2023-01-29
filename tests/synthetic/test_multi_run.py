@@ -125,7 +125,7 @@ class TestMultiRunProcessing(unittest.TestCase):
         tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
 
 
-def test():
+def main():
     # tmp = TestMultiRunProcessing()
     # tmp.setUp()
     # tmp.test_works_with_truncated_run()
@@ -134,4 +134,4 @@ def test():
 
 
 if __name__ == "__main__":
-    test()
+    main()
