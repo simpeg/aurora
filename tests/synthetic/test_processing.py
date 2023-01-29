@@ -1,6 +1,6 @@
+import logging
 import pathlib
 import unittest
-import logging
 
 from aurora.pipelines.run_summary import RunSummary
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel

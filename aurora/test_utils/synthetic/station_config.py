@@ -155,6 +155,17 @@ def make_station_02(channel_nomenclature="default"):
 
 
 def make_station_03(channel_nomenclature="default"):
+    """
+    Here we create a synthetic station with multiple runs.  Rather than generate fresh
+    synthetic data, we just reuse test1.asc for each run.
+    Parameters
+    ----------
+    channel_nomenclature
+
+    Returns
+    -------
+
+    """
     channel_nomenclature_obj = ChannelNomenclature()
     channel_nomenclature_obj.keyword = channel_nomenclature
     EX, EY, HX, HY, HZ = channel_nomenclature_obj.unpack()
