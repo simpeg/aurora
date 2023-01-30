@@ -1,23 +1,6 @@
 """
-follows Gary's TTF.m in
-iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
-
-2021-07-20: Addressing Issue #12.  If we are going to use xarray it is
-tempting to use the frequency band centers as the axis for the arrays
-here, rather than simple integer indexing.  This has the advantage of
-making the data structures more explicit and self describing.  We can also
-continue to use integer indices to assign and access tf values if needed.
-However, one concern I have is that if we use floating point numbers for the
-frequencies (or periods) we run the risk of machine roundoff error giving
-problems down stream.  One way around this is to add a .band_centers()
-method to FrequencyBands() which will provide is a list of band centers and
-then rather than access by the band center, we can use an access method that
-gets us the frequencies between the band_egdes, which will be a unique frequency
-... however, if we use overlapping bands this will in general get complicated.
-However, for an MT TF representation, we do not in general use overlapping
-bands.  A reasonably general, and simple solution is to make FrequencyBands
-support an iterable of bands, accessable by integer position, and by center
-frequency.
+follows Gary's TTF.m in iris_mt_scratch
+egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
 """
 
 import numpy as np
@@ -27,10 +10,6 @@ import xarray as xr
 class TransferFunction(object):
     """
     Class to contain transfer function array.
-    2021-07-21: adding processing_config so that it lives with this object.
-    This will facilitate the writing of z-files if we use a band setup file
-    that is not of EMTF style
-
 
     Parameters:
     TF : numpy array
@@ -70,8 +49,10 @@ class TransferFunction(object):
 
         Parameters
         ----------
-        tf_header
-        frequency_bands
+        tf_header: aurora.transfer_function.transfer_function_header.TransferFunctionHeader
+            TF header, soon to be deprecated.
+        frequency_bands: aurora.time_series.frequency_band.FrequencyBands
+            frequency bands object
         """
         self.tf_header = tf_header
         self.frequency_bands = frequency_bands
@@ -81,7 +62,7 @@ class TransferFunction(object):
         self.R2 = None
         self.initialized = False
         self.processing_config = kwargs.get("processing_config", None)
-        self.num_segments
+
         if self.tf_header is not None:
             if self.num_bands is not None:
                 self._initialize_arrays()
@@ -93,8 +74,6 @@ class TransferFunction(object):
     @property
     def num_bands(self):
         """
-        temporary function to allow access to old property num_bands used in
-        the matlab codes for initialization
         Returns num_bands : int
             a count of the frequency bands associated with the TF
         -------
@@ -148,9 +127,8 @@ class TransferFunction(object):
                 "input_channel": self.tf_header.input_channels,
             },
         )
-        # </transfer function xarray>
 
-        # <num_segments xarray>
+        # num_segments xarray
         num_segments = np.zeros((self.num_channels_out, self.num_bands), dtype=np.int32)
         num_segments_xr = xr.DataArray(
             num_segments,
@@ -162,9 +140,8 @@ class TransferFunction(object):
             },
         )
         self.num_segments = num_segments_xr
-        # <num_segments xarray>
 
-        # <Inverse signal covariance>
+        # Inverse signal covariance
         cov_ss_dims = (self.num_channels_in, self.num_channels_in, self.num_bands)
         cov_ss_inv = np.zeros(cov_ss_dims, dtype=np.complex128)
         self.cov_ss_inv = xr.DataArray(
@@ -176,9 +153,8 @@ class TransferFunction(object):
                 "period": self.periods,
             },
         )
-        # </Inverse signal covariance>
 
-        # <Noise covariance>
+        # Noise covariance
         cov_nn_dims = (self.num_channels_out, self.num_channels_out, self.num_bands)
         cov_nn = np.zeros(cov_nn_dims, dtype=np.complex128)
         self.cov_nn = xr.DataArray(
@@ -190,9 +166,8 @@ class TransferFunction(object):
                 "period": self.periods,
             },
         )
-        # </Noise covariance>
 
-        # <Coefficient of determination>
+        # Coefficient of determination
         self.R2 = xr.DataArray(
             np.zeros((self.num_channels_out, self.num_bands)),
             dims=["output_channel", "period"],
@@ -201,7 +176,7 @@ class TransferFunction(object):
                 "period": self.periods,
             },
         )
-        # </Coefficient of determination>
+
         self.initialized = True
 
     @property
