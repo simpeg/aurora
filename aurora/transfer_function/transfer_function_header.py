@@ -12,9 +12,6 @@ class TransferFunctionHeader(object):
     stations. As of 2021-07-20 the class functions with only the station_id
     and channel_id values.
 
-    <See Issue #41>
-    </See Issue #41>
-
     """
 
     def __init__(self, **kwargs):
