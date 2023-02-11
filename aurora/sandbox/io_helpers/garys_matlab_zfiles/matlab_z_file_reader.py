@@ -8,7 +8,6 @@ import numpy as np
 import scipy.io as sio
 
 
-from aurora.config.metadata.decimation_level import DecimationLevel
 from aurora.config.metadata.processing import Processing
 from aurora.config.emtf_band_setup import BANDS_256_29_FILE
 from aurora.general_helper_functions import TEST_PATH
@@ -21,7 +20,6 @@ from aurora.transfer_function.plot.rho_phi_helpers import plot_rho
 from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
 )
-from aurora.transfer_function.TTFZ import TTFZ
 
 
 def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
