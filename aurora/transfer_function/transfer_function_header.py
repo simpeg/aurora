@@ -17,10 +17,10 @@ class TransferFunctionHeader(object):
     def __init__(self, **kwargs):
         """
         Parameters
-        local_station : mt_metadata.transfer_functions.tf.station.Station()
+        _local_station : mt_metadata.transfer_functions.tf.station.Station()
             Station metadata object for the station to be estimated (
             location, channel_azimuths, etc.)
-        remote_site: same object type as local site
+        _reference_station: same object type as local station
             if no remote reference then this can be None
         output_channels: list
             Probably a list of channel keys -- usually ["ex","ey","hz"]
@@ -43,6 +43,7 @@ class TransferFunctionHeader(object):
         self.input_channels = kwargs.get("input_channels", ["hx", "hy"])
         self.output_channels = kwargs.get("output_channels", ["ex", "ey"])
         self.reference_channels = kwargs.get("reference_channels", [])
+        self.decimation_level_id = kwargs.get("decimation_level_id", None)
         self.user_meta_data = None  # placeholder for anything
 
         # <ByPass mt_metadata classes>

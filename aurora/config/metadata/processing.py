@@ -328,3 +328,31 @@ class Processing(Base):
         json_str = self.to_json(nested=nested, required=required)
         with open(filename, "w") as f:
             f.write(json_str)
+
+    def make_tf_header(self, dec_level_id):
+        """
+
+        Parameters
+        ----------
+        dec_level_id: int
+            This may tolerate strings in the future, but keep as int for now
+
+        Returns
+        -------
+        tfh: aurora.transfer_function.transfer_function_header.TransferFunctionHeader
+        """
+        from aurora.transfer_function.transfer_function_header import (
+            TransferFunctionHeader,
+        )
+
+        tfh = TransferFunctionHeader(
+            processing_scheme=self.decimations[dec_level_id].estimator.engine,
+            local_station=self.stations.local,
+            reference_station=self.stations.remote,
+            input_channels=self.decimations[dec_level_id].input_channels,
+            output_channels=self.decimations[dec_level_id].output_channels,
+            reference_channels=self.decimations[dec_level_id].reference_channels,
+            decimation_level_id=dec_level_id,
+        )
+
+        return tfh

@@ -16,7 +16,7 @@ class TransferFunction(object):
         array of transfer functions: TF(Nout, Nin, Nperiods)
     T : numpy array
         list of periods
-    Header : transfer_function_header.TransferFunctionHeader() object.
+    Header : transfer_function_header.TransferFunctionHeader object.
         TF header contains local site header, remote site header if
         appropriate, and information about estimation approach???
     cov_ss_inv : numpy array
@@ -50,7 +50,7 @@ class TransferFunction(object):
         Parameters
         ----------
         tf_header: aurora.transfer_function.transfer_function_header.TransferFunctionHeader
-            TF header, soon to be deprecated.
+            TF header, may be deprecated in future.
         frequency_bands: aurora.time_series.frequency_band.FrequencyBands
             frequency bands object
         """

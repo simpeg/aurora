@@ -29,7 +29,6 @@ from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.transfer_function_helpers import process_transfer_functions
-from aurora.pipelines.transfer_function_helpers import tf_header_from_config
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
 
 from aurora.transfer_function.transfer_function_collection import (
@@ -129,7 +128,7 @@ def process_tf_decimation_level(
         The transfer function values packed into an object
     """
     frequency_bands = config.decimations[i_dec_level].frequency_bands_obj()
-    tf_header = tf_header_from_config(config, i_dec_level)
+    tf_header = config.make_tf_header(i_dec_level)
     transfer_function_obj = TTFZ(tf_header, frequency_bands, processing_config=config)
 
     transfer_function_obj = process_transfer_functions(

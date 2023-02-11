@@ -22,7 +22,8 @@ from aurora.transfer_function.plot.rho_phi_helpers import plot_phi
 from aurora.transfer_function.plot.rho_phi_helpers import plot_rho
 
 EMTF_REGRESSION_ENGINE_LABELS = {}
-EMTF_REGRESSION_ENGINE_LABELS["RME"] = "Robust Single station"
+EMTF_REGRESSION_ENGINE_LABELS["RME"] = "Robust Single Station"
+EMTF_REGRESSION_ENGINE_LABELS["RME_RR"] = "Robust Remote Reference"
 
 
 class TransferFunctionCollection(object):
@@ -48,7 +49,6 @@ class TransferFunctionCollection(object):
     @property
     def local_station_id(self):
         """
-        TODO: make this take the station_id directly from the header
         Returns
         -------
 
@@ -58,7 +58,6 @@ class TransferFunctionCollection(object):
     @property
     def remote_station_id(self):
         """
-        TODO: make this take the station_id directly from the header
         Returns
         -------
 
@@ -102,14 +101,13 @@ class TransferFunctionCollection(object):
 
     def _merge_decimation_levels(self):
         """
-        Addressing Aurora Issue #93
-        Will merge all decimation levels into a single 3D xarray for output.
+        Will merge all decimation levels into a single xarray for export.
         The output of this may become its own class, MergedTransferFunction
 
         One concern here is that the same period can be estiamted at more then one
         decimation level, making the frequency or period axis not of the same order
         as the number of estimates.  Ways around this:
-         1. We can stack that axis with decimation level
+         1. We can multi-index the period axis with decimation level
          2. Make sure that the processing config does not dupliacate periods
          3. Take the average estimate over all periods heving the same value
          4. Drop all but one estimate accoring to a rule (keep most observations say)
@@ -123,12 +121,10 @@ class TransferFunctionCollection(object):
         This dataset list is then combined over all periods forming a representation
         of the TTFZ which is merged over all the decimation levels.
 
-        2021-09-25: probably break this into two methods
-        The first will crate the merged object, and the second will
-
-        Returns xarray.dataset
-        -------
-
+        result is to build:
+        merged_tf
+        merged_cov_ss_inv
+        merged_cov_nn
         """
         n_dec = self.number_of_decimation_levels
 

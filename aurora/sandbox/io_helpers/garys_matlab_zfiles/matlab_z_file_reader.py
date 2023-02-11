@@ -19,7 +19,6 @@ from aurora.transfer_function.emtf_z_file_helpers import clip_bands_from_z_file
 from aurora.transfer_function.emtf_z_file_helpers import get_default_orientation_block
 from aurora.transfer_function.plot.rho_phi_helpers import plot_phi
 from aurora.transfer_function.plot.rho_phi_helpers import plot_rho
-from aurora.transfer_function.transfer_function_header import TransferFunctionHeader
 from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
 )
@@ -54,11 +53,31 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
     bs_file = BANDS_256_29_FILE
     if case_id == "synthetic":
         n_periods_clip = 3  # for synthetic case
+        estimator_engine = "RME"
+        local_station_id = "test1"
+        remote_station_id = ""
+        input_channels = ["hx", "hy"]
+        output_channels = [
+            "hz",
+            "ex",
+            "ey",
+        ]
+        reference_channels = []
         z_mat = "TS1zss20210831.mat"
         archived_z_file_path = None
         z_file_path = "from_matlab.zss"
     elif case_id == "IAK34ss":
         n_periods_clip = 3
+        estimator_engine = "RME"
+        local_station_id = "IAK34"
+        remote_station_id = ""
+        input_channels = ["hx", "hy"]
+        output_channels = [
+            "hz",
+            "ex",
+            "ey",
+        ]
+        reference_channels = []
         z_mat = test_dir_path.joinpath("IAK34_struct_zss.mat")
         archived_z_file_path = test_dir_path.joinpath("archived_from_matlab.zss")
         z_file_path = test_dir_path.joinpath("from_matlab.zss")
@@ -70,6 +89,9 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
     tf_dict = {}
 
     p = Processing()
+    p.stations.local.id = local_station_id
+    if remote_station_id:
+        p.stations.remote.id = remote_station_id
     emtf_band_setup = EMTFBandSetupFile(filepath=bs_file, sample_rate=sample_rate)
     num_samples_window = 256
     band_edges = emtf_band_setup.compute_band_edges(
@@ -78,24 +100,16 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
     for i_dec in range(4):
         edges = np.flipud(band_edges[i_dec])
         frequency_bands = FrequencyBands(band_edges=edges)
-        transfer_function_header = TransferFunctionHeader(
-            processing_scheme="RME",
-            local_station_id="test1",
-            remote_station_id="",
-            input_channels=["hx", "hy"],
-            output_channels=[
-                "hz",
-                "ex",
-                "ey",
-            ],
-            reference_channels=[],
-        )
-        tf_obj = TTFZ(transfer_function_header, frequency_bands)
-
         dec_level_cfg = DecimationLevel()
         dec_level_cfg.decimation.sample_rate = sample_rate
         dec_level_cfg.window.num_samples = num_samples_window
+        dec_level_cfg.estimator.engine = estimator_engine
+        dec_level_cfg.input_channels = input_channels
+        dec_level_cfg.output_channels = output_channels
+        dec_level_cfg.reference_channels = reference_channels
         p.add_decimation_level(dec_level_cfg)
+        transfer_function_header = p.make_tf_header(i_dec)
+        tf_obj = TTFZ(transfer_function_header, frequency_bands)
         tf_obj.processing_config = p
 
         tf_dict[i_dec] = tf_obj
