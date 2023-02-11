@@ -348,7 +348,9 @@ def process_mth5(
             plot_tf_obj(tf_obj, out_filename="out")
 
     # TODO: Add run_obj to TransferFunctionCollection so it doesn't need header?
-    tf_collection = TransferFunctionCollection(header=tf_obj.tf_header, tf_dict=tf_dict)
+    tf_collection = TransferFunctionCollection(
+        header=tf_obj.tf_header, tf_dict=tf_dict, processing_config=tfk.config
+    )
 
     # local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
     local_run_obj = tfk_dataset.get_run_object(0)

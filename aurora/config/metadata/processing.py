@@ -356,3 +356,23 @@ class Processing(Base):
         )
 
         return tfh
+
+    def make_tf_level(self, dec_level_id):
+        """
+
+        Parameters
+        ----------
+        dec_level_id: int
+            This may tolerate strings in the future, but keep as int for now
+
+        Returns
+        -------
+        tfh: aurora.transfer_function.TTFZ.TTFZ
+        """
+        # from aurora.transfer_function.base import TransferFunction
+        from aurora.transfer_function.TTFZ import TTFZ
+
+        tf_header = self.make_tf_header(dec_level_id)
+        tf_obj = TTFZ(tf_header, self.decimations[dec_level_id].frequency_bands_obj())
+
+        return tf_obj

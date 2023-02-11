@@ -14,7 +14,6 @@ from aurora.config.emtf_band_setup import BANDS_256_29_FILE
 from aurora.general_helper_functions import TEST_PATH
 from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
-from aurora.time_series.frequency_band import FrequencyBands
 from aurora.transfer_function.emtf_z_file_helpers import clip_bands_from_z_file
 from aurora.transfer_function.emtf_z_file_helpers import get_default_orientation_block
 from aurora.transfer_function.plot.rho_phi_helpers import plot_phi
@@ -84,7 +83,6 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
 
     orientation_strs = get_default_orientation_block()
 
-    frequency_bands = FrequencyBands()
     sample_rate = 1.0
     tf_dict = {}
 
@@ -94,24 +92,21 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
         p.stations.remote.id = remote_station_id
     emtf_band_setup = EMTFBandSetupFile(filepath=bs_file, sample_rate=sample_rate)
     num_samples_window = 256
+    decimation_factors = [1, 4, 4, 4]
     band_edges = emtf_band_setup.compute_band_edges(
-        decimation_factors=[1, 4, 4, 4], num_samples_window=4 * [num_samples_window]
+        decimation_factors=decimation_factors,
+        num_samples_window=4 * [num_samples_window],
     )
+    p.assign_bands(band_edges, sample_rate, decimation_factors, 4 * num_samples_window)
     for i_dec in range(4):
-        edges = np.flipud(band_edges[i_dec])
-        frequency_bands = FrequencyBands(band_edges=edges)
-        dec_level_cfg = DecimationLevel()
-        dec_level_cfg.decimation.sample_rate = sample_rate
-        dec_level_cfg.window.num_samples = num_samples_window
-        dec_level_cfg.estimator.engine = estimator_engine
-        dec_level_cfg.input_channels = input_channels
-        dec_level_cfg.output_channels = output_channels
-        dec_level_cfg.reference_channels = reference_channels
-        p.add_decimation_level(dec_level_cfg)
-        transfer_function_header = p.make_tf_header(i_dec)
-        tf_obj = TTFZ(transfer_function_header, frequency_bands)
-        tf_obj.processing_config = p
+        p.decimations[i_dec].decimation.sample_rate = sample_rate
+        p.decimations[i_dec].window.num_samples = num_samples_window
+        p.decimations[i_dec].estimator.engine = estimator_engine
+        p.decimations[i_dec].input_channels = input_channels
+        p.decimations[i_dec].output_channels = output_channels
+        p.decimations[i_dec].reference_channels = reference_channels
 
+        tf_obj = p.make_tf_level(i_dec)
         tf_dict[i_dec] = tf_obj
         sample_rate /= 4.0
 
@@ -170,7 +165,9 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
     for i_dec in range(4):
         tf_dict[i_dec].tf.data = tf_dict[i_dec].tf.data
 
-    tfc = TransferFunctionCollection(header=tf_obj.tf_header, tf_dict=tf_dict)
+    tfc = TransferFunctionCollection(
+        header=tf_obj.tf_header, tf_dict=tf_dict, processing_config=p
+    )
     tfc.write_emtf_z_file(z_file_path, orientation_strs=orientation_strs)
 
     if n_periods_clip:

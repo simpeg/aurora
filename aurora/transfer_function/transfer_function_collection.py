@@ -41,6 +41,7 @@ class TransferFunctionCollection(object):
         """
         self.header = kwargs.get("header", None)
         self.tf_dict = kwargs.get("tf_dict", None)
+        self.processing_config = kwargs.get("processing_config", None)
         self.labelled_tf = None
         self.merged_tf = None
         self.merged_cov_nn = None
@@ -311,7 +312,7 @@ class TransferFunctionCollection(object):
             cov_nn_xr = tf.cov_nn
             periods = tf.frequency_bands.band_centers(frequency_or_period="period")
             periods = np.flip(periods)  # EMTF works in increasing period
-            dec_level_config = tf.processing_config.decimations[i_dec]
+            dec_level_config = self.processing_config.decimations[i_dec]
 
             for band in tf.frequency_bands.bands(direction="increasing_period"):
                 # print(f"band {band}")
