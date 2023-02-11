@@ -183,7 +183,7 @@ def export_tf(
     return tf_cls
 
 
-def update_dataset_df(i_dec_level, config, tfk=None):
+def update_dataset_df(i_dec_level, tfk):
     """
     2023-01-28: if tfk argument is provided, dataset_df is not needed.
 
@@ -229,10 +229,10 @@ def update_dataset_df(i_dec_level, config, tfk=None):
             if not tfk.is_valid_dataset(row, i_dec_level):
                 continue
             run_xrds = row["run_dataarray"].to_dataset("channel")
-            decimated_run_xrds = prototype_decimate(config.decimation, run_xrds)
-            tfk.dataset_df["run_dataarray"].at[i] = decimated_run_xrds.to_array(
-                "channel"
-            )
+            decimation = tfk.config.decimations[i_dec_level].decimation
+            decimated_xrds = prototype_decimate(decimation, run_xrds)
+            tfk.dataset_df["run_dataarray"].at[i] = decimated_xrds.to_array("channel")
+
     print("DATASET DF UPDATED")
     return
 
@@ -296,7 +296,7 @@ def process_mth5(
 
     for i_dec_level, dec_level_config in enumerate(tfk.valid_decimations()):
 
-        update_dataset_df(i_dec_level, dec_level_config, tfk=tfk)
+        update_dataset_df(i_dec_level, dec_level_config, tfk)
 
         # TFK 1: get clock-zero from data if needed
         if dec_level_config.window.clock_zero_type == "data start":
