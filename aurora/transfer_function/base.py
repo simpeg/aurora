@@ -6,8 +6,10 @@ egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/class
 import numpy as np
 import xarray as xr
 
+from mt_metadata.base import Base
 
-class TransferFunction(object):
+
+class TransferFunction(Base):
     """
     Class to contain transfer function array.
 
