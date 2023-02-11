@@ -3,6 +3,7 @@ follows Gary's TTFZ.m in
 iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
 """
 import numpy as np
+import xarray as xr
 
 from aurora.transfer_function.base import TransferFunction
 
@@ -22,6 +23,34 @@ class TTFZ(TransferFunction):
 
     def __init__(self, *args, **kwargs):
         super(TTFZ, self).__init__(*args, **kwargs)
+
+    def standard_error(self):
+        """
+        TODO: make this a property that returns self._standard_error so it doesn't
+        compute every time you call it.
+        Returns
+        -------
+        standard_error: xr.DataArray
+        """
+        stderr = np.zeros(self.tf.data.shape)
+        standard_error = xr.DataArray(
+            stderr,
+            dims=["output_channel", "input_channel", "period"],
+            coords={
+                "output_channel": self.tf_header.output_channels,
+                "input_channel": self.tf_header.input_channels,
+                "period": self.periods,
+            },
+        )
+        for out_ch in self.tf_header.output_channels:
+            for inp_ch in self.tf_header.input_channels:
+                for T in self.periods:
+                    cov_ss = self.cov_ss_inv.loc[inp_ch, inp_ch, T]
+                    cov_nn = self.cov_nn.loc[out_ch, out_ch, T]
+                    std_err = np.sqrt(np.abs(cov_ss * cov_nn))
+                    standard_error.loc[out_ch, inp_ch, T] = std_err
+
+        return standard_error
 
     def apparent_resistivity(self, channel_nomenclature, units="SI"):
         """
