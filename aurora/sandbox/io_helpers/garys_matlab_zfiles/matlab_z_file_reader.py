@@ -160,9 +160,6 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
     tf_dict[3].num_segments.data = n_data[:, 23:]
     tf_dict[3].R2.data = R2[:, 23:]
 
-    for i_dec in range(4):
-        tf_dict[i_dec].tf.data = tf_dict[i_dec].tf.data
-
     tfc = TransferFunctionCollection(tf_dict=tf_dict, processing_config=p)
     tfc.write_emtf_z_file(z_file_path, orientation_strs=orientation_strs)
 

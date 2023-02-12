@@ -52,20 +52,10 @@ class TransferFunctionCollection(object):
 
     @property
     def local_station_id(self):
-        """
-        Returns
-        -------
-
-        """
         return self.header.local_station_id
 
     @property
     def remote_station_id(self):
-        """
-        Returns
-        -------
-
-        """
         return self.header.remote_station_id
 
     @property
