@@ -39,7 +39,6 @@ class TransferFunctionCollection(object):
             keyed by the decimation_level_id, usually integers 0, 1, 2... n_dec
 
         """
-        self.header = kwargs.get("header", None)
         self.tf_dict = kwargs.get("tf_dict", None)
         self.processing_config = kwargs.get("processing_config", None)
         self.labelled_tf = None
@@ -48,13 +47,17 @@ class TransferFunctionCollection(object):
         self.merged_cov_ss_inv = None
 
     @property
+    def header(self):
+        return self.tf_dict[0].tf_header
+
+    @property
     def local_station_id(self):
         """
         Returns
         -------
 
         """
-        return self.tf_dict[0].tf_header.local_station_id
+        return self.header.local_station_id
 
     @property
     def remote_station_id(self):
@@ -63,7 +66,7 @@ class TransferFunctionCollection(object):
         -------
 
         """
-        return self.tf_dict[0].tf_header.remote_station_id
+        return self.header.remote_station_id
 
     @property
     def total_number_of_frequencies(self):

@@ -185,12 +185,10 @@ def export_tf(
 
 def update_dataset_df(i_dec_level, tfk):
     """
-    2023-01-28: if tfk argument is provided, dataset_df is not needed.
-
     This function has two different modes.  The first mode, initializes values in the
     array, and could be placed into TFKDataset.initialize_time_series_data()
-    The second mode, decimates. Becasue it calls time series operations, I prefer
-    to keep it in pipelines.
+    The second mode, decimates. The function is kept in pipelines becasue it calls
+    time series operations.
 
 
     Notes:
@@ -349,7 +347,7 @@ def process_mth5(
 
     # TODO: Add run_obj to TransferFunctionCollection so it doesn't need header?
     tf_collection = TransferFunctionCollection(
-        header=tf_obj.tf_header, tf_dict=tf_dict, processing_config=tfk.config
+        tf_dict=tf_dict, processing_config=tfk.config
     )
 
     # local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)

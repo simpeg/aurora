@@ -163,9 +163,7 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
     for i_dec in range(4):
         tf_dict[i_dec].tf.data = tf_dict[i_dec].tf.data
 
-    tfc = TransferFunctionCollection(
-        header=tf_obj.tf_header, tf_dict=tf_dict, processing_config=p
-    )
+    tfc = TransferFunctionCollection(tf_dict=tf_dict, processing_config=p)
     tfc.write_emtf_z_file(z_file_path, orientation_strs=orientation_strs)
 
     if n_periods_clip:
