@@ -296,7 +296,7 @@ def process_mth5(
 
     for i_dec_level, dec_level_config in enumerate(tfk.valid_decimations()):
 
-        update_dataset_df(i_dec_level, dec_level_config, tfk)
+        update_dataset_df(i_dec_level, tfk)
 
         # TFK 1: get clock-zero from data if needed
         if dec_level_config.window.clock_zero_type == "data start":
