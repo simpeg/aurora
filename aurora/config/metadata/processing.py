@@ -359,6 +359,7 @@ class Processing(Base):
 
     def make_tf_level(self, dec_level_id):
         """
+        Initialize container for a single decimation level -- "flat" transfer function.
 
         Parameters
         ----------
@@ -367,7 +368,7 @@ class Processing(Base):
 
         Returns
         -------
-        tfh: aurora.transfer_function.TTFZ.TTFZ
+        tf_obj: aurora.transfer_function.TTFZ.TTFZ
         """
         # from aurora.transfer_function.base import TransferFunction
         from aurora.transfer_function.TTFZ import TTFZ

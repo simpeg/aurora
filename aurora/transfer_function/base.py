@@ -134,9 +134,8 @@ class TransferFunction(Base):
         num_segments = np.zeros((self.num_channels_out, self.num_bands), dtype=np.int32)
         num_segments_xr = xr.DataArray(
             num_segments,
-            dims=["channel", "period"],  # "frequency"],
+            dims=["channel", "period"],
             coords={
-                # "frequency": self.frequency_bands.band_centers(),
                 "period": self.periods,
                 "channel": self.tf_header.output_channels,
             },
@@ -218,10 +217,8 @@ class TransferFunction(Base):
 
     def set_tf(self, regression_estimator, period):
         """
-        This sets TF elements for one band, using contents of TRegression
-        object.  This version assumes there are estimates for Nout output
-        channels
-
+        This sets TF elements for one band, using contents of regression_estimator
+        object.  This version assumes there are estimates for Nout output channels
         """
         index = self.period_index(period)
 
