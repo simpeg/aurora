@@ -6,7 +6,7 @@ iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_1
 
 class TransferFunctionHeader(object):
     """
-    class for storing metadata for a TF estimate
+    Convenince class for storing metadata for a TF estimate
 
     This class should inherit the metadata from the remote and reference
     stations. As of 2021-07-20 the class functions with only the station_id
@@ -29,7 +29,7 @@ class TransferFunctionHeader(object):
             These are the channels being provided as input to the regression.
         reference_channels : list
             These are the channels being used from the RR station. This is a
-            channel list -- usually [?, ?]
+            channel list -- usually ["hx", "hy"]
         processing_scheme: str
             Denotes the regression engine used to estimate the transfer
             function.  One of "OLS" or "RME", "RME_RR.  Future
@@ -46,10 +46,9 @@ class TransferFunctionHeader(object):
         self.decimation_level_id = kwargs.get("decimation_level_id", None)
         self.user_meta_data = None  # placeholder for anything
 
-        # <ByPass mt_metadata classes>
+        # Bypass mt_metadata classes
         self._local_station_id = kwargs.get("local_station_id", None)
         self._remote_station_id = kwargs.get("remote_station_id", None)
-        # </ByPass mt_metadata classes>
 
     @property
     def local_station_id(self):
