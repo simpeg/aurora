@@ -14,7 +14,9 @@ from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 from mth5.helpers import close_open_files
 
 
-def test_processing(return_collection=False, z_file_path=None, test_clock_zero=False):
+def test_processing(
+    return_collection=False, z_file_path=None, test_clock_zero=False
+):
     """
     Parameters
     ----------
@@ -43,7 +45,11 @@ def test_processing(return_collection=False, z_file_path=None, test_clock_zero=F
     tfk_dataset.from_run_summary(run_summary, "PKD")
 
     cc = ConfigCreator()
-    config = cc.create_from_kernel_dataset(tfk_dataset, estimator={"engine": "RME"})
+    config = cc.create_from_kernel_dataset(
+        tfk_dataset,
+        estimator={"engine": "RME"},
+        output_channels=["ex", "ey"],
+    )
 
     if test_clock_zero:
         for dec_lvl_cfg in config.decimations:
