@@ -244,11 +244,9 @@ def process_mth5(
     return_collection=False,
 ):
     """
-    1. Read in the config and figure out how many decimation levels there are
-    2. ToDo TFK: Based on the run durations, and sampling rates, determined which runs
-    are valid for which decimation levels, or for which effective sample rates.  This
-    action should be taken before we get here.  The tfk_dataset should already
-    be trimmed to exactly what will be processed.
+    This is the main method used to transform a processing_config,
+    and a kernel_dataset into a transfer function estimate.
+
 
 
     Parameters
@@ -345,7 +343,6 @@ def process_mth5(
 
             plot_tf_obj(tf_obj, out_filename="out")
 
-    # TODO: Add run_obj to TransferFunctionCollection so it doesn't need header?
     tf_collection = TransferFunctionCollection(
         tf_dict=tf_dict, processing_config=tfk.config
     )
