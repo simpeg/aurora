@@ -6,8 +6,10 @@ egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/class
 import numpy as np
 import xarray as xr
 
+from mt_metadata.base import Base
 
-class TransferFunction(object):
+
+class TransferFunction(Base):
     """
     Class to contain transfer function array.
 
@@ -16,7 +18,7 @@ class TransferFunction(object):
         array of transfer functions: TF(Nout, Nin, Nperiods)
     T : numpy array
         list of periods
-    Header : transfer_function_header.TransferFunctionHeader() object.
+    Header : transfer_function_header.TransferFunctionHeader object.
         TF header contains local site header, remote site header if
         appropriate, and information about estimation approach???
     cov_ss_inv : numpy array
@@ -50,7 +52,7 @@ class TransferFunction(object):
         Parameters
         ----------
         tf_header: aurora.transfer_function.transfer_function_header.TransferFunctionHeader
-            TF header, soon to be deprecated.
+            TF header, may be deprecated in future.
         frequency_bands: aurora.time_series.frequency_band.FrequencyBands
             frequency bands object
         """
@@ -132,9 +134,8 @@ class TransferFunction(object):
         num_segments = np.zeros((self.num_channels_out, self.num_bands), dtype=np.int32)
         num_segments_xr = xr.DataArray(
             num_segments,
-            dims=["channel", "period"],  # "frequency"],
+            dims=["channel", "period"],
             coords={
-                # "frequency": self.frequency_bands.band_centers(),
                 "period": self.periods,
                 "channel": self.tf_header.output_channels,
             },
@@ -216,10 +217,8 @@ class TransferFunction(object):
 
     def set_tf(self, regression_estimator, period):
         """
-        This sets TF elements for one band, using contents of TRegression
-        object.  This version assumes there are estimates for Nout output
-        channels
-
+        This sets TF elements for one band, using contents of regression_estimator
+        object.  This version assumes there are estimates for Nout output channels
         """
         index = self.period_index(period)
 

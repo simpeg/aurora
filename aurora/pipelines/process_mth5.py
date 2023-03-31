@@ -5,17 +5,18 @@ Note 1: process_mth5 assumes application of cascading decimation, and that the
 decimated data will be accessed from the previous decimation level.  This should be
 revisited. It may make more sense to have a get_decimation_level() interface that
 provides an option of applying decimation or loading predecimated data.
+This will be addressed via creation of the FC layer inside mth5.
 
-#Note 2: Question: Can we run into cases where some of these runs can be decimated
-and others can not?  We need a way to handle this. For example, a short run may not
-yield any data from a later decimation level. Returning an empty xarray may work.
-It is desireable that the empty xarray, or whatever comes back to pass through STFT
-and MERGE steps smoothy. If it is empty, we could just drop the run entirely but
-this may have adverse consequences on downstream bookkeeping, like the creation of
-station_metadata before packaging the tf for export. This could be worked around by
-extracting the metadata at the start of this method. It would be a good idea in
-general to run a pre-check on the data that identifies which decimation levels are
-valid for each run. (see Issue #182)
+Note 2: We can encounter cases where some runs can be decimated and others can not.
+We need a way to handle this. For example, a short run may not yield any data from a
+later decimation level. An attempt to handle this has been made in TF Kernel by
+adding a is_valid_dataset column, associated with each run-decimation level pair.
+
+
+Note 3: This point in the loop marks the interface between _generation_ of the FCs and
+ their _usage_. In future the code above this comment would be pushed into
+ create_fourier_coefficients() and the code below this would access those FCs and
+ execute compute_transfer_function()
 
 """
 # =============================================================================
@@ -28,7 +29,6 @@ from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.transfer_function_helpers import process_transfer_functions
-from aurora.pipelines.transfer_function_helpers import tf_header_from_config
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
 
 from aurora.transfer_function.transfer_function_collection import (
@@ -128,7 +128,7 @@ def process_tf_decimation_level(
         The transfer function values packed into an object
     """
     frequency_bands = config.decimations[i_dec_level].frequency_bands_obj()
-    tf_header = tf_header_from_config(config, i_dec_level)
+    tf_header = config.make_tf_header(i_dec_level)
     transfer_function_obj = TTFZ(tf_header, frequency_bands, processing_config=config)
 
     transfer_function_obj = process_transfer_functions(
@@ -183,14 +183,12 @@ def export_tf(
     return tf_cls
 
 
-def update_dataset_df(i_dec_level, config, tfk=None):
+def update_dataset_df(i_dec_level, tfk):
     """
-    2023-01-28: if tfk argument is provided, dataset_df is not needed.
-
     This function has two different modes.  The first mode, initializes values in the
     array, and could be placed into TFKDataset.initialize_time_series_data()
-    The second mode, decimates. Becasue it calls time series operations, I prefer
-    to keep it in pipelines.
+    The second mode, decimates. The function is kept in pipelines becasue it calls
+    time series operations.
 
 
     Notes:
@@ -226,14 +224,13 @@ def update_dataset_df(i_dec_level, config, tfk=None):
         # See Note 1 top of module
         # See Note 2 top of module
         for i, row in tfk.dataset_df.iterrows():
-            valid = tfk.is_valid_dataset(row, i_dec_level)
-            if not valid:
+            if not tfk.is_valid_dataset(row, i_dec_level):
                 continue
             run_xrds = row["run_dataarray"].to_dataset("channel")
-            decimated_run_xrds = prototype_decimate(config.decimation, run_xrds)
-            tfk.dataset_df["run_dataarray"].at[i] = decimated_run_xrds.to_array(
-                "channel"
-            )
+            decimation = tfk.config.decimations[i_dec_level].decimation
+            decimated_xrds = prototype_decimate(decimation, run_xrds)
+            tfk.dataset_df["run_dataarray"].at[i] = decimated_xrds.to_array("channel")
+
     print("DATASET DF UPDATED")
     return
 
@@ -247,11 +244,9 @@ def process_mth5(
     return_collection=False,
 ):
     """
-    1. Read in the config and figure out how many decimation levels there are
-    2. ToDo TFK: Based on the run durations, and sampling rates, determined which runs
-    are valid for which decimation levels, or for which effective sample rates.  This
-    action should be taken before we get here.  The tfk_dataset should already
-    be trimmed to exactly what will be processed.
+    This is the main method used to transform a processing_config,
+    and a kernel_dataset into a transfer function estimate.
+
 
 
     Parameters
@@ -288,9 +283,6 @@ def process_mth5(
     # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
     tfk.dataset.initialize_dataframe_for_processing(mth5_objs)
 
-    # Place checks that would be done by TF Kernel here
-    # see notes labelled with ToDo TFK above
-
     print(
         f"Processing config indicates {len(tfk.config.decimations)} "
         f"decimation levels "
@@ -300,7 +292,7 @@ def process_mth5(
 
     for i_dec_level, dec_level_config in enumerate(tfk.valid_decimations()):
 
-        update_dataset_df(i_dec_level, dec_level_config, tfk=tfk)
+        update_dataset_df(i_dec_level, tfk)
 
         # TFK 1: get clock-zero from data if needed
         if dec_level_config.window.clock_zero_type == "data start":
@@ -310,9 +302,8 @@ def process_mth5(
         local_stfts = []
         remote_stfts = []
         for i, row in tfk.dataset_df.iterrows():
-            # Check that this row is valid
-            valid = tfk.is_valid_dataset(row, i_dec_level)
-            if not valid:
+
+            if not tfk.is_valid_dataset(row, i_dec_level):
                 continue
 
             run_xrds = row["run_dataarray"].to_dataset("channel")
@@ -334,7 +325,9 @@ def process_mth5(
         else:
             remote_merged_stft_obj = None
 
-        # Could mute bad FCs here - Not implemented yet.
+        # FC TF Interface here (see Note #3)
+
+        # Could downweight bad FCs here
 
         tf_obj = process_tf_decimation_level(
             tfk.config,
@@ -350,8 +343,9 @@ def process_mth5(
 
             plot_tf_obj(tf_obj, out_filename="out")
 
-    # TODO: Add run_obj to TransferFunctionCollection so it doesn't need header?
-    tf_collection = TransferFunctionCollection(header=tf_obj.tf_header, tf_dict=tf_dict)
+    tf_collection = TransferFunctionCollection(
+        tf_dict=tf_dict, processing_config=tfk.config
+    )
 
     # local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
     local_run_obj = tfk_dataset.get_run_object(0)

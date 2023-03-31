@@ -26,8 +26,6 @@ class TTFZ(TransferFunction):
 
     def standard_error(self):
         """
-        TODO: make this a property that returns self._standard_error so it doesn't
-        compute every time you call it.
         Returns
         -------
         standard_error: xr.DataArray

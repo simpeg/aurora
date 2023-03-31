@@ -3,7 +3,6 @@ import numpy as np
 from aurora.time_series.frequency_band_helpers import extract_band
 from aurora.time_series.xarray_helpers import handle_nan
 from aurora.transfer_function.regression.iter_control import IterControl
-from aurora.transfer_function.transfer_function_header import TransferFunctionHeader
 from aurora.transfer_function.regression.TRME import TRME
 from aurora.transfer_function.regression.TRME_RR import TRME_RR
 
@@ -63,25 +62,6 @@ def set_up_iter_control(config):
     ]:
         iter_control = None
     return iter_control
-
-
-def tf_header_from_config(config, i_dec_level):
-    remote_station_id = ""
-    reference_channels = []
-    dec_level_config = config.decimations[i_dec_level]
-    if config.stations.remote:
-        remote_station_id = config.stations.remote[0].id
-        reference_channels = dec_level_config.reference_channels
-
-    transfer_function_header = TransferFunctionHeader(
-        processing_scheme=dec_level_config.estimator.engine,
-        local_station_id=config.stations.local.id,
-        remote_station_id=remote_station_id,
-        input_channels=dec_level_config.input_channels,
-        output_channels=dec_level_config.output_channels,
-        reference_channels=reference_channels,
-    )
-    return transfer_function_header
 
 
 def check_time_axes_synched(X, Y):

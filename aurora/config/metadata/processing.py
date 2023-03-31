@@ -155,30 +155,6 @@ class Processing(Base):
             band_edges_dict[i_dec] = decimation.band_edges
         return band_edges_dict
 
-    def assign_decimation_level_data_emtf(self, sample_rate):
-        """
-
-        Warning: This does not actually tell us how many samples we are decimating down
-        at each level.  That is assumed to be 4 but we need a way to bookkeep this in general
-
-        Parameters
-        ----------
-        sample_rate: float
-            The initial sampling rate of the data before any decimation
-
-        """
-        for key in sorted(self.decimations_dict.keys()):
-            if key in [0, "0"]:
-                d = 1
-                sr = sample_rate
-            else:
-                # careful with this hardcoded assumption of decimation by 4
-                d = 4
-                sr = sample_rate / (d ** int(key))
-            decimation_obj = self.decimations_dict[key]
-            decimation_obj.decimation.factor = d
-            decimation_obj.decimation.sample_rate = sr
-
     def assign_bands(
         self, band_edges_dict, sample_rate, decimation_factors, num_samples_window
     ):
@@ -204,7 +180,7 @@ class Processing(Base):
                 sr = sample_rate
             else:
                 # careful with this hardcoded assumption of decimation by 4
-                d = d = decimation_factors[i_level]  # 4
+                d = decimation_factors[i_level]  # 4
                 sr = 1.0 * sample_rate / (d ** int(i_level))
             decimation_obj = DecimationLevel()
             decimation_obj.decimation.level = int(i_level)  # self.decimations_dict[key]
@@ -352,3 +328,52 @@ class Processing(Base):
         json_str = self.to_json(nested=nested, required=required)
         with open(filename, "w") as f:
             f.write(json_str)
+
+    def make_tf_header(self, dec_level_id):
+        """
+
+        Parameters
+        ----------
+        dec_level_id: int
+            This may tolerate strings in the future, but keep as int for now
+
+        Returns
+        -------
+        tfh: aurora.transfer_function.transfer_function_header.TransferFunctionHeader
+        """
+        from aurora.transfer_function.transfer_function_header import (
+            TransferFunctionHeader,
+        )
+
+        tfh = TransferFunctionHeader(
+            processing_scheme=self.decimations[dec_level_id].estimator.engine,
+            local_station=self.stations.local,
+            reference_station=self.stations.remote,
+            input_channels=self.decimations[dec_level_id].input_channels,
+            output_channels=self.decimations[dec_level_id].output_channels,
+            reference_channels=self.decimations[dec_level_id].reference_channels,
+            decimation_level_id=dec_level_id,
+        )
+
+        return tfh
+
+    def make_tf_level(self, dec_level_id):
+        """
+        Initialize container for a single decimation level -- "flat" transfer function.
+
+        Parameters
+        ----------
+        dec_level_id: int
+            This may tolerate strings in the future, but keep as int for now
+
+        Returns
+        -------
+        tf_obj: aurora.transfer_function.TTFZ.TTFZ
+        """
+        # from aurora.transfer_function.base import TransferFunction
+        from aurora.transfer_function.TTFZ import TTFZ
+
+        tf_header = self.make_tf_header(dec_level_id)
+        tf_obj = TTFZ(tf_header, self.decimations[dec_level_id].frequency_bands_obj())
+
+        return tf_obj
