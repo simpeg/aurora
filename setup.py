@@ -18,6 +18,7 @@ requirements = [
     "numpy",
     "numba",
     "obspy",
+    "psutil",
     "pandas<1.5",
     "scipy",
     "xarray",
