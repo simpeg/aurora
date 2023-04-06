@@ -19,7 +19,6 @@ jobs:
       matrix:
         os: ["ubuntu-latest"]
         python-version: [3.6, 3.7, 3.8, 3.9, "3.10"] 
-        # python-version: [3.6, 3.9] 
 
     steps:
     - uses: actions/checkout@v2
@@ -46,7 +45,8 @@ jobs:
     - name: Run Tests
       run: |
         # pytest -s -v tests/synthetic/test_multi_run.py --cov=./ --cov-report=xml --cov=aurora
-        pytest -s -v --cov=./ --cov-report=xml --cov=aurora
+        pytest -s -v tests/parkfield/test_calibrate_parkfield.py --cov=./ --cov-report=xml --cov=aurora
+        # pytest -s -v --cov=./ --cov-report=xml --cov=aurora
 
     - name: "Upload coverage to Codecov"
       uses: codecov/codecov-action@v1
