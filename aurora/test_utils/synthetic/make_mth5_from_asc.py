@@ -33,6 +33,18 @@ from mth5.mth5 import MTH5
 np.random.seed(0)
 
 
+class DotDict(dict):
+    def __getattr__(self, name):
+        if name in self:
+            return self[name]
+        raise AttributeError(
+            f"'{self.__class__.__name__}' object has no attribute '{name}'"
+        )
+
+    def __setattr__(self, name, value):
+        self[name] = value
+
+
 def create_run_ts_from_synthetic_run(run, df, channel_nomenclature="default"):
     """
     Loop over stations and make ChannelTS objects.
@@ -62,6 +74,7 @@ def create_run_ts_from_synthetic_run(run, df, channel_nomenclature="default"):
                 "component": col,
                 "sample_rate": run.sample_rate,
                 "filter.name": run.filters[col],
+                "time_period.start": "1977-01-01T00:00:00+00:00",
             }
             chts = ChannelTS(
                 channel_type="electric", data=data, channel_metadata=meta_dict
@@ -90,6 +103,7 @@ def create_run_ts_from_synthetic_run(run, df, channel_nomenclature="default"):
 
     # add in metadata
     runts.run_metadata.id = run.id
+    # runts.run_metadata.start = "1988-01-01T00:00:00+00:00"
     return runts
 
 
@@ -183,6 +197,12 @@ def create_mth5_synthetic_file(
                 runts.plot()
 
             run_group = station_group.add_run(run.id)
+
+            # rrun_metadata={
+            #     "id":run.id,
+            #     "start":"1988-01-01T00:00:00+00:00"}
+            # rrun_metadata =DotDict(rrun_metadata)
+            # run_group = station_group.add_run(run.id, run_metadata=rrun_metadata)
 
             run_group.from_runts(runts)
 
@@ -284,10 +304,10 @@ def main():
     file_version = "0.1.0"
     # file_version="0.2.0"
     create_test1_h5(file_version=file_version)
-    create_test1_h5_with_nan(file_version=file_version)
-    create_test2_h5(file_version=file_version)
-    create_test12rr_h5(file_version=file_version)
-    create_test3_h5(file_version=file_version)
+    # create_test1_h5_with_nan(file_version=file_version)
+    # create_test2_h5(file_version=file_version)
+    # create_test12rr_h5(file_version=file_version)
+    # create_test3_h5(file_version=file_version)
 
 
 if __name__ == "__main__":
