@@ -60,13 +60,14 @@ class SyntheticRun(object):
         self.sample_rate = kwargs.get("sample_rate", 1.0)
         self.raw_data_path = kwargs.get("raw_data_path", None)
 
-        # set channel_map
+        # set channel names
         self._channel_map = None
         self.channel_nomenclature_keyword = kwargs.get(
             "channel_nomenclature", "default"
         )
         self.set_channel_map()
         self.channels = kwargs.get("channels", list(self.channel_map.values()))
+
         self.noise_scalars = kwargs.get("noise_scalars", None)
         self.nan_indices = kwargs.get("nan_indices", {})
         self.filters = kwargs.get("filters", {})
@@ -162,11 +163,15 @@ def make_station_03(channel_nomenclature="default"):
     synthetic data, we just reuse test1.asc for each run.
     Parameters
     ----------
-    channel_nomenclature
+    channel_nomenclature: str
+        one of the keys from CHANNEL_MAPS dict in
+        aurora/config/metadata/channel_nomenclature.py
+        Example values ["default", "lemi12", "lemi34", "phoenix123"]
 
     Returns
     -------
-
+    station: SyntheticStation()
+        All the info needed in order to create synthetic data.
     """
     channel_nomenclature_obj = ChannelNomenclature()
     channel_nomenclature_obj.keyword = channel_nomenclature

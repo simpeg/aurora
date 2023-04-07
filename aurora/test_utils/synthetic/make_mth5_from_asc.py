@@ -194,9 +194,10 @@ def create_mth5_synthetic_file(
             raise NotImplementedError
 
     m.close_mth5()
-    m.open_mth5(mth5_path, mode="a")
-    channel_summary_df = m.channel_summary.to_dataframe()
-    print(channel_summary_df[["start", "end"]])
+    # Following lines used to visually confirm start/end times were
+    # m.open_mth5(mth5_path, mode="a")
+    # channel_summary_df = m.channel_summary.to_dataframe()
+    # print(channel_summary_df[["start", "end"]])
     return mth5_path
 
 
@@ -280,7 +281,7 @@ def create_test3_h5(
 
 def main():
     file_version = "0.1.0"
-    file_version = "0.2.0"
+    # file_version = "0.2.0"
     create_test1_h5(file_version=file_version)
     create_test1_h5_with_nan(file_version=file_version)
     create_test2_h5(file_version=file_version)

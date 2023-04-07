@@ -37,7 +37,6 @@ class TestMultiRunProcessing(unittest.TestCase):
         run_summary = RunSummary()
         run_summary.from_mth5s(mth5s)
         return run_summary
-        # print(run_summary.df)
 
     def test_each_run_individually(self):
         close_open_files()
