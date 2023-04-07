@@ -71,7 +71,6 @@ class SyntheticRun(object):
         self.nan_indices = kwargs.get("nan_indices", {})
         self.filters = kwargs.get("filters", {})
         self.start = kwargs.get("start", None)
-        self.end = kwargs.get("end", None)
 
         if self.noise_scalars is None:
             self.noise_scalars = {}
@@ -116,6 +115,7 @@ def make_station_01(channel_nomenclature="default"):
         "001",
         raw_data_path=DATA_PATH.joinpath("test1.asc"),
         channel_nomenclature=channel_nomenclature,
+        start=None,
     )
     nan_indices = {}
     for ch in run_001.channels:
@@ -195,7 +195,6 @@ def make_station_03(channel_nomenclature="default"):
         filters=filters,
         channel_nomenclature=channel_nomenclature,
         start="1980-01-01T00:00:00+00:00",
-        end="1999-01-01T11:06:39+00:00",
     )
 
     noise_scalars = {}
@@ -209,7 +208,6 @@ def make_station_03(channel_nomenclature="default"):
         filters=filters,
         channel_nomenclature=channel_nomenclature,
         start="1980-01-02T00:00:00+00:00",
-        end="1980-01-02T11:06:39+00:00",
     )
 
     for ch in channels:
@@ -222,7 +220,6 @@ def make_station_03(channel_nomenclature="default"):
         filters=filters,
         channel_nomenclature=channel_nomenclature,
         start="1980-01-03T00:00:00+00:00",
-        end="1980-01-03T11:06:39+00:00",
     )
 
     for ch in channels:
@@ -235,7 +232,6 @@ def make_station_03(channel_nomenclature="default"):
         filters=filters,
         channel_nomenclature=channel_nomenclature,
         start="1980-01-04T00:00:00+00:00",
-        end="1980-01-04T11:06:39+00:00",
     )
 
     run_001.filters = filters

@@ -157,3 +157,23 @@ def save_to_mat(data, variable_name, filename):
     """
     sio.savemat(filename, {variable_name: data})
     return
+
+
+class DotDict(dict):
+    """
+    Helper function for debugging, casts a dict so that its values
+    can be accessed via dict.key as well as dict["key"]
+
+    Usage:
+    dot_dict = DotDict(basic_dict)
+    """
+
+    def __getattr__(self, name):
+        if name in self:
+            return self[name]
+        raise AttributeError(
+            f"'{self.__class__.__name__}' object has no attribute '{name}'"
+        )
+
+    def __setattr__(self, name, value):
+        self[name] = value
