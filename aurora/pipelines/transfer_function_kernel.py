@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import psutil
 
 from aurora.config.metadata.processing import Processing
 from aurora.pipelines.helpers import initialize_config
@@ -104,15 +105,14 @@ class TransferFunctionKernel(object):
     ):
         """
         Refers to issue #182 (and #103, and possibly #196 and #233).
-        Essentially we want to make sure that the data don't get so decimated that
-        the time-series cannot be windowed.
-
         Determine if there exist (one or more) runs that will yield decimated datasets
         that have too few samples to be passed to the STFT algorithm.
 
         Strategy for handling this:
-        We will mark as invlaid any rows of the processing summary that do not yield
-        enough time series.
+        Mark as invlaid rows of the processing summary that do not yield long
+        enough time series to window.  This way all other rows, with decimations up to
+        the invalid cases will still process.
+
 
         WCGW: If the runs are "chunked" we could encounter a situation where the
         chunk fails to yield a deep decimation level, yet the level could be produced
@@ -121,20 +121,8 @@ class TransferFunctionKernel(object):
         now and assume that the user will select a chunk size that is appropriate to
         the decimation scheme, i.e. use large chunks for deep decimations.
 
-
-
-        If there are any such runs, we should also look at strategies for handling this.
-
-        We may hove some long runs that don't encounter the issue at all, and some
-        runs that do.
-        If we have this mixed situation, the best solution (since the user did ask
-        for the decimated frequency bands) is to return them the decimated runs when
-        available, and skip the ones that are not
-
-        This makes it seem like a general solution would be to return a sort of log
-        that tells the user about each run and decimation level ... how many
-        STFT-windows it yielded at each decimation level.
-
+        A general solution: return a log that tells the user about each run and
+        decimation level ... how many STFT-windows it yielded at each decimation level.
         This conjures the notion of (run, decimation_level) pairs
         -------
 
@@ -169,6 +157,8 @@ class TransferFunctionKernel(object):
     def validate(self):
         self.validate_processing()
         self.validate_decimation_scheme_and_dataset_compatability()
+        if self.memory_warning():
+            raise Exception
 
     def valid_decimations(self):
         """
@@ -188,18 +178,21 @@ class TransferFunctionKernel(object):
 
     def is_valid_dataset(self, row, i_dec):
         """
-        Given a row form the RunSummary, will this decimation level yield a valid
-        dataset?
+        Given a row from the RunSummary, answers:
+        Will this decimation level yield a valid dataset?
 
         Parameters
         ----------
-        row: a row of the self._dataset_df (corresponding to a run that will be
-        processed
-        i_dec: integer - refers to decimation level
+        row: pandas.core.series.Series
+            Row of the self._dataset_df (corresponding to a run that will be processed)
+        i_dec: integer
+            refers to decimation level
 
         Returns
         -------
-
+        is_valid: Bool
+            Whether the (run, decimation_level) pair associated with this row yields
+            a valid dataset
         """
         # Query processing on survey, station, run, decimation
         cond1 = self.processing_summary.survey == row.survey
@@ -209,4 +202,38 @@ class TransferFunctionKernel(object):
         cond = cond1 & cond2 & cond3 & cond4
         processing_row = self.processing_summary[cond]
         assert len(processing_row) == 1
-        return processing_row.valid.iloc[0]
+        is_valid = processing_row.valid.iloc[0]
+        return is_valid
+
+    def memory_warning(self):
+        """
+        Checks if we should be anitcipating a RAM issue
+        Requires an estimate of available RAM, and an estimate of the dataset size
+        Available RAM is taken from psutil,
+        Dataset size is number of samples, times the number of bytes per sample
+        Bits per sample is estimated to be 64 by default, which is 8-bytes
+        Returns
+        -------
+
+        """
+        bytes_per_sample = 8  # 64-bit
+        memory_threshold = 0.5
+
+        # get the total amount of RAM in bytes
+        total_memory = psutil.virtual_memory().total
+
+        # print the total amount of RAM in GB
+        print(f"Total memory: {total_memory / (1024 ** 3):.2f} GB")
+        num_samples = self.dataset_df.duration * self.dataset_df.sample_rate
+        total_samples = num_samples.sum()
+        total_bytes = total_samples * bytes_per_sample
+        print(f"Total Bytes of Raw Data: {total_bytes / (1024 ** 3):.3f} GB")
+
+        ram_fraction = 1.0 * total_bytes / total_memory
+        print(f"Raw Data will use: {100 * ram_fraction:.3f} % of memory")
+
+        # Check a condition
+        if total_bytes > memory_threshold * total_memory:
+            return True
+        else:
+            return False
