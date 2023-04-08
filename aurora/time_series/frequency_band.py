@@ -33,11 +33,10 @@ class FrequencyBand(pd.Interval):
     which are only 1 Harmonic wide, and if we dont use closed intervals we
     can wind up with intervals like [a,a), which is the empty set.
 
-    The best solution I can think of for now incorporates the fact that the
-    harmonic frequencies we are going to interact with in digital processing
-    will be a discrete collection separated by df.
+    However, the harmonic frequencies we are going to interact with in digital
+    processing will be a collections of discrete values, separated by df.
 
-    If we are given the context of df (= 1/(N*dt)) wher N is number of
+    Given the context of df (= 1/(N*dt)) where N is number of
     samples in the original time series and dt is the sample interval,
     then we can use half-open intervals with width df centered at the
     frequencies under consideration.
@@ -52,7 +51,7 @@ class FrequencyBand(pd.Interval):
     [f_i-df/2, f_i+df/2) to get the satisfying property of covering the
     frequency axis completely but ensure no accidental double coverage.
 
-    Notes that this is just a default convention.  There is no rule against
+    This is just a default convention.  There is no rule against
     using closed intervals, nor having overlapping bands.
 
     The df/2 trick also protects us from numeric roundoff errors resulting in
@@ -123,7 +122,7 @@ class FrequencyBand(pd.Interval):
 
     def in_band_harmonics(self, frequencies):
         """
-
+        rename to within_band_harmonics?
         Parameters
         ----------
         frequencies: array-like, floating poirt
@@ -199,7 +198,6 @@ class FrequencyBands(object):
         kwargs
         band_edges: 2d numpy array
         """
-        self.gates = None
         self.band_edges = kwargs.get("band_edges", None)
 
     @property
@@ -246,15 +244,13 @@ class FrequencyBands(object):
         if direction == "increasing_period":
             band_indices = np.flip(band_indices)
         return (self.band(i_band) for i_band in band_indices)
-        # raise NotImplementedError
 
     def band(self, i_band):
         """
-        ToDO: Decide whether to index bands from zero or one, i.e.  Choosing 0 for now.
-
         Parameters
         ----------
-        i_band: integer key for band
+        i_band: integer (zero-indexed)
+            Specifies the band to return
 
         Returns
         -------
@@ -272,14 +268,13 @@ class FrequencyBands(object):
         Parameters
         ----------
         frequency_or_period : str
-        "frequency" or "period" determines if the vector of band centers is
-        returned in "Hz" or "s"
+            One of ["frequency" , "period"].  Determines if the vector of band
+            centers is returned in "Hz" or "s"
 
         Returns
         -------
         band_centers : numpy array
             center frequencies of the bands in Hz or in s
-
         """
         band_centers = np.full(self.number_of_bands, np.nan)
         for i_band in range(self.number_of_bands):
@@ -291,13 +286,14 @@ class FrequencyBands(object):
 
     def from_decimation_object(self, decimation_object):
         """
-        Convert band edges from a :class:`aurora.config.Decimation` object,
-        Which has all the information in it.
+        Define band_edges array from config object,
 
-        :param decimation_object: DESCRIPTION
-        :type decimation_object: TYPE
-        :return: DESCRIPTION
-        :rtype: TYPE
+        Parameters
+        ----------
+        decimation_object: aurora.config.Decimation
+
+        Returns
+        -------
 
         """
         # replace below with decimation_object.delta_frequency ?

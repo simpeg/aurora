@@ -156,7 +156,6 @@ def process_station_runs(local_station_id, remote_station_id="", station_runs={}
     print(kernel_dataset.df)
 
     cc = ConfigCreator()
-    cc = ConfigCreator(config_path=CONFIG_PATH)
     pc = cc.create_from_kernel_dataset(kernel_dataset)
     pc.validate()
     z_file_name = tmp_station_runs.z_file_name(AURORA_RESULTS_PATH)

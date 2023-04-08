@@ -18,8 +18,6 @@ from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
 
 class ConfigCreator:
     def __init__(self, **kwargs):
-        default_config_path = Path("config")
-        self.config_path = kwargs.get("config_path", default_config_path)
         self._band_specification_style = None
 
     def processing_id(self, kernel_dataset):
@@ -183,23 +181,3 @@ class ConfigCreator:
                 except KeyError:
                     pass
         return processing_obj
-
-    def to_json(self, processing_obj, path=None, nested=True, required=False):
-        """
-        Write a processing object to path
-
-        :param path: DESCRIPTION
-        :type path: TYPE
-        :param processing_obj: DESCRIPTION
-        :type processing_obj: TYPE
-        :return: DESCRIPTION
-        :rtype: TYPE
-
-        """
-        if path is None:
-            json_fn = processing_obj.json_fn()  # config_id + "_run_config.json"
-            self.config_path.mkdir(exist_ok=True)
-            path = self.config_path.joinpath(json_fn)
-        with open(path, "w") as fid:
-            json_obj = processing_obj.to_json(nested=nested, required=required)
-            fid.write(json_obj)

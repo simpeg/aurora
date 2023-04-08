@@ -1,7 +1,9 @@
 import pandas as pd
 
 
-def channel_summary_to_make_mth5(df, network="", verbose=False):
+def channel_summary_to_make_mth5(
+    df, network="", channel_nomenclature=None, verbose=False
+):
     """
     Context is say you have a station_xml that has come from somewhere and you want
     to make an mth5 from it, with all the relevant data.  Then you should use
@@ -10,7 +12,11 @@ def channel_summary_to_make_mth5(df, network="", verbose=False):
     MakeMTH5() expects.  Specifically, there is one row for each channel-run
     combination.
 
-    TODO: This method could be an option for output format of mth5.channel_summary()
+    This method could be an option for output format of mth5.channel_summary()
+
+    TODO: Add support for channel_nomenclature
+
+    This method could be an option for output format of mth5.channel_summary()
 
     Parameters
     ----------
@@ -33,11 +39,14 @@ def channel_summary_to_make_mth5(df, network="", verbose=False):
     if not network:
         print("Network not specified")
         print("this will cause IRIS data pull to fail")
+        raise ValueError
+
     ch_map = {"ex": "LQN", "ey": "LQE", "hx": "LFN", "hy": "LFE", "hz": "LFZ"}
-    number_of_station_runs = len(df.groupby(["station", "run"]))
-    # number_of_runs = len(df["run"].unique())
-    num_channels_per_run = 5
-    num_rows = num_channels_per_run * number_of_station_runs
+    if channel_nomenclature is not None:
+        print("Need to add handling for channel nomenclature")
+        # either replace the keys in ch_map, or create a new ch_map
+
+    num_rows = len(df)
     networks = num_rows * [network]
     stations = num_rows * [None]
     locations = num_rows * [""]

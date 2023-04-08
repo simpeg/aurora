@@ -3,7 +3,7 @@ from mth5.mth5 import MTH5
 from aurora.test_utils.parkfield.calibration_helpers import (
     parkfield_sanity_check,
 )
-from aurora.test_utils.parkfield.make_parkfield_mth5 import make_pkdsao_mth5
+from aurora.test_utils.parkfield.make_parkfield_mth5 import ensure_h5_exists
 from aurora.test_utils.parkfield.path_helpers import AURORA_RESULTS_PATH
 from aurora.test_utils.parkfield.path_helpers import DATA_PATH
 
@@ -72,24 +72,9 @@ def test():
 
     run_id = "001"
     station_id = "PKD"
-    dataset_id = "pkd_test_00"
-    parkfield_h5_path = DATA_PATH.joinpath(f"{dataset_id}.h5")
-    if not parkfield_h5_path.exists():
-        print(f"-1 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
-        try:
-            make_pkdsao_mth5(dataset_id)
-        except Exception as e:  # ValueError
-            print(f"Exception {e} encountered")
-            print("NCEDC Likley Down")
-            print("Skipping this test")
-            print(f"0 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
-            return
-    else:
-        print("Skipping make_pkdsao_mth5 --  H5 exists already")
-    print(f"1 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
+    h5_path = ensure_h5_exists()
     m = MTH5(file_version="0.1.0")
-    print(f"2 parkfield_h5_path.exists() {parkfield_h5_path.exists()}")
-    m.open_mth5(parkfield_h5_path, mode="r")
+    m.open_mth5(h5_path, mode="r")
     run_obj = m.get_run(station_id, run_id)
     run_ts_obj = run_obj.to_runts()
     validate_bulk_spectra_have_correct_units(run_obj, run_ts_obj, show_spectra=True)

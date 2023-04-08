@@ -7,6 +7,7 @@ Created on Thu Feb 17 14:15:20 2022
 # =============================================================================
 # Imports
 # =============================================================================
+import pandas as pd
 from deprecated import deprecated
 import numpy as np
 from pathlib import Path
@@ -154,30 +155,6 @@ class Processing(Base):
             band_edges_dict[i_dec] = decimation.band_edges
         return band_edges_dict
 
-    def assign_decimation_level_data_emtf(self, sample_rate):
-        """
-
-        Warning: This does not actually tell us how many samples we are decimating down
-        at each level.  That is assumed to be 4 but we need a way to bookkeep this in general
-
-        Parameters
-        ----------
-        sample_rate: float
-            The initial sampling rate of the data before any decimation
-
-        """
-        for key in sorted(self.decimations_dict.keys()):
-            if key in [0, "0"]:
-                d = 1
-                sr = sample_rate
-            else:
-                # careful with this hardcoded assumption of decimation by 4
-                d = 4
-                sr = sample_rate / (d ** int(key))
-            decimation_obj = self.decimations_dict[key]
-            decimation_obj.decimation.factor = d
-            decimation_obj.decimation.sample_rate = sr
-
     def assign_bands(
         self, band_edges_dict, sample_rate, decimation_factors, num_samples_window
     ):
@@ -203,7 +180,7 @@ class Processing(Base):
                 sr = sample_rate
             else:
                 # careful with this hardcoded assumption of decimation by 4
-                d = d = decimation_factors[i_level]  # 4
+                d = decimation_factors[i_level]  # 4
                 sr = 1.0 * sample_rate / (d ** int(i_level))
             decimation_obj = DecimationLevel()
             decimation_obj.decimation.level = int(i_level)  # self.decimations_dict[key]
@@ -229,13 +206,6 @@ class Processing(Base):
                 # self.decimations_dict[i_level].add_band(band)
                 decimation_obj.add_band(band)
             self.add_decimation_level(decimation_obj)
-        #            self.decimations_dict[i_level] = decimation_obj
-        print("OK")
-
-    #
-    def json_fn(self):
-        json_fn = self.id + "_processing_config.json"
-        return json_fn
 
     def num_decimation_levels(self):
         return len(self.decimations)
@@ -314,3 +284,96 @@ class Processing(Base):
             mth5_objs[self.stations.remote[0].id] = remote_mth5_obj
 
         return mth5_objs
+
+    def window_scheme(self, as_type="df"):
+        """
+        Make a dataframe of processing parameters one row per decimation level.
+        Returns
+        -------
+
+        """
+        window_schemes = [x.windowing_scheme for x in self.decimations]
+        data_dict = {}
+        data_dict["sample_rate"] = [x.sample_rate for x in window_schemes]
+        data_dict["window_duration"] = [x.window_duration for x in window_schemes]
+        data_dict["num_samples_window"] = [x.num_samples_window for x in window_schemes]
+        data_dict["num_samples_overlap"] = [
+            x.num_samples_overlap for x in window_schemes
+        ]
+        data_dict["num_samples_advance"] = [
+            x.num_samples_advance for x in window_schemes
+        ]
+        if as_type == "dict":
+            return data_dict
+        elif as_type == "df":
+            df = pd.DataFrame(data=data_dict)
+            return df
+        else:
+            print(f"unexpected rtype for window_scheme {as_type}")
+            raise TypeError
+
+    def decimation_info(self):
+        decimation_ids = [x.decimation.level for x in self.decimations]
+        decimation_factors = [x.decimation.factor for x in self.decimations]
+        decimation_info = dict(zip(decimation_ids, decimation_factors))
+        return decimation_info
+
+    def json_fn(self, file_id=None):
+        json_fn = f"{self.id}_processing_config.json"
+        return json_fn
+
+    def save_as_json(self, filename=None, nested=True, required=False):
+        if filename is None:
+            filename = self.json_fn()
+        json_str = self.to_json(nested=nested, required=required)
+        with open(filename, "w") as f:
+            f.write(json_str)
+
+    def make_tf_header(self, dec_level_id):
+        """
+
+        Parameters
+        ----------
+        dec_level_id: int
+            This may tolerate strings in the future, but keep as int for now
+
+        Returns
+        -------
+        tfh: aurora.transfer_function.transfer_function_header.TransferFunctionHeader
+        """
+        from aurora.transfer_function.transfer_function_header import (
+            TransferFunctionHeader,
+        )
+
+        tfh = TransferFunctionHeader(
+            processing_scheme=self.decimations[dec_level_id].estimator.engine,
+            local_station=self.stations.local,
+            reference_station=self.stations.remote,
+            input_channels=self.decimations[dec_level_id].input_channels,
+            output_channels=self.decimations[dec_level_id].output_channels,
+            reference_channels=self.decimations[dec_level_id].reference_channels,
+            decimation_level_id=dec_level_id,
+        )
+
+        return tfh
+
+    def make_tf_level(self, dec_level_id):
+        """
+        Initialize container for a single decimation level -- "flat" transfer function.
+
+        Parameters
+        ----------
+        dec_level_id: int
+            This may tolerate strings in the future, but keep as int for now
+
+        Returns
+        -------
+        tf_obj: aurora.transfer_function.TTFZ.TTFZ
+        """
+        # from aurora.transfer_function.base import TransferFunction
+        from aurora.transfer_function.TTFZ import TTFZ
+
+        tf_header = self.make_tf_header(dec_level_id)
+        tf_obj = TTFZ(tf_header, self.decimations[dec_level_id].frequency_bands_obj())
+
+        return tf_obj

@@ -1,8 +1,9 @@
+import logging
 import pathlib
 import unittest
-import logging
 
 from aurora.pipelines.run_summary import RunSummary
+from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test2_h5
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
@@ -34,18 +35,19 @@ class TestSyntheticProcessing(unittest.TestCase):
         logging.getLogger("matplotlib.font_manager").disabled = True
         logging.getLogger("matplotlib.ticker").disabled = True
 
-    @property
-    def z_file_path(self):
-        return AURORA_RESULTS_PATH.joinpath(self.z_file_base)
-
-    def test_can_output_tf_collection(self):
-        z_file_path = AURORA_RESULTS_PATH.joinpath("syn1.zss")
-        tf_collection = process_synthetic_1(
-            z_file_path=z_file_path,
-            file_version=self.file_version,
-            return_collection=True,
+    def test_no_crash_with_too_many_decimations(self):
+        z_file_path = AURORA_RESULTS_PATH.joinpath("syn1_tfk.zss")
+        xml_file_base = "syn1_tfk.xml"
+        xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
+        tf_cls = process_synthetic_1(
+            config_keyword="test1_tfk", z_file_path=z_file_path
         )
-        assert tf_collection.tf_dict is not None
+        tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
+
+        xml_file_base = "syn1r2_tfk.xml"
+        xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
+        tf_cls = process_synthetic_1r2(config_keyword="test1r2_tfk")
+        tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
 
     def test_can_output_tf_class_and_write_tf_xml(self):
         tf_cls = process_synthetic_1(file_version=self.file_version)
@@ -55,26 +57,20 @@ class TestSyntheticProcessing(unittest.TestCase):
 
     def test_can_use_channel_nomenclature(self):
         channel_nomencalture = "LEMI12"
-        z_file_path = AURORA_RESULTS_PATH.joinpath(
-            f"syn1-{channel_nomencalture}.zss"
-        )
+        z_file_path = AURORA_RESULTS_PATH.joinpath(f"syn1-{channel_nomencalture}.zss")
         tf_cls = process_synthetic_1(
             z_file_path=z_file_path,
             file_version=self.file_version,
             channel_nomenclature=channel_nomencalture,
         )
-        xml_file_base = (
-            f"syn1_mth5-{self.file_version}_{channel_nomencalture}.xml"
-        )
+        xml_file_base = f"syn1_mth5-{self.file_version}_{channel_nomencalture}.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
         tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
 
     def test_can_use_mth5_file_version_020(self):
         file_version = "0.2.0"
         z_file_path = AURORA_RESULTS_PATH.joinpath(f"syn1-{file_version}.zss")
-        tf_cls = process_synthetic_1(
-            z_file_path=z_file_path, file_version=file_version
-        )
+        tf_cls = process_synthetic_1(z_file_path=z_file_path, file_version=file_version)
         xml_file_base = f"syn1_mth5v{file_version}.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
         tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
@@ -100,12 +96,10 @@ class TestSyntheticProcessing(unittest.TestCase):
         )
         assert tf_collection.tf_dict is not None
 
-    def test_simultaneos_regression(self):
-        z_file_path = AURORA_RESULTS_PATH.joinpath(
-            "syn1_simultaneous_estimate.zss"
-        )
+    def test_simultaneous_regression(self):
+        z_file_path = AURORA_RESULTS_PATH.joinpath("syn1_simultaneous_estimate.zss")
         tf_cls = process_synthetic_1(
-            z_file_path=z_file_path, test_simultaneous_regression=True
+            z_file_path=z_file_path, simultaneous_regression=True
         )
         xml_file_base = "syn1_simultaneous_estimate.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
@@ -117,11 +111,11 @@ class TestSyntheticProcessing(unittest.TestCase):
         tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
 
     def test_can_process_remote_reference_data_to_tf_collection(self):
-        tf_collection = process_synthetic_rr12(return_collection=True)
+        tf_collection = process_synthetic_1r2(return_collection=True)
         assert tf_collection.tf_dict is not None
 
     def test_can_process_remote_reference_data_to_tf_class(self):
-        tf_cls = process_synthetic_rr12(channel_nomenclature="default")
+        tf_cls = process_synthetic_1r2(channel_nomenclature="default")
         xml_file_base = "syn12rr_mth5-010.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
         tf_cls.write_tf_file(
@@ -131,7 +125,7 @@ class TestSyntheticProcessing(unittest.TestCase):
         )
 
     def test_can_process_remote_reference_data_with_channel_nomenclature(self):
-        tf_cls = process_synthetic_rr12(channel_nomenclature="LEMI34")
+        tf_cls = process_synthetic_1r2(channel_nomenclature="LEMI34")
         xml_file_base = "syn12rr_mth5-010_LEMI34.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
         tf_cls.write_tf_file(
@@ -142,25 +136,31 @@ class TestSyntheticProcessing(unittest.TestCase):
 
 
 def process_synthetic_1(
+    config_keyword="test1",
     z_file_path="",
     test_scale_factor=False,
-    test_simultaneous_regression=False,
+    simultaneous_regression=False,
     file_version="0.1.0",
     return_collection=False,
     channel_nomenclature="default",
+    reload_config=False,
 ):
     """
 
     Parameters
     ----------
+    config_keyword: str
+        "test1", "test1_tfk", this is an argument passed to the create_test_run_config
+        as test_case_id.
     z_file_path: str or path
         Where the z-file will be output
     test_scale_factor: bool
         If true, will assign scale factors to the channels
-    test_simultaneous_regression: bool
+    simultaneous_regression: bool
         If True will do regression all outut channels in one step, rather than the
         usual, channel-by-channel method
-
+    file_version: str
+        one of ["0.1.0", "0.2.0"]
     Returns
     -------
     tf_result: TransferFunctionCollection or mt_metadata.transfer_functions.TF
@@ -196,10 +196,18 @@ def process_synthetic_1(
         tfk_dataset.df.drop(columns=["channel_scale_factors"], inplace=True)
 
     processing_config = create_test_run_config(
-        "test1", tfk_dataset, channel_nomenclature=channel_nomenclature
+        config_keyword, tfk_dataset, channel_nomenclature=channel_nomenclature
     )
+    # Relates to issue #172
+    # reload_config = True
+    # if reload_config:
+    #     from aurora.config.metadata import Processing
+    #     p = Processing()
+    #     config_path = pathlib.Path("config")
+    #     json_fn = config_path.joinpath(processing_config.json_fn())
+    #     p.from_json(json_fn)
 
-    if test_simultaneous_regression:
+    if simultaneous_regression:
         for decimation in processing_config.decimations:
             decimation.estimator.estimate_per_channel = False
 
@@ -227,12 +235,11 @@ def process_synthetic_1(
 
 def process_synthetic_2():
     mth5_path = create_test2_h5()
+    mth5_paths = [
+        mth5_path,
+    ]
     run_summary = RunSummary()
-    run_summary.from_mth5s(
-        [
-            mth5_path,
-        ]
-    )
+    run_summary.from_mth5s(mth5_paths)
     tfk_dataset = KernelDataset()
     tfk_dataset.from_run_summary(run_summary, "test2")
     processing_config = create_test_run_config("test2", tfk_dataset)
@@ -240,20 +247,19 @@ def process_synthetic_2():
     return tfc
 
 
-def process_synthetic_rr12(
-    channel_nomenclature="default", return_collection=False
+def process_synthetic_1r2(
+    config_keyword="test1r2", channel_nomenclature="default", return_collection=False
 ):
     mth5_path = create_test12rr_h5(channel_nomenclature=channel_nomenclature)
+    mth5_paths = [
+        mth5_path,
+    ]
     run_summary = RunSummary()
-    run_summary.from_mth5s(
-        [
-            mth5_path,
-        ]
-    )
+    run_summary.from_mth5s(mth5_paths)
     tfk_dataset = KernelDataset()
     tfk_dataset.from_run_summary(run_summary, "test1", "test2")
     processing_config = create_test_run_config(
-        "test1r2", tfk_dataset, channel_nomenclature=channel_nomenclature
+        config_keyword, tfk_dataset, channel_nomenclature=channel_nomenclature
     )
     tfc = process_synthetic_data(
         processing_config,
@@ -267,6 +273,9 @@ def main():
     """
     Testing the processing of synthetic data
     """
+    # tmp = TestSyntheticProcessing()
+    # tmp.setUp()
+    # tmp.test_no_crash_with_too_many_decimations()
     unittest.main()
 
 

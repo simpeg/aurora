@@ -7,10 +7,8 @@ from aurora.pipelines.run_summary import RunSummary
 from aurora.sandbox.mth5_channel_summary_helpers import (
     channel_summary_to_make_mth5,
 )
-from aurora.test_utils.parkfield.make_parkfield_mth5 import make_pkdsao_mth5
+from aurora.test_utils.parkfield.make_parkfield_mth5 import ensure_h5_exists
 from aurora.test_utils.parkfield.path_helpers import AURORA_RESULTS_PATH
-from aurora.test_utils.parkfield.path_helpers import CONFIG_PATH
-from aurora.test_utils.parkfield.path_helpers import DATA_PATH
 from aurora.test_utils.parkfield.path_helpers import EMTF_RESULTS_PATH
 from aurora.transfer_function.kernel_dataset import KernelDataset
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
@@ -21,7 +19,7 @@ from mth5.helpers import close_open_files
 
 def test_stuff_that_belongs_elsewhere():
     """
-    ping the mth5, extract the summary and pass it
+    ping the mth5, extract the summary and pass it to channel_summary_to_make_mth5
 
     This test was created so that codecov would see channel_summary_to_make_mth5().
     ToDo: channel_summary_to_make_mth5() method should be moved into mth5 and removed
@@ -32,23 +30,13 @@ def test_stuff_that_belongs_elsewhere():
 
     """
     close_open_files()
-    parkfield_h5_path = DATA_PATH.joinpath("pkd_sao_test_00.h5")
-
-    # Ensure there is an mth5 to process
-    if not parkfield_h5_path.exists():
-        try:
-            make_pkdsao_mth5("pkd_sao_test_00")
-        except Exception as e:  # ValueError:
-            print(f"Exception {e}")
-            print("NCEDC Likley Down")
-            print("Skipping this test")
-            return
+    h5_path = ensure_h5_exists()
 
     mth5_obj = mth5.mth5.MTH5()
     mth5_obj = MTH5(file_version="0.1.0")
-    mth5_obj.open_mth5(parkfield_h5_path, mode="a")
+    mth5_obj.open_mth5(h5_path, mode="a")
     df = mth5_obj.channel_summary.to_dataframe()
-    make_mth5_df = channel_summary_to_make_mth5(df)
+    make_mth5_df = channel_summary_to_make_mth5(df, network="NCEDC")
     mth5_obj.close_mth5()
     return make_mth5_df
 
@@ -66,28 +54,16 @@ def test_processing(z_file_path=None):
     """
 
     close_open_files()
-    parkfield_h5_path = DATA_PATH.joinpath("pkd_sao_test_00.h5")
-
-    # Ensure there is an mth5 to process
-    if not parkfield_h5_path.exists():
-        try:
-            make_pkdsao_mth5("pkd_sao_test_00")
-        except Exception as e:  # ValueError:
-            print(f"Exception {e}")
-            print("NCEDC Likley Down")
-            print("Skipping this test")
-            return
-
+    h5_path = ensure_h5_exists()
+    h5s_list = [
+        h5_path,
+    ]
     run_summary = RunSummary()
-    run_summary.from_mth5s(
-        [
-            parkfield_h5_path,
-        ]
-    )
+    run_summary.from_mth5s(h5s_list)
     tfk_dataset = KernelDataset()
     tfk_dataset.from_run_summary(run_summary, "PKD", "SAO")
 
-    cc = ConfigCreator(config_path=CONFIG_PATH)
+    cc = ConfigCreator()
     config = cc.create_from_kernel_dataset(
         tfk_dataset,
         output_channels=["ex", "ey"],

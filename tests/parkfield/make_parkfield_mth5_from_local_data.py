@@ -74,7 +74,7 @@ def create_from_local_data(dataset_id, run_id):
 
 
 def test_make_parkfield_mth5_from_local():
-    dataset_id = "pkd_test_00"
+    dataset_id = "pkd_sao_test_00"
     run_id = "001"
     create_from_local_data(dataset_id, run_id)
     h5_path = DATA_PATH.joinpath(f"{dataset_id}_from_local.h5")

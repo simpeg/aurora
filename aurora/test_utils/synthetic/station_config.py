@@ -6,7 +6,7 @@ Survey level: 'mth5_path', Path to output h5
 Station level: 'station_id', name of the station
 Station level:'latitude':17.996
 
-Run level:'columns', :channel names as a list; ["hx", "hy", "hz", "ex", "ey"]
+Run level: 'columns', :channel names as a list; ["hx", "hy", "hz", "ex", "ey"]
 Run level: 'raw_data_path', Path to ascii data source
 Run level: 'noise_scalars', dict keyed by channel, default is zero,
 Run level: 'nan_indices', iterable of integers, where to put nan [
@@ -60,16 +60,18 @@ class SyntheticRun(object):
         self.sample_rate = kwargs.get("sample_rate", 1.0)
         self.raw_data_path = kwargs.get("raw_data_path", None)
 
-        # set channel_map
+        # set channel names
         self._channel_map = None
-        self.channel_nomemclature_keyword = kwargs.get(
+        self.channel_nomenclature_keyword = kwargs.get(
             "channel_nomenclature", "default"
         )
         self.set_channel_map()
         self.channels = kwargs.get("channels", list(self.channel_map.values()))
+
         self.noise_scalars = kwargs.get("noise_scalars", None)
         self.nan_indices = kwargs.get("nan_indices", {})
         self.filters = kwargs.get("filters", {})
+        self.start = kwargs.get("start", None)
 
         if self.noise_scalars is None:
             self.noise_scalars = {}
@@ -82,9 +84,9 @@ class SyntheticRun(object):
 
     def set_channel_map(self):
         channel_nomenclature = ChannelNomenclature()
-        channel_nomenclature.keyword = self.channel_nomemclature_keyword
+        channel_nomenclature.keyword = self.channel_nomenclature_keyword
         channel_map = channel_nomenclature.get_channel_map(
-            self.channel_nomemclature_keyword
+            self.channel_nomenclature_keyword
         )
         self._channel_map = channel_map
 
@@ -114,6 +116,7 @@ def make_station_01(channel_nomenclature="default"):
         "001",
         raw_data_path=DATA_PATH.joinpath("test1.asc"),
         channel_nomenclature=channel_nomenclature,
+        start=None,
     )
     nan_indices = {}
     for ch in run_001.channels:
@@ -155,6 +158,21 @@ def make_station_02(channel_nomenclature="default"):
 
 
 def make_station_03(channel_nomenclature="default"):
+    """
+    Here we create a synthetic station with multiple runs.  Rather than generate fresh
+    synthetic data, we just reuse test1.asc for each run.
+    Parameters
+    ----------
+    channel_nomenclature: str
+        one of the keys from CHANNEL_MAPS dict in
+        aurora/config/metadata/channel_nomenclature.py
+        Example values ["default", "lemi12", "lemi34", "phoenix123"]
+
+    Returns
+    -------
+    station: SyntheticStation()
+        All the info needed in order to create synthetic data.
+    """
     channel_nomenclature_obj = ChannelNomenclature()
     channel_nomenclature_obj.keyword = channel_nomenclature
     EX, EY, HX, HY, HZ = channel_nomenclature_obj.unpack()
@@ -181,6 +199,7 @@ def make_station_03(channel_nomenclature="default"):
         nan_indices=nan_indices,
         filters=filters,
         channel_nomenclature=channel_nomenclature,
+        start="1980-01-01T00:00:00+00:00",
     )
 
     noise_scalars = {}
@@ -193,6 +212,7 @@ def make_station_03(channel_nomenclature="default"):
         nan_indices=nan_indices,
         filters=filters,
         channel_nomenclature=channel_nomenclature,
+        start="1980-01-02T00:00:00+00:00",
     )
 
     for ch in channels:
@@ -204,6 +224,7 @@ def make_station_03(channel_nomenclature="default"):
         nan_indices=nan_indices,
         filters=filters,
         channel_nomenclature=channel_nomenclature,
+        start="1980-01-03T00:00:00+00:00",
     )
 
     for ch in channels:
@@ -215,6 +236,7 @@ def make_station_03(channel_nomenclature="default"):
         nan_indices=nan_indices,
         filters=filters,
         channel_nomenclature=channel_nomenclature,
+        start="1980-01-04T00:00:00+00:00",
     )
 
     run_001.filters = filters

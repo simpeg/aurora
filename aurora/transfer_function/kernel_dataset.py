@@ -41,7 +41,7 @@ local so that overlap is complete.
 c) restrict start/end times of the local runs so that they DO intersect with remote
 8. This is now a TFKernel Dataset Definition (ish).  Initialize a default
 processing object and pass it this df:
-cc = ConfigCreator(config_path=CONFIG_PATH)
+cc = ConfigCreator()
 p = cc.create_from_kernel_dataset(kernel_dataset, emtf_band_file=emtf_band_setup_file)
 9. Edit the Processing Config appropriately,
 
@@ -117,9 +117,7 @@ class KernelDataset:
     def clone_dataframe(self):
         return copy.deepcopy(self.df)
 
-    def from_run_summary(
-        self, run_summary, local_station_id, remote_station_id=None
-    ):
+    def from_run_summary(self, run_summary, local_station_id, remote_station_id=None):
         """
 
         Parameters
@@ -143,9 +141,7 @@ class KernelDataset:
         ]
         if remote_station_id:
             station_ids.append(remote_station_id)
-        df = restrict_to_station_list(
-            run_summary.df, station_ids, inplace=False
-        )
+        df = restrict_to_station_list(run_summary.df, station_ids, inplace=False)
         df["remote"] = False
         if remote_station_id:
             cond = df.station_id == remote_station_id

@@ -30,8 +30,8 @@ def available_number_of_windows_in_array(n_samples_array, n_samples_window, n_ad
     """
     stridable_samples = n_samples_array - n_samples_window
     if stridable_samples < 0:
-        print("Window is longer than the time series")
-        raise Exception
+        print("CRITICAL Window is longer than the time series")
+        return 0
     available_number_of_strides = int(np.floor(stridable_samples / n_advance))
     available_number_of_strides += 1
     return available_number_of_strides
