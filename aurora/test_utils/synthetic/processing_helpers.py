@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from aurora.config.metadata.processing import Processing
+from mt_metadata.transfer_functions.processing.aurora import Processing
 from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.process_mth5 import process_mth5
 

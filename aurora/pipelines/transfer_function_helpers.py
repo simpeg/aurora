@@ -45,7 +45,7 @@ def set_up_iter_control(config):
 
     Parameters
     ----------
-    config: aurora.config.metadata.decimation_level.DecimationLevel
+    config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
 
     Returns
     -------
@@ -103,7 +103,7 @@ def get_band_for_tf_estimate(
     band : aurora.time_series.frequency_band.FrequencyBand
         object with lower_bound and upper_bound to tell stft object which
         subarray to return
-    config : aurora.config.metadata.decimation_level.DecimationLevel
+    config : mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
         information about the input and output channels needed for TF
         estimation problem setup
     local_stft_obj : xarray.core.dataset.Dataset or None

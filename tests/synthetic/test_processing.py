@@ -201,7 +201,7 @@ def process_synthetic_1(
     # Relates to issue #172
     # reload_config = True
     # if reload_config:
-    #     from aurora.config.metadata import Processing
+    #     from mt_metadata.transfer_functions.processing.aurora import Processing
     #     p = Processing()
     #     config_path = pathlib.Path("config")
     #     json_fn = config_path.joinpath(processing_config.json_fn())
@@ -273,9 +273,9 @@ def main():
     """
     Testing the processing of synthetic data
     """
-    # tmp = TestSyntheticProcessing()
-    # tmp.setUp()
-    # tmp.test_no_crash_with_too_many_decimations()
+    tmp = TestSyntheticProcessing()
+    tmp.setUp()
+    tmp.test_no_crash_with_too_many_decimations()
     unittest.main()
 
 

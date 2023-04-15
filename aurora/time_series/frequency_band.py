@@ -290,7 +290,7 @@ class FrequencyBands(object):
 
         Parameters
         ----------
-        decimation_object: aurora.config.Decimation
+        decimation_object: mt_metadata.transfer_functions.processing.aurora.Decimation
 
         Returns
         -------

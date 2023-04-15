@@ -6,7 +6,7 @@ Created on Thu Feb 24 14:11:24 2022
 """
 
 import unittest
-from aurora.config import Estimator
+from mt_metadata.transfer_functions.processing.aurora import Estimator
 
 
 class TestEstimator(unittest.TestCase):

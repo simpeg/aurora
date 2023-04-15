@@ -96,7 +96,7 @@ def df_from_bands(band_list):
     Parameters
     ----------
     band_list: list
-        obtained from aurora.config.metadata.decimation_level.DecimationLevel.bands
+        obtained from mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel.bands
 
     Returns
     -------

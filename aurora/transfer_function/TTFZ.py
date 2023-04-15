@@ -64,7 +64,7 @@ class TTFZ(TransferFunction):
         units: str
             one of ["MT","SI"]
         channel_nomenclature:
-        aurora.config.metadata.channel_nomenclature.ChannelNomenclature
+        mt_metadata.transfer_functions.processing.aurora.channel_nomenclature.ChannelNomenclature
             has a dict that you
 
         """

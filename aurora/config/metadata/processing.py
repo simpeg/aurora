@@ -339,9 +339,9 @@ class Processing(Base):
 
         Returns
         -------
-        tfh: aurora.transfer_function.transfer_function_header.TransferFunctionHeader
+        tfh: mt_metadata.transfer_functions.processing.aurora.transfer_function_header.TransferFunctionHeader
         """
-        from aurora.transfer_function.transfer_function_header import (
+        from mt_metadata.transfer_functions.processing.aurora.transfer_function_header import (
             TransferFunctionHeader,
         )
 

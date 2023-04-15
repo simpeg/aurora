@@ -22,7 +22,7 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 
-from aurora.config.metadata.channel_nomenclature import ChannelNomenclature
+from mt_metadata.transfer_functions.processing.aurora import ChannelNomenclature
 from aurora.test_utils.synthetic.station_config import make_filters
 from aurora.test_utils.synthetic.station_config import make_station_01
 from aurora.test_utils.synthetic.station_config import make_station_02

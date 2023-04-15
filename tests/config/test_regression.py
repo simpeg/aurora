@@ -6,7 +6,7 @@ Created on Thu Feb 24 14:11:24 2022
 """
 
 import unittest
-from aurora.config import Regression
+from mt_metadata.transfer_functions.processing.aurora import Regression
 
 
 class TestRegression(unittest.TestCase):

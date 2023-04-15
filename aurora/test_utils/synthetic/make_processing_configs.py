@@ -127,7 +127,7 @@ def test_to_from_json():
 
     """
     import pandas as pd
-    from aurora.config.metadata import Processing
+    from mt_metadata.transfer_functions.processing.aurora import Processing
     from aurora.pipelines.run_summary import RunSummary
     from aurora.transfer_function.kernel_dataset import KernelDataset
 

@@ -41,7 +41,7 @@ def apply_prewhitening(decimation_obj, run_xrds_input):
 
     Parameters
     ----------
-    decimation_obj : aurora.config.metadata.decimation_level.DecimationLevel
+    decimation_obj : mt_metadata.transfer_functions.processing.aurora.DecimationLevel
         Information about how the decimation level is to be processed
     run_xrds_input : xarray.core.dataset.Dataset
         Time series to be prewhitened
@@ -68,7 +68,7 @@ def apply_recoloring(decimation_obj, stft_obj):
     """
     Parameters
     ----------
-    decimation_obj : aurora.config.metadata.decimation_level.DecimationLevel
+    decimation_obj : mt_metadata.transfer_functions.processing.aurora.DecimationLevel
         Information about how the decimation level is to be processed
     stft_obj : xarray.core.dataset.Dataset
         Time series of Fourier coefficients to be recoloured
@@ -111,7 +111,7 @@ def run_ts_to_stft_scipy(decimation_obj, run_xrds_orig):
     """
     Parameters
     ----------
-    decimation_obj : aurora.config.metadata.decimation_level.DecimationLevel
+    decimation_obj : mt_metadata.transfer_functions.processing.aurora.DecimationLevel
         Information about how the decimation level is to be processed
     run_xrds_orig : : xarray.core.dataset.Dataset
         Time series to be processed
@@ -167,7 +167,7 @@ def truncate_to_clock_zero(decimation_obj, run_xrds):
 
     Parameters
     ----------
-    decimation_obj: aurora.config.metadata.decimation_level.DecimationLevel
+    decimation_obj: mt_metadata.transfer_functions.processing.aurora.DecimationLevel
         Information about how the decimation level is to be processed
     run_xrds : xarray.core.dataset.Dataset
         normally extracted from mth5.RunTS
@@ -209,7 +209,7 @@ def run_ts_to_stft(decimation_obj, run_xrds_orig):
 
     Parameters
     ----------
-    decimation_obj : aurora.config.metadata.decimation_level.DecimationLevel
+    decimation_obj : mt_metadata.transfer_functions.processing.aurora.DecimationLevel
         Information about how the decimation level is to be processed
     run_ts : xarray.core.dataset.Dataset
         normally extracted from mth5.RunTS
@@ -296,7 +296,7 @@ def prototype_decimate(config, run_xrds):
 
     Parameters
     ----------
-    config : aurora.config.metadata.decimation.Decimation
+    config : mt_metadata.transfer_functions.processing.aurora.Decimation
     run_xrds: xr.Dataset
         Originally from mth5.timeseries.run_ts.RunTS.dataset, but possibly decimated
         multiple times
@@ -338,7 +338,7 @@ def prototype_decimate_2(config, run_xrds):
 
     Parameters
     ----------
-    config : aurora.config.metadata.decimation.Decimation
+    config : mt_metadata.transfer_functions.processing.aurora.Decimation
     run_xrds: xr.Dataset
         Originally from mth5.timeseries.run_ts.RunTS.dataset, but possibly decimated
         multiple times
@@ -365,7 +365,7 @@ def prototype_decimate_3(config, run_xrds):
 
     Parameters
     ----------
-    config : aurora.config.metadata.decimation.Decimation
+    config : mt_metadata.transfer_functions.processing.aurora.Decimation
     run_xrds: xr.Dataset
         Originally from mth5.timeseries.run_ts.RunTS.dataset, but possibly decimated
         multiple times

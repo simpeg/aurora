@@ -144,7 +144,7 @@ class TransferFunctionCollection(object):
 
         Parameters
         ----------
-        channel_nomenclature: aurora.config.metadata.channel_nomenclature.ChannelNomenclature
+        channel_nomenclature: mt_metadata.transfer_functions.processing.aurora.channel_nomenclature.ChannelNomenclature
             Scheme according to how channels are named
         """
         ex, ey, hx, hy, hz = channel_nomenclature.unpack()

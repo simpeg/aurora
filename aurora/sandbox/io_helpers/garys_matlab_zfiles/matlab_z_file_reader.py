@@ -8,7 +8,7 @@ import numpy as np
 import scipy.io as sio
 
 
-from aurora.config.metadata.processing import Processing
+from mt_metadata.transfer_functions.processing.aurora import Processing
 from aurora.config.emtf_band_setup import BANDS_256_29_FILE
 from aurora.general_helper_functions import TEST_PATH
 from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile

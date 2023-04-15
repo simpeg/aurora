@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import psutil
 
-from aurora.config.metadata.processing import Processing
+from mt_metadata.transfer_functions.processing.aurora import Processing
 from aurora.pipelines.helpers import initialize_config
 from aurora.transfer_function.kernel_dataset import KernelDataset
 

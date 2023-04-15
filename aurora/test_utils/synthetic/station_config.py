@@ -18,7 +18,7 @@ Run level: 'sample_rate', 1.0
 import numpy as np
 import random
 
-from aurora.config.metadata.channel_nomenclature import ChannelNomenclature
+from mt_metadata.transfer_functions.processing.aurora import ChannelNomenclature
 from aurora.test_utils.synthetic.paths import DATA_PATH
 from aurora.time_series.filters.filter_helpers import make_coefficient_filter
 
@@ -165,7 +165,7 @@ def make_station_03(channel_nomenclature="default"):
     ----------
     channel_nomenclature: str
         one of the keys from CHANNEL_MAPS dict in
-        aurora/config/metadata/channel_nomenclature.py
+        mt_metadata.transfer_functions.processing.aurora.channel_nomenclature
         Example values ["default", "lemi12", "lemi34", "phoenix123"]
 
     Returns

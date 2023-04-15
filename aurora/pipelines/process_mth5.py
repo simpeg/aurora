@@ -54,7 +54,7 @@ def make_stft_objects(
 
     Parameters
     ----------
-    processing_config: aurora.config.metadata.processing.Processing
+    processing_config: mt_metadata.transfer_functions.processing.aurora.Processing
         Metadata about the processing to be applied
     i_dec_level: int
         The decimation level to process
@@ -110,7 +110,7 @@ def process_tf_decimation_level(
 
     Parameters
     ----------
-    config: aurora.config.metadata.decimation_level.DecimationLevel
+    config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
         Config for a single decimation level
     i_dec_level: int
         decimation level_id
@@ -204,7 +204,7 @@ def update_dataset_df(i_dec_level, tfk):
     ----------
     i_dec_level: int
         decimation level id, indexed from zero
-    config: aurora.config.metadata.decimation_level.DecimationLevel
+    config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
         decimation level config
 
     Returns
@@ -251,7 +251,7 @@ def process_mth5(
 
     Parameters
     ----------
-    config: aurora.config.metadata.processing.Processing or path to json
+    config: mt_metadata.transfer_functions.processing.aurora.Processing or path to json
         All processing parameters
     tfk_dataset: aurora.tf_kernel.dataset.Dataset or None
         Specifies what datasets to process according to config
