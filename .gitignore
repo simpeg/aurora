@@ -6,6 +6,7 @@ aurora/sandbox/data
 tests/cas04/aurora_results/*
 tests/cas04/config/*
 tests/cas04/data/*
+tests/earthscope/data_availability/*
 tests/parkfield/*.png
 tests/parkfield/aurora_results/*
 tests/parkfield/config/*backup.json
