@@ -10,8 +10,15 @@ from aurora.transfer_function.regression.base import RegressionEstimator
 from aurora.transfer_function.weights.edf_weights import (
     effective_degrees_of_freedom_weights,
 )
+from mth5.utils.mth5_logger import setup_logger
 
-ESTIMATOR_LIBRARY = {"OLS": RegressionEstimator, "RME": TRME, "RME_RR": TRME_RR}
+ESTIMATOR_LIBRARY = {
+    "OLS": RegressionEstimator,
+    "RME": TRME,
+    "RME_RR": TRME_RR,
+}
+
+logger = setup_logger("aurora.transfer_function_helpers")
 
 
 def get_estimator_class(estimation_engine):
@@ -31,8 +38,10 @@ def get_estimator_class(estimation_engine):
     try:
         estimator_class = ESTIMATOR_LIBRARY[estimation_engine]
     except KeyError:
-        print(f"processing_scheme {estimation_engine} not supported")
-        print(f"processing_scheme must be one of {list(ESTIMATOR_LIBRARY.keys())}")
+        logger.error(
+            f"processing_scheme {estimation_engine} not supported"
+            f"processing_scheme must be one of {list(ESTIMATOR_LIBRARY.keys())}"
+        )
         raise Exception
     return estimator_class
 
@@ -87,7 +96,7 @@ def check_time_axes_synched(X, Y):
     if (X.time == Y.time).all():
         pass
     else:
-        print("WARNING - NAN Handling could fail if X,Y dont share time axes")
+        logger.warning("NAN Handling could fail if X,Y dont share time axes")
         raise Exception
     return
 
@@ -121,7 +130,7 @@ def get_band_for_tf_estimate(
         being within the frequency band given as an input argument.
     """
     dec_level_config = config.decimations[0]
-    print(f"Processing band {band.center_period:.6f}s")
+    logger.info(f"Processing band {band.center_period:.6f}s")
     band_dataset = extract_band(band, local_stft_obj)
     X = band_dataset[dec_level_config.input_channels]
     Y = band_dataset[dec_level_config.output_channels]
@@ -232,7 +241,9 @@ def process_transfer_functions(
 
         if dec_level_config.estimator.estimate_per_channel:
             for ch in dec_level_config.output_channels:
-                Y_ch = Y[ch].to_dataset()  # keep as a dataset, maybe not needed
+                Y_ch = Y[
+                    ch
+                ].to_dataset()  # keep as a dataset, maybe not needed
 
                 X_, Y_, RR_ = handle_nan(X, Y_ch, RR, drop_dim="observation")
 
@@ -246,13 +257,17 @@ def process_transfer_functions(
                     X=X_, Y=Y_, Z=RR_, iter_control=iter_control
                 )
                 regression_estimator.estimate()
-                transfer_function_obj.set_tf(regression_estimator, band.center_period)
+                transfer_function_obj.set_tf(
+                    regression_estimator, band.center_period
+                )
         else:
             X, Y, RR = handle_nan(X, Y, RR, drop_dim="observation")
             regression_estimator = estimator_class(
                 X=X, Y=Y, Z=RR, iter_control=iter_control
             )
             regression_estimator.estimate()
-            transfer_function_obj.set_tf(regression_estimator, band.center_period)
+            transfer_function_obj.set_tf(
+                regression_estimator, band.center_period
+            )
 
     return transfer_function_obj

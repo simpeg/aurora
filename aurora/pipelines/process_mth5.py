@@ -23,12 +23,15 @@ Note 3: This point in the loop marks the interface between _generation_ of the F
 # Imports
 # =============================================================================
 
+from pathlib import Path
 import xarray as xr
 
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
-from aurora.pipelines.transfer_function_helpers import process_transfer_functions
+from aurora.pipelines.transfer_function_helpers import (
+    process_transfer_functions,
+)
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
 
 from aurora.transfer_function.transfer_function_collection import (
@@ -37,6 +40,7 @@ from aurora.transfer_function.transfer_function_collection import (
 from aurora.transfer_function.TTFZ import TTFZ
 
 from mt_metadata.transfer_functions.core import TF
+from mth5.utils.mth5_logger import setup_logger
 
 
 # =============================================================================
@@ -86,7 +90,9 @@ def make_stft_objects(
         ].channel_scale_factors
     elif station_id == processing_config.stations.remote[0].id:
         scale_factors = (
-            processing_config.stations.remote[0].run_dict[run_id].channel_scale_factors
+            processing_config.stations.remote[0]
+            .run_dict[run_id]
+            .channel_scale_factors
         )
 
     stft_obj = calibrate_stft_obj(
@@ -129,10 +135,16 @@ def process_tf_decimation_level(
     """
     frequency_bands = config.decimations[i_dec_level].frequency_bands_obj()
     tf_header = config.make_tf_header(i_dec_level)
-    transfer_function_obj = TTFZ(tf_header, frequency_bands, processing_config=config)
+    transfer_function_obj = TTFZ(
+        tf_header, frequency_bands, processing_config=config
+    )
 
     transfer_function_obj = process_transfer_functions(
-        config, i_dec_level, local_stft_obj, remote_stft_obj, transfer_function_obj
+        config,
+        i_dec_level,
+        local_stft_obj,
+        remote_stft_obj,
+        transfer_function_obj,
     )
 
     return transfer_function_obj
@@ -161,7 +173,9 @@ def export_tf(
         Transfer function container
     """
     merged_tf_dict = tf_collection.get_merged_dict(channel_nomenclature)
-    channel_nomenclature_dict = channel_nomenclature.to_dict()["channel_nomenclature"]
+    channel_nomenclature_dict = channel_nomenclature.to_dict()[
+        "channel_nomenclature"
+    ]
     tf_cls = TF(channel_nomenclature=channel_nomenclature_dict)
     renamer_dict = {"output_channel": "output", "input_channel": "input"}
     tmp = merged_tf_dict["tf"].rename(renamer_dict)
@@ -183,7 +197,7 @@ def export_tf(
     return tf_cls
 
 
-def update_dataset_df(i_dec_level, tfk):
+def update_dataset_df(i_dec_level, tfk, logger):
     """
     This function has two different modes.  The first mode, initializes values in the
     array, and could be placed into TFKDataset.initialize_time_series_data()
@@ -220,7 +234,7 @@ def update_dataset_df(i_dec_level, tfk):
 
         # APPLY TIMING CORRECTIONS HERE
     else:
-        print(f"DECIMATION LEVEL {i_dec_level}")
+        logger.info(f"DECIMATION LEVEL {i_dec_level}")
         # See Note 1 top of module
         # See Note 2 top of module
         for i, row in tfk.dataset_df.iterrows():
@@ -229,9 +243,11 @@ def update_dataset_df(i_dec_level, tfk):
             run_xrds = row["run_dataarray"].to_dataset("channel")
             decimation = tfk.config.decimations[i_dec_level].decimation
             decimated_xrds = prototype_decimate(decimation, run_xrds)
-            tfk.dataset_df["run_dataarray"].at[i] = decimated_xrds.to_array("channel")
+            tfk.dataset_df["run_dataarray"].at[i] = decimated_xrds.to_array(
+                "channel"
+            )
 
-    print("DATASET DF UPDATED")
+    logger.debug("DATASET DF UPDATED")
     return
 
 
@@ -273,6 +289,16 @@ def process_mth5(
     tf_cls: mt_metadata.transfer_functions.TF
         TF object
     """
+    if tfk_dataset is not None:
+        station = tfk_dataset.df.station_id[0]
+        logger_path = Path(tfk_dataset.df.mth5_path[0]).parent.joinpath(
+            f"aurora_processing_{station}.log"
+        )
+    else:
+        logger_path = Path().cwd()
+
+    logger = setup_logger("aurora.pipelines.process_mth5", fn=logger_path)
+
     # Initialize config and mth5s
     tfk = TransferFunctionKernel(dataset=tfk_dataset, config=config)
     tfk.make_processing_summary()
@@ -283,7 +309,7 @@ def process_mth5(
     # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
     tfk.dataset.initialize_dataframe_for_processing(mth5_objs)
 
-    print(
+    logger.info(
         f"Processing config indicates {len(tfk.config.decimations)} "
         f"decimation levels "
     )
@@ -292,11 +318,13 @@ def process_mth5(
 
     for i_dec_level, dec_level_config in enumerate(tfk.valid_decimations()):
 
-        update_dataset_df(i_dec_level, tfk)
+        update_dataset_df(i_dec_level, tfk, logger)
 
         # TFK 1: get clock-zero from data if needed
         if dec_level_config.window.clock_zero_type == "data start":
-            dec_level_config.window.clock_zero = str(tfk.dataset_df.start.min())
+            dec_level_config.window.clock_zero = str(
+                tfk.dataset_df.start.min()
+            )
 
         # Apply STFT to all runs
         local_stfts = []
@@ -309,7 +337,12 @@ def process_mth5(
             run_xrds = row["run_dataarray"].to_dataset("channel")
             run_obj = row.mth5_obj.from_reference(row.run_reference)
             stft_obj = make_stft_objects(
-                tfk.config, i_dec_level, run_obj, run_xrds, units, row.station_id
+                tfk.config,
+                i_dec_level,
+                run_obj,
+                run_xrds,
+                units,
+                row.station_id,
             )
 
             if row.station_id == tfk.config.stations.local.id:
@@ -335,7 +368,9 @@ def process_mth5(
             local_merged_stft_obj,
             remote_merged_stft_obj,
         )
-        tf_obj.apparent_resistivity(tfk.config.channel_nomenclature, units=units)
+        tf_obj.apparent_resistivity(
+            tfk.config.channel_nomenclature, units=units
+        )
         tf_dict[i_dec_level] = tf_obj
 
         if show_plot:
