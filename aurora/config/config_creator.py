@@ -8,8 +8,9 @@ change.
 """
 from pathlib import Path
 
-from mt_metadata.transfer_functions.processing.aurora import Processing, Station, Run
+from aurora.config.metadata.processing import Processing
 from aurora.config import BANDS_DEFAULT_FILE
+from mt_metadata.transfer_functions.processing.aurora import Station, Run
 from mt_metadata.transfer_functions.processing.aurora.window import Window
 from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
 
