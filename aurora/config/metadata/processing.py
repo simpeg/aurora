@@ -7,6 +7,7 @@ Extend the Processing class with some aurora-specific methods
 # =============================================================================
 import pandas as pd
 
+from aurora.time_series.windowing_scheme import window_scheme_from_decimation
 from mt_metadata.transfer_functions.processing.aurora.processing import Processing
 from mth5.utils.helpers import initialize_mth5
 
@@ -47,7 +48,7 @@ class Processing(Processing):
         -------
 
         """
-        window_schemes = [x.windowing_scheme for x in self.decimations]
+        window_schemes = [window_scheme_from_decimation(x) for x in self.decimations]
         data_dict = {}
         data_dict["sample_rate"] = [x.sample_rate for x in window_schemes]
         data_dict["window_duration"] = [x.window_duration for x in window_schemes]

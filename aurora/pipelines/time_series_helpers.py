@@ -6,6 +6,7 @@ import xarray as xr
 
 from aurora.time_series.frequency_domain_helpers import get_fft_harmonics
 from aurora.time_series.windowed_time_series import WindowedTimeSeries
+from aurora.time_series.windowing_scheme import window_scheme_from_decimation
 
 
 def validate_sample_rate(run_ts, expected_sample_rate, tol=1e-4):
@@ -122,7 +123,7 @@ def run_ts_to_stft_scipy(decimation_obj, run_xrds_orig):
         Time series of Fourier coefficients
     """
     run_xrds = apply_prewhitening(decimation_obj, run_xrds_orig)
-    windowing_scheme = decimation_obj.windowing_scheme
+    windowing_scheme = window_scheme_from_decimation(decimation_obj)
 
     stft_obj = xr.Dataset()
     for channel_id in run_xrds.data_vars:
@@ -189,7 +190,7 @@ def truncate_to_clock_zero(decimation_obj, run_xrds):
         if delta_t_seconds == 0:
             pass  # time series start is already clock zero
         else:
-            windowing_scheme = decimation_obj.windowing_scheme
+            windowing_scheme = window_scheme_from_decimation(decimation_obj)
             number_of_steps = delta_t_seconds / windowing_scheme.duration_advance
             n_partial_steps = number_of_steps - np.floor(number_of_steps)
             n_clip = n_partial_steps * windowing_scheme.num_samples_advance
@@ -223,7 +224,7 @@ def run_ts_to_stft(decimation_obj, run_xrds_orig):
     """
     run_xrds = apply_prewhitening(decimation_obj, run_xrds_orig)
     run_xrds = truncate_to_clock_zero(decimation_obj, run_xrds)
-    windowing_scheme = decimation_obj.windowing_scheme
+    windowing_scheme = window_scheme_from_decimation(decimation_obj)
     windowed_obj = windowing_scheme.apply_sliding_window(
         run_xrds, dt=1.0 / decimation_obj.decimation.sample_rate
     )

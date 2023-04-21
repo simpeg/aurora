@@ -444,3 +444,28 @@ def fft_xr_ds(dataset, sample_rate, detrend_type=None, prewhitening=None):
         output_ds.update({channel_id: xrd})
 
     return output_ds
+
+
+def window_scheme_from_decimation(decimation):
+    """
+    Helper function to workaround mt_metadata to not import form aurora
+
+    Parameters
+    ----------
+    decimation: mt_metadata.transfer_function.processing.aurora.decimation_level
+    .DecimationLevel
+
+    Returns
+    -------
+        windowing_scheme aurora.time_series.windowing_scheme.WindowingScheme
+    """
+    from aurora.time_series.windowing_scheme import WindowingScheme
+
+    windowing_scheme = WindowingScheme(
+        taper_family=decimation.window.type,
+        num_samples_window=decimation.window.num_samples,
+        num_samples_overlap=decimation.window.overlap,
+        taper_additional_args=decimation.window.additional_args,
+        sample_rate=decimation.decimation.sample_rate,
+    )
+    return windowing_scheme
