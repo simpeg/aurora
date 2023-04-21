@@ -56,13 +56,14 @@ def create_run_ts_from_synthetic_run(run, df, channel_nomenclature="default"):
     ch_list = []
     for col in df.columns:
         data = df[col].values
-
+        meta_dict = {
+            "component": col,
+            "sample_rate": run.sample_rate,
+            "filter.name": run.filters[col],
+            "time_period.start": run.start,
+        }
         if col in [EX, EY]:
-            meta_dict = {
-                "component": col,
-                "sample_rate": run.sample_rate,
-                "filter.name": run.filters[col],
-            }
+
             chts = ChannelTS(
                 channel_type="electric", data=data, channel_metadata=meta_dict
             )
@@ -72,11 +73,6 @@ def create_run_ts_from_synthetic_run(run, df, channel_nomenclature="default"):
                 chts.channel_metadata.measurement_azimuth = 90.0
 
         elif col in [HX, HY, HZ]:
-            meta_dict = {
-                "component": col,
-                "sample_rate": run.sample_rate,
-                "filter.name": run.filters[col],
-            }
             chts = ChannelTS(
                 channel_type="magnetic", data=data, channel_metadata=meta_dict
             )
@@ -183,7 +179,6 @@ def create_mth5_synthetic_file(
                 runts.plot()
 
             run_group = station_group.add_run(run.id)
-
             run_group.from_runts(runts)
 
     # add filters
@@ -199,6 +194,10 @@ def create_mth5_synthetic_file(
             raise NotImplementedError
 
     m.close_mth5()
+    # Following lines used to visually confirm start/end times were
+    # m.open_mth5(mth5_path, mode="a")
+    # channel_summary_df = m.channel_summary.to_dataframe()
+    # print(channel_summary_df[["start", "end"]])
     return mth5_path
 
 
@@ -282,7 +281,7 @@ def create_test3_h5(
 
 def main():
     file_version = "0.1.0"
-    # file_version="0.2.0"
+    # file_version = "0.2.0"
     create_test1_h5(file_version=file_version)
     create_test1_h5_with_nan(file_version=file_version)
     create_test2_h5(file_version=file_version)
