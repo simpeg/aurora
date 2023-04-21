@@ -1,12 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Apr 21 14:24:40 2023
+
+@author: jpeacock
+"""
+
 # =============================================================================
 # Imports
 # =============================================================================
-from aurora.logging.aurora_logger import setup_logger
 
 # =============================================================================
-
-__version__ = "0.0.5"
-
-LOG_LEVEL = "debug"
-
-logger = setup_logger("aurora", level=LOG_LEVEL)
