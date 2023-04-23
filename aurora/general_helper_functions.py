@@ -67,7 +67,7 @@ def execute_subprocess(cmd, **kwargs):
     exit_status = subprocess.call([cmd], shell=True, **kwargs)
     if exit_status != 0:
         raise Exception("Failed to execute \n {}".format(cmd))
-    return
+    return exit_status
 
 
 def execute_command(cmd, **kwargs):
