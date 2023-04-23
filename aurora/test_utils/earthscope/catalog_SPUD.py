@@ -14,17 +14,18 @@ import pandas as pd
 import subprocess
 import time
 
-TMP_FROM_EMTF = True  #boolean, controls whether emtf_xml is stored as tmp, or archived locally
+TMP_FROM_EMTF = False  #boolean, controls whether emtf_xml is stored as tmp, or archived locally
 
 # def grep_text(fname, ):
 # 	'"'"'"'
+data_dir = pathlib.Path(".")
 input_spud_ids_file = pathlib.Path('0_spud_ids.list')
 output_spud_ids_file = pathlib.Path('1_spud_ids.list')
-# target_dir_emtf = pathlib.Path('spud_emtf_xml')
-# target_dir_data = pathlib.Path('spud_data_xml')
-# target_dir_emtf
-target_dir = pathlib.Path('spud_xml')
-target_dir.mkdir(exist_ok=True, parents=True)
+target_dir_emtf = data_dir.joinpath('spud_xml').joinpath("emtf")
+target_dir_data = data_dir.joinpath('spud_xml').joinpath("data")
+target_dir_emtf.mkdir(exist_ok=True, parents=True)
+target_dir_data.mkdir(exist_ok=True, parents=True)
+
 EMTF_URL = "https://ds.iris.edu/spudservice/emtf"
 DATA_URL = "https://ds.iris.edu/spudservice/data"
 
@@ -42,6 +43,8 @@ def scrape_spud(force_download=False):
 	df["data_id"] = 0
 	df["file_size"] = 0
 	df["fail"] = False
+	df["emtf_xml_path"] = ""
+	df["data_xml_path"] = ""
 	n_rows = len(df)
 
 	print(f"There are {n_rows} spud files")
@@ -54,17 +57,33 @@ def scrape_spud(force_download=False):
 		# if i_row < cutoff:
 		# 	continue
 
-		print(f"{i_row}/{n_rows}, {row.emtf_id}")
+		print(f"Getting {i_row}/{n_rows}, {row.emtf_id}")
 
 		# Get xml from web location, and make a local copy
 		source_url = f"{EMTF_URL}/{row.emtf_id}"
 		if TMP_FROM_EMTF:
-			emtf_file = target_dir.joinpath("tmp.xml")
-		try:
-			get_via_curl(source_url, emtf_file)
-		except:
-			df.at[i_row, "fail"] = True
-			continue
+			out_file_base = "tmp.xml"
+		else:
+			out_file_base = f"{row.emtf_id}.xml"
+
+		emtf_file = target_dir_emtf.joinpath(out_file_base)
+		if TMP_FROM_EMTF:
+			download_emtf = True
+		else:
+			if emtf_file.exists():
+				download_emtf = False
+				print(f"XML emtf_file {emtf_file} already exists - skipping")
+			else:
+				download_emtf = True
+
+		if download_emtf:
+			try:
+				get_via_curl(source_url, emtf_file)
+			except:
+				df.at[i_row, "fail"] = True
+				continue
+
+		df.at[i_row, "emtf_xml_path"] = str(emtf_file)
 
 		# Extract source ID from DATA_URL, and add to df
 		cmd = f"grep 'SourceData id' {emtf_file} | awk -F'"'"'"' '{print $2}'"
@@ -87,11 +106,12 @@ def scrape_spud(force_download=False):
 
 		out_file_base = "_".join([str(row.emtf_id), network, station]) + ".xml"
 		source_url = f"{DATA_URL}/{data_id}"
-		output_xml = target_dir.joinpath(out_file_base)
+		output_xml = target_dir_data.joinpath(out_file_base)
 		if output_xml.exists():
 			if force_download:
 				get_via_curl(source_url, output_xml)
 			else:
+				print(f"XML data_file {output_xml} already exists - skipping")
 				pass
 		else:
 			get_via_curl(source_url, output_xml)
@@ -99,7 +119,7 @@ def scrape_spud(force_download=False):
 		if output_xml.exists():
 			file_size = output_xml.lstat().st_size
 			df.at[i_row, "file_size"] = file_size
-
+			df.at[i_row, "data_xml_path"] = str(emtf_file)
 		print("OK")
 	df.to_csv("spud_summary.csv", index=False)
 
