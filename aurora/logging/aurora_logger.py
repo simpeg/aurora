@@ -96,8 +96,7 @@ def setup_logger(logger_name, fn=None, level="debug"):
             logger.handlers.clear()
 
         logger.propagate = False
-        # log_que = queue.Queue(-1)
-        # que_handler = logging.handlers.QueueHandler(log_que)
+
         # want to add a stream handler for any Info print statements as stdOut
         stream_handler = logging.StreamHandler()
         stream_handler.setFormatter(LOG_FORMAT)
