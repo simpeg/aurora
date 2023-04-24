@@ -119,7 +119,7 @@ def scrape_spud(force_download=False):
 		if output_xml.exists():
 			file_size = output_xml.lstat().st_size
 			df.at[i_row, "file_size"] = file_size
-			df.at[i_row, "data_xml_path"] = str(emtf_file)
+			df.at[i_row, "data_xml_path"] = str(output_xml)
 		print("OK")
 	df.to_csv("spud_summary.csv", index=False)
 
