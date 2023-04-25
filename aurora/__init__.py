@@ -7,6 +7,6 @@ from aurora.logging.aurora_logger import setup_logger
 
 __version__ = "0.0.5"
 
-LOG_LEVEL = "debug"
+# LOG_LEVEL = "info"
 
-logger = setup_logger("aurora", level=LOG_LEVEL)
+# logger = setup_logger("aurora", level=LOG_LEVEL)
