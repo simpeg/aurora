@@ -40,6 +40,7 @@ from aurora.transfer_function.transfer_function_collection import (
 from aurora.transfer_function.TTFZ import TTFZ
 
 from mt_metadata.transfer_functions.core import TF
+from mt_metadata.utils.list_dict import ListDict
 from mth5.utils.mth5_logger import setup_logger
 
 
@@ -191,7 +192,7 @@ def export_tf(
     res_cov = res_cov.rename(renamer_dict)
     tf_cls.residual_covariance = res_cov
 
-    tf_cls.station_metadata._runs = []
+    tf_cls.station_metadata._runs = ListDict()
     tf_cls.station_metadata.from_dict(station_metadata_dict)
     tf_cls.survey_metadata.from_dict(survey_dict)
     return tf_cls
@@ -322,9 +323,7 @@ def process_mth5(
 
         # TFK 1: get clock-zero from data if needed
         if dec_level_config.window.clock_zero_type == "data start":
-            dec_level_config.window.clock_zero = str(
-                tfk.dataset_df.start.min()
-            )
+            dec_level_config.window.clock_zero = str(tfk.dataset_df.start.min())
 
         # Apply STFT to all runs
         local_stfts = []
