@@ -40,6 +40,7 @@ from aurora.transfer_function.transfer_function_collection import (
 from aurora.transfer_function.TTFZ import TTFZ
 
 from mt_metadata.transfer_functions.core import TF
+from mt_metadata.utils.list_dict import ListDict
 from mth5.utils.mth5_logger import setup_logger
 
 
@@ -90,8 +91,11 @@ def make_stft_objects(
         ].channel_scale_factors
     elif station_id == processing_config.stations.remote[0].id:
         scale_factors = (
-            processing_config.stations.remote[0].run_dict[run_id].channel_scale_factors
+            processing_config.stations.remote[0]
+            .run_dict[run_id]
+            .channel_scale_factors
         )
+
     stft_obj = calibrate_stft_obj(
         stft_obj,
         run_obj,
@@ -132,7 +136,9 @@ def process_tf_decimation_level(
     """
     frequency_bands = config.decimations[i_dec_level].frequency_bands_obj()
     tf_header = config.make_tf_header(i_dec_level)
-    transfer_function_obj = TTFZ(tf_header, frequency_bands, processing_config=config)
+    transfer_function_obj = TTFZ(
+        tf_header, frequency_bands, processing_config=config
+    )
 
     transfer_function_obj = process_transfer_functions(
         config,
@@ -168,7 +174,9 @@ def export_tf(
         Transfer function container
     """
     merged_tf_dict = tf_collection.get_merged_dict(channel_nomenclature)
-    channel_nomenclature_dict = channel_nomenclature.to_dict()["channel_nomenclature"]
+    channel_nomenclature_dict = channel_nomenclature.to_dict()[
+        "channel_nomenclature"
+    ]
     tf_cls = TF(channel_nomenclature=channel_nomenclature_dict)
     renamer_dict = {"output_channel": "output", "input_channel": "input"}
     tmp = merged_tf_dict["tf"].rename(renamer_dict)
@@ -184,7 +192,7 @@ def export_tf(
     res_cov = res_cov.rename(renamer_dict)
     tf_cls.residual_covariance = res_cov
 
-    tf_cls.station_metadata.runs = []
+    tf_cls.station_metadata._runs = ListDict()
     tf_cls.station_metadata.from_dict(station_metadata_dict)
     tf_cls.survey_metadata.from_dict(survey_dict)
     return tf_cls
@@ -236,9 +244,11 @@ def update_dataset_df(i_dec_level, tfk, logger):
             run_xrds = row["run_dataarray"].to_dataset("channel")
             decimation = tfk.config.decimations[i_dec_level].decimation
             decimated_xrds = prototype_decimate(decimation, run_xrds)
-            tfk.dataset_df["run_dataarray"].at[i] = decimated_xrds.to_array("channel")
-    logger.debug("DATASET DF UPDATED")
+            tfk.dataset_df["run_dataarray"].at[i] = decimated_xrds.to_array(
+                "channel"
+            )
 
+    logger.debug("DATASET DF UPDATED")
     return
 
 
@@ -287,6 +297,7 @@ def process_mth5(
         )
     else:
         logger_path = Path().cwd()
+
     logger = setup_logger("aurora.pipelines.process_mth5", fn=logger_path)
 
     # Initialize config and mth5s
@@ -313,6 +324,7 @@ def process_mth5(
         # TFK 1: get clock-zero from data if needed
         if dec_level_config.window.clock_zero_type == "data start":
             dec_level_config.window.clock_zero = str(tfk.dataset_df.start.min())
+
         # Apply STFT to all runs
         local_stfts = []
         remote_stfts = []
@@ -320,6 +332,7 @@ def process_mth5(
 
             if not tfk.is_valid_dataset(row, i_dec_level):
                 continue
+
             run_xrds = row["run_dataarray"].to_dataset("channel")
             run_obj = row.mth5_obj.from_reference(row.run_reference)
             stft_obj = make_stft_objects(
@@ -335,6 +348,7 @@ def process_mth5(
                 local_stfts.append(stft_obj)
             elif row.station_id == tfk.config.stations.remote[0].id:
                 remote_stfts.append(stft_obj)
+
         # Merge STFTs
         local_merged_stft_obj = xr.concat(local_stfts, "time")
 
@@ -342,6 +356,7 @@ def process_mth5(
             remote_merged_stft_obj = xr.concat(remote_stfts, "time")
         else:
             remote_merged_stft_obj = None
+
         # FC TF Interface here (see Note #3)
 
         # Could downweight bad FCs here
@@ -352,13 +367,16 @@ def process_mth5(
             local_merged_stft_obj,
             remote_merged_stft_obj,
         )
-        tf_obj.apparent_resistivity(tfk.config.channel_nomenclature, units=units)
+        tf_obj.apparent_resistivity(
+            tfk.config.channel_nomenclature, units=units
+        )
         tf_dict[i_dec_level] = tf_obj
 
         if show_plot:
             from aurora.sandbox.plot_helpers import plot_tf_obj
 
             plot_tf_obj(tf_obj, out_filename="out")
+
     tf_collection = TransferFunctionCollection(
         tf_dict=tf_dict, processing_config=tfk.config
     )
@@ -368,6 +386,7 @@ def process_mth5(
 
     if z_file_path:
         tf_collection.write_emtf_z_file(z_file_path, run_obj=local_run_obj)
+
     if return_collection:
         # this is now really only to be used for debugging and may be deprecated soon
         tfk_dataset.close_mths_objs()
@@ -386,6 +405,7 @@ def process_mth5(
             ].survey.unique()[0]
             survey_obj = local_mth5_obj.get_survey(survey_id)
             survey_dict = survey_obj.metadata.to_dict()
+
         tf_cls = export_tf(
             tf_collection,
             tfk.config.channel_nomenclature,
