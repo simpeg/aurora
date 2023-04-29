@@ -25,7 +25,7 @@ from mth5.helpers import close_open_files
 
 class TestSyntheticProcessing(unittest.TestCase):
     """
-    Runs several synthetic processing tests from config creation to tf_collection.
+    Runs several synthetic processing tests from config creation to tf_cls.
 
     """
 
@@ -89,12 +89,11 @@ class TestSyntheticProcessing(unittest.TestCase):
 
         """
         z_file_path = AURORA_RESULTS_PATH.joinpath("syn1-scaled.zss")
-        tf_collection = process_synthetic_1(
+        tf_cls = process_synthetic_1(
             z_file_path=z_file_path,
-            return_collection=True,
             test_scale_factor=True,
         )
-        assert tf_collection.tf_dict is not None
+        assert tf_cls.transfer_function.data.shape == (25, 3, 2)
 
     def test_simultaneous_regression(self):
         z_file_path = AURORA_RESULTS_PATH.joinpath("syn1_simultaneous_estimate.zss")
@@ -110,11 +109,7 @@ class TestSyntheticProcessing(unittest.TestCase):
         xml_file_name = AURORA_RESULTS_PATH.joinpath("syn2.xml")
         tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
 
-    def test_can_process_remote_reference_data_to_tf_collection(self):
-        tf_collection = process_synthetic_1r2(return_collection=True)
-        assert tf_collection.tf_dict is not None
-
-    def test_can_process_remote_reference_data_to_tf_class(self):
+    def test_can_process_remote_reference_data(self):
         tf_cls = process_synthetic_1r2(channel_nomenclature="default")
         xml_file_base = "syn12rr_mth5-010.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
@@ -273,9 +268,10 @@ def main():
     """
     Testing the processing of synthetic data
     """
-    tmp = TestSyntheticProcessing()
-    tmp.setUp()
-    tmp.test_no_crash_with_too_many_decimations()
+    # tmp = TestSyntheticProcessing()
+    # tmp.setUp()
+    # tmp.test_no_crash_with_too_many_decimations()
+    # tmp.test_can_use_scale_factor_dictionary()
     unittest.main()
 
 
