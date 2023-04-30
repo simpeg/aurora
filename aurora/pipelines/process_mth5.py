@@ -160,6 +160,8 @@ def export_tf(
     tf_cls: mt_metadata.transfer_functions.core.TF
         Transfer function container
     """
+    from mt_metadata.utils.list_dict import ListDict
+
     merged_tf_dict = tf_collection.get_merged_dict(channel_nomenclature)
     channel_nomenclature_dict = channel_nomenclature.to_dict()["channel_nomenclature"]
     tf_cls = TF(channel_nomenclature=channel_nomenclature_dict)
@@ -177,7 +179,7 @@ def export_tf(
     res_cov = res_cov.rename(renamer_dict)
     tf_cls.residual_covariance = res_cov
 
-    tf_cls.station_metadata._runs = []
+    tf_cls.station_metadata._runs = ListDict()
     tf_cls.station_metadata.from_dict(station_metadata_dict)
     tf_cls.survey_metadata.from_dict(survey_dict)
     return tf_cls
