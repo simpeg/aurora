@@ -146,7 +146,6 @@ class KernelDataset:
         if remote_station_id:
             cond = df.station_id == remote_station_id
             df.remote = cond
-
         self.df = df
         if remote_station_id:
             self.restrict_run_intervals_to_simultaneous()
@@ -328,7 +327,11 @@ class KernelDataset:
             run_ts = run_obj.to_runts(start=row.start, end=row.end)
             xr_ds = run_ts.dataset
             self.df["run_dataarray"].at[i] = xr_ds.to_array("channel")
-        print("DATASET DF POPULATED")
+        ## need to close the MTH5's here, in the future should use with to be
+        ## sure the context manager closes automatically on exit.
+        for m_obj in mth5_objs.values():
+            m_obj.close_mth5()
+        print("DATASET POPULATED")
 
     def add_columns_for_processing(self, mth5_objs):
         """
@@ -457,7 +460,6 @@ def select_station_runs(
             drop_df = df[cond1 & ~cond2]
         else:
             drop_df = df[cond1 & cond2]
-
         df.drop(drop_df.index, inplace=True)
         df.reset_index(drop=True, inplace=True)
     return df
