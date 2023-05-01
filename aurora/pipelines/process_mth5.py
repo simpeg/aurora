@@ -290,6 +290,8 @@ def process_mth5(
     logger = setup_logger("aurora.pipelines.process_mth5", fn=logger_path)
 
     # Initialize config and mth5s
+    ## Use context manager 'with' such that MTH5's are closed if something
+    ## fails.
     with tfk_dataset:
         tfk = TransferFunctionKernel(dataset=tfk_dataset, config=config)
         tfk.make_processing_summary()
@@ -302,7 +304,7 @@ def process_mth5(
 
         logger.info(
             f"Processing config indicates {len(tfk.config.decimations)} "
-            f"decimation levels "
+            "decimation levels "
         )
 
         tf_dict = {}
