@@ -3,12 +3,11 @@ import pandas as pd
 import psutil
 
 from aurora.pipelines.helpers import initialize_config
-from mth5.utils.mth5_logger import setup_logger
+from loguru import logger
 
 
 class TransferFunctionKernel(object):
     def __init__(self, dataset=None, config=None):
-        self.logger = setup_logger(f"{__name__}.{self.__class__.__name__}")
         processing_config = initialize_config(config)
         self._config = processing_config
         self._dataset = dataset
@@ -57,15 +56,11 @@ class TransferFunctionKernel(object):
         decimation_info = self.config.decimation_info()
         for i_dec, dec_factor in decimation_info.items():
             tmp[i_dec] = dec_factor
-        tmp = tmp.melt(
-            id_vars=id_vars, value_name="dec_factor", var_name="dec_level"
-        )
+        tmp = tmp.melt(id_vars=id_vars, value_name="dec_factor", var_name="dec_level")
         sortby = ["survey", "station_id", "run_id", "start", "dec_level"]
         tmp.sort_values(by=sortby, inplace=True)
         tmp.reset_index(drop=True, inplace=True)
-        tmp.drop(
-            "sample_rate", axis=1, inplace=True
-        )  # not valid for decimated data
+        tmp.drop("sample_rate", axis=1, inplace=True)  # not valid for decimated data
 
         # Add window info
         group_by = [
@@ -77,11 +72,9 @@ class TransferFunctionKernel(object):
         groups = []
         grouper = tmp.groupby(group_by)
         for group, df in grouper:
-            self.logger.debug(group)
-            self.logger.debug(df.to_string())
-            assert (
-                df.dec_level.diff()[1:] == 1
-            ).all()  # dec levels increment by 1
+            logger.debug(group)
+            logger.debug(df.to_string())
+            assert (df.dec_level.diff()[1:] == 1).all()  # dec levels increment by 1
             assert df.dec_factor.iloc[0] == 1
             assert df.dec_level.iloc[0] == 0
             # df.sample_rate /= np.cumprod(df.dec_factor)  # better to take from config
@@ -95,16 +88,14 @@ class TransferFunctionKernel(object):
                     num_samples_window=row.num_samples_window,
                     num_samples_overlap=row.num_samples_overlap,
                 )
-                num_windows[i] = ws.available_number_of_windows(
-                    row.num_samples
-                )
+                num_windows[i] = ws.available_number_of_windows(row.num_samples)
             df["num_stft_windows"] = num_windows
             groups.append(df)
 
             # tmp.loc[df.index, "sample_rate"] = df.sample_rate
         processing_summary = pd.concat(groups)
         processing_summary.reset_index(drop=True, inplace=True)
-        self.logger.debug(processing_summary.to_string())
+        logger.debug(processing_summary.to_string())
         self._processing_summary = processing_summary
         return processing_summary
 
@@ -153,14 +144,11 @@ class TransferFunctionKernel(object):
         if not self.config.stations.remote:
             for decimation in self.config.decimations:
                 if decimation.estimator.engine == "RME_RR":
-                    self.logger.warning(
-                        "No RR station specified, switching RME_RR to RME"
-                    )
+                    logger.warning("No RR station specified, switching RME_RR to RME")
                     decimation.estimator.engine = "RME"
-
         # Make sure that a local station is defined
         if not self.config.stations.local.id:
-            self.logger.warning(
+            logger.warning(
                 "Local station not specified."
                 "Setting local station from Kernel Dataset"
             )
@@ -184,10 +172,8 @@ class TransferFunctionKernel(object):
         valid_levels = tmp.dec_level.unique()
 
         dec_levels = [x for x in self.config.decimations]
-        dec_levels = [
-            x for x in dec_levels if x.decimation.level in valid_levels
-        ]
-        self.logger.debug(
+        dec_levels = [x for x in dec_levels if x.decimation.level in valid_levels]
+        logger.debug(
             f"After validation there are {len(dec_levels)} valid decimation levels"
         )
         return dec_levels
@@ -239,18 +225,14 @@ class TransferFunctionKernel(object):
         total_memory = psutil.virtual_memory().total
 
         # print the total amount of RAM in GB
-        self.logger.info(f"Total memory: {total_memory / (1024 ** 3):.2f} GB")
+        logger.info(f"Total memory: {total_memory / (1024 ** 3):.2f} GB")
         num_samples = self.dataset_df.duration * self.dataset_df.sample_rate
         total_samples = num_samples.sum()
         total_bytes = total_samples * bytes_per_sample
-        self.logger.info(
-            f"Total Bytes of Raw Data: {total_bytes / (1024 ** 3):.3f} GB"
-        )
+        logger.info(f"Total Bytes of Raw Data: {total_bytes / (1024 ** 3):.3f} GB")
 
         ram_fraction = 1.0 * total_bytes / total_memory
-        self.logger.info(
-            f"Raw Data will use: {100 * ram_fraction:.3f} % of memory"
-        )
+        logger.info(f"Raw Data will use: {100 * ram_fraction:.3f} % of memory")
 
         # Check a condition
         if total_bytes > memory_threshold * total_memory:

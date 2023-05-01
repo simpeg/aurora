@@ -50,6 +50,7 @@ p = cc.create_from_kernel_dataset(kernel_dataset, emtf_band_file=emtf_band_setup
 import copy
 import pandas as pd
 from mt_metadata.utils.list_dict import ListDict
+from loguru import logger
 
 
 class KernelDataset:
@@ -306,7 +307,7 @@ class KernelDataset:
     @property
     def sample_rate(self):
         if self.num_sample_rates != 1:
-            print("Aurora does not yet process data from mixed sample rates")
+            logger.error("Aurora does not yet process data from mixed sample rates")
             raise NotImplementedError
         sample_rate = self.df.sample_rate.unique()[0]
         return sample_rate
@@ -334,7 +335,7 @@ class KernelDataset:
             run_ts = run_obj.to_runts(start=row.start, end=row.end)
             xr_ds = run_ts.dataset
             self.df["run_dataarray"].at[i] = xr_ds.to_array("channel")
-        print("DATASET POPULATED")
+        logger.info("DATASET POPULATED")
 
     def add_columns_for_processing(self, mth5_objs):
         """

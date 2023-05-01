@@ -7,6 +7,8 @@ import xarray as xr
 from aurora.time_series.frequency_domain_helpers import get_fft_harmonics
 from aurora.time_series.windowed_time_series import WindowedTimeSeries
 
+from loguru import logger
+
 
 def validate_sample_rate(run_ts, expected_sample_rate, tol=1e-4):
     """
@@ -21,14 +23,16 @@ def validate_sample_rate(run_ts, expected_sample_rate, tol=1e-4):
 
     """
     if run_ts.sample_rate != expected_sample_rate:
-        print(
+        logger.warning(
             f"sample rate in run time series {run_ts.sample_rate} and "
             f"processing decimation_obj {expected_sample_rate} do not match"
         )
         delta = run_ts.sample_rate - expected_sample_rate
         if np.abs(delta) > tol:
-            print(f"Delta sample rate {delta} > {tol} tolerance")
-            print("TOL should be a percentage")
+            logger.error(
+                f"Delta sample rate {delta} > {tol} tolerance TOL "
+                "should be a percentage"
+            )
             raise Exception
 
 
@@ -54,12 +58,12 @@ def apply_prewhitening(decimation_obj, run_xrds_input):
     """
     if not decimation_obj.prewhitening_type:
         return run_xrds_input
-
     if decimation_obj.prewhitening_type == "first difference":
         run_xrds = run_xrds_input.differentiate("time")
-
     else:
-        print(f"{decimation_obj.prewhitening_type} pre-whitening not implemented")
+        logger.error(
+            f"{decimation_obj.prewhitening_type} pre-whitening not implemented"
+        )
         raise NotImplementedError
     return run_xrds
 
@@ -81,7 +85,6 @@ def apply_recoloring(decimation_obj, stft_obj):
     """
     if not decimation_obj.prewhitening_type:
         return stft_obj
-
     if decimation_obj.prewhitening_type == "first difference":
         # replace below with decimation_obj.get_fft_harmonics() ?
         freqs = get_fft_harmonics(
@@ -101,9 +104,10 @@ def apply_recoloring(decimation_obj, stft_obj):
     #     MA = 4 # add this to processing config
 
     else:
-        print(f"{decimation_obj.prewhitening_type} recoloring not yet implemented")
+        logger.error(
+            f"{decimation_obj.prewhitening_type} recoloring not yet implemented"
+        )
         raise NotImplementedError
-
     return stft_obj
 
 
@@ -153,7 +157,6 @@ def run_ts_to_stft_scipy(decimation_obj, run_xrds_orig):
             coords={"frequency": ff, "time": time_axis},
         )
         stft_obj.update({channel_id: xrd})
-
     stft_obj = apply_recoloring(decimation_obj, stft_obj)
 
     return stft_obj
@@ -196,7 +199,7 @@ def truncate_to_clock_zero(decimation_obj, run_xrds):
             n_clip = int(np.round(n_clip))
             t_clip = run_xrds.time[n_clip]
             cond1 = run_xrds.time >= t_clip
-            print(
+            logger.info(
                 f"dropping {n_clip} samples to agree with "
                 f"{decimation_obj.window.clock_zero_type} clock zero {clock_zero}"
             )
@@ -229,7 +232,6 @@ def run_ts_to_stft(decimation_obj, run_xrds_orig):
     )
     if not np.prod(windowed_obj.to_array().data.shape):
         raise ValueError
-
     windowed_obj = WindowedTimeSeries.detrend(data=windowed_obj, detrend_type="linear")
     tapered_obj = windowed_obj * windowing_scheme.taper
     # stft_obj = WindowedTimeSeries.apply_stft(data=tapered_obj,
@@ -270,7 +272,7 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
         mth5_channel = run_obj.get_channel(channel_id)
         channel_filter = mth5_channel.channel_response_filter
         if not channel_filter.filters_list:
-            print("WARNING UNEXPECTED CHANNEL WITH NO FILTERS")
+            logger.warning("UNEXPECTED CHANNEL WITH NO FILTERS")
             if channel_id == "hy":
                 channel_filter = run_obj.get_channel("hx").channel_response_filter
         calibration_response = channel_filter.complex_response(stft_obj.frequency.data)
@@ -281,8 +283,7 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
                 channel_scale_factor = 1.0
             calibration_response /= channel_scale_factor
         if units == "SI":
-            print("Warning: SI Units are not robustly supported issue #36")
-
+            logger.warning("SI Units are not robustly supported issue #36")
         stft_obj[channel_id].data /= calibration_response
     return stft_obj
 
@@ -315,7 +316,6 @@ def prototype_decimate(config, run_xrds):
     new_data = np.full((num_observations, num_channels), np.nan)
     for i_ch, ch_label in enumerate(channel_labels):
         new_data[:, i_ch] = ssig.decimate(run_xrds[ch_label], int(config.factor))
-
     xr_da = xr.DataArray(
         new_data,
         dims=["time", "channel"],
