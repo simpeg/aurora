@@ -111,6 +111,13 @@ class KernelDataset:
             "duration",
         ]
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args, **kwargs):
+        self.close_mths_objs()
+        return False
+
     def clone(self):
         return copy.deepcopy(self)
 
