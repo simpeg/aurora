@@ -72,8 +72,6 @@ class TransferFunctionKernel(object):
         groups = []
         grouper = tmp.groupby(group_by)
         for group, df in grouper:
-            logger.debug(group)
-            logger.debug(df.to_string())
             assert (df.dec_level.diff()[1:] == 1).all()  # dec levels increment by 1
             assert df.dec_factor.iloc[0] == 1
             assert df.dec_level.iloc[0] == 0
@@ -95,7 +93,6 @@ class TransferFunctionKernel(object):
             # tmp.loc[df.index, "sample_rate"] = df.sample_rate
         processing_summary = pd.concat(groups)
         processing_summary.reset_index(drop=True, inplace=True)
-        logger.debug(processing_summary.to_string())
         self._processing_summary = processing_summary
         return processing_summary
 

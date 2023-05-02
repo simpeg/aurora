@@ -238,7 +238,7 @@ def update_dataset_df(i_dec_level, tfk, logger):
             decimation = tfk.config.decimations[i_dec_level].decimation
             decimated_xrds = prototype_decimate(decimation, run_xrds)
             tfk.dataset_df["run_dataarray"].at[i] = decimated_xrds.to_array("channel")
-    logger.debug("DATASET DF UPDATED")
+    logger.debug("DATASET UPDATED")
     return
 
 
