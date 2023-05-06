@@ -5,6 +5,9 @@ Python version of Laura's bash script to scrape SPUD emtf xml
 if 127 is returned you may need to install curl in your environment
 If you need a file with the IRIS mda string, i_row=6000 has one.
 
+There are two potential sources for SPUD XML data.
+
+
 
 """
 import pathlib
@@ -14,17 +17,20 @@ import pandas as pd
 import subprocess
 import time
 
-TMP_FROM_EMTF = False  #boolean, controls whether emtf_xml is stored as tmp, or archived locally
 
+from aurora.test_utils.earthscope.helpers import SPUD_DATA_PATH
+from aurora.test_utils.earthscope.helpers import SPUD_EMTF_PATH
+from aurora.test_utils.earthscope.helpers import SPUD_XML_CSV
+
+TMP_FROM_EMTF = False  #boolean, controls whether emtf_xml is stored as tmp, or archived locally
 # def grep_text(fname, ):
 # 	'"'"'"'
-data_dir = pathlib.Path(".")
+
 input_spud_ids_file = pathlib.Path('0_spud_ids.list')
-output_spud_ids_file = pathlib.Path('1_spud_ids.list')
-target_dir_emtf = data_dir.joinpath('spud_xml').joinpath("emtf")
-target_dir_data = data_dir.joinpath('spud_xml').joinpath("data")
-target_dir_emtf.mkdir(exist_ok=True, parents=True)
-target_dir_data.mkdir(exist_ok=True, parents=True)
+# output_spud_ids_file = pathlib.Path('1_spud_ids.list')
+target_dir_data = SPUD_DATA_PATH
+target_dir_emtf = SPUD_EMTF_PATH
+
 
 EMTF_URL = "https://ds.iris.edu/spudservice/emtf"
 DATA_URL = "https://ds.iris.edu/spudservice/data"
@@ -39,6 +45,12 @@ def get_via_curl(source, target):
 	return
 
 def scrape_spud(force_download=False):
+	"""
+
+	:param force_download:
+	:return:
+	"""
+	# Read in list of spud emtf_ids and initialize a dataframe
 	df = pd.read_csv(input_spud_ids_file, names=["emtf_id", ])
 	df["data_id"] = 0
 	df["file_size"] = 0
@@ -49,9 +61,10 @@ def scrape_spud(force_download=False):
 
 	print(f"There are {n_rows} spud files")
 
+	# Iterate over rows of dataframe (spud files)
 	for i_row, row in df.iterrows():
 		if np.mod(i_row, 20) == 0:
-			df.to_csv("spud_summary.csv", index=False)
+			df.to_csv(SPUD_XML_CSV, index=False)
 		# Uncomment lines below to enable fast-forward
 		# cutoff = 11# 6000 #2000 # 11
 		# if i_row < cutoff:
@@ -121,7 +134,7 @@ def scrape_spud(force_download=False):
 			df.at[i_row, "file_size"] = file_size
 			df.at[i_row, "data_xml_path"] = str(output_xml)
 		print("OK")
-	df.to_csv("spud_summary.csv", index=False)
+	df.to_csv(SPUD_XML_CSV, index=False)
 
 def main():
 	t0 = time.time()
