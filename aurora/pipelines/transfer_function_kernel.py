@@ -200,7 +200,7 @@ class TransferFunctionKernel(object):
         cond3 = self.processing_summary.run_id == row.run_id
         cond4 = self.processing_summary.dec_level == i_dec
         cond5 = self.processing_summary.start == row.start
-
+        # 20230506 - added additional cond - issue #260
         cond = cond1 & cond2 & cond3 & cond4 & cond5
         processing_row = self.processing_summary[cond]
         assert len(processing_row) == 1
