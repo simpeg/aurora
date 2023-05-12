@@ -50,6 +50,7 @@ p = cc.create_from_kernel_dataset(kernel_dataset, emtf_band_file=emtf_band_setup
 import copy
 import pandas as pd
 from mt_metadata.utils.list_dict import ListDict
+from loguru import logger
 
 
 class KernelDataset:
@@ -111,6 +112,13 @@ class KernelDataset:
             "duration",
         ]
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args, **kwargs):
+        self.close_mths_objs()
+        return False
+
     def clone(self):
         return copy.deepcopy(self)
 
@@ -146,7 +154,6 @@ class KernelDataset:
         if remote_station_id:
             cond = df.station_id == remote_station_id
             df.remote = cond
-
         self.df = df
         if remote_station_id:
             self.restrict_run_intervals_to_simultaneous()
@@ -300,7 +307,7 @@ class KernelDataset:
     @property
     def sample_rate(self):
         if self.num_sample_rates != 1:
-            print("Aurora does not yet process data from mixed sample rates")
+            logger.error("Aurora does not yet process data from mixed sample rates")
             raise NotImplementedError
         sample_rate = self.df.sample_rate.unique()[0]
         return sample_rate
@@ -328,7 +335,7 @@ class KernelDataset:
             run_ts = run_obj.to_runts(start=row.start, end=row.end)
             xr_ds = run_ts.dataset
             self.df["run_dataarray"].at[i] = xr_ds.to_array("channel")
-        print("DATASET DF POPULATED")
+        logger.info("DATASET POPULATED")
 
     def add_columns_for_processing(self, mth5_objs):
         """
@@ -457,7 +464,6 @@ def select_station_runs(
             drop_df = df[cond1 & ~cond2]
         else:
             drop_df = df[cond1 & cond2]
-
         df.drop(drop_df.index, inplace=True)
         df.reset_index(drop=True, inplace=True)
     return df

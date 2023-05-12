@@ -20,6 +20,7 @@ from mth5.utils.helpers import initialize_mth5
 
 from .standards import SCHEMA_FN_PATHS
 from . import DecimationLevel, Stations, Band, ChannelNomenclature
+from loguru import logger
 
 
 # =============================================================================
@@ -50,7 +51,6 @@ class Processing(Base):
             elif isinstance(item, DecimationLevel):
                 level = item
             return_list.append(level)
-
         return return_list
 
     @decimations.setter
@@ -65,7 +65,6 @@ class Processing(Base):
 
         if isinstance(value, DecimationLevel):
             self._decimations.append(value)
-
         elif isinstance(value, dict):
             self._decimations = []
             for key, obj in value.items():
@@ -75,13 +74,11 @@ class Processing(Base):
                     )
                 else:
                     self._decimations.append(obj)
-
         elif isinstance(value, list):
             self._decimations = []
             for obj in value:
                 if isinstance(value, DecimationLevel):
                     self._decimations.append(obj)
-
                 elif isinstance(obj, dict):
                     level = DecimationLevel()
                     level.from_dict(obj)
@@ -90,7 +87,6 @@ class Processing(Base):
                     raise TypeError(
                         f"List entry must be a DecimationLevel or dict object not {type(obj)}"
                     )
-
         else:
             raise TypeError(f"Not sure what to do with {type(value)}")
 
@@ -119,15 +115,12 @@ class Processing(Base):
 
         try:
             decimation = self.decimations_dict[level]
-
         except KeyError:
             raise KeyError(f"Could not find {level} in decimations.")
-
         if isinstance(decimation, dict):
             decimation_level = DecimationLevel()
             decimation_level.from_dict(decimation)
             return decimation_level
-
         return decimation
 
     def add_decimation_level(self, decimation_level):
@@ -142,10 +135,8 @@ class Processing(Base):
         if isinstance(decimation_level, dict):
             obj = DecimationLevel()
             obj.from_dict(decimation_level)
-
         else:
             obj = decimation_level
-
         self._decimations.append(obj)
 
     @property
@@ -172,7 +163,6 @@ class Processing(Base):
         num_decimation_levels = len(band_edges_dict)
         if isinstance(num_samples_window, int):
             num_samples_window = num_decimation_levels * [num_samples_window]
-
         for i_level in sorted(band_edges_dict.keys()):
             band_edges = band_edges_dict[i_level]
             if i_level in [0, "0"]:
@@ -201,7 +191,7 @@ class Processing(Base):
                         index_max=indices[-1],
                     )
                 except IndexError:
-                    print("WHAAAAAAA?")
+                    logger.error("WHAAAAAAA?")
                 # now refine frequency edges based on "canonical" or "exact"
                 # self.decimations_dict[i_level].add_band(band)
                 decimation_obj.add_band(band)
@@ -253,13 +243,14 @@ class Processing(Base):
         if not self.stations.remote:
             for decimation in self.decimations:
                 if decimation.estimator.engine == "RME_RR":
-                    print("No RR station specified, switching RME_RR to RME")
+                    logger.info("No RR station specified, switching RME_RR to RME")
                     decimation.estimator.engine = "RME"
-
         # Make sure that a local station is defined
         if not self.stations.local.id:
-            print("WARNING: Local station not specified")
-            print("Local station should be set from Kernel Dataset")
+            logger.warning(
+                "Local station not specified Local station should be set "
+                "from Kernel Dataset"
+            )
             self.stations.from_dataset_dataframe(kernel_dataset.df)
 
     def initialize_mth5s(self):
@@ -278,11 +269,9 @@ class Processing(Base):
             remote_mth5_obj = initialize_mth5(remote_path, mode="r")
         else:
             remote_mth5_obj = None
-
         mth5_objs = {self.stations.local.id: local_mth5_obj}
         if self.stations.remote:
             mth5_objs[self.stations.remote[0].id] = remote_mth5_obj
-
         return mth5_objs
 
     def window_scheme(self, as_type="df"):
@@ -309,7 +298,7 @@ class Processing(Base):
             df = pd.DataFrame(data=data_dict)
             return df
         else:
-            print(f"unexpected rtype for window_scheme {as_type}")
+            logger.error(f"unexpected rtype for window_scheme {as_type}")
             raise TypeError
 
     def decimation_info(self):
