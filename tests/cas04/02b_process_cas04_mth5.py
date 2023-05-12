@@ -167,7 +167,7 @@ def process_station_runs(local_station_id, remote_station_id="", station_runs={}
     )
     xml_file_base = f"{tmp_station_runs.label}.xml"
     xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
-    tf_result.write_tf_file(fn=xml_file_name, file_type="emtfxml")
+    tf_result.write(fn=xml_file_name, file_type="emtfxml")
     return tf_result
 
 
