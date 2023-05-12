@@ -121,7 +121,6 @@ class TestSyntheticProcessing(unittest.TestCase):
         tf_cls.write(
             fn=xml_file_name,
             file_type="emtfxml",
-            channel_nomenclature="default",
         )
 
     def test_can_process_remote_reference_data_with_channel_nomenclature(self):
@@ -131,7 +130,6 @@ class TestSyntheticProcessing(unittest.TestCase):
         tf_cls.write(
             fn=xml_file_name,
             file_type="emtfxml",
-            channel_nomenclature="LEMI34",
         )
 
 
@@ -275,6 +273,7 @@ def main():
     """
     # tmp = TestSyntheticProcessing()
     # tmp.setUp()
+    # tmp.test_can_process_remote_reference_data_with_channel_nomenclature()
     # tmp.test_no_crash_with_too_many_decimations()
     unittest.main()
 
