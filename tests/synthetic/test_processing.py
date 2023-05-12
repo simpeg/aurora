@@ -241,7 +241,9 @@ def process_synthetic_2():
 
 
 def process_synthetic_1r2(
-    config_keyword="test1r2", channel_nomenclature="default", return_collection=False
+    config_keyword="test1r2",
+    channel_nomenclature="default",
+    return_collection=False,
 ):
     mth5_path = create_test12rr_h5(channel_nomenclature=channel_nomenclature)
     mth5_paths = [
