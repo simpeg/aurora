@@ -41,7 +41,7 @@ from aurora.transfer_function.TTFZ import TTFZ
 
 from mt_metadata.transfer_functions.core import TF
 from mt_metadata.utils.list_dict import ListDict
-from mth5.utils.mth5_logger import setup_logger
+from loguru import logger
 
 
 # =============================================================================
@@ -298,7 +298,7 @@ def process_mth5(
     else:
         logger_path = Path().cwd()
 
-    logger = setup_logger("aurora.pipelines.process_mth5", fn=logger_path)
+    logger.add(logger_path)
 
     # Initialize config and mth5s
     tfk = TransferFunctionKernel(dataset=tfk_dataset, config=config)
