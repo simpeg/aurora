@@ -42,18 +42,18 @@ class TestSyntheticProcessing(unittest.TestCase):
         tf_cls = process_synthetic_1(
             config_keyword="test1_tfk", z_file_path=z_file_path
         )
-        tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
+        tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
         xml_file_base = "syn1r2_tfk.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
         tf_cls = process_synthetic_1r2(config_keyword="test1r2_tfk")
-        tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
+        tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
     def test_can_output_tf_class_and_write_tf_xml(self):
         tf_cls = process_synthetic_1(file_version=self.file_version)
         xml_file_base = "syn1_mth5-010.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
-        tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
+        tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
     def test_can_use_channel_nomenclature(self):
         channel_nomencalture = "LEMI12"
@@ -65,7 +65,7 @@ class TestSyntheticProcessing(unittest.TestCase):
         )
         xml_file_base = f"syn1_mth5-{self.file_version}_{channel_nomencalture}.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
-        tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
+        tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
     def test_can_use_mth5_file_version_020(self):
         file_version = "0.2.0"
@@ -73,7 +73,7 @@ class TestSyntheticProcessing(unittest.TestCase):
         tf_cls = process_synthetic_1(z_file_path=z_file_path, file_version=file_version)
         xml_file_base = f"syn1_mth5v{file_version}.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
-        tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
+        tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
     def test_can_use_scale_factor_dictionary(self):
         """
@@ -103,12 +103,12 @@ class TestSyntheticProcessing(unittest.TestCase):
         )
         xml_file_base = "syn1_simultaneous_estimate.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
-        tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
+        tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
     def test_can_process_other_station(self):
         tf_cls = process_synthetic_2()
         xml_file_name = AURORA_RESULTS_PATH.joinpath("syn2.xml")
-        tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
+        tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
     def test_can_process_remote_reference_data_to_tf_collection(self):
         tf_collection = process_synthetic_1r2(return_collection=True)
@@ -118,20 +118,18 @@ class TestSyntheticProcessing(unittest.TestCase):
         tf_cls = process_synthetic_1r2(channel_nomenclature="default")
         xml_file_base = "syn12rr_mth5-010.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
-        tf_cls.write_tf_file(
+        tf_cls.write(
             fn=xml_file_name,
             file_type="emtfxml",
-            channel_nomenclature="default",
         )
 
     def test_can_process_remote_reference_data_with_channel_nomenclature(self):
         tf_cls = process_synthetic_1r2(channel_nomenclature="LEMI34")
         xml_file_base = "syn12rr_mth5-010_LEMI34.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
-        tf_cls.write_tf_file(
+        tf_cls.write(
             fn=xml_file_name,
             file_type="emtfxml",
-            channel_nomenclature="LEMI34",
         )
 
 
@@ -275,6 +273,7 @@ def main():
     """
     # tmp = TestSyntheticProcessing()
     # tmp.setUp()
+    # tmp.test_can_process_remote_reference_data_with_channel_nomenclature()
     # tmp.test_no_crash_with_too_many_decimations()
     unittest.main()
 

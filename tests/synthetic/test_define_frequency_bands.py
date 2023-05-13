@@ -38,9 +38,7 @@ def test_can_declare_frequencies_directly_in_config():
     kernel_dataset.from_run_summary(run_summary, "test1")
 
     cc = ConfigCreator()
-    cfg1 = cc.create_from_kernel_dataset(
-        kernel_dataset, estimator={"engine": "RME"}
-    )
+    cfg1 = cc.create_from_kernel_dataset(kernel_dataset, estimator={"engine": "RME"})
 
     # Default Band edges, corresponds to DEFAULT_BANDS_FILE
     band_edges = cfg1.band_edges_dict
@@ -53,9 +51,9 @@ def test_can_declare_frequencies_directly_in_config():
     )
 
     tf_cls1 = process_mth5(cfg1, kernel_dataset)
-    tf_cls1.write_tf_file(fn="cfg1.xml", file_type="emtfxml")
+    tf_cls1.write(fn="cfg1.xml", file_type="emtfxml")
     tf_cls2 = process_mth5(cfg2, kernel_dataset)
-    tf_cls2.write_tf_file(fn="cfg2.xml", file_type="emtfxml")
+    tf_cls2.write(fn="cfg2.xml", file_type="emtfxml")
     assert tf_cls2 == tf_cls1
 
 
