@@ -78,7 +78,7 @@ def test_processing(z_file_path=None):
         z_file_path=z_file_path,
     )
 
-    # tf_cls.write_tf_file(fn="emtfxml_test.xml", file_type="emtfxml")
+    # tf_cls.write(fn="emtfxml_test.xml", file_type="emtfxml")
     return tf_cls
 
 

@@ -66,7 +66,7 @@ class TestMultiRunProcessing(unittest.TestCase):
             )
             xml_file_base = f"syn3_{run_id}.xml"
             xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
-            tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
+            tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
     def test_all_runs(self):
         close_open_files()
@@ -88,7 +88,7 @@ class TestMultiRunProcessing(unittest.TestCase):
             z_file_path=z_file_path,
         )
         xml_file_name = AURORA_RESULTS_PATH.joinpath("syn3_all.xml")
-        tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
+        tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
     def test_works_with_truncated_run(self):
         """
@@ -121,7 +121,7 @@ class TestMultiRunProcessing(unittest.TestCase):
             z_file_path=z_file_path,
         )
         xml_file_name = AURORA_RESULTS_PATH.joinpath("syn3_all_truncated_run.xml")
-        tf_cls.write_tf_file(fn=xml_file_name, file_type="emtfxml")
+        tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
 
 def main():
