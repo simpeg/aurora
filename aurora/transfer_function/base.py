@@ -57,6 +57,7 @@ class TransferFunction(Base):
         frequency_bands: aurora.time_series.frequency_band.FrequencyBands
             frequency bands object
         """
+        self._emtf_tf_header = None
         self.decimation_level_id = decimation_level_id
         self.frequency_bands = frequency_bands
         self.num_segments = None
@@ -66,16 +67,24 @@ class TransferFunction(Base):
         self.initialized = False
         self.processing_config = kwargs.get("processing_config", None)
 
-        if self.tf_header is not None:
+        if self.emtf_tf_header is not None:
             if self.num_bands is not None:
                 self._initialize_arrays()
 
     @property
-    def tf_header(self):
+    def emtf_tf_header(self):
         if self.processing_config is None:
             print("No header is available without a processing config")
-            return None
-        return self.processing_config.make_tf_header(self.decimation_level_id)
+            self._emtf_tf_header = None
+        else:
+            if self._emtf_tf_header is None:
+                tfh = self.processing_config.emtf_tf_header(self.decimation_level_id)
+                self._emtf_tf_header = tfh
+        return self._emtf_tf_header
+
+    @property
+    def tf_header(self):
+        return self.emtf_tf_header
 
     @property
     def tf(self):

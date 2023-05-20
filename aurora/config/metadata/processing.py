@@ -82,7 +82,7 @@ class Processing(Processing):
         with open(filename, "w") as f:
             f.write(json_str)
 
-    def make_tf_header(self, dec_level_id):
+    def emtf_tf_header(self, dec_level_id):
         """
 
         Parameters
@@ -94,16 +94,14 @@ class Processing(Processing):
         -------
         tfh: mt_metadata.transfer_functions.processing.aurora.transfer_function_header.TransferFunctionHeader
         """
-
-        tfh = EMTFTFHeader(
-            processing_scheme=self.decimations[dec_level_id].estimator.engine,
-            local_station=self.stations.local,
-            remote_station=self.stations.remote,
-            input_channels=self.decimations[dec_level_id].input_channels,
-            output_channels=self.decimations[dec_level_id].output_channels,
-            reference_channels=self.decimations[dec_level_id].reference_channels,
-            decimation_level_id=dec_level_id,
-        )
+        tfh = ListDict()
+        tfh.processing_scheme = self.decimations[dec_level_id].estimator.engine
+        tfh.local_station = self.stations.local
+        tfh.remote_station = self.stations.remote
+        tfh.input_channels = self.decimations[dec_level_id].input_channels
+        tfh.output_channels = self.decimations[dec_level_id].output_channels
+        tfh.reference_channels = self.decimations[dec_level_id].reference_channels
+        tfh.decimation_level_id = dec_level_id
 
         return tfh
 
