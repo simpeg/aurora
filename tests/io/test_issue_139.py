@@ -7,7 +7,6 @@ mt_metadata TF class to write z-files.
 While investigation this issue, I have encountered another potential issue:
 I would expect that I can read-in an emtf_xml and then push the same data structure
 back to an xml, but this does not work as expected.
-
 """
 # ## Process Synthetic Data with Aurora
 
@@ -78,27 +77,16 @@ def test_can_read_and_write_xml(tf_cls):
 #
 # The synthetic mth5 file is used for testing in `aurora/tests/synthetic/` and probably already exists on your system
 
-# In[2]:
-
-
 mth5_path = DATA_PATH.joinpath("test12rr.h5")
 
 
 # But, if it doesn't or you want to re-make it, call `create_test12rr_h5()`
-
-# In[3]:
-
 
 if not mth5_path.exists():
     create_test12rr_h5()
 
 
 # ## Get a Run Summary
-#
-# Note that we didn't need to explicitly open the mth5 to do that, we can pass the path if we want
-
-# In[4]:
-
 
 mth5_run_summary = RunSummary()
 mth5_run_summary.from_mth5s(
@@ -111,33 +99,17 @@ run_summary.mini_summary
 
 
 # ## Define a Kernel Dataset
-#
-
-# In[5]:
-
 
 kernel_dataset = KernelDataset()
 kernel_dataset.from_run_summary(run_summary, "test1", "test2")
 
 
-# ## Now define the processing Configuration
-#
-# The only things we need to provide are our band processing scheme, and the data sample rate to generate a default processing configuration.
-#
-# The config is then told about the stations via the kernel dataset.
-#
-# **When doing only single station processing you need to specify RME processing (rather than remote reference processing which expects extra time series from another station)
-
-# In[6]:
-
-
+# ## Define the processing Configuration
 cc = ConfigCreator()
 config = cc.create_from_kernel_dataset(kernel_dataset)
 
 
 # ## Call process_mth5
-
-# In[7]:
 
 
 show_plot = False
@@ -150,9 +122,6 @@ tf_cls = process_mth5(
 )
 
 
-# In[8]:
-
-
 xml_file_base = "synthetic_test1.xml"
 tf_cls.write(fn=xml_file_base, file_type="emtfxml")
 
@@ -161,8 +130,9 @@ print(type(tf_cls))
 # zss_file_base = f"synthetic_test1.zss"
 # tf_cls.write(fn=zss_file_base, file_type="zss")
 
-zrr_file_base = "synthetic_test1.zrr"
-tf_cls.write(fn=zrr_file_base, file_type="zrr")
+# comment out while working issue 109
+# zrr_file_base = "synthetic_test1.zrr"
+# tf_cls.write(fn=zrr_file_base, file_type="zrr")
 
 
 #
