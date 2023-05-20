@@ -126,7 +126,9 @@ class Processing(Processing):
         from aurora.transfer_function.TTFZ import TTFZ
 
         tf_obj = TTFZ(
-            dec_level_id, self.decimations[dec_level_id].frequency_bands_obj()
+            dec_level_id,
+            self.decimations[dec_level_id].frequency_bands_obj(),
+            processing_config=self,
         )
 
         return tf_obj
