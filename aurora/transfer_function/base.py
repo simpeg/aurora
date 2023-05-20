@@ -51,8 +51,9 @@ class TransferFunction(Base):
 
         Parameters
         ----------
-        tf_header: aurora.transfer_function.transfer_function_header.TransferFunctionHeader
-            TF header, may be deprecated in future.
+        decimation_level_id: int
+            Identifies the relevant decimation level.  Used for accessing the
+            appropriate info in self.processing config.
         frequency_bands: aurora.time_series.frequency_band.FrequencyBands
             frequency bands object
         """
@@ -197,11 +198,11 @@ class TransferFunction(Base):
 
     @property
     def num_channels_in(self):
-        return self.tf_header.num_input_channels
+        return len(self.tf_header.input_channels)
 
     @property
     def num_channels_out(self):
-        return self.tf_header.num_output_channels
+        return len(self.tf_header.output_channels)
 
     def frequency_index(self, frequency):
         return self.period_index(1.0 / frequency)
