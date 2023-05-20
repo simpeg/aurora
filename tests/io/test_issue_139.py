@@ -118,7 +118,6 @@ run_summary.mini_summary
 
 kernel_dataset = KernelDataset()
 kernel_dataset.from_run_summary(run_summary, "test1", "test2")
-kernel_dataset.mini_summary
 
 
 # ## Now define the processing Configuration
@@ -147,7 +146,7 @@ tf_cls = process_mth5(
     kernel_dataset,
     units="MT",
     show_plot=show_plot,
-    z_file_path=None,
+    z_file_path="zzz.zz",
 )
 
 

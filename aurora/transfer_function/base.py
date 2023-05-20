@@ -41,7 +41,7 @@ class TransferFunction(Base):
     Nin
     """
 
-    def __init__(self, tf_header, frequency_bands, **kwargs):
+    def __init__(self, decimation_level_id, frequency_bands, **kwargs):
         """
         change 2021-07-23 to require a frequency_bands object.  We may want
         to just pass the band_edges.  I'm not a fan of forcing dependency of
@@ -56,7 +56,7 @@ class TransferFunction(Base):
         frequency_bands: aurora.time_series.frequency_band.FrequencyBands
             frequency bands object
         """
-        self.tf_header = tf_header
+        self.decimation_level_id = decimation_level_id
         self.frequency_bands = frequency_bands
         self.num_segments = None
         self.cov_ss_inv = None
@@ -68,6 +68,13 @@ class TransferFunction(Base):
         if self.tf_header is not None:
             if self.num_bands is not None:
                 self._initialize_arrays()
+
+    @property
+    def tf_header(self):
+        if self.processing_config is None:
+            print("No header is available without a processing config")
+            return None
+        return self.processing_config.make_tf_header(self.decimation_level_id)
 
     @property
     def tf(self):

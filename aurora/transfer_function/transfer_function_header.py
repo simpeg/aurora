@@ -1,17 +1,13 @@
-"""
-follows Gary's TFHeader.m
-iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
-"""
+from mt_metadata.utils.list_dict import ListDict
 
 
-class TransferFunctionHeader(object):
+class TransferFunctionHeader(ListDict):
     """
-    Convenince class for storing metadata for a TF estimate
+    Convenince class for storing metadata for a TF estimate.
+    Based on Gary Egbert's TFHeader.m originally in
+    iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
 
-    This class should inherit the metadata from the remote and reference
-    stations. As of 2021-07-20 the class functions with only the station_id
-    and channel_id values.
-
+    It completely depends on the Processing class
     """
 
     def __init__(self, **kwargs):
@@ -37,6 +33,7 @@ class TransferFunctionHeader(object):
             etc.
 
         """
+        super().__init__()
         self.processing_scheme = kwargs.get("processing_scheme", None)
         self._local_station = kwargs.get("local_station", None)
         self._reference_station = kwargs.get("reference_station", None)
