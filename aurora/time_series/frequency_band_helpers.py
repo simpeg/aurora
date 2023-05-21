@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from aurora.time_series.frequency_band import FrequencyBands
+from mt_metadata.transfer_functions.processing.aurora import FrequencyBands
 
 
 def extract_band(frequency_band, fft_obj, epsilon=1e-7):
