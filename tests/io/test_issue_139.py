@@ -38,103 +38,144 @@ from aurora.transfer_function.kernel_dataset import KernelDataset
 warnings.filterwarnings("ignore")
 
 
-# def test_can_read_and_write_xml(tf_cls):
-#     """
-#
-#     Parameters
-#     ----------
-#     tf_cls: mt_metadata.transfer_functions.core import TF
-#
-#
-#     """
-#
-#     from mt_metadata.transfer_functions.core import TF
-#
-#     xml_file_base = "synthetic_test1.xml"
-#     tf_cls.write(fn=xml_file_base, file_type="emtfxml")
-#
-#     new_tf = TF()
-#     new_tf.read_tf_file(xml_file_base)
-#
-#     # First issue:
-#     try:
-#         assert new_tf == tf_cls
-#     except AssertionError:
-#         print("Fail expected condition")
-#         print("the pre-export and post-read objects are different")
-#
-#     # Second Issue:
-#     xml_file_base2 = xml_file_base.replace(".xml", "_a.xml")
-#     try:
-#         new_tf.write(fn=xml_file_base2, file_type="emtfxml")
-#     except AttributeError:
-#         print("Failed to write TF back to xml")
-#
-#     return
+def test_can_read_and_write_xml():
+    """
+
+    Parameters
+    ----------
+    tf_cls: mt_metadata.transfer_functions.core import TF
 
 
-# ## Define mth5 file
-#
-# The synthetic mth5 file is used for testing in `aurora/tests/synthetic/` and probably already exists on your system
+    """
 
-mth5_path = DATA_PATH.joinpath("test12rr.h5")
+    from mt_metadata.transfer_functions.core import TF
+
+    xml_file_base = "synthetic_test1.xml"
+    tf0 = TF()
+    tf0.read(xml_file_base)
+
+    xml_file_base = "synthetic_test1_rewrite.xml"
+    tf0.write(fn=xml_file_base, file_type="emtfxml")
+
+    tf1 = TF()
+    tf1.read(xml_file_base)
+
+    # First issue:
+    try:
+        assert tf0 == tf1
+    except AssertionError:
+        print("Fail expected condition")
+        print("the pre-export and post-read objects are different")
+
+    return
 
 
-# But, if it doesn't or you want to re-make it, call `create_test12rr_h5()`
+def test_can_write_and_read_xml(tf_cls):
+    """
 
-if not mth5_path.exists():
+    Parameters
+    ----------
+    tf_cls: mt_metadata.transfer_functions.core import TF
+
+
+    """
+
+    from mt_metadata.transfer_functions.core import TF
+
+    xml_file_base = "synthetic_test1.xml"
+    tf_cls.write(fn=xml_file_base, file_type="emtfxml")
+
+    new_tf = TF()
+    new_tf.read_tf_file(xml_file_base)
+
+    # First issue:
+    try:
+        assert new_tf == tf_cls
+    except AssertionError:
+        print("Fail expected condition")
+        print("the pre-export and post-read objects are different")
+
+    # Second Issue:
+    xml_file_base2 = xml_file_base.replace(".xml", "_a.xml")
+    try:
+        new_tf.write(fn=xml_file_base2, file_type="emtfxml")
+    except AttributeError:
+        print("Failed to write TF back to xml")
+
+    return
+
+
+def test_issue_139():
+    # ## Define mth5 file
+    #
+    # The synthetic mth5 file is used for testing in `aurora/tests/synthetic/` and probably already exists on your system
+
+    mth5_path = DATA_PATH.joinpath("test12rr.h5")
+
+    # But, if it doesn't or you want to re-make it, call `create_test12rr_h5()`
+
+    # if not mth5_path.exists():
     create_test12rr_h5()
 
+    # ## Get a Run Summary
 
-# ## Get a Run Summary
+    mth5_run_summary = RunSummary()
+    mth5_run_summary.from_mth5s(
+        [
+            mth5_path,
+        ]
+    )
+    run_summary = mth5_run_summary.clone()
+    run_summary.mini_summary
 
-mth5_run_summary = RunSummary()
-mth5_run_summary.from_mth5s(
-    [
-        mth5_path,
-    ]
-)
-run_summary = mth5_run_summary.clone()
-run_summary.mini_summary
+    # ## Define a Kernel Dataset
+
+    kernel_dataset = KernelDataset()
+    kernel_dataset.from_run_summary(run_summary, "test1", "test2")
+
+    # ## Define the processing Configuration
+    cc = ConfigCreator()
+    config = cc.create_from_kernel_dataset(kernel_dataset)
+
+    # ## Call process_mth5
+
+    show_plot = False
+    tf_cls = process_mth5(
+        config,
+        kernel_dataset,
+        units="MT",
+        show_plot=show_plot,
+        z_file_path="zzz.zz",
+    )
+
+    # test_can_write_and_read_xml(tf_obj)
+    # test_can_read_and_write_xml()
+
+    xml_file_base = "synthetic_test1.xml"
+    tf_cls.write(fn=xml_file_base, file_type="emtfxml")
+
+    print(type(tf_cls))
+    # zss_file_base = f"synthetic_test1.zss"
+    # tf_cls.write(fn=zss_file_base, file_type="zss")
+
+    zrr_file_base = "synthetic_test1.zrr"
+    # hmm, tf_cls.dataset.transfer_function has a lot of nan here
+    # tf_cls.transfer_function is "fully loaded" at the return form proceess_mth5
+    # and synthetic_test1.xml
+    # BUT
+    # tf_cls.dataset.transfer_function is nan-full
+    tf_cls.write(fn=zrr_file_base, file_type="zrr")
+
+    #
+    # zmm_file_base = f"synthetic_test1.zmm"
+    # tf_cls.write(fn=zmm_file_base, file_type="zmm")
 
 
-# ## Define a Kernel Dataset
-
-kernel_dataset = KernelDataset()
-kernel_dataset.from_run_summary(run_summary, "test1", "test2")
-
-
-# ## Define the processing Configuration
-cc = ConfigCreator()
-config = cc.create_from_kernel_dataset(kernel_dataset)
+def main():
+    test_issue_139()
+    test_can_read_and_write_xml()
+    # test_can_write_and_read_xml()
 
 
-# ## Call process_mth5
-
-
-show_plot = False
-tf_cls = process_mth5(
-    config,
-    kernel_dataset,
-    units="MT",
-    show_plot=show_plot,
-    z_file_path="zzz.zz",
-)
-
-
-xml_file_base = "synthetic_test1.xml"
-tf_cls.write(fn=xml_file_base, file_type="emtfxml")
-
-
-print(type(tf_cls))
-# zss_file_base = f"synthetic_test1.zss"
-# tf_cls.write(fn=zss_file_base, file_type="zss")
-
-# comment out while working issue 109
-# zrr_file_base = "synthetic_test1.zrr"
-# tf_cls.write(fn=zrr_file_base, file_type="zrr")
-
-
-#
-# zmm_file_base = f"synthetic_test1.zmm"
-# tf_cls.write(fn=zmm_file_base, file_type="zmm")
+if __name__ == "__main__":
+    main()
