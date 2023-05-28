@@ -1,4 +1,7 @@
+import datetime
 import pathlib
+
+import pandas as pd
 
 HOME = pathlib.Path().home()
 CACHE_PATH = HOME.joinpath(".cache").joinpath("earthscope")
@@ -46,4 +49,31 @@ def get_remotes_from_tf(tf_obj):
                 remotes.append(remote_station)
 
     return remotes
+
+def build_request_df(station_ids, network_id, start=None, end=None):
+    from mth5.clients import FDSN
+    fdsn_object = FDSN(mth5_version='0.2.0')
+    fdsn_object.client = "IRIS"
+    if start is None:
+        start = '1970-01-01 00:00:00'
+    if end is None:
+        end = datetime.datetime.now()
+
+    print(station_ids)
+    request_list = [[network_id, station_ids.pop(0), '', '*', start, end]]
+
+    # Handle remotes
+    try:
+        for station_id in station_ids:
+            request_list.append([network_id, station_ids, '', '*', startdate, enddate])
+
+    except Exception as e:
+        print(e)
+        print("kwahhat? ")
+
+    print(request_list)
+
+    request_df = pd.DataFrame(request_list, columns=fdsn_object.request_columns)
+    return request_df
+
 
