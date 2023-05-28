@@ -40,35 +40,35 @@ warnings.filterwarnings("ignore")
 XML_FILE_BASE = "synthetic_test1.xml"
 
 
-def test_can_read_and_write_xml():
-    """
-
-    Parameters
-    ----------
-    tf_cls: mt_metadata.transfer_functions.core import TF
-
-
-    """
-
-    from mt_metadata.transfer_functions.core import TF
-
-    tf0 = TF()
-    tf0.read(XML_FILE_BASE)
-
-    xml_file_base = XML_FILE_BASE.replace("test1", "test1_rewrite")
-    tf0.write(fn=xml_file_base, file_type="emtfxml")
-
-    tf1 = TF()
-    tf1.read(xml_file_base)
-
-    # First issue:
-    try:
-        assert tf0 == tf1
-    except AssertionError:
-        print("Fail expected condition")
-        print("the pre-export and post-read objects are different")
-
-    return
+# def test_can_read_and_write_xml():
+#     """
+#
+#     Parameters
+#     ----------
+#     tf_cls: mt_metadata.transfer_functions.core import TF
+#
+#
+#     """
+#
+#     from mt_metadata.transfer_functions.core import TF
+#
+#     tf0 = TF()
+#     tf0.read(XML_FILE_BASE)
+#
+#     xml_file_base = XML_FILE_BASE.replace("test1", "test1_rewrite")
+#     tf0.write(fn=xml_file_base, file_type="emtfxml")
+#
+#     tf1 = TF()
+#     tf1.read(xml_file_base)
+#
+#     # First issue:
+#     try:
+#         assert tf0 == tf1
+#     except AssertionError:
+#         print("Fail expected condition")
+#         print("the pre-export and post-read objects are different")
+#
+#     return
 
 
 def test_can_write_and_read_xml(tf_cls):
