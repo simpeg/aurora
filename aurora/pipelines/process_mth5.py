@@ -128,8 +128,7 @@ def process_tf_decimation_level(
         The transfer function values packed into an object
     """
     frequency_bands = config.decimations[i_dec_level].frequency_bands_obj()
-    tf_header = config.make_tf_header(i_dec_level)
-    transfer_function_obj = TTFZ(tf_header, frequency_bands, processing_config=config)
+    transfer_function_obj = TTFZ(i_dec_level, frequency_bands, processing_config=config)
 
     transfer_function_obj = process_transfer_functions(
         config, i_dec_level, local_stft_obj, remote_stft_obj, transfer_function_obj
