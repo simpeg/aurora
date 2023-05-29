@@ -71,7 +71,8 @@ def test():
     logging.getLogger("matplotlib.ticker").disabled = True
 
     z_file_path = AURORA_RESULTS_PATH.joinpath("pkd.zss")
-    test_processing(z_file_path=z_file_path)
+    tf_cls = test_processing(z_file_path=z_file_path)
+    tf_cls.write("pkd_mt_metadata.zss", file_type="zss")
     test_processing(
         z_file_path=z_file_path,
         test_clock_zero="user specified",
