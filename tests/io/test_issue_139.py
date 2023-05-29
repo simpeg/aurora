@@ -74,13 +74,19 @@ class TestZFileReadWrite(unittest.TestCase):
             self.get_tf_obj_from_processing_synthetic_data()
         return self._tf_obj
 
+    def tf_z_obj(self):
+        if not self.zrr_file_base.exists():
+            self.test_tf_obj_from_zrr()
+        tf_z = TF()
+        tf_z.read(self.zrr_file_base)
+        return tf_z
+
     def test_zrr_from_tf_obj(self):
         tf_obj = self.tf_obj()
         tf_obj.write(fn=self.zrr_file_base, file_type="zrr")
 
     def test_tf_obj_from_zrr(self):
-        tf_z = TF()
-        tf_z.read(self.zrr_file_base)
+        tf_z = self.tf_z_obj()
         tf = self.tf_obj()
         # check numeric values
         assert (
@@ -91,10 +97,9 @@ class TestZFileReadWrite(unittest.TestCase):
         return tf
 
     def test_tf_read_and_write(self):
-        if not self.zrr_file_base.exists():
-            self.test_tf_obj_from_zrr()
-        tf = self.test_tf_obj_from_zrr()
-        tf.write(str(self.zrr_file_base).replace(".zrr", "_rewrite.zrr"))
+        tf_z = self.tf_z_obj()
+        out_file_name = str(self.zrr_file_base).replace(".zrr", "_rewrite.zrr")
+        tf_z.write(out_file_name)
         print("Add assert statement that the zrr are the same")
 
     def test_tf_write_and_read(self):
@@ -103,7 +108,6 @@ class TestZFileReadWrite(unittest.TestCase):
 
         tf_obj2 = TF()
         tf_obj2.read(fn=self.xml_file_base)
-
         print("ASSERT tfobj==tfob2 everywhere it hsould")
 
 
