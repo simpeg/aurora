@@ -18,49 +18,23 @@ import pathlib
 import unittest
 import warnings
 
-from aurora.config.config_creator import ConfigCreator
-from aurora.pipelines.process_mth5 import process_mth5
-from aurora.pipelines.run_summary import RunSummary
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
 from aurora.test_utils.synthetic.paths import DATA_PATH
-from aurora.transfer_function.kernel_dataset import KernelDataset
+from aurora.test_utils.synthetic.processing_helpers import tf_obj_from_synthetic_data
 from mt_metadata.transfer_functions.core import TF
 
 warnings.filterwarnings("ignore")
 
 
-def get_tf_obj_from_processing_synthetic_data(mth5_path):
-    run_summary = RunSummary()
-    run_summary.from_mth5s(list((mth5_path,)))
-
-    kernel_dataset = KernelDataset()
-    kernel_dataset.from_run_summary(run_summary, "test1", "test2")
-
-    # Define the processing Configuration
-    cc = ConfigCreator()
-    config = cc.create_from_kernel_dataset(kernel_dataset)
-
-    tf_cls = process_mth5(
-        config,
-        kernel_dataset,
-        units="MT",
-        z_file_path="zzz.zz",
-    )
-    return tf_cls
+def write_zrr(tf_obj, zrr_file_base):
+    tf_obj.write(fn=zrr_file_base, file_type="zrr")
 
 
 class TestZFileReadWrite(unittest.TestCase):
     """ """
 
-    def setUp(self):
-        """
-        ivar mth5_path: The synthetic mth5 file used for testing
-        Returns
-        -------
-
-        """
-        logging.getLogger("matplotlib.font_manager").disabled = True
-        logging.getLogger("matplotlib.ticker").disabled = True
+    @classmethod
+    def setUpClass(self):
         self.xml_file_base = pathlib.Path("synthetic_test1.xml")
         self.mth5_path = DATA_PATH.joinpath("test12rr.h5")
         self.zrr_file_base = pathlib.Path("synthetic_test1.zrr")
@@ -68,25 +42,22 @@ class TestZFileReadWrite(unittest.TestCase):
         if not self.mth5_path.exists():
             create_test12rr_h5()
 
-        self._tf_obj = get_tf_obj_from_processing_synthetic_data(self.mth5_path)
+        self._tf_obj = tf_obj_from_synthetic_data(self.mth5_path)
+        write_zrr(self._tf_obj, self.zrr_file_base)
+        self._tf_z_obj = TF()
+        self._tf_z_obj.read(self.zrr_file_base)
 
+    @property
     def tf_obj(self):
         return self._tf_obj
 
+    @property
     def tf_z_obj(self):
-        if not self.zrr_file_base.exists():
-            self.test_tf_obj_from_zrr()
-        tf_z = TF()
-        tf_z.read(self.zrr_file_base)
-        return tf_z
-
-    def test_zrr_from_tf_obj(self):
-        tf_obj = self.tf_obj()
-        tf_obj.write(fn=self.zrr_file_base, file_type="zrr")
+        return self._tf_z_obj
 
     def test_tf_obj_from_zrr(self):
-        tf_z = self.tf_z_obj()
-        tf = self.tf_obj()
+        tf_z = self._tf_z_obj
+        tf = self.tf_obj
         # check numeric values
         assert (
             np.isclose(tf_z.transfer_function.data, tf.transfer_function.data, 1e-4)
@@ -96,13 +67,14 @@ class TestZFileReadWrite(unittest.TestCase):
         return tf
 
     def test_tf_read_and_write(self):
-        tf_z = self.tf_z_obj()
+        tf_z = self._tf_z_obj
         out_file_name = str(self.zrr_file_base).replace(".zrr", "_rewrite.zrr")
-        tf_z.write(out_file_name)
+        out_file_path = pathlib.Path(out_file_name)
+        tf_z.write(out_file_path)
         print("Add assert statement that the zrr are the same")
 
     def test_tf_write_and_read(self):
-        tf_obj = self.tf_obj()
+        tf_obj = self.tf_obj
         tf_obj.write(fn=self.xml_file_base, file_type="emtfxml")
 
         tf_obj2 = TF()
