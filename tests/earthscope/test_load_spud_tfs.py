@@ -17,7 +17,7 @@ from aurora.test_utils.earthscope.helpers import SPUD_XML_CSV
 from aurora.test_utils.earthscope.helpers import DATA_PATH
 from aurora.test_utils.earthscope.helpers import load_xml_tf
 from aurora.test_utils.earthscope.helpers import get_remotes_from_tf
-
+from aurora.test_utils.earthscope.helpers import get_rr_type
 
 SPUD_DF = pd.read_csv(SPUD_XML_CSV)
 now = datetime.datetime.now().__str__().split(".")[0].replace(" ","_")
@@ -40,6 +40,7 @@ def review_spud_tfs(xml_sources=["emtf_xml_path", "data_xml_path"],
         spud_df[f"{xml_source}_error"] = False
         spud_df[f"{xml_source}_exception"] = ""
         spud_df[f"{xml_source}_error_message"] = ""
+        spud_df[f"{xml_source}_remote_ref_type"] = ""
         spud_df[f"{xml_source}_remotes"] = ""
 
     for i_row, row in spud_df.iterrows():
@@ -49,9 +50,11 @@ def review_spud_tfs(xml_sources=["emtf_xml_path", "data_xml_path"],
             xml_path = pathlib.Path(row[xml_source])
             try:
                 spud_tf = load_xml_tf(xml_path)
-                remotes = get_remotes_from_tf()
-                if remotes:
-                    print("parse thmem")
+                rr_type = get_rr_type(spud_tf)
+                spud_df[f"{xml_source}_remote_ref_type"].iat[i_row] = rr_type
+                remotes = get_remotes_from_tf(spud_tf)
+                spud_df[f"{xml_source}_remotes"].iat[i_row] = ",".join(remotes)
+
             except Exception as e:
                 spud_df[f"{xml_source}_error"].at[i_row] = True
                 spud_df[f"{xml_source}_exception"].at[i_row] = e.__class__.__name__
@@ -67,9 +70,13 @@ def get_station_info():
     pass
 
 def main():
-    results_df = review_spud_tfs()#
-    #results_df =
-    results_df = pd.read_csv(SPUD_XML_REVIEW_CSV)
+    # results_df = review_spud_tfs()
+    review_csv = "spud_xml_review_2023-05-28_13:21:18.csv"
+    df = pd.read_csv(review_csv)
+    print("summarize")
+
+#    results_df = pd.read_csv(SPUD_XML_REVIEW_CSV)
+
 
 if __name__ == "__main__":
     main()
