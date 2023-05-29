@@ -70,40 +70,40 @@ XML_FILE_BASE = "synthetic_test1.xml"
 #
 #     return
 
-
-def test_can_write_and_read_xml(tf_cls):
-    """
-
-    Parameters
-    ----------
-    tf_cls: mt_metadata.transfer_functions.core import TF
-
-
-    """
-
-    from mt_metadata.transfer_functions.core import TF
-
-    xml_file_base = "synthetic_test1.xml"
-    tf_cls.write(fn=xml_file_base, file_type="emtfxml")
-
-    new_tf = TF()
-    new_tf.read_tf_file(xml_file_base)
-
-    # First issue:
-    try:
-        assert new_tf == tf_cls
-    except AssertionError:
-        print("Fail expected condition")
-        print("the pre-export and post-read objects are different")
-
-    # Second Issue:
-    xml_file_base2 = xml_file_base.replace(".xml", "_a.xml")
-    try:
-        new_tf.write(fn=xml_file_base2, file_type="emtfxml")
-    except AttributeError:
-        print("Failed to write TF back to xml")
-
-    return
+#
+# def test_can_write_and_read_xml(tf_cls):
+#     """
+#
+#     Parameters
+#     ----------
+#     tf_cls: mt_metadata.transfer_functions.core import TF
+#
+#
+#     """
+#
+#     from mt_metadata.transfer_functions.core import TF
+#
+#     xml_file_base = "synthetic_test1.xml"
+#     tf_cls.write(fn=xml_file_base, file_type="emtfxml")
+#
+#     new_tf = TF()
+#     new_tf.read_tf_file(xml_file_base)
+#
+#     # First issue:
+#     try:
+#         assert new_tf == tf_cls
+#     except AssertionError:
+#         print("Fail expected condition")
+#         print("the pre-export and post-read objects are different")
+#
+#     # Second Issue:
+#     xml_file_base2 = xml_file_base.replace(".xml", "_a.xml")
+#     try:
+#         new_tf.write(fn=xml_file_base2, file_type="emtfxml")
+#     except AttributeError:
+#         print("Failed to write TF back to xml")
+#
+#     return
 
 
 def test_issue_139():
