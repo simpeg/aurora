@@ -268,9 +268,6 @@ class TransferFunctionCollection(object):
                 latitude = run_obj.station_metadata.location.latitude
                 longitude = run_obj.station_metadata.location.longitude
                 declination = run_obj.station_metadata.location.declination.value
-            # latitude = run_obj.station_group.metadata.location.latitude
-            # longitude = run_obj.station_group.metadata.location.longitude
-            # declination = run_obj.station_group.metadata.location.declination.value
             if declination is None:
                 declination = 0.0
 

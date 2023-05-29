@@ -29,6 +29,26 @@ from mt_metadata.transfer_functions.core import TF
 warnings.filterwarnings("ignore")
 
 
+def get_tf_obj_from_processing_synthetic_data(mth5_path):
+    run_summary = RunSummary()
+    run_summary.from_mth5s(list((mth5_path,)))
+
+    kernel_dataset = KernelDataset()
+    kernel_dataset.from_run_summary(run_summary, "test1", "test2")
+
+    # Define the processing Configuration
+    cc = ConfigCreator()
+    config = cc.create_from_kernel_dataset(kernel_dataset)
+
+    tf_cls = process_mth5(
+        config,
+        kernel_dataset,
+        units="MT",
+        z_file_path="zzz.zz",
+    )
+    return tf_cls
+
+
 class TestZFileReadWrite(unittest.TestCase):
     """ """
 
@@ -43,35 +63,14 @@ class TestZFileReadWrite(unittest.TestCase):
         logging.getLogger("matplotlib.ticker").disabled = True
         self.xml_file_base = pathlib.Path("synthetic_test1.xml")
         self.mth5_path = DATA_PATH.joinpath("test12rr.h5")
-        self._tf_obj = None
         self.zrr_file_base = pathlib.Path("synthetic_test1.zrr")
 
         if not self.mth5_path.exists():
             create_test12rr_h5()
 
-    def get_tf_obj_from_processing_synthetic_data(self):
-        run_summary = RunSummary()
-        run_summary.from_mth5s(list((self.mth5_path,)))
-
-        kernel_dataset = KernelDataset()
-        kernel_dataset.from_run_summary(run_summary, "test1", "test2")
-
-        # Define the processing Configuration
-        cc = ConfigCreator()
-        config = cc.create_from_kernel_dataset(kernel_dataset)
-
-        tf_cls = process_mth5(
-            config,
-            kernel_dataset,
-            units="MT",
-            z_file_path="zzz.zz",
-        )
-        self._tf_obj = tf_cls
-        return
+        self._tf_obj = get_tf_obj_from_processing_synthetic_data(self.mth5_path)
 
     def tf_obj(self):
-        if self._tf_obj is None:
-            self.get_tf_obj_from_processing_synthetic_data()
         return self._tf_obj
 
     def tf_z_obj(self):
