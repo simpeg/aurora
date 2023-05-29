@@ -14,6 +14,7 @@ import pathlib
 import time
 
 from aurora.test_utils.earthscope.helpers import SPUD_XML_CSV
+from aurora.test_utils.earthscope.helpers import SPUD_XML_PATH
 from aurora.test_utils.earthscope.helpers import DATA_PATH
 from aurora.test_utils.earthscope.helpers import load_xml_tf
 from aurora.test_utils.earthscope.helpers import get_remotes_from_tf
@@ -21,12 +22,13 @@ from aurora.test_utils.earthscope.helpers import get_rr_type
 
 SPUD_DF = pd.read_csv(SPUD_XML_CSV)
 now = datetime.datetime.now().__str__().split(".")[0].replace(" ","_")
-SPUD_XML_REVIEW_CSV = f"spud_xml_review_{now}.csv"
+SPUD_XML_REVIEW_CSV_NAME = f"spud_xml_review_{now}.csv"
+SPUD_XML_REVIEW_CSV_PATH = SPUD_XML_PATH.joinpath(SPUD_XML_REVIEW_CSV_NAME)
 
 
 
 def review_spud_tfs(xml_sources=["emtf_xml_path", "data_xml_path"],
-                    results_csv=SPUD_XML_REVIEW_CSV):
+                    results_csv=SPUD_XML_REVIEW_CSV_PATH):
     """
 
     :param xml_source_column:"data_xml_path" or "emtf_xml_path"
@@ -70,13 +72,17 @@ def get_station_info():
     pass
 
 def main():
-    # results_df = review_spud_tfs()
-    review_csv = "spud_xml_review_2023-05-28_13:21:18.csv"
-    df = pd.read_csv(review_csv)
+    results_df = review_spud_tfs()
+
+    # DEBUGGING
+    # review_csv_name = "spud_xml_review_2023-05-28_13:21:18.csv"
+    # review_csv_path = SPUD_XML_PATH.joinpath(review_csv_name)
+    # df = pd.read_csv(review_csv)
+
+    results_df = pd.read_csv(SPUD_XML_REVIEW_CSV_PATH)
     print("summarize")
 
-#    results_df = pd.read_csv(SPUD_XML_REVIEW_CSV)
-
+    
 
 if __name__ == "__main__":
     main()
