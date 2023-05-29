@@ -108,14 +108,10 @@ class TestZFileReadWrite(unittest.TestCase):
 
 
 def main():
-    tmp = TestZFileReadWrite()
-    tmp.setUp()
-    tmp.test_tf_obj_from_zrr()
-    # unittest.main()
-
-
-if __name__ == "__main__":
-    main()
+    # tmp = TestZFileReadWrite()
+    # tmp.setUp()
+    # tmp.test_tf_obj_from_zrr()
+    unittest.main()
 
 
 if __name__ == "__main__":
