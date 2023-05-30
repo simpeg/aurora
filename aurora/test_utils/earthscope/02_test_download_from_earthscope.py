@@ -44,6 +44,7 @@ from aurora.test_utils.earthscope.helpers import DATA_PATH
 from aurora.test_utils.earthscope.helpers import SPUD_DATA_PATH
 from aurora.test_utils.earthscope.helpers import SPUD_EMTF_PATH
 from aurora.test_utils.earthscope.helpers import SPUD_XML_CSV
+from aurora.test_utils.earthscope.helpers import SPUD_XML_PATH
 from aurora.test_utils.earthscope.helpers import get_remotes_from_tf
 from aurora.test_utils.earthscope.helpers import get_rr_type
 from aurora.test_utils.earthscope.helpers import load_xml_tf
@@ -71,22 +72,23 @@ def initialize_coverage_df():
 
 
 data_coverage_csv_name = "local_data_coverage.csv"
-data_coverage_csv_path = SPUD_DATA_PATH.joinpath(data_coverage_csv_name)
+data_coverage_csv_path = DATA_PATH.joinpath(data_coverage_csv_name)
+GET_REMOTES_FROM = "spud_xml_review" # tf_xml
 
 
-def main():
+def batch_download():
     """
     2023-05-27
     :return:
 
 
     """
-    local_data_coverage_csv = "local_data_coverage.csv"
-    local_data_coverage_df = pd.read_csv(local_data_coverage_csv)
+    local_data_coverage_df = pd.read_csv(data_coverage_csv_path)
 
     xml_source = "data_xml_path"
-    spud_csv = "spud_xml_review_2023-05-26_17:10:33.csv"
-    spud_df = pd.read_csv(spud_csv)
+    spud_csv_name = "spud_xml_review_2023-05-29_15:08:25.csv"
+    spud_csv_path = SPUD_XML_PATH.joinpath(spud_csv_name)
+    spud_df = pd.read_csv(spud_csv_path)
 
     for i_row, row in spud_df.iterrows():
         if row[f"{xml_source}_error"] is True:
@@ -99,9 +101,12 @@ def main():
             continue
 
         [xml_uid, network_id, station_id] = xml_path.stem.split("_")
-        tf = load_xml_tf(xml_path)
-        rr_type = get_rr_type(tf)
-        remotes = get_remotes_from_tf(tf)
+        if GET_REMOTES_FROM == "tf_xml":
+            tf = load_xml_tf(xml_path)
+            rr_type = get_rr_type(tf)
+            remotes = get_remotes_from_tf(tf)
+        elif GET_REMOTES_FROM == "spud_xml_review":
+            remotes = row.data_xml_path_remotes.split(",")
         if remotes:
             print(f"remotes: {remotes} ")
         all_stations = remotes + [station_id,]
@@ -168,6 +173,9 @@ def main():
     #     spud_tf = load_xml_tf(xml_path)
     #     print(row[SPUD_XML_COLUMN])
     # pass
+
+def main():
+    batch_download()
 
 if __name__ == "__main__":
     main()
