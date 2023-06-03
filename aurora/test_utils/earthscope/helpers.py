@@ -154,11 +154,21 @@ def build_request_df(station_ids, network_id, start=None, end=None):
 
 
 def get_summary_table_filename(stage_number):
+    base_names = {}
+    base_names["01"] = "spud_xml_review"
+    base_names["02"] = "local_metadata_coverage"
     stage_number_str = str(stage_number).zfill(2)
+
     now = datetime.datetime.now().__str__().split(".")[0].replace(" ", "_")
     now_str = now.replace(":", "")
-    csv_name = f"{stage_number_str}_spud_xml_review_{now_str}.csv"
+    csv_name = f"{stage_number_str}_{base_names[stage_number_str]}.csv"
+    if stage_number in [1,]:
+        now = datetime.datetime.now().__str__().split(".")[0].replace(" ", "_")
+        now_str = now.replace(":", "")
+        csv_name = csv_name.replace(".csv", f"_{now_str}.csv")
+
     csv_path = SUMMARY_TABLES_PATH.joinpath(csv_name)
+
     return csv_path
 
 
