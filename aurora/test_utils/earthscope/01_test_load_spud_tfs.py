@@ -22,7 +22,8 @@ from aurora.test_utils.earthscope.helpers import get_rr_type
 
 SPUD_DF = pd.read_csv(SPUD_XML_CSV)
 now = datetime.datetime.now().__str__().split(".")[0].replace(" ","_")
-SPUD_XML_REVIEW_CSV_NAME = f"spud_xml_review_{now}.csv"
+now_str = now.replace(":","")
+SPUD_XML_REVIEW_CSV_NAME = f"spud_xml_review_{now_str}.csv"
 SPUD_XML_REVIEW_CSV_PATH = SPUD_XML_PATH.joinpath(SPUD_XML_REVIEW_CSV_NAME)
 
 
