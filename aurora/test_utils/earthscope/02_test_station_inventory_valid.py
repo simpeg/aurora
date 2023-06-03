@@ -33,6 +33,7 @@ from aurora.test_utils.earthscope.helpers import build_request_df
 from aurora.test_utils.earthscope.helpers import EXPERIMENT_PATH
 from aurora.test_utils.earthscope.helpers import get_most_recent_review
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
+from aurora.test_utils.earthscope.helpers import load_data_availability_dfs
 from mth5.mth5 import MTH5
 from mth5.clients import FDSN, MakeMTH5
 from mt_metadata.transfer_functions.core import TF
@@ -40,7 +41,7 @@ from mt_metadata import TF_XML
 
 STAGE_ID = 2
 
-
+AVAILABILITY_TABLE = load_data_availability_dfs()
 coverage_csv = get_summary_table_filename(STAGE_ID)
 GET_REMOTES_FROM = "spud_xml_review" # tf_xml
 
@@ -65,7 +66,7 @@ def initialize_metadata_df():
 
 
 
-def batch_review_metadata(source_csv=None, results_csv=None):
+def batch_download_metadata(source_csv=None, results_csv=None):
     """
 
     :param xml_source_column:"data_xml_path" or "emtf_xml_path"
@@ -87,7 +88,7 @@ def batch_review_metadata(source_csv=None, results_csv=None):
 
     for i_row, row in spud_df.iterrows():
         if row[f"{xml_source}_error"] is True:
-            print(f"Skipping {row} for now, tf not reading in")
+            print(f"Skipping {row.emtf_id} for now, tf not reading in")
             continue
 
         xml_path = pathlib.Path(row[xml_source])
@@ -106,7 +107,11 @@ def batch_review_metadata(source_csv=None, results_csv=None):
         all_stations = remotes + [station_id,]
 
         for station in all_stations:
-            request_df = build_request_df([station,], network_id, start=None, end=None)
+            availability_df = AVAILABILITY_TABLE[network_id]
+            sub_availability_df = availability_df[availability_df["Station"] == station_id]
+            availabile_channels = sub_availability_df['Channel'].unique()
+            request_df = build_request_df(station, network_id,
+                                          channels=availabile_channels, start=None, end=None)
             print(request_df)
             fdsn_object = FDSN(mth5_version='0.2.0')
             fdsn_object.client = "IRIS"
@@ -118,9 +123,10 @@ def batch_review_metadata(source_csv=None, results_csv=None):
                 print(f"{sub_coverage_df}")
                 continue
             try:
-                inventory = fdsn_object.get_inventory_from_df(request_df, data=False)
-                n_ch_inventory = len(inventory[0].networks[0].stations[0].channels)
-                experiment = get_experiment_from_obspy_inventory(inventory[0])
+                time.sleep(0.1)
+                inventory, data = fdsn_object.get_inventory_from_df(request_df, data=False)
+                n_ch_inventory = len(inventory.networks[0].stations[0].channels)
+                experiment = get_experiment_from_obspy_inventory(inventory)
                 mth5 = mth5_from_experiment(experiment, expected_file_name)
                 mth5.channel_summary.summarize()
                 channel_summary_df = mth5.channel_summary.to_dataframe()
@@ -149,8 +155,15 @@ def batch_review_metadata(source_csv=None, results_csv=None):
                 coverage_df = coverage_df.append(new_row, ignore_index=True)
                 coverage_df.to_csv(coverage_csv, index=False)
 
+def review_results():
+    coverage_csv = get_summary_table_filename(STAGE_ID)
+    coverage_df = pd.read_csv(coverage_csv)
+    print("OK")
+    pass
+
 def main():
-    batch_review_metadata()
+    batch_download_metadata()
+    review_results()
 
 if __name__ == "__main__":
     main()

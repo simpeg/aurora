@@ -125,7 +125,12 @@ def get_remotes_from_tf(tf_obj):
         remotes = get_remotes_from_tf_2(tf_obj)
     return remotes
 
-def build_request_df(station_ids, network_id, start=None, end=None):
+def build_request_df(station_id, network_id, channels=None, start=None, end=None):
+    if channels is None:
+        channels = "*"
+        print("this doesn't work")
+
+    # need this for columns
     from mth5.clients import FDSN
     fdsn_object = FDSN(mth5_version='0.2.0')
     fdsn_object.client = "IRIS"
@@ -135,17 +140,9 @@ def build_request_df(station_ids, network_id, start=None, end=None):
         end = datetime.datetime.now()
         end = end.replace(hour=0, minute=0, second=0, microsecond=0)
 
-    print(station_ids)
-    request_list = [[network_id, station_ids.pop(0), '', '*', start, end]]
-
-    # Handle remotes
-    try:
-        for station_id in station_ids:
-            request_list.append([network_id, station_ids, '', '*', startdate, enddate])
-
-    except Exception as e:
-        print(e)
-        print("kwahhat? ")
+    request_list = []
+    for channel in channels:
+        request_list.append([network_id, station_id, '', channel, start, end])
 
     print(request_list)
 
@@ -187,3 +184,14 @@ def get_most_recent_review(stage_number):
     globby = list(globby)
     return globby[-1]
 
+
+def load_data_availability_dfs():
+    output = {}
+    globby = PUBLIC_DATA_AVAILABILITY_PATH.glob("*txt")
+    for txt_file in globby:
+        print(txt_file)
+        network_id = txt_file.name.split("_")[-1].split(".txt")[0]
+        df = pd.read_csv(txt_file, parse_dates=['Earliest', 'Latest', ])
+        output[network_id] = df
+        print(f"loaded {network_id}")
+    return output
