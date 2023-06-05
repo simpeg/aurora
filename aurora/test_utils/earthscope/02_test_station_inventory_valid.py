@@ -41,7 +41,7 @@ from mt_metadata import TF_XML
 
 STAGE_ID = 2
 
-AVAILABILITY_TABLE = load_data_availability_dfs()
+
 coverage_csv = get_summary_table_filename(STAGE_ID)
 GET_REMOTES_FROM = "spud_xml_review" # tf_xml
 
@@ -73,6 +73,7 @@ def batch_download_metadata(source_csv=None, results_csv=None):
     specifies which of the two possible collections of xml files to use as source
     :return:
     """
+    AVAILABILITY_TABLE = load_data_availability_dfs()
     t0 = time.time()
     try:
         coverage_df = pd.read_csv(coverage_csv)
@@ -117,13 +118,12 @@ def batch_download_metadata(source_csv=None, results_csv=None):
             fdsn_object.client = "IRIS"
 
             expected_file_name = EXPERIMENT_PATH.joinpath(fdsn_object.make_filename(request_df))
-            sub_coverage_df = coverage_df[coverage_df["filename"] == str(expected_file_name)]
-            if len(sub_coverage_df):
+            if expected_file_name.exists():
                 print(f"Already have data for {station}-{network_id}")
-                print(f"{sub_coverage_df}")
                 continue
+
             try:
-                time.sleep(0.1)
+                # time.sleep(0.1)
                 inventory, data = fdsn_object.get_inventory_from_df(request_df, data=False)
                 n_ch_inventory = len(inventory.networks[0].stations[0].channels)
                 experiment = get_experiment_from_obspy_inventory(inventory)
@@ -162,7 +162,7 @@ def review_results():
     pass
 
 def main():
-    batch_download_metadata()
+    #batch_download_metadata()
     review_results()
 
 if __name__ == "__main__":
