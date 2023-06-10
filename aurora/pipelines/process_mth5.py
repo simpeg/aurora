@@ -243,6 +243,7 @@ def process_mth5(
     show_plot=False,
     z_file_path=None,
     return_collection=False,
+    save_fcs=False
 ):
     """
     This is the main method used to transform a processing_config,

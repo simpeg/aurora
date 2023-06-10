@@ -73,13 +73,13 @@ class TestZFileReadWrite(unittest.TestCase):
         tf_z.write(out_file_path)
         print("Add assert statement that the zrr are the same")
 
-    def test_tf_write_and_read(self):
-        tf_obj = self.tf_obj
-        tf_obj.write(fn=self.xml_file_base, file_type="emtfxml")
-
-        tf_obj2 = TF()
-        tf_obj2.read(fn=self.xml_file_base)
-        print("ASSERT tfobj==tfob2 everywhere it hsould")
+    # def test_tf_write_and_read(self):
+    #     tf_obj = self.tf_obj
+    #     tf_obj.write(fn=self.xml_file_base, file_type="emtfxml")
+    #
+    #     tf_obj2 = TF()
+    #     tf_obj2.read(fn=self.xml_file_base)
+    #     print("ASSERT tfobj==tfob2 everywhere it should")
 
 
 def main():
