@@ -31,7 +31,7 @@ from aurora.sandbox.mth5_helpers import mth5_from_experiment
 
 from aurora.test_utils.earthscope.helpers import build_request_df
 from aurora.test_utils.earthscope.helpers import DATA_PATH
-from aurora.test_utils.earthscope.helpers import get_most_recent_review
+from aurora.test_utils.earthscope.helpers import get_most_recent_summary_filepath
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
 from aurora.test_utils.earthscope.helpers import load_data_availability_dfs
 from mth5.mth5 import MTH5
@@ -67,7 +67,7 @@ def batch_download_mth5(source_csv=None, results_csv=None):
         coverage_df = initialize_mth5_df()
 
     if not source_csv:
-        source_csv = get_most_recent_review(2)
+        source_csv = get_most_recent_summary_filepath(2)
     source_df = pd.read_csv(source_csv)
 
 

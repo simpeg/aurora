@@ -31,7 +31,7 @@ from aurora.sandbox.mth5_helpers import mth5_from_experiment
 
 from aurora.test_utils.earthscope.helpers import build_request_df
 from aurora.test_utils.earthscope.helpers import EXPERIMENT_PATH
-from aurora.test_utils.earthscope.helpers import get_most_recent_review
+from aurora.test_utils.earthscope.helpers import get_most_recent_summary_filepath
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
 from aurora.test_utils.earthscope.helpers import load_data_availability_dfs
 from mth5.mth5 import MTH5
@@ -81,7 +81,7 @@ def batch_download_metadata(source_csv=None, results_csv=None):
         coverage_df = initialize_metadata_df()
 
     if not source_csv:
-        source_csv = get_most_recent_review(1)
+        source_csv = get_most_recent_summary_filepath(1)
     spud_df = pd.read_csv(source_csv)
     spud_df["data_xml_path_remotes"] = spud_df.data_xml_path_remotes.astype(str)
 

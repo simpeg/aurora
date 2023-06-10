@@ -155,6 +155,7 @@ def get_summary_table_filename(stage_number):
     base_names["01"] = "spud_xml_review"
     base_names["02"] = "local_metadata_coverage"
     base_names["03"] = "local_mth5_coverage"
+    base_names["04"] = "processing_review"
     stage_number_str = str(stage_number).zfill(2)
 
     now = datetime.datetime.now().__str__().split(".")[0].replace(" ", "_")
@@ -170,7 +171,7 @@ def get_summary_table_filename(stage_number):
     return csv_path
 
 
-def get_most_recent_review(stage_number):
+def get_most_recent_summary_filepath(stage_number):
     """
     For each stage of task 1, there is a summary table produced, and that summary table is used
     as input for the next stage of the process.  These tables are timestamped.
@@ -183,8 +184,13 @@ def get_most_recent_review(stage_number):
     stage_number_str = str(stage_number).zfill(2)
     globby = SUMMARY_TABLES_PATH.glob(f"{stage_number_str}*")
     globby = list(globby)
-    return globby[-1]
+    return globby[0]
 
+def load_most_recent_summary(stage_number):
+    review_csv = get_most_recent_summary_filepath(stage_number)
+    print(f"loading {review_csv}")
+    results_df = pd.read_csv(review_csv)
+    return results_df
 
 def load_data_availability_dfs():
     output = {}
