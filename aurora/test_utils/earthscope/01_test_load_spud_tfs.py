@@ -18,10 +18,12 @@ from aurora.test_utils.earthscope.helpers import SPUD_XML_PATH
 from aurora.test_utils.earthscope.helpers import SUMMARY_TABLES_PATH
 from aurora.test_utils.earthscope.helpers import DATA_PATH
 from aurora.test_utils.earthscope.helpers import load_xml_tf
+from aurora.test_utils.earthscope.helpers import get_most_recent_summary_filepath
 from aurora.test_utils.earthscope.helpers import get_remotes_from_tf
 from aurora.test_utils.earthscope.helpers import get_remotes_from_tf_2
 from aurora.test_utils.earthscope.helpers import get_rr_type
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
+from aurora.test_utils.earthscope.helpers import load_most_recent_summary
 
 STAGE_ID = 1
 
@@ -73,19 +75,20 @@ def review_spud_tfs(xml_sources=["emtf_xml_path", "data_xml_path"],
 
 
 
-def get_station_info():
-    pass
 
 def main():
-    results_df = review_spud_tfs()
+    #    results_df = review_spud_tfs()
 
     # DEBUGGING
-    # review_csv_name = "spud_xml_review_2023-05-28_13:21:18.csv"
-    # review_csv_path = SPUD_XML_PATH.joinpath(review_csv_name)
-    # df = pd.read_csv(review_csv)
-    print("OK")
-    # review_csv_name = "spud_xml_review_2023-05-28_13:21:18.csv"
-    # results_df = pd.read_csv(review_csv_name)
+    df = load_most_recent_summary()
+    #df = pd.read_csv("01_spud_xml_review_2023-06-03_120018.csv")
+    n_xml = len(df)
+    is_not_mda = df.data_xml_path.str.contains("__")
+    n_non_mda = is_not_mda.sum()
+    n_mda = len(df) - n_non_mda
+    print(f"There are {n_mda} / {n_xml} files with mda string ")
+    print(f"There are {n_non_mda} / {n_xml} files without mda string ")
+    non_mda_df = df[is_not_mda]
     print("summarize")
 
     
