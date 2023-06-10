@@ -6,6 +6,7 @@ import xarray as xr
 
 from aurora.time_series.frequency_domain_helpers import get_fft_harmonics
 from aurora.time_series.windowed_time_series import WindowedTimeSeries
+from aurora.time_series.windowing_scheme import window_scheme_from_decimation
 
 
 def validate_sample_rate(run_ts, expected_sample_rate, tol=1e-4):
@@ -41,7 +42,7 @@ def apply_prewhitening(decimation_obj, run_xrds_input):
 
     Parameters
     ----------
-    decimation_obj : aurora.config.metadata.decimation_level.DecimationLevel
+    decimation_obj : mt_metadata.transfer_functions.processing.aurora.DecimationLevel
         Information about how the decimation level is to be processed
     run_xrds_input : xarray.core.dataset.Dataset
         Time series to be prewhitened
@@ -68,7 +69,7 @@ def apply_recoloring(decimation_obj, stft_obj):
     """
     Parameters
     ----------
-    decimation_obj : aurora.config.metadata.decimation_level.DecimationLevel
+    decimation_obj : mt_metadata.transfer_functions.processing.aurora.DecimationLevel
         Information about how the decimation level is to be processed
     stft_obj : xarray.core.dataset.Dataset
         Time series of Fourier coefficients to be recoloured
@@ -111,7 +112,7 @@ def run_ts_to_stft_scipy(decimation_obj, run_xrds_orig):
     """
     Parameters
     ----------
-    decimation_obj : aurora.config.metadata.decimation_level.DecimationLevel
+    decimation_obj : mt_metadata.transfer_functions.processing.aurora.DecimationLevel
         Information about how the decimation level is to be processed
     run_xrds_orig : : xarray.core.dataset.Dataset
         Time series to be processed
@@ -122,7 +123,7 @@ def run_ts_to_stft_scipy(decimation_obj, run_xrds_orig):
         Time series of Fourier coefficients
     """
     run_xrds = apply_prewhitening(decimation_obj, run_xrds_orig)
-    windowing_scheme = decimation_obj.windowing_scheme
+    windowing_scheme = window_scheme_from_decimation(decimation_obj)
 
     stft_obj = xr.Dataset()
     for channel_id in run_xrds.data_vars:
@@ -167,7 +168,7 @@ def truncate_to_clock_zero(decimation_obj, run_xrds):
 
     Parameters
     ----------
-    decimation_obj: aurora.config.metadata.decimation_level.DecimationLevel
+    decimation_obj: mt_metadata.transfer_functions.processing.aurora.DecimationLevel
         Information about how the decimation level is to be processed
     run_xrds : xarray.core.dataset.Dataset
         normally extracted from mth5.RunTS
@@ -189,7 +190,7 @@ def truncate_to_clock_zero(decimation_obj, run_xrds):
         if delta_t_seconds == 0:
             pass  # time series start is already clock zero
         else:
-            windowing_scheme = decimation_obj.windowing_scheme
+            windowing_scheme = window_scheme_from_decimation(decimation_obj)
             number_of_steps = delta_t_seconds / windowing_scheme.duration_advance
             n_partial_steps = number_of_steps - np.floor(number_of_steps)
             n_clip = n_partial_steps * windowing_scheme.num_samples_advance
@@ -209,7 +210,7 @@ def run_ts_to_stft(decimation_obj, run_xrds_orig):
 
     Parameters
     ----------
-    decimation_obj : aurora.config.metadata.decimation_level.DecimationLevel
+    decimation_obj : mt_metadata.transfer_functions.processing.aurora.DecimationLevel
         Information about how the decimation level is to be processed
     run_ts : xarray.core.dataset.Dataset
         normally extracted from mth5.RunTS
@@ -223,7 +224,7 @@ def run_ts_to_stft(decimation_obj, run_xrds_orig):
     """
     run_xrds = apply_prewhitening(decimation_obj, run_xrds_orig)
     run_xrds = truncate_to_clock_zero(decimation_obj, run_xrds)
-    windowing_scheme = decimation_obj.windowing_scheme
+    windowing_scheme = window_scheme_from_decimation(decimation_obj)
     windowed_obj = windowing_scheme.apply_sliding_window(
         run_xrds, dt=1.0 / decimation_obj.decimation.sample_rate
     )
@@ -296,7 +297,7 @@ def prototype_decimate(config, run_xrds):
 
     Parameters
     ----------
-    config : aurora.config.metadata.decimation.Decimation
+    config : mt_metadata.transfer_functions.processing.aurora.Decimation
     run_xrds: xr.Dataset
         Originally from mth5.timeseries.run_ts.RunTS.dataset, but possibly decimated
         multiple times
@@ -338,7 +339,7 @@ def prototype_decimate_2(config, run_xrds):
 
     Parameters
     ----------
-    config : aurora.config.metadata.decimation.Decimation
+    config : mt_metadata.transfer_functions.processing.aurora.Decimation
     run_xrds: xr.Dataset
         Originally from mth5.timeseries.run_ts.RunTS.dataset, but possibly decimated
         multiple times
@@ -365,7 +366,7 @@ def prototype_decimate_3(config, run_xrds):
 
     Parameters
     ----------
-    config : aurora.config.metadata.decimation.Decimation
+    config : mt_metadata.transfer_functions.processing.aurora.Decimation
     run_xrds: xr.Dataset
         Originally from mth5.timeseries.run_ts.RunTS.dataset, but possibly decimated
         multiple times

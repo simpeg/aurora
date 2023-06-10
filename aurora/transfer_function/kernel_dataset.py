@@ -287,7 +287,10 @@ class KernelDataset:
         for i, row in sub_df.iterrows():
             local_run_obj = self.get_run_object(row)
             if station_metadata is None:
-                station_metadata = local_run_obj.station_group.metadata
+                try:
+                    station_metadata = local_run_obj.station_group.metadata
+                except AttributeError:
+                    station_metadata = local_run_obj.station_metadata
                 station_metadata.runs = ListDict()
             run_metadata = local_run_obj.metadata
             station_metadata.add_run(run_metadata)

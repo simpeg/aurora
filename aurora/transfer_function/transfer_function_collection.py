@@ -52,11 +52,14 @@ class TransferFunctionCollection(object):
 
     @property
     def local_station_id(self):
-        return self.header.local_station_id
+        return self.header.local_station.id
 
     @property
     def remote_station_id(self):
-        return self.header.remote_station_id
+        if self.header.remote_station:
+            return self.header.remote_station[0].id
+        else:
+            return ""
 
     @property
     def total_number_of_frequencies(self):
@@ -75,8 +78,8 @@ class TransferFunctionCollection(object):
     @property
     def total_number_of_channels(self):
         num_channels = 0
-        num_channels += self.header.num_input_channels
-        num_channels += self.header.num_output_channels
+        num_channels += len(self.header.input_channels)
+        num_channels += len(self.header.output_channels)
         return num_channels
 
     @property
@@ -144,7 +147,7 @@ class TransferFunctionCollection(object):
 
         Parameters
         ----------
-        channel_nomenclature: aurora.config.metadata.channel_nomenclature.ChannelNomenclature
+        channel_nomenclature: mt_metadata.transfer_functions.processing.aurora.channel_nomenclature.ChannelNomenclature
             Scheme according to how channels are named
         """
         ex, ey, hx, hy, hz = channel_nomenclature.unpack()
@@ -244,7 +247,7 @@ class TransferFunctionCollection(object):
 
         # <station>
         # format('station    :', a20)
-        station_line = f"station    :{self.header.local_station_id}"
+        station_line = f"station    :{self.header.local_station.id}"
         station_line += (32 - len(station_line)) * " " + "\n"
         f.writelines(station_line)
         # </station>
@@ -257,9 +260,14 @@ class TransferFunctionCollection(object):
             longitude = 0.000
             declination = 0.00
         else:
-            latitude = run_obj.station_group.metadata.location.latitude
-            longitude = run_obj.station_group.metadata.location.longitude
-            declination = run_obj.station_group.metadata.location.declination.value
+            try:
+                latitude = run_obj.station_group.metadata.location.latitude
+                longitude = run_obj.station_group.metadata.location.longitude
+                declination = run_obj.station_group.metadata.location.declination.value
+            except AttributeError:
+                latitude = run_obj.station_metadata.location.latitude
+                longitude = run_obj.station_metadata.location.longitude
+                declination = run_obj.station_metadata.location.declination.value
             if declination is None:
                 declination = 0.0
 
@@ -495,7 +503,7 @@ class TransferFunctionCollection(object):
         axs[0].set_ylabel(r"$\Omega$-m", fontsize=y_axis_fontsize)
         axs[1].set_ylabel("Degrees", fontsize=y_axis_fontsize)
 
-        ttl_str = f"{tf.tf_header.local_station_id} {xy_or_yx} \n{ttl_str}"
+        ttl_str = f"{tf.tf_header.local_station.id} {xy_or_yx} \n{ttl_str}"
         axs[0].set_title(ttl_str, fontsize=ttl_fontsize)
         if rho_ylims is not None:
             axs[0].set_ylim(rho_ylims)
@@ -507,7 +515,6 @@ class TransferFunctionCollection(object):
         default_figure_basename = f"{self.local_station_id}_{xy_or_yx}.png"
         figure_basename = kwargs.get("figure_basename", default_figure_basename)
         figure_path = kwargs.get("figure_path", FIGURES_PATH)
-        # figure_basename = f"synthetic_{tf.tf_header.local_station_id}_{xy_or_yx}.png"
         out_file = figure_path.joinpath(figure_basename)
         plt.savefig(out_file)
         if show:

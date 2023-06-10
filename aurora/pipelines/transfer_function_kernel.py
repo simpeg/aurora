@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import psutil
 
-from aurora.config.metadata.processing import Processing
+from mt_metadata.transfer_functions.processing.aurora import Processing
 from aurora.pipelines.helpers import initialize_config
 from aurora.transfer_function.kernel_dataset import KernelDataset
 
@@ -200,7 +200,6 @@ class TransferFunctionKernel(object):
         cond3 = self.processing_summary.run_id == row.run_id
         cond4 = self.processing_summary.dec_level == i_dec
         cond5 = self.processing_summary.start == row.start
-        # 20230506 - added additional cond - issue #260
         cond = cond1 & cond2 & cond3 & cond4 & cond5
         processing_row = self.processing_summary[cond]
         assert len(processing_row) == 1

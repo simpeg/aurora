@@ -54,7 +54,7 @@ def make_stft_objects(
 
     Parameters
     ----------
-    processing_config: aurora.config.metadata.processing.Processing
+    processing_config: mt_metadata.transfer_functions.processing.aurora.Processing
         Metadata about the processing to be applied
     i_dec_level: int
         The decimation level to process
@@ -110,7 +110,7 @@ def process_tf_decimation_level(
 
     Parameters
     ----------
-    config: aurora.config.metadata.decimation_level.DecimationLevel
+    config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
         Config for a single decimation level
     i_dec_level: int
         decimation level_id
@@ -128,8 +128,7 @@ def process_tf_decimation_level(
         The transfer function values packed into an object
     """
     frequency_bands = config.decimations[i_dec_level].frequency_bands_obj()
-    tf_header = config.make_tf_header(i_dec_level)
-    transfer_function_obj = TTFZ(tf_header, frequency_bands, processing_config=config)
+    transfer_function_obj = TTFZ(i_dec_level, frequency_bands, processing_config=config)
 
     transfer_function_obj = process_transfer_functions(
         config, i_dec_level, local_stft_obj, remote_stft_obj, transfer_function_obj
@@ -160,6 +159,8 @@ def export_tf(
     tf_cls: mt_metadata.transfer_functions.core.TF
         Transfer function container
     """
+    from mt_metadata.utils.list_dict import ListDict
+
     merged_tf_dict = tf_collection.get_merged_dict(channel_nomenclature)
     channel_nomenclature_dict = channel_nomenclature.to_dict()["channel_nomenclature"]
     tf_cls = TF(channel_nomenclature=channel_nomenclature_dict)
@@ -177,7 +178,7 @@ def export_tf(
     res_cov = res_cov.rename(renamer_dict)
     tf_cls.residual_covariance = res_cov
 
-    tf_cls.station_metadata._runs = []
+    tf_cls.station_metadata._runs = ListDict()
     tf_cls.station_metadata.from_dict(station_metadata_dict)
     tf_cls.survey_metadata.from_dict(survey_dict)
     return tf_cls
@@ -204,7 +205,7 @@ def update_dataset_df(i_dec_level, tfk):
     ----------
     i_dec_level: int
         decimation level id, indexed from zero
-    config: aurora.config.metadata.decimation_level.DecimationLevel
+    config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
         decimation level config
 
     Returns
@@ -242,6 +243,7 @@ def process_mth5(
     show_plot=False,
     z_file_path=None,
     return_collection=False,
+    save_fcs=False
 ):
     """
     This is the main method used to transform a processing_config,
@@ -251,7 +253,7 @@ def process_mth5(
 
     Parameters
     ----------
-    config: aurora.config.metadata.processing.Processing or path to json
+    config: mt_metadata.transfer_functions.processing.aurora.Processing or path to json
         All processing parameters
     tfk_dataset: aurora.tf_kernel.dataset.Dataset or None
         Specifies what datasets to process according to config

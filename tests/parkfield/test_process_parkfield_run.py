@@ -14,24 +14,18 @@ from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 from mth5.helpers import close_open_files
 
 
-def test_processing(
-    return_collection=False, z_file_path=None, test_clock_zero=False
-):
+def test_processing(z_file_path=None, test_clock_zero=False):
     """
     Parameters
     ----------
-    return_collection: bool
-        Controls dtype of returned object
     z_file_path: str or Path or None
         Where to store zfile
 
     Returns
     -------
-    tf_cls: TF object,
-        if  return_collection is True:
-        aurora.transfer_function.transfer_function_collection.TransferFunctionCollection
-        if  return_collection is False:
-        mt_metadata.transfer_functions.core.TF
+    tf_cls: mt_metadata.transfer_functions.core.TF
+        The TF object,
+
     """
     close_open_files()
     h5_path = ensure_h5_exists()
@@ -64,14 +58,9 @@ def test_processing(
         units="MT",
         show_plot=show_plot,
         z_file_path=z_file_path,
-        return_collection=return_collection,
     )
 
-    if return_collection:
-        tf_collection = tf_cls
-        return tf_collection
-    else:
-        tf_cls.write_tf_file(fn="emtfxml_test.xml", file_type="emtfxml")
+    tf_cls.write(fn="emtfxml_test.xml", file_type="emtfxml")
     return tf_cls
 
 
@@ -82,13 +71,13 @@ def test():
     logging.getLogger("matplotlib.ticker").disabled = True
 
     z_file_path = AURORA_RESULTS_PATH.joinpath("pkd.zss")
-    test_processing(return_collection=True, z_file_path=z_file_path)
+    tf_cls = test_processing(z_file_path=z_file_path)
+    tf_cls.write("pkd_mt_metadata.zss", file_type="zss")
     test_processing(
         z_file_path=z_file_path,
         test_clock_zero="user specified",
     )
     test_processing(z_file_path=z_file_path, test_clock_zero="data start")
-    test_processing(z_file_path=z_file_path)
 
     # COMPARE WITH ARCHIVED Z-FILE
     auxilliary_z_file = EMTF_RESULTS_PATH.joinpath("PKD_272_00.zrr")

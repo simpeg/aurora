@@ -44,7 +44,10 @@ def make_orientation_block_of_z_file(run_obj, channel_list=None):
         channel = run_obj.get_channel(channel_id)
         azimuth = channel.metadata.measurement_azimuth
         tilt = channel.metadata.measurement_tilt
-        station_id = run_obj.station_group.name
+        try:
+            station_id = run_obj.station_group.name
+        except AttributeError:
+            station_id = run_obj.station_metadata.id
         emtf_channel_id = channel_id.capitalize()
         fortran_str = ff_format.write(
             [i_ch + 1, azimuth, tilt, station_id, emtf_channel_id]

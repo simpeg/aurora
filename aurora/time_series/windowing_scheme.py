@@ -53,23 +53,24 @@ TODO: Regarding the optional time_vector input to self.apply_sliding_window()
 also allow for an xarray to be implemented. In the simplest case we would
 take an xarray in and extract its "time" axis as time vector
 
-<20210529>
+20210529
 This class is going to be modified to only accept xarray as input data.
 We can force any incoming numpy arrays to be either xr.DataArray or xr.Dataset.
 Similarly, output will be only xr.DataArray or xr.Dataset
-</20210529>
 """
 
 import copy
 import numpy as np
 import xarray as xr
 
-from aurora.time_series.frequency_domain_helpers import get_fft_harmonics
 from aurora.time_series.apodization_window import ApodizationWindow
-
+from aurora.time_series.windowed_time_series import WindowedTimeSeries
 from aurora.time_series.window_helpers import available_number_of_windows_in_array
 from aurora.time_series.window_helpers import SLIDING_WINDOW_FUNCTIONS
-from aurora.time_series.windowed_time_series import WindowedTimeSeries
+
+from mt_metadata.transfer_functions.processing.aurora.frequency_band import (
+    get_fft_harmonics,
+)
 
 
 class WindowingScheme(ApodizationWindow):
@@ -360,7 +361,7 @@ class WindowingScheme(ApodizationWindow):
         dataset *= scale_factor
         return dataset
 
-    # <PROPERTIES THAT NEED SAMPLING RATE>
+    # PROPERTIES THAT NEED SAMPLING RATE
     # these may be moved elsewhere later
     @property
     def dt(self):
@@ -393,9 +394,6 @@ class WindowingScheme(ApodizationWindow):
         return np.sqrt(2 / (self.sample_rate * self.S2))
 
 
-# </PROPERTIES THAT NEED SAMPLING RATE>
-
-
 def fft_xr_ds(dataset, sample_rate, detrend_type=None, prewhitening=None):
     """
     TODO: Add support for "first difference" prewhitening
@@ -424,7 +422,7 @@ def fft_xr_ds(dataset, sample_rate, detrend_type=None, prewhitening=None):
     n_fft_harmonics = int(samples_per_window / 2)  # no bin at Nyquist,
     harmonic_frequencies = get_fft_harmonics(samples_per_window, sample_rate)
 
-    # <CORE METHOD>
+    # CORE METHOD
     output_ds = xr.Dataset()
     # operation_axis = 1  # make this pick the "time" axis from xarray
     time_coordinate_index = list(dataset.coords.keys()).index("time")
@@ -444,5 +442,30 @@ def fft_xr_ds(dataset, sample_rate, detrend_type=None, prewhitening=None):
             coords={"frequency": harmonic_frequencies, "time": dataset.time.data},
         )
         output_ds.update({channel_id: xrd})
-    # </CORE METHOD>
+
     return output_ds
+
+
+def window_scheme_from_decimation(decimation):
+    """
+    Helper function to workaround mt_metadata to not import form aurora
+
+    Parameters
+    ----------
+    decimation: mt_metadata.transfer_function.processing.aurora.decimation_level
+    .DecimationLevel
+
+    Returns
+    -------
+        windowing_scheme aurora.time_series.windowing_scheme.WindowingScheme
+    """
+    from aurora.time_series.windowing_scheme import WindowingScheme
+
+    windowing_scheme = WindowingScheme(
+        taper_family=decimation.window.type,
+        num_samples_window=decimation.window.num_samples,
+        num_samples_overlap=decimation.window.overlap,
+        taper_additional_args=decimation.window.additional_args,
+        sample_rate=decimation.decimation.sample_rate,
+    )
+    return windowing_scheme

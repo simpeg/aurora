@@ -41,7 +41,7 @@ class TransferFunction(Base):
     Nin
     """
 
-    def __init__(self, tf_header, frequency_bands, **kwargs):
+    def __init__(self, decimation_level_id, frequency_bands, **kwargs):
         """
         change 2021-07-23 to require a frequency_bands object.  We may want
         to just pass the band_edges.  I'm not a fan of forcing dependency of
@@ -51,12 +51,14 @@ class TransferFunction(Base):
 
         Parameters
         ----------
-        tf_header: aurora.transfer_function.transfer_function_header.TransferFunctionHeader
-            TF header, may be deprecated in future.
+        decimation_level_id: int
+            Identifies the relevant decimation level.  Used for accessing the
+            appropriate info in self.processing config.
         frequency_bands: aurora.time_series.frequency_band.FrequencyBands
             frequency bands object
         """
-        self.tf_header = tf_header
+        self._emtf_tf_header = None
+        self.decimation_level_id = decimation_level_id
         self.frequency_bands = frequency_bands
         self.num_segments = None
         self.cov_ss_inv = None
@@ -65,9 +67,24 @@ class TransferFunction(Base):
         self.initialized = False
         self.processing_config = kwargs.get("processing_config", None)
 
-        if self.tf_header is not None:
+        if self.emtf_tf_header is not None:
             if self.num_bands is not None:
                 self._initialize_arrays()
+
+    @property
+    def emtf_tf_header(self):
+        if self.processing_config is None:
+            print("No header is available without a processing config")
+            self._emtf_tf_header = None
+        else:
+            if self._emtf_tf_header is None:
+                tfh = self.processing_config.emtf_tf_header(self.decimation_level_id)
+                self._emtf_tf_header = tfh
+        return self._emtf_tf_header
+
+    @property
+    def tf_header(self):
+        return self.emtf_tf_header
 
     @property
     def tf(self):
@@ -190,11 +207,11 @@ class TransferFunction(Base):
 
     @property
     def num_channels_in(self):
-        return self.tf_header.num_input_channels
+        return len(self.tf_header.input_channels)
 
     @property
     def num_channels_out(self):
-        return self.tf_header.num_output_channels
+        return len(self.tf_header.output_channels)
 
     def frequency_index(self, frequency):
         return self.period_index(1.0 / frequency)

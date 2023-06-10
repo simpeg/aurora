@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from aurora.config import Processing
+from mt_metadata.transfer_functions.processing.aurora import Processing
 
 
 def initialize_config(processing_config):
@@ -13,7 +13,7 @@ def initialize_config(processing_config):
         Processing object is stored in.
     Returns :
     -------
-    config: aurora.config.metadata.processing.Processing
+    config: mt_metadata.transfer_functions.processing.aurora.Processing
         Object that contains the processing parameters
     """
     if isinstance(processing_config, (Path, str)):

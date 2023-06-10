@@ -1,7 +1,9 @@
 import numpy as np
 import pandas as pd
 
-from aurora.time_series.frequency_band import FrequencyBands
+from mt_metadata.transfer_functions.processing.aurora.frequency_band import (
+    FrequencyBands,
+)
 
 
 def extract_band(frequency_band, fft_obj, epsilon=1e-7):
@@ -96,7 +98,7 @@ def df_from_bands(band_list):
     Parameters
     ----------
     band_list: list
-        obtained from aurora.config.metadata.decimation_level.DecimationLevel.bands
+        obtained from mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel.bands
 
     Returns
     -------
