@@ -266,9 +266,9 @@ def main():
     """
     Testing the processing of synthetic data
     """
-    tmp = TestSyntheticProcessing()
-    tmp.setUp()
-    tmp.test_can_output_tf_class_and_write_tf_xml()
+    # tmp = TestSyntheticProcessing()
+    # tmp.setUp()
+    # tmp.test_can_output_tf_class_and_write_tf_xml()
     # tmp.test_no_crash_with_too_many_decimations()
     # tmp.test_can_use_scale_factor_dictionary()
     unittest.main()
