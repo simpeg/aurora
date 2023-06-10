@@ -77,18 +77,18 @@ def review_spud_tfs(xml_sources=["emtf_xml_path", "data_xml_path"],
 
 
 def main():
-    #    results_df = review_spud_tfs()
+    #results_df = review_spud_tfs()
 
-    # DEBUGGING
-    df = load_most_recent_summary()
-    #df = pd.read_csv("01_spud_xml_review_2023-06-03_120018.csv")
-    n_xml = len(df)
-    is_not_mda = df.data_xml_path.str.contains("__")
-    n_non_mda = is_not_mda.sum()
-    n_mda = len(df) - n_non_mda
-    print(f"There are {n_mda} / {n_xml} files with mda string ")
-    print(f"There are {n_non_mda} / {n_xml} files without mda string ")
-    non_mda_df = df[is_not_mda]
+    # # DEBUGGING
+    df = load_most_recent_summary(1)
+    # old_df = pd.read_csv(SUMMARY_TABLES_PATH.joinpath("01_spud_xml_review_2023-06-03_114350.csv"))
+    # n_xml = len(df)
+    # is_not_mda = df.data_xml_path.str.contains("__")
+    # n_non_mda = is_not_mda.sum()
+    # n_mda = len(df) - n_non_mda
+    # print(f"There are {n_mda} / {n_xml} files with mda string ")
+    # print(f"There are {n_non_mda} / {n_xml} files without mda string ")
+    # non_mda_df = df[is_not_mda]
     print("summarize")
 
     

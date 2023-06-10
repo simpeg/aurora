@@ -184,7 +184,7 @@ def get_most_recent_summary_filepath(stage_number):
     stage_number_str = str(stage_number).zfill(2)
     globby = SUMMARY_TABLES_PATH.glob(f"{stage_number_str}*")
     globby = list(globby)
-    return globby[-1]
+    return globby[0]
 
 def load_most_recent_summary(stage_number):
     review_csv = get_most_recent_summary_filepath(stage_number)
