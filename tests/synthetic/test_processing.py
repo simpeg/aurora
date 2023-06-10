@@ -2,6 +2,7 @@ import logging
 import pathlib
 import unittest
 
+from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
@@ -11,9 +12,6 @@ from aurora.test_utils.synthetic.make_processing_configs import (
     create_test_run_config,
 )
 from aurora.test_utils.synthetic.paths import AURORA_RESULTS_PATH
-from aurora.test_utils.synthetic.processing_helpers import (
-    process_synthetic_data,
-)
 from aurora.transfer_function.kernel_dataset import KernelDataset
 from mth5.helpers import close_open_files
 
@@ -204,9 +202,9 @@ def process_synthetic_1(
         for decimation in processing_config.decimations:
             decimation.estimator.estimate_per_channel = False
 
-    tf_result = process_synthetic_data(
+    tf_result = process_mth5(
         processing_config,
-        tfk_dataset,
+        tfk_dataset=tfk_dataset,
         z_file_path=z_file_path,
         return_collection=return_collection,
     )
@@ -236,7 +234,7 @@ def process_synthetic_2():
     tfk_dataset = KernelDataset()
     tfk_dataset.from_run_summary(run_summary, "test2")
     processing_config = create_test_run_config("test2", tfk_dataset)
-    tfc = process_synthetic_data(processing_config, tfk_dataset)
+    tfc = process_mth5(processing_config, tfk_dataset=tfk_dataset)
     return tfc
 
 
@@ -256,9 +254,9 @@ def process_synthetic_1r2(
     processing_config = create_test_run_config(
         config_keyword, tfk_dataset, channel_nomenclature=channel_nomenclature
     )
-    tfc = process_synthetic_data(
+    tfc = process_mth5(
         processing_config,
-        tfk_dataset,
+        tfk_dataset=tfk_dataset,
         return_collection=return_collection,
     )
     return tfc
@@ -268,8 +266,9 @@ def main():
     """
     Testing the processing of synthetic data
     """
-    # tmp = TestSyntheticProcessing()
-    # tmp.setUp()
+    tmp = TestSyntheticProcessing()
+    tmp.setUp()
+    tmp.test_can_output_tf_class_and_write_tf_xml()
     # tmp.test_no_crash_with_too_many_decimations()
     # tmp.test_can_use_scale_factor_dictionary()
     unittest.main()
@@ -292,7 +291,7 @@ if __name__ == "__main__":
 #     test_config = CONFIG_PATH.joinpath("test1_run_config_underdetermined.json")
 #     # test_config = Path("config", "test1_run_config_underdetermined.json")
 #     run_id = "001"
-#     process_synthetic_data(test_config, run_id, units="MT")
+#     process_mth5(test_config, run_id, units="MT")
 #
 #
 # def process_synthetic_1_with_nans():
@@ -305,4 +304,4 @@ if __name__ == "__main__":
 #     test_config = CONFIG_PATH.joinpath("test1_run_config_nan.json")
 #     #    test_config = Path("config", "test1_run_config_nan.json")
 #     run_id = "001"
-#     process_synthetic_data(test_config, run_id, units="MT")
+#     process_mth5(test_config, run_id, units="MT")
