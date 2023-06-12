@@ -150,7 +150,13 @@ class KernelDataset:
         self.df = df
         if remote_station_id:
             self.restrict_run_intervals_to_simultaneous()
-        self._add_duration_column()
+        # ADD A CHECK HERE df is non-empty
+        if len(self.df) == 0:
+            print("No Overlap between local and remote station data streams")
+            print("Remote reference processing not a valid option")
+        else:
+            self._add_duration_column()
+
 
     @property
     def mini_summary(self):
@@ -257,6 +263,7 @@ class KernelDataset:
                     # print(f"NOVERLAP {i_local}, {i_remote}")
         df = pd.DataFrame(output_sub_runs)
         df = df.reset_index(drop=True)
+
         self.df = df
         return
 
