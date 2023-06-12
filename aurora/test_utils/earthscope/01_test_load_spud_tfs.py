@@ -69,7 +69,7 @@ def review_spud_tfs(xml_sources=["emtf_xml_path", "data_xml_path"],
                 spud_df[f"{xml_source}_exception"].at[i_row] = e.__class__.__name__
                 spud_df[f"{xml_source}_error_message"].at[i_row] = e.args[0]
         print(i_row, row[xml_source])
-    spud_df.to_csv(results_csv)
+    spud_df.to_csv(results_csv, index=False)
     print(f"Took {time.time()-t0}s to review spud tfs")
     return spud_df
 
