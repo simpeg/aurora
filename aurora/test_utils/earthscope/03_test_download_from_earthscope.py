@@ -79,12 +79,16 @@ def batch_download_mth5(source_csv=None, results_csv=None):
         availability_df = AVAILABILITY_TABLE[row.network_id]
         sub_availability_df = availability_df[availability_df["Station"] == row.station_id]
         availabile_channels = sub_availability_df['Channel'].unique()
+        # availabile_channels = ["*Q*", "*F*",]
         request_df = build_request_df(row.station_id, row.network_id,
                                       channels=availabile_channels, start=None, end=None)
         #print(request_df)
         fdsn_object = FDSN(mth5_version='0.2.0')
         fdsn_object.client = "IRIS"
-
+        if row.station_id == "ORF08":
+            print("debug")
+        # else:
+        #     continue
         expected_file_name = DATA_PATH.joinpath(fdsn_object.make_filename(request_df))
         if expected_file_name.exists():
             print(f"Already have data for {row.station_id}-{row.network_id}")

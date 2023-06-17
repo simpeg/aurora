@@ -111,6 +111,7 @@ def batch_download_metadata(source_csv=None, results_csv=None):
             availability_df = AVAILABILITY_TABLE[network_id]
             sub_availability_df = availability_df[availability_df["Station"] == station_id]
             availabile_channels = sub_availability_df['Channel'].unique()
+            # availabile_channels = ["*Q*", "*F*",]
             request_df = build_request_df(station, network_id,
                                           channels=availabile_channels, start=None, end=None)
             print(request_df)

@@ -139,6 +139,7 @@ def build_request_df(station_id, network_id, channels=None, start=None, end=None
     if end is None:
         end = datetime.datetime.now()
         end = end.replace(hour=0, minute=0, second=0, microsecond=0)
+        end = str(end)
 
     request_list = []
     for channel in channels:
