@@ -75,7 +75,8 @@ def batch_process(xml_source="data_xml_path"):
         if row[f"{xml_source}_error"] is True:
             print(f"Skipping {row} for now, tf not reading in")
             continue
-
+        if row.station_id == "CAM01":
+            print("DEBUG")
         data_file_base = f"{row.network_id}_{row.station_id}.h5"
         data_file = DATA_PATH.joinpath(data_file_base)
         if not data_file.exists():
@@ -104,9 +105,15 @@ def batch_process(xml_source="data_xml_path"):
             remote_id = None
             mth5_files = [data_file, ]
 
-
+        xml_file_base = f"{row.network_id}_{row.station_id}_RR{remote_id}.xml"
+        xml_file_path = AURORA_TF_PATH.joinpath(xml_file_base)
+        if xml_file_path.exists():
+            print(f"SKIPPING {xml_file_path} exists")
+            continue
         mth5_run_summary = RunSummary()
-        mth5_run_summary.from_mth5s([data_file, rr_file])
+        mth5s = [data_file, rr_file]
+        mth5s = [x for x in mth5s if x is not None]
+        mth5_run_summary.from_mth5s(mth5s)
         run_summary = mth5_run_summary.clone()
         run_summary.mini_summary
 
@@ -139,8 +146,8 @@ def batch_process(xml_source="data_xml_path"):
                             show_plot=show_plot,
                             z_file_path=None,
                         )
-        xml_file_base = f"{row.network_id}_{row.station_id}_RR{remote_id}.xml"
-        xml_file_path = AURORA_TF_PATH.joinpath(xml_file_base)
+        # xml_file_base = f"{row.network_id}_{row.station_id}_RR{remote_id}.xml"
+        # xml_file_path = AURORA_TF_PATH.joinpath(xml_file_base)
         tf_cls.write(fn=xml_file_path, file_type="emtfxml")
 
 

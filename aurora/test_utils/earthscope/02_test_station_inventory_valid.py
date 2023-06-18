@@ -85,13 +85,14 @@ def batch_download_metadata(source_csv=None, results_csv=None):
             print(f"Skipping {row.emtf_id} for now, tf not reading in")
             continue
 
-        xml_path = pathlib.Path(row[xml_source])
-        if "__" in xml_path.name:
-            print(f"Skipping {row[xml_source]} for now, Station/network unknown")
-            continue
+        # xml_path = pathlib.Path(row[xml_source])
+        # if "__" in xml_path.name:
+        #     print(f"Skipping {row[xml_source]} for now, Station/network unknown")
+        #     continue
+        # [xml_uid, network_id, station_id] = xml_path.stem.split("_")
 
-
-        [xml_uid, network_id, station_id] = xml_path.stem.split("_")
+        network_id = row.network_id
+        station_id = row.station_id
         remotes = row.data_xml_path_remotes.split(",")
         if len(remotes)==1:
             if remotes[0] == "nan":
