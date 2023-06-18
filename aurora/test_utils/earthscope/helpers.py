@@ -242,8 +242,8 @@ def restrict_to_mda(df, RR=None, keep_columns=KEEP_COLUMNS):
 
     if "data_xml_path_remotes" in mda_df.columns:
         mda_df["data_xml_path_remotes"] = mda_df.data_xml_path_remotes.astype(str)
-        mda_df[mda_df["data_xml_path_remotes"]=="nan"] = ""
-        
+        mda_df[mda_df["data_xml_path_remotes"]=="nan"]["data_xml_path_remotes"] = ""
+
     print("ADD NETWORK/STATION COLUMNS for convenience")
     print("Consdier PUSH THIS BACK TO TASK 01 once all XML are reading successfully")
     # Get station/Networks

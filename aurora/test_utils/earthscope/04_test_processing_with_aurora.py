@@ -46,20 +46,20 @@ GET_REMOTES_FROM = "spud_xml_review"
 processing_summary_csv = get_summary_table_filename(STAGE_ID)
 print(SUMMARY_TABLES_PATH)
 print(processing_summary_csv)
-print(processing_summary_csv)
 
 
 
 
 
 
-# def initialize_coverage_df():
-#     #local_data_coverage_df = pd.DataFrame(columns=["station_id", "network_id", "filename", "filesize"])
-#     pass
-#
-#
-#
-#
+def initialize_tf_df():
+    tf_df = pd.DataFrame(columns=["station_id", "network_id", "remote_id",
+                                  "filename", "exception", "error_message"])
+    return tf_df
+
+tf_csv = processing_summary_csv
+
+
 # local_data_coverage_csv = get_most_recent_summary_filepath(3)
 # local_data_coverage_df = pd.read_csv(data_coverage_csv)
 
@@ -69,7 +69,7 @@ def batch_process(xml_source="data_xml_path"):
 
 
     """
-
+    tf_df = initialize_tf_df()
     for i_row, row in spud_df.iterrows():
         print(row)
         if row[f"{xml_source}_error"] is True:
@@ -129,8 +129,7 @@ def batch_process(xml_source="data_xml_path"):
 
         kernel_dataset = KernelDataset()
         kernel_dataset.from_run_summary(run_summary, row.station_id, remote_id)
-        #kernel_dataset.from_run_summary(run_summary, "AZT14")
-        # kernel_dataset.mini_summary
+
         if len(kernel_dataset.df) == 0:
             print("No RR Coverage")
             kernel_dataset.from_run_summary(run_summary, row.station_id)
@@ -140,15 +139,30 @@ def batch_process(xml_source="data_xml_path"):
         config = cc.create_from_kernel_dataset(kernel_dataset)
 
         show_plot = False
-        tf_cls = process_mth5(config,
-                            kernel_dataset,
-                            units="MT",
-                            show_plot=show_plot,
-                            z_file_path=None,
-                        )
-        # xml_file_base = f"{row.network_id}_{row.station_id}_RR{remote_id}.xml"
-        # xml_file_path = AURORA_TF_PATH.joinpath(xml_file_base)
-        tf_cls.write(fn=xml_file_path, file_type="emtfxml")
+        #["station_id", "network_id", "remote_id", "filename", "exception", "error_message"]
+        try:
+            tf_cls = process_mth5(config,
+                                kernel_dataset,
+                                units="MT",
+                                show_plot=show_plot,
+                                z_file_path=None,
+                            )
+            tf_cls.write(fn=xml_file_path, file_type="emtfxml")
+            new_row = {"station_id": row.station_id,
+                       "network_id": row.network_id,
+                       "remote_id": remote_id,
+                       "filename": xml_file_path,
+                       "exception": "",
+                       "error_message": ""}
+        except Exception as e:
+            new_row = {"station_id": row.station_id,
+                       "network_id": row.network_id,
+                       "remote_id": remote_id,
+                       "filename": xml_file_path,
+                       "exception": e.__class__.__name__,
+                       "error_message": e.args[0]}
+        tf_df = tf_df.append(new_row, ignore_index=True)
+        tf_df.to_csv(tf_csv, index=False)
 
 
 def main():
