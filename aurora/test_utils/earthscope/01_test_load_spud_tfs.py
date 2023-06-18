@@ -77,7 +77,12 @@ def review_spud_tfs(xml_sources=["emtf_xml_path", "data_xml_path"],
 
 
 def main():
-    #results_df = review_spud_tfs()
+    # normal
+    results_df = review_spud_tfs()
+
+    # run only data
+    #results_df = review_spud_tfs(xml_sources = ["data_xml_path", ])
+
 
     # # DEBUGGING
     df = load_most_recent_summary(1)
