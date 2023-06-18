@@ -32,6 +32,10 @@ DATA_PATH.mkdir(parents=True, exist_ok=True)
 EXPERIMENT_PATH = CACHE_PATH.joinpath("experiments")
 EXPERIMENT_PATH.mkdir(parents=True, exist_ok=True)
 
+# Transfer Functions
+AURORA_TF_PATH = CACHE_PATH.joinpath("aurora_transfer_functions")
+AURORA_TF_PATH.mkdir(parents=True, exist_ok=True)
+
 # Summary tables
 SUMMARY_TABLES_PATH = CACHE_PATH.joinpath("summary_tables")
 SUMMARY_TABLES_PATH.mkdir(parents=True, exist_ok=True)
@@ -209,13 +213,13 @@ def load_data_availability_dfs():
 KEEP_COLUMNS = ['emtf_id', 'data_id','file_size','data_xml_path',
                 'data_xml_path_error',
                 'data_xml_path_remote_ref_type', 'data_xml_path_remotes',]
-def restrict_to_mda(df, RR=None, keep=KEEP_COLUMNS):
+def restrict_to_mda(df, RR=None, keep_columns=KEEP_COLUMNS):
     """
     Takes as input the summary from xml ingest (process 01) and restricts to rows where
     data at IRIS/Earthscope are expected.
     :param df:
     :param RR:
-    :param keep:
+    :param keep_columns:
     :return:
     """
     n_xml = len(df)
@@ -225,10 +229,33 @@ def restrict_to_mda(df, RR=None, keep=KEEP_COLUMNS):
     print(f"There are {n_mda} / {n_xml} files with mda string ")
     print(f"There are {n_non_mda} / {n_xml} files without mda string ")
     mda_df = df[~is_not_mda]
+    mda_df.reset_index(drop=True, inplace=True)
+
+
     if RR:
         is_rrr = mda_df.data_xml_path_remote_ref_type == RR
         mda_df = mda_df[is_rrr]
-    mda_df = mda_df[keep]
+        mda_df.reset_index(drop=True, inplace=True)
+
+    mda_df = mda_df[keep_columns]
+
+
+    if "data_xml_path_remotes" in mda_df.columns:
+        mda_df["data_xml_path_remotes"] = mda_df.data_xml_path_remotes.astype(str)
+
     print("ADD NETWORK/STATION COLUMNS for convenience")
-    print("PUSH THIS BACK TO TASK 01 once all XML are reading successfully")
+    print("Consdier PUSH THIS BACK TO TASK 01 once all XML are reading successfully")
+    # Get station/Networks
+    xml_source = 'data_xml_path'
+    n_rows = len(mda_df)
+    networks = n_rows * [""]
+    stations = n_rows * [""]
+    for i, row in mda_df.iterrows():
+        xml_path = pathlib.Path(row[xml_source])
+        [xml_uid, network_id, station_id] = xml_path.stem.split("_")
+        networks[i] = network_id
+        stations[i] = station_id
+    mda_df["station_id"] = stations
+    mda_df["network_id"] = networks
+
     return mda_df

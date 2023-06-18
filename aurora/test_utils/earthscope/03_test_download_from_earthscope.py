@@ -34,6 +34,7 @@ from aurora.test_utils.earthscope.helpers import DATA_PATH
 from aurora.test_utils.earthscope.helpers import get_most_recent_summary_filepath
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
 from aurora.test_utils.earthscope.helpers import load_data_availability_dfs
+from aurora.test_utils.earthscope.helpers import restrict_to_mda
 from mth5.mth5 import MTH5
 from mth5.clients import FDSN, MakeMTH5
 from mt_metadata.transfer_functions.core import TF

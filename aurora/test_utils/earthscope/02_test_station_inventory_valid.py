@@ -34,6 +34,7 @@ from aurora.test_utils.earthscope.helpers import EXPERIMENT_PATH
 from aurora.test_utils.earthscope.helpers import get_most_recent_summary_filepath
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
 from aurora.test_utils.earthscope.helpers import load_data_availability_dfs
+from aurora.test_utils.earthscope.helpers import restrict_to_mda
 from mth5.mth5 import MTH5
 from mth5.clients import FDSN, MakeMTH5
 from mt_metadata.transfer_functions.core import TF
@@ -74,7 +75,8 @@ def batch_download_metadata(source_csv=None, results_csv=None):
     if not source_csv:
         source_csv = get_most_recent_summary_filepath(1)
     spud_df = pd.read_csv(source_csv)
-    spud_df["data_xml_path_remotes"] = spud_df.data_xml_path_remotes.astype(str)
+    spud_df = restrict_to_mda(spud_df)
+
 
     xml_source = "data_xml_path"
 
@@ -155,7 +157,7 @@ def review_results():
     pass
 
 def main():
-    #batch_download_metadata()
+    batch_download_metadata()
     review_results()
 
 if __name__ == "__main__":
