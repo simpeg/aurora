@@ -47,16 +47,7 @@ GET_REMOTES_FROM = "spud_xml_review" # tf_xml
 
 
 def initialize_metadata_df():
-    """
-    We want columns
-    station_id
-    network_id
-    num_channels
-    h5_path
-
-
-    :return:
-    """
+    """ """
     coverage_df = pd.DataFrame(columns=["station_id", "network_id", "filename", 
                                         "filesize",
                                         "num_channels_inventory",
@@ -144,7 +135,7 @@ def batch_download_metadata(source_csv=None, results_csv=None):
                 coverage_df = coverage_df.append(new_row, ignore_index=True)
                 coverage_df.to_csv(coverage_csv, index=False)
             except Exception as e:
-                print("")
+                print(f"{e}")
                 new_row = {"station_id":station,
                            "network_id":network_id,
                            "filename":"", #expected_file_name
@@ -159,6 +150,7 @@ def batch_download_metadata(source_csv=None, results_csv=None):
 def review_results():
     coverage_csv = get_summary_table_filename(STAGE_ID)
     coverage_df = pd.read_csv(coverage_csv)
+    print(f"coverage_df has columns \n {coverage_df.columns}")
     print("OK")
     pass
 

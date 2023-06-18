@@ -75,6 +75,10 @@ def review_spud_tfs(xml_sources=["emtf_xml_path", "data_xml_path"],
 
 
 
+def summarize_errors():
+    df = load_most_recent_summary(1)
+    print("emtf_xml_path_error")
+    df.emtf_xml_path_error.value_counts()
 
 def main():
     # normal

@@ -204,3 +204,31 @@ def load_data_availability_dfs():
         output[network_id] = df
         print(f"loaded {network_id}")
     return output
+
+
+KEEP_COLUMNS = ['emtf_id', 'data_id','file_size','data_xml_path',
+                'data_xml_path_error',
+                'data_xml_path_remote_ref_type', 'data_xml_path_remotes',]
+def restrict_to_mda(df, RR=None, keep=KEEP_COLUMNS):
+    """
+    Takes as input the summary from xml ingest (process 01) and restricts to rows where
+    data at IRIS/Earthscope are expected.
+    :param df:
+    :param RR:
+    :param keep:
+    :return:
+    """
+    n_xml = len(df)
+    is_not_mda = df.data_xml_path.str.contains("__")
+    n_non_mda = is_not_mda.sum()
+    n_mda = len(df) - n_non_mda
+    print(f"There are {n_mda} / {n_xml} files with mda string ")
+    print(f"There are {n_non_mda} / {n_xml} files without mda string ")
+    mda_df = df[~is_not_mda]
+    if RR:
+        is_rrr = mda_df.data_xml_path_remote_ref_type == RR
+        mda_df = mda_df[is_rrr]
+    mda_df = mda_df[keep]
+    print("ADD NETWORK/STATION COLUMNS for convenience")
+    print("PUSH THIS BACK TO TASK 01 once all XML are reading successfully")
+    return mda_df
