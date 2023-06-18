@@ -7,13 +7,20 @@ If you need a file with the IRIS mda string, i_row=6000 has one.
 
 There are two potential sources for SPUD XML data.
 
+Note that the EMTF spuds come as HTML, to get XML need to edit the curl command, adding
+-H 'Accept: application/xml'
+https://stackoverflow.com/questions/22924993/getting-webpage-data-in-xml-format-using-curl
 
+Stripping the xml tags after grepping:
+https://stackoverflow.com/questions/3662142/how-to-remove-tags-from-a-string-in-python-using-regular-expressions-not-in-ht
 
 """
-import pathlib
+
 
 import numpy as np
 import pandas as pd
+import pathlib
+import re
 import subprocess
 import time
 
@@ -23,8 +30,6 @@ from aurora.test_utils.earthscope.helpers import SPUD_EMTF_PATH
 from aurora.test_utils.earthscope.helpers import SPUD_XML_CSV
 
 TMP_FROM_EMTF = False  #boolean, controls whether emtf_xml is stored as tmp, or archived locally
-# def grep_text(fname, ):
-# 	'"'"'"'
 
 input_spud_ids_file = pathlib.Path('0_spud_ids.list')
 # output_spud_ids_file = pathlib.Path('1_spud_ids.list')
@@ -36,7 +41,7 @@ EMTF_URL = "https://ds.iris.edu/spudservice/emtf"
 DATA_URL = "https://ds.iris.edu/spudservice/data"
 
 def get_via_curl(source, target):
-	cmd = f"curl -s {source} -o {target}"
+	cmd = f"curl -s -H 'Accept: application/xml' {source} -o {target}"
 	print(cmd)
 	exit_status = subprocess.call([cmd], shell=True)
 	if exit_status != 0:
@@ -44,7 +49,10 @@ def get_via_curl(source, target):
 		raise Exception
 	return
 
-def scrape_spud(force_download=False):
+def scrape_spud(force_download_data=False,
+				force_download_emtf=False,
+				save_at_intervals=False,
+				save_final=True):
 	"""
 
 	:param force_download:
@@ -63,12 +71,13 @@ def scrape_spud(force_download=False):
 
 	# Iterate over rows of dataframe (spud files)
 	for i_row, row in df.iterrows():
-		if np.mod(i_row, 20) == 0:
-			df.to_csv(SPUD_XML_CSV, index=False)
+		if save_at_intervals:
+			if np.mod(i_row, 20) == 0:
+				df.to_csv(SPUD_XML_CSV, index=False)
 		# Uncomment lines below to enable fast-forward
-		# cutoff = 11# 6000 #2000 # 11
-		# if i_row < cutoff:
-		# 	continue
+		cutoff = 840# 6000 #2000 # 11
+		if i_row < cutoff:
+			continue
 
 		print(f"Getting {i_row}/{n_rows}, {row.emtf_id}")
 
@@ -89,6 +98,10 @@ def scrape_spud(force_download=False):
 			else:
 				download_emtf = True
 
+		if force_download_emtf:
+			download_emtf = True
+			print("Forcing download of EMTF file")
+
 		if download_emtf:
 			try:
 				get_via_curl(source_url, emtf_file)
@@ -105,23 +118,32 @@ def scrape_spud(force_download=False):
 		data_id = int(qq.decode().strip())
 		print(f"source_data_id = {data_id}")
 		df.at[i_row, "data_id" ] = data_id
-
+		#re.sub('<[^>]*>', '', mystring)
 		# Extract Station Name info if IRIS provides it
-		cmd = f"grep 'mda' {emtf_file} | awk -F'"'"'"' '{print $2}'"
-		qq = subprocess.check_output([cmd], shell=True)
+		#cmd = f"grep 'mda' {emtf_file} | awk -F'"'"'"' '{print $2}'"
+		cmd = f"grep 'mda' {emtf_file}"
+		try:
+			qq = subprocess.check_output([cmd], shell=True)
+		except subprocess.CalledProcessError as e:
+			print("NO GREPP")
+			qq = None
 		network = ""
 		station = ""
 		if qq:
-			url_parts = qq.decode().strip().split("/")
-			if url_parts[-3] == "mda":
-				network = url_parts[-2]
-				station = url_parts[-1]
+			xml_url = qq.decode().strip()
+			url = re.sub('<[^>]*>', '', xml_url)
+			url_parts = url.split("/")
+			if "mda" in url_parts:
+				idx = url_parts.index("mda")
+				network = url_parts[idx + 1]
+				station = url_parts[idx + 2]
 
 		out_file_base = "_".join([str(row.emtf_id), network, station]) + ".xml"
 		source_url = f"{DATA_URL}/{data_id}"
 		output_xml = target_dir_data.joinpath(out_file_base)
 		if output_xml.exists():
-			if force_download:
+			if force_download_data:
+				print("Forcing download of DATA file")
 				get_via_curl(source_url, output_xml)
 			else:
 				print(f"XML data_file {output_xml} already exists - skipping")
@@ -134,11 +156,21 @@ def scrape_spud(force_download=False):
 			df.at[i_row, "file_size"] = file_size
 			df.at[i_row, "data_xml_path"] = str(output_xml)
 		print("OK")
-	df.to_csv(SPUD_XML_CSV, index=False)
+	if save_final:
+		df.to_csv(SPUD_XML_CSV, index=False)
 
 def main():
 	t0 = time.time()
-	scrape_spud()
+
+	# normal usage
+	scrape_spud(save_at_intervals=True)
+
+	# debugging
+	#scrape_spud(force_download_emtf=False, save_final=False)
+
+	# re-scrape emtf
+	# scrape_spud(force_download_emtf=True, save_final=False)
+
 	delta_t = time.time() - t0
 	print(f"Success {delta_t}s")
 
