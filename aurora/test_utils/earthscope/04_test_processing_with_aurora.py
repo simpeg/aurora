@@ -51,10 +51,10 @@ print(processing_summary_csv)
 
 
 
-
+tf_report_schema = ["data_id", "station_id", "network_id", "remote_id",
+                                  "filename", "exception", "error_message", "data_xml_path"]
 def initialize_tf_df():
-    tf_df = pd.DataFrame(columns=["station_id", "network_id", "remote_id",
-                                  "filename", "exception", "error_message"])
+    tf_df = pd.DataFrame(columns=tf_report_schema)
     return tf_df
 
 tf_csv = processing_summary_csv
@@ -148,19 +148,23 @@ def batch_process(xml_source="data_xml_path"):
                                 z_file_path=None,
                             )
             tf_cls.write(fn=xml_file_path, file_type="emtfxml")
-            new_row = {"station_id": row.station_id,
+            new_row = {"data_id": row.data_id,
+                       "station_id": row.station_id,
                        "network_id": row.network_id,
                        "remote_id": remote_id,
                        "filename": xml_file_path,
                        "exception": "",
-                       "error_message": ""}
+                       "error_message": "",
+                       "data_xml_path":row.data_xml_path}
         except Exception as e:
-            new_row = {"station_id": row.station_id,
+            new_row = {"data_id": row.data_id,
+                       "station_id": row.station_id,
                        "network_id": row.network_id,
                        "remote_id": remote_id,
                        "filename": xml_file_path,
                        "exception": e.__class__.__name__,
-                       "error_message": e.args[0]}
+                       "error_message": e.args[0],
+                       "data_xml_path":row.data_xml_path}
         tf_df = tf_df.append(new_row, ignore_index=True)
         tf_df.to_csv(tf_csv, index=False)
 
