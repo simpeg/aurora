@@ -522,7 +522,7 @@ def overlap(t1start, t1end, t2start, t2end):
     elif t2start <= t1start <= t1end <= t2end:
         return t1start, t1end
     else:
-        return None
+        return None, None
 
 
 def main():
