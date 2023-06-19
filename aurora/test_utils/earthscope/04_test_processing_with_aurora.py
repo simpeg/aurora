@@ -71,11 +71,11 @@ def batch_process(xml_source="data_xml_path"):
         processing_df = initialize_processing_df()
 
     for i_row, row in spud_df.iterrows():
-        print(row)
+        print(row) #station_id = row.station_id; network_id = row.network_id
         if row[f"{xml_source}_error"] is True:
             print(f"Skipping {row} for now, tf not reading in")
             continue
-        if row.station_id == "WAD07":#CAM01":
+        if row.station_id == "MTB15":#WAD07":#CAM01":
             print("DEBUG")
         data_file_base = f"{row.network_id}_{row.station_id}.h5"
         data_file = DATA_PATH.joinpath(data_file_base)
