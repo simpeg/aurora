@@ -161,6 +161,7 @@ def get_summary_table_filename(stage_number):
     base_names["02"] = "local_metadata_coverage"
     base_names["03"] = "local_mth5_coverage"
     base_names["04"] = "processing_review"
+    base_names["05"] = "tf_comparison_review"
     stage_number_str = str(stage_number).zfill(2)
 
     now = datetime.datetime.now().__str__().split(".")[0].replace(" ", "_")

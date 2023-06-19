@@ -29,8 +29,9 @@ from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
 from aurora.transfer_function.kernel_dataset import KernelDataset
 
-from mth5.mth5 import MTH5
 from mth5.clients import FDSN, MakeMTH5
+from mth5.helpers import close_open_files
+from mth5.mth5 import MTH5
 from mt_metadata.transfer_functions.core import TF
 from mt_metadata import TF_XML
 
@@ -51,17 +52,12 @@ print(processing_summary_csv)
 
 
 
-tf_report_schema = ["data_id", "station_id", "network_id", "remote_id",
+processing_report_schema = ["data_id", "station_id", "network_id", "remote_id",
                                   "filename", "exception", "error_message", "data_xml_path"]
-def initialize_tf_df():
-    tf_df = pd.DataFrame(columns=tf_report_schema)
-    return tf_df
+def initialize_processing_df():
+    df = pd.DataFrame(columns=processing_report_schema)
+    return df
 
-tf_csv = processing_summary_csv
-
-
-# local_data_coverage_csv = get_most_recent_summary_filepath(3)
-# local_data_coverage_df = pd.read_csv(data_coverage_csv)
 
 
 def batch_process(xml_source="data_xml_path"):
@@ -69,13 +65,17 @@ def batch_process(xml_source="data_xml_path"):
 
 
     """
-    tf_df = initialize_tf_df()
+    try:
+        processing_df = pd.read_csv(processing_summary_csv)
+    except FileNotFoundError:
+        processing_df = initialize_processing_df()
+
     for i_row, row in spud_df.iterrows():
         print(row)
         if row[f"{xml_source}_error"] is True:
             print(f"Skipping {row} for now, tf not reading in")
             continue
-        if row.station_id == "CAM01":
+        if row.station_id == "WAD07":#CAM01":
             print("DEBUG")
         data_file_base = f"{row.network_id}_{row.station_id}.h5"
         data_file = DATA_PATH.joinpath(data_file_base)
@@ -165,8 +165,9 @@ def batch_process(xml_source="data_xml_path"):
                        "exception": e.__class__.__name__,
                        "error_message": e.args[0],
                        "data_xml_path":row.data_xml_path}
-        tf_df = tf_df.append(new_row, ignore_index=True)
-        tf_df.to_csv(tf_csv, index=False)
+        processing_df = processing_df.append(new_row, ignore_index=True)
+        processing_df.to_csv(processing_summary_csv, index=False)
+        close_open_files()
 
 
 def main():
