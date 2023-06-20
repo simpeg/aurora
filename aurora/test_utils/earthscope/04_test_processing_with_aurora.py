@@ -135,12 +135,11 @@ def batch_process(xml_source="data_xml_path"):
             kernel_dataset.from_run_summary(run_summary, row.station_id)
             continue
 
-        cc = ConfigCreator()
-        config = cc.create_from_kernel_dataset(kernel_dataset)
 
-        show_plot = False
-        #["station_id", "network_id", "remote_id", "filename", "exception", "error_message"]
         try:
+            cc = ConfigCreator()
+            config = cc.create_from_kernel_dataset(kernel_dataset)
+            show_plot = False
             tf_cls = process_mth5(config,
                                 kernel_dataset,
                                 units="MT",
