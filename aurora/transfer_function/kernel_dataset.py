@@ -310,8 +310,9 @@ class KernelDataset:
     @property
     def sample_rate(self):
         if self.num_sample_rates != 1:
-            print("Aurora does not yet process data from mixed sample rates")
-            raise NotImplementedError
+            msg = "Aurora does not yet process data from mixed sample rates"
+            print(f"{msg}")
+            raise NotImplementedError(msg)
         sample_rate = self.df.sample_rate.unique()[0]
         return sample_rate
 
@@ -522,7 +523,7 @@ def overlap(t1start, t1end, t2start, t2end):
     elif t2start <= t1start <= t1end <= t2end:
         return t1start, t1end
     else:
-        return None
+        return None, None
 
 
 def main():

@@ -75,9 +75,12 @@ class TransferFunctionKernel(object):
         for group, df in grouper:
             print(group)
             print(df)
-            assert (df.dec_level.diff()[1:] == 1).all()  # dec levels increment by 1
-            assert df.dec_factor.iloc[0] == 1
-            assert df.dec_level.iloc[0] == 0
+            try:
+                assert (df.dec_level.diff()[1:] == 1).all()  # dec levels increment by 1
+                assert df.dec_factor.iloc[0] == 1
+                assert df.dec_level.iloc[0] == 0
+            except AssertionError:
+                raise AssertionError("Decimation levels not structured as expected")
             # df.sample_rate /= np.cumprod(df.dec_factor)  # better to take from config
             window_params_df = self.config.window_scheme(as_type="df")
             df.reset_index(inplace=True, drop=True)
