@@ -14,9 +14,7 @@ from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 from mth5.helpers import close_open_files
 
 
-def test_processing(
-    return_collection=False, z_file_path=None, test_clock_zero=False
-):
+def test_processing(return_collection=False, z_file_path=None, test_clock_zero=False):
     """
     Parameters
     ----------
@@ -71,7 +69,7 @@ def test_processing(
         tf_collection = tf_cls
         return tf_collection
     else:
-        tf_cls.write_tf_file(fn="emtfxml_test.xml", file_type="emtfxml")
+        tf_cls.write(fn="emtfxml_test.xml", file_type="emtfxml")
     return tf_cls
 
 

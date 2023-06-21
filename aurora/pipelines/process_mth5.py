@@ -39,6 +39,7 @@ from aurora.transfer_function.transfer_function_collection import (
 )
 from aurora.transfer_function.TTFZ import TTFZ
 
+from mt_metadata.utils.list_dict import ListDict
 from mt_metadata.transfer_functions.core import TF
 from mt_metadata.utils.list_dict import ListDict
 from loguru import logger
