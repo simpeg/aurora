@@ -11,13 +11,8 @@ import time
 from matplotlib import pyplot as plt
 from pathlib import Path
 
-from aurora.test_utils.earthscope.helpers import build_request_df
 from aurora.test_utils.earthscope.helpers import DATA_PATH
 from aurora.test_utils.earthscope.helpers import EXPERIMENT_PATH
-from aurora.test_utils.earthscope.helpers import SPUD_DATA_PATH
-from aurora.test_utils.earthscope.helpers import SPUD_EMTF_PATH
-from aurora.test_utils.earthscope.helpers import SPUD_XML_CSV
-from aurora.test_utils.earthscope.helpers import SPUD_XML_PATH
 from aurora.test_utils.earthscope.helpers import SUMMARY_TABLES_PATH
 from aurora.test_utils.earthscope.helpers import AURORA_TF_PATH
 from aurora.test_utils.earthscope.helpers import load_most_recent_summary
@@ -32,8 +27,6 @@ from aurora.transfer_function.kernel_dataset import KernelDataset
 from mth5.clients import FDSN, MakeMTH5
 from mth5.helpers import close_open_files
 from mth5.mth5 import MTH5
-from mt_metadata.transfer_functions.core import TF
-from mt_metadata import TF_XML
 
 
 spud_df = load_most_recent_summary(1)
@@ -71,6 +64,7 @@ def batch_process(xml_source="data_xml_path"):
         processing_df = initialize_processing_df()
 
     for i_row, row in spud_df.iterrows():
+
         print(row) #station_id = row.station_id; network_id = row.network_id
         if row[f"{xml_source}_error"] is True:
             print(f"Skipping {row} for now, tf not reading in")

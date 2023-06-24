@@ -12,10 +12,8 @@ output are normally
 
 Thus there are normally 6 coefficients in the TF
 
-The output table will be an xarray with these six values,
 
-And a summary table will be
-of
+And a summary table will of differences and ratios will be computed
 """
 
 

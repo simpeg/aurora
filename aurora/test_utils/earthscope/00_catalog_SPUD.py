@@ -75,9 +75,9 @@ def scrape_spud(force_download_data=False,
 			if np.mod(i_row, 20) == 0:
 				df.to_csv(SPUD_XML_CSV, index=False)
 		# Uncomment lines below to enable fast-forward
-		cutoff = 840# 6000 #2000 # 11
-		if i_row < cutoff:
-			continue
+		# cutoff = 840# 6000 #2000 # 11
+		# if i_row < cutoff:
+		#	continue
 
 		print(f"Getting {i_row}/{n_rows}, {row.emtf_id}")
 
