@@ -11,9 +11,12 @@ import pathlib
 
 import pandas as pd
 
+## PLACEHOLDER FOR CONFIG
 HOME = pathlib.Path().home()
 CACHE_PATH = HOME.joinpath(".cache").joinpath("earthscope")
 CACHE_PATH.mkdir(parents=True, exist_ok=True)
+USE_CHANNEL_WILDCARDS = False
+## PLACEHOLDER FOR CONFIG
 
 # Data Availability
 DATA_AVAILABILITY_PATH = CACHE_PATH.joinpath("data_availability")
