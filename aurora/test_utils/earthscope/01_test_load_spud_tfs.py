@@ -14,7 +14,6 @@ import pathlib
 import time
 
 from aurora.test_utils.earthscope.helpers import SPUD_XML_CSV
-from aurora.test_utils.earthscope.helpers import SPUD_XML_PATH
 from aurora.test_utils.earthscope.helpers import SUMMARY_TABLES_PATH
 from aurora.test_utils.earthscope.helpers import DATA_PATH
 from aurora.test_utils.earthscope.helpers import load_xml_tf

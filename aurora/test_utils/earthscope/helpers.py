@@ -40,12 +40,15 @@ AURORA_TF_PATH.mkdir(parents=True, exist_ok=True)
 SUMMARY_TABLES_PATH = CACHE_PATH.joinpath("summary_tables")
 SUMMARY_TABLES_PATH.mkdir(parents=True, exist_ok=True)
 
-SPUD_XML_PATH = CACHE_PATH.joinpath("spud_xml")
-SPUD_XML_CSV = SPUD_XML_PATH.joinpath("spud_summary.csv")
-SPUD_EMTF_PATH = SPUD_XML_PATH.joinpath("emtf")
-SPUD_DATA_PATH = SPUD_XML_PATH.joinpath("data")
-SPUD_EMTF_PATH.mkdir(parents=True, exist_ok=True)
-SPUD_DATA_PATH.mkdir(parents=True, exist_ok=True)
+SPUD_XML_PATHS = {}
+SPUD_XML_PATHS["base"] = CACHE_PATH.joinpath("spud_xml")
+SPUD_XML_PATHS["base"].mkdir(parents=True, exist_ok=True)
+SPUD_XML_PATHS["data"] = SPUD_XML_PATHS["base"].joinpath("data")
+SPUD_XML_PATHS["data"].mkdir(parents=True, exist_ok=True)
+SPUD_XML_PATHS["emtf"] = SPUD_XML_PATHS["base"].joinpath("emtf")
+SPUD_XML_PATHS["emtf"].mkdir(parents=True, exist_ok=True)
+SPUD_XML_CSV = SPUD_XML_PATHS["base"].joinpath("spud_summary.csv")
+
 
 def load_xml_tf(file_path):
     """
