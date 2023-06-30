@@ -18,6 +18,27 @@ from mth5.helpers import close_open_files
 
 
 def test_stft_methods_agree():
+    """
+    The purpose of this method was to check if we could reasonably replace Gary's
+    fft with scipy.signal.spectrogram.
+    The answer is "mostly yes", under two conditons:
+    1. scipy.signal.spectrogram does not inately support an extra linear detrending
+    to be applied _after_ tapering.
+    2. We do not wish to apply "per-segment" prewhitening as is done in some
+    variations of EMTF.
+    excluding this, we get numerically identical results, with basically
+    zero-maintenance by using scipy.
+
+    As of 30 Jun 2023, run_ts_to_stft_scipy is never actually used in aurora, except in
+    this test.  That will change with the introduction of the FC layer in mth5 which
+    will use that method.
+
+    Because run_ts_to_stft_scipy will be used in mth5, we can port the aurora
+    processing config to a mth5 FC processing config.  I.e. the dec_config argument to
+    run_ts_to_stft can be reformatted so that it is an instance of
+    mt_metadata.transfer_functions.processing.fourier_coefficients.decimation.Decimation
+
+    """
     close_open_files()
     mth5_path = create_test1_h5()
     mth5_paths = [
