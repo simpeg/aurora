@@ -117,7 +117,9 @@ class KernelDataset:
     def clone_dataframe(self):
         return copy.deepcopy(self.df)
 
-    def from_run_summary(self, run_summary, local_station_id, remote_station_id=None):
+    def from_run_summary(
+        self, run_summary, local_station_id, remote_station_id=None
+    ):
         """
 
         Parameters
@@ -141,7 +143,9 @@ class KernelDataset:
         ]
         if remote_station_id:
             station_ids.append(remote_station_id)
-        df = restrict_to_station_list(run_summary.df, station_ids, inplace=False)
+        df = restrict_to_station_list(
+            run_summary.df, station_ids, inplace=False
+        )
         df["remote"] = False
         if remote_station_id:
             cond = df.station_id == remote_station_id
@@ -156,7 +160,6 @@ class KernelDataset:
             print("Remote reference processing not a valid option")
         else:
             self._add_duration_column()
-
 
     @property
     def mini_summary(self):
@@ -294,10 +297,7 @@ class KernelDataset:
         for i, row in sub_df.iterrows():
             local_run_obj = self.get_run_object(row)
             if station_metadata is None:
-                try:
-                    station_metadata = local_run_obj.station_group.metadata
-                except AttributeError:
-                    station_metadata = local_run_obj.station_metadata
+                station_metadata = local_run_obj.station_metadata
                 station_metadata.runs = ListDict()
             run_metadata = local_run_obj.metadata
             station_metadata.add_run(run_metadata)
