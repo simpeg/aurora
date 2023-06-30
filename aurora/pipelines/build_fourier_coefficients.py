@@ -52,6 +52,22 @@ Note 3: This point in the loop marks the interface between _generation_ of the F
  create_fourier_coefficients() and the code below this would access those FCs and
  execute compute_transfer_function()
 
+I think the way to move this forward is to follow process_mth5,
+but try to initialize an mt_metadata FourierCoefficients object from the existing processing config
+– this will point at any missing elements. Then replace the
+
+run_ts_to_stft(stft_config, run_xrds)
+
+with
+
+run_ts_to_stft(fourier_coeffs_from_mtmetadata_config, run_xrds)
+
+That is the piece that we can work on together on Friday. Once we have that,
+then the “building” of the FC layer should be able to simply follow your test example in mth5.
+
+
+
+
 """
 # =============================================================================
 # Imports
@@ -59,9 +75,13 @@ Note 3: This point in the loop marks the interface between _generation_ of the F
 import copy
 import xarray as xr
 
+from aurora.pipelines.time_series_helpers import apply_prewhitening
+from aurora.pipelines.time_series_helpers import apply_recoloring
+from aurora.pipelines.time_series_helpers import truncate_to_clock_zero
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
+
 from aurora.pipelines.transfer_function_helpers import process_transfer_functions
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
 
@@ -72,7 +92,9 @@ from aurora.transfer_function.TTFZ import TTFZ
 
 from mth5.mth5 import MTH5
 from mt_metadata.transfer_functions.core import TF
-from mt_metadata.transfer_functions.processing.fourier_coefficients import FC, Channel, Decimation
+from mt_metadata.transfer_functions.processing.fourier_coefficients import Channel
+from mt_metadata.transfer_functions.processing.fourier_coefficients import Decimation
+from mt_metadata.transfer_functions.processing.fourier_coefficients import FC
 
 
 # =============================================================================
@@ -99,7 +121,7 @@ def decimation_and_stft_config_creator():
 
 def take_a_look_at_synthetic_data():
     decimation_info = {0: 1.0, 1: 4.0, 2: 4.0, 3: 4.0}  # decimation_levels_and_factors  was config.decimation_info()
-    dd = Decimation()
+    decimation_obj = Decimation()
     synthetic_file_paths = list(DATA_PATH.glob("*.h5"))
     synthetic_file_paths = [x for x in synthetic_file_paths if "nan" not in str(x)]
     for mth5_path in synthetic_file_paths:
@@ -130,13 +152,30 @@ def take_a_look_at_synthetic_data():
                     tmp[i_dec] = dec_factor
                 tmp = tmp.melt(id_vars=id_vars, value_name="dec_factor", var_name="dec_level")
                 print("We should further group these by sample rate...")
+
                 sortby = ["id", "dec_level"] # might be nice to sort on "start" as well
                 tmp.sort_values(by=sortby, inplace=True)
                 tmp.reset_index(drop=True, inplace=True)
                 for i_dec_row, dec_row in tmp.iterrows():
+
                     print("ACCESS RUN DATA")
+                    run_obj = m.from_reference(run_row.hdf5_reference)
+                    runts = run_obj.to_runts()
+
+                    print("Could it be this easy????")
+                    #qq = run_ts_to_stft(decimation_obj,runts.dataset)
+
                     print("DECIMATE IF i_dec_row!=0")
+                    if i_dec_row != 0:
+                        print("APPLY DECIMATION")
+                        print("Use ProtoypeDecimation")
+                        raise NotImplementedError
+
                     print("PREWHITEN")
+                    run_xrds = apply_prewhitening(decimation_obj, runts.dataset)
+                    run_xrds = truncate_to_clock_zero(decimation_obj, run_xrds)
+                    # windowing_scheme = window_scheme_from_decimation(decimation_obj)
+
                     print("Where is my STFT scheme???")
                     print("STFT -- use spectrogram!!")
                     print("RECOLOR")
