@@ -313,6 +313,11 @@ def process_mth5(
             stft_obj = make_stft_objects(
                 tfk.config, i_dec_level, run_obj, run_xrds, units, row.station_id
             )
+            if save_fcs:
+                csv_name = f"{row.station_id}_dec_level_{i_dec_level}.csv"
+                stft_df = stft_obj.to_dataframe()
+                stft_df.to_csv(csv_name)
+
 
             if row.station_id == tfk.config.stations.local.id:
                 local_stfts.append(stft_obj)
