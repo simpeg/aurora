@@ -28,7 +28,9 @@ import xarray as xr
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
-from aurora.pipelines.transfer_function_helpers import process_transfer_functions
+from aurora.pipelines.transfer_function_helpers import (
+    process_transfer_functions,
+)
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
 
 from aurora.transfer_function.transfer_function_collection import (
@@ -86,7 +88,9 @@ def make_stft_objects(
         ].channel_scale_factors
     elif station_id == processing_config.stations.remote[0].id:
         scale_factors = (
-            processing_config.stations.remote[0].run_dict[run_id].channel_scale_factors
+            processing_config.stations.remote[0]
+            .run_dict[run_id]
+            .channel_scale_factors
         )
 
     stft_obj = calibrate_stft_obj(
@@ -128,10 +132,16 @@ def process_tf_decimation_level(
         The transfer function values packed into an object
     """
     frequency_bands = config.decimations[i_dec_level].frequency_bands_obj()
-    transfer_function_obj = TTFZ(i_dec_level, frequency_bands, processing_config=config)
+    transfer_function_obj = TTFZ(
+        i_dec_level, frequency_bands, processing_config=config
+    )
 
     transfer_function_obj = process_transfer_functions(
-        config, i_dec_level, local_stft_obj, remote_stft_obj, transfer_function_obj
+        config,
+        i_dec_level,
+        local_stft_obj,
+        remote_stft_obj,
+        transfer_function_obj,
     )
 
     return transfer_function_obj
@@ -140,8 +150,7 @@ def process_tf_decimation_level(
 def export_tf(
     tf_collection,
     channel_nomenclature,
-    station_metadata_dict={},
-    survey_dict={},
+    survey_metadata,
 ):
     """
     This method may wind up being embedded in the TF class
@@ -162,7 +171,9 @@ def export_tf(
     from mt_metadata.utils.list_dict import ListDict
 
     merged_tf_dict = tf_collection.get_merged_dict(channel_nomenclature)
-    channel_nomenclature_dict = channel_nomenclature.to_dict()["channel_nomenclature"]
+    channel_nomenclature_dict = channel_nomenclature.to_dict()[
+        "channel_nomenclature"
+    ]
     tf_cls = TF(channel_nomenclature=channel_nomenclature_dict)
     renamer_dict = {"output_channel": "output", "input_channel": "input"}
     tmp = merged_tf_dict["tf"].rename(renamer_dict)
@@ -178,9 +189,8 @@ def export_tf(
     res_cov = res_cov.rename(renamer_dict)
     tf_cls.residual_covariance = res_cov
 
-    tf_cls.station_metadata._runs = ListDict()
-    tf_cls.station_metadata.from_dict(station_metadata_dict)
-    tf_cls.survey_metadata.from_dict(survey_dict)
+    tf_cls.survey_metadata = survey_metadata
+    tf_cls.station_metadata.update(survey_metadata.stations[0])
     return tf_cls
 
 
@@ -230,7 +240,9 @@ def update_dataset_df(i_dec_level, tfk):
             run_xrds = row["run_dataarray"].to_dataset("channel")
             decimation = tfk.config.decimations[i_dec_level].decimation
             decimated_xrds = prototype_decimate(decimation, run_xrds)
-            tfk.dataset_df["run_dataarray"].at[i] = decimated_xrds.to_array("channel")
+            tfk.dataset_df["run_dataarray"].at[i] = decimated_xrds.to_array(
+                "channel"
+            )
 
     print("DATASET DF UPDATED")
     return
@@ -243,7 +255,7 @@ def process_mth5(
     show_plot=False,
     z_file_path=None,
     return_collection=False,
-    save_fcs=False
+    save_fcs=False,
 ):
     """
     This is the main method used to transform a processing_config,
@@ -311,13 +323,17 @@ def process_mth5(
             run_xrds = row["run_dataarray"].to_dataset("channel")
             run_obj = row.mth5_obj.from_reference(row.run_reference)
             stft_obj = make_stft_objects(
-                tfk.config, i_dec_level, run_obj, run_xrds, units, row.station_id
+                tfk.config,
+                i_dec_level,
+                run_obj,
+                run_xrds,
+                units,
+                row.station_id,
             )
             if save_fcs:
                 csv_name = f"{row.station_id}_dec_level_{i_dec_level}.csv"
                 stft_df = stft_obj.to_dataframe()
                 stft_df.to_csv(csv_name)
-
 
             if row.station_id == tfk.config.stations.local.id:
                 local_stfts.append(stft_obj)
@@ -342,7 +358,9 @@ def process_mth5(
             local_merged_stft_obj,
             remote_merged_stft_obj,
         )
-        tf_obj.apparent_resistivity(tfk.config.channel_nomenclature, units=units)
+        tf_obj.apparent_resistivity(
+            tfk.config.channel_nomenclature, units=units
+        )
         tf_dict[i_dec_level] = tf_obj
 
         if show_plot:
@@ -366,24 +384,26 @@ def process_mth5(
         return tf_collection
     else:
         local_station_id = tfk.config.stations.local.id
-        station_metadata = tfk_dataset.get_station_metadata(local_station_id)
-        local_mth5_obj = mth5_objs[local_station_id]
 
+        local_mth5_obj = mth5_objs[local_station_id]
         if local_mth5_obj.file_version == "0.1.0":
-            survey_dict = local_mth5_obj.survey_group.metadata.to_dict()
+            survey_metadata = local_mth5_obj.survey_group.metadata
         elif local_mth5_obj.file_version == "0.2.0":
             # this could be a method of tf_kernel.get_survey_dict()
             survey_id = tfk.dataset_df[
                 tfk.dataset_df["station_id"] == local_station_id
             ].survey.unique()[0]
             survey_obj = local_mth5_obj.get_survey(survey_id)
-            survey_dict = survey_obj.metadata.to_dict()
+            survey_metadata = survey_obj.metadata
+
+        survey_metadata.add_station(
+            tfk_dataset.get_station_metadata(local_station_id)
+        )
 
         tf_cls = export_tf(
             tf_collection,
             tfk.config.channel_nomenclature,
-            station_metadata_dict=station_metadata.to_dict(),
-            survey_dict=survey_dict,
+            survey_metadata=survey_metadata,
         )
         tfk_dataset.close_mths_objs()
         return tf_cls
