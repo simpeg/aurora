@@ -320,7 +320,7 @@ class TransferFunctionCollection(object):
                 line1 = f"period :      {band.center_period:.5f}    "
                 line1 += f"decimation level   {i_dec+1}     "
 
-                sample_rate = dec_level_config.decimation.sample_rate
+                sample_rate = dec_level_config.sample_rate_decimation
                 num_samples_window = dec_level_config.window.num_samples
                 freqs = get_fft_harmonics(num_samples_window, sample_rate)
                 fc_indices = band.fourier_coefficient_indices(freqs)

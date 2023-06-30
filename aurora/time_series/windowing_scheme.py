@@ -470,6 +470,6 @@ def window_scheme_from_decimation(decimation):
         num_samples_window=decimation.window.num_samples,
         num_samples_overlap=decimation.window.overlap,
         taper_additional_args=decimation.window.additional_args,
-        sample_rate=decimation.decimation.sample_rate,
+        sample_rate=decimation.sample_rate_decimation,
     )
     return windowing_scheme
