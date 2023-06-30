@@ -396,8 +396,7 @@ class WindowingScheme(ApodizationWindow):
 
 def fft_xr_ds(dataset, sample_rate, detrend_type=None, prewhitening=None):
     """
-    TODO: Add support for "first difference" prewhitening
-    assume you have an xr.dataset or xr.DataArray.  It is 2D.
+
     This should call window_helpers.apply_fft_to_windowed_array
     or get moved to window_helpers.py
 
@@ -410,6 +409,11 @@ def fft_xr_ds(dataset, sample_rate, detrend_type=None, prewhitening=None):
     Parameters
     ----------
     dataset : xr.Dataset
+        Data are 2D (windowed univariate time series).
+    sample_rate: float
+
+    detrend_type
+    prewhitening
 
     Returns
     -------
@@ -466,6 +470,6 @@ def window_scheme_from_decimation(decimation):
         num_samples_window=decimation.window.num_samples,
         num_samples_overlap=decimation.window.overlap,
         taper_additional_args=decimation.window.additional_args,
-        sample_rate=decimation.decimation.sample_rate,
+        sample_rate=decimation.sample_rate_decimation,
     )
     return windowing_scheme

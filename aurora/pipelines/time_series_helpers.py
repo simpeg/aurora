@@ -86,7 +86,7 @@ def apply_recoloring(decimation_obj, stft_obj):
     if decimation_obj.prewhitening_type == "first difference":
         # replace below with decimation_obj.get_fft_harmonics() ?
         freqs = get_fft_harmonics(
-            decimation_obj.window.num_samples, decimation_obj.decimation.sample_rate
+            decimation_obj.window.num_samples, decimation_obj.sample_rate_decimation
         )
         prewhitening_correction = 1.0j * 2 * np.pi * freqs  # jw
 
@@ -129,7 +129,7 @@ def run_ts_to_stft_scipy(decimation_obj, run_xrds_orig):
     for channel_id in run_xrds.data_vars:
         ff, tt, specgm = ssig.spectrogram(
             run_xrds[channel_id].data,
-            fs=decimation_obj.decimation.sample_rate,
+            fs=decimation_obj.sample_rate_decimation,
             window=windowing_scheme.taper,
             nperseg=decimation_obj.window.num_samples,
             noverlap=decimation_obj.window.overlap,
@@ -145,7 +145,7 @@ def run_ts_to_stft_scipy(decimation_obj, run_xrds_orig):
 
         # make time_axis
         tt = tt - tt[0]
-        tt *= decimation_obj.decimation.sample_rate
+        tt *= decimation_obj.sample_rate_decimation
         time_axis = run_xrds.time.data[tt.astype(int)]
 
         xrd = xr.DataArray(
@@ -226,7 +226,7 @@ def run_ts_to_stft(decimation_obj, run_xrds_orig):
     run_xrds = truncate_to_clock_zero(decimation_obj, run_xrds)
     windowing_scheme = window_scheme_from_decimation(decimation_obj)
     windowed_obj = windowing_scheme.apply_sliding_window(
-        run_xrds, dt=1.0 / decimation_obj.decimation.sample_rate
+        run_xrds, dt=1.0 / decimation_obj.sample_rate_decimation
     )
     if not np.prod(windowed_obj.to_array().data.shape):
         raise ValueError

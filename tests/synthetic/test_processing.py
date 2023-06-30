@@ -225,6 +225,7 @@ def process_synthetic_1(
 
 
 def process_synthetic_2():
+    station_id = "test2"
     mth5_path = create_test2_h5()
     mth5_paths = [
         mth5_path,
@@ -232,9 +233,9 @@ def process_synthetic_2():
     run_summary = RunSummary()
     run_summary.from_mth5s(mth5_paths)
     tfk_dataset = KernelDataset()
-    tfk_dataset.from_run_summary(run_summary, "test2")
-    processing_config = create_test_run_config("test2", tfk_dataset)
-    tfc = process_mth5(processing_config, tfk_dataset=tfk_dataset)
+    tfk_dataset.from_run_summary(run_summary, station_id)
+    processing_config = create_test_run_config(station_id, tfk_dataset)
+    tfc = process_mth5(processing_config, tfk_dataset=tfk_dataset, save_fcs=True)
     return tfc
 
 
@@ -268,9 +269,12 @@ def main():
     """
     # tmp = TestSyntheticProcessing()
     # tmp.setUp()
+    # tmp.test_can_process_other_station() # makes FC csvs
+
     # tmp.test_can_output_tf_class_and_write_tf_xml()
     # tmp.test_no_crash_with_too_many_decimations()
     # tmp.test_can_use_scale_factor_dictionary()
+
     unittest.main()
 
 

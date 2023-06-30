@@ -22,7 +22,7 @@ class DecimationLevel(DecimationLevel):
             num_samples_window=self.window.num_samples,
             num_samples_overlap=self.window.overlap,
             taper_additional_args=self.window.additional_args,
-            sample_rate=self.decimation.sample_rate,
+            sample_rate=self.sample_rate_decimation,
         )
         return windowing_scheme
 
@@ -44,7 +44,7 @@ class DecimationLevel(DecimationLevel):
     #     output["num_samples_window"] = self.window.num_samples
     #     output["num_samples_overlap"] = self.window.overlap
     #     output["taper_additional_args"] = self.window.additional_args
-    #     output["sample_rate"] = self.decimation.sample_rate
+    #     output["sample_rate"] = self.sample_rate_decimation
     #     output["prewhitening_type"] = self.prewhitening_type
     #     output["extra_pre_fft_detrend_type"] = self.extra_pre_fft_detrend_type
     #     return output
