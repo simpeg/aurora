@@ -30,11 +30,12 @@ from aurora.sandbox.mth5_helpers import get_experiment_from_obspy_inventory
 from aurora.sandbox.mth5_helpers import mth5_from_experiment
 
 from aurora.test_utils.earthscope.helpers import build_request_df
+from aurora.test_utils.earthscope.helpers import DataAvailability
 from aurora.test_utils.earthscope.helpers import DATA_PATH
 from aurora.test_utils.earthscope.helpers import get_most_recent_summary_filepath
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
-from aurora.test_utils.earthscope.helpers import load_data_availability_dfs
 from aurora.test_utils.earthscope.helpers import restrict_to_mda
+from aurora.test_utils.earthscope.helpers import USE_CHANNEL_WILDCARDS
 from mth5.mth5 import MTH5
 from mth5.clients import FDSN, MakeMTH5
 from mt_metadata.transfer_functions.core import TF
@@ -60,7 +61,7 @@ def batch_download_mth5(source_csv=None, results_csv=None):
     specifies which of the two possible collections of xml files to use as source
     :return:
     """
-    AVAILABILITY_TABLE = load_data_availability_dfs()
+    DATA_AVAILABILITY = DataAvailability()
     t0 = time.time()
     try:
         coverage_df = pd.read_csv(coverage_csv)
@@ -76,11 +77,12 @@ def batch_download_mth5(source_csv=None, results_csv=None):
         if isinstance(row.exception, str):
             print(f"Skipping row {i_row} for now, Exception {row.exception} was encounterd in metadata")
             continue
+        if USE_CHANNEL_WILDCARDS:
+            availabile_channels = ["*Q*", "*F*",]
+        else:
+            availabile_channels = DATA_AVAILABILITY.get_available_channels(
+                network_id, station_id)
 
-        availability_df = AVAILABILITY_TABLE[row.network_id]
-        sub_availability_df = availability_df[availability_df["Station"] == row.station_id]
-        availabile_channels = sub_availability_df['Channel'].unique()
-        # availabile_channels = ["*Q*", "*F*",]
         request_df = build_request_df(row.station_id, row.network_id,
                                       channels=availabile_channels, start=None, end=None)
         #print(request_df)

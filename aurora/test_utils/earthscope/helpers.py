@@ -15,7 +15,7 @@ import pandas as pd
 HOME = pathlib.Path().home()
 CACHE_PATH = HOME.joinpath(".cache").joinpath("earthscope")
 CACHE_PATH.mkdir(parents=True, exist_ok=True)
-USE_CHANNEL_WILDCARDS = False
+USE_CHANNEL_WILDCARDS = True
 ## PLACEHOLDER FOR CONFIG
 
 # Data Availability
@@ -205,6 +205,7 @@ def load_most_recent_summary(stage_number):
     results_df = pd.read_csv(review_csv)
     return results_df
 
+
 def load_data_availability_dfs():
     output = {}
     globby = PUBLIC_DATA_AVAILABILITY_PATH.glob("*txt")
@@ -215,6 +216,16 @@ def load_data_availability_dfs():
         output[network_id] = df
         print(f"loaded {network_id}")
     return output
+
+class DataAvailability(object):
+    def __init__(self):
+        self.df = load_data_availability_dfs()
+
+    def get_available_channels(self, network_id, station_id):
+        availability_df = self.df[network_id]
+        sub_availability_df = availability_df[availability_df["Station"] == station_id]
+        availabile_channels = sub_availability_df['Channel'].unique()
+        return availabile_channels
 
 
 KEEP_COLUMNS = ['emtf_id', 'data_id','file_size','data_xml_path',
