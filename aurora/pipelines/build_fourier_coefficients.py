@@ -164,9 +164,16 @@ def take_a_look_at_synthetic_data():
                     run_obj = m.from_reference(run_row.hdf5_reference)
                     runts = run_obj.to_runts()
 
+                    #xrds = runts.dataset
                     print("Could it be this easy????")
                     stft_obj = run_ts_to_stft_scipy(decimation_obj,runts.dataset)
-
+                    stft_obj = calibrate_stft_obj(stft_obj,run_obj)
+                    print("READY TO PACK!!!")
+                    fc_group = (station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id))
+                    decimation_level = fc_group.add_decimation_level(f"{i_dec_row}")
+                    decimation_level.from_xarray(stft_obj)
+                    decimation_level.update_metadata()
+                    fc_group.update_metadata()
 
                     print("DECIMATE IF i_dec_row!=0")
                     if i_dec_row != 0:
@@ -174,14 +181,7 @@ def take_a_look_at_synthetic_data():
                         print("Use ProtoypeDecimation")
                         raise NotImplementedError
 
-                    print("PREWHITEN")
-                    run_xrds = apply_prewhitening(decimation_obj, runts.dataset)
-                    run_xrds = truncate_to_clock_zero(decimation_obj, run_xrds)
-                    # windowing_scheme = window_scheme_from_decimation(decimation_obj)
 
-                    print("Where is my STFT scheme???")
-                    print("STFT -- use spectrogram!!")
-                    print("RECOLOR")
                 # tmp.drop("sample_rate", axis=1, inplace=True)  # not valid for decimated data
                 # sortby = ["survey", "station_id", "run_id", "start", "dec_level"]
                 # tmp.sort_values(by=sortby, inplace=True)
