@@ -81,21 +81,6 @@ Note 3: This point in the loop marks the interface between _generation_ of the F
  create_fourier_coefficients() and the code below this would access those FCs and
  execute compute_transfer_function()
 
-I think the way to move this forward is to follow process_mth5,
-but try to initialize an mt_metadata FourierCoefficients object from the existing processing config
-– this will point at any missing elements. Then replace the
-
-run_ts_to_stft(stft_config, run_xrds)
-
-with
-
-run_ts_to_stft(fourier_coeffs_from_mtmetadata_config, run_xrds)
-
-That is the piece that we can work on together on Friday. Once we have that,
-then the “building” of the FC layer should be able to simply follow your test example in mth5.
-
-
-
 
 """
 # =============================================================================
@@ -106,16 +91,11 @@ import copy
 import numpy as np
 import xarray as xr
 
-from aurora.pipelines.time_series_helpers import apply_prewhitening
-from aurora.pipelines.time_series_helpers import apply_recoloring
-from aurora.pipelines.time_series_helpers import truncate_to_clock_zero
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import prototype_decimate
-from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
 
 
-from aurora.pipelines.transfer_function_helpers import process_transfer_functions
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
 
 from aurora.transfer_function.transfer_function_collection import (
@@ -268,18 +248,12 @@ def read_back_fcs(mth5_path):
                 xrds = dec_level.to_xarray(["hx", "hy"])
                 print(f"TIME {xrds.time.data.shape}")
                 print(f"FREQ {xrds.frequency.data.shape}")
-            pass
-# decimation_level.channel_summary
-# decimation_level.dataset_options
-# decimation_level.update_metadata()
-# decimation_level.to_xarray(["ex",])
-# decimation_level.to_xarray(["ex","ey"])
 
 
 
 
 
-def processmth5(
+def processmth5fromfc(
     config,
     tfk_dataset=None,
     units="MT",
@@ -432,15 +406,10 @@ def main():
     for mth5_path in synthetic_file_paths:
  #       generate_fcs_synthetic(mth5_path)
         read_back_fcs(mth5_path)
-    print("WOWWWWEEEEE")
+    print("se funciona!")
 
 if __name__ == "__main__":
     main()
-# tmp.drop("sample_rate", axis=1, inplace=True)  # not valid for decimated data
-# sortby = ["survey", "station_id", "run_id", "start", "dec_level"]
-# tmp.sort_values(by=sortby, inplace=True)
-# tmp.reset_index(drop=True, inplace=True)
-# tmp.drop("sample_rate", axis=1, inplace=True)  # not valid for decimated data
 
 
 # Not sure we need this:
@@ -455,3 +424,8 @@ if __name__ == "__main__":
 # sortby = ["id", "dec_level"] # might be nice to sort on "start" as well
 # tmp.sort_values(by=sortby, inplace=True)
 # tmp.reset_index(drop=True, inplace=True)
+# tmp.drop("sample_rate", axis=1, inplace=True)  # not valid for decimated data
+# sortby = ["survey", "station_id", "run_id", "start", "dec_level"]
+# tmp.sort_values(by=sortby, inplace=True)
+# tmp.reset_index(drop=True, inplace=True)
+# tmp.drop("sample_rate", axis=1, inplace=True)  # not valid for decimated data
