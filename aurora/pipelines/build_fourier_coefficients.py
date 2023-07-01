@@ -233,13 +233,24 @@ def generate_fcs_synthetic(mth5_path, min_num_stft_windows=2):
                     fc_group.update_metadata()
 
     m.close_mth5()
-    print("WOWWWWEEEEE")
     return
 
 
 def read_back_fcs(mth5_path):
     m = MTH5()
     m.open_mth5(mth5_path)
+    channel_summary_df = m.channel_summary.to_dataframe()
+    print(channel_summary_df)
+    print("do some groupby stuffs")
+    station_obj = m.get_station("test1")
+    print("Here are the fc groups")
+    station_obj.fourier_coefficients_group.groups_list
+    fc_group = station_obj.fourier_coefficients_group.get_fc_group("001")
+    dec_level = fc_group.get_decimation_level("0")
+    print(dec_level.channel_summary)
+    xrds = dec_level.to_xarray(["hx", "hy"])
+    xrds.time.data.shape
+    xrds.frequency.data.shape
     pass
 # decimation_level.channel_summary
 # decimation_level.dataset_options
@@ -403,6 +414,8 @@ def main():
     synthetic_file_paths = [x for x in synthetic_file_paths if "nan" not in str(x)]
     for mth5_path in synthetic_file_paths:
         generate_fcs_synthetic(mth5_path)
+        read_back_fcs(mth5_path)
+    print("WOWWWWEEEEE")
 
 if __name__ == "__main__":
     main()
