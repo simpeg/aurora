@@ -6,7 +6,8 @@ and iterate over the rows, creating the FC levels.
 
 We need to start with
 1. A list of mth5 files
-2. A FC-scheme
+2. A FC-scheme.
+
 
 FC-SCheme in the past has come from ConfigCreator
 which takes a KernelDataset as input
@@ -36,6 +37,34 @@ Here are the parameters that are defined via the mt_metadata fourier coefficient
 "window.num_samples": 128,
 "window.overlap": 32,
 "window.type": "boxcar"
+
+Key to creating the decimations config is the decision about decimation factors and the number of levels
+We have been getting this from the EMTF band setup file by default.  It is desireable to continue supporting this, however,
+note that the EMTF band setup is really about processing, and not about making STFTs.
+
+What we really want here is control of the decimation config.
+This was controlled by decset.cfg which looks like this:
+4     0      # of decimation level, & decimation offset
+128  32.   1   0   0   7   4   32   1
+1.0
+128  32.   4   0   0   7   4   32   4
+.2154  .1911   .1307   .0705
+128  32.   4   0   0   7   4   32   4
+.2154  .1911   .1307   .0705
+128  32.   4   0   0   7   4   32   4
+.2154  .1911   .1307   .0705
+
+This essentially corresponds to a "Decimations Group" which is a list of decimations.
+Related to the generation of FCs is the ARMA prewhitening (Issue #60) which was controlled in
+EMTF with pwset.cfg
+4    5             # of decimation level, # of channels
+3 3 3 3 3
+3 3 3 3 3
+3 3 3 3 3
+3 3 3 3 3
+
+For now, lets make a Decimations list,
+For now, lets continue supporting this as an interfce.
 
 
 Note 1: Assumes application of cascading decimation, and that the
@@ -73,6 +102,8 @@ then the “building” of the FC layer should be able to simply follow your tes
 # Imports
 # =============================================================================
 import copy
+
+import numpy as np
 import xarray as xr
 
 from aurora.pipelines.time_series_helpers import apply_prewhitening
@@ -103,27 +134,51 @@ from mt_metadata.transfer_functions.processing.fourier_coefficients import FC
 from aurora.general_helper_functions import TEST_PATH
 from aurora.test_utils.synthetic.paths import DATA_PATH
 
-def decimation_and_stft_config_creator():
-    num_decimations = 4
-    decimation_factors = None
-    if decimation_factors is None:
+def decimation_and_stft_config_creator(initial_sample_rate, max_levels=6, decimation_factors=None):
+    """
+    Based on the number of samples in the run, we can compute the maximum number of valid decimation levels.
+    This would re-use code in processing summary ... or we could just decimate until we cant anymore?
+
+    You can provide soemthing like: decimation_info = {0: 1.0, 1: 4.0, 2: 4.0, 3: 4.0}
+    :param initial_sample_rate:
+    :param max_levels:
+    :return:
+    """
+    if not decimation_factors:
         # set default values to EMTF default values [1, 4, 4, 4, ..., 4]
-        decimation_factors = num_decimations * [4]
+        decimation_factors = max_levels * [4]
         decimation_factors[0] = 1
+        # add labels for the dec levels ... maybe not needed?
+        # decimation_factors = dict(zip(np.arange(max_levels), decimation_factors))
 
-    initial_sample_rate = 1.0
-    decimation_and_stft_config = {}
-    for i_dec in range(num_decimations):
+    num_decimations = len(decimation_factors)
+
+
+    # Refer to processing.Processing.assign_bands()
+    decimation_and_stft_config = []
+    for i_dec_level , decimation_factor in enumerate(decimation_factors):
         dd = Decimation()
-        dd.decimation_level=i_dec_level
-        dd.sample_rate_decimation = "figure it out"
-        dd.sample_rate_decimation = "figure it out"
-        decimation_and_stft_config[i_dec] = dd
+        dd.decimation_level = i_dec_level
+        dd.decimation_factor = decimation_factor
+        if i_dec_level == 0:
+            current_sample_rate = 1.0 * initial_sample_rate
+        else:
+            current_sample_rate /= decimation_factor
+        dd.sample_rate_decimation = current_sample_rate
+        print(dd.sample_rate_decimation)
+        decimation_and_stft_config.append(dd)
+    print("OKOKOK")
+    print("WHAT ABOUT TIME PERIOD START AND END??? ")
+    return decimation_and_stft_config
 
+
+decimation_and_stft_config_creator(1.0)
 
 def take_a_look_at_synthetic_data():
-    decimation_info = {0: 1.0, 1: 4.0, 2: 4.0, 3: 4.0}  # decimation_levels_and_factors  was config.decimation_info()
-    decimation_obj = Decimation()
+    decimation_and_stft_config = decimation_and_stft_config_creator(1.0)
+    decimation_info = {0: 1.0, 1: 4.0, 2: 4.0, 3: 4.0}
+#    initial_sample_rate = # decimation_levels_and_factors  was config.decimation_info()
+    # decimation_obj = Decimation()
     synthetic_file_paths = list(DATA_PATH.glob("*.h5"))
     synthetic_file_paths = [x for x in synthetic_file_paths if "nan" not in str(x)]
     for mth5_path in synthetic_file_paths:
@@ -140,61 +195,57 @@ def take_a_look_at_synthetic_data():
 
             station_obj = m.get_station(station, survey)
             run_summary = station_obj.run_summary
+
             print("We should further group these by sample rate...")
-            drop_columns = ["start", "end"]
-            for i_run_row, run_row in run_summary.iterrows():
-                print("HERE Is where you would merge the FC SCHEME")
+            unique_station_sample_rate_grouper = run_summary.groupby(["sample_rate"])
+            ussr_grouper = unique_station_sample_rate_grouper
+            # I cannot resist calling this a ussr_grouper
 
-                print("MELT  Decimations")
-                # Borrow from tfkernel line 60
-                tmp = run_summary.copy(deep=True)
-                tmp.drop(drop_columns, axis=1, inplace=True)
-                id_vars = list(tmp.columns)
-                for i_dec, dec_factor in decimation_info.items():
-                    tmp[i_dec] = dec_factor
-                tmp = tmp.melt(id_vars=id_vars, value_name="dec_factor", var_name="dec_level")
-                print("We should further group these by sample rate...")
-
-                sortby = ["id", "dec_level"] # might be nice to sort on "start" as well
-                tmp.sort_values(by=sortby, inplace=True)
-                tmp.reset_index(drop=True, inplace=True)
-                for i_dec_row, dec_row in tmp.iterrows():
-
-                    print("ACCESS RUN DATA")
+            for sample_rate, ussr_group in ussr_grouper:
+                drop_columns = ["start", "end"]
+                for i_run_row, run_row in run_summary.iterrows():
+                    # Access Time Series Data
                     run_obj = m.from_reference(run_row.hdf5_reference)
                     runts = run_obj.to_runts()
+                    run_xrds = runts.dataset
 
-                    #xrds = runts.dataset
-                    print("Could it be this easy????")
-                    stft_obj = run_ts_to_stft_scipy(decimation_obj,runts.dataset)
-                    stft_obj = calibrate_stft_obj(stft_obj,run_obj)
-                    print("READY TO PACK!!!")
-                    fc_group = (station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id))
-                    decimation_level = fc_group.add_decimation_level(f"{i_dec_row}")
-                    decimation_level.from_xarray(stft_obj)
-                    decimation_level.update_metadata()
-                    fc_group.update_metadata()
+                    print(" TIMING CORRECTIONS WOULD GO HERE ")
 
-                    print("DECIMATE IF i_dec_row!=0")
-                    if i_dec_row != 0:
-                        print("APPLY DECIMATION")
-                        print("Use ProtoypeDecimation")
-                        raise NotImplementedError
+                    print("GET the FC SCHEMES")
+                    decimation_and_stft_configs = decimation_and_stft_config_creator(sample_rate)
+                    decimation_info = {x.decimation_level:x.decimation_factor for x in decimation_and_stft_config}
+
+                    for i_dec_level, decimation_stft_obj in enumerate(decimation_and_stft_configs):
+                        if i_dec_level != 0:
+                            print("APPLY DECIMATION")
+                            run_xrds = prototype_decimate(decimation_stft_obj, run_xrds)
+                            print("OK")
+                        else:
+                            pass
+
+                        stft_obj = run_ts_to_stft_scipy(decimation_stft_obj, run_xrds)
+                        stft_obj = calibrate_stft_obj(stft_obj,run_obj)
+
+                        print("Pack FCs into h5 and update metadata")
+                        fc_group = (station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id))
+                        decimation_level = fc_group.add_decimation_level(f"{i_dec_level}")
+                        decimation_level.from_xarray(stft_obj)
+                        decimation_level.update_metadata()
+                        fc_group.update_metadata()
 
 
-                # tmp.drop("sample_rate", axis=1, inplace=True)  # not valid for decimated data
-                # sortby = ["survey", "station_id", "run_id", "start", "dec_level"]
-                # tmp.sort_values(by=sortby, inplace=True)
-                # tmp.reset_index(drop=True, inplace=True)
-                # tmp.drop("sample_rate", axis=1, inplace=True)  # not valid for decimated data
-                print("MELTED  Decimations")
-                print("ITerate over the melted df")
+
+
 
         m.close_mth5()
 #        m.run_summary
-    print(len(synthetic_file_paths))
+#    print(len(synthetic_file_paths))
 
-
+# decimation_level.channel_summary
+# decimation_level.dataset_options
+# decimation_level.update_metadata()
+# decimation_level.to_xarray(["ex",])
+# decimation_level.to_xarray(["ex","ey"])
 def make_stft_objects(
     processing_config, i_dec_level, run_obj, run_xrds, units, station_id
 ):
@@ -540,3 +591,22 @@ def main():
 
 if __name__ == "__main__":
     main()
+# tmp.drop("sample_rate", axis=1, inplace=True)  # not valid for decimated data
+# sortby = ["survey", "station_id", "run_id", "start", "dec_level"]
+# tmp.sort_values(by=sortby, inplace=True)
+# tmp.reset_index(drop=True, inplace=True)
+# tmp.drop("sample_rate", axis=1, inplace=True)  # not valid for decimated data
+
+
+# Not sure we need this:
+# print("MELT  Decimations") # Borrow from tfkernel line 60
+# tmp = run_summary.copy(deep=True)
+# tmp.drop(drop_columns, axis=1, inplace=True)
+# id_vars = list(tmp.columns)
+# for i_dec, dec_factor in decimation_info.items():
+#     tmp[i_dec] = dec_factor
+# tmp = tmp.melt(id_vars=id_vars, value_name="dec_factor", var_name="dec_level")
+#
+# sortby = ["id", "dec_level"] # might be nice to sort on "start" as well
+# tmp.sort_values(by=sortby, inplace=True)
+# tmp.reset_index(drop=True, inplace=True)
