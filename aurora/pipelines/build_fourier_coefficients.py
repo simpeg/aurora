@@ -172,13 +172,10 @@ def decimation_and_stft_config_creator(initial_sample_rate, max_levels=6, decima
     return decimation_and_stft_config
 
 
-decimation_and_stft_config_creator(1.0)
+# decimation_and_stft_config_creator(1.0)
 
 def take_a_look_at_synthetic_data():
-    decimation_and_stft_config = decimation_and_stft_config_creator(1.0)
-    decimation_info = {0: 1.0, 1: 4.0, 2: 4.0, 3: 4.0}
-#    initial_sample_rate = # decimation_levels_and_factors  was config.decimation_info()
-    # decimation_obj = Decimation()
+    min_num_stft_windows = 2
     synthetic_file_paths = list(DATA_PATH.glob("*.h5"))
     synthetic_file_paths = [x for x in synthetic_file_paths if "nan" not in str(x)]
     for mth5_path in synthetic_file_paths:
@@ -213,8 +210,8 @@ def take_a_look_at_synthetic_data():
 
                     print("GET the FC SCHEMES")
                     decimation_and_stft_configs = decimation_and_stft_config_creator(sample_rate)
-                    decimation_info = {x.decimation_level:x.decimation_factor for x in decimation_and_stft_config}
-
+                    decimation_info = {x.decimation_level:x.decimation_factor for x in decimation_and_stft_configs}
+                    decimation_level_is_valid = True
                     for i_dec_level, decimation_stft_obj in enumerate(decimation_and_stft_configs):
                         if i_dec_level != 0:
                             print("APPLY DECIMATION")
@@ -222,6 +219,15 @@ def take_a_look_at_synthetic_data():
                             print("OK")
                         else:
                             pass
+
+                        # Check that decimation_level_is_valid
+
+                        #n_samples = run_xrds.time.shape[0]
+                        required_num_samples = decimation_stft_obj.window.num_samples + (min_num_stft_windows - 1) * decimation_stft_obj.window.num_samples_advance
+                        if run_xrds.time.shape[0] < required_num_samples:
+                            decimation_level_is_valid = False
+                        if not decimation_level_is_valid:
+                            continue
 
                         stft_obj = run_ts_to_stft_scipy(decimation_stft_obj, run_xrds)
                         stft_obj = calibrate_stft_obj(stft_obj,run_obj)
@@ -238,8 +244,8 @@ def take_a_look_at_synthetic_data():
 
 
         m.close_mth5()
-#        m.run_summary
-#    print(len(synthetic_file_paths))
+    print("WOWWWWEEEEE")
+    return
 
 # decimation_level.channel_summary
 # decimation_level.dataset_options
