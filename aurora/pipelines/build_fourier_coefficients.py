@@ -81,6 +81,8 @@ from aurora.pipelines.time_series_helpers import truncate_to_clock_zero
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
+from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
+
 
 from aurora.pipelines.transfer_function_helpers import process_transfer_functions
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
@@ -163,7 +165,8 @@ def take_a_look_at_synthetic_data():
                     runts = run_obj.to_runts()
 
                     print("Could it be this easy????")
-                    #qq = run_ts_to_stft(decimation_obj,runts.dataset)
+                    stft_obj = run_ts_to_stft_scipy(decimation_obj,runts.dataset)
+
 
                     print("DECIMATE IF i_dec_row!=0")
                     if i_dec_row != 0:
