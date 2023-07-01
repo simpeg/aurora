@@ -233,11 +233,6 @@ def run_ts_to_stft(decimation_obj, run_xrds_orig):
 
     windowed_obj = WindowedTimeSeries.detrend(data=windowed_obj, detrend_type="linear")
     tapered_obj = windowed_obj * windowing_scheme.taper
-    # stft_obj = WindowedTimeSeries.apply_stft(data=tapered_obj,
-    #                                          sample_rate=windowing_scheme.sample_rate,
-    #                                          detrend_type="linear",
-    # scale_factor=windowing_scheme.linear_spectral_density_calibration_factor)
-
     stft_obj = windowing_scheme.apply_fft(
         tapered_obj, detrend_type=decimation_obj.extra_pre_fft_detrend_type
     )
@@ -273,6 +268,7 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
         if not channel_filter.filters_list:
             print("WARNING UNEXPECTED CHANNEL WITH NO FILTERS")
             if channel_id == "hy":
+                print("Channel HY has no filters, try using filters from HX")
                 channel_filter = run_obj.get_channel("hx").channel_response_filter
         calibration_response = channel_filter.complex_response(stft_obj.frequency.data)
         if channel_scale_factors:
