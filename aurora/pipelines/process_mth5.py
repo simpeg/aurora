@@ -75,10 +75,6 @@ def make_stft_objects(
     """
     stft_config = processing_config.get_decimation_level(i_dec_level)
     stft_obj = run_ts_to_stft(stft_config, run_xrds)
-    # if stft_obj is None:
-    #    # not enough data to FFT
-    #    return stft_obj
-    # stft_obj = run_ts_to_stft_scipy(stft_config, run_xrds)
     run_id = run_obj.metadata.id
     if station_id == processing_config.stations.local.id:
         scale_factors = processing_config.stations.local.run_dict[
