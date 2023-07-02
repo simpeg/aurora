@@ -22,7 +22,6 @@ from aurora.test_utils.earthscope.helpers import SPUD_XML_CSV
 
 
 input_spud_ids_file = pathlib.Path('0_spud_ids.list')
-# output_spud_ids_file = pathlib.Path('1_spud_ids.list')
 target_dir_data = SPUD_XML_PATHS["data"]
 target_dir_emtf = SPUD_XML_PATHS["emtf"]
 
@@ -183,7 +182,7 @@ def scrape_spud(force_download_data=False,
 			file_size = data_filepath.lstat().st_size
 			df.at[i_row, "file_size"] = file_size
 			df.at[i_row, "data_xml_path"] = str(data_filepath)
-			df.at[i_row, "data_filebase"] = data_filebase
+			df.at[i_row, "data_xml_filebase"] = data_filebase
 		print("OK")
 	if save_final:
 		df.to_csv(SPUD_XML_CSV, index=False)
@@ -193,11 +192,11 @@ def main():
 	t0 = time.time()
 
 	# normal usage
-	# scrape_spud(save_at_intervals=True)
+	scrape_spud(save_at_intervals=True)
 
 	# debugging
-	df= scrape_spud(force_download_emtf=False, restrict_to_first_n_rows=11,
-					save_final=False)
+	#df= scrape_spud(force_download_emtf=False, restrict_to_first_n_rows=11,
+    #					save_final=False)
 
 	# re-scrape emtf
 	# scrape_spud(force_download_emtf=True, save_final=False)
