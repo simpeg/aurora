@@ -43,23 +43,23 @@ from mt_metadata import TF_XML
 
 STAGE_ID = 2
 
+KNOWN_NON_EARTHCSCOPE_STATIONS = ["FRD", ]
 
-coverage_csv = get_summary_table_filename(STAGE_ID)
-GET_REMOTES_FROM = "spud_xml_review" # tf_xml
-
-
+COVERAGE_DF_SCHEMA = ["network_id", "station_id", "filename", "filesize", "num_channels_inventory",
+                      "num_channels_h5", "num_channels", "exception", "error_message"]
 def initialize_metadata_df():
     """ """
-    coverage_df = pd.DataFrame(columns=["station_id", "network_id", "filename", 
-                                        "filesize",
-                                        "num_channels_inventory",
-                                        "num_channels_h5",
-                                        "num_channels", "exception", "error_message"])
+    coverage_df = pd.DataFrame(columns=COVERAGE_DF_SCHEMA)
     return coverage_df
 
+def already_in_df(df, network_id, station_id):
+    cond1 = df.network_id.isin([network_id, ])
+    cond2 = df.station_id.isin([station_id, ])
+    sub_df = df[cond1 & cond2]
+    return len(sub_df)
 
 
-def batch_download_metadata(source_csv=None, results_csv=None):
+def batch_download_metadata(source_csv=None, results_csv=None, append_rows_for_existing=False):
     """
 
     :param xml_source_column:"data_xml_path" or "emtf_xml_path"
@@ -69,6 +69,7 @@ def batch_download_metadata(source_csv=None, results_csv=None):
     DATA_AVAILABILITY = DataAvailability()
     t0 = time.time()
     try:
+        coverage_csv = get_summary_table_filename(STAGE_ID)
         coverage_df = pd.read_csv(coverage_csv)
     except FileNotFoundError:
         coverage_df = initialize_metadata_df()
@@ -79,44 +80,84 @@ def batch_download_metadata(source_csv=None, results_csv=None):
     spud_df = restrict_to_mda(spud_df)
 
 
-    xml_source = "data_xml_path"
+    xml_source = "data"
 
+    # Careful in this loop, it is associated with one station (that has a TF, but may have many remotes)
     for i_row, row in spud_df.iterrows():
+
+        # Ignore XML that cannot be read
         if row[f"{xml_source}_error"] is True:
             print(f"Skipping {row.emtf_id} for now, tf not reading in")
             continue
 
-        # xml_path = pathlib.Path(row[xml_source])
-        # if "__" in xml_path.name:
-        #     print(f"Skipping {row[xml_source]} for now, Station/network unknown")
-        #     continue
-        # [xml_uid, network_id, station_id] = xml_path.stem.split("_")
-
-        network_id = row.network_id
-        station_id = row.station_id
-        remotes = row.data_xml_path_remotes.split(",")
+        # Sort out remotes
+        remotes = row.data_remotes.split(",")
         if len(remotes)==1:
             if remotes[0] == "nan":
                 remotes = []
         if remotes:
             print(f"remotes: {remotes} ")
-        all_stations = remotes + [station_id,]
+        all_stations = [row.station_id,] + remotes
+        network_id = row.network_id
+        for station_id in all_stations:
+            if station_id in KNOWN_NON_EARTHCSCOPE_STATIONS:
+                print(f"skipping {station_id} -- it's not an earthscope station")
+                continue
+            if len(station_id) == 0:
+                print("NO Station ID")
+                station_id = "EMPTY"
+            elif len(station_id) == 3:
+                print(f"Probably forgot to archive the TWO-CHAR STATE CODE onto station_id {station_id}")
+            elif len(station_id) > 5:
+                print(f"run labels probably tacked onto station_id {station_id}")
+                print("Can we confirm that FDSN has a max 5CHAR station ID code???")
+                station_id = station_id[0:5]
+                print(f"Setting to first 5 chars: {station_id}")
+            elif len(station_id) == 5:
+                pass #normal
+            else:
+                print("WHAT STAT")
 
-        for station in all_stations:
+            new_row = {"station_id": station_id,
+                       "network_id": network_id,}
             if USE_CHANNEL_WILDCARDS:
                 availabile_channels = ["*Q*", "*F*",]
             else:
                 availabile_channels = DATA_AVAILABILITY.get_available_channels(
-                    network_id, station_id)
-            request_df = build_request_df(station, network_id,
+                    row.network_id, station_id)
+            request_df = build_request_df(station_id, network_id,
                                           channels=availabile_channels, start=None, end=None)
             print(request_df)
             fdsn_object = FDSN(mth5_version='0.2.0')
             fdsn_object.client = "IRIS"
 
             expected_file_name = EXPERIMENT_PATH.joinpath(fdsn_object.make_filename(request_df))
+
             if expected_file_name.exists():
-                print(f"Already have data for {station}-{network_id}")
+                print(f"Already have data for {network_id}-{station_id}")
+                if already_in_df(coverage_df, network_id, station_id):
+                    continue
+                if append_rows_for_existing:
+                    m = MTH5()
+                    m.open_mth5(expected_file_name)
+                    channel_summary_df = m.channel_summary.to_dataframe()
+                    n_ch_h5 = len(channel_summary_df)
+                    m.close_mth5()
+                    new_row["filename"] = expected_file_name
+                    new_row["filesize"] = expected_file_name.stat().st_size
+                    #new_row["num_channels_inventory"] = n_ch_inventory
+                    new_row["num_channels_h5"] = n_ch_h5
+                    #new_row["exception"] = ""
+                    #new_row["error_message"] = ""
+                    coverage_df = coverage_df.append(new_row, ignore_index=True)
+                continue
+
+            # Avoid duplication of already tried cases:
+            # By virtue of this being BELOW the check for filename exists, to encounter this case,
+            # it must be true that the last attempt failed ...
+            if already_in_df(coverage_df, network_id, station_id):
+                print(f"Already tried getting data for {network_id}-{station_id}")
+                print("SKIPPING IT FOR NOW")
                 continue
 
             try:
@@ -128,40 +169,50 @@ def batch_download_metadata(source_csv=None, results_csv=None):
                 mth5.channel_summary.summarize()
                 channel_summary_df = mth5.channel_summary.to_dataframe()
                 n_ch_h5 = len(channel_summary_df)
-
-                new_row = {"station_id": station,
-                           "network_id": network_id,
-                           "filename": expected_file_name,
-                           "filesize": expected_file_name.stat().st_size,
-                           "num_channels_inventory":n_ch_inventory,
-                           "num_channels_h5": n_ch_h5,
-                           "exception":"",
-                           "error_message":""}
-                coverage_df = coverage_df.append(new_row, ignore_index=True)
-                coverage_df.to_csv(coverage_csv, index=False)
+                # ? do we need to close this object afterwards ?
+                new_row["filename"] = expected_file_name
+                new_row["filesize"] = expected_file_name.stat().st_size
+                new_row["num_channels_inventory"] = n_ch_inventory
+                new_row["num_channels_h5"] = n_ch_h5
+                new_row["exception"] = ""
+                new_row["error_message"] = ""
             except Exception as e:
                 print(f"{e}")
-                new_row = {"station_id":station,
-                           "network_id":network_id,
-                           "filename":"", #expected_file_name
-                           "filesize": "", #expected_file_name.stat().st_size,
-                           "num_channels_inventory":0,
-                           "num_channels_h5": 0,
-                           "exception":e.__class__.__name__,
-                           "error_message":e.args[0]}
-                coverage_df = coverage_df.append(new_row, ignore_index=True)
-                coverage_df.to_csv(coverage_csv, index=False)
+                new_row["filename"] = ""
+                new_row["filesize"] =  ""
+                new_row["num_channels_inventory"] = 0
+                new_row["num_channels_h5"] = 0
+                new_row["exception"] = e.__class__.__name__
+                new_row["error_message"] = e.args[0]
+            coverage_df = coverage_df.append(new_row, ignore_index=True)
+            coverage_df.to_csv(coverage_csv, index=False)
 
 def review_results():
     coverage_csv = get_summary_table_filename(STAGE_ID)
-    coverage_df = pd.read_csv(coverage_csv)
-    print(f"coverage_df has columns \n {coverage_df.columns}")
+    df = pd.read_csv(coverage_csv)
+    df = df[COVERAGE_DF_SCHEMA] #sort columns in desired order
+
+    print(f"coverage_df has columns \n {df.columns}")
+    to_str_cols = ["network_id", "station_id"]
+    for str_col in to_str_cols:
+        df[str_col] = df[str_col].astype(str)
+
+    grouper = df.groupby(["network_id", "station_id"])
     print("OK")
     pass
 
 def main():
-    batch_download_metadata()
+    t0 = time.time()
+    # Normal usage: complete run, will not in-fill with info from existing
+    # batch_download_metadata()
+
+    # Complete run, use when part of data already here on disk
+    # This will be nearly complete, but does not fill out the n_ch_
+    # batch_download_metadata(append_rows_for_existing=True)
+
+    print(f"Total scraping time {time.time() - t0}")
     review_results()
+    print(f"Total scraping & review time {time.time() - t0}")
 
 if __name__ == "__main__":
     main()

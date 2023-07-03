@@ -13,9 +13,8 @@ import pandas as pd
 import pathlib
 import time
 
-from aurora.test_utils.earthscope.helpers import SPUD_XML_CSV
+from aurora.test_utils.earthscope.helpers import SPUD_XML_PATHS
 from aurora.test_utils.earthscope.helpers import SUMMARY_TABLES_PATH
-from aurora.test_utils.earthscope.helpers import DATA_PATH
 from aurora.test_utils.earthscope.helpers import load_xml_tf
 from aurora.test_utils.earthscope.helpers import get_most_recent_summary_filepath
 from aurora.test_utils.earthscope.helpers import get_remotes_from_tf
@@ -26,12 +25,14 @@ from aurora.test_utils.earthscope.helpers import load_most_recent_summary
 
 STAGE_ID = 1
 
+DROP_COLS = ["emtf_xml_path", "data_xml_path"]
+USE_SECOND_WAY_OF_PARSING_REMOTES = True
 
-def review_spud_tfs(xml_sources=["emtf_xml_path", "data_xml_path"],
-                    results_csv=""):
+def review_spud_tfs(xml_sources=["emtf", "data"], results_csv=""):
     """
 
-    :param xml_source_column:"data_xml_path" or "emtf_xml_path"
+    :param xml_sources:"data_xml_path" or "emtf_xml_path"
+        20230702
     specifies which of the two possible collections of xml files to use as source
     :return:
     """
@@ -39,7 +40,8 @@ def review_spud_tfs(xml_sources=["emtf_xml_path", "data_xml_path"],
         results_csv = get_summary_table_filename(STAGE_ID)
 
     t0 = time.time()
-    spud_df = pd.read_csv(SPUD_XML_CSV)
+    spud_xml_csv = get_summary_table_filename(0)
+    spud_df = pd.read_csv(spud_xml_csv)
 
     for xml_source in xml_sources:
         spud_df[f"{xml_source}_error"] = False
@@ -53,7 +55,7 @@ def review_spud_tfs(xml_sources=["emtf_xml_path", "data_xml_path"],
         # if i_row<750:
         #     continue
         for xml_source in xml_sources:
-            xml_path = pathlib.Path(row[xml_source])
+            xml_path = SPUD_XML_PATHS[xml_source].joinpath(row[f"{xml_source}_xml_filebase"])
             try:
                 spud_tf = load_xml_tf(xml_path)
                 rr_type = get_rr_type(spud_tf)
@@ -67,7 +69,7 @@ def review_spud_tfs(xml_sources=["emtf_xml_path", "data_xml_path"],
                 spud_df[f"{xml_source}_error"].at[i_row] = True
                 spud_df[f"{xml_source}_exception"].at[i_row] = e.__class__.__name__
                 spud_df[f"{xml_source}_error_message"].at[i_row] = e.args[0]
-        print(i_row, row[xml_source])
+        print(i_row, xml_source)
     spud_df.to_csv(results_csv, index=False)
     print(f"Took {time.time()-t0}s to review spud tfs")
     return spud_df
@@ -75,16 +77,20 @@ def review_spud_tfs(xml_sources=["emtf_xml_path", "data_xml_path"],
 
 
 def summarize_errors():
+    xml_sources = ["data", "emtf"]
     df = load_most_recent_summary(1)
-    print("emtf_xml_path_error")
-    df.emtf_xml_path_error.value_counts()
+    for xml_source in xml_sources:
+        print(f"{xml_source} error \n {df[f'{xml_source}_error'].value_counts()}\n\n")
+    print("OK")
 
 def main():
     # normal
-    results_df = review_spud_tfs()
+    # results_df = review_spud_tfs()
 
     # run only data
     #results_df = review_spud_tfs(xml_sources = ["data_xml_path", ])
+
+    summarize_errors()
 
 
     # # DEBUGGING

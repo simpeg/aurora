@@ -15,7 +15,7 @@ import pandas as pd
 HOME = pathlib.Path().home()
 CACHE_PATH = HOME.joinpath(".cache").joinpath("earthscope")
 CACHE_PATH.mkdir(parents=True, exist_ok=True)
-USE_CHANNEL_WILDCARDS = True
+USE_CHANNEL_WILDCARDS = False
 ## PLACEHOLDER FOR CONFIG
 
 # Data Availability
@@ -50,7 +50,6 @@ SPUD_XML_PATHS["data"] = SPUD_XML_PATHS["base"].joinpath("data")
 SPUD_XML_PATHS["data"].mkdir(parents=True, exist_ok=True)
 SPUD_XML_PATHS["emtf"] = SPUD_XML_PATHS["base"].joinpath("emtf")
 SPUD_XML_PATHS["emtf"].mkdir(parents=True, exist_ok=True)
-SPUD_XML_CSV = SPUD_XML_PATHS["base"].joinpath("spud_summary.csv")
 
 
 def load_xml_tf(file_path):
@@ -163,6 +162,7 @@ def build_request_df(station_id, network_id, channels=None, start=None, end=None
 
 def get_summary_table_filename(stage_number):
     base_names = {}
+    base_names["00"] = "spud_xml_scrape"
     base_names["01"] = "spud_xml_review"
     base_names["02"] = "local_metadata_coverage"
     base_names["03"] = "local_mth5_coverage"
@@ -219,18 +219,17 @@ def load_data_availability_dfs():
 
 class DataAvailability(object):
     def __init__(self):
-        self.df = load_data_availability_dfs()
+        self.df_dict = load_data_availability_dfs()
 
     def get_available_channels(self, network_id, station_id):
-        availability_df = self.df[network_id]
+        availability_df = self.df_dict[network_id]
         sub_availability_df = availability_df[availability_df["Station"] == station_id]
         availabile_channels = sub_availability_df['Channel'].unique()
         return availabile_channels
 
 
-KEEP_COLUMNS = ['emtf_id', 'data_id','file_size','data_xml_path',
-                'data_xml_path_error',
-                'data_xml_path_remote_ref_type', 'data_xml_path_remotes',]
+KEEP_COLUMNS = ['emtf_id', 'data_id','file_size','data_xml_filebase',
+                'data_error', 'data_remote_ref_type', 'data_remotes',]
 def restrict_to_mda(df, RR=None, keep_columns=KEEP_COLUMNS):
     """
     Takes as input the summary from xml ingest (process 01) and restricts to rows where
@@ -241,7 +240,7 @@ def restrict_to_mda(df, RR=None, keep_columns=KEEP_COLUMNS):
     :return:
     """
     n_xml = len(df)
-    is_not_mda = df.data_xml_path.str.contains("__")
+    is_not_mda = df.data_xml_filebase.str.contains("__")
     n_non_mda = is_not_mda.sum()
     n_mda = len(df) - n_non_mda
     print(f"There are {n_mda} / {n_xml} files with mda string ")
@@ -257,21 +256,24 @@ def restrict_to_mda(df, RR=None, keep_columns=KEEP_COLUMNS):
 
     mda_df = mda_df[keep_columns]
 
-
-    if "data_xml_path_remotes" in mda_df.columns:
-        mda_df["data_xml_path_remotes"] = mda_df.data_xml_path_remotes.astype(str)
-        mda_df[mda_df["data_xml_path_remotes"]=="nan"]["data_xml_path_remotes"] = ""
+    fix_nans_in_columns = ["data_remotes",]
+    for col in fix_nans_in_columns:
+        if col in mda_df.columns:
+            mda_df[col] = mda_df[col].astype(str)
+            mda_df[mda_df[col]=="nan"][col] = ""
 
     print("ADD NETWORK/STATION COLUMNS for convenience")
     print("Consdier PUSH THIS BACK TO TASK 01 once all XML are reading successfully")
     # Get station/Networks
-    xml_source = 'data_xml_path'
+    xml_source = 'data'
     n_rows = len(mda_df)
     networks = n_rows * [""]
     stations = n_rows * [""]
     for i, row in mda_df.iterrows():
-        xml_path = pathlib.Path(row[xml_source])
-        [xml_uid, network_id, station_id] = xml_path.stem.split("_")
+        #xml_path = SPUD_XML_PATHS[xml_source].joinpath(row[f"{xml_source}_xml_filebase"])
+        xml_filebase = row[f"{xml_source}_xml_filebase"]
+        xml_filestem = xml_filebase.split(".")[0]
+        [xml_uid, network_id, station_id] = xml_filestem.split("_")
         networks[i] = network_id
         stations[i] = station_id
     mda_df["station_id"] = stations

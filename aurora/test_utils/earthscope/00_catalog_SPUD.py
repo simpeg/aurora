@@ -18,8 +18,7 @@ import time
 
 
 from aurora.test_utils.earthscope.helpers import SPUD_XML_PATHS
-from aurora.test_utils.earthscope.helpers import SPUD_XML_CSV
-
+from aurora.test_utils.earthscope.helpers import get_summary_table_filename
 
 input_spud_ids_file = pathlib.Path('0_spud_ids.list')
 target_dir_data = SPUD_XML_PATHS["data"]
@@ -82,6 +81,7 @@ def scrape_spud(force_download_data=False,
 	-------
 
 	"""
+	spud_xml_csv = get_summary_table_filename(0)
 	# Read in list of spud emtf_ids and initialize a dataframe
 	df = pd.read_csv(input_spud_ids_file, names=["emtf_id", ])
 	df["data_id"] = 0
@@ -105,7 +105,7 @@ def scrape_spud(force_download_data=False,
 	for i_row, row in df.iterrows():
 		if save_at_intervals:
 			if np.mod(i_row, 20) == 0:
-				df.to_csv(SPUD_XML_CSV, index=False)
+				df.to_csv(spud_xml_csv, index=False)
 		# Uncomment lines below to enable fast-forward
 		# cutoff = 840# 6000 #2000 # 11
 		# if i_row < cutoff:
@@ -185,7 +185,7 @@ def scrape_spud(force_download_data=False,
 			df.at[i_row, "data_xml_filebase"] = data_filebase
 		print("OK")
 	if save_final:
-		df.to_csv(SPUD_XML_CSV, index=False)
+		df.to_csv(spud_xml_csv, index=False)
 	return df
 
 def main():
