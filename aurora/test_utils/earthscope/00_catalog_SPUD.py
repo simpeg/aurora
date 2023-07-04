@@ -16,11 +16,11 @@ import re
 import subprocess
 import time
 
-
+from aurora.general_helper_functions import AURORA_PATH
 from aurora.test_utils.earthscope.helpers import SPUD_XML_PATHS
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
 
-input_spud_ids_file = pathlib.Path('0_spud_ids.list')
+input_spud_ids_file = AURORA_PATH.joinpath("aurora", "test_utils", "earthscope", "0_spud_ids.list")
 target_dir_data = SPUD_XML_PATHS["data"]
 target_dir_emtf = SPUD_XML_PATHS["emtf"]
 
@@ -85,13 +85,13 @@ def scrape_spud(force_download_data=False,
 	# Read in list of spud emtf_ids and initialize a dataframe
 	df = pd.read_csv(input_spud_ids_file, names=["emtf_id", ])
 	df["data_id"] = 0
-	df["file_size"] = 0
 	df["fail"] = False
-	df["emtf_xml_path"] = ""
+	df["emtf_file_size"] = 0
 	df["emtf_xml_filebase"] = ""
-	df["data_xml_path"] = ""
+	# df["emtf_xml_path"] = ""
+	df["data_file_size"] = 0
 	df["data_xml_filebase"] = ""
-
+	# df["data_xml_path"] = ""
 	n_rows = len(df)
 	info_str = f"There are {n_rows} spud files"
 	print(f"There are {n_rows} spud files")
@@ -134,10 +134,10 @@ def scrape_spud(force_download_data=False,
 			except:
 				df.at[i_row, "fail"] = True
 				continue
-
-		df.at[i_row, "emtf_xml_path"] = str(emtf_filepath)
+		file_size = emtf_filepath.lstat().st_size
+		df.at[i_row, "emtf_file_size"] = file_size
 		df.at[i_row, "emtf_xml_filebase"] = emtf_filebase
-
+		# df.at[i_row, "emtf_xml_path"] = str(emtf_filepath)
 		# Extract source ID from DATA_URL, and add to df
 		cmd = f"grep 'SourceData id' {emtf_filepath} | awk -F'"'"'"' '{print $2}'"
 
@@ -180,9 +180,9 @@ def scrape_spud(force_download_data=False,
 
 		if data_filepath.exists():
 			file_size = data_filepath.lstat().st_size
-			df.at[i_row, "file_size"] = file_size
-			df.at[i_row, "data_xml_path"] = str(data_filepath)
+			df.at[i_row, "data_file_size"] = file_size
 			df.at[i_row, "data_xml_filebase"] = data_filebase
+#			df.at[i_row, "data_xml_path"] = str(data_filepath)
 		print("OK")
 	if save_final:
 		df.to_csv(spud_xml_csv, index=False)
