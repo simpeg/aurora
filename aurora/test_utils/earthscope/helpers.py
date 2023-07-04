@@ -7,15 +7,20 @@ DATA_PATH: This is where the mth5 files are archived locally
 SPUD_XML_PATH
 """
 import datetime
+import socket
+import pandas as pd
 import pathlib
 
-import pandas as pd
-
 ## PLACEHOLDER FOR CONFIG
-HOME = pathlib.Path().home()
-CACHE_PATH = HOME.joinpath(".cache").joinpath("earthscope")
-CACHE_PATH.mkdir(parents=True, exist_ok=True)
 USE_CHANNEL_WILDCARDS = False
+HOSTNAME = socket.gethostname()
+HOME = pathlib.Path().home()
+
+if "gadi" in HOSTNAME:
+    CACHE_PATH = pathlib.Path("/scratch/my80/kk9397/earthscope")
+else:
+    CACHE_PATH = HOME.joinpath(".cache").joinpath("earthscope")
+CACHE_PATH.mkdir(parents=True, exist_ok=True)
 ## PLACEHOLDER FOR CONFIG
 
 # Data Availability
