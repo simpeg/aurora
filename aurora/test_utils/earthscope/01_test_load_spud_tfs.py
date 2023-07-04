@@ -26,7 +26,12 @@ from aurora.test_utils.earthscope.helpers import load_most_recent_summary
 STAGE_ID = 1
 
 DROP_COLS = ["emtf_xml_path", "data_xml_path"]
-USE_SECOND_WAY_OF_PARSING_REMOTES = True
+
+USE_SECOND_WAY_OF_PARSING_REMOTES = False # Deprecated
+# Have already asserted that
+# (df.data_remotes.astype(str)==df.data_remotes_2.astype(str)).all()
+# (df.emtf_remotes.astype(str)==df.emtf_remotes_2.astype(str)).all()
+# (df.emtf_remotes.astype(str) == df.data_remotes_2.astype(str)).all()
 
 def review_spud_tfs(xml_sources=["emtf", "data"], results_csv=""):
     """
@@ -43,6 +48,7 @@ def review_spud_tfs(xml_sources=["emtf", "data"], results_csv=""):
     spud_xml_csv = get_summary_table_filename(0)
     spud_df = pd.read_csv(spud_xml_csv)
 
+    # Set Up Schema with default values
     for xml_source in xml_sources:
         spud_df[f"{xml_source}_error"] = False
         spud_df[f"{xml_source}_exception"] = ""
@@ -62,8 +68,9 @@ def review_spud_tfs(xml_sources=["emtf", "data"], results_csv=""):
                 spud_df[f"{xml_source}_remote_ref_type"].iat[i_row] = rr_type
                 remotes = get_remotes_from_tf(spud_tf)
                 spud_df[f"{xml_source}_remotes"].iat[i_row] = ",".join(remotes)
-                remotes2 = get_remotes_from_tf_2(spud_tf)
-                spud_df[f"{xml_source}_remotes_2"].iat[i_row] = ",".join(remotes)
+                if USE_SECOND_WAY_OF_PARSING_REMOTES:
+                    remotes2 = get_remotes_from_tf_2(spud_tf)
+                    spud_df[f"{xml_source}_remotes_2"].iat[i_row] = ",".join(remotes)
 
             except Exception as e:
                 spud_df[f"{xml_source}_error"].at[i_row] = True
@@ -81,11 +88,12 @@ def summarize_errors():
     df = load_most_recent_summary(1)
     for xml_source in xml_sources:
         print(f"{xml_source} error \n {df[f'{xml_source}_error'].value_counts()}\n\n")
+
     print("OK")
 
 def main():
     # normal
-    # results_df = review_spud_tfs()
+    results_df = review_spud_tfs()
 
     # run only data
     #results_df = review_spud_tfs(xml_sources = ["data_xml_path", ])
