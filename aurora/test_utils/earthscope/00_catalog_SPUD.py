@@ -19,7 +19,11 @@ import time
 from aurora.general_helper_functions import AURORA_PATH
 from aurora.test_utils.earthscope.helpers import SPUD_XML_PATHS
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
+from aurora.test_utils.earthscope.helpers import get_via_curl
+from aurora.test_utils.earthscope.helpers import strip_xml_tags
 
+force_download_data = False
+force_download_emtf = False
 input_spud_ids_file = AURORA_PATH.joinpath("aurora", "test_utils", "earthscope", "0_spud_ids.list")
 target_dir_data = SPUD_XML_PATHS["data"]
 target_dir_emtf = SPUD_XML_PATHS["emtf"]
@@ -28,44 +32,121 @@ target_dir_emtf = SPUD_XML_PATHS["emtf"]
 EMTF_URL = "https://ds.iris.edu/spudservice/emtf"
 DATA_URL = "https://ds.iris.edu/spudservice/data"
 
-def get_via_curl(source, target):
-	"""
-	If exit_status of 127 is returned you may need to install curl in your environment
-	If you need a file with the IRIS mda string, i_row=6000 has one.
+# class EMTFXML(object):
+# 	def __init__(self, **kwargs):
+# 		self.filepath = kwargs.get("filepath", "")
 
-	Note that the EMTF spuds come as HTML, to get XML need to edit the curl command, adding
-	-H 'Accept: application/xml'
-	https://stackoverflow.com/questions/22924993/getting-webpage-data-in-xml-format-using-curl
+def extract_network_and_station_from_mda_info(emtf_filepath):
+	# cmd = f"grep 'mda' {emtf_file} | awk -F'"'"'"' '{print $2}'"
+	cmd = f"grep 'mda' {emtf_filepath}"
+	try:
+		qq = subprocess.check_output([cmd], shell=True)
+	except subprocess.CalledProcessError as e:
+		print("GREP found no mda string-- assuming data are archived elsewhere")
+		qq = None
+	network = ""
+	station = ""
+	if qq:
+		xml_url = qq.decode().strip()
+		url = strip_xml_tags(xml_url)
+		url_parts = url.split("/")
+		if "mda" in url_parts:
+			idx = url_parts.index("mda")
+			network = url_parts[idx + 1]
+			station = url_parts[idx + 2]
+	return network, station
 
-	ToDo: confirm the -H option works OK for DATA_URL as well.
+def prepare_dataframe_for_scraping(restrict_to_first_n_rows=False):
+	# Read in list of spud emtf_ids and initialize a dataframe
+	df = pd.read_csv(input_spud_ids_file, names=["emtf_id", ])
+	df["data_id"] = 0
+	df["fail"] = False
+	df["emtf_file_size"] = 0
+	df["emtf_xml_filebase"] = ""
+	df["data_file_size"] = 0
+	df["data_xml_filebase"] = ""
+	n_rows = len(df)
+	info_str = f"There are {n_rows} spud files"
+	print(f"There are {n_rows} spud files")
+	if restrict_to_first_n_rows:
+		df = df.iloc[:restrict_to_first_n_rows]
+		info_str += f"\n restricting to first {restrict_to_first_n_rows} rows for testing"
+		n_rows = len(df)
+	print(info_str)
+	return df
 
-	Parameters
-	----------
-	source
-	target
+def enrich_row(row):
+	#print("row",row)
+	print(f"Getting {row.emtf_id}")
+	source_url = f"{EMTF_URL}/{row.emtf_id}"
+	emtf_filebase = f"{row.emtf_id}.xml"
+	emtf_filepath = target_dir_emtf.joinpath(emtf_filebase)
 
-	Returns
-	-------
+	# To download on not to download - that is the question:
+	if emtf_filepath.exists():
+		download_emtf = False
+		print(f"XML emtf_file {emtf_filepath} already exists")
+		if force_download_emtf:
+			download_emtf = True
+			print("Forcing download of EMTF file")
+	else:
+		download_emtf = True
 
-	"""
-	cmd = f"curl -s -H 'Accept: application/xml' {source} -o {target}"
-	print(cmd)
-	exit_status = subprocess.call([cmd], shell=True)
-	if exit_status != 0:
-		print(f"Failed to {cmd}")
-		raise Exception
-	return
+	if download_emtf:
+		try:
+			get_via_curl(source_url, emtf_filepath)
+		except:
+			row["fail"] = True
+
+	file_size = emtf_filepath.lstat().st_size
+	row["emtf_file_size"] = file_size
+	row["emtf_xml_filebase"] = emtf_filebase
+
+	# Extract source ID from DATA_URL, and add to df
+	print(emtf_filepath)
+	cmd = f"grep 'SourceData id' {emtf_filepath} | awk -F'"'"'"' '{print $2}'"
+	qq = subprocess.check_output([cmd], shell=True)
+	data_id = int(qq.decode().strip())
+
+	cmd = f"grep 'SourceData id' {emtf_filepath}"
+	qq = subprocess.check_output([cmd], shell=True)
+	data_id2 = int(qq.decode().strip().split('"')[1])
+
+	assert data_id2==data_id
+
+	print(f"source_data_id = {data_id}")
+	row["data_id"] = data_id
+
+	# Extract Station Name info if IRIS provides it
+	network, station = extract_network_and_station_from_mda_info(emtf_filepath)
+
+	data_filebase = "_".join([str(row.emtf_id), network, station]) + ".xml"
+	source_url = f"{DATA_URL}/{data_id}"
+	data_filepath = target_dir_data.joinpath(data_filebase)
+	if data_filepath.exists():
+		if force_download_data:
+			print("Forcing download of DATA file")
+			get_via_curl(source_url, data_filepath)
+		else:
+			print(f"XML data_file {data_filepath} already exists - skipping")
+	else:
+		get_via_curl(source_url, data_filepath)
+
+	if data_filepath.exists():
+		file_size = data_filepath.lstat().st_size
+		row.at["data_file_size"] = file_size
+		row.at["data_xml_filebase"] = data_filebase
+	return row
 
 def scrape_spud(force_download_data=False,
 				force_download_emtf=False,
 				restrict_to_first_n_rows=False,
 				save_at_intervals=False,
-				save_final=True, ):
+				save_final=True,
+				npartitions=0):
 	"""
 	Notes:
-	1. columns "emtf_xml_path" and "data_xml_path" should be depreacted.  A better
-	solution is to store the filebase only, and use a config to control the path.
-
+		Gets xml from web location, and makes a local copy
 
 	Parameters
 	----------
@@ -81,122 +162,32 @@ def scrape_spud(force_download_data=False,
 	-------
 
 	"""
-	spud_xml_csv = get_summary_table_filename(0)
-	# Read in list of spud emtf_ids and initialize a dataframe
-	df = pd.read_csv(input_spud_ids_file, names=["emtf_id", ])
-	df["data_id"] = 0
-	df["fail"] = False
-	df["emtf_file_size"] = 0
-	df["emtf_xml_filebase"] = ""
-	# df["emtf_xml_path"] = ""
-	df["data_file_size"] = 0
-	df["data_xml_filebase"] = ""
-	# df["data_xml_path"] = ""
-	n_rows = len(df)
-	info_str = f"There are {n_rows} spud files"
-	print(f"There are {n_rows} spud files")
-	if restrict_to_first_n_rows:
-		df = df.iloc[:restrict_to_first_n_rows]
-		info_str += f"\n restricting to first {restrict_to_first_n_rows} rows for testing"
+	df = prepare_dataframe_for_scraping(restrict_to_first_n_rows=restrict_to_first_n_rows)
+	if not npartitions:
+		enriched_df = df.apply(enrich_row, axis=1)
+	else:
+		import dask.dataframe as dd
+		ddf = dd.from_pandas(df, npartitions=npartitions)
 		n_rows = len(df)
-	print(info_str)
+		meta = {'emtf_id': "int64", 'data_id': 'int64', 'fail': 'bool',
+				'emtf_file_size': 'int64', 'emtf_xml_filebase': 'string',
+				'data_file_size': 'int64', 'data_xml_filebase': 'string'}
+		enriched_df = ddf.apply(enrich_row, axis=1, meta=meta).compute()
 
-	# Iterate over rows of dataframe (spud files)
-	for i_row, row in df.iterrows():
-		if save_at_intervals:
-			if np.mod(i_row, 20) == 0:
-				df.to_csv(spud_xml_csv, index=False)
-		# Uncomment lines below to enable fast-forward
-		# cutoff = 840# 6000 #2000 # 11
-		# if i_row < cutoff:
-		#	continue
-
-		print(f"Getting {i_row}/{n_rows}, {row.emtf_id}")
-
-		# Get xml from web location, and make a local copy
-		source_url = f"{EMTF_URL}/{row.emtf_id}"
-		emtf_filebase = f"{row.emtf_id}.xml"
-
-		emtf_filepath = target_dir_emtf.joinpath(emtf_filebase)
-		if emtf_filepath.exists():
-			download_emtf = False
-			print(f"XML emtf_file {emtf_filepath} already exists - skipping")
-		else:
-			download_emtf = True
-
-		if force_download_emtf:
-			download_emtf = True
-			print("Forcing download of EMTF file")
-
-		if download_emtf:
-			try:
-				get_via_curl(source_url, emtf_filepath)
-			except:
-				df.at[i_row, "fail"] = True
-				continue
-		file_size = emtf_filepath.lstat().st_size
-		df.at[i_row, "emtf_file_size"] = file_size
-		df.at[i_row, "emtf_xml_filebase"] = emtf_filebase
-		# df.at[i_row, "emtf_xml_path"] = str(emtf_filepath)
-		# Extract source ID from DATA_URL, and add to df
-		cmd = f"grep 'SourceData id' {emtf_filepath} | awk -F'"'"'"' '{print $2}'"
-
-		qq = subprocess.check_output([cmd], shell=True)
-		data_id = int(qq.decode().strip())
-		print(f"source_data_id = {data_id}")
-		df.at[i_row, "data_id" ] = data_id
-		#re.sub('<[^>]*>', '', mystring)
-		# Extract Station Name info if IRIS provides it
-		#cmd = f"grep 'mda' {emtf_file} | awk -F'"'"'"' '{print $2}'"
-		cmd = f"grep 'mda' {emtf_filepath}"
-		try:
-			qq = subprocess.check_output([cmd], shell=True)
-		except subprocess.CalledProcessError as e:
-			print("NO GREPP")
-			qq = None
-		network = ""
-		station = ""
-		if qq:
-			xml_url = qq.decode().strip()
-			url = re.sub('<[^>]*>', '', xml_url)
-			url_parts = url.split("/")
-			if "mda" in url_parts:
-				idx = url_parts.index("mda")
-				network = url_parts[idx + 1]
-				station = url_parts[idx + 2]
-
-		data_filebase = "_".join([str(row.emtf_id), network, station]) + ".xml"
-		source_url = f"{DATA_URL}/{data_id}"
-		data_filepath = target_dir_data.joinpath(data_filebase)
-		if data_filepath.exists():
-			if force_download_data:
-				print("Forcing download of DATA file")
-				get_via_curl(source_url, data_filepath)
-			else:
-				print(f"XML data_file {data_filepath} already exists - skipping")
-				pass
-		else:
-			get_via_curl(source_url, data_filepath)
-
-		if data_filepath.exists():
-			file_size = data_filepath.lstat().st_size
-			df.at[i_row, "data_file_size"] = file_size
-			df.at[i_row, "data_xml_filebase"] = data_filebase
-#			df.at[i_row, "data_xml_path"] = str(data_filepath)
-		print("OK")
 	if save_final:
-		df.to_csv(spud_xml_csv, index=False)
-	return df
+		spud_xml_csv = get_summary_table_filename(0)
+		enriched_df.to_csv(spud_xml_csv, index=False)
+	return enriched_df
 
 def main():
 	t0 = time.time()
 
 	# normal usage
-	scrape_spud(save_at_intervals=True)
+	#scrape_spud(save_at_intervals=False, restrict_to_first_n_rows=False, save_final=True, npartitions=20)
 
 	# debugging
-	#df= scrape_spud(force_download_emtf=False, restrict_to_first_n_rows=11,
-    #					save_final=False)
+	df= scrape_spud(force_download_emtf=False, restrict_to_first_n_rows=False,
+    					save_final=False, npartitions=0)
 
 	# re-scrape emtf
 	# scrape_spud(force_download_emtf=True, save_final=False)

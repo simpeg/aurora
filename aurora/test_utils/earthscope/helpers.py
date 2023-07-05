@@ -7,9 +7,11 @@ DATA_PATH: This is where the mth5 files are archived locally
 SPUD_XML_PATH
 """
 import datetime
-import socket
 import pandas as pd
 import pathlib
+import re
+import socket
+import subprocess
 
 ## PLACEHOLDER FOR CONFIG
 USE_CHANNEL_WILDCARDS = False
@@ -56,6 +58,50 @@ SPUD_XML_PATHS["data"].mkdir(parents=True, exist_ok=True)
 SPUD_XML_PATHS["emtf"] = SPUD_XML_PATHS["base"].joinpath("emtf")
 SPUD_XML_PATHS["emtf"].mkdir(parents=True, exist_ok=True)
 
+def strip_xml_tags(some_string):
+    """
+    Allows simplification of less intuitive (albeit faster) commands such as:
+    cmd = f"grep 'SourceData id' {emtf_filepath} | awk -F'"'"'"' '{print $2}'"
+    qq = subprocess.check_output([cmd], shell=True)
+    data_id = int(qq.decode().strip())
+    with
+    cmd = f"grep 'SourceData id' {emtf_filepath}"
+    qq = subprocess.check_output([cmd], shell=True)
+    qq = strip_xml_tags(qq)
+    data_id = int(qq.decode().strip())
+    :param some_string:
+    :return:
+    """
+    stripped = re.sub('<[^>]*>', '', some_string)
+    return stripped
+
+def get_via_curl(source, target):
+	"""
+	If exit_status of 127 is returned you may need to install curl in your environment
+	If you need a file with the IRIS mda string, i_row=6000 has one.
+
+	Note that the EMTF spuds come as HTML, to get XML need to edit the curl command, adding
+	-H 'Accept: application/xml'
+	https://stackoverflow.com/questions/22924993/getting-webpage-data-in-xml-format-using-curl
+
+	ToDo: confirm the -H option works OK for DATA_URL as well.
+
+	Parameters
+	----------
+	source
+	target
+
+	Returns
+	-------
+
+	"""
+	cmd = f"curl -s -H 'Accept: application/xml' {source} -o {target}"
+	print(cmd)
+	exit_status = subprocess.call([cmd], shell=True)
+	if exit_status != 0:
+		print(f"Failed to {cmd}")
+		raise Exception
+	return
 
 def load_xml_tf(file_path):
     """
