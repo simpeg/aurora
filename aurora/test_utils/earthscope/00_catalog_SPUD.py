@@ -8,7 +8,7 @@ https://stackoverflow.com/questions/3662142/how-to-remove-tags-from-a-string-in-
 
 """
 
-
+import argparse
 import numpy as np
 import pandas as pd
 import pathlib
@@ -141,7 +141,6 @@ def enrich_row(row):
 def scrape_spud(force_download_data=False,
 				force_download_emtf=False,
 				restrict_to_first_n_rows=False,
-				save_at_intervals=False,
 				save_final=True,
 				npartitions=0):
 	"""
@@ -155,7 +154,6 @@ def scrape_spud(force_download_data=False,
 	restrict_to_first_n_rows: integer or None
 		If an integer is provided, we will only operate of restrict_to_first_n_rows
 		of the dataframe.  Used for testing only
-	save_at_intervals
 	save_final
 
 	Returns
@@ -180,14 +178,32 @@ def scrape_spud(force_download_data=False,
 	return enriched_df
 
 def main():
+	"""
+	Follows this great argparse tutorial: https://docs.python.org/3/howto/argparse.html
+	:return:
+	"""
+	# parser = argparse.ArgumentParser(description="Scrape XML files from SPUD")
+	# parser.add_argument("echo", help="echo the string you use here")
+	# parser.add_argument("square", help="display a square of a given number", type=int)
+	# parser.add_argument("-v", "--verbose", help="increase output verbosity", action="store_true")
+	# parser.add_argument("--save_at_intevals", help="increase output verbosity", action="store_true")
+	# args = parser.parse_args()
+	# print(args.echo)
+	# answer = args.square**2
+	# if args.verbose:
+	# 	print(f"Running '{__file__}'")
+	# 	print(f"the square of {args.square} equals {answer}")
+	# else:
+	# 	print(answer)
+
 	t0 = time.time()
 
 	# normal usage
-	#scrape_spud(save_at_intervals=False, restrict_to_first_n_rows=False, save_final=True, npartitions=20)
+	#scrape_spud(restrict_to_first_n_rows=False, save_final=True, npartitions=20)
 
 	# debugging
-	df= scrape_spud(force_download_emtf=False, restrict_to_first_n_rows=False,
-    					save_final=False, npartitions=0)
+	#df= scrape_spud(force_download_emtf=False, restrict_to_first_n_rows=5,
+   # 					save_final=False, npartitions=0)
 
 	# re-scrape emtf
 	# scrape_spud(force_download_emtf=True, save_final=False)
