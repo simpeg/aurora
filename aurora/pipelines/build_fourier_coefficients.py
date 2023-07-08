@@ -105,7 +105,7 @@ from aurora.transfer_function.TTFZ import TTFZ
 
 from mth5.mth5 import MTH5
 from mt_metadata.transfer_functions.core import TF
-from mt_metadata.transfer_functions.processing.fourier_coefficients import Channel
+# from mt_metadata.transfer_functions.processing.fourier_coefficients import Channel
 from mt_metadata.transfer_functions.processing.fourier_coefficients import Decimation
 from mt_metadata.transfer_functions.processing.fourier_coefficients import FC
 
