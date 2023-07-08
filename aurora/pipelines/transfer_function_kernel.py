@@ -2,7 +2,9 @@ import numpy as np
 import pandas as pd
 import psutil
 
+
 from aurora.pipelines.helpers import initialize_config
+from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.transfer_function.kernel_dataset import KernelDataset
 from mth5.utils.helpers import initialize_mth5
 from mt_metadata.transfer_functions.processing.aurora import Processing
@@ -72,6 +74,62 @@ class TransferFunctionKernel(object):
             mth5_objs[self.config.stations.remote[0].id] = remote_mth5_obj
         self._mth5_objs = mth5_objs
         return # mth5_objs
+
+    def update_dataset_df(self,i_dec_level):
+        """
+        This could and probably should be moved to TFK.update_dataset_df()
+
+        This function has two different modes.  The first mode, initializes values in the
+        array, and could be placed into TFKDataset.initialize_time_series_data()
+        The second mode, decimates. The function is kept in pipelines becasue it calls
+        time series operations.
+
+
+        Notes:
+        1. When iterating over dataframe, (i)ndex must run from 0 to len(df), otherwise
+        get indexing errors.  Maybe reset_index() before main loop? or push reindexing
+        into TF Kernel, so that this method only gets a cleanly indexed df, restricted to
+        only the runs to be processed for this specific TF?
+        2. When assigning xarrays to dataframe cells, df dislikes xr.Dataset,
+        so we convert to DataArray before assignment
+
+
+        Parameters
+        ----------
+        i_dec_level: int
+            decimation level id, indexed from zero
+        config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
+            decimation level config
+
+        Returns
+        -------
+        dataset_df: pd.DataFrame
+            Same df that was input to the function but now has columns:
+
+
+        """
+        if i_dec_level == 0:
+            # Consider moving the line below into update_dataset_df.  This will allow bypassing loading of the data if
+            # FC Level of mth5 is used.
+            # Assign additional columns to dataset_df, populate with mth5_objs and xr_ts
+            # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
+            self.dataset.initialize_dataframe_for_processing(self.mth5_objs)
+
+            # APPLY TIMING CORRECTIONS HERE
+        else:
+            print(f"DECIMATION LEVEL {i_dec_level}")
+            # See Note 1 top of module
+            # See Note 2 top of module
+            for i, row in self.dataset_df.iterrows():
+                if not self.is_valid_dataset(row, i_dec_level):
+                    continue
+                run_xrds = row["run_dataarray"].to_dataset("channel")
+                decimation = self.config.decimations[i_dec_level].decimation
+                decimated_xrds = prototype_decimate(decimation, run_xrds)
+                self.dataset_df["run_dataarray"].at[i] = decimated_xrds.to_array("channel")
+
+        print("DATASET DF UPDATED")
+        return
 
     def make_processing_summary(self):
         """

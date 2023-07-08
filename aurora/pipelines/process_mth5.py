@@ -26,7 +26,6 @@ Note 3: This point in the loop marks the interface between _generation_ of the F
 import xarray as xr
 
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
-from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.transfer_function_helpers import process_transfer_functions
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
@@ -180,62 +179,6 @@ def export_tf(
     return tf_cls
 
 
-def update_dataset_df(i_dec_level, tfk):
-    """
-    This could and probably should be moved to TFK.update_dataset_df()
-
-    This function has two different modes.  The first mode, initializes values in the
-    array, and could be placed into TFKDataset.initialize_time_series_data()
-    The second mode, decimates. The function is kept in pipelines becasue it calls
-    time series operations.
-
-
-    Notes:
-    1. When iterating over dataframe, (i)ndex must run from 0 to len(df), otherwise
-    get indexing errors.  Maybe reset_index() before main loop? or push reindexing
-    into TF Kernel, so that this method only gets a cleanly indexed df, restricted to
-    only the runs to be processed for this specific TF?
-    2. When assigning xarrays to dataframe cells, df dislikes xr.Dataset,
-    so we convert to DataArray before assignment
-
-
-    Parameters
-    ----------
-    i_dec_level: int
-        decimation level id, indexed from zero
-    config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
-        decimation level config
-
-    Returns
-    -------
-    dataset_df: pd.DataFrame
-        Same df that was input to the function but now has columns:
-
-
-    """
-    if i_dec_level == 0:
-        # Consider moving the line below into update_dataset_df.  This will allow bypassing loading of the data if
-        # FC Level of mth5 is used.
-        # Assign additional columns to dataset_df, populate with mth5_objs and xr_ts
-        # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
-        tfk.dataset.initialize_dataframe_for_processing(tfk.mth5_objs)
-
-        # APPLY TIMING CORRECTIONS HERE
-    else:
-        print(f"DECIMATION LEVEL {i_dec_level}")
-        # See Note 1 top of module
-        # See Note 2 top of module
-        for i, row in tfk.dataset_df.iterrows():
-            if not tfk.is_valid_dataset(row, i_dec_level):
-                continue
-            run_xrds = row["run_dataarray"].to_dataset("channel")
-            decimation = tfk.config.decimations[i_dec_level].decimation
-            decimated_xrds = prototype_decimate(decimation, run_xrds)
-            tfk.dataset_df["run_dataarray"].at[i] = decimated_xrds.to_array("channel")
-
-    print("DATASET DF UPDATED")
-    return
-
 def fc_levels_exist_to_support_processing():
     return False
 
@@ -299,8 +242,8 @@ def process_mth5(
     tf_dict = {}
 
     for i_dec_level, dec_level_config in enumerate(tfk.valid_decimations()):
-
-        update_dataset_df(i_dec_level, tfk)
+        # Check first if TS processing or accessing FC Levels
+        tfk.update_dataset_df(i_dec_level)
 
         # TFK 1: get clock-zero from data if needed
         if dec_level_config.window.clock_zero_type == "data start":
