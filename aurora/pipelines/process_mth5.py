@@ -182,6 +182,8 @@ def export_tf(
 
 def update_dataset_df(i_dec_level, tfk):
     """
+    This could and probably should be moved to TFK.update_dataset_df()
+
     This function has two different modes.  The first mode, initializes values in the
     array, and could be placed into TFKDataset.initialize_time_series_data()
     The second mode, decimates. The function is kept in pipelines becasue it calls
@@ -212,8 +214,11 @@ def update_dataset_df(i_dec_level, tfk):
 
     """
     if i_dec_level == 0:
-        pass
-        # replaced with kernel_dataset.initialize_dataframe_for_processing()
+        # Consider moving the line below into update_dataset_df.  This will allow bypassing loading of the data if
+        # FC Level of mth5 is used.
+        # Assign additional columns to dataset_df, populate with mth5_objs and xr_ts
+        # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
+        tfk.dataset.initialize_dataframe_for_processing(tfk.mth5_objs)
 
         # APPLY TIMING CORRECTIONS HERE
     else:
@@ -278,12 +283,6 @@ def process_mth5(
     tfk.make_processing_summary()
     tfk.validate()
     tfk.initialize_mth5s()
-
-    # Consider moving the line below into update_dataset_df.  This will allow bypassing loading of the data if
-    # FC Level of mth5 is used.
-    # Assign additional columns to dataset_df, populate with mth5_objs and xr_ts
-    # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
-    tfk.dataset.initialize_dataframe_for_processing(tfk.mth5_objs)
 
     print(
         f"Processing config indicates {len(tfk.config.decimations)} "
