@@ -231,6 +231,8 @@ def update_dataset_df(i_dec_level, tfk):
     print("DATASET DF UPDATED")
     return
 
+def fc_levels_exist_to_support_processing():
+    return False
 
 def process_mth5(
     config,
@@ -275,16 +277,25 @@ def process_mth5(
     tfk = TransferFunctionKernel(dataset=tfk_dataset, config=config)
     tfk.make_processing_summary()
     tfk.validate()
-    mth5_objs = tfk.config.initialize_mth5s()
+    tfk.initialize_mth5s()
 
+    # Consider moving the line below into update_dataset_df.  This will allow bypassing loading of the data if
+    # FC Level of mth5 is used.
     # Assign additional columns to dataset_df, populate with mth5_objs and xr_ts
     # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
-    tfk.dataset.initialize_dataframe_for_processing(mth5_objs)
+    tfk.dataset.initialize_dataframe_for_processing(tfk.mth5_objs)
 
     print(
         f"Processing config indicates {len(tfk.config.decimations)} "
         f"decimation levels "
     )
+
+    # Add a check here that examines the mth5 files and determines if FC Levels already exist, and
+    # if so, can they support the processing.
+    # If True, Use existing, if False, compute on the fly.
+    # This could later, further be modified to have a kwarg for storing the computed on the fly
+    # Ultimately, we will probably want to store the decimated time series in some applications too :/
+    # from mt_metadata.transfer_functions.processing.fourier_coefficients import Decimation
 
     tf_dict = {}
 
@@ -363,7 +374,7 @@ def process_mth5(
     else:
         local_station_id = tfk.config.stations.local.id
         station_metadata = tfk_dataset.get_station_metadata(local_station_id)
-        local_mth5_obj = mth5_objs[local_station_id]
+        local_mth5_obj = tfk.mth5_objs[local_station_id]
 
         if local_mth5_obj.file_version == "0.1.0":
             survey_dict = local_mth5_obj.survey_group.metadata.to_dict()

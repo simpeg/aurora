@@ -10,7 +10,6 @@ import pandas as pd
 from aurora.time_series.windowing_scheme import window_scheme_from_decimation
 from mt_metadata.transfer_functions.processing.aurora.processing import Processing
 from mt_metadata.utils.list_dict import ListDict
-from mth5.utils.helpers import initialize_mth5
 
 
 class Processing(Processing):
@@ -19,28 +18,6 @@ class Processing(Processing):
         # super().__init__(attr_dict=attr_dict, **kwargs)
         super().__init__(**kwargs)
 
-    def initialize_mth5s(self):
-        """
-
-        Returns
-        -------
-        mth5_objs : dict
-            Keyed by station_ids.
-            local station id : mth5.mth5.MTH5
-            remote station id: mth5.mth5.MTH5
-        """
-        local_mth5_obj = initialize_mth5(self.stations.local.mth5_path, mode="r")
-        if self.stations.remote:
-            remote_path = self.stations.remote[0].mth5_path
-            remote_mth5_obj = initialize_mth5(remote_path, mode="r")
-        else:
-            remote_mth5_obj = None
-
-        mth5_objs = {self.stations.local.id: local_mth5_obj}
-        if self.stations.remote:
-            mth5_objs[self.stations.remote[0].id] = remote_mth5_obj
-
-        return mth5_objs
 
     def window_scheme(self, as_type="df"):
         """

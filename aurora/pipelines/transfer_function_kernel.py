@@ -2,16 +2,17 @@ import numpy as np
 import pandas as pd
 import psutil
 
-from mt_metadata.transfer_functions.processing.aurora import Processing
 from aurora.pipelines.helpers import initialize_config
 from aurora.transfer_function.kernel_dataset import KernelDataset
-
+from mth5.utils.helpers import initialize_mth5
+from mt_metadata.transfer_functions.processing.aurora import Processing
 
 class TransferFunctionKernel(object):
     def __init__(self, dataset=None, config=None):
         processing_config = initialize_config(config)
         self._config = processing_config
         self._dataset = dataset
+        self._mth5_objs = None
 
     @property
     def dataset(self):
@@ -38,6 +39,39 @@ class TransferFunctionKernel(object):
         if self._processing_summary is None:
             self.make_processing_summary()
         return self._processing_summary
+
+    @property
+    def mth5_objs(self):
+        if self._mth5_objs is None:
+            self.initialize_mth5s()
+        return self._mth5_objs
+
+    def initialize_mth5s(self):
+        """
+        returns a dict of open mth5 objects, keyed by
+        Consder moving the initialize_mth5s() method out of config, since it depends on mth5.
+        In this way, we can keep the dependencies on mth5 out of the metadatd object (of which config is one)
+
+        Returns
+        -------
+        mth5_objs : dict
+            Keyed by station_ids.
+            local station id : mth5.mth5.MTH5
+            remote station id: mth5.mth5.MTH5
+        """
+
+        local_mth5_obj = initialize_mth5(self.config.stations.local.mth5_path, mode="r")
+        if self.config.stations.remote:
+            remote_path = self.config.stations.remote[0].mth5_path
+            remote_mth5_obj = initialize_mth5(remote_path, mode="r")
+        else:
+            remote_mth5_obj = None
+
+        mth5_objs = {self.config.stations.local.id: local_mth5_obj}
+        if self.config.stations.remote:
+            mth5_objs[self.config.stations.remote[0].id] = remote_mth5_obj
+        self._mth5_objs = mth5_objs
+        return # mth5_objs
 
     def make_processing_summary(self):
         """
