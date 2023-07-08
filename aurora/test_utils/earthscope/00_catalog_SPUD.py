@@ -19,6 +19,7 @@ import time
 from aurora.general_helper_functions import AURORA_PATH
 from aurora.test_utils.earthscope.helpers import SPUD_XML_PATHS
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
+from aurora.test_utils.earthscope.helpers import get_summary_table_schema
 from aurora.test_utils.earthscope.helpers import get_via_curl
 from aurora.test_utils.earthscope.helpers import strip_xml_tags
 
@@ -31,6 +32,7 @@ target_dir_emtf = SPUD_XML_PATHS["emtf"]
 # There are two potential sources for SPUD XML sheets
 EMTF_URL = "https://ds.iris.edu/spudservice/emtf"
 DATA_URL = "https://ds.iris.edu/spudservice/data"
+DF_SCHEMA = get_summary_table_schema(0)
 
 # class EMTFXML(object):
 # 	def __init__(self, **kwargs):
@@ -167,9 +169,7 @@ def scrape_spud(force_download_data=False,
 		import dask.dataframe as dd
 		ddf = dd.from_pandas(df, npartitions=npartitions)
 		n_rows = len(df)
-		meta = {'emtf_id': "int64", 'data_id': 'int64', 'fail': 'bool',
-				'emtf_file_size': 'int64', 'emtf_xml_filebase': 'string',
-				'data_file_size': 'int64', 'data_xml_filebase': 'string'}
+		meta = DF_SCHEMA
 		enriched_df = ddf.apply(enrich_row, axis=1, meta=meta).compute()
 
 	if save_final:
@@ -199,7 +199,7 @@ def main():
 	t0 = time.time()
 
 	# normal usage
-	#scrape_spud(restrict_to_first_n_rows=False, save_final=True, npartitions=20)
+	scrape_spud(restrict_to_first_n_rows=False, save_final=True, npartitions=20)
 
 	# debugging
 	#df= scrape_spud(force_download_emtf=False, restrict_to_first_n_rows=5,

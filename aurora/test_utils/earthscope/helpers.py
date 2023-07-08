@@ -210,6 +210,19 @@ def build_request_df(station_id, network_id, channels=None, start=None, end=None
     request_df = pd.DataFrame(request_list, columns=fdsn_object.request_columns)
     return request_df
 
+def get_summary_table_schema(stage_number):
+    schemata = {}
+    schemata[0] = {'emtf_id': "int64", 'data_id': 'int64', 'fail': 'bool',
+				'emtf_file_size': 'int64', 'emtf_xml_filebase': 'string',
+				'data_file_size': 'int64', 'data_xml_filebase': 'string'}
+    new_01 = {'emtf_error': 'bool', 'data_error': 'bool',
+              'emtf_exception': 'string', 'data_exception': 'string',
+              'emtf_error_message': 'string', 'data_error_message': 'string',
+              'emtf_remote_ref_type': 'string', 'data_remote_ref_type': 'string',
+              'emtf_remotes': 'string', 'data_remotes': 'string',
+              }
+    schemata[1] = {**schemata[0], **new_01 }
+    return schemata[stage_number]
 
 def get_summary_table_filename(stage_number):
     base_names = {}
@@ -281,6 +294,7 @@ class DataAvailability(object):
 
 KEEP_COLUMNS = ['emtf_id', 'data_id','file_size','data_xml_filebase',
                 'data_error', 'data_remote_ref_type', 'data_remotes',]
+
 def restrict_to_mda(df, RR=None, keep_columns=KEEP_COLUMNS):
     """
     Takes as input the summary from xml ingest (process 01) and restricts to rows where

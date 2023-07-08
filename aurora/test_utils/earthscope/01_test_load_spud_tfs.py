@@ -21,17 +21,38 @@ from aurora.test_utils.earthscope.helpers import get_remotes_from_tf
 from aurora.test_utils.earthscope.helpers import get_remotes_from_tf_2
 from aurora.test_utils.earthscope.helpers import get_rr_type
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
+from aurora.test_utils.earthscope.helpers import get_summary_table_schema
 from aurora.test_utils.earthscope.helpers import load_most_recent_summary
+
 
 STAGE_ID = 1
 
 DROP_COLS = ["emtf_xml_path", "data_xml_path"]
-
+DF_SCHEMA = get_summary_table_schema(1)
 USE_SECOND_WAY_OF_PARSING_REMOTES = False # Deprecated
 # Have already asserted that
 # (df.data_remotes.astype(str)==df.data_remotes_2.astype(str)).all()
 # (df.emtf_remotes.astype(str)==df.emtf_remotes_2.astype(str)).all()
 # (df.emtf_remotes.astype(str) == df.data_remotes_2.astype(str)).all()
+def prepare_dataframe_for_scraping(restrict_to_first_n_rows=False):
+    """
+    Define the data structure that is output from this stage of processing
+    It is basically the df from the prvious stage (0) with some new rows added.
+
+    :param restrict_to_first_n_rows:
+    :return:
+    """
+    spud_xml_csv = get_summary_table_filename(0)
+    spud_df = pd.read_csv(spud_xml_csv)
+
+def enrich_row():
+    """
+    This will eventually get used by dask, but as a step we need to make this a method
+    that works with df.apply()
+    Returns:
+
+    """
+    pass
 
 def review_spud_tfs(xml_sources=["emtf", "data"], results_csv=""):
     """

@@ -196,6 +196,12 @@ def review_results():
     to_str_cols = ["network_id", "station_id"]
     for str_col in to_str_cols:
         df[str_col] = df[str_col].astype(str)
+    attribute_error_df = df[df.exception == "AttributeError"]
+    print(attribute_error_df.error_message.unique())
+    xse_df = df[df.exception == "XMLSyntaxError"]
+    print(xse.error_message.unique())
+    ve_df = df[df.exception == "ValueError"]
+    print(ve.error_message.unique())
 
     grouper = df.groupby(["network_id", "station_id"])
     print("OK")

@@ -404,7 +404,7 @@ def main():
     synthetic_file_paths = list(DATA_PATH.glob("*.h5"))
     synthetic_file_paths = [x for x in synthetic_file_paths if "nan" not in str(x)]
     for mth5_path in synthetic_file_paths:
- #       generate_fcs_synthetic(mth5_path)
+        generate_fcs_synthetic(mth5_path)
         read_back_fcs(mth5_path)
     print("se funciona!")
 
