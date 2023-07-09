@@ -178,9 +178,8 @@ def export_tf(
     tf_cls.survey_metadata.from_dict(survey_dict)
     return tf_cls
 
-
-def fc_levels_exist_to_support_processing():
-    return False
+def enrich_row(row):
+    pass
 
 def process_mth5(
     config,
@@ -226,7 +225,7 @@ def process_mth5(
     tfk.make_processing_summary()
     tfk.validate()
     tfk.initialize_mth5s()
-
+    tfk.check_if_fc_levels_already_exist()
     print(
         f"Processing config indicates {len(tfk.config.decimations)} "
         f"decimation levels "
@@ -237,12 +236,16 @@ def process_mth5(
     # If True, Use existing, if False, compute on the fly.
     # This could later, further be modified to have a kwarg for storing the computed on the fly
     # Ultimately, we will probably want to store the decimated time series in some applications too :/
-    # from mt_metadata.transfer_functions.processing.fourier_coefficients import Decimation
+
+    # Because decimation is a cascading operation, I would rather not treat the case where some (valid) decimation
+    # levels exist in the mth5 FC archive and others do not.  The maximum granularity tolerated will be at the
+    # "station-run level, so for a given run, either all relevant FCs are packed into the h5 or we treat as if none of
+    # them are.  Sounds harsh, but if you want to add the logic otherwise, feel free.
 
     tf_dict = {}
 
     for i_dec_level, dec_level_config in enumerate(tfk.valid_decimations()):
-        # Check first if TS processing or accessing FC Levels
+
         tfk.update_dataset_df(i_dec_level)
 
         # TFK 1: get clock-zero from data if needed
@@ -252,6 +255,8 @@ def process_mth5(
         # Apply STFT to all runs
         local_stfts = []
         remote_stfts = []
+
+        # Check first if TS processing or accessing FC Levels
         for i, row in tfk.dataset_df.iterrows():
 
             if not tfk.is_valid_dataset(row, i_dec_level):
@@ -262,6 +267,7 @@ def process_mth5(
             stft_obj = make_stft_objects(
                 tfk.config, i_dec_level, run_obj, run_xrds, units, row.station_id
             )
+            # ToDo: add proper FC packing into here
             if save_fcs:
                 csv_name = f"{row.station_id}_dec_level_{i_dec_level}.csv"
                 stft_df = stft_obj.to_dataframe()

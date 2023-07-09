@@ -131,6 +131,40 @@ class TransferFunctionKernel(object):
         print("DATASET DF UPDATED")
         return
 
+    def check_if_fc_levels_already_exist(self):
+        """
+        Iterate over the processing summary_df, grouping by unique "Station-Run"s.
+        When all FC Levels for a given station-run are already built, mark the RunSummary with a True in
+        the (yet-to-be-built) mth5_has_FCs column
+        Returns:
+
+        """
+        ps_df = self.processing_summary
+        groupby = ['survey', 'station_id', 'run_id',]
+        grouper = ps_df.groupby(groupby)
+        print(len(grouper))
+        for (survey, station_id, run_id), df in grouper:
+            cond1 = self.dataset_df.survey==survey
+            cond2 = self.dataset_df.station_id == station_id
+            cond3 = self.dataset_df.run_id == run_id
+            run_row = self.dataset_df[cond1 & cond2 & cond3].iloc[0]
+            print("Need to update mth5_objs dict so that it is keyed by survey, then station, otra vez might break when "
+                  "mixing in data from other surveys (if the stations are named the same)")
+            # When addresssing the above issue -- consider adding the mth5_obj to self.dataset_df instead of keeping
+            # the dict around ...
+            mth5_obj = self.mth5_objs[station_id]
+            station_obj = mth5_obj.survey_group.stations_group.get_station(station_id)
+            if not station_obj.fourier_coefficients_group.groups_list:
+                print("Nothign to see here folks, return False")
+                return False
+            else:
+                print(df)
+                print("New Logic for FC existence and satisfaction of processing requirements goes here")
+                raise NotImplementedError
+
+        return
+
+
     def make_processing_summary(self):
         """
         Melt the decimation levels over the run summary.  Add columns to estimate
