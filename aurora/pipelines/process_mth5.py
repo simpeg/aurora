@@ -225,6 +225,10 @@ def process_mth5(
     tfk.make_processing_summary()
     tfk.validate()
     tfk.initialize_mth5s()
+    # Look at the processing Config and check whether the as-yet-nonexistant arg build_fc_layers is True.
+    # If build_fc_layers is True we should also have a flag: force_rebuild_fcs, normally False that will verify
+    # check_if_fc_levels_already_exist.  if check_if_fc_levels_already_exist returns True, skip building
+    # unless force_rebuild_fcs is True, in which case it regenerates them.
     tfk.check_if_fc_levels_already_exist()
     print(
         f"Processing config indicates {len(tfk.config.decimations)} "
@@ -309,10 +313,10 @@ def process_mth5(
         tf_dict=tf_dict, processing_config=tfk.config
     )
 
-    # local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
-    local_run_obj = tfk_dataset.get_run_object(0)
 
     if z_file_path:
+        # local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
+        local_run_obj = tfk_dataset.get_run_object(0)
         tf_collection.write_emtf_z_file(z_file_path, run_obj=local_run_obj)
 
     if return_collection:

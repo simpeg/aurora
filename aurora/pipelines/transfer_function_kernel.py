@@ -153,7 +153,11 @@ class TransferFunctionKernel(object):
             # When addresssing the above issue -- consider adding the mth5_obj to self.dataset_df instead of keeping
             # the dict around ...
             mth5_obj = self.mth5_objs[station_id]
-            station_obj = mth5_obj.survey_group.stations_group.get_station(station_id)
+            # Make compatible with v0.1.0 and v0.2.0:
+            # station_obj = mth5_obj.survey_group.stations_group.get_station(station_id)
+            # INSERT get_survey here so it works with v010 and v020
+            survey = mth5_obj.get_survey(survey)
+            station_obj = survey.stations_group.get_station(station_id)
             if not station_obj.fourier_coefficients_group.groups_list:
                 print("Nothign to see here folks, return False")
                 return False
