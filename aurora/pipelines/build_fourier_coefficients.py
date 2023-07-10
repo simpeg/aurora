@@ -181,67 +181,73 @@ def decimation_and_stft_config_creator(initial_sample_rate, max_levels=6, decima
 
 
 def add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=None):
+    """
+
+    Args:
+        mth5_path: str or pathlib.Path
+            Where the mth5 file is locatid
+        decimation_and_stft_configs:
+
+    Returns:
+
+    """
     m = MTH5()
     m.open_mth5(mth5_path)
     channel_summary_df = m.channel_summary.to_dataframe()
-    # print(m.channel_summary)
+
 
     groupby = get_groupby_columns(m)
-    unique_station_sample_rate_grouper = channel_summary_df.groupby(groupby)
-    # I cannot resist calling this a ussr_grouper
+    unique_station_sample_rate_grouper = channel_summary_df.groupby(groupby)# Can't resist calling this ussr_grouper
     ussr_grouper = unique_station_sample_rate_grouper
     print(f"DETECTED {len(ussr_grouper)} unique station-sample_rate instances")
     print("Need to groupby experiment as well for v0.2.0?? See Question 1 at top of module")
 
     for (survey, station, sample_rate), ussr_group in ussr_grouper:
-        print(f"survey: {survey}, station: {station}, sample_rate {sample_rate}")
+        print(f"\n\n\nsurvey: {survey}, station: {station}, sample_rate {sample_rate}")
         station_obj = m.get_station(station, survey)
         run_summary = station_obj.run_summary
 
-        drop_columns = ["start", "end"]
+        # Get the FC schemes
+        if not decimation_and_stft_configs:
+            print("FC config not supplied, using default, creating on the fly")
+            decimation_and_stft_configs = decimation_and_stft_config_creator(sample_rate, time_period=None)
+            decimation_info = {x.decimation_level: x.decimation_factor for x in decimation_and_stft_configs}
+
+        # Make this a function that can be done using df.apply()
+        # I wonder if daskifiying that will cause issues with multiple threads trying to
+        # write to the hdf5 file -- will need testing
         for i_run_row, run_row in run_summary.iterrows():
-            # Access Time Series Data
+            print(f"survey: {survey}, station: {station}, sample_rate {sample_rate}, i_run_row {i_run_row}")
+            # Access Run
             run_obj = m.from_reference(run_row.hdf5_reference)
 
-            # Get the FC schemes
-            if not decimation_and_stft_configs:
-                print("FC config not supplied, using default, creating on the fly")
-                decimation_and_stft_configs = decimation_and_stft_config_creator(sample_rate, time_period=None)
-                decimation_info = {x.decimation_level: x.decimation_factor for x in decimation_and_stft_configs}
+            # Set the time period:
+            for decimation_and_stft_config in decimation_and_stft_configs:
+                decimation_and_stft_config.time_period = run_obj.metadata.time_period
 
-            print("TIME PERIOD HANDLING GOES HERE")
+            runts = run_obj.to_runts(start=decimation_and_stft_config.time_period.start,
+                                     end=decimation_and_stft_config.time_period.end)
+            # runts = run_obj.to_runts() # skip setting time_period explcitly
 
-            # Check if time_period start and end are defualt, if not, subselect the part of the run that is specified,
-            # if so ... we may need to assign start and end to the decimation obj
-
-
-            runts = run_obj.to_runts()
             run_xrds = runts.dataset
             # access container for FCs
             fc_group = (station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id))
+
             print(" TIMING CORRECTIONS WOULD GO HERE ")
-
-
 
             for i_dec_level, decimation_stft_obj in enumerate(decimation_and_stft_configs):
                 if i_dec_level != 0:
-                    print("APPLY DECIMATION")
+                    # Apply decimation
                     run_xrds = prototype_decimate(decimation_stft_obj, run_xrds)
-                    print("OK")
-                else:
-                    pass
-
-                # Check that decimation_level_is_valid
 
                 if not decimation_stft_obj.is_valid_for_time_series_length(run_xrds.time.shape[0]):
                     print(f"Decimation Level {i_dec_level} invalid, TS of {run_xrds.time.shape[0]} samples too short")
                     continue
 
-
                 stft_obj = run_ts_to_stft_scipy(decimation_stft_obj, run_xrds)
                 stft_obj = calibrate_stft_obj(stft_obj,run_obj)
 
-                print("Pack FCs into h5 and update metadata")
+                # print("Pack FCs into h5 and update metadata")
                 decimation_level = fc_group.add_decimation_level(f"{i_dec_level}")
                 decimation_level.from_xarray(stft_obj)
                 decimation_level.update_metadata()
