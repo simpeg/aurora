@@ -1,16 +1,14 @@
 """
-Based on process mth5, this will build the FC level of the mth5
+Supporting codes for building the FC level of the mth5
 
-The overall flow will be to start with a somthing like a processing_summary
-and iterate over the rows, creating the FC levels.
 
 We need to start with
 1. A list of mth5 files
 2. A FC-scheme.
 
 
-FC-SCheme in the past has come from ConfigCreator
-which takes a KernelDataset as input
+FC-SCheme in the past has come from ConfigCreator, which takes a KernelDataset as input.
+
 KernelDataset at its core is a run_summary df with columns:
 ['survey', 'station_id', 'run_id', 'start', 'end', 'sample_rate',
        'input_channels', 'output_channels', 'channel_scale_factors',
@@ -82,6 +80,21 @@ Note 3: This point in the loop marks the interface between _generation_ of the F
  execute compute_transfer_function()
 
 
+ToDo:
+1. Create tests and put them in aurora/tests/___where_exactly__?
+2. Make one test generate the decimation_and_stft_config with default values from
+the decimation_and_stft_config_creator method here
+3. Make another test take the existing aurora processing config and transform it to
+decimation_and_stft_config
+
+Tools for this are already in the FourierCoefficients branch.
+
+Questions:
+1. Shouldn;t there be an experiment column in the channel_summary dataframe for a v0.2.0 file?
+See my note in get_groupby_columns() function.
+2. How to assign default values to Decimation.time_period?
+Usually we will want to convert the entire run, so these should be assigned
+during processing when we knwo the run extents.  Thus the
 """
 # =============================================================================
 # Imports
@@ -105,19 +118,19 @@ from aurora.transfer_function.TTFZ import TTFZ
 
 from mth5.mth5 import MTH5
 from mt_metadata.transfer_functions.core import TF
-# from mt_metadata.transfer_functions.processing.fourier_coefficients import Channel
 from mt_metadata.transfer_functions.processing.fourier_coefficients import Decimation
-from mt_metadata.transfer_functions.processing.fourier_coefficients import FC
 
 
 # =============================================================================
 from aurora.general_helper_functions import TEST_PATH
 from aurora.test_utils.synthetic.paths import DATA_PATH
 
+DEFAULT_TIME = "1980-01-01T00:00:00+00:00"
 def get_groupby_columns(m):
     groupby = ["survey", "station", "sample_rate"]
     if m.file_version == "0.2.0":
-        groupby.insert(0, "experiement")
+        print("Shouldn't we have an experiment column here? I get a KeyError when I uncomment the line below")
+        #groupby.insert(0, "experiment")
     return groupby
 
 def decimation_and_stft_config_creator(initial_sample_rate, max_levels=6, decimation_factors=None):
@@ -153,24 +166,26 @@ def decimation_and_stft_config_creator(initial_sample_rate, max_levels=6, decima
         dd.sample_rate_decimation = current_sample_rate
         print(dd.sample_rate_decimation)
         decimation_and_stft_config.append(dd)
+
     print("OKOKOK")
     print("WHAT ABOUT TIME PERIOD START AND END??? ")
     return decimation_and_stft_config
 
 
 
-def generate_fcs_synthetic(mth5_path, min_num_stft_windows=2):
+def add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=None):
     m = MTH5()
     m.open_mth5(mth5_path)
     channel_summary_df = m.channel_summary.to_dataframe()
-    print(m.channel_summary)
-    #try one big groupby:
+    # print(m.channel_summary)
+
     groupby = get_groupby_columns(m)
     unique_station_sample_rate_grouper = channel_summary_df.groupby(groupby)
     # I cannot resist calling this a ussr_grouper
     ussr_grouper = unique_station_sample_rate_grouper
     print(f"DETECTED {len(ussr_grouper)} unique station-sample_rate instances")
-    print("careful to groupby experiment as well for v0.2.0")
+    print("Need to groupby experiment as well for v0.2.0?? See Question 1 at top of module")
+
     for (survey, station, sample_rate), ussr_group in ussr_grouper:
         print(f"survey: {survey}, station: {station}, sample_rate {sample_rate}")
         station_obj = m.get_station(station, survey)
@@ -180,16 +195,26 @@ def generate_fcs_synthetic(mth5_path, min_num_stft_windows=2):
         for i_run_row, run_row in run_summary.iterrows():
             # Access Time Series Data
             run_obj = m.from_reference(run_row.hdf5_reference)
+
+            # Get the FC schemes
+            if not decimation_and_stft_configs:
+                print("FC config not supplied, using default, creating on the fly")
+                decimation_and_stft_configs = decimation_and_stft_config_creator(sample_rate)
+                decimation_info = {x.decimation_level: x.decimation_factor for x in decimation_and_stft_configs}
+
+            print("TIME PERIOD HANDLING GOES HERE")
+            # Check if time_period start and end are defualt, if not, subselect the part of the run that is specified,
+            # if so ... we may need to assign start and end to the decimation obj
+
+
             runts = run_obj.to_runts()
             run_xrds = runts.dataset
             # access container for FCs
             fc_group = (station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id))
             print(" TIMING CORRECTIONS WOULD GO HERE ")
 
-            # Get the FC schemes
-            decimation_and_stft_configs = decimation_and_stft_config_creator(sample_rate)
-            decimation_info = {x.decimation_level:x.decimation_factor for x in decimation_and_stft_configs}
-            decimation_level_is_valid = True
+
+
             for i_dec_level, decimation_stft_obj in enumerate(decimation_and_stft_configs):
                 if i_dec_level != 0:
                     print("APPLY DECIMATION")
@@ -200,15 +225,10 @@ def generate_fcs_synthetic(mth5_path, min_num_stft_windows=2):
 
                 # Check that decimation_level_is_valid
 
-                #n_samples = run_xrds.time.shape[0]
-                required_num_samples = decimation_stft_obj.window.num_samples + (min_num_stft_windows - 1) * decimation_stft_obj.window.num_samples_advance
-                if run_xrds.time.shape[0] < required_num_samples:
-                    decimation_level_is_valid = False
-                if not decimation_level_is_valid:
-                    print(f"DECIMATION LEVEL {i_dec_level} found to be invalid")
-                    print(f"DECIMATED TS HAS {run_xrds.time.shape[0]} samples")
-                    print(f"NOT ENOUGH to get {min_num_stft_windows} of len {decimation_stft_obj.window.num_samples} and overlap {decimation_stft_obj.window.overlap}")
+                if not decimation_stft_obj.is_valid_for_time_series_length(run_xrds.time.shape[0]):
+                    print(f"Decimation Level {i_dec_level} invalid, TS of {run_xrds.time.shape[0]} samples too short")
                     continue
+
 
                 stft_obj = run_ts_to_stft_scipy(decimation_stft_obj, run_xrds)
                 stft_obj = calibrate_stft_obj(stft_obj,run_obj)
@@ -252,14 +272,22 @@ def read_back_fcs(mth5_path):
 
 
 
-
-def main():
+def test_decimation_and_stft_config_creator():
     cfgs = decimation_and_stft_config_creator(1.0)
+    return cfgs
+
+def test_can_add_fcs_to_synthetic_mth5s(decimation_and_stft_configs=None):
     synthetic_file_paths = list(DATA_PATH.glob("*.h5"))
     synthetic_file_paths = [x for x in synthetic_file_paths if "nan" not in str(x)]
     for mth5_path in synthetic_file_paths:
-        generate_fcs_synthetic(mth5_path)
+        add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=decimation_and_stft_configs)
         read_back_fcs(mth5_path)
+    return
+
+def main():
+    cfgs = test_decimation_and_stft_config_creator()
+
+    test_can_add_fcs_to_synthetic_mth5s()
     print("se funciona!")
 
 if __name__ == "__main__":
