@@ -101,6 +101,7 @@ during processing when we knwo the run extents.  Thus the
 # =============================================================================
 import copy
 
+import mt_metadata.timeseries.time_period
 import numpy as np
 import xarray as xr
 
@@ -133,7 +134,7 @@ def get_groupby_columns(m):
         #groupby.insert(0, "experiment")
     return groupby
 
-def decimation_and_stft_config_creator(initial_sample_rate, max_levels=6, decimation_factors=None):
+def decimation_and_stft_config_creator(initial_sample_rate, max_levels=6, decimation_factors=None, time_period=None):
     """
     Based on the number of samples in the run, we can compute the maximum number of valid decimation levels.
     This would re-use code in processing summary ... or we could just decimate until we cant anymore?
@@ -165,10 +166,16 @@ def decimation_and_stft_config_creator(initial_sample_rate, max_levels=6, decima
             current_sample_rate /= decimation_factor
         dd.sample_rate_decimation = current_sample_rate
         print(dd.sample_rate_decimation)
+        if time_period:
+            # Add logic here for assigning dd.time_period
+            if isinstance(mt_metadata.timeseries.time_period.TimePeriod, time_period):
+                dd.time_period = time_period
+            else:
+                print(f"Not sure how to assign time_period with {time_period}")
+                raise NotImplementedError
+
         decimation_and_stft_config.append(dd)
 
-    print("OKOKOK")
-    print("WHAT ABOUT TIME PERIOD START AND END??? ")
     return decimation_and_stft_config
 
 
@@ -199,10 +206,11 @@ def add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=None):
             # Get the FC schemes
             if not decimation_and_stft_configs:
                 print("FC config not supplied, using default, creating on the fly")
-                decimation_and_stft_configs = decimation_and_stft_config_creator(sample_rate)
+                decimation_and_stft_configs = decimation_and_stft_config_creator(sample_rate, time_period=None)
                 decimation_info = {x.decimation_level: x.decimation_factor for x in decimation_and_stft_configs}
 
             print("TIME PERIOD HANDLING GOES HERE")
+
             # Check if time_period start and end are defualt, if not, subselect the part of the run that is specified,
             # if so ... we may need to assign start and end to the decimation obj
 
