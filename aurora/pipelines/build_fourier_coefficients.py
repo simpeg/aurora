@@ -262,15 +262,13 @@ def read_back_fcs(mth5_path):
     m.open_mth5(mth5_path)
     channel_summary_df = m.channel_summary.to_dataframe()
     print(channel_summary_df)
-    print("do some groupby stuffs")
     groupby = get_groupby_columns(m)
     ussr_grouper = channel_summary_df.groupby(groupby)
     for (survey, station, sample_rate), ussr_group in ussr_grouper:
         print(f"survey: {survey}, station: {station}, sample_rate {sample_rate}")
         station_obj = m.get_station(station, survey)
-        print("Here are the fc groups")
         fc_groups = station_obj.fourier_coefficients_group.groups_list
-        print(fc_groups)
+        print(f"FC Groups: {fc_groups}")
         for run_id in fc_groups:
             fc_group = station_obj.fourier_coefficients_group.get_fc_group(run_id)
             dec_level_ids = fc_group.groups_list
@@ -300,7 +298,6 @@ def test_can_add_fcs_to_synthetic_mth5s(decimation_and_stft_configs=None):
 
 def main():
     cfgs = test_decimation_and_stft_config_creator()
-
     test_can_add_fcs_to_synthetic_mth5s()
     print("se funciona!")
 
