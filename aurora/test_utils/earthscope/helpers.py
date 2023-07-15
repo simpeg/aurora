@@ -76,32 +76,32 @@ def strip_xml_tags(some_string):
     return stripped
 
 def get_via_curl(source, target):
-	"""
-	If exit_status of 127 is returned you may need to install curl in your environment
-	If you need a file with the IRIS mda string, i_row=6000 has one.
+    """
+    If exit_status of 127 is returned you may need to install curl in your environment
 
-	Note that the EMTF spuds come as HTML, to get XML need to edit the curl command, adding
-	-H 'Accept: application/xml'
-	https://stackoverflow.com/questions/22924993/getting-webpage-data-in-xml-format-using-curl
+    Note 1: EMTF spuds come as HTML, to get XML, needed to edit the curl command, adding
+    -H 'Accept: application/xml'
+    https://stackoverflow.com/questions/22924993/getting-webpage-data-in-xml-format-using-curl
 
-	ToDo: confirm the -H option works OK for DATA_URL as well.
+    Parameters
+    ----------
+    source
+    target
 
-	Parameters
-	----------
-	source
-	target
-
-	Returns
-	-------
-
-	"""
-	cmd = f"curl -s -H 'Accept: application/xml' {source} -o {target}"
-	print(cmd)
-	exit_status = subprocess.call([cmd], shell=True)
-	if exit_status != 0:
-		print(f"Failed to {cmd}")
-		raise Exception
-	return
+    Returns
+    -------
+    """
+    cmd = f"curl -s -H 'Accept: application/xml' {source} -o {target}"
+    print(cmd)
+    exit_status = subprocess.call([cmd], shell=True)
+    if exit_status == 0:
+        return
+    else:
+        print(f"Failed to {cmd}")
+        print(f"exit_status {exit_status}")
+        if exit_status==127:
+            print("you may need to install curl in your environment")
+            raise Exception
 
 def load_xml_tf(file_path):
     """
