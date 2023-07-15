@@ -213,8 +213,8 @@ def build_request_df(station_id, network_id, channels=None, start=None, end=None
 def get_summary_table_schema(stage_number):
     schemata = {}
     schemata[0] = {'emtf_id': "int64", 'data_id': 'int64', 'fail': 'bool',
-				'emtf_file_size': 'int64', 'emtf_xml_filebase': 'string',
-				'data_file_size': 'int64', 'data_xml_filebase': 'string'}
+                'emtf_file_size': 'int64', 'emtf_xml_filebase': 'string',
+                'data_file_size': 'int64', 'data_xml_filebase': 'string'}
     new_01 = {'emtf_error': 'bool', 'data_error': 'bool',
               'emtf_exception': 'string', 'data_exception': 'string',
               'emtf_error_message': 'string', 'data_error_message': 'string',
@@ -345,3 +345,12 @@ def restrict_to_mda(df, RR=None, keep_columns=KEEP_COLUMNS):
     mda_df["network_id"] = networks
 
     return mda_df
+
+
+def test_summary_table_schema():
+    get_summary_table_schema(0)
+    get_summary_table_schema(1)
+    print("OK")
+
+if __name__ == "__main__":
+    test_summary_table_schema()
