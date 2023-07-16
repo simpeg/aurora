@@ -34,6 +34,7 @@ from aurora.test_utils.earthscope.helpers import DataAvailability
 from aurora.test_utils.earthscope.helpers import EXPERIMENT_PATH
 from aurora.test_utils.earthscope.helpers import get_most_recent_summary_filepath
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
+from aurora.test_utils.earthscope.helpers import get_summary_table_schema
 from aurora.test_utils.earthscope.helpers import restrict_to_mda
 from aurora.test_utils.earthscope.helpers import USE_CHANNEL_WILDCARDS
 from mth5.mth5 import MTH5
@@ -45,12 +46,13 @@ STAGE_ID = 2
 
 KNOWN_NON_EARTHCSCOPE_STATIONS = ["FRD", ]
 
-COVERAGE_DF_SCHEMA = ["network_id", "station_id", "filename", "filesize", "num_channels_inventory",
-                      "num_channels_h5", "num_channels", "exception", "error_message",
-                      "emtf_id", "data_id", "data_xml_filebase"]
+
+COVERAGE_DF_SCHEMA = get_summary_table_schema(2)
+
 def initialize_metadata_df():
     """ """
-    coverage_df = pd.DataFrame(columns=COVERAGE_DF_SCHEMA)
+    column_names = list(COVERAGE_DF_SCHEMA.keys())
+    coverage_df = pd.DataFrame(columns=column_names)
     return coverage_df
 
 def already_in_df(df, network_id, station_id):
@@ -60,7 +62,7 @@ def already_in_df(df, network_id, station_id):
     return len(sub_df)
 
 
-def batch_download_metadata(source_csv=None, results_csv=None, append_rows_for_existing=False):
+def batch_download_metadata(source_csv=None, results_csv=None, append_rows_for_existing=False, verbosity=1):
     """
 
     :param xml_source_column:"data_xml_path" or "emtf_xml_path"
@@ -134,7 +136,8 @@ def batch_download_metadata(source_csv=None, results_csv=None, append_rows_for_e
                     row.network_id, station_id)
             request_df = build_request_df(station_id, network_id,
                                           channels=availabile_channels, start=None, end=None)
-            print(request_df)
+            if verbosity > 1:
+                print(f"request_df: \n {request_df}")
             fdsn_object = FDSN(mth5_version='0.2.0')
             fdsn_object.client = "IRIS"
 
@@ -150,7 +153,7 @@ def batch_download_metadata(source_csv=None, results_csv=None, append_rows_for_e
                     channel_summary_df = m.channel_summary.to_dataframe()
                     n_ch_h5 = len(channel_summary_df)
                     m.close_mth5()
-                    new_row["filename"] = expected_file_name
+                    new_row["filename"] = expected_file_name.name
                     new_row["filesize"] = expected_file_name.stat().st_size
                     #new_row["num_channels_inventory"] = n_ch_inventory
                     new_row["num_channels_h5"] = n_ch_h5
@@ -177,7 +180,7 @@ def batch_download_metadata(source_csv=None, results_csv=None, append_rows_for_e
                 channel_summary_df = mth5.channel_summary.to_dataframe()
                 n_ch_h5 = len(channel_summary_df)
                 # ? do we need to close this object afterwards ?
-                new_row["filename"] = expected_file_name
+                new_row["filename"] = expected_file_name.name
                 new_row["filesize"] = expected_file_name.stat().st_size
                 new_row["num_channels_inventory"] = n_ch_inventory
                 new_row["num_channels_h5"] = n_ch_h5
@@ -234,7 +237,7 @@ def main():
 
     # Use when part of data already here on disk
     # This will be nearly complete, but does not fill out the n_ch_
-    # batch_download_metadata(append_rows_for_existing=True)
+    batch_download_metadata(append_rows_for_existing=True)
 
     print(f"Total scraping time {time.time() - t0}")
     review_results()

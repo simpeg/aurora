@@ -30,7 +30,6 @@ target_dir_emtf = SPUD_XML_PATHS["emtf"]
 # There are two potential sources for SPUD XML sheets
 EMTF_URL = "https://ds.iris.edu/spudservice/emtf"
 DATA_URL = "https://ds.iris.edu/spudservice/data"
-DF_SCHEMA = get_summary_table_schema(0)
 
 # class EMTFXML(object):
 # 	def __init__(self, **kwargs):
@@ -57,6 +56,14 @@ def extract_network_and_station_from_mda_info(emtf_filepath):
 	return network, station
 
 def prepare_dataframe_for_scraping(restrict_to_first_n_rows=False):
+	"""
+	Define columns and default values
+	Args:
+		restrict_to_first_n_rows:
+
+	Returns:
+
+	"""
 	# Read in list of spud emtf_ids and initialize a dataframe
 	df = pd.read_csv(input_spud_ids_file, names=["emtf_id", ])
 	df["data_id"] = 0
@@ -167,8 +174,8 @@ def scrape_spud(force_download_data=False,
 		import dask.dataframe as dd
 		ddf = dd.from_pandas(df, npartitions=npartitions)
 		n_rows = len(df)
-		meta = DF_SCHEMA
-		enriched_df = ddf.apply(enrich_row, axis=1, meta=meta).compute()
+		df_schema = get_summary_table_schema(0)
+		enriched_df = ddf.apply(enrich_row, axis=1, meta=df_schema).compute()
 
 	if save_final:
 		spud_xml_csv = get_summary_table_filename(0)

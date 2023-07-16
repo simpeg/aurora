@@ -6,6 +6,7 @@ DATA_PATH: This is where the mth5 files are archived locally
 
 SPUD_XML_PATH
 """
+import copy
 import datetime
 import pandas as pd
 import pathlib
@@ -211,6 +212,24 @@ def build_request_df(station_id, network_id, channels=None, start=None, end=None
     return request_df
 
 def get_summary_table_schema(stage_number):
+    """
+    A place where the columns of the various summary tables are defined.
+    Stages 0 and 1 are related in the sense that the summary_table of stage 1 simply involves adding columns to the
+    summmary from stage 0.  The same relationship exists between stages 2 and 3.
+
+    If we were going to properly formalize this flow, it would be good to make a json of the schema, where each column
+    was associated with a dtype, a description, and a default_value.  In that way, the same script could run to prepare
+    a table at any stage, taking only the schema as input.
+
+    This
+    Stage 0
+    Args:
+        stage_number:
+
+    Returns:
+
+    """
+    # Stages 0 and 1
     schemata = {}
     schemata[0] = {'emtf_id': "int64", 'data_id': 'int64', 'fail': 'bool',
                 'emtf_file_size': 'int64', 'emtf_xml_filebase': 'string',
@@ -222,7 +241,34 @@ def get_summary_table_schema(stage_number):
               'emtf_remotes': 'string', 'data_remotes': 'string',
               }
     schemata[1] = {**schemata[0], **new_01 }
-    return schemata[stage_number]
+
+    # Stages 2 and 3
+    # Note emtf_id, data_id, data_xml_filebase are duplicated from schema 0
+    schemata[2] = {"network_id":"string",
+                   "station_id":"string",
+                   "filename":"string",
+                   "filesize":"int64",
+                   "num_channels_inventory": 'int64',
+                   "num_channels_h5":'int64',
+                   "exception":'string',
+                   "error_message":'string',
+                   'emtf_id': "int64", 'data_id': 'int64','data_xml_filebase': 'string'
+                   }
+
+    schemata[3] = copy.deepcopy(schemata[2])
+    # rename filename,filesise to metadata_filename, metadata_filesize
+    schemata[3]["metadata_filename"] = schemata[3].pop("filename")
+    schemata[3]["metadata_filesize"] = schemata[3].pop("filesize")
+    schemata[3]["data_mth5_size"] = "int64"
+    schemata[3]["data_mth5_name"] = "string"
+    schemata[3]["data_mth5_exception"] = "string"
+    schemata[3]["data_mth5_error_message"] = "string"
+
+    try:
+        return schemata[stage_number]
+    except KeyError:
+        print(f"Schema for stage number {stage_number} is not defined")
+        return None
 
 def get_summary_table_filename(stage_number):
     base_names = {}
