@@ -1,8 +1,6 @@
 """
 Python version of Laura's bash script to scrape SPUD emtf xml
 
-
-
 Stripping the xml tags after grepping:
 https://stackoverflow.com/questions/3662142/how-to-remove-tags-from-a-string-in-python-using-regular-expressions-not-in-ht
 

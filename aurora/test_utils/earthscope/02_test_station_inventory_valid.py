@@ -46,7 +46,8 @@ STAGE_ID = 2
 KNOWN_NON_EARTHCSCOPE_STATIONS = ["FRD", ]
 
 COVERAGE_DF_SCHEMA = ["network_id", "station_id", "filename", "filesize", "num_channels_inventory",
-                      "num_channels_h5", "num_channels", "exception", "error_message"]
+                      "num_channels_h5", "num_channels", "exception", "error_message",
+                      "emtf_id", "data_id", "data_xml_filebase"]
 def initialize_metadata_df():
     """ """
     coverage_df = pd.DataFrame(columns=COVERAGE_DF_SCHEMA)
@@ -78,6 +79,8 @@ def batch_download_metadata(source_csv=None, results_csv=None, append_rows_for_e
         source_csv = get_most_recent_summary_filepath(1)
     spud_df = pd.read_csv(source_csv)
     spud_df = restrict_to_mda(spud_df)
+    print(f"Restricting spud_df to mda (Earthscope) entries: {len(spud_df)} rows")
+
 
 
     xml_source = "data"
@@ -97,6 +100,7 @@ def batch_download_metadata(source_csv=None, results_csv=None, append_rows_for_e
                 remotes = []
         if remotes:
             print(f"remotes: {remotes} ")
+
         all_stations = [row.station_id,] + remotes
         network_id = row.network_id
         for station_id in all_stations:
@@ -105,7 +109,7 @@ def batch_download_metadata(source_csv=None, results_csv=None, append_rows_for_e
                 continue
             if len(station_id) == 0:
                 print("NO Station ID")
-                station_id = "EMPTY"
+                continue
             elif len(station_id) == 3:
                 print(f"Probably forgot to archive the TWO-CHAR STATE CODE onto station_id {station_id}")
             elif len(station_id) > 5:
@@ -113,13 +117,16 @@ def batch_download_metadata(source_csv=None, results_csv=None, append_rows_for_e
                 print("Can we confirm that FDSN has a max 5CHAR station ID code???")
                 station_id = station_id[0:5]
                 print(f"Setting to first 5 chars: {station_id}")
-            elif len(station_id) == 5:
-                pass #normal
-            else:
-                print("WHAT STAT")
+            # elif len(station_id) == 5:
+            #     pass #normal
+            # else:
+            #     print("WHAT STAT")
 
             new_row = {"station_id": station_id,
-                       "network_id": network_id,}
+                       "network_id": network_id,
+                       "emtf_id": row.emtf_id,
+                       "data_id": row.data_id,
+                       "data_xml_filebase": row.data_xml_filebase}
             if USE_CHANNEL_WILDCARDS:
                 availabile_channels = ["*Q*", "*F*",]
             else:
@@ -193,26 +200,39 @@ def review_results():
     df = df[COVERAGE_DF_SCHEMA] #sort columns in desired order
 
     print(f"coverage_df has columns \n {df.columns}")
-    to_str_cols = ["network_id", "station_id"]
+    to_str_cols = ["network_id", "station_id", "exception"]
     for str_col in to_str_cols:
         df[str_col] = df[str_col].astype(str)
-    attribute_error_df = df[df.exception == "AttributeError"]
-    print(attribute_error_df.error_message.unique())
-    xse_df = df[df.exception == "XMLSyntaxError"]
-    print(xse.error_message.unique())
-    ve_df = df[df.exception == "ValueError"]
-    print(ve.error_message.unique())
+
+    exception_types = df.exception.unique()
+    exception_types = [x for x in exception_types if x!="nan"]
+    print(f"Identified {len(exception_types)} exception types\n {exception_types}\n")
+
+    print("*** EXCEPTIONS SUMMARY *** \n\n")
+    exception_counts = {}
+    for exception_type in exception_types:
+        exception_df = df[df.exception == exception_type]
+        unique_messages = exception_df.error_message.unique()
+
+        print(f"{exception_type} has {len(exception_df)} instances, with {len(unique_messages)} unique message(s)")
+        print(unique_messages)
+        exception_counts[exception_type] = len(exception_df)
+        if exception_type=="IndexError":
+            exception_df.to_csv("02_do_these_exist.csv", index=False)
+
 
     grouper = df.groupby(["network_id", "station_id"])
-    print("OK")
+    print(f"\n\nThere were {len(grouper)} unique network-station pairs in {len(df)} rows\n\n")
+    print(exception_counts)
+    print(f"TOTAL #Exceptions {np.array(list(exception_counts.values())).sum()} of {len(df)} Cases")
     pass
 
 def main():
     t0 = time.time()
     # Normal usage: complete run, will not in-fill with info from existing
-    # batch_download_metadata()
+    #batch_download_metadata()
 
-    # Complete run, use when part of data already here on disk
+    # Use when part of data already here on disk
     # This will be nearly complete, but does not fill out the n_ch_
     # batch_download_metadata(append_rows_for_existing=True)
 

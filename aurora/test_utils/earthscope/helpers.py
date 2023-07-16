@@ -292,7 +292,7 @@ class DataAvailability(object):
         return availabile_channels
 
 
-KEEP_COLUMNS = ['emtf_id', 'data_id','file_size','data_xml_filebase',
+KEEP_COLUMNS = ['emtf_id', 'data_id','data_file_size','data_xml_filebase',
                 'data_error', 'data_remote_ref_type', 'data_remotes',]
 
 def restrict_to_mda(df, RR=None, keep_columns=KEEP_COLUMNS):
