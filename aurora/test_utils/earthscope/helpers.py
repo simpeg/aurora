@@ -15,7 +15,7 @@ import socket
 import subprocess
 
 ## PLACEHOLDER FOR CONFIG
-USE_CHANNEL_WILDCARDS = False
+USE_CHANNEL_WILDCARDS = True #False
 HOSTNAME = socket.gethostname()
 HOME = pathlib.Path().home()
 
@@ -307,7 +307,11 @@ def get_most_recent_summary_filepath(stage_number):
     globby = SUMMARY_TABLES_PATH.glob(f"{stage_number_str}*")
     globby = list(globby)
     globby.sort()
+    if len(globby) == 0:
+        print(f"glob operation returned an empty list when looking for data from stage {stage_number_str}")
+        print("Expect an IndexError")
     return globby[-1]
+
 
 def load_most_recent_summary(stage_number):
     review_csv = get_most_recent_summary_filepath(stage_number)

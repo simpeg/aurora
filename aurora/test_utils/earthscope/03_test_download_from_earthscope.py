@@ -6,6 +6,15 @@ For each such row,
     extract the network/station_id (if the metadata exist)
     download data
 
+Handy steps for debugging:
+# metadata_local = EXPERIMENT_PATH.joinpath(data_file_base)
+# metadata_local.exists()
+# m = MTH5()
+# m.open_mth5(metadata_local)
+# m.channel_summary
+# m.close_mth5()
+# m.open_mth5(data_file)
+# m.channel_summary
 """
 
 
@@ -35,7 +44,8 @@ from mt_metadata.transfer_functions.core import TF
 from mt_metadata import TF_XML
 
 STAGE_ID = 3
-DATA_AVAILABILITY = DataAvailability()
+if not USE_CHANNEL_WILDCARDS:
+    DATA_AVAILABILITY = DataAvailability()
 
 
 def enrich_row(row):
