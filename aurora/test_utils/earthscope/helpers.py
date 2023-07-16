@@ -186,30 +186,6 @@ def get_remotes_from_tf(tf_obj):
         remotes = get_remotes_from_tf_2(tf_obj)
     return remotes
 
-def build_request_df(station_id, network_id, channels=None, start=None, end=None):
-    if channels is None:
-        channels = "*"
-        print("this doesn't work")
-
-    # need this for columns
-    from mth5.clients import FDSN
-    fdsn_object = FDSN(mth5_version='0.2.0')
-    fdsn_object.client = "IRIS"
-    if start is None:
-        start = '1970-01-01 00:00:00'
-    if end is None:
-        end = datetime.datetime.now()
-        end = end.replace(hour=0, minute=0, second=0, microsecond=0)
-        end = str(end)
-
-    request_list = []
-    for channel in channels:
-        request_list.append([network_id, station_id, '', channel, start, end])
-
-    print(request_list)
-
-    request_df = pd.DataFrame(request_list, columns=fdsn_object.request_columns)
-    return request_df
 
 def get_summary_table_schema(stage_number):
     """

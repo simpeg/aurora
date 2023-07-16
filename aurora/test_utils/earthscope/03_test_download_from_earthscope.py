@@ -18,19 +18,18 @@ Handy steps for debugging:
 """
 
 
-
+import argparse
 import numpy as np
 import pandas as pd
 import pathlib
 import time
 
-from matplotlib import pyplot as plt
 from pathlib import Path
 
 from aurora.sandbox.mth5_helpers import get_experiment_from_obspy_inventory
 from aurora.sandbox.mth5_helpers import mth5_from_experiment
 
-from aurora.test_utils.earthscope.helpers import build_request_df
+from aurora.sandbox.mth5_helpers import build_request_df
 from aurora.test_utils.earthscope.helpers import DataAvailability
 from aurora.test_utils.earthscope.helpers import DATA_PATH
 from aurora.test_utils.earthscope.helpers import get_most_recent_summary_filepath
