@@ -27,6 +27,7 @@ import pandas as pd
 from aurora.general_helper_functions import TEST_PATH
 from aurora.general_helper_functions import execute_subprocess
 from aurora.sandbox.mth5_channel_summary_helpers import channel_summary_to_make_mth5
+from aurora.sandbox.mth5_helpers import build_request_df
 from mth5.utils.helpers import initialize_mth5
 from mth5.utils.helpers import read_back_data
 
@@ -42,13 +43,20 @@ DATA_PATH.mkdir(exist_ok=True)
 XML_PATH = CAS04_PATH.joinpath("cas04_from_tim_20211203.xml")
 
 # Define args for data getter
-NETWORK = "8P"
+NETWORK_ID = "8P"
+STATION_IDS = ["CAS04", "CAV07", "NVR11", "REV06"]
+CHANNELS = ["LQE", "LQN", "LFE", "LFN", "LFZ",]
 START = "2020-06-02T19:00:00"
 END = "2020-07-13T19:00:00"
-
 # Test cast wide net (passes)
 # START = "2000-06-02T19:00:00"
 # END = "2023-07-13T19:00:00"
+
+def make_request_dataframe(station_ids=STATION_IDS, network_id=NETWORK_ID):
+    for station_id in station_ids:
+        df = build_request_df(network_id, station_id, channels=CHANNELS, start=START, end=END)
+
+
 
 STATIONS = ["CAS04", "CAV07", "NVR11", "REV06"]
 CHANNELS = [

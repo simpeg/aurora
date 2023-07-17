@@ -134,7 +134,7 @@ def batch_download_metadata(source_csv=None, results_csv=None, append_rows_for_e
             else:
                 availabile_channels = DATA_AVAILABILITY.get_available_channels(
                     row.network_id, station_id)
-            request_df = build_request_df(station_id, network_id,
+            request_df = build_request_df(network_id, station_id,
                                           channels=availabile_channels, start=None, end=None)
             if verbosity > 1:
                 print(f"request_df: \n {request_df}")

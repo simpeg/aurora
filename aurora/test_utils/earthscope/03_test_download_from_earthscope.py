@@ -58,7 +58,7 @@ def enrich_row(row):
         availabile_channels = DATA_AVAILABILITY.get_available_channels(
             row.network_id, row.station_id)
 
-    request_df = build_request_df(row.station_id, row.network_id,
+    request_df = build_request_df(row.network_id, row.station_id,
                                   channels=availabile_channels, start=None, end=None)
 
     fdsn_object = FDSN(mth5_version='0.2.0')
