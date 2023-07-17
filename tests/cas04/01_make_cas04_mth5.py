@@ -103,49 +103,8 @@ def make_all_stations(h5_path="all.h5", mth5_version="0.1.0", return_obj=False, 
     if download:
         print("getting...", request_df)
         mth5_filename = fdsn_object.make_mth5_from_fdsn_client(request_df,interact=False, path=DATA_PATH)
-    # # Initialize mth5_maker
-    # maker = MakeMTH5(mth5_version=mth5_version)
-    # maker.client = "IRIS"
-    #
-    # # Make request list
-    # request_list = get_dataset_request_lists()
-    # print(f"Request List \n {request_list}")
-    #
-    # # Turn list into dataframe
-    # metadata_request_df = pd.DataFrame(request_list, columns=maker.column_names)
-    # print(f"metadata_request_df \n {metadata_request_df}")
-    #
-    #
-    # # Request the inventory information from IRIS
-    # inventory, streams = maker.get_inventory_from_df(metadata_request_df, data=False)
-    #
-    # # convert the inventory information to an mth5
-    # translator = XMLInventoryMTExperiment()
-    # experiment = translator.xml_to_mt(inventory_object=inventory)
-    mth5_obj = initialize_mth5(h5_path)  # mode="a")
-    mth5_obj.from_experiment(experiment)
+    return mth5_filename
 
-    # get channel summary info
-    mth5_obj.channel_summary.summarize()
-    summary_df = mth5_obj.channel_summary.to_dataframe()
-
-    # Transform channel_summary into request_df
-    # TODO: Make this function run in PKD testing...
-    request_df = channel_summary_to_make_mth5(summary_df, network=NETWORK)
-    print(request_df)
-
-    # Build the big mth5 with data
-    maker = MakeMTH5(mth5_version=mth5_version)
-    mth5_obj = maker.make_mth5_from_fdsnclient(
-        request_df, client="IRIS", path=DATA_PATH, interact=True
-    )
-
-    if return_obj:
-        return mth5_obj
-    else:
-        mth5_path = mth5_obj.filename
-        mth5_obj.close_mth5()
-        return mth5_path
 
 
 def test_make_mth5(mth5_version="0.1.0"):
