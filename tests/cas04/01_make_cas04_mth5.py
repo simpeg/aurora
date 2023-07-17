@@ -28,12 +28,12 @@ from aurora.general_helper_functions import TEST_PATH
 from aurora.general_helper_functions import execute_subprocess
 from aurora.sandbox.mth5_channel_summary_helpers import channel_summary_to_make_mth5
 from aurora.sandbox.mth5_helpers import build_request_df
+
+from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
+from mth5.clients import FDSN
+from mth5.clients.make_mth5 import MakeMTH5
 from mth5.utils.helpers import initialize_mth5
 from mth5.utils.helpers import read_back_data
-
-# from mth5.clients.make_mth5_rev_002 import MakeMTH5
-from mth5.clients.make_mth5 import MakeMTH5
-from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 from helper_functions import xml_to_mth5
 
 # Define paths
@@ -52,39 +52,31 @@ END = "2020-07-13T19:00:00"
 # START = "2000-06-02T19:00:00"
 # END = "2023-07-13T19:00:00"
 
-def make_request_dataframe(station_ids=STATION_IDS, network_id=NETWORK_ID):
+def make_merged_request_dataframe(station_ids=STATION_IDS, network_id=NETWORK_ID, channels=CHANNELS, start=START, end=END):
+    """
+    Consider moving this to sandbox
+    Args:
+        station_ids:
+        network_id:
+        channels:
+        start:
+        end:
+
+    Returns:
+
+    """
+    df_list = []
     for station_id in station_ids:
-        df = build_request_df(network_id, station_id, channels=CHANNELS, start=START, end=END)
+        df = build_request_df(network_id, station_id, channels=channels, start=start, end=end)
+        df_list.append(df)
+    output_df = pd.concat(df_list)
+    output_df.reset_index(inplace=True, drop=True)
+    return output_df
 
 
 
-STATIONS = ["CAS04", "CAV07", "NVR11", "REV06"]
-CHANNELS = [
-    "LQE",
-    "LQN",
-    "LFE",
-    "LFN",
-    "LFZ",
-]
 
-
-def get_dataset_request_lists():
-    """
-
-    Returns
-    -------
-    request_list: list
-
-    """
-    request_list = []
-    for station_id in STATIONS:
-        for channel_id in CHANNELS:
-            request = [NETWORK, station_id, "", channel_id, START, END]
-            request_list.append(request)
-    return request_list
-
-
-def make_all_stations(h5_path="all.h5", mth5_version="0.1.0", return_obj=False):
+def make_all_stations(h5_path="all.h5", mth5_version="0.1.0", return_obj=False, force_download=False):
     """
 
     Parameters
@@ -97,24 +89,39 @@ def make_all_stations(h5_path="all.h5", mth5_version="0.1.0", return_obj=False):
     -------
 
     """
-    # Initialize mth5_maker
-    maker = MakeMTH5(mth5_version=mth5_version)
-    maker.client = "IRIS"
+    request_df = make_merged_request_dataframe()
+    fdsn_object = FDSN(mth5_version='0.2.0')
+    fdsn_object.client = "IRIS"
 
-    # Make request list
-    request_list = get_dataset_request_lists()
-    print(f"Request List \n {request_list}")
-
-    # Turn list into dataframe
-    metadata_request_df = pd.DataFrame(request_list, columns=maker.column_names)
-    print(f"metadata_request_df \n {metadata_request_df}")
-
-    # Request the inventory information from IRIS
-    inventory, streams = maker.get_inventory_from_df(metadata_request_df, data=False)
-
-    # convert the inventory information to an mth5
-    translator = XMLInventoryMTExperiment()
-    experiment = translator.xml_to_mt(inventory_object=inventory)
+    expected_file_name = DATA_PATH.joinpath(fdsn_object.make_filename(request_df))
+    download = force_download
+    if expected_file_name.exists():
+        print(f"Already have data for {expected_file_name.name}")
+        download = False
+        if force_download:
+            download = True
+    if download:
+        print("getting...", request_df)
+        mth5_filename = fdsn_object.make_mth5_from_fdsn_client(request_df,interact=False, path=DATA_PATH)
+    # # Initialize mth5_maker
+    # maker = MakeMTH5(mth5_version=mth5_version)
+    # maker.client = "IRIS"
+    #
+    # # Make request list
+    # request_list = get_dataset_request_lists()
+    # print(f"Request List \n {request_list}")
+    #
+    # # Turn list into dataframe
+    # metadata_request_df = pd.DataFrame(request_list, columns=maker.column_names)
+    # print(f"metadata_request_df \n {metadata_request_df}")
+    #
+    #
+    # # Request the inventory information from IRIS
+    # inventory, streams = maker.get_inventory_from_df(metadata_request_df, data=False)
+    #
+    # # convert the inventory information to an mth5
+    # translator = XMLInventoryMTExperiment()
+    # experiment = translator.xml_to_mt(inventory_object=inventory)
     mth5_obj = initialize_mth5(h5_path)  # mode="a")
     mth5_obj.from_experiment(experiment)
 
@@ -149,7 +156,7 @@ def test_make_mth5(mth5_version="0.1.0"):
     mth5_path: string
         Where the built mth5 lives
     """
-    mth5_path = make_all_stations(mth5_version=mth5_version)
+    mth5_path = make_all_stations(mth5_version=mth5_version, force_download=True)
     if mth5_version == "0.1.0":
         new_filepath = str(mth5_path).replace(".h5", "_v1.h5")
     elif mth5_version == "0.2.0":
