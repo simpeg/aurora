@@ -17,14 +17,14 @@ from mth5.clients import FDSN
 from mth5.utils.helpers import initialize_mth5
 
 
-def build_request_df(station_id, network_id, channels=None, start=None, end=None):
+def build_request_df(network_id, station_id, channels=None, start=None, end=None):
     """
 
     Args:
-        station_id: string
-            Short identifier code used by FDSN, e.g. CAS04, NVR11
         network_id: string
             Two-character network identifier string fro FDSN.
+        station_id: string
+            Short identifier code used by FDSN, e.g. CAS04, NVR11
         channels: list or None
             3-character channel identifiers, e.g. ["LQ2", "MFZ"], also supports wildcards of the form ["*F*", "*Q*",]
              Does not support wildcards of the form ["*",]
