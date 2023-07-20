@@ -291,15 +291,6 @@ def process_mth5(
     tf_cls: mt_metadata.transfer_functions.TF
         TF object
     """
-    if tfk_dataset is not None:
-        station = tfk_dataset.df.station_id[0]
-        logger_path = Path(tfk_dataset.df.mth5_path[0]).parent.joinpath(
-            f"aurora_processing_{station}.log"
-        )
-    else:
-        logger_path = Path().cwd()
-
-    logger.add(logger_path)
 
     # Initialize config and mth5s
     tfk = TransferFunctionKernel(dataset=tfk_dataset, config=config)
@@ -324,7 +315,9 @@ def process_mth5(
 
         # TFK 1: get clock-zero from data if needed
         if dec_level_config.window.clock_zero_type == "data start":
-            dec_level_config.window.clock_zero = str(tfk.dataset_df.start.min())
+            dec_level_config.window.clock_zero = str(
+                tfk.dataset_df.start.min()
+            )
 
         # Apply STFT to all runs
         local_stfts = []
