@@ -36,6 +36,7 @@ from aurora.test_utils.earthscope.helpers import get_most_recent_summary_filepat
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
 from aurora.test_utils.earthscope.helpers import get_summary_table_schema
 from aurora.test_utils.earthscope.helpers import restrict_to_mda
+from aurora.test_utils.earthscope.helpers import timestamp_now
 from aurora.test_utils.earthscope.helpers import USE_CHANNEL_WILDCARDS
 from mth5.mth5 import MTH5
 from mth5.clients import FDSN, MakeMTH5
@@ -198,50 +199,69 @@ def batch_download_metadata(source_csv=None, results_csv=None, append_rows_for_e
             coverage_df.to_csv(coverage_csv, index=False)
 
 def review_results():
+    now_str = timestamp_now()
+    fname = f"02_exceptions_summary_{now_str}.txt"
+
     coverage_csv = get_summary_table_filename(STAGE_ID)
     df = pd.read_csv(coverage_csv)
     df = df[COVERAGE_DF_SCHEMA] #sort columns in desired order
 
-    print(f"coverage_df has columns \n {df.columns}")
     to_str_cols = ["network_id", "station_id", "exception"]
     for str_col in to_str_cols:
         df[str_col] = df[str_col].astype(str)
 
-    exception_types = df.exception.unique()
-    exception_types = [x for x in exception_types if x!="nan"]
-    print(f"Identified {len(exception_types)} exception types\n {exception_types}\n")
+    with open(fname, 'w') as f:
+        msg = "*** EXCEPTIONS SUMMARY *** \n\n"
+        print(msg)
+        f.write(msg)
 
-    print("*** EXCEPTIONS SUMMARY *** \n\n")
-    exception_counts = {}
-    for exception_type in exception_types:
-        exception_df = df[df.exception == exception_type]
-        unique_messages = exception_df.error_message.unique()
-
-        print(f"{exception_type} has {len(exception_df)} instances, with {len(unique_messages)} unique message(s)")
-        print(unique_messages)
-        exception_counts[exception_type] = len(exception_df)
-        if exception_type=="IndexError":
-            exception_df.to_csv("02_do_these_exist.csv", index=False)
+        exception_types = df.exception.unique()
+        exception_types = [x for x in exception_types if x!="nan"]
+        msg = f"Identified {len(exception_types)} exception types\n {exception_types}\n\n"
+        print(msg)
+        f.write(msg)
 
 
-    grouper = df.groupby(["network_id", "station_id"])
-    print(f"\n\nThere were {len(grouper)} unique network-station pairs in {len(df)} rows\n\n")
-    print(exception_counts)
-    print(f"TOTAL #Exceptions {np.array(list(exception_counts.values())).sum()} of {len(df)} Cases")
-    pass
+        exception_counts = {}
+        for exception_type in exception_types:
+            exception_df = df[df.exception == exception_type]
+            n_exceptions = len(exception_df)
+            unique_errors = exception_df.error_message.unique()
+            n_unique_errors = len(unique_errors)
+            msg = f"{n_exceptions} instances of {exception_type}, with {n_unique_errors} unique error(s)\n"
+            print(msg)
+            f.write(msg)
+            print(unique_errors)
+            msg = [f"{x}\n" for x in unique_errors]
+            f.write("".join(msg) + "\n\n")
+            exception_counts[exception_type] = len(exception_df)
+            if exception_type=="IndexError":
+                exception_df.to_csv("02_do_these_exist.csv", index=False)
+
+        grouper = df.groupby(["network_id", "station_id"])
+        msg = f"\n\nThere were {len(grouper)} unique network-station pairs in {len(df)} rows\n\n"
+        print(msg)
+        f.write(msg)
+        print(exception_counts)
+        f.write(str(exception_counts))
+        msg = f"TOTAL #Exceptions {np.array(list(exception_counts.values())).sum()} of {len(df)} Cases"
+        print(msg)
+        f.write(msg)
+    return
 
 def main():
     t0 = time.time()
     # Normal usage: complete run, will not in-fill with info from existing
-    #batch_download_metadata()
+    # batch_download_metadata()
 
     # Use when part of data already here on disk
     # This will be nearly complete, but does not fill out the n_ch_
-    batch_download_metadata(append_rows_for_existing=True)
+    # batch_download_metadata(append_rows_for_existing=True)
 
     print(f"Total scraping time {time.time() - t0}")
     review_results()
-    print(f"Total scraping & review time {time.time() - t0}")
+    total_time_elapsed = time.time() - t0
+    print(f"Total scraping & review time {total_time_elapsed:.2f}s")
 
 if __name__ == "__main__":
     main()

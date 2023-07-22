@@ -15,7 +15,7 @@ import socket
 import subprocess
 
 ## PLACEHOLDER FOR CONFIG
-USE_CHANNEL_WILDCARDS = True #False
+USE_CHANNEL_WILDCARDS = False
 HOSTNAME = socket.gethostname()
 HOME = pathlib.Path().home()
 
@@ -246,6 +246,18 @@ def get_summary_table_schema(stage_number):
         print(f"Schema for stage number {stage_number} is not defined")
         return None
 
+def timestamp_now():
+    """
+    helper function to make a timestamp for file labelling.
+    Default behaviour is to strip milliseconds/microseconds,
+    replace spaces with underscores, and colons with empty string.
+    Returns:
+
+    """
+    now = datetime.datetime.now().__str__().split(".")[0].replace(" ", "_")
+    now_str = now.replace(":", "")
+    return now_str
+
 def get_summary_table_filename(stage_number):
     base_names = {}
     base_names["00"] = "spud_xml_scrape"
@@ -256,12 +268,9 @@ def get_summary_table_filename(stage_number):
     base_names["05"] = "tf_comparison_review"
     stage_number_str = str(stage_number).zfill(2)
 
-    now = datetime.datetime.now().__str__().split(".")[0].replace(" ", "_")
-    now_str = now.replace(":", "")
     csv_name = f"{stage_number_str}_{base_names[stage_number_str]}.csv"
     if stage_number in [1,]:
-        now = datetime.datetime.now().__str__().split(".")[0].replace(" ", "_")
-        now_str = now.replace(":", "")
+        now_str = timestamp_now()
         csv_name = csv_name.replace(".csv", f"_{now_str}.csv")
 
     csv_path = SUMMARY_TABLES_PATH.joinpath(csv_name)
