@@ -57,6 +57,7 @@ CONFIG_PATH = CAS04_PATH.joinpath("config")
 CONFIG_PATH.mkdir(exist_ok=True)
 DATA_PATH = CAS04_PATH.joinpath("data")
 H5_PATH = DATA_PATH.joinpath("8P_CAS04_CAV07_NVR11_REV06.h5")
+H5_PATH = DATA_PATH.joinpath("8P_CAS04_NVR11_REV06_v1.h5")
 DEFAULT_EMTF_FILE = "emtf_results/CAS04-CAS04bcd_REV06-CAS04bcd_NVR08.zmm"
 AURORA_RESULTS_PATH = CAS04_PATH.joinpath("aurora_results")
 EMTF_RESULTS_PATH = CAS04_PATH.joinpath("emtf_results")
@@ -308,11 +309,11 @@ def process_with_remote(local, remote, band_setup_file="band_setup_emtf_nims.txt
     -------
 
     """
-    h5_path = DATA_PATH.joinpath("8P_CAS04_CAV07_NVR11_REV06.h5")
+    h5_path = H5_PATH#  DATA_PATH.joinpath("8P_CAS04_CAV07_NVR11_REV06.h5")
     # channel_summary = get_channel_summary(h5_path)
     run_summary = get_run_summary(h5_path)
     kernel_dataset = KernelDataset()
-    #    kernel_dataset.from_run_summary(run_summary, "CAS04")
+    #kernel_dataset.from_run_summary(run_summary, "CAS04")
     kernel_dataset.from_run_summary(run_summary, local, remote)
     kernel_dataset.restrict_run_intervals_to_simultaneous()
     kernel_dataset.drop_runs_shorter_than(15000)
@@ -326,7 +327,10 @@ def process_with_remote(local, remote, band_setup_file="band_setup_emtf_nims.txt
     for decimation in config.decimations:
         decimation.window.type = "hamming"
     show_plot = False
-    z_file_base = f"{local}_RR{remote}.zrr"
+    if remote:
+        z_file_base = f"{local}_RR{remote}.zrr"
+    else:
+        z_file_base = f"{local}.zrr"
     z_file_path = AURORA_RESULTS_PATH.joinpath(z_file_base)
     tf_cls = process_mth5(
         config,
@@ -371,7 +375,7 @@ def compare_aurora_vs_emtf(local_station_id, remote_station_id, coh=False):
     return
 
 
-def main():
+def old_main():
     process_all_runs_individually()  # reprocess=False)
     process_run_list("CAS04", ["b", "c", "d"])  # , reprocess=False)
     process_with_remote("CAS04", "CAV07")
@@ -382,6 +386,12 @@ def main():
         compare_aurora_vs_emtf("CAS04", RR, coh=False)
         compare_aurora_vs_emtf("CAS04", RR, coh=True)
 
+
+def main():
+    RR = "REV06"
+    process_with_remote("CAS04", RR)
+    print("OK")
+    compare_aurora_vs_emtf("CAS04", RR, coh=False)
 
 if __name__ == "__main__":
     main()
