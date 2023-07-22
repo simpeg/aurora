@@ -241,55 +241,7 @@ def process_run_list(station_id, run_list, reprocess=True):
     compare_results(station_runs.z_file_name(AURORA_RESULTS_PATH))
 
 
-def get_channel_summary(h5_path):
-    """
-
-    Parameters
-    ----------
-    h5_path: pathlib.Path
-        Where is the h5
-
-    Returns
-    -------
-    channel_summary_df: pd.DataFrame
-        channel summary from mth5
-    """
-
-    h5_path = DATA_PATH.joinpath("8P_CAS04_CAV07_NVR11_REV06.h5")
-    mth5_obj = initialize_mth5(
-        h5_path=h5_path,
-    )
-    mth5_obj.channel_summary.summarize()
-    channel_summary_df = mth5_obj.channel_summary.to_dataframe()
-    mth5_obj.close_mth5()
-    print(channel_summary_df)
-    return channel_summary_df
-
-
-def get_run_summary(h5_path):
-    """
-    Use this method to take a look at what runs are available for processing
-
-    Parameters
-    ----------
-    h5_path: str or pathlib.Path
-        Target mth5 file
-
-    Returns
-    -------
-    run_summary: aurora.pipelines.run_summary.RunSummary
-        object that has the run summary
-    """
-    run_summary = RunSummary()
-    h5_list = [
-        h5_path,
-    ]
-    run_summary.from_mth5s(h5_list)
-    # print(run_summary.df)
-    return run_summary
-
-
-def process_with_remote(local, remote, band_setup_file="band_setup_emtf_nims.txt"):
+def process_with_remote(h5_paths, local, remote=None, band_setup_file="band_setup_emtf_nims.txt"):
     """
     How this works:
     1. Make Run Summary
@@ -309,11 +261,9 @@ def process_with_remote(local, remote, band_setup_file="band_setup_emtf_nims.txt
     -------
 
     """
-    h5_path = H5_PATH#  DATA_PATH.joinpath("8P_CAS04_CAV07_NVR11_REV06.h5")
-    # channel_summary = get_channel_summary(h5_path)
-    run_summary = get_run_summary(h5_path)
+    run_summary = RunSummary()
+    run_summary.from_mth5s(h5_paths)
     kernel_dataset = KernelDataset()
-    #kernel_dataset.from_run_summary(run_summary, "CAS04")
     kernel_dataset.from_run_summary(run_summary, local, remote)
     kernel_dataset.restrict_run_intervals_to_simultaneous()
     kernel_dataset.drop_runs_shorter_than(15000)
@@ -388,8 +338,9 @@ def old_main():
 
 
 def main():
+    h5_paths = [H5_PATH,]
     RR = "REV06"
-    process_with_remote("CAS04", RR)
+    process_with_remote(h5_paths, "CAS04", RR)
     print("OK")
     compare_aurora_vs_emtf("CAS04", RR, coh=False)
 

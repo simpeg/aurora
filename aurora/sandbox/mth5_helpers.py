@@ -82,4 +82,25 @@ def mth5_from_experiment(experiment, h5_path=None):
 
 
 
+def get_channel_summary(h5_path):
+    """
+
+    Parameters
+    ----------
+    h5_path: pathlib.Path
+        Where is the h5
+
+    Returns
+    -------
+    channel_summary_df: pd.DataFrame
+        channel summary from mth5
+    """
+    mth5_obj = initialize_mth5(
+        h5_path=h5_path,
+    )
+    mth5_obj.channel_summary.summarize()
+    channel_summary_df = mth5_obj.channel_summary.to_dataframe()
+    mth5_obj.close_mth5()
+    print(channel_summary_df)
+    return channel_summary_df
 
