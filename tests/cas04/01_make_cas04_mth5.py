@@ -7,7 +7,6 @@ https://user-images.githubusercontent.com/8312937/142910549-52de8007-62bf-407c-8
 
 The reference stations were: {CAV07, NVR11, REV06}.
 
-
 This test is also related to several other issues and testing out several
 functionalities, including:
 - make_mth5_from_fdsnclient() method of MakeMTH5.
@@ -19,6 +18,9 @@ stationxml file in theory, and an example showing that workflow should be added 
 future.
 
 ToDo: Test make_all_stations() with mth5_version 0.1.0 and 0.2.0
+ToDo: July 2023: Identify if CAV07 is the reason for the problem ... add an option to make individual stations
+CAV07 is the reason the build failed, CAV07 fails metadata pull with IndexError: index 0 is out of bounds for axis 0 with size 0
+
 
 """
 
@@ -44,11 +46,11 @@ XML_PATH = CAS04_PATH.joinpath("cas04_from_tim_20211203.xml")
 
 # Define args for data getter
 NETWORK_ID = "8P"
-STATION_IDS = ["CAS04", "CAV07", "NVR11", "REV06"]
+STATION_IDS = ["CAS04",  "NVR11", "REV06",] # "CAV07",] # skip CAV07 until exception fixed in mth5/metadata
 CHANNELS = ["LQE", "LQN", "LFE", "LFN", "LFZ",]
 START = "2020-06-02T19:00:00"
 END = "2020-07-13T19:00:00"
-# Test cast wide net (passes)
+# Test use very large time interval to build all (passes)
 # START = "2000-06-02T19:00:00"
 # END = "2023-07-13T19:00:00"
 
@@ -75,13 +77,25 @@ def make_merged_request_dataframe(station_ids=STATION_IDS, network_id=NETWORK_ID
 
 
 
+def make_all_stations_individually(mth5_version="0.1.0",):
+    """
+    Makes 1 h5 for each station in STATION_IDS
+    Args:
+        mth5_version:
+    """
+    for station_id in STATION_IDS:
+        #request_df = build_request_df(NETWORK_ID, station_id, channels=["*F*", "*Q*", ], start=None, end=None)
+        request_df = build_request_df(NETWORK_ID, station_id, channels=CHANNELS, start=None, end=None)
+        fdsn_object = FDSN(mth5_version=mth5_version)
+        fdsn_object.client = "IRIS"
+        mth5_filename = fdsn_object.make_mth5_from_fdsn_client(request_df, interact=False, path=DATA_PATH)
+    return
 
-def make_all_stations(h5_path="all.h5", mth5_version="0.1.0", return_obj=False, force_download=False):
+def make_all_stations_together(mth5_version="0.1.0", return_obj=False, force_download=False):
     """
 
     Parameters
     ----------
-    h5_path
     mth5_version
     return_obj
 
@@ -90,7 +104,7 @@ def make_all_stations(h5_path="all.h5", mth5_version="0.1.0", return_obj=False, 
 
     """
     request_df = make_merged_request_dataframe()
-    fdsn_object = FDSN(mth5_version='0.2.0')
+    fdsn_object = FDSN(mth5_version=mth5_version)
     fdsn_object.client = "IRIS"
 
     expected_file_name = DATA_PATH.joinpath(fdsn_object.make_filename(request_df))
@@ -98,11 +112,15 @@ def make_all_stations(h5_path="all.h5", mth5_version="0.1.0", return_obj=False, 
     if expected_file_name.exists():
         print(f"Already have data for {expected_file_name.name}")
         download = False
+        mth5_filename = expected_file_name
         if force_download:
             download = True
     if download:
         print("getting...", request_df)
         mth5_filename = fdsn_object.make_mth5_from_fdsn_client(request_df,interact=False, path=DATA_PATH)
+
+
+
     return mth5_filename
 
 
@@ -115,12 +133,13 @@ def test_make_mth5(mth5_version="0.1.0"):
     mth5_path: string
         Where the built mth5 lives
     """
-    mth5_path = make_all_stations(mth5_version=mth5_version, force_download=True)
+    # make_all_stations_individually()
+    mth5_path = make_all_stations_together(mth5_version=mth5_version, force_download=True)
     if mth5_version == "0.1.0":
         new_filepath = str(mth5_path).replace(".h5", "_v1.h5")
     elif mth5_version == "0.2.0":
         new_filepath = str(mth5_path).replace(".h5", "_v2.h5")
-    cmd = f"cp {mth5_path} {new_filepath}"
+    cmd = f"mv {mth5_path} {new_filepath}"
     execute_subprocess(cmd)
 
     if mth5_version == "0.1.0":
