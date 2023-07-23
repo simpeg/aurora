@@ -103,4 +103,3 @@ def get_channel_summary(h5_path):
     mth5_obj.close_mth5()
     print(channel_summary_df)
     return channel_summary_df
-

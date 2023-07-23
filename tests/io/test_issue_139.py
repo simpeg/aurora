@@ -20,7 +20,9 @@ import warnings
 
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
 from aurora.test_utils.synthetic.paths import DATA_PATH
-from aurora.test_utils.synthetic.processing_helpers import tf_obj_from_synthetic_data
+from aurora.test_utils.synthetic.processing_helpers import (
+    tf_obj_from_synthetic_data,
+)
 from mt_metadata.transfer_functions.core import TF
 
 warnings.filterwarnings("ignore")
@@ -60,7 +62,9 @@ class TestZFileReadWrite(unittest.TestCase):
         tf = self.tf_obj
         # check numeric values
         assert (
-            np.isclose(tf_z.transfer_function.data, tf.transfer_function.data, 1e-4)
+            np.isclose(
+                tf_z.transfer_function.data, tf.transfer_function.data, 1e-4
+            )
         ).all()
         # check metadata
         print("add metadata checks for station name, azimuths and tilts")
@@ -76,7 +80,7 @@ class TestZFileReadWrite(unittest.TestCase):
     # def test_tf_write_and_read(self):
     #     tf_obj = self.tf_obj
     #     tf_obj.write(fn=self.xml_file_base, file_type="emtfxml")
-    #
+    #     tf_obj.logger.info(f"TF Object written to {tf_obj.fn}")
     #     tf_obj2 = TF()
     #     tf_obj2.read(fn=self.xml_file_base)
     #     print("ASSERT tfobj==tfob2 everywhere it should")

@@ -80,9 +80,12 @@ def apply_recoloring(decimation_obj, stft_obj):
     stft_obj : xarray.core.dataset.Dataset
         Recolored time series of Fourier coefficients
     """
+    # No recoloring needed if prewhitening not appiled, or recoloring set to False
     if not decimation_obj.prewhitening_type:
         return stft_obj
-
+    if not decimation_obj.recoloring:
+        return stft_obj
+    
     if decimation_obj.prewhitening_type == "first difference":
         # replace below with decimation_obj.get_fft_harmonics() ?
         freqs = get_fft_harmonics(

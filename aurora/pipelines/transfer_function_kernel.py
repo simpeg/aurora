@@ -2,16 +2,19 @@ import numpy as np
 import pandas as pd
 import psutil
 
-from mt_metadata.transfer_functions.processing.aurora import Processing
-from aurora.pipelines.helpers import initialize_config
-from aurora.transfer_function.kernel_dataset import KernelDataset
 
+from aurora.pipelines.helpers import initialize_config
+from aurora.pipelines.time_series_helpers import prototype_decimate
+from aurora.transfer_function.kernel_dataset import KernelDataset
+from mth5.utils.helpers import initialize_mth5
+from mt_metadata.transfer_functions.processing.aurora import Processing
 
 class TransferFunctionKernel(object):
     def __init__(self, dataset=None, config=None):
         processing_config = initialize_config(config)
         self._config = processing_config
         self._dataset = dataset
+        self._mth5_objs = None
 
     @property
     def dataset(self):
@@ -38,6 +41,133 @@ class TransferFunctionKernel(object):
         if self._processing_summary is None:
             self.make_processing_summary()
         return self._processing_summary
+
+    @property
+    def mth5_objs(self):
+        if self._mth5_objs is None:
+            self.initialize_mth5s()
+        return self._mth5_objs
+
+    def initialize_mth5s(self):
+        """
+        returns a dict of open mth5 objects, keyed by
+        Consder moving the initialize_mth5s() method out of config, since it depends on mth5.
+        In this way, we can keep the dependencies on mth5 out of the metadatd object (of which config is one)
+
+        Returns
+        -------
+        mth5_objs : dict
+            Keyed by station_ids.
+            local station id : mth5.mth5.MTH5
+            remote station id: mth5.mth5.MTH5
+        """
+
+        local_mth5_obj = initialize_mth5(self.config.stations.local.mth5_path, mode="r")
+        if self.config.stations.remote:
+            remote_path = self.config.stations.remote[0].mth5_path
+            remote_mth5_obj = initialize_mth5(remote_path, mode="r")
+        else:
+            remote_mth5_obj = None
+
+        mth5_objs = {self.config.stations.local.id: local_mth5_obj}
+        if self.config.stations.remote:
+            mth5_objs[self.config.stations.remote[0].id] = remote_mth5_obj
+        self._mth5_objs = mth5_objs
+        return # mth5_objs
+
+    def update_dataset_df(self,i_dec_level):
+        """
+        This could and probably should be moved to TFK.update_dataset_df()
+
+        This function has two different modes.  The first mode, initializes values in the
+        array, and could be placed into TFKDataset.initialize_time_series_data()
+        The second mode, decimates. The function is kept in pipelines becasue it calls
+        time series operations.
+
+
+        Notes:
+        1. When iterating over dataframe, (i)ndex must run from 0 to len(df), otherwise
+        get indexing errors.  Maybe reset_index() before main loop? or push reindexing
+        into TF Kernel, so that this method only gets a cleanly indexed df, restricted to
+        only the runs to be processed for this specific TF?
+        2. When assigning xarrays to dataframe cells, df dislikes xr.Dataset,
+        so we convert to DataArray before assignment
+
+
+        Parameters
+        ----------
+        i_dec_level: int
+            decimation level id, indexed from zero
+        config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
+            decimation level config
+
+        Returns
+        -------
+        dataset_df: pd.DataFrame
+            Same df that was input to the function but now has columns:
+
+
+        """
+        if i_dec_level == 0:
+            # Consider moving the line below into update_dataset_df.  This will allow bypassing loading of the data if
+            # FC Level of mth5 is used.
+            # Assign additional columns to dataset_df, populate with mth5_objs and xr_ts
+            # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
+            self.dataset.initialize_dataframe_for_processing(self.mth5_objs)
+
+            # APPLY TIMING CORRECTIONS HERE
+        else:
+            print(f"DECIMATION LEVEL {i_dec_level}")
+            # See Note 1 top of module
+            # See Note 2 top of module
+            for i, row in self.dataset_df.iterrows():
+                if not self.is_valid_dataset(row, i_dec_level):
+                    continue
+                run_xrds = row["run_dataarray"].to_dataset("channel")
+                decimation = self.config.decimations[i_dec_level].decimation
+                decimated_xrds = prototype_decimate(decimation, run_xrds)
+                self.dataset_df["run_dataarray"].at[i] = decimated_xrds.to_array("channel")
+
+        print("DATASET DF UPDATED")
+        return
+
+    def check_if_fc_levels_already_exist(self):
+        """
+        Iterate over the processing summary_df, grouping by unique "Station-Run"s.
+        When all FC Levels for a given station-run are already built, mark the RunSummary with a True in
+        the (yet-to-be-built) mth5_has_FCs column
+        Returns:
+
+        """
+        ps_df = self.processing_summary
+        groupby = ['survey', 'station_id', 'run_id',]
+        grouper = ps_df.groupby(groupby)
+        print(len(grouper))
+        for (survey, station_id, run_id), df in grouper:
+            cond1 = self.dataset_df.survey==survey
+            cond2 = self.dataset_df.station_id == station_id
+            cond3 = self.dataset_df.run_id == run_id
+            run_row = self.dataset_df[cond1 & cond2 & cond3].iloc[0]
+            print("Need to update mth5_objs dict so that it is keyed by survey, then station, otra vez might break when "
+                  "mixing in data from other surveys (if the stations are named the same)")
+            # When addresssing the above issue -- consider adding the mth5_obj to self.dataset_df instead of keeping
+            # the dict around ...
+            mth5_obj = self.mth5_objs[station_id]
+            # Make compatible with v0.1.0 and v0.2.0:
+            # station_obj = mth5_obj.survey_group.stations_group.get_station(station_id)
+            # INSERT get_survey here so it works with v010 and v020
+            survey = mth5_obj.get_survey(survey)
+            station_obj = survey.stations_group.get_station(station_id)
+            if not station_obj.fourier_coefficients_group.groups_list:
+                print("Nothign to see here folks, return False")
+                return False
+            else:
+                print(df)
+                print("New Logic for FC existence and satisfaction of processing requirements goes here")
+                raise NotImplementedError
+
+        return
+
 
     def make_processing_summary(self):
         """

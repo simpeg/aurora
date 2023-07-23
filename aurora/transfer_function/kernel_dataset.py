@@ -4,7 +4,9 @@ Players on the stage:  One or more mth5s.
 Each mth5 has a mth5_obj.channel_summary dataframe which tells what data are available.
 Here we use a compressed view of this df with one line per acquisition run. I've been
 calling that a "run_summary".  That object could be moved to mth5, so that each mth5
-has a mth5_obj.run_summary dataframe.
+has a mth5_obj.run_summary dataframe.  As of Mar 29, 2023 a RunSummary is available at the
+station level in mth5, but the aurora version is still being used.  This should be merged if possible
+so that aurora uses the built-in mth5 method.
 
 The run_summary provides options for the local and possibly remote reference stations.
  Candidates for local station are the unique value in the station column.
@@ -321,8 +323,15 @@ class KernelDataset:
         Adds extra columns needed for processing, populates them with mth5 objects,
         run_reference, and xr.Datasets.
 
-        When assigning xarrays to dataframe cells, df dislikes xr.Dataset,
+        Note #1: When assigning xarrays to dataframe cells, df dislikes xr.Dataset,
         so we convert to xr.DataArray before packing df
+
+        Note #2: [OPTIMIZATION] By accesssing the run_ts and packing the "run_dataarray" column of the df with it, we
+         perform a non-lazy operation, and essentially forcing the entire decimation_level=0 dataset to be
+         loaded into memory.  Seeking a lazy method to handle this maybe worthwhile.  For example, using
+         a df.apply() approach to initialize only ione row at a time would allow us to gernerate the FCs one
+         row at a time and never ingest more than one run of data at a time ...
+
 
         Parameters
         ----------
@@ -336,6 +345,7 @@ class KernelDataset:
                 row.station_id, row.run_id, survey=row.survey
             )
             self.df["run_reference"].at[i] = run_obj.hdf5_group.ref
+            # the line below is not lazy, See Note #2
             run_ts = run_obj.to_runts(start=row.start, end=row.end)
             xr_ds = run_ts.dataset
             self.df["run_dataarray"].at[i] = xr_ds.to_array("channel")
