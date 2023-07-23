@@ -24,6 +24,11 @@ class TestMultiRunProcessing(unittest.TestCase):
         logging.getLogger("matplotlib.font_manager").disabled = True
         logging.getLogger("matplotlib.ticker").disabled = True
 
+    @classmethod
+    def setUpClass(cls) -> None:
+        """ Add a fresh h5 to start the test, sowe don't have FCs in there from other tests"""
+        create_test3_h5(remake_if_exists=True)
+
     def make_mth5(self):
         close_open_files()
         mth5_path = create_test3_h5(remake_if_exists=self.remake_mth5_for_each_test)
