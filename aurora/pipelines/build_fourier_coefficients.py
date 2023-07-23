@@ -1,11 +1,25 @@
 """
 Supporting codes for building the FC level of the mth5
 
+When this is done the following new files exist:
+1. tests/synthetic/test_add_fourier_coefficients.py
+
+
+20230722: will make this into a test on fc branch.
+
+Flow:
+1. Assert that synthetic data exist, (and build if they dont)
+- you should know what you expect here ...  test1,2,3.h5 and test12rr.h5
+2. Two ways to prepare the FC instructions (processing configs)
+- a) use the mt_metadata processing fourier_coefficients structures explictly
+- b) use the default processing configs you already use for processing, and
+extract type (a) cfgs from these (the machinery to do this should exist already)
+3. Loop over files and generate FCs
+4. Compare fc values against some archived values
 
 We need to start with
 1. A list of mth5 files
 2. A FC-scheme.
-
 
 FC-SCheme in the past has come from ConfigCreator, which takes a KernelDataset as input.
 
@@ -91,7 +105,9 @@ Tools for this are already in the FourierCoefficients branch.
 
 Questions:
 1. Shouldn;t there be an experiment column in the channel_summary dataframe for a v0.2.0 file?
-See my note in get_groupby_columns() function.
+GROUPBY_COLUMNS = ["survey", "station", "sample_rate"]
+If I use ["experiment", "survey", "station", "sample_rate"] instead (for a v0.2.0 file) encounter KeyError.
+
 2. How to assign default values to Decimation.time_period?
 Usually we will want to convert the entire run, so these should be assigned
 during processing when we knwo the run extents.  Thus the
@@ -100,64 +116,121 @@ during processing when we knwo the run extents.  Thus the
 # Imports
 # =============================================================================
 import copy
+import unittest
 
 import mt_metadata.timeseries.time_period
 import numpy as np
 import xarray as xr
 
+from aurora.test_utils.synthetic.make_processing_configs import create_test_run_config
+from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
+from aurora.test_utils.synthetic.make_mth5_from_asc import create_test2_h5
+from aurora.test_utils.synthetic.make_mth5_from_asc import create_test3_h5
+from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
+from aurora.test_utils.synthetic.make_mth5_from_asc import main as make_all_h5
+
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
-
-
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
-
 from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
 )
 from aurora.transfer_function.TTFZ import TTFZ
-
 from mth5.mth5 import MTH5
+from mth5.helpers import close_open_files
 from mt_metadata.transfer_functions.core import TF
-from mt_metadata.transfer_functions.processing.fourier_coefficients import Decimation
+from mt_metadata.transfer_functions.processing.fourier_coefficients import Decimation as FCDecimation
 
 
 # =============================================================================
 from aurora.general_helper_functions import TEST_PATH
+from aurora.pipelines.run_summary import RunSummary
 from aurora.test_utils.synthetic.paths import DATA_PATH
+from aurora.transfer_function.kernel_dataset import KernelDataset
 
+FILE_VERSION = "you need to set this, and ideally cycle over 0.1.0, 0.2.0"
 DEFAULT_TIME = "1980-01-01T00:00:00+00:00"
-def get_groupby_columns(m):
-    groupby = ["survey", "station", "sample_rate"]
-    if m.file_version == "0.2.0":
-        print("Shouldn't we have an experiment column here? I get a KeyError when I uncomment the line below")
-        #groupby.insert(0, "experiment")
-    return groupby
+GROUPBY_COLUMNS = ["survey", "station", "sample_rate"] # ["experiment", "survey", "station", "sample_rate"]
+# ? Shouldn't we have an "experiment" column here? results in KeyError when using it.
 
+# tests/synthetic/test_add_fourier_coefficients.py
+class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
+    """
+    Runs several synthetic processing tests from config creation to tf_cls.
+
+    """
+
+    def setUpClass(self):
+        print("make synthetic data")
+        close_open_files()
+        self.file_version = "0.1.0"
+        self.mth5_path_1 = create_test1_h5(file_version=self.file_version)
+        # self.mth5_path_2 = create_test2_h5(file_version=self.file_version)
+        # mth5_path_3 = create_test3_h5(file_version=self.file_version)
+        # mth5_path_12rr = create_test12rr_h5(file_version=self.file_version)
+        #self.mth5_paths = [mth5_path_1, mth5_path_2, mth5_path_3, mth5_path_12rr]
+        # logging.getLogger("matplotlib.font_manager").disabled = True
+        # logging.getLogger("matplotlib.ticker").disabled = True
+
+    def test_1(self):
+        mth5_path = self.mth5_path_1
+        station_id = "test1"
+        mth5_paths = [ mth5_path, ]
+        run_summary = RunSummary()
+        run_summary.from_mth5s(mth5_paths)
+        tfk_dataset = KernelDataset()
+        tfk_dataset.from_run_summary(run_summary, station_id)
+        processing_config = create_test_run_config(station_id, tfk_dataset)
+        fc_decimations = [x.to_fc_decimation("local") for x in processing_config.decimations]
+        add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=fc_decimations)
+        # Now build the layer:
+
+#        tfc = process_mth5(processing_config, tfk_dataset=tfk_dataset, save_fcs=True)
+        #return tfc
+        print("OK")
+        print("NEXT STEP is add a Tap-Point into existing processing to create these levels")
+        print("NEXT STEP AFTER THAT is to try processing data from the FC LEVEL")
+
+        pass
+
+# Belongs in time_series/fourier_coefficients.py
 def decimation_and_stft_config_creator(initial_sample_rate, max_levels=6, decimation_factors=None, time_period=None):
     """
     Based on the number of samples in the run, we can compute the maximum number of valid decimation levels.
     This would re-use code in processing summary ... or we could just decimate until we cant anymore?
 
     You can provide soemthing like: decimation_info = {0: 1.0, 1: 4.0, 2: 4.0, 3: 4.0}
-    :param initial_sample_rate:
-    :param max_levels:
-    :return:
+
+    Note 1:  This does not yet work through the assignment of which bands to keep.  Refer to
+    mt_metadata.transfer_functions.processing.Processing.assign_bands() to see how this was done in the past
+
+    Args:
+        initial_sample_rate:
+        max_levels:
+        decimation_factors:
+        time_period:
+
+    Returns:
+        decimation_and_stft_config: list
+            Each element of the list is a Decimation() object.  The order of the list implies the order of the cascading
+            decimation (thus no decimation levels are omitted).  This could be changed in future by using a dict
+            instead of a list, e.g. decimation_factors = dict(zip(np.arange(max_levels), decimation_factors))
+
     """
     if not decimation_factors:
-        # set default values to EMTF default values [1, 4, 4, 4, ..., 4]
-        decimation_factors = max_levels * [4]
+        # msg = "No decimation factors given, set default values to EMTF default values [1, 4, 4, 4, ..., 4]")
+        # logger.info(msg)
+        default_decimation_factor = 4
+        decimation_factors = max_levels * [default_decimation_factor]
         decimation_factors[0] = 1
-        # add labels for the dec levels ... maybe not needed?
-        # decimation_factors = dict(zip(np.arange(max_levels), decimation_factors))
 
     num_decimations = len(decimation_factors)
 
-
-    # Refer to processing.Processing.assign_bands()
+    # See Note 1
     decimation_and_stft_config = []
     for i_dec_level , decimation_factor in enumerate(decimation_factors):
-        dd = Decimation()
+        dd = FCDecimation()
         dd.decimation_level = i_dec_level
         dd.decimation_factor = decimation_factor
         if i_dec_level == 0:
@@ -165,9 +238,8 @@ def decimation_and_stft_config_creator(initial_sample_rate, max_levels=6, decima
         else:
             current_sample_rate /= decimation_factor
         dd.sample_rate_decimation = current_sample_rate
-        print(dd.sample_rate_decimation)
+
         if time_period:
-            # Add logic here for assigning dd.time_period
             if isinstance(mt_metadata.timeseries.time_period.TimePeriod, time_period):
                 dd.time_period = time_period
             else:
@@ -179,7 +251,7 @@ def decimation_and_stft_config_creator(initial_sample_rate, max_levels=6, decima
     return decimation_and_stft_config
 
 
-
+# MOVE THIS TO pipelines/fourier_coefficients.py
 def add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=None):
     """
 
@@ -196,8 +268,7 @@ def add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=None):
     channel_summary_df = m.channel_summary.to_dataframe()
 
 
-    groupby = get_groupby_columns(m)
-    unique_station_sample_rate_grouper = channel_summary_df.groupby(groupby)# Can't resist calling this ussr_grouper
+    unique_station_sample_rate_grouper = channel_summary_df.groupby(GROUPBY_COLUMNS)# Can't resist calling this ussr_grouper
     ussr_grouper = unique_station_sample_rate_grouper
     print(f"DETECTED {len(ussr_grouper)} unique station-sample_rate instances")
     print("Need to groupby experiment as well for v0.2.0?? See Question 1 at top of module")
@@ -239,7 +310,7 @@ def add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=None):
                 if i_dec_level != 0:
                     # Apply decimation
                     run_xrds = prototype_decimate(decimation_stft_obj, run_xrds)
-
+                print(f"type decimation_stft_obj = {type(decimation_stft_obj)}")
                 if not decimation_stft_obj.is_valid_for_time_series_length(run_xrds.time.shape[0]):
                     print(f"Decimation Level {i_dec_level} invalid, TS of {run_xrds.time.shape[0]} samples too short")
                     continue
@@ -256,14 +327,23 @@ def add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=None):
     m.close_mth5()
     return
 
-
+# pipelines/fourier_coefficients.py
 def read_back_fcs(mth5_path):
+    """
+    This is mostly a helper function for tests
+
+    Args:
+        mth5_path: str or pathlib.Path
+            The path to an h5 file that we will scan the fcs from
+
+    Returns:
+
+    """
     m = MTH5()
     m.open_mth5(mth5_path)
     channel_summary_df = m.channel_summary.to_dataframe()
     print(channel_summary_df)
-    groupby = get_groupby_columns(m)
-    ussr_grouper = channel_summary_df.groupby(groupby)
+    ussr_grouper = channel_summary_df.groupby(GROUPBY_COLUMNS)
     for (survey, station, sample_rate), ussr_group in ussr_grouper:
         print(f"survey: {survey}, station: {station}, sample_rate {sample_rate}")
         station_obj = m.get_station(station, survey)
@@ -291,14 +371,23 @@ def test_decimation_and_stft_config_creator():
 def test_can_add_fcs_to_synthetic_mth5s(decimation_and_stft_configs=None):
     synthetic_file_paths = list(DATA_PATH.glob("*.h5"))
     synthetic_file_paths = [x for x in synthetic_file_paths if "nan" not in str(x)]
+    # Here are the synthetic files for which this is currently passing tests
+    # [PosixPath('/home/kkappler/software/irismt/aurora/tests/synthetic/data/test1.h5'),
+    #  PosixPath('/home/kkappler/software/irismt/aurora/tests/synthetic/data/test2.h5'),
+    #  PosixPath('/home/kkappler/software/irismt/aurora/tests/synthetic/data/test3.h5'),
+    #  PosixPath('/home/kkappler/software/irismt/aurora/tests/synthetic/data/test12rr.h5')]
+
     for mth5_path in synthetic_file_paths:
         add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=decimation_and_stft_configs)
         read_back_fcs(mth5_path)
     return
 
 def main():
-    cfgs = test_decimation_and_stft_config_creator()
-    test_can_add_fcs_to_synthetic_mth5s()
+    # cfgs = test_decimation_and_stft_config_creator()
+    # test_can_add_fcs_to_synthetic_mth5s()
+    test_case = TestAddFourierCoefficientsToSyntheticData()
+    test_case.setUpClass()
+    test_case.test_1()
     print("se funciona!")
 
 if __name__ == "__main__":
