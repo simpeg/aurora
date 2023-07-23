@@ -194,7 +194,7 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
 
         pass
 
-# Belongs in time_series/fourier_coefficients.py
+# Belongs in pipelines/fourier_coefficients.py
 def decimation_and_stft_config_creator(initial_sample_rate, max_levels=6, decimation_factors=None, time_period=None):
     """
     Based on the number of samples in the run, we can compute the maximum number of valid decimation levels.
@@ -363,11 +363,12 @@ def read_back_fcs(mth5_path):
 
 
 
-
+# tests/synthetic/test_add_fourier_coefficients.py
 def test_decimation_and_stft_config_creator():
     cfgs = decimation_and_stft_config_creator(1.0)
     return cfgs
 
+# tests/synthetic/test_add_fourier_coefficients.py
 def test_can_add_fcs_to_synthetic_mth5s(decimation_and_stft_configs=None):
     synthetic_file_paths = list(DATA_PATH.glob("*.h5"))
     synthetic_file_paths = [x for x in synthetic_file_paths if "nan" not in str(x)]
