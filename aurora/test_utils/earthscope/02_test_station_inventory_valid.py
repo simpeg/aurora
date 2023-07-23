@@ -198,6 +198,10 @@ def batch_download_metadata(source_csv=None, results_csv=None, append_rows_for_e
             coverage_df = coverage_df.append(new_row, ignore_index=True)
             coverage_df.to_csv(coverage_csv, index=False)
 
+
+def add_filters_info():
+    pass
+
 def review_results():
     now_str = timestamp_now()
     fname = f"02_exceptions_summary_{now_str}.txt"

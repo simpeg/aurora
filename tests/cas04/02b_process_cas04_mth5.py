@@ -38,7 +38,7 @@ orientations and tilts of each channel
     5    86.70     0.00 CAS  Ey
 
 """
-# import matplotlib.pyplot as plt
+
 import os
 import pathlib
 from collections import UserDict
@@ -56,8 +56,9 @@ CAS04_PATH = TEST_PATH.joinpath("cas04")
 CONFIG_PATH = CAS04_PATH.joinpath("config")
 CONFIG_PATH.mkdir(exist_ok=True)
 DATA_PATH = CAS04_PATH.joinpath("data")
-H5_PATH = DATA_PATH.joinpath("8P_CAS04_CAV07_NVR11_REV06.h5")
-H5_PATH = DATA_PATH.joinpath("8P_CAS04_NVR11_REV06_v1.h5")
+# H5_PATH = DATA_PATH.joinpath("8P_CAS04_CAV07_NVR11_REV06.h5")
+H5_PATH = DATA_PATH.joinpath("8P_CAS04_NVR11_REV06_v2.h5")
+H5_PATH = pathlib.Path("/home/kkappler/.cache/earthscope/data/8P_CAS04.h5")
 DEFAULT_EMTF_FILE = "emtf_results/CAS04-CAS04bcd_REV06-CAS04bcd_NVR08.zmm"
 AURORA_RESULTS_PATH = CAS04_PATH.joinpath("aurora_results")
 EMTF_RESULTS_PATH = CAS04_PATH.joinpath("emtf_results")
@@ -158,7 +159,6 @@ def process_station_runs(local_station_id, remote_station_id="", station_runs={}
 
     cc = ConfigCreator()
     pc = cc.create_from_kernel_dataset(kernel_dataset)
-    pc.validate()
     z_file_name = tmp_station_runs.z_file_name(AURORA_RESULTS_PATH)
     tf_result = process_mth5(
         pc,
@@ -265,7 +265,8 @@ def process_with_remote(h5_paths, local, remote=None, band_setup_file="band_setu
     run_summary.from_mth5s(h5_paths)
     kernel_dataset = KernelDataset()
     kernel_dataset.from_run_summary(run_summary, local, remote)
-    kernel_dataset.restrict_run_intervals_to_simultaneous()
+    if remote:
+        kernel_dataset.restrict_run_intervals_to_simultaneous()
     kernel_dataset.drop_runs_shorter_than(15000)
 
     # Add a method to ensure all samplintg rates are the same
@@ -280,7 +281,7 @@ def process_with_remote(h5_paths, local, remote=None, band_setup_file="band_setu
     if remote:
         z_file_base = f"{local}_RR{remote}.zrr"
     else:
-        z_file_base = f"{local}.zrr"
+        z_file_base = f"{local}.zss"
     z_file_path = AURORA_RESULTS_PATH.joinpath(z_file_base)
     tf_cls = process_mth5(
         config,
@@ -309,16 +310,25 @@ def compare_aurora_vs_emtf(local_station_id, remote_station_id, coh=False):
     -------
 
     """
-    emtf_file_base = f"{local_station_id}bcd_{remote_station_id}.zrr"
+    if remote_station_id is None:
+        emtf_file_base = "CAS04bcd_REV06.zrr"
+        print("Warning: No Single station EMTF results were provided for CAS04 by USGS")
+        print(f"Using {emtf_file_base}")
+    else:
+        emtf_file_base = f"{local_station_id}bcd_{remote_station_id}.zrr"
     emtf_file = EMTF_RESULTS_PATH.joinpath(emtf_file_base)
     aurora_label = f"{local_station_id} RR vs {remote_station_id}"
-    if coh:
-        z_file_base = f"{local_station_id}_RR{remote_station_id}_coh.zrr"
+    if remote_station_id is None:
+        z_file_base = f"{local_station_id}.zss"
     else:
-        z_file_base = f"{local_station_id}_RR{remote_station_id}.zrr"
+        if coh:
+            z_file_base = f"{local_station_id}_RR{remote_station_id}_coh.zrr"
+        else:
+            z_file_base = f"{local_station_id}_RR{remote_station_id}.zrr"
     aurora_z_file = AURORA_RESULTS_PATH.joinpath(z_file_base)
     out_png = str(aurora_z_file)
-    out_png = out_png.replace("zrr", "png")
+    out_png = out_png[:-3] + "png"
+
     compare_results(
         aurora_z_file, label=aurora_label, emtf_file=emtf_file, out_file=out_png
     )
@@ -326,11 +336,12 @@ def compare_aurora_vs_emtf(local_station_id, remote_station_id, coh=False):
 
 
 def old_main():
+    h5_paths = [H5_PATH, ]
     process_all_runs_individually()  # reprocess=False)
     process_run_list("CAS04", ["b", "c", "d"])  # , reprocess=False)
-    process_with_remote("CAS04", "CAV07")
-    process_with_remote("CAS04", "NVR11", band_setup_file=BANDS_DEFAULT_FILE)
-    process_with_remote("CAS04", "REV06")
+    process_with_remote(h5_paths, "CAS04", "CAV07")
+    process_with_remote(h5_paths, "CAS04", "NVR11", band_setup_file=BANDS_DEFAULT_FILE)
+    process_with_remote(h5_paths, "CAS04", "REV06")
 
     for RR in ["CAV07", "NVR11", "REV06"]:
         compare_aurora_vs_emtf("CAS04", RR, coh=False)
@@ -338,11 +349,12 @@ def old_main():
 
 
 def main():
-    h5_paths = [H5_PATH,]
-    RR = "REV06"
-    process_with_remote(h5_paths, "CAS04", RR)
-    print("OK")
-    compare_aurora_vs_emtf("CAS04", RR, coh=False)
+    process_all_runs_individually()
+    # h5_paths = [H5_PATH,]
+    # RR = None# "REV06"
+    # process_with_remote(h5_paths, "CAS04", RR)
+    # print("OK")
+    # compare_aurora_vs_emtf("CAS04", RR, coh=False)
 
 if __name__ == "__main__":
     main()
