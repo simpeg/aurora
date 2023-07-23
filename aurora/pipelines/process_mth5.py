@@ -272,6 +272,8 @@ def process_mth5(
                 tfk.config, i_dec_level, run_obj, run_xrds, units, row.station_id
             )
             # ToDo: add proper FC packing into here
+            # save_fcs == "csv" dump to csv (for testing only)
+            # save_fcs == "h5" store in the h5
             if save_fcs:
                 csv_name = f"{row.station_id}_dec_level_{i_dec_level}.csv"
                 stft_df = stft_obj.to_dataframe()

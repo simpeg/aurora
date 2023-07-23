@@ -47,7 +47,7 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
     Runs several synthetic processing tests from config creation to tf_cls.
 
     """
-
+    @classmethod
     def setUpClass(self):
         print("make synthetic data")
         close_open_files()
@@ -114,12 +114,12 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
 #     return
 
 def main():
-    # test_can_add_fcs_to_synthetic_mth5s()
-    test_case = TestAddFourierCoefficientsToSyntheticData()
-    test_case.setUpClass()
-    test_case.test_123()
-    test_case.test_decimation_and_stft_config_creator()
-    print("se funciona!")
+    # test_case = TestAddFourierCoefficientsToSyntheticData()
+    # test_case.setUpClass()
+    # test_case.test_123()
+    # test_case.test_decimation_and_stft_config_creator()
+    # print("se funciona!")
+    unittest.main()
 
 if __name__ == "__main__":
     main()
