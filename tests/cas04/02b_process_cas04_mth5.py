@@ -22,6 +22,10 @@ maximize coverage of the local station runs is generated
 6. Given such a "restricted run list", runs can be dropped
 7. Time interval endpoints can be changed
 
+
+N.B. Rotations are not being applied when TFs are compared.
+To get good comparison in the past, I manually changed the orientations and tilts
+from:
 number of channels   5   number of frequencies   25
  orientations and tilts of each channel
     1    13.20     0.00 CAS  Hx
@@ -30,12 +34,20 @@ number of channels   5   number of frequencies   25
     4    13.20     0.00 CAS  Ex
     5   103.20     0.00 CAS  Ey
 
+To:
 orientations and tilts of each channel
-    1   -13.20     0.00 CAS  Hx
-    2    86.70     0.00 CAS  Hy
+    1     0.00     0.00 CAS  Hx
+    2    90.00     0.00 CAS  Hy
     3     0.00    90.00 CAS  Hz
-    4   -13.20     0.00 CAS  Ex
-    5    86.70     0.00 CAS  Ey
+    4     0.00     0.00 CAS  Ex
+    5    90.00     0.00 CAS  Ey
+
+The handling of rotations in general is not intended to be supported in aurora,
+rather this will be done with the TF object in MTpy.
+One can also use the angle argument in Ben Murphy's impedance and apparent_resistivity
+functions, but these are slated for deprecation.
+As a temporary workaround an arguments angle1, angle2 have been added to compare_two_z_files
+In the following, we set angle2=13.0 to undo the difference between aurora and SPUD.
 
 """
 
@@ -58,7 +70,7 @@ CONFIG_PATH.mkdir(exist_ok=True)
 DATA_PATH = CAS04_PATH.joinpath("data")
 # H5_PATH = DATA_PATH.joinpath("8P_CAS04_CAV07_NVR11_REV06.h5")
 H5_PATH = DATA_PATH.joinpath("8P_CAS04_NVR11_REV06_v2.h5")
-H5_PATH = pathlib.Path("/home/kkappler/.cache/earthscope/data/8P_CAS04.h5")
+#H5_PATH = pathlib.Path("/home/kkappler/.cache/earthscope/data/8P_CAS04.h5")
 DEFAULT_EMTF_FILE = "emtf_results/CAS04-CAS04bcd_REV06-CAS04bcd_NVR08.zmm"
 AURORA_RESULTS_PATH = CAS04_PATH.joinpath("aurora_results")
 EMTF_RESULTS_PATH = CAS04_PATH.joinpath("emtf_results")
@@ -192,6 +204,7 @@ def compare_results(
     compare_two_z_files(
         emtf_file,
         z_file_name,
+        angle2=13.0,
         label1="emtf",
         label2=label,
         scale_factor1=1,
@@ -220,7 +233,9 @@ def process_all_runs_individually(station_id="CAS04", reprocess=True):
         ]
         if reprocess:
             process_station_runs(station_id, station_runs=station_runs)
-        compare_results(station_runs.z_file_name(AURORA_RESULTS_PATH))
+        z_file_name = station_runs.z_file_name(AURORA_RESULTS_PATH)
+        png_name = str(z_file_name).replace(".zss", ".png")
+        compare_results(station_runs.z_file_name(AURORA_RESULTS_PATH), out_file=png_name)
 
 
 def process_run_list(station_id, run_list, reprocess=True):
@@ -337,19 +352,22 @@ def compare_aurora_vs_emtf(local_station_id, remote_station_id, coh=False):
 
 def old_main():
     h5_paths = [H5_PATH, ]
-    process_all_runs_individually()  # reprocess=False)
-    process_run_list("CAS04", ["b", "c", "d"])  # , reprocess=False)
-    process_with_remote(h5_paths, "CAS04", "CAV07")
-    process_with_remote(h5_paths, "CAS04", "NVR11", band_setup_file=BANDS_DEFAULT_FILE)
-    process_with_remote(h5_paths, "CAS04", "REV06")
+    #process_all_runs_individually()  # reprocess=False)
+    #process_run_list("CAS04", ["b", "c", "d"])  # , reprocess=False)
+    #process_with_remote(h5_paths, "CAS04", "CAV07")
+    #process_with_remote(h5_paths, "CAS04", "NVR11", band_setup_file=BANDS_DEFAULT_FILE)
+    #process_with_remote(h5_paths, "CAS04", "REV06")
 
-    for RR in ["CAV07", "NVR11", "REV06"]:
+    #for RR in ["CAV07", "NVR11", "REV06"]:
+    for RR in ["REV06",]:
         compare_aurora_vs_emtf("CAS04", RR, coh=False)
-        compare_aurora_vs_emtf("CAS04", RR, coh=True)
+        #compare_aurora_vs_emtf("CAS04", RR, coh=True)
 
 
 def main():
-    process_all_runs_individually()
+    old_main()
+#    process_all_runs_individually(reprocess=False)
+
     # h5_paths = [H5_PATH,]
     # RR = None# "REV06"
     # process_with_remote(h5_paths, "CAS04", RR)
