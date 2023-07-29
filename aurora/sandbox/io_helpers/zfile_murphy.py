@@ -379,12 +379,32 @@ class ZFile:
             return self.pyx
 
 
-def read_z_file(z_file_path):
+def read_z_file(z_file_path, angle=0.0):
+    """
+
+    Parameters
+    ----------
+    z_file_path: string or pathlib.Path
+        The name of the EMTF-style z-file to operate on
+    angle: float
+        How much rotation to apply.  This is a kludge variable used to help compare
+        legacy SPUD results which are rotated onto a cardinal grid, vs aurora which
+        store the TF in the coordinate system of acquisition
+
+    Returns
+    -------
+
+        z_file_path: string or pathlib.Path
+            The name of the EMTF-style z-file to operate on
+        angle: float
+            How much rotation to apply
+
+    Returns:
+
+    """
     z_obj = ZFile(z_file_path)
     z_obj.load()
-    # print(z_obj)
-    # print(z_obj.impedance())
-    z_obj.apparent_resistivity()
+    z_obj.apparent_resistivity(angle=angle)
     return z_obj
 
 
