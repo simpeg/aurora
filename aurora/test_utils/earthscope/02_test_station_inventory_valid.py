@@ -63,12 +63,62 @@ def already_in_df(df, network_id, station_id):
     return len(sub_df)
 
 
-def batch_download_metadata(source_csv=None, results_csv=None, append_rows_for_existing=False, verbosity=1):
+def analyse_station_id(station_id):
+    """
+    Helper function that is not very robust, but specific to handling station_ids in the 2023 earthscope tests,
+    in particular, parsing non-schema defined reference stations from SPUD TF XML.
+
+    Parameters
+    ----------
+    station_id
+
+    Returns
+    -------
+
+    """
+    if station_id in KNOWN_NON_EARTHCSCOPE_STATIONS:
+        print(f"skipping {station_id} -- it's not an earthscope station")
+        return None
+    if len(station_id) == 0:
+        print("NO Station ID")
+        return None
+    if len(station_id) == 1:
+        print(f"This ust be a typo or something station_id={station_id}")
+
+        return None
+    elif len(station_id) == 3:
+        print(f"Probably forgot to archive the TWO-CHAR STATE CODE onto station_id {station_id}")
+    elif len(station_id) == 4:
+        print(f"?? Typo in station_id {station_id}??")
+    elif len(station_id) > 5:
+        print(f"run labels probably tacked onto station_id {station_id}")
+        print("Can we confirm that FDSN has a max 5CHAR station ID code???")
+        station_id = station_id[0:5]
+        print(f"Setting to first 5 chars: {station_id}")
+    elif len(station_id)==5:
+        pass # looks normal
+    else:
+        print(f"Havent encountered case len(station_id)={len(station_id)}")
+        raise NotImplementedError
+    return station_id
+
+def batch_download_metadata(source_csv=None,
+                            results_csv=None,
+                            append_rows_for_existing=False,
+                            verbosity=1,
+                            mth5_version="0.2.0"):
     """
 
-    :param xml_source_column:"data_xml_path" or "emtf_xml_path"
-    specifies which of the two possible collections of xml files to use as source
-    :return:
+    Parameters
+    ----------
+    source_csv
+    results_csv
+    append_rows_for_existing
+    verbosity
+
+    Returns
+    -------
+
     """
     DATA_AVAILABILITY = DataAvailability()
     t0 = time.time()
@@ -106,24 +156,10 @@ def batch_download_metadata(source_csv=None, results_csv=None, append_rows_for_e
 
         all_stations = [row.station_id,] + remotes
         network_id = row.network_id
-        for station_id in all_stations:
-            if station_id in KNOWN_NON_EARTHCSCOPE_STATIONS:
-                print(f"skipping {station_id} -- it's not an earthscope station")
+        for original_station_id in all_stations:
+            station_id = analyse_station_id(original_station_id)
+            if not station_id:
                 continue
-            if len(station_id) == 0:
-                print("NO Station ID")
-                continue
-            elif len(station_id) == 3:
-                print(f"Probably forgot to archive the TWO-CHAR STATE CODE onto station_id {station_id}")
-            elif len(station_id) > 5:
-                print(f"run labels probably tacked onto station_id {station_id}")
-                print("Can we confirm that FDSN has a max 5CHAR station ID code???")
-                station_id = station_id[0:5]
-                print(f"Setting to first 5 chars: {station_id}")
-            # elif len(station_id) == 5:
-            #     pass #normal
-            # else:
-            #     print("WHAT STAT")
 
             new_row = {"station_id": station_id,
                        "network_id": network_id,
@@ -139,7 +175,7 @@ def batch_download_metadata(source_csv=None, results_csv=None, append_rows_for_e
                                           channels=availabile_channels, start=None, end=None)
             if verbosity > 1:
                 print(f"request_df: \n {request_df}")
-            fdsn_object = FDSN(mth5_version='0.2.0')
+            fdsn_object = FDSN(mth5_version=mth5_version)
             fdsn_object.client = "IRIS"
 
             expected_file_name = EXPERIMENT_PATH.joinpath(fdsn_object.make_filename(request_df))
@@ -164,10 +200,9 @@ def batch_download_metadata(source_csv=None, results_csv=None, append_rows_for_e
                 continue
 
             # Avoid duplication of already tried cases:
-            # By virtue of this being BELOW the check for filename exists, to encounter this case,
-            # it must be true that the last attempt failed ...
             if already_in_df(coverage_df, network_id, station_id):
                 print(f"Already tried getting data for {network_id}-{station_id}")
+                print(f"Because this is BELOW checking filename exists, to encounter this case, it must be true that the last attempt failed ...")
                 print("SKIPPING IT FOR NOW")
                 continue
 
@@ -256,7 +291,7 @@ def review_results():
 def main():
     t0 = time.time()
     # Normal usage: complete run, will not in-fill with info from existing
-    # batch_download_metadata()
+    batch_download_metadata()
 
     # Use when part of data already here on disk
     # This will be nearly complete, but does not fill out the n_ch_
