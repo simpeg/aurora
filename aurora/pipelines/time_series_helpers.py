@@ -207,6 +207,14 @@ def truncate_to_clock_zero(decimation_obj, run_xrds):
     return run_xrds
 
 
+def nan_to_mean(xrds):
+    for ch in xrds.keys():
+        if not (xrds[ch].isnull() == False).all().data:
+            value = np.nan_to_num(np.nanmean(xrds[ch].data))
+            xrds[ch] = xrds[ch].fillna(value)
+    return xrds
+
+
 def run_ts_to_stft(decimation_obj, run_xrds_orig):
     """
 
@@ -224,9 +232,14 @@ def run_ts_to_stft(decimation_obj, run_xrds_orig):
         recoloring. This really doesn't matter since we don't use the DC harmonic for
         anything.
     """
-    run_xrds = apply_prewhitening(decimation_obj, run_xrds_orig)
+    # need to remove any nans before windowing, or else if there is a single
+    # nan then the whole channel becomes nan.
+    run_xrds = nan_to_mean(run_xrds_orig)
+    run_xrds = apply_prewhitening(decimation_obj, run_xrds)
     run_xrds = truncate_to_clock_zero(decimation_obj, run_xrds)
+
     windowing_scheme = decimation_obj.windowing_scheme
+
     windowed_obj = windowing_scheme.apply_sliding_window(
         run_xrds, dt=1.0 / decimation_obj.decimation.sample_rate
     )

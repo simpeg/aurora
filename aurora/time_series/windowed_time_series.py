@@ -45,7 +45,6 @@ def get_time_coordinate_axis(dataset):
     if len(coordinate_labels) != 2:
         print("Warning - Expected two distinct coordinates")
         # raise Exception
-
     return coordinate_labels.index("time")
     # time_coord_indices = [ndx for x, ndx in enumerate(coordinate_labels) if
     #                                                   x=="time"]
@@ -115,7 +114,6 @@ class WindowedTimeSeries(object):
             detrend_axis = get_time_coordinate_axis(data)
         if not inplace:
             raise NotImplementedError
-
         for channel in data.keys():
 
             # windowed_array = data[key].data
@@ -135,10 +133,10 @@ class WindowedTimeSeries(object):
                         f"{data[channel].coords.indexes['time'][-1].isoformat()}."
                     )
                     if ensembles.size == 0:
+                        print(error)
                         print(msg + " NO DATA")
                     else:
                         print(msg + "UNKOWN REASON:" + error)
-
             if inplace:
                 if len(nanless_data.time) < len(data[channel].time):
                     data[channel].data += np.nan

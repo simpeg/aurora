@@ -165,7 +165,6 @@ def effective_degrees_of_freedom_weights(X, R, edf_obj=None, test=True):
     X = X.to_array(dim="channel")
     if R is not None:
         R = R.to_array(dim="channel")
-
     if test:
         pass
         # add_nan - this syntax only works for dataarray
@@ -178,7 +177,6 @@ def effective_degrees_of_freedom_weights(X, R, edf_obj=None, test=True):
         # #     pass
         # # if R is not None:
         # #     R[1,2:11] *= np.nan
-
     n_observations_initial = len(X.observation)
     weights = np.ones(n_observations_initial)
 
@@ -195,7 +193,6 @@ def effective_degrees_of_freedom_weights(X, R, edf_obj=None, test=True):
 
     if edf_obj is None:
         edf_obj = EffectiveDegreesOfFreedom(n_data=n_observations_numeric)
-
     # %    determine intial robust B-field cross-power matrix; this just uses
     # %    edfl1 -- cut off for estimating robust local magnetic covariance
     nOmit = n_observations_numeric
@@ -213,7 +210,6 @@ def effective_degrees_of_freedom_weights(X, R, edf_obj=None, test=True):
         use = eff_deg_of_freedom <= edf_obj.edfl1  # update "use" boolean selector
         nOmit = n_valid_observations - sum(use)
         n_valid_observations = sum(use)
-
     wt = np.ones(n_observations_numeric)
     wt[eff_deg_of_freedom > edf_obj.p2] = 0
     cond = (eff_deg_of_freedom <= edf_obj.p2) & (eff_deg_of_freedom > edf_obj.p1)
@@ -236,7 +232,6 @@ def effective_degrees_of_freedom_weights(X, R, edf_obj=None, test=True):
         differentAmp = cond1 | cond2
         wt = wt * wtRef
         wt[differentAmp] = 0
-
     weights[keep_indices] = wt
     weights[weights == 0] *= np.nan
     return weights

@@ -1,4 +1,5 @@
 import numpy as np
+from loguru import logger
 
 from aurora.time_series.frequency_band_helpers import extract_band
 from aurora.time_series.xarray_helpers import handle_nan
@@ -10,15 +11,13 @@ from aurora.transfer_function.regression.base import RegressionEstimator
 from aurora.transfer_function.weights.edf_weights import (
     effective_degrees_of_freedom_weights,
 )
-from mth5.utils.mth5_logger import setup_logger
+
 
 ESTIMATOR_LIBRARY = {
     "OLS": RegressionEstimator,
     "RME": TRME,
     "RME_RR": TRME_RR,
 }
-
-logger = setup_logger("aurora.transfer_function_helpers")
 
 
 def get_estimator_class(estimation_engine):
@@ -141,7 +140,6 @@ def get_band_for_tf_estimate(
         check_time_axes_synched(Y, RR)
     else:
         RR = None
-
     return X, Y, RR
 
 
@@ -220,7 +218,6 @@ def process_transfer_functions(
         Y = Y.stack(observation=("frequency", "time"))
         if RR is not None:
             RR = RR.stack(observation=("frequency", "time"))
-
         W = effective_degrees_of_freedom_weights(X, RR, edf_obj=None)
         W[W == 0] = np.nan  # use this to drop values in the handle_nan
         # apply weights
@@ -232,7 +229,6 @@ def process_transfer_functions(
         Y = Y.dropna(dim="observation")
         if RR is not None:
             RR = RR.dropna(dim="observation")
-
         # INSERT COHERENCE SORTING HERE>
         # coh_type = "local"
         # if i_dec_level == 0:
@@ -241,9 +237,7 @@ def process_transfer_functions(
 
         if dec_level_config.estimator.estimate_per_channel:
             for ch in dec_level_config.output_channels:
-                Y_ch = Y[
-                    ch
-                ].to_dataset()  # keep as a dataset, maybe not needed
+                Y_ch = Y[ch].to_dataset()  # keep as a dataset, maybe not needed
 
                 X_, Y_, RR_ = handle_nan(X, Y_ch, RR, drop_dim="observation")
 
@@ -257,17 +251,12 @@ def process_transfer_functions(
                     X=X_, Y=Y_, Z=RR_, iter_control=iter_control
                 )
                 regression_estimator.estimate()
-                transfer_function_obj.set_tf(
-                    regression_estimator, band.center_period
-                )
+                transfer_function_obj.set_tf(regression_estimator, band.center_period)
         else:
             X, Y, RR = handle_nan(X, Y, RR, drop_dim="observation")
             regression_estimator = estimator_class(
                 X=X, Y=Y, Z=RR, iter_control=iter_control
             )
             regression_estimator.estimate()
-            transfer_function_obj.set_tf(
-                regression_estimator, band.center_period
-            )
-
+            transfer_function_obj.set_tf(regression_estimator, band.center_period)
     return transfer_function_obj
