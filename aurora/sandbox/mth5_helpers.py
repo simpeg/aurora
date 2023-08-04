@@ -16,6 +16,43 @@ from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 from mth5.clients import FDSN
 from mth5.utils.helpers import initialize_mth5
 
+def enrich_row_of_channel_summary(row, keyword):
+    """
+
+    Parameters
+    ----------
+    row
+    keyword
+
+    Returns
+    -------
+
+    """
+    if keyword=="num_filters":
+        pass
+
+def augmented_channel_summary(mth5_object, df=None):#, **kwargs):
+    """
+    Consider supportig kwargs, such as a list of keyords that tell what columns to add
+    For now, we only want to add n_filters
+    Parameters
+    ----------
+    df: channel summary dataframe
+
+
+    Returns
+    -------
+
+    """
+    if not df:
+        df = mth5_object.channel_summary.to_dataframe()
+    df["n_filters"] = -1
+    for i_row, row in df.iterrows():
+        channel = mth5_object.get_channel(row.station, row.run, row.component, row.survey)
+        n_filters = len(channel.channel_response_filter.filters_list)
+        df.n_filters.iat[i_row] = n_filters
+    return df
+
 
 def build_request_df(network_id, station_id, channels=None, start=None, end=None):
     """
