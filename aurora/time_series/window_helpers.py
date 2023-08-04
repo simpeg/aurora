@@ -11,7 +11,9 @@ import time
 
 
 # Window-to-timeseries relationshp
-def available_number_of_windows_in_array(n_samples_array, n_samples_window, n_advance):
+def available_number_of_windows_in_array(
+    n_samples_array, n_samples_window, n_advance
+):
     """
 
     Parameters
@@ -28,6 +30,7 @@ def available_number_of_windows_in_array(n_samples_array, n_samples_window, n_ad
     available_number_of_strides: int
         The number of windows the time series will yield
     """
+
     stridable_samples = n_samples_array - n_samples_window
     if stridable_samples < 0:
         print("CRITICAL Window is longer than the time series")
@@ -67,14 +70,17 @@ def sliding_window_crude(
     output_array = np.full((num_windows, num_samples_window), np.nan)
     for i in range(num_windows):
         output_array[i, :] = data[
-            i * num_samples_advance : i * num_samples_advance + num_samples_window
+            i * num_samples_advance : i * num_samples_advance
+            + num_samples_window
         ]
 
     return output_array
 
 
 @jit
-def sliding_window_numba(data, num_samples_window, num_samples_advance, num_windows):
+def sliding_window_numba(
+    data, num_samples_window, num_samples_advance, num_windows
+):
     """
 
     Parameters
@@ -96,13 +102,16 @@ def sliding_window_numba(data, num_samples_window, num_samples_advance, num_wind
     output_array = np.full((num_windows, num_samples_window), np.nan)
     for i in range(num_windows):
         output_array[i, :] = data[
-            i * num_samples_advance : i * num_samples_advance + num_samples_window
+            i * num_samples_advance : i * num_samples_advance
+            + num_samples_window
         ]
 
     return output_array
 
 
-def striding_window(data, num_samples_window, num_samples_advance, num_windows=None):
+def striding_window(
+    data, num_samples_window, num_samples_advance, num_windows=None
+):
     """
     Applies a striding window to an array.  We use 1D arrays here.
     Note that this method is extendable to N-dimensional arrays as was once shown
@@ -153,7 +162,10 @@ def striding_window(data, num_samples_window, num_samples_advance, num_windows=N
     bytes_per_element = data.itemsize
     output_shape = (num_windows, num_samples_window)
     # print("output_shape", output_shape)
-    strides_shape = (num_samples_advance * bytes_per_element, bytes_per_element)
+    strides_shape = (
+        num_samples_advance * bytes_per_element,
+        bytes_per_element,
+    )
     # strides_shape = None
     print("strides_shape", strides_shape)
     strided_window = as_strided(
@@ -243,7 +255,9 @@ def do_some_tests():
 
     print(slid_window)
 
-    num_windows = available_number_of_windows_in_array(N, n_samples_window, n_advance)
+    num_windows = available_number_of_windows_in_array(
+        N, n_samples_window, n_advance
+    )
     print(num_windows)
     t0 = time.time()
     numba_slid_window = sliding_window_numba(

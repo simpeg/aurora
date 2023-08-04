@@ -305,7 +305,10 @@ def process_mth5(
 
         # TFK 1: get clock-zero from data if needed
         if dec_level_config.window.clock_zero_type == "data start":
-            dec_level_config.window.clock_zero = str(tfk.dataset_df.start.min())
+            dec_level_config.window.clock_zero = str(
+                tfk.dataset_df.start.min()
+            )
+
         # Apply STFT to all runs
         local_stfts = []
         remote_stfts = []
