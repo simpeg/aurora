@@ -30,7 +30,7 @@ from aurora.test_utils.earthscope.helpers import load_xml_tf
 from aurora.test_utils.earthscope.helpers import load_most_recent_summary
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
 from aurora.test_utils.earthscope.helpers import restrict_to_mda
-
+from aurora.test_utils.earthscope.helpers import SPUD_XML_PATHS
 
 spud_df = load_most_recent_summary(1)
 spud_df = restrict_to_mda(spud_df, RR="Robust Remote Reference")
@@ -94,7 +94,7 @@ def batch_compare(xml_source="data_xml_path"):
         new_row["remote_id"] = row["remote_id"]
         new_row["aurora_xml_path"] = row["filename"]
 
-        spud_tf = load_xml_tf(row.data_xml_path)
+        spud_tf = load_xml_tf(SPUD_XML_PATHS["data"].joinpath(row.data_xml_path))
         aurora_tf = load_xml_tf(row.filename)
 
 

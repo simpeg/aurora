@@ -28,6 +28,7 @@ from pathlib import Path
 
 from aurora.sandbox.mth5_helpers import get_experiment_from_obspy_inventory
 from aurora.sandbox.mth5_helpers import mth5_from_experiment
+from aurora.sandbox.mth5_helpers import enrich_channel_summary
 
 from aurora.sandbox.mth5_helpers import build_request_df
 from aurora.test_utils.earthscope.helpers import DataAvailability
@@ -36,6 +37,7 @@ from aurora.test_utils.earthscope.helpers import get_most_recent_summary_filepat
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
 from aurora.test_utils.earthscope.helpers import get_summary_table_schema
 from aurora.test_utils.earthscope.helpers import restrict_to_mda
+from aurora.test_utils.earthscope.helpers import SUMMARY_TABLES_PATH
 from aurora.test_utils.earthscope.helpers import timestamp_now
 from aurora.test_utils.earthscope.helpers import USE_CHANNEL_WILDCARDS
 from mth5.mth5 import MTH5
@@ -47,8 +49,15 @@ STAGE_ID = 2
 
 KNOWN_NON_EARTHCSCOPE_STATIONS = ["FRD", ]
 
-
 COVERAGE_DF_SCHEMA = get_summary_table_schema(2)
+
+# CONFIG
+MTH5_VERSION = "0.2.0"
+VERBOSITY = 1
+AUGMENT_WITH_EXISTING = True
+
+if not USE_CHANNEL_WILDCARDS:
+    DATA_AVAILABILITY = DataAvailability()
 
 def initialize_metadata_df():
     """ """
@@ -102,26 +111,21 @@ def analyse_station_id(station_id):
         raise NotImplementedError
     return station_id
 
-def batch_download_metadata(source_csv=None,
-                            results_csv=None,
-                            append_rows_for_existing=False,
-                            verbosity=1,
-                            mth5_version="0.2.0"):
-    """
 
-    Parameters
-    ----------
-    source_csv
-    results_csv
-    append_rows_for_existing
-    verbosity
+def prepare_dataframe_for_processing(source_csv=None, use_skeleton=False):
+    """
+    Towards parallelization, I want to make the skeleton of the dataframe first, and then fill it in.
+    Ppeviously, we had added rows to the dataframe on the fly.
 
     Returns
     -------
 
     """
-    DATA_AVAILABILITY = DataAvailability()
-    t0 = time.time()
+    skeleton_file = "02_skeleton.csv"
+    if use_skeleton:
+        df = pd.read_csv(skeleton_file)
+        return df
+
     try:
         coverage_csv = get_summary_table_filename(STAGE_ID)
         coverage_df = pd.read_csv(coverage_csv)
@@ -166,72 +170,106 @@ def batch_download_metadata(source_csv=None,
                        "emtf_id": row.emtf_id,
                        "data_id": row.data_id,
                        "data_xml_filebase": row.data_xml_filebase}
-            if USE_CHANNEL_WILDCARDS:
-                availabile_channels = ["*Q*", "*F*",]
-            else:
-                availabile_channels = DATA_AVAILABILITY.get_available_channels(
-                    row.network_id, station_id)
-            request_df = build_request_df(network_id, station_id,
-                                          channels=availabile_channels, start=None, end=None)
-            if verbosity > 1:
-                print(f"request_df: \n {request_df}")
-            fdsn_object = FDSN(mth5_version=mth5_version)
-            fdsn_object.client = "IRIS"
-
-            expected_file_name = EXPERIMENT_PATH.joinpath(fdsn_object.make_filename(request_df))
-
-            if expected_file_name.exists():
-                print(f"Already have data for {network_id}-{station_id}")
-                if already_in_df(coverage_df, network_id, station_id):
-                    continue
-                if append_rows_for_existing:
-                    m = MTH5()
-                    m.open_mth5(expected_file_name)
-                    channel_summary_df = m.channel_summary.to_dataframe()
-                    n_ch_h5 = len(channel_summary_df)
-                    m.close_mth5()
-                    new_row["filename"] = expected_file_name.name
-                    new_row["filesize"] = expected_file_name.stat().st_size
-                    #new_row["num_channels_inventory"] = n_ch_inventory
-                    new_row["num_channels_h5"] = n_ch_h5
-                    #new_row["exception"] = ""
-                    #new_row["error_message"] = ""
-                    coverage_df = coverage_df.append(new_row, ignore_index=True)
-                continue
-
-            # Avoid duplication of already tried cases:
-            if already_in_df(coverage_df, network_id, station_id):
-                print(f"Already tried getting data for {network_id}-{station_id}")
-                print(f"Because this is BELOW checking filename exists, to encounter this case, it must be true that the last attempt failed ...")
-                print("SKIPPING IT FOR NOW")
-                continue
-
-            try:
-                # time.sleep(0.1)
-                inventory, data = fdsn_object.get_inventory_from_df(request_df, data=False)
-                n_ch_inventory = len(inventory.networks[0].stations[0].channels)
-                experiment = get_experiment_from_obspy_inventory(inventory)
-                mth5 = mth5_from_experiment(experiment, expected_file_name)
-                mth5.channel_summary.summarize()
-                channel_summary_df = mth5.channel_summary.to_dataframe()
-                n_ch_h5 = len(channel_summary_df)
-                # ? do we need to close this object afterwards ?
-                new_row["filename"] = expected_file_name.name
-                new_row["filesize"] = expected_file_name.stat().st_size
-                new_row["num_channels_inventory"] = n_ch_inventory
-                new_row["num_channels_h5"] = n_ch_h5
-                new_row["exception"] = ""
-                new_row["error_message"] = ""
-            except Exception as e:
-                print(f"{e}")
-                new_row["filename"] = ""
-                new_row["filesize"] =  ""
-                new_row["num_channels_inventory"] = 0
-                new_row["num_channels_h5"] = 0
-                new_row["exception"] = e.__class__.__name__
-                new_row["error_message"] = e.args[0]
+            new_row["filename"] = ""
+            new_row["filesize"] = ""
+            new_row["num_channels_inventory"] = -1
+            new_row["num_filterless_channels"] = -1
+            new_row["num_channels_h5"] = -1
+            new_row["exception"] = ""
+            new_row["error_message"] = ""
+            # of course we should collect all the dictionaries first and then build the df,
+            # this is inefficient, but tis a work in progress.
             coverage_df = coverage_df.append(new_row, ignore_index=True)
-            coverage_df.to_csv(coverage_csv, index=False)
+
+    # Now you have coverage df, but you need to uniquify it
+    print(len(coverage_df))
+    subset = ['network_id', 'station_id']
+    ucdf = coverage_df.drop_duplicates(subset=subset, keep='first')
+    ucdf.to_csv("02_skeleton.csv", index=False)
+    return ucdf
+
+def enrich_row(row):
+
+    if USE_CHANNEL_WILDCARDS:
+        availabile_channels = availabile_channels = ["*Q*", "*F*", ]
+    else:
+        availabile_channels = DATA_AVAILABILITY.get_available_channels(row.network_id, row.station_id)
+
+    request_df = build_request_df(row.network_id, row.station_id,
+                                  channels=availabile_channels, start=None, end=None)
+    if VERBOSITY > 1:
+        print(f"request_df: \n {request_df}")
+    fdsn_object = FDSN(mth5_version=MTH5_VERSION)
+    fdsn_object.client = "IRIS"
+
+    expected_file_name = EXPERIMENT_PATH.joinpath(fdsn_object.make_filename(request_df))
+
+    if expected_file_name.exists():
+        print(f"Already have data for {row.network_id}-{row.station_id}")
+
+        if AUGMENT_WITH_EXISTING:
+            m = MTH5()
+            m.open_mth5(expected_file_name)
+            channel_summary_df = m.channel_summary.to_dataframe()
+            channel_summary_df = enrich_channel_summary(m, channel_summary_df, "num_filters")
+            num_filterless_channels = len(channel_summary_df[channel_summary_df.num_filters==0])
+            n_ch_h5 = len(channel_summary_df)
+            m.close_mth5()
+            row["filename"] = expected_file_name.name
+            row["filesize"] = expected_file_name.stat().st_size
+            row["num_filterless_channels"] = num_filterless_channels
+            aa = channel_summary_df.component.to_list()
+            bb = channel_summary_df.num_filters.to_list()
+            row["num_filter_details"] = str(dict(zip(aa,bb)))
+            # new_row["num_channels_inventory"] = n_ch_inventory
+            row["num_channels_h5"] = n_ch_h5
+            # new_row["exception"] = ""
+            # new_row["error_message"] = ""
+            # coverage_df = coverage_df.append(new_row, ignore_index=True)
+
+    else:
+        return
+        try:
+            # time.sleep(0.1)
+            inventory, data = fdsn_object.get_inventory_from_df(request_df, data=False)
+            n_ch_inventory = len(inventory.networks[0].stations[0].channels)
+            experiment = get_experiment_from_obspy_inventory(inventory)
+            m = mth5_from_experiment(experiment, expected_file_name)
+            m.channel_summary.summarize()
+            channel_summary_df = m.channel_summary.to_dataframe()
+            channel_summary_df = enrich_channel_summary(m, channel_summary_df, "num_filters")
+            num_filterless_channels = len(channel_summary_df[channel_summary_df.num_filters == 0])
+            n_ch_h5 = len(channel_summary_df)
+            # ? do we need to close this object afterwards ?
+            row["filename"] = expected_file_name.name
+            row["filesize"] = expected_file_name.stat().st_size
+            row["num_channels_inventory"] = n_ch_inventory
+            row["num_channels_h5"] = n_ch_h5
+            row["exception"] = ""
+            row["error_message"] = ""
+        except Exception as e:
+            print(f"{e}")
+            row["filename"] = ""
+            row["filesize"] = ""
+            row["num_channels_inventory"] = 0
+            row["num_channels_h5"] = 0
+            row["exception"] = e.__class__.__name__
+            row["error_message"] = e.args[0]
+
+
+def batch_download_metadata_v2(augment_with_existing=True):
+    if USE_CHANNEL_WILDCARDS:
+        availabile_channels = ["*Q*", "*F*", ]
+    else:
+        DATA_AVAILABILITY = DataAvailability()
+
+    df = prepare_dataframe_for_processing()
+
+    enriched_df = df.apply(enrich_row, axis=1)
+    coverage_csv = get_summary_table_filename(STAGE_ID)
+    df.to_csv(coverage_csv, index=False)
+
+
 
 
 def add_filters_info():
@@ -239,7 +277,9 @@ def add_filters_info():
 
 def review_results():
     now_str = timestamp_now()
-    fname = f"02_exceptions_summary_{now_str}.txt"
+    exceptions_summary_filebase = f"02_exceptions_summary_{now_str}.txt"
+    exceptions_summary_filepath = SUMMARY_TABLES_PATH.joinpath(exceptions_summary_filebase)
+
 
     coverage_csv = get_summary_table_filename(STAGE_ID)
     df = pd.read_csv(coverage_csv)
@@ -249,7 +289,7 @@ def review_results():
     for str_col in to_str_cols:
         df[str_col] = df[str_col].astype(str)
 
-    with open(fname, 'w') as f:
+    with open(exceptions_summary_filepath, 'w') as f:
         msg = "*** EXCEPTIONS SUMMARY *** \n\n"
         print(msg)
         f.write(msg)
@@ -290,13 +330,7 @@ def review_results():
 
 def main():
     t0 = time.time()
-    # Normal usage: complete run, will not in-fill with info from existing
-    batch_download_metadata()
-
-    # Use when part of data already here on disk
-    # This will be nearly complete, but does not fill out the n_ch_
-    # batch_download_metadata(append_rows_for_existing=True)
-
+    batch_download_metadata_v2()
     print(f"Total scraping time {time.time() - t0}")
     review_results()
     total_time_elapsed = time.time() - t0

@@ -226,6 +226,8 @@ def get_summary_table_schema(stage_number):
                    "filesize":"int64",
                    "num_channels_inventory": 'int64',
                    "num_channels_h5":'int64',
+                   "num_filterless_channels":"int64",
+                   "num_filter_details": "string",
                    "exception":'string',
                    "error_message":'string',
                    'emtf_id': "int64", 'data_id': 'int64','data_xml_filebase': 'string'
