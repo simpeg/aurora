@@ -35,8 +35,6 @@ spud_df = restrict_to_mda(spud_df, RR="Robust Remote Reference")
 STAGE_ID = 4
 
 
-GET_REMOTES_FROM = "spud_xml_review"
-
 processing_summary_csv = get_summary_table_filename(STAGE_ID)
 print(SUMMARY_TABLES_PATH)
 print(processing_summary_csv)
@@ -53,7 +51,7 @@ def initialize_processing_df():
 
 
 
-def batch_process(xml_source="data_xml_path"):
+def batch_process(xml_source="data"):
     """
 
 
@@ -76,12 +74,8 @@ def batch_process(xml_source="data_xml_path"):
         if not data_file.exists():
             print(f"skipping proc {data_file} DNE")
             continue
-        # if GET_REMOTES_FROM == "tf_xml":
-        #     tf = load_xml_tf(xml_path)
-        #     rr_type = get_rr_type(tf)
-        #     remotes = get_remotes_from_tf(tf)
-        elif GET_REMOTES_FROM == "spud_xml_review":
-            remotes = row.data_xml_path_remotes.split(",")
+
+        remotes = row.data_remotes.split(",")
 
         if remotes:
             print(f"remotes: {remotes} ")
@@ -148,7 +142,7 @@ def batch_process(xml_source="data_xml_path"):
                        "filename": xml_file_path,
                        "exception": "",
                        "error_message": "",
-                       "data_xml_path":row.data_xml_path}
+                       "data_xml_path":row.data_xml_filebase}
         except Exception as e:
             new_row = {"data_id": row.data_id,
                        "station_id": row.station_id,
@@ -157,7 +151,7 @@ def batch_process(xml_source="data_xml_path"):
                        "filename": xml_file_path,
                        "exception": e.__class__.__name__,
                        "error_message": e.args[0],
-                       "data_xml_path":row.data_xml_path}
+                       "data_xml_path":row.data_xml_filebase}
         processing_df = processing_df.append(new_row, ignore_index=True)
         processing_df.to_csv(processing_summary_csv, index=False)
         close_open_files()
