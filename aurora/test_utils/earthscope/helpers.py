@@ -350,7 +350,7 @@ def restrict_to_mda(df, RR=None, keep_columns=KEEP_COLUMNS):
 
 
     if RR:
-        is_rrr = mda_df.data_xml_path_remote_ref_type == RR
+        is_rrr = mda_df.data_remote_ref_type == RR
         mda_df = mda_df[is_rrr]
         mda_df.reset_index(drop=True, inplace=True)
 
