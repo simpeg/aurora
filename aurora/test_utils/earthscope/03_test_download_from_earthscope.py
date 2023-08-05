@@ -137,6 +137,9 @@ def batch_download_mth5(output_csv=None, restrict_to_first_n_rows=False, npartit
         enriched_df = df.apply(enrich_row, axis=1)
     if output_csv:
         enriched_df.to_csv(output_csv, index=False)
+    t1 = time.time()
+    delta_t = t1-t0
+    print(f"Elapsed Time = {delta_t:.2f}s")
 
 def review_results():
     coverage_csv = get_summary_table_filename(STAGE_ID)
@@ -146,7 +149,9 @@ def review_results():
 
 def main():
     output_csv = get_summary_table_filename(STAGE_ID)
-    batch_download_mth5(output_csv=output_csv, restrict_to_first_n_rows=10, npartitions=20)
+    #batch_download_mth5(output_csv=output_csv, restrict_to_first_n_rows=10, npartitions=20)
+    #batch_download_mth5(output_csv=output_csv, npartitions=20)
+    batch_download_mth5(output_csv=output_csv)
     #review_results()
     print("all done!")
 
