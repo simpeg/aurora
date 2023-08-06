@@ -16,6 +16,53 @@ from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 from mth5.clients import FDSN
 from mth5.utils.helpers import initialize_mth5
 
+def enrich_channel_summary(mth5_object, df, keyword):
+    """
+
+    Parameters
+    ----------
+    mth5_object: mth5.mth5.MTH5
+    df: pd.DataFrame
+        A channel summary dataframe
+    keyword: str
+        supported keywords are ["num_filters",]
+        "num_filters" computes the number of filters associated with each row (channel-run) and adds that "num_filters" column of df
+
+    Returns
+    -------
+    df: pd.DataFrame
+        The channel summary df with the new column
+    """
+    df[keyword] = -1
+    if keyword=="num_filters":
+        for i_row, row in df.iterrows():
+            channel = mth5_object.get_channel(row.station, row.run, row.component, row.survey)
+            num_filters = len(channel.channel_response_filter.filters_list)
+            df[keyword].iat[i_row] = num_filters
+    return df
+
+def augmented_channel_summary(mth5_object, df=None):#, **kwargs):
+    """
+    Consider supportig kwargs, such as a list of keyords that tell what columns to add
+    For now, we only want to add n_filters
+    Parameters
+    ----------
+    df: channel summary dataframe
+
+
+    Returns
+    -------
+
+    """
+    if not df:
+        df = mth5_object.channel_summary.to_dataframe()
+    df["n_filters"] = -1
+    for i_row, row in df.iterrows():
+        channel = mth5_object.get_channel(row.station, row.run, row.component, row.survey)
+        n_filters = len(channel.channel_response_filter.filters_list)
+        df.n_filters.iat[i_row] = n_filters
+    return df
+
 
 def build_request_df(network_id, station_id, channels=None, start=None, end=None):
     """
