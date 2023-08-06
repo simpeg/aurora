@@ -105,6 +105,7 @@ def prepare_dataframe_for_scraping(restrict_to_first_n_rows=False):
     df["data_mth5_name"] = ""
     df["data_mth5_exception"] = ""
     df["data_mth5_error_message"] = ""
+    df["num_filter_details"] = ""
     n_rows = len(df)
     info_str = f"There are {n_rows} network-station pairs"
     print(info_str)

@@ -356,7 +356,7 @@ def old_main():
     #process_run_list("CAS04", ["b", "c", "d"])  # , reprocess=False)
     #process_with_remote(h5_paths, "CAS04", "CAV07")
     #process_with_remote(h5_paths, "CAS04", "NVR11", band_setup_file=BANDS_DEFAULT_FILE)
-    #process_with_remote(h5_paths, "CAS04", "REV06")
+    process_with_remote(h5_paths, "CAS04", "REV06")
 
     #for RR in ["CAV07", "NVR11", "REV06"]:
     for RR in ["REV06",]:
