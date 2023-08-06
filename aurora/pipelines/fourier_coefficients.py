@@ -142,7 +142,7 @@ def decimation_and_stft_config_creator(initial_sample_rate, max_levels=6, decima
 
 def add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=None):
     """
-    usssr_grouper: unique survey, station, sample_rate grouper
+    usssr_grouper: output of a groupby on unique {survey, station, sample_rate} tuples
 
     Args:
         mth5_path: str or pathlib.Path
@@ -189,7 +189,7 @@ def add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=None):
 
             run_xrds = runts.dataset
             # access container for FCs
-            fc_group = (station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id))
+            fc_group = station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id)
 
             print(" TIMING CORRECTIONS WOULD GO HERE ")
 
