@@ -55,6 +55,8 @@ COVERAGE_DF_SCHEMA = get_summary_table_schema(2)
 MTH5_VERSION = "0.2.0"
 VERBOSITY = 1
 AUGMENT_WITH_EXISTING = True
+USE_SKELETON = True # speeds up preparing the dataframe
+N_PARTITIONS = 0
 
 if not USE_CHANNEL_WILDCARDS:
     DATA_AVAILABILITY = DataAvailability()
@@ -112,7 +114,7 @@ def analyse_station_id(station_id):
     return station_id
 
 
-def prepare_dataframe_for_processing(source_csv=None, use_skeleton=False):
+def prepare_dataframe_for_processing(source_csv=None, use_skeleton=USE_SKELETON):
     """
     Towards parallelization, I want to make the skeleton of the dataframe first, and then fill it in.
     Ppeviously, we had added rows to the dataframe on the fly.
@@ -188,6 +190,27 @@ def prepare_dataframe_for_processing(source_csv=None, use_skeleton=False):
     ucdf.to_csv("02_skeleton.csv", index=False)
     return ucdf
 
+def get_augmented_channel_summary(m):
+    channel_summary_df = m.channel_summary.to_dataframe()
+    channel_summary_df = enrich_channel_summary(m, channel_summary_df, "num_filters")
+    return channel_summary_df
+
+
+def add_row_properties(expected_file_name, channel_summary_df, row):
+    num_filterless_channels = len(channel_summary_df[channel_summary_df.num_filters == 0])
+    n_ch_h5 = len(channel_summary_df)
+    row["filename"] = expected_file_name.name
+    row["filesize"] = expected_file_name.stat().st_size
+    row["num_filterless_channels"] = num_filterless_channels
+    aa = channel_summary_df.component.to_list()
+    bb = channel_summary_df.num_filters.to_list()
+    row["num_filter_details"] = str(dict(zip(aa, bb)))
+    # new_row["num_channels_inventory"] = n_ch_inventory
+    row["num_channels_h5"] = n_ch_h5
+    row["exception"] = ""
+    row["error_message"] = ""
+    #return row
+
 def enrich_row(row):
 
     if USE_CHANNEL_WILDCARDS:
@@ -210,70 +233,50 @@ def enrich_row(row):
         if AUGMENT_WITH_EXISTING:
             m = MTH5()
             m.open_mth5(expected_file_name)
-            channel_summary_df = m.channel_summary.to_dataframe()
-            channel_summary_df = enrich_channel_summary(m, channel_summary_df, "num_filters")
-            num_filterless_channels = len(channel_summary_df[channel_summary_df.num_filters==0])
-            n_ch_h5 = len(channel_summary_df)
+            channel_summary_df = get_augmented_channel_summary(m)
             m.close_mth5()
-            row["filename"] = expected_file_name.name
-            row["filesize"] = expected_file_name.stat().st_size
-            row["num_filterless_channels"] = num_filterless_channels
-            aa = channel_summary_df.component.to_list()
-            bb = channel_summary_df.num_filters.to_list()
-            row["num_filter_details"] = str(dict(zip(aa,bb)))
-            # new_row["num_channels_inventory"] = n_ch_inventory
-            row["num_channels_h5"] = n_ch_h5
-            # new_row["exception"] = ""
-            # new_row["error_message"] = ""
-            # coverage_df = coverage_df.append(new_row, ignore_index=True)
-
+            add_row_properties(expected_file_name, channel_summary_df, row)
     else:
-        return
         try:
-            # time.sleep(0.1)
             inventory, data = fdsn_object.get_inventory_from_df(request_df, data=False)
             n_ch_inventory = len(inventory.networks[0].stations[0].channels)
+            row["num_channels_inventory"] = n_ch_inventory
             experiment = get_experiment_from_obspy_inventory(inventory)
             m = mth5_from_experiment(experiment, expected_file_name)
             m.channel_summary.summarize()
-            channel_summary_df = m.channel_summary.to_dataframe()
-            channel_summary_df = enrich_channel_summary(m, channel_summary_df, "num_filters")
-            num_filterless_channels = len(channel_summary_df[channel_summary_df.num_filters == 0])
-            n_ch_h5 = len(channel_summary_df)
-            # ? do we need to close this object afterwards ?
-            row["filename"] = expected_file_name.name
-            row["filesize"] = expected_file_name.stat().st_size
-            row["num_channels_inventory"] = n_ch_inventory
-            row["num_channels_h5"] = n_ch_h5
-            row["exception"] = ""
-            row["error_message"] = ""
+            channel_summary_df = get_augmented_channel_summary(m)
+            m.close_mth5()
+            add_row_properties(expected_file_name, channel_summary_df, row)
         except Exception as e:
             print(f"{e}")
-            row["filename"] = ""
-            row["filesize"] = ""
             row["num_channels_inventory"] = 0
             row["num_channels_h5"] = 0
             row["exception"] = e.__class__.__name__
             row["error_message"] = e.args[0]
+    return row
 
 
-def batch_download_metadata_v2(augment_with_existing=True):
+def batch_download_metadata_v2():
     if USE_CHANNEL_WILDCARDS:
         availabile_channels = ["*Q*", "*F*", ]
     else:
         DATA_AVAILABILITY = DataAvailability()
 
     df = prepare_dataframe_for_processing()
+    df = df.iloc[0:10]
+    if not N_PARTITIONS:
+        enriched_df = df.apply(enrich_row, axis=1)
+    else:
+        import dask.dataframe as dd
+        ddf = dd.from_pandas(df, npartitions=N_PARTITIONS)
+        n_rows = len(df)
+        df_schema = get_summary_table_schema(2)
+        enriched_df = ddf.apply(enrich_row, axis=1, meta=df_schema).compute()
 
-    enriched_df = df.apply(enrich_row, axis=1)
     coverage_csv = get_summary_table_filename(STAGE_ID)
-    df.to_csv(coverage_csv, index=False)
+    enriched_df.to_csv(coverage_csv, index=False)
 
 
-
-
-def add_filters_info():
-    pass
 
 def review_results():
     now_str = timestamp_now()
@@ -314,7 +317,7 @@ def review_results():
             msg = [f"{x}\n" for x in unique_errors]
             f.write("".join(msg) + "\n\n")
             exception_counts[exception_type] = len(exception_df)
-            if exception_type=="IndexError":
+            if exception_type == "IndexError":
                 exception_df.to_csv("02_do_these_exist.csv", index=False)
 
         grouper = df.groupby(["network_id", "station_id"])
