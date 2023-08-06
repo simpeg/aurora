@@ -56,7 +56,7 @@ MTH5_VERSION = "0.2.0"
 VERBOSITY = 1
 AUGMENT_WITH_EXISTING = True
 USE_SKELETON = True # speeds up preparing the dataframe
-N_PARTITIONS = 0
+N_PARTITIONS = 4
 
 if not USE_CHANNEL_WILDCARDS:
     DATA_AVAILABILITY = DataAvailability()
@@ -263,7 +263,7 @@ def batch_download_metadata_v2():
         DATA_AVAILABILITY = DataAvailability()
 
     df = prepare_dataframe_for_processing()
-    df = df.iloc[0:10]
+    #df = df.iloc[0:10]
     if not N_PARTITIONS:
         enriched_df = df.apply(enrich_row, axis=1)
     else:
