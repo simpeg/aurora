@@ -87,7 +87,8 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
             add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=fc_decimations)
             read_back_fcs(mth5_path)
             # Confirm the file still processes fine with the fcs inside
-            # tfc = process_mth5(processing_config, tfk_dataset=tfk_dataset, save_fcs=True)
+            # This is currently failing due to tf_kernel checking if fcs already exist, NotImplementedError
+            # tfc = process_mth5(processing_config, tfk_dataset=tfk_dataset)
             #return tfc
         print("OK")
         print("NEXT STEP is add a Tap-Point into existing processing to create these levels")

@@ -188,7 +188,6 @@ def process_mth5(
     show_plot=False,
     z_file_path=None,
     return_collection=False,
-    save_fcs=False
 ):
     """
     This is the main method used to transform a processing_config,
@@ -272,12 +271,21 @@ def process_mth5(
                 tfk.config, i_dec_level, run_obj, run_xrds, units, row.station_id
             )
             # ToDo: add proper FC packing into here
-            # save_fcs == "csv" dump to csv (for testing only)
-            # save_fcs == "h5" store in the h5
-            if save_fcs:
-                csv_name = f"{row.station_id}_dec_level_{i_dec_level}.csv"
-                stft_df = stft_obj.to_dataframe()
-                stft_df.to_csv(csv_name)
+            if dec_level_config.save_fcs:
+                if dec_level_config.save_fcs_type == "csv":
+                    print("WARNING: Unless you are debugging or running the tests, saving FCs to csv is unexpected")
+                    csv_name = f"{row.station_id}_dec_level_{i_dec_level}.csv"
+                    stft_df = stft_obj.to_dataframe()
+                    stft_df.to_csv(csv_name)
+                elif dec_level_config.save_fcs_type == "h5":
+                    # access container for FCs
+                    # where can I access the station_obj from?
+                    # fc_group = station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id)
+                    # fc_decimation_level = fc_group.add_decimation_level(f"{i_dec_level}")
+                    # fc_decimation_level.from_xarray(stft_obj)
+                    # fc_decimation_level.update_metadata()
+                    # fc_group.update_metadata()
+                    raise NotImplementedError
 
 
             if row.station_id == tfk.config.stations.local.id:

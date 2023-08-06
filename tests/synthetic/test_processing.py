@@ -235,7 +235,10 @@ def process_synthetic_2():
     tfk_dataset = KernelDataset()
     tfk_dataset.from_run_summary(run_summary, station_id)
     processing_config = create_test_run_config(station_id, tfk_dataset)
-    tfc = process_mth5(processing_config, tfk_dataset=tfk_dataset, save_fcs=True)
+    for decimation_level in processing_config.decimations:
+        decimation_level.save_fcs = True
+        decimation_level.save_fcs_type = "csv"
+    tfc = process_mth5(processing_config, tfk_dataset=tfk_dataset)
     return tfc
 
 
