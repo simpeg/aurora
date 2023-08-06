@@ -100,18 +100,6 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
         return cfgs
 
 
-# def test_can_add_fcs_to_synthetic_mth5s(decimation_and_stft_configs=None):
-#     synthetic_file_paths = list(DATA_PATH.glob("*.h5"))
-#     synthetic_file_paths = [x for x in synthetic_file_paths if "nan" not in str(x)]
-#     # Here are the synthetic files for which this is currently passing tests
-#     # [PosixPath('/home/kkappler/software/irismt/aurora/tests/synthetic/data/test1.h5'),
-#     #  PosixPath('/home/kkappler/software/irismt/aurora/tests/synthetic/data/test2.h5'),
-#     #  PosixPath('/home/kkappler/software/irismt/aurora/tests/synthetic/data/test3.h5'),
-#     #  PosixPath('/home/kkappler/software/irismt/aurora/tests/synthetic/data/test12rr.h5')]
-#     for mth5_path in synthetic_file_paths:
-#         add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=decimation_and_stft_configs)
-#         read_back_fcs(mth5_path)
-#     return
 
 def main():
     # test_case = TestAddFourierCoefficientsToSyntheticData()
