@@ -242,6 +242,16 @@ def get_summary_table_schema(stage_number):
     schemata[3]["data_mth5_exception"] = "string"
     schemata[3]["data_mth5_error_message"] = "string"
 
+    schemata[4] = {}
+    schemata[4]["data_id"] = 'int64'
+    schemata[4]["network_id"] = "string"
+    schemata[4]["station_id"] = "string"
+    schemata[4]["remote_id"] = "string"
+    schemata[4]["filename"] = "string"
+    schemata[4]["exception"] = "string"
+    schemata[4]["error_message"] = "string"
+    schemata[4]["data_xml_path"] = "string"
+
     try:
         return schemata[stage_number]
     except KeyError:
