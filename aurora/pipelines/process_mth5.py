@@ -278,13 +278,28 @@ def process_mth5(
                     stft_df = stft_obj.to_dataframe()
                     stft_df.to_csv(csv_name)
                 elif dec_level_config.save_fcs_type == "h5":
-                    # access container for FCs
-                    # where can I access the station_obj from?
+                    # Access the station object:
+                    # This if/else could be avoided by replacing the text string "none" with a None object in survay column
+                    if row.survey == "none":
+                        station_obj = row.mth5_obj.stations_group.get_station(row.station_id)
+                    else:
+                        station_obj = row.mth5_obj.stations_group.get_station(row.station_id, survey=row.survey)
+
+                    #better to check if this already exists, but should get caught by mth5
+                    # ValueError: Unable to create group (no write intent on file)
+                    # Hmm, looks like I need to open in append mode (if save_fcs==True and save_fcs_type=="h5")
+                    # Could close the mth5 and reopen in append mode, then close again and reopen in read mode ...
+                    # That is safest, if not a little uglier, but will station obj stay relevant
+                    if not row.mth5_obj.h5_is_write():
+                        print("Can't write, maybe close and reopen in append mode")
+                        print("But note that to modify the ROW, does not modify the parent DF")
+                        print("dev solution: open in append mode during init if any save_fcs_type is h5, and warn")
                     # fc_group = station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id)
                     # fc_decimation_level = fc_group.add_decimation_level(f"{i_dec_level}")
                     # fc_decimation_level.from_xarray(stft_obj)
                     # fc_decimation_level.update_metadata()
                     # fc_group.update_metadata()
+                    # print("OK")
                     raise NotImplementedError
 
 
