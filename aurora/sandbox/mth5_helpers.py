@@ -11,12 +11,21 @@ aurora (and what to throw out).
 import datetime
 import pandas as pd
 
-
+from aurora.time_series.filters.filter_helpers import make_coefficient_filter
 from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 from mth5.clients import FDSN
 from mth5.utils.helpers import initialize_mth5
 
-def repair_missing_filters(mth5_path, mth5_version):
+ELECTRIC_SI_TO_MT = make_coefficient_filter(name="electric_si_units", gain=1e-6,
+                                            units_in="mV/km", units_out="V/m")
+MAGNETIC_SI_TO_MT = make_coefficient_filter(name="magnetic_si_units", gain=1e-9,
+                                            units_in="nT", units_out="T")
+
+def check_if_22111(channel_summary_df):
+    print("Pick the earliest run, and check if it is 22111")
+    return True
+
+def repair_missing_filters(mth5_path, mth5_version, triage_units=False):
     m = initialize_mth5(mth5_path, file_version=mth5_version)
     channel_summary_df = m.channel_summary.to_dataframe()
     # if len(channel_summary_df) == 0:
@@ -24,6 +33,44 @@ def repair_missing_filters(mth5_path, mth5_version):
     #     m.channel_summary.summarize()
     #     channel_summary_df = m.channel_summary.to_dataframe()
     channel_summary_df = enrich_channel_summary(m, channel_summary_df, "num_filters")
+    # TRIAGE UNITS
+    if triage_units:
+        print("Pick the earliest run, and check if it is 22111")
+        is_22111 = check_if_22111(channel_summary_df)
+        if is_22111:
+            survey_id = channel_summary_df.iloc[0].survey
+            survey = m.get_survey(survey_id)
+            survey.filters_group.add_filter(ELECTRIC_SI_TO_MT)
+            survey.filters_group.add_filter(MAGNETIC_SI_TO_MT)
+            survey.write_metadata()
+            for i_row, row in channel_summary_df.iterrows():
+                if row.measurement_type == "electric":
+                    if row.num_filters == 2:
+                        print("looks like a 22111, should probably check some other things too but ... assume SI for now")
+                        channel = m.get_channel(row.station, row.run, row.component, row.survey)
+                        current_filter = channel.metadata.filter
+                        cfd = current_filter.to_dict()
+                        cfd['filtered']["applied"] = [False, ] + cfd['filtered']["applied"]
+                        cfd['filtered']["name"] = ["electric_si_units", ] + cfd['filtered']["name"]
+                        current_filter.from_dict(cfd)
+                        channel.metadata.filter = current_filter
+                        channel.write_metadata()
+                elif row.measurement_type == "magnetic":
+                    if row.num_filters == 1:
+                        print("looks like a 22111, should probably check some other things too but ... assume SI for now")
+                        channel = m.get_channel(row.station, row.run, row.component, row.survey)
+                        current_filter = channel.metadata.filter
+                        cfd = current_filter.to_dict()
+                        cfd['filtered']["applied"] = [False, ] + cfd['filtered']["applied"]
+                        cfd['filtered']["name"] = ["magnetic_si_units", ] + cfd['filtered']["name"]
+                        current_filter.from_dict(cfd)
+                        channel.metadata.filter = current_filter
+                        channel.write_metadata()
+            print(row)
+            print("FixyFixy")
+        # Find E-fields with only 2 stages, and if so, add a 1e-6 coefficient
+        # Find B-fields with only 1 stages, and if so, add a 1e-9 coefficient
+        pass
     sssr_grouper = channel_summary_df.groupby(["survey", "station", "sample_rate"])
     for (survey, station, sample_rate), sub_df in sssr_grouper:
         runs_and_starts = sub_df.groupby(["run", "start"]).size().reset_index()[["run", "start"]]
@@ -40,8 +87,12 @@ def repair_missing_filters(mth5_path, mth5_version):
                     print("No earlier runs -- so we cannot fix the missing filters")
                 previous_run = earlier_runs.iloc[-1].run
                 previous_channel = m.get_channel(row.station, previous_run, row.component, row.survey)
+                channel_time_period = channel.metadata.time_period
+
+                channel.metadata = previous_channel.metadata
+                channel.metadata.time_period = channel_time_period
                 print("WE NEED TO ASSERT METADATA ARE SAME (except filters")
-                channel.metadata.filter = previous_channel.metadata.filter
+                #channel.metadata.filter = previous_channel.metadata.filter
                 channel.write_metadata()
     m.close_mth5()
 
