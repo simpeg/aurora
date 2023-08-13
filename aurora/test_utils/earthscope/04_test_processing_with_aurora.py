@@ -182,7 +182,7 @@ def enrich_row(row):
 def batch_process():
 
     df = prepare_dataframe_for_processing()
-    df = df.iloc[0:10]
+    df = df.iloc[0:1]
     if not N_PARTITIONS:
         enriched_df = df.apply(enrich_row, axis=1)
 

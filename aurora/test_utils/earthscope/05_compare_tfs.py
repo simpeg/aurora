@@ -26,6 +26,7 @@ import time
 from matplotlib import pyplot as plt
 from pathlib import Path
 
+from aurora.test_utils.earthscope.helpers import AURORA_TF_PATH
 from aurora.test_utils.earthscope.helpers import load_xml_tf
 from aurora.test_utils.earthscope.helpers import load_most_recent_summary
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
@@ -94,8 +95,8 @@ def batch_compare(xml_source="data_xml_path"):
         new_row["remote_id"] = row["remote_id"]
         new_row["aurora_xml_path"] = row["filename"]
 
-        spud_tf = load_xml_tf(SPUD_XML_PATHS["data"].joinpath(row.data_xml_path))
-        aurora_tf = load_xml_tf(row.filename)
+        spud_tf = load_xml_tf(SPUD_XML_PATHS["data"].joinpath(row.data_xml_filebase))
+        aurora_tf = load_xml_tf(AURORA_TF_PATH.joinpath(row.filename))
 
 
         # Find Overlap of Periods where both TFs are defined

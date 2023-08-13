@@ -16,6 +16,36 @@ from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 from mth5.clients import FDSN
 from mth5.utils.helpers import initialize_mth5
 
+def repair_missing_filters(mth5_path, mth5_version):
+    m = initialize_mth5(mth5_path, file_version=mth5_version)
+    channel_summary_df = m.channel_summary.to_dataframe()
+    # if len(channel_summary_df) == 0:
+    #     print("whoops, no channel summary")
+    #     m.channel_summary.summarize()
+    #     channel_summary_df = m.channel_summary.to_dataframe()
+    channel_summary_df = enrich_channel_summary(m, channel_summary_df, "num_filters")
+    sssr_grouper = channel_summary_df.groupby(["survey", "station", "sample_rate"])
+    for (survey, station, sample_rate), sub_df in sssr_grouper:
+        runs_and_starts = sub_df.groupby(["run", "start"]).size().reset_index()[["run", "start"]]
+
+        for i_row, row in sub_df.iterrows():
+            if row.num_filters < 1:
+                print(f"Filterless channel detected in row {i_row} fo sub_df")
+                print(f"survey={survey}, station={station}, sample_rate={sample_rate}")
+                print("Try to fix it with filter from a previous run")
+                channel = m.get_channel(row.station, row.run, row.component, row.survey)
+                start_time = pd.Timestamp(row.start)
+                earlier_runs = runs_and_starts[runs_and_starts.start < row.start]
+                if len(earlier_runs) == 0:
+                    print("No earlier runs -- so we cannot fix the missing filters")
+                previous_run = earlier_runs.iloc[-1].run
+                previous_channel = m.get_channel(row.station, previous_run, row.component, row.survey)
+                print("WE NEED TO ASSERT METADATA ARE SAME (except filters")
+                channel.metadata.filter = previous_channel.metadata.filter
+                channel.write_metadata()
+    m.close_mth5()
+
+
 def enrich_channel_summary(mth5_object, df, keyword):
     """
 

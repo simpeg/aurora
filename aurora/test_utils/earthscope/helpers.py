@@ -250,7 +250,7 @@ def get_summary_table_schema(stage_number):
     schemata[4]["filename"] = "string"
     schemata[4]["exception"] = "string"
     schemata[4]["error_message"] = "string"
-    schemata[4]["data_xml_path"] = "string"
+    schemata[4]["data_xml_filebase"] = "string"
 
     try:
         return schemata[stage_number]

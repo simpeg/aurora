@@ -30,6 +30,7 @@ from aurora.sandbox.mth5_helpers import get_experiment_from_obspy_inventory
 from aurora.sandbox.mth5_helpers import mth5_from_experiment
 
 from aurora.sandbox.mth5_helpers import build_request_df
+from aurora.sandbox.mth5_helpers import repair_missing_filters
 from aurora.test_utils.earthscope.helpers import DataAvailability
 from aurora.test_utils.earthscope.helpers import DATA_PATH
 from aurora.test_utils.earthscope.helpers import get_most_recent_summary_filepath
@@ -42,6 +43,8 @@ from mth5.clients import FDSN, MakeMTH5
 from mt_metadata.transfer_functions.core import TF
 from mt_metadata import TF_XML
 
+MTH5_VERSION = "0.2.0"
+TRY_REPAIR_MISSING_FILTERS = True
 STAGE_ID = 3
 if not USE_CHANNEL_WILDCARDS:
     DATA_AVAILABILITY = DataAvailability()
@@ -61,7 +64,7 @@ def enrich_row(row):
     request_df = build_request_df(row.network_id, row.station_id,
                                   channels=availabile_channels, start=None, end=None)
 
-    fdsn_object = FDSN(mth5_version='0.2.0')
+    fdsn_object = FDSN(mth5_version=MTH5_VERSION)
     fdsn_object.client = "IRIS"
 
     expected_file_name = DATA_PATH.joinpath(fdsn_object.make_filename(request_df))
@@ -75,6 +78,8 @@ def enrich_row(row):
         mth5_filename = fdsn_object.make_mth5_from_fdsn_client(request_df,
                                                                interact=False,
                                                                path=DATA_PATH)
+        if TRY_REPAIR_MISSING_FILTERS:
+            repair_missing_filters(mth5_filename, MTH5_VERSION)
         row.at["data_mth5_size"] = expected_file_name.stat().st_size
         row.at["data_mth5_name"] = expected_file_name
         row.at["data_mth5_exception"] = ""
@@ -150,9 +155,10 @@ def review_results():
 
 def main():
     output_csv = get_summary_table_filename(STAGE_ID)
+    batch_download_mth5(output_csv=output_csv, restrict_to_first_n_rows=4, npartitions=0)
     #batch_download_mth5(output_csv=output_csv, restrict_to_first_n_rows=10, npartitions=20)
     #batch_download_mth5(output_csv=output_csv, npartitions=20)
-    batch_download_mth5(output_csv=output_csv)
+    #batch_download_mth5(output_csv=output_csv)
     #review_results()
     print("all done!")
 
