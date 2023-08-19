@@ -1,9 +1,15 @@
 """
-This script iterates over all of the scraped XML from SPUD and
-registers information about success or failure of ingest into a mt_metadata TF object
+This script iterates over all of the scraped XML from SPUD and registers information about success or failure of
+ingest into a mt_metadata TF object
 
-There are two possible places to access an xml in each row, called
-emtf_xml_path and data_xml_path.
+There are two possible places to access an xml in each row, called emtf_xml_path and data_xml_path.
+
+It has been asserted that
+(df.data_remotes.astype(str)==df.data_remotes_2.astype(str)).all()
+(df.emtf_remotes.astype(str)==df.emtf_remotes_2.astype(str)).all()
+(df.emtf_remotes.astype(str) == df.data_remotes_2.astype(str)).all()
+which basically means we can deprecate one of get_remotes_from_tf, get_remotes_from_tf_2
+
 """
 
 
@@ -30,11 +36,8 @@ STAGE_ID = 1
 DROP_COLS = ["emtf_xml_path", "data_xml_path"]
 DF_SCHEMA = get_summary_table_schema(1)
 USE_SECOND_WAY_OF_PARSING_REMOTES = False # Deprecated
-# Have already asserted that
-# (df.data_remotes.astype(str)==df.data_remotes_2.astype(str)).all()
-# (df.emtf_remotes.astype(str)==df.emtf_remotes_2.astype(str)).all()
-# (df.emtf_remotes.astype(str) == df.data_remotes_2.astype(str)).all()
-def prepare_dataframe_for_scraping(restrict_to_first_n_rows=False):
+
+def prepare_dataframe_for_scraping(restrict_to_first_n_rows=False, xml_sources=["emtf", "data"]):
     """
     Define the data structure that is output from this stage of processing
     It is basically the df from the prvious stage (0) with some new rows added.
@@ -44,6 +47,17 @@ def prepare_dataframe_for_scraping(restrict_to_first_n_rows=False):
     """
     spud_xml_csv = get_summary_table_filename(0)
     spud_df = pd.read_csv(spud_xml_csv)
+
+    # Set Up Schema with default values
+    for xml_source in xml_sources:
+        spud_df[f"{xml_source}_error"] = False
+        spud_df[f"{xml_source}_exception"] = ""
+        spud_df[f"{xml_source}_error_message"] = ""
+        spud_df[f"{xml_source}_remote_ref_type"] = ""
+        spud_df[f"{xml_source}_remotes"] = ""
+        spud_df[f"{xml_source}_remotes_2"] = ""
+
+    return spud_df
 
 def enrich_row():
     """
@@ -66,17 +80,7 @@ def review_spud_tfs(xml_sources=["emtf", "data"], results_csv=""):
         results_csv = get_summary_table_filename(STAGE_ID)
 
     t0 = time.time()
-    spud_xml_csv = get_summary_table_filename(0)
-    spud_df = pd.read_csv(spud_xml_csv)
-
-    # Set Up Schema with default values
-    for xml_source in xml_sources:
-        spud_df[f"{xml_source}_error"] = False
-        spud_df[f"{xml_source}_exception"] = ""
-        spud_df[f"{xml_source}_error_message"] = ""
-        spud_df[f"{xml_source}_remote_ref_type"] = ""
-        spud_df[f"{xml_source}_remotes"] = ""
-        spud_df[f"{xml_source}_remotes_2"] = ""
+    spud_df = prepare_dataframe_for_scraping(xml_sources=xml_sources)
 
     for i_row, row in spud_df.iterrows():
         # if i_row<750:
