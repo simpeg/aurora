@@ -1,6 +1,6 @@
 """
 This script iterates over all of the scraped XML from SPUD and registers information about success or failure of
-ingest into a mt_metadata TF object
+ingest into a mt_metadata TF object.
 
 There are two possible places to access an xml in each row, called emtf_xml_path and data_xml_path.
 
@@ -10,6 +10,22 @@ It has been asserted that
 (df.emtf_remotes.astype(str) == df.data_remotes_2.astype(str)).all()
 which basically means we can deprecate one of get_remotes_from_tf, get_remotes_from_tf_2
 
+Dask Notes:
+- 0 partitions 720s
+- 1 partitions 682s
+- 2 partitions 723s
+- 4 partitions 882s
+- 12 partitions 866s
+- 32 partitions 857s
+
+Not much difference.
+
+Link where I originally got into dask apply with partitions: ____find this again__
+
+But I am starting to suspect multiprocessing is the right solution..
+https://stackoverflow.com/questions/67457956/how-to-parallelize-the-row-wise-pandas-dataframes-apply-method
+but read this first:
+https://examples.dask.org/applications/embarrassingly-parallel.html
 """
 
 
@@ -33,11 +49,13 @@ from aurora.test_utils.earthscope.helpers import load_most_recent_summary
 
 STAGE_ID = 1
 
-DROP_COLS = ["emtf_xml_path", "data_xml_path"]
-DF_SCHEMA = get_summary_table_schema(1)
-USE_SECOND_WAY_OF_PARSING_REMOTES = False # Deprecated
 
-def prepare_dataframe_for_scraping(restrict_to_first_n_rows=False, xml_sources=["emtf", "data"]):
+# Config Params
+XML_SOURCES = ["emtf", "data"]
+USE_SECOND_WAY_OF_PARSING_REMOTES = False # Deprecated
+N_PARTITIONS = 1
+
+def prepare_dataframe_for_scraping(restrict_to_first_n_rows=False,):
     """
     Define the data structure that is output from this stage of processing
     It is basically the df from the prvious stage (0) with some new rows added.
@@ -49,63 +67,101 @@ def prepare_dataframe_for_scraping(restrict_to_first_n_rows=False, xml_sources=[
     spud_df = pd.read_csv(spud_xml_csv)
 
     # Set Up Schema with default values
-    for xml_source in xml_sources:
+    for xml_source in XML_SOURCES:
         spud_df[f"{xml_source}_error"] = False
         spud_df[f"{xml_source}_exception"] = ""
         spud_df[f"{xml_source}_error_message"] = ""
         spud_df[f"{xml_source}_remote_ref_type"] = ""
         spud_df[f"{xml_source}_remotes"] = ""
-        spud_df[f"{xml_source}_remotes_2"] = ""
+        if USE_SECOND_WAY_OF_PARSING_REMOTES:
+            spud_df[f"{xml_source}_remotes_2"] = ""
 
     return spud_df
 
-def enrich_row():
+def enrich_row(row):
     """
     This will eventually get used by dask, but as a step we need to make this a method
     that works with df.apply()
     Returns:
 
     """
-    pass
+    for xml_source in XML_SOURCES:
+        xml_path = SPUD_XML_PATHS[xml_source].joinpath(row[f"{xml_source}_xml_filebase"])
+        try:
+            spud_tf = load_xml_tf(xml_path)
+            rr_type = get_rr_type(spud_tf)
+            row[f"{xml_source}_remote_ref_type"] = rr_type
+            remotes = get_remotes_from_tf(spud_tf)
+            row[f"{xml_source}_remotes"] = ",".join(remotes)
+            if USE_SECOND_WAY_OF_PARSING_REMOTES:
+                remotes2 = get_remotes_from_tf_2(spud_tf)
+                row[f"{xml_source}_remotes_2"] = ",".join(remotes)
 
-def review_spud_tfs(xml_sources=["emtf", "data"], results_csv=""):
-    """
+        except Exception as e:
+            row[f"{xml_source}_error"] = True
+            row[f"{xml_source}_exception"] = e.__class__.__name__
+            row[f"{xml_source}_error_message"] = e.args[0]
+    return row
 
-    :param xml_sources:"data_xml_path" or "emtf_xml_path"
-        20230702
-    specifies which of the two possible collections of xml files to use as source
-    :return:
-    """
-    if not results_csv:
-        results_csv = get_summary_table_filename(STAGE_ID)
+# def review_spud_tfs(xml_sources=["emtf", "data"], results_csv=""):
+#     """
+#
+#     :param xml_sources:"data_xml_path" or "emtf_xml_path"
+#         20230702
+#     specifies which of the two possible collections of xml files to use as source
+#     :return:
+#     """
+#     if not results_csv:
+#         results_csv = get_summary_table_filename(STAGE_ID)
+#
+#     t0 = time.time()
+#     spud_df = prepare_dataframe_for_scraping(xml_sources=xml_sources)
+#
+#     for i_row, row in spud_df.iterrows():
+#
+#         # if i_row<750:
+#         #     continue
+#         for xml_source in xml_sources:
+#             xml_path = SPUD_XML_PATHS[xml_source].joinpath(row[f"{xml_source}_xml_filebase"])
+#             try:
+#                 spud_tf = load_xml_tf(xml_path)
+#                 rr_type = get_rr_type(spud_tf)
+#                 spud_df[f"{xml_source}_remote_ref_type"].iat[i_row] = rr_type
+#                 remotes = get_remotes_from_tf(spud_tf)
+#                 spud_df[f"{xml_source}_remotes"].iat[i_row] = ",".join(remotes)
+#                 if USE_SECOND_WAY_OF_PARSING_REMOTES:
+#                     remotes2 = get_remotes_from_tf_2(spud_tf)
+#                     spud_df[f"{xml_source}_remotes_2"].iat[i_row] = ",".join(remotes)
+#
+#             except Exception as e:
+#                 spud_df[f"{xml_source}_error"].at[i_row] = True
+#                 spud_df[f"{xml_source}_exception"].at[i_row] = e.__class__.__name__
+#                 spud_df[f"{xml_source}_error_message"].at[i_row] = e.args[0]
+#         print(i_row, xml_source)
+#     spud_df.to_csv(results_csv, index=False)
+#     print(f"Took {time.time()-t0}s to review spud tfs")
+#     return spud_df
 
+
+
+def batch_process():
     t0 = time.time()
-    spud_df = prepare_dataframe_for_scraping(xml_sources=xml_sources)
+    df = prepare_dataframe_for_scraping()
+    #df = df.iloc[0:12]
+    if not N_PARTITIONS:
+        enriched_df = df.apply(enrich_row, axis=1)
+    else:
+        import dask.dataframe as dd
+        ddf = dd.from_pandas(df, npartitions=N_PARTITIONS)
+        n_rows = len(df)
+        print(f"nrows ---> {n_rows}")
+        df_schema = get_summary_table_schema(STAGE_ID)
+        enriched_df = ddf.apply(enrich_row, axis=1, meta=df_schema).compute()
 
-    for i_row, row in spud_df.iterrows():
-        # if i_row<750:
-        #     continue
-        for xml_source in xml_sources:
-            xml_path = SPUD_XML_PATHS[xml_source].joinpath(row[f"{xml_source}_xml_filebase"])
-            try:
-                spud_tf = load_xml_tf(xml_path)
-                rr_type = get_rr_type(spud_tf)
-                spud_df[f"{xml_source}_remote_ref_type"].iat[i_row] = rr_type
-                remotes = get_remotes_from_tf(spud_tf)
-                spud_df[f"{xml_source}_remotes"].iat[i_row] = ",".join(remotes)
-                if USE_SECOND_WAY_OF_PARSING_REMOTES:
-                    remotes2 = get_remotes_from_tf_2(spud_tf)
-                    spud_df[f"{xml_source}_remotes_2"].iat[i_row] = ",".join(remotes)
-
-            except Exception as e:
-                spud_df[f"{xml_source}_error"].at[i_row] = True
-                spud_df[f"{xml_source}_exception"].at[i_row] = e.__class__.__name__
-                spud_df[f"{xml_source}_error_message"].at[i_row] = e.args[0]
-        print(i_row, xml_source)
-    spud_df.to_csv(results_csv, index=False)
-    print(f"Took {time.time()-t0}s to review spud tfs")
-    return spud_df
-
+    results_csv = get_summary_table_filename(STAGE_ID)
+    enriched_df.to_csv(results_csv, index=False)
+    print(f"Took {time.time()-t0}s to review spud tfs, running with {N_PARTITIONS} partitions")
+    return enriched_df
 
 
 def summarize_errors():
@@ -118,7 +174,8 @@ def summarize_errors():
 
 def main():
     # normal
-    results_df = review_spud_tfs()
+    #results_df = review_spud_tfs()
+    results_df = batch_process()
 
     # run only data
     #results_df = review_spud_tfs(xml_sources = ["data_xml_path", ])

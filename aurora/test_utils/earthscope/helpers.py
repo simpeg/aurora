@@ -210,11 +210,17 @@ def get_summary_table_schema(stage_number):
     schemata[0] = {'emtf_id': "int64", 'data_id': 'int64', 'fail': 'bool',
                 'emtf_file_size': 'int64', 'emtf_xml_filebase': 'string',
                 'data_file_size': 'int64', 'data_xml_filebase': 'string'}
-    new_01 = {'emtf_error': 'bool', 'data_error': 'bool',
-              'emtf_exception': 'string', 'data_exception': 'string',
-              'emtf_error_message': 'string', 'data_error_message': 'string',
-              'emtf_remote_ref_type': 'string', 'data_remote_ref_type': 'string',
-              'emtf_remotes': 'string', 'data_remotes': 'string',
+
+    new_01 = {'emtf_error': 'bool',
+              'emtf_exception': 'string',
+              'emtf_error_message': 'string',
+              'emtf_remote_ref_type': 'string',
+              'emtf_remotes': 'string',
+              'data_error': 'bool',
+              'data_exception': 'string',
+              'data_error_message': 'string',
+              'data_remote_ref_type': 'string',
+              'data_remotes': 'string',
               }
     schemata[1] = {**schemata[0], **new_01 }
 
