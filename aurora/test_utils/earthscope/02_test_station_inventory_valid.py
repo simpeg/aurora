@@ -56,7 +56,7 @@ MTH5_VERSION = "0.2.0"
 VERBOSITY = 1
 AUGMENT_WITH_EXISTING = True
 USE_SKELETON = True # speeds up preparing the dataframe
-N_PARTITIONS = 4
+N_PARTITIONS = 1
 
 if not USE_CHANNEL_WILDCARDS:
     DATA_AVAILABILITY = DataAvailability()
@@ -214,10 +214,12 @@ def add_row_properties(expected_file_name, channel_summary_df, row):
 def enrich_row(row):
 
     if USE_CHANNEL_WILDCARDS:
-        availabile_channels = availabile_channels = ["*Q*", "*F*", ]
+        availabile_channels = ["*Q*", "*F*", ]
     else:
         availabile_channels = DATA_AVAILABILITY.get_available_channels(row.network_id, row.station_id)
-
+    if len(availabile_channels) == 0:
+        print("Setting channels to wildcards because local data_availabilty query returned empty list")
+        availabile_channels = ["*Q*", "*F*", ]
     request_df = build_request_df(row.network_id, row.station_id,
                                   channels=availabile_channels, start=None, end=None)
     if VERBOSITY > 1:
@@ -256,13 +258,16 @@ def enrich_row(row):
     return row
 
 
-def batch_download_metadata_v2():
+def batch_download_metadata_v2(row_start=0, row_end=None):
     if USE_CHANNEL_WILDCARDS:
         availabile_channels = ["*Q*", "*F*", ]
     else:
         DATA_AVAILABILITY = DataAvailability()
 
     df = prepare_dataframe_for_processing()
+    if row_end is None:
+        row_end = len(df)
+    df = df[row_start:row_end]
     #df = df.iloc[0:10]
     if not N_PARTITIONS:
         enriched_df = df.apply(enrich_row, axis=1)
@@ -313,7 +318,7 @@ def review_results():
             msg = f"{n_exceptions} instances of {exception_type}, with {n_unique_errors} unique error(s)\n"
             print(msg)
             f.write(msg)
-            print(unique_errors)
+            print(unique_errors, "\n\n")
             msg = [f"{x}\n" for x in unique_errors]
             f.write("".join(msg) + "\n\n")
             exception_counts[exception_type] = len(exception_df)
@@ -331,13 +336,19 @@ def review_results():
         f.write(msg)
     return
 
+def exception_analyser():
+    """like batch_download, but will only try to pull selected row ids
+    """
+    batch_download_metadata_v2(row_start=857, row_end=858)
+
+
 def main():
     t0 = time.time()
     batch_download_metadata_v2()
-    print(f"Total scraping time {time.time() - t0}")
+    print(f"Total scraping time {time.time() - t0} using {N_PARTITIONS} partitions")
     review_results()
     total_time_elapsed = time.time() - t0
-    print(f"Total scraping & review time {total_time_elapsed:.2f}s")
+    print(f"Total scraping & review time {total_time_elapsed:.2f}s using {N_PARTITIONS} partitions")
 
 if __name__ == "__main__":
     main()

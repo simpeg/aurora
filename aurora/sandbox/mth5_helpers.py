@@ -216,7 +216,7 @@ def augmented_channel_summary(mth5_object, df=None):#, **kwargs):
     return df
 
 
-def build_request_df(network_id, station_id, channels=None, start=None, end=None):
+def build_request_df(network_id, station_id, channels=None, start=None, end=None, mth5_version='0.2.0'):
     """
 
     Args:
@@ -238,7 +238,7 @@ def build_request_df(network_id, station_id, channels=None, start=None, end=None
 
     """
     from mth5.clients import FDSN
-    fdsn_object = FDSN(mth5_version='0.2.0')
+    fdsn_object = FDSN(mth5_version=mth5_version)
     fdsn_object.client = "IRIS"
     if start is None:
         start = '1970-01-01 00:00:00'
