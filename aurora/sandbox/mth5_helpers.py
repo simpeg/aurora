@@ -216,21 +216,33 @@ def augmented_channel_summary(mth5_object, df=None):#, **kwargs):
     return df
 
 
-def build_request_df(network_id, station_id, channels=None, start=None, end=None, mth5_version='0.2.0'):
+def build_request_df(network_id, station_id, channels=None,
+                     start=None, end=None, time_period_dict={},
+                     mth5_version='0.2.0'):
     """
 
-    Args:
-        network_id: string
-            Two-character network identifier string fro FDSN.
-        station_id: string
-            Short identifier code used by FDSN, e.g. CAS04, NVR11
-        channels: list or None
-            3-character channel identifiers, e.g. ["LQ2", "MFZ"], also supports wildcards of the form ["*F*", "*Q*",]
-             Does not support wildcards of the form ["*",]
-        start: string
-            ISO-8601 representation of a timestamp
-        end: string
-            ISO-8601 representation of a timestamp
+    Parameters
+    ----------
+    network_id: string
+        Two-character network identifier string fro FDSN.
+    station_id: string
+        Short identifier code used by FDSN, e.g. CAS04, NVR11
+    channels: list or None
+        3-character channel identifiers, e.g. ["LQ2", "MFZ"],
+        support for wildcards of the form ["*F*", "*Q*",] is experimental
+        Does not support wildcards of the form ["*",]
+    start: string
+        ISO-8601 representation of a timestamp
+    end: string
+        ISO-8601 representation of a timestamp
+    time_period_dict: dict
+        Keyed by same values as channels, this gives explicit start/end times for each of the channels
+    mth5_version: str
+        From ["0.1.0", "0.2.0"]
+
+    Returns
+    -------
+
 
     Returns:
         request_df: pd.DataFrame
@@ -238,18 +250,27 @@ def build_request_df(network_id, station_id, channels=None, start=None, end=None
 
     """
     from mth5.clients import FDSN
+    def get_time_period_bounds(ch):
+        if ch in time_period_dict.keys():
+            time_interval = time_period_dict[ch]
+            ch_start = time_period_dict[ch].left.isoformat()
+            ch_end = time_period_dict[ch].right.isoformat()
+        else:
+            if start is None:
+                ch_start = '1970-01-01 00:00:00'
+            if end is None:
+                ch_end = datetime.datetime.now()
+                ch_end = end.replace(hour=0, minute=0, second=0, microsecond=0)
+                ch_end = str(end)
+        return ch_start, ch_end
+
     fdsn_object = FDSN(mth5_version=mth5_version)
     fdsn_object.client = "IRIS"
-    if start is None:
-        start = '1970-01-01 00:00:00'
-    if end is None:
-        end = datetime.datetime.now()
-        end = end.replace(hour=0, minute=0, second=0, microsecond=0)
-        end = str(end)
 
     request_list = []
     for channel in channels:
-        request_list.append([network_id, station_id, '', channel, start, end])
+        ch_start, ch_end = get_time_period_bounds(channel)
+        request_list.append([network_id, station_id, '', channel, ch_start, ch_end])
 
     print(f"request_list: {request_list}")
 

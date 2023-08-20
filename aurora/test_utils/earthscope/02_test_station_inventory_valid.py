@@ -213,15 +213,20 @@ def add_row_properties(expected_file_name, channel_summary_df, row):
 
 def enrich_row(row):
 
+    time_period_dict = {}
     if USE_CHANNEL_WILDCARDS:
         availabile_channels = ["*Q*", "*F*", ]
     else:
         availabile_channels = DATA_AVAILABILITY.get_available_channels(row.network_id, row.station_id)
+        for ch in availabile_channels:
+            tp = DATA_AVAILABILITY.get_available_time_period(row.network_id, row.station_id, ch)
+            time_period_dict[ch] = tp
+
     if len(availabile_channels) == 0:
         print("Setting channels to wildcards because local data_availabilty query returned empty list")
         availabile_channels = ["*Q*", "*F*", ]
     request_df = build_request_df(row.network_id, row.station_id,
-                                  channels=availabile_channels, start=None, end=None)
+                                  channels=availabile_channels, start=None, end=None, time_period_dict=time_period_dict)
     if VERBOSITY > 1:
         print(f"request_df: \n {request_df}")
     fdsn_object = FDSN(mth5_version=MTH5_VERSION)
@@ -337,12 +342,14 @@ def review_results():
     return
 
 def exception_analyser():
-    """like batch_download, but will only try to pull selected row ids
-    """
-    batch_download_metadata_v2(row_start=857, row_end=858)
+    """like batch_download, but will only try to pull selected row ids"""
+    # batch_download_metadata_v2(row_start=857, row_end=858) #EM AB718 FDSNNoDataException
+    batch_download_metadata_v2(row_start=1399, row_end=1400) # ZU COR22 NotImplementedError
+
 
 
 def main():
+    # exception_analyser()
     t0 = time.time()
     batch_download_metadata_v2()
     print(f"Total scraping time {time.time() - t0} using {N_PARTITIONS} partitions")
