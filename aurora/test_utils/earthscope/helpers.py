@@ -20,7 +20,7 @@ HOSTNAME = socket.gethostname()
 HOME = pathlib.Path().home()
 
 if "gadi" in HOSTNAME:
-    CACHE_PATH = pathlib.Path("/scratch/kd14/kk9397/earthscope")
+    CACHE_PATH = pathlib.Path("/scratch/tq84/kk9397/earthscope")
 else:
     CACHE_PATH = HOME.joinpath(".cache").joinpath("earthscope")
 CACHE_PATH.mkdir(parents=True, exist_ok=True)
