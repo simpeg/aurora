@@ -187,24 +187,17 @@ def main():
 	Follows this great argparse tutorial: https://docs.python.org/3/howto/argparse.html
 	:return:
 	"""
-	# parser = argparse.ArgumentParser(description="Scrape XML files from SPUD")
-	# parser.add_argument("echo", help="echo the string you use here")
-	# parser.add_argument("square", help="display a square of a given number", type=int)
-	# parser.add_argument("-v", "--verbose", help="increase output verbosity", action="store_true")
-	# parser.add_argument("--save_at_intevals", help="increase output verbosity", action="store_true")
-	# args = parser.parse_args()
-	# print(args.echo)
-	# answer = args.square**2
-	# if args.verbose:
-	# 	print(f"Running '{__file__}'")
-	# 	print(f"the square of {args.square} equals {answer}")
-	# else:
-	# 	print(answer)
+	parser = argparse.ArgumentParser(description="Scrape XML files from SPUD")
+	parser.add_argument("--nrows", help="process only the first n rows of the df", default=0)
+	parser.add_argument("--npart", help="how many partitions to use (triggers dask dataframe if > 0", default=0)
+	args = parser.parse_args()
+	print(f"nrows = {args.nrows}")
+	print(f"npartitions = {args.npart}")
 
 	t0 = time.time()
 
 	# normal usage
-	scrape_spud(restrict_to_first_n_rows=False, save_final=True, npartitions=20)
+	scrape_spud(restrict_to_first_n_rows=args.nrows, save_final=True, npartitions=args.npart)
 
 	# debugging
 	#df= scrape_spud(force_download_emtf=False, restrict_to_first_n_rows=5,
