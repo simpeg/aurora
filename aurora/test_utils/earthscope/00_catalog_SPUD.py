@@ -188,8 +188,8 @@ def main():
 	:return:
 	"""
 	parser = argparse.ArgumentParser(description="Scrape XML files from SPUD")
-	parser.add_argument("--nrows", help="process only the first n rows of the df", default=0)
-	parser.add_argument("--npart", help="how many partitions to use (triggers dask dataframe if > 0", default=0)
+	parser.add_argument("--nrows", help="process only the first n rows of the df", type=int, default=0)
+	parser.add_argument("--npart", help="how many partitions to use (triggers dask dataframe if > 0", type=int,  default=0)
 	args = parser.parse_args()
 	print(f"nrows = {args.nrows}")
 	print(f"npartitions = {args.npart}")
