@@ -79,7 +79,7 @@ def enrich_row(row):
                                                                interact=False,
                                                                path=DATA_PATH)
         if TRY_REPAIR_MISSING_FILTERS:
-            repair_missing_filters(mth5_filename, MTH5_VERSION)
+            repair_missing_filters(mth5_filename, MTH5_VERSION, triage_units=True)
         row.at["data_mth5_size"] = expected_file_name.stat().st_size
         row.at["data_mth5_name"] = expected_file_name
         row.at["data_mth5_exception"] = ""
@@ -153,12 +153,37 @@ def review_results():
     print("OK")
     pass
 
+
+def test_repair_filters_SI_to_MT():
+    from mth5.helpers import close_open_files
+    close_open_files()
+    mth5_paths = ["/home/kkappler/.cache/earthscope/data/EM_ORF08.h5",
+                  "/home/kkappler/.cache/earthscope/data/EM_ORG08.h5"]
+
+    for mth5_path in mth5_paths:
+        repair_missing_filters(mth5_path, mth5_version=MTH5_VERSION, triage_units=True)
+    #mth5_path = "/home/kkappler/.cache/earthscope/data/EM_ORF08.h5"
+    # mth5_path = "/home/kkappler/.cache/earthscope/data/EM_ORG08.h5"
+    # repair_missing_filters(mth5_path, mth5_version="0.2.0", triage_units=True)
+
+def repair_all_filters_and_units():
+    from mth5.helpers import close_open_files
+    close_open_files()
+    all_data_h5 = DATA_PATH.glob("*.h5")
+
+    for i, mth5_path in enumerate(all_data_h5):
+        if i>14:
+            print(f"repairing {i} {mth5_path.name}")
+            repair_missing_filters(mth5_path, mth5_version=MTH5_VERSION, triage_units=True)
+    print("ALL DONE")
 def main():
+    #test_repair_filters_SI_to_MT()
+    #repair_all_filters_and_units()
     output_csv = get_summary_table_filename(STAGE_ID)
-    batch_download_mth5(output_csv=output_csv, restrict_to_first_n_rows=4, npartitions=0)
+    #batch_download_mth5(output_csv=output_csv, restrict_to_first_n_rows=4, npartitions=0)
     #batch_download_mth5(output_csv=output_csv, restrict_to_first_n_rows=10, npartitions=20)
     #batch_download_mth5(output_csv=output_csv, npartitions=20)
-    #batch_download_mth5(output_csv=output_csv)
+    batch_download_mth5(output_csv=output_csv)
     #review_results()
     print("all done!")
 
