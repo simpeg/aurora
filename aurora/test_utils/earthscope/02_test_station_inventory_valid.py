@@ -35,6 +35,7 @@ from aurora.test_utils.earthscope.helpers import get_most_recent_summary_filepat
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
 from aurora.test_utils.earthscope.helpers import get_summary_table_schema
 from aurora.test_utils.earthscope.helpers import restrict_to_mda
+from aurora.test_utils.earthscope.helpers import row_to_request_df
 from aurora.test_utils.earthscope.helpers import SUMMARY_TABLES_PATH
 from aurora.test_utils.earthscope.helpers import timestamp_now
 from aurora.test_utils.earthscope.helpers import USE_CHANNEL_WILDCARDS
@@ -224,34 +225,11 @@ def add_row_properties(expected_file_name, channel_summary_df, row):
     #return row
 
 
-def row_to_request_df(row, verbosity=1):# data_availability, use_wildcards):
-    """Factor this into helpers, it will get used in 03 as well."""
-    time_period_dict = {}
-    if USE_CHANNEL_WILDCARDS:
-        availabile_channels = ["*Q*", "*F*", ]
-    else:
-        availabile_channels = DATA_AVAILABILITY.get_available_channels(row.network_id, row.station_id)
-        for ch in availabile_channels:
-            tp = DATA_AVAILABILITY.get_available_time_period(row.network_id, row.station_id, ch)
-            time_period_dict[ch] = tp
-
-    if len(availabile_channels) == 0:
-        if RAISE_EXCEPTION_IF_DATA_AVAILABILITY_EMPTY:
-            msg = f"No data from {row.network_id}_{row.station_id}"
-            raise DataAvailabilityException(msg)
-        else:
-            print("Setting channels to wildcards because local data_availabilty query returned empty list")
-            availabile_channels = ["*Q*", "*F*", ]
-
-    request_df = build_request_df(row.network_id, row.station_id,
-                                  channels=availabile_channels, start=None, end=None, time_period_dict=time_period_dict)
-    if verbosity > 1:
-        print(f"request_df: \n {request_df}")
-    return request_df
-
 def enrich_row(row):
     try:
-        request_df = row_to_request_df(row)
+        request_df = row_to_request_df(row, DATA_AVAILABILITY, verbosity=1, use_channel_wildcards=USE_CHANNEL_WILDCARDS,
+                          raise_exception_if_data_availability_empty=RAISE_EXCEPTION_IF_DATA_AVAILABILITY_EMPTY)
+#        request_df = row_to_request_df(row)
     except Exception as e:
         print(f"{e}")
         row["num_channels_inventory"] = 0
@@ -404,10 +382,10 @@ def exception_analyser():
 
 
 def main():
-    exception_analyser()
-    #scan_data_availability_exceptions()
+    # exception_analyser()
+    # scan_data_availability_exceptions()
     t0 = time.time()
-    batch_download_metadata_v2()
+    batch_download_metadata_v2(row_end=10)
     print(f"Total scraping time {time.time() - t0} using {N_PARTITIONS} partitions")
     review_results()
     total_time_elapsed = time.time() - t0

@@ -14,6 +14,8 @@ import re
 import socket
 import subprocess
 
+from aurora.sandbox.mth5_helpers import build_request_df
+
 ## PLACEHOLDER FOR CONFIG
 USE_CHANNEL_WILDCARDS = False
 HOSTNAME = socket.gethostname()
@@ -420,6 +422,57 @@ def restrict_to_mda(df, RR=None, keep_columns=KEEP_COLUMNS):
 
     return mda_df
 
+
+def row_to_request_df(row, data_availability_obj, verbosity=1, use_channel_wildcards=False,
+                      raise_exception_if_data_availability_empty=True):
+    """
+
+    Parameters
+    ----------
+    row: pandas.core.series.Series
+        Row of a custom dataframe used in widescale earthscope tests.
+        The only information we currently take from this row is the network_id and station_id
+    data_availability: This is an instance of DataAvailability object.
+        the data_availability object is a global varaible in 02 and 03, and so I anticipate there
+        could be issues running this in parallel ...
+        This could be handled in future with webcalls
+        Also, if I passed instead row.network_id, row.station_id, I could just pass
+        the
+    verbosity: int
+        Print request df to screen, to be deprecated
+    use_channel_wildcards: bool
+        If True look for ["*Q*", "*F*", ]
+
+    Returns
+    -------
+
+    """
+    time_period_dict = {}
+    network_id = row.network_id
+    station_id = row.station_id
+    if use_channel_wildcards:
+        availabile_channels = ["*Q*", "*F*", ]
+    else:
+        availabile_channels = data_availability_obj.get_available_channels(network_id, station_id)
+        for ch in availabile_channels:
+            tp = data_availability_obj.get_available_time_period(network_id, station_id, ch)
+            time_period_dict[ch] = tp
+
+    if len(availabile_channels) == 0:
+        if raise_exception_if_data_availability_empty:
+            msg = f"No data from {network_id}_{station_id}"
+            raise DataAvailabilityException(msg)
+        else:
+            print("Setting channels to wildcards because local data_availabilty query returned empty list")
+            availabile_channels = ["*Q*", "*F*", ]
+
+    request_df = build_request_df(network_id, station_id,
+                                  channels=availabile_channels,
+                                  start=None, end=None,
+                                  time_period_dict=time_period_dict)
+    if verbosity > 1:
+        print(f"request_df: \n {request_df}")
+    return request_df
 
 def test_summary_table_schema():
     get_summary_table_schema(0)
