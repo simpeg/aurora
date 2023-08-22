@@ -260,8 +260,8 @@ def build_request_df(network_id, station_id, channels=None,
                 ch_start = '1970-01-01 00:00:00'
             if end is None:
                 ch_end = datetime.datetime.now()
-                ch_end = end.replace(hour=0, minute=0, second=0, microsecond=0)
-                ch_end = str(end)
+                ch_end = ch_end.replace(hour=0, minute=0, second=0, microsecond=0)
+                ch_end = str(ch_end)
         return ch_start, ch_end
 
     fdsn_object = FDSN(mth5_version=mth5_version)
