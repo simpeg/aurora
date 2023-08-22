@@ -20,11 +20,8 @@ For every station in list:
 
 import numpy as np
 import pandas as pd
-import pathlib
+import requests
 import time
-
-from matplotlib import pyplot as plt
-from pathlib import Path
 
 from aurora.sandbox.mth5_helpers import get_experiment_from_obspy_inventory
 from aurora.sandbox.mth5_helpers import mth5_from_experiment
@@ -32,6 +29,7 @@ from aurora.sandbox.mth5_helpers import enrich_channel_summary
 
 from aurora.sandbox.mth5_helpers import build_request_df
 from aurora.test_utils.earthscope.helpers import DataAvailability
+from aurora.test_utils.earthscope.helpers import DataAvailabilityException
 from aurora.test_utils.earthscope.helpers import EXPERIMENT_PATH
 from aurora.test_utils.earthscope.helpers import get_most_recent_summary_filepath
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
@@ -41,15 +39,12 @@ from aurora.test_utils.earthscope.helpers import SUMMARY_TABLES_PATH
 from aurora.test_utils.earthscope.helpers import timestamp_now
 from aurora.test_utils.earthscope.helpers import USE_CHANNEL_WILDCARDS
 from mth5.mth5 import MTH5
-from mth5.clients import FDSN, MakeMTH5
-from mt_metadata.transfer_functions.core import TF
-from mt_metadata import TF_XML
+from mth5.clients import FDSN
 
 STAGE_ID = 2
-
 KNOWN_NON_EARTHCSCOPE_STATIONS = ["FRD", ]
+COVERAGE_DF_SCHEMA = get_summary_table_schema(STAGE_ID)
 
-COVERAGE_DF_SCHEMA = get_summary_table_schema(2)
 
 # CONFIG
 MTH5_VERSION = "0.2.0"
@@ -57,9 +52,25 @@ VERBOSITY = 1
 AUGMENT_WITH_EXISTING = True
 USE_SKELETON = True # speeds up preparing the dataframe
 N_PARTITIONS = 1
+RAISE_EXCEPTION_IF_DATA_AVAILABILITY_EMPTY = True
 
 if not USE_CHANNEL_WILDCARDS:
     DATA_AVAILABILITY = DataAvailability()
+
+def url_maker(net, sta):
+    """
+    URL = "https://service.iris.edu/fdsnws/station/1/query?net=8P&sta=REU09&level=response&format=xml&includecomments=true&includeavailability=true&nodata=404"
+    Parameters
+    ----------
+    net
+    sta
+
+    Returns
+    -------
+
+    """
+    url = f"https://service.iris.edu/fdsnws/station/1/query?net={net}&sta={sta}&level=response&format=xml&includecomments=true&includeavailability=true&nodata=404"
+    return url
 
 def initialize_metadata_df():
     """ """
@@ -187,6 +198,7 @@ def prepare_dataframe_for_processing(source_csv=None, use_skeleton=USE_SKELETON)
     print(len(coverage_df))
     subset = ['network_id', 'station_id']
     ucdf = coverage_df.drop_duplicates(subset=subset, keep='first')
+    print(len(ucdf))
     ucdf.to_csv("02_skeleton.csv", index=False)
     return ucdf
 
@@ -211,8 +223,9 @@ def add_row_properties(expected_file_name, channel_summary_df, row):
     row["error_message"] = ""
     #return row
 
-def enrich_row(row):
 
+def row_to_request_df(row, verbosity=1):# data_availability, use_wildcards):
+    """Factor this into helpers, it will get used in 03 as well."""
     time_period_dict = {}
     if USE_CHANNEL_WILDCARDS:
         availabile_channels = ["*Q*", "*F*", ]
@@ -223,15 +236,32 @@ def enrich_row(row):
             time_period_dict[ch] = tp
 
     if len(availabile_channels) == 0:
-        print("Setting channels to wildcards because local data_availabilty query returned empty list")
-        availabile_channels = ["*Q*", "*F*", ]
+        if RAISE_EXCEPTION_IF_DATA_AVAILABILITY_EMPTY:
+            msg = f"No data from {row.network_id}_{row.station_id}"
+            raise DataAvailabilityException(msg)
+        else:
+            print("Setting channels to wildcards because local data_availabilty query returned empty list")
+            availabile_channels = ["*Q*", "*F*", ]
+
     request_df = build_request_df(row.network_id, row.station_id,
                                   channels=availabile_channels, start=None, end=None, time_period_dict=time_period_dict)
-    if VERBOSITY > 1:
+    if verbosity > 1:
         print(f"request_df: \n {request_df}")
+    return request_df
+
+def enrich_row(row):
+    try:
+        request_df = row_to_request_df(row)
+    except Exception as e:
+        print(f"{e}")
+        row["num_channels_inventory"] = 0
+        row["num_channels_h5"] = 0
+        row["exception"] = e.__class__.__name__
+        row["error_message"] = e.args[0]
+        return row
+
     fdsn_object = FDSN(mth5_version=MTH5_VERSION)
     fdsn_object.client = "IRIS"
-
     expected_file_name = EXPERIMENT_PATH.joinpath(fdsn_object.make_filename(request_df))
 
     if expected_file_name.exists():
@@ -286,7 +316,28 @@ def batch_download_metadata_v2(row_start=0, row_end=None):
     coverage_csv = get_summary_table_filename(STAGE_ID)
     enriched_df.to_csv(coverage_csv, index=False)
 
+def scan_data_availability_exceptions():#df):
+    """
 
+
+    -------
+
+    """
+    coverage_csv = get_summary_table_filename(STAGE_ID)
+    df = pd.read_csv(coverage_csv)
+    sub_df = df[df["exception"]=="DataAvailabilityException"]
+    #sub_df = df
+    print(len(sub_df))
+    for i, row in sub_df.iterrows():
+        print(i)
+        url = url_maker(row.network_id, row.station_id)
+        response = requests.get(url)
+        if response.status_code == 200:
+            print('Web site exists')
+            raise NotImplementedError
+        else:
+            print(f'Web site does not exist {response.status_code}')
+    return
 
 def review_results():
     now_str = timestamp_now()
@@ -344,12 +395,17 @@ def review_results():
 def exception_analyser():
     """like batch_download, but will only try to pull selected row ids"""
     # batch_download_metadata_v2(row_start=857, row_end=858) #EM AB718 FDSNNoDataException
-    batch_download_metadata_v2(row_start=1399, row_end=1400) # ZU COR22 NotImplementedError
-
+    #batch_download_metadata_v2(row_start=1399, row_end=1400) # ZU COR22 NotImplementedError
+    # batch_download_metadata_v2(row_start=1337, row_end=1338) #
+    #batch_download_metadata_v2(row_start=1784, row_end=1785) # ZU Y30 TypeError
+    # batch_download_metadata_v2(row_start=613, row_end=614)  # EM OHM52 FDSNTimeoutException
+    #batch_download_metadata_v2(row_start=1443, row_end=1444)  # 8P REU09 TypeError
+    batch_download_metadata_v2(row_start=1487, row_end=1488)  # 8P REX11 IndexError
 
 
 def main():
-    # exception_analyser()
+    exception_analyser()
+    #scan_data_availability_exceptions()
     t0 = time.time()
     batch_download_metadata_v2()
     print(f"Total scraping time {time.time() - t0} using {N_PARTITIONS} partitions")

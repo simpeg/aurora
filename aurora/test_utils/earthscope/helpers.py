@@ -334,6 +334,9 @@ def load_data_availability_dfs():
         print(f"loaded {network_id}")
     return output
 
+class DataAvailabilityException(Exception):
+    pass
+
 class DataAvailability(object):
     def __init__(self):
         self.df_dict = load_data_availability_dfs()
@@ -354,6 +357,13 @@ class DataAvailability(object):
         latest = sub_availability_df["Latest"].max()
         interval = pd.Interval(earliest, latest)
         return interval
+
+    def raise_exception(self, msg=""):
+        raise DataAvailabilityException(msg)
+
+
+
+
 
 
 KEEP_COLUMNS = ['emtf_id', 'data_id','data_file_size','data_xml_filebase',
@@ -417,4 +427,8 @@ def test_summary_table_schema():
     print("OK")
 
 if __name__ == "__main__":
+    try:
+        assert(1==0)
+    except Exception as e:
+        raise DataAvailabilityException("put message here")
     test_summary_table_schema()
