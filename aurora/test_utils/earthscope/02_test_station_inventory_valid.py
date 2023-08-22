@@ -27,9 +27,9 @@ from aurora.sandbox.mth5_helpers import get_experiment_from_obspy_inventory
 from aurora.sandbox.mth5_helpers import mth5_from_experiment
 from aurora.sandbox.mth5_helpers import enrich_channel_summary
 
-from aurora.sandbox.mth5_helpers import build_request_df
-from aurora.test_utils.earthscope.helpers import DataAvailability
-from aurora.test_utils.earthscope.helpers import DataAvailabilityException
+from aurora.test_utils.earthscope.data_availability import DataAvailability
+from aurora.test_utils.earthscope.data_availability import DataAvailabilityException
+from aurora.test_utils.earthscope.data_availability import url_maker
 from aurora.test_utils.earthscope.helpers import EXPERIMENT_PATH
 from aurora.test_utils.earthscope.helpers import get_most_recent_summary_filepath
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
@@ -58,20 +58,6 @@ RAISE_EXCEPTION_IF_DATA_AVAILABILITY_EMPTY = True
 if not USE_CHANNEL_WILDCARDS:
     DATA_AVAILABILITY = DataAvailability()
 
-def url_maker(net, sta):
-    """
-    URL = "https://service.iris.edu/fdsnws/station/1/query?net=8P&sta=REU09&level=response&format=xml&includecomments=true&includeavailability=true&nodata=404"
-    Parameters
-    ----------
-    net
-    sta
-
-    Returns
-    -------
-
-    """
-    url = f"https://service.iris.edu/fdsnws/station/1/query?net={net}&sta={sta}&level=response&format=xml&includecomments=true&includeavailability=true&nodata=404"
-    return url
 
 def initialize_metadata_df():
     """ """
