@@ -144,10 +144,12 @@ def enrich_row(row):
 
 
 
-def batch_process():
+def batch_process(row_start=0, row_end=None):
     t0 = time.time()
     df = prepare_dataframe_for_scraping()
-    #df = df.iloc[0:12]
+    if row_end is None:
+        row_end = len(df)
+    df = df[row_start:row_end]
     if not N_PARTITIONS:
         enriched_df = df.apply(enrich_row, axis=1)
     else:
@@ -174,7 +176,8 @@ def summarize_errors():
 
 def main():
     # normal
-    #results_df = review_spud_tfs()
+    #results_df = batch_process(row_end=1)
+    results_df = review_spud_tfs()
     results_df = batch_process()
 
     # run only data
