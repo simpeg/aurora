@@ -92,7 +92,9 @@ def make_stft_objects(
         ].channel_scale_factors
     elif station_id == processing_config.stations.remote[0].id:
         scale_factors = (
-            processing_config.stations.remote[0].run_dict[run_id].channel_scale_factors
+            processing_config.stations.remote[0]
+            .run_dict[run_id]
+            .channel_scale_factors
         )
     stft_obj = calibrate_stft_obj(
         stft_obj,
@@ -134,7 +136,9 @@ def process_tf_decimation_level(
     """
     frequency_bands = config.decimations[i_dec_level].frequency_bands_obj()
     tf_header = config.make_tf_header(i_dec_level)
-    transfer_function_obj = TTFZ(tf_header, frequency_bands, processing_config=config)
+    transfer_function_obj = TTFZ(
+        tf_header, frequency_bands, processing_config=config
+    )
 
     transfer_function_obj = process_transfer_functions(
         config,
@@ -170,7 +174,9 @@ def export_tf(
         Transfer function container
     """
     merged_tf_dict = tf_collection.get_merged_dict(channel_nomenclature)
-    channel_nomenclature_dict = channel_nomenclature.to_dict()["channel_nomenclature"]
+    channel_nomenclature_dict = channel_nomenclature.to_dict()[
+        "channel_nomenclature"
+    ]
     tf_cls = TF(channel_nomenclature=channel_nomenclature_dict)
     renamer_dict = {"output_channel": "output", "input_channel": "input"}
     tmp = merged_tf_dict["tf"].rename(renamer_dict)
@@ -238,7 +244,9 @@ def update_dataset_df(i_dec_level, tfk, logger):
             run_xrds = row["run_dataarray"].to_dataset("channel")
             decimation = tfk.config.decimations[i_dec_level].decimation
             decimated_xrds = prototype_decimate(decimation, run_xrds)
-            tfk.dataset_df["run_dataarray"].at[i] = decimated_xrds.to_array("channel")
+            tfk.dataset_df["run_dataarray"].at[i] = decimated_xrds.to_array(
+                "channel"
+            )
     logger.debug("DATASET DF UPDATED")
     return
 
@@ -315,6 +323,9 @@ def process_mth5(
         for i, row in tfk.dataset_df.iterrows():
 
             if not tfk.is_valid_dataset(row, i_dec_level):
+                logger.warning(
+                    f"Skipping decimation level {i_dec_level} for row {row}"
+                )
                 continue
             run_xrds = row["run_dataarray"].to_dataset("channel")
             run_obj = row.mth5_obj.from_reference(row.run_reference)
@@ -348,7 +359,9 @@ def process_mth5(
             local_merged_stft_obj,
             remote_merged_stft_obj,
         )
-        tf_obj.apparent_resistivity(tfk.config.channel_nomenclature, units=units)
+        tf_obj.apparent_resistivity(
+            tfk.config.channel_nomenclature, units=units
+        )
         tf_dict[i_dec_level] = tf_obj
 
         if show_plot:
