@@ -103,46 +103,6 @@ def enrich_row(row):
             row[f"{xml_source}_error_message"] = e.args[0]
     return row
 
-# def review_spud_tfs(xml_sources=["emtf", "data"], results_csv=""):
-#     """
-#
-#     :param xml_sources:"data_xml_path" or "emtf_xml_path"
-#         20230702
-#     specifies which of the two possible collections of xml files to use as source
-#     :return:
-#     """
-#     if not results_csv:
-#         results_csv = get_summary_table_filename(STAGE_ID)
-#
-#     t0 = time.time()
-#     spud_df = prepare_dataframe_for_scraping(xml_sources=xml_sources)
-#
-#     for i_row, row in spud_df.iterrows():
-#
-#         # if i_row<750:
-#         #     continue
-#         for xml_source in xml_sources:
-#             xml_path = SPUD_XML_PATHS[xml_source].joinpath(row[f"{xml_source}_xml_filebase"])
-#             try:
-#                 spud_tf = load_xml_tf(xml_path)
-#                 rr_type = get_rr_type(spud_tf)
-#                 spud_df[f"{xml_source}_remote_ref_type"].iat[i_row] = rr_type
-#                 remotes = get_remotes_from_tf(spud_tf)
-#                 spud_df[f"{xml_source}_remotes"].iat[i_row] = ",".join(remotes)
-#                 if USE_SECOND_WAY_OF_PARSING_REMOTES:
-#                     remotes2 = get_remotes_from_tf_2(spud_tf)
-#                     spud_df[f"{xml_source}_remotes_2"].iat[i_row] = ",".join(remotes)
-#
-#             except Exception as e:
-#                 spud_df[f"{xml_source}_error"].at[i_row] = True
-#                 spud_df[f"{xml_source}_exception"].at[i_row] = e.__class__.__name__
-#                 spud_df[f"{xml_source}_error_message"].at[i_row] = e.args[0]
-#         print(i_row, xml_source)
-#     spud_df.to_csv(results_csv, index=False)
-#     print(f"Took {time.time()-t0}s to review spud tfs")
-#     return spud_df
-
-
 
 def batch_process(row_start=0, row_end=None):
     t0 = time.time()
@@ -176,8 +136,7 @@ def summarize_errors():
 
 def main():
     # normal
-    #results_df = batch_process(row_end=1)
-    results_df = review_spud_tfs()
+    # results_df = batch_process(row_end=1)
     results_df = batch_process()
 
     # run only data
