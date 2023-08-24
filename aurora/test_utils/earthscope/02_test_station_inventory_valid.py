@@ -1,9 +1,5 @@
 """
-
-Flow
-Use stage 1 output csv
-
-We will iterate over rows of the CSV, selecting only rows where the name is of the form:
+Iterate over rows of stage 1 output csv, selecting only rows where the name is of the form:
 18057859_EM_MH010.xml
 uid_NETWORK_STATION.xml
 
@@ -29,13 +25,13 @@ from aurora.sandbox.mth5_helpers import enrich_channel_summary
 
 from aurora.test_utils.earthscope.data_availability import DataAvailability
 from aurora.test_utils.earthscope.data_availability import DataAvailabilityException
+from aurora.test_utils.earthscope.data_availability import row_to_request_df
 from aurora.test_utils.earthscope.data_availability import url_maker
 from aurora.test_utils.earthscope.helpers import EXPERIMENT_PATH
 from aurora.test_utils.earthscope.helpers import get_most_recent_summary_filepath
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
 from aurora.test_utils.earthscope.helpers import get_summary_table_schema
 from aurora.test_utils.earthscope.helpers import restrict_to_mda
-from aurora.test_utils.earthscope.helpers import row_to_request_df
 from aurora.test_utils.earthscope.helpers import SUMMARY_TABLES_PATH
 from aurora.test_utils.earthscope.helpers import timestamp_now
 from aurora.test_utils.earthscope.helpers import USE_CHANNEL_WILDCARDS
@@ -54,6 +50,7 @@ AUGMENT_WITH_EXISTING = True
 USE_SKELETON = True # speeds up preparing the dataframe
 N_PARTITIONS = 1
 RAISE_EXCEPTION_IF_DATA_AVAILABILITY_EMPTY = True
+MAX_TRIES = 3
 
 if not USE_CHANNEL_WILDCARDS:
     DATA_AVAILABILITY = DataAvailability()
@@ -115,7 +112,7 @@ def analyse_station_id(station_id):
 def prepare_dataframe_for_processing(source_csv=None, use_skeleton=USE_SKELETON):
     """
     Towards parallelization, I want to make the skeleton of the dataframe first, and then fill it in.
-    Ppeviously, we had added rows to the dataframe on the fly.
+    Previously, we had added rows to the dataframe on the fly.
 
     Returns
     -------
@@ -174,6 +171,8 @@ def prepare_dataframe_for_processing(source_csv=None, use_skeleton=USE_SKELETON)
             new_row["filesize"] = ""
             new_row["num_channels_inventory"] = -1
             new_row["num_filterless_channels"] = -1
+            new_row["filter_units_in_details"] = ""
+            new_row["filter_units_out_details"]  = ""
             new_row["num_channels_h5"] = -1
             new_row["exception"] = ""
             new_row["error_message"] = ""
@@ -192,6 +191,8 @@ def prepare_dataframe_for_processing(source_csv=None, use_skeleton=USE_SKELETON)
 def get_augmented_channel_summary(m):
     channel_summary_df = m.channel_summary.to_dataframe()
     channel_summary_df = enrich_channel_summary(m, channel_summary_df, "num_filters")
+    channel_summary_df = enrich_channel_summary(m, channel_summary_df, "filter_units_in")
+    channel_summary_df = enrich_channel_summary(m, channel_summary_df, "filter_units_out")
     return channel_summary_df
 
 
@@ -204,18 +205,27 @@ def add_row_properties(expected_file_name, channel_summary_df, row):
     aa = channel_summary_df.component.to_list()
     bb = channel_summary_df.num_filters.to_list()
     row["num_filter_details"] = str(dict(zip(aa, bb)))
+
+    cc = channel_summary_df.filter_units_in.to_list()
+    row["filter_units_in_details"] = str(dict(zip(aa, cc)))
+    dd = channel_summary_df.filter_units_out.to_list()
+    row["filter_units_out_details"] = str(dict(zip(aa, dd)))
+
     # new_row["num_channels_inventory"] = n_ch_inventory
     row["num_channels_h5"] = n_ch_h5
     row["exception"] = ""
     row["error_message"] = ""
     #return row
 
+def get_from_iris():
+    """Tool for multitry"""
+    pass
 
 def enrich_row(row):
     try:
         request_df = row_to_request_df(row, DATA_AVAILABILITY, verbosity=1, use_channel_wildcards=USE_CHANNEL_WILDCARDS,
                           raise_exception_if_data_availability_empty=RAISE_EXCEPTION_IF_DATA_AVAILABILITY_EMPTY)
-#        request_df = row_to_request_df(row)
+
     except Exception as e:
         print(f"{e}")
         row["num_channels_inventory"] = 0
@@ -238,22 +248,28 @@ def enrich_row(row):
             m.close_mth5()
             add_row_properties(expected_file_name, channel_summary_df, row)
     else:
-        try:
-            inventory, data = fdsn_object.get_inventory_from_df(request_df, data=False)
-            n_ch_inventory = len(inventory.networks[0].stations[0].channels)
-            row["num_channels_inventory"] = n_ch_inventory
-            experiment = get_experiment_from_obspy_inventory(inventory)
-            m = mth5_from_experiment(experiment, expected_file_name)
-            m.channel_summary.summarize()
-            channel_summary_df = get_augmented_channel_summary(m)
-            m.close_mth5()
-            add_row_properties(expected_file_name, channel_summary_df, row)
-        except Exception as e:
-            print(f"{e}")
-            row["num_channels_inventory"] = 0
-            row["num_channels_h5"] = 0
-            row["exception"] = e.__class__.__name__
-            row["error_message"] = e.args[0]
+        n_tries = 0
+        while n_tries < MAX_TRIES:
+            try:
+                inventory, data = fdsn_object.get_inventory_from_df(request_df, data=False)
+                n_ch_inventory = len(inventory.networks[0].stations[0].channels)
+                row["num_channels_inventory"] = n_ch_inventory
+                experiment = get_experiment_from_obspy_inventory(inventory)
+                m = mth5_from_experiment(experiment, expected_file_name)
+                m.channel_summary.summarize()
+                channel_summary_df = get_augmented_channel_summary(m)
+                m.close_mth5()
+                add_row_properties(expected_file_name, channel_summary_df, row)
+                n_tries = MAX_TRIES
+            except Exception as e:
+                print(f"{e}")
+                row["num_channels_inventory"] = 0
+                row["num_channels_h5"] = 0
+                row["exception"] = e.__class__.__name__
+                row["error_message"] = e.args[0]
+                n_tries += 1
+                if e.__class__.__name__ == "DataAvailabilityException":
+                    n_tries = MAX_TRIES
     return row
 
 
@@ -264,10 +280,11 @@ def batch_download_metadata_v2(row_start=0, row_end=None):
         DATA_AVAILABILITY = DataAvailability()
 
     df = prepare_dataframe_for_processing()
+
     if row_end is None:
         row_end = len(df)
     df = df[row_start:row_end]
-    #df = df.iloc[0:10]
+
     if not N_PARTITIONS:
         enriched_df = df.apply(enrich_row, axis=1)
     else:
@@ -280,7 +297,7 @@ def batch_download_metadata_v2(row_start=0, row_end=None):
     coverage_csv = get_summary_table_filename(STAGE_ID)
     enriched_df.to_csv(coverage_csv, index=False)
 
-def scan_data_availability_exceptions():#df):
+def scan_data_availability_exceptions():
     """
 
 
@@ -358,7 +375,7 @@ def review_results():
 
 def exception_analyser():
     """like batch_download, but will only try to pull selected row ids"""
-    # batch_download_metadata_v2(row_start=857, row_end=858) #EM AB718 FDSNNoDataException
+    # batch_download_metadata_v2(row_start=853, row_end=854) #EM AB718 FDSNNoDataException
     #batch_download_metadata_v2(row_start=1399, row_end=1400) # ZU COR22 NotImplementedError
     # batch_download_metadata_v2(row_start=1337, row_end=1338) #
     #batch_download_metadata_v2(row_start=1784, row_end=1785) # ZU Y30 TypeError
@@ -371,7 +388,7 @@ def main():
     # exception_analyser()
     # scan_data_availability_exceptions()
     t0 = time.time()
-    batch_download_metadata_v2(row_end=10)
+    batch_download_metadata_v2() # row_end=2)
     print(f"Total scraping time {time.time() - t0} using {N_PARTITIONS} partitions")
     review_results()
     total_time_elapsed = time.time() - t0

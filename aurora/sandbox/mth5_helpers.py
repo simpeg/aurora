@@ -66,6 +66,7 @@ def repair_missing_filters(mth5_path, mth5_version, triage_units=False):
     -------
 
     """
+
     def check_units_are_known(channel):
         """
         Logic can be expanded here, this is just a placeholder in a function that is alraedy a workaround:/
@@ -191,6 +192,16 @@ def enrich_channel_summary(mth5_object, df, keyword):
             channel = mth5_object.get_channel(row.station, row.run, row.component, row.survey)
             num_filters = len(channel.channel_response_filter.filters_list)
             df[keyword].iat[i_row] = num_filters
+    elif keyword=="filter_units_in":
+        for i_row, row in df.iterrows():
+            channel = mth5_object.get_channel(row.station, row.run, row.component, row.survey)
+            units_in = [x.units_in for x in channel.channel_response_filter.filters_list]
+            df[keyword].iat[i_row] = units_in
+    elif keyword=="filter_units_out":
+        for i_row, row in df.iterrows():
+            channel = mth5_object.get_channel(row.station, row.run, row.component, row.survey)
+            units_out = [x.units_out for x in channel.channel_response_filter.filters_list]
+            df[keyword].iat[i_row] = units_out
     return df
 
 def augmented_channel_summary(mth5_object, df=None):#, **kwargs):
