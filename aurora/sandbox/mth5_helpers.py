@@ -43,15 +43,17 @@ def check_if_22111(channel_summary_df):
     elif (num_filters == [6, 6, 3, 3, 3]).all():
         return False
     elif (num_filters == [3, 3, 2, 2, 2]).all():
-        print("looks like this one already got fixex")
+        print("looks like this one already got fixed")
         return False
     else:
-        print(f"UNEXPECTED num fulters {num_filters}")
+        msg = f"Unexpected number of filters {num_filters}"
+        raise NotImplementedError(msg)
         return False
     return True
 
-def repair_missing_filters(mth5_path, mth5_version, triage_units=False):
+def repair_missing_filters(mth5_path, mth5_version, triage_units=False, add_filters_where_none=False):
     """
+    This is highly specific to wide-scale testing at IRIS Earthscope summer 2023, and should not be used in general.
 
     Parameters
     ----------
@@ -143,29 +145,31 @@ def repair_missing_filters(mth5_path, mth5_version, triage_units=False):
                         current_filter.from_dict(cfd)
                         channel.metadata.filter = current_filter
                         channel.write_metadata()
-    sssr_grouper = channel_summary_df.groupby(["survey", "station", "sample_rate"])
-    for (survey, station, sample_rate), sub_df in sssr_grouper:
-        runs_and_starts = sub_df.groupby(["run", "start"]).size().reset_index()[["run", "start"]]
 
-        for i_row, row in sub_df.iterrows():
-            if row.num_filters < 1:
-                print(f"Filterless channel detected in row {i_row} fo sub_df")
-                print(f"survey={survey}, station={station}, sample_rate={sample_rate}")
-                print("Try to fix it with filter from a previous run")
-                channel = m.get_channel(row.station, row.run, row.component, row.survey)
-                start_time = pd.Timestamp(row.start)
-                earlier_runs = runs_and_starts[runs_and_starts.start < row.start]
-                if len(earlier_runs) == 0:
-                    print("No earlier runs -- so we cannot fix the missing filters")
-                    continue
-                previous_run = earlier_runs.iloc[-1].run
-                previous_channel = m.get_channel(row.station, previous_run, row.component, row.survey)
-                channel_time_period = channel.metadata.time_period
+    if add_filters_where_none:
+        sssr_grouper = channel_summary_df.groupby(["survey", "station", "sample_rate"])
+        for (survey, station, sample_rate), sub_df in sssr_grouper:
+            runs_and_starts = sub_df.groupby(["run", "start"]).size().reset_index()[["run", "start"]]
 
-                channel.metadata = previous_channel.metadata
-                channel.metadata.time_period = channel_time_period
-                #channel.metadata.filter = previous_channel.metadata.filter
-                channel.write_metadata()
+            for i_row, row in sub_df.iterrows():
+                if row.num_filters < 1:
+                    print(f"Filterless channel detected in row {i_row} fo sub_df")
+                    print(f"survey={survey}, station={station}, sample_rate={sample_rate}")
+                    print("Try to fix it with filter from a previous run")
+                    channel = m.get_channel(row.station, row.run, row.component, row.survey)
+                    start_time = pd.Timestamp(row.start)
+                    earlier_runs = runs_and_starts[runs_and_starts.start < row.start]
+                    if len(earlier_runs) == 0:
+                        print("No earlier runs -- so we cannot fix the missing filters")
+                        continue
+                    previous_run = earlier_runs.iloc[-1].run
+                    previous_channel = m.get_channel(row.station, previous_run, row.component, row.survey)
+                    channel_time_period = channel.metadata.time_period
+
+                    channel.metadata = previous_channel.metadata
+                    channel.metadata.time_period = channel_time_period
+                    #channel.metadata.filter = previous_channel.metadata.filter
+                    channel.write_metadata()
     m.close_mth5()
 
 

@@ -21,17 +21,15 @@ Handy steps for debugging:
 import argparse
 import numpy as np
 import pandas as pd
-import pathlib
 import time
-
-from pathlib import Path
 
 from aurora.sandbox.mth5_helpers import get_experiment_from_obspy_inventory
 from aurora.sandbox.mth5_helpers import mth5_from_experiment
-
-from aurora.sandbox.mth5_helpers import build_request_df
 from aurora.sandbox.mth5_helpers import repair_missing_filters
-from aurora.test_utils.earthscope.helpers import DataAvailability
+
+from aurora.test_utils.earthscope.data_availability import DataAvailability
+from aurora.test_utils.earthscope.data_availability import DataAvailabilityException
+from aurora.test_utils.earthscope.data_availability import row_to_request_df
 from aurora.test_utils.earthscope.helpers import DATA_PATH
 from aurora.test_utils.earthscope.helpers import get_most_recent_summary_filepath
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
@@ -39,31 +37,23 @@ from aurora.test_utils.earthscope.helpers import get_summary_table_schema
 from aurora.test_utils.earthscope.helpers import restrict_to_mda
 from aurora.test_utils.earthscope.helpers import USE_CHANNEL_WILDCARDS
 from mth5.mth5 import MTH5
-from mth5.clients import FDSN, MakeMTH5
+from mth5.clients import FDSN
 from mt_metadata.transfer_functions.core import TF
 from mt_metadata import TF_XML
 
+STAGE_ID = 3
 MTH5_VERSION = "0.2.0"
 TRY_REPAIR_MISSING_FILTERS = True
-STAGE_ID = 3
+RAISE_EXCEPTION_IF_DATA_AVAILABILITY_EMPTY = False
+
 if not USE_CHANNEL_WILDCARDS:
     DATA_AVAILABILITY = DataAvailability()
 
 
 def enrich_row(row):
-    if isinstance(row.exception, str):
-        print(f"Skipping row {row} for now, Exception {row.exception} was encounterd in metadata")
-        return row
 
-    if USE_CHANNEL_WILDCARDS:
-        availabile_channels = ["*Q*", "*F*", ]
-    else:
-        availabile_channels = DATA_AVAILABILITY.get_available_channels(
-            row.network_id, row.station_id)
-
-    request_df = build_request_df(row.network_id, row.station_id,
-                                  channels=availabile_channels, start=None, end=None)
-
+    request_df = row_to_request_df(row, DATA_AVAILABILITY, verbosity=1, use_channel_wildcards=USE_CHANNEL_WILDCARDS,
+                                   raise_exception_if_data_availability_empty=RAISE_EXCEPTION_IF_DATA_AVAILABILITY_EMPTY)
     fdsn_object = FDSN(mth5_version=MTH5_VERSION)
     fdsn_object.client = "IRIS"
 
@@ -74,14 +64,14 @@ def enrich_row(row):
         row.at["data_mth5_name"] = expected_file_name
         return row
     try:
-        print(request_df)
+
         mth5_filename = fdsn_object.make_mth5_from_fdsn_client(request_df,
                                                                interact=False,
                                                                path=DATA_PATH)
         if TRY_REPAIR_MISSING_FILTERS:
-            repair_missing_filters(mth5_filename, MTH5_VERSION, triage_units=True)
+            repair_missing_filters(mth5_filename, MTH5_VERSION, triage_units=True, add_filters_where_none=False)
         row.at["data_mth5_size"] = expected_file_name.stat().st_size
-        row.at["data_mth5_name"] = expected_file_name
+        row.at["data_mth5_name"] = expected_file_name.name
         row.at["data_mth5_exception"] = ""
         row.at["data_mth5_error_message"] = ""
     except Exception as e:
@@ -91,7 +81,7 @@ def enrich_row(row):
         row.at["data_mth5_error_message"] = e.args[0]
     return row
 
-def prepare_dataframe_for_scraping(restrict_to_first_n_rows=False):
+def prepare_dataframe_for_scraping(restrict_to_first_n_rows=False, drop_exceptions=True):
     """
     Define columns and default values
     Args:
@@ -114,6 +104,16 @@ def prepare_dataframe_for_scraping(restrict_to_first_n_rows=False):
     n_rows = len(df)
     info_str = f"There are {n_rows} network-station pairs"
     print(info_str)
+
+    to_str_cols = ["network_id", "station_id", "exception"]
+    for str_col in to_str_cols:
+        df[str_col] = df[str_col].astype(str)
+
+    print("dropping impossible files")
+    df = df[df.exception == "nan"]
+    df.reset_index(inplace=True, drop=True)
+
+
     if restrict_to_first_n_rows:
         df = df.iloc[:restrict_to_first_n_rows]
         info_str += f"\n restricting to first {restrict_to_first_n_rows} rows for testing"
@@ -176,14 +176,15 @@ def repair_all_filters_and_units():
             print(f"repairing {i} {mth5_path.name}")
             repair_missing_filters(mth5_path, mth5_version=MTH5_VERSION, triage_units=True)
     print("ALL DONE")
+
 def main():
-    #test_repair_filters_SI_to_MT()
+    # test_repair_filters_SI_to_MT()
     #repair_all_filters_and_units()
     output_csv = get_summary_table_filename(STAGE_ID)
-    #batch_download_mth5(output_csv=output_csv, restrict_to_first_n_rows=4, npartitions=0)
-    #batch_download_mth5(output_csv=output_csv, restrict_to_first_n_rows=10, npartitions=20)
+    # batch_download_mth5(output_csv=output_csv, restrict_to_first_n_rows=3, npartitions=1)
+    batch_download_mth5(output_csv=output_csv, npartitions=1)
     #batch_download_mth5(output_csv=output_csv, npartitions=20)
-    batch_download_mth5(output_csv=output_csv)
+    #batch_download_mth5(output_csv=output_csv)
     #review_results()
     print("all done!")
 

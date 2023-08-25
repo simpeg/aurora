@@ -56,11 +56,7 @@ if not USE_CHANNEL_WILDCARDS:
     DATA_AVAILABILITY = DataAvailability()
 
 
-def initialize_metadata_df():
-    """ """
-    column_names = list(COVERAGE_DF_SCHEMA.keys())
-    coverage_df = pd.DataFrame(columns=column_names)
-    return coverage_df
+
 
 def already_in_df(df, network_id, station_id):
     cond1 = df.network_id.isin([network_id, ])
@@ -109,15 +105,26 @@ def analyse_station_id(station_id):
     return station_id
 
 
-def prepare_dataframe_for_processing(source_csv=None, use_skeleton=USE_SKELETON):
+def prepare_dataframe_for_processing(source_csv=None, use_skeleton=USE_SKELETON, xml_source="data"):
     """
-    Towards parallelization, I want to make the skeleton of the dataframe first, and then fill it in.
+    Towards parallelization, make the skeleton of the dataframe first, and then fill it in.
     Previously, we had added rows to the dataframe on the fly.
+
+
+    Note 1: The main for-loop executes over each row of spud_df (the existing TFs) but the output df can have
+     appreciably more rows than spud_df because multiple reference stations maybe assocated with a given TF.
 
     Returns
     -------
 
     """
+
+    def initialize_metadata_df():
+        """ """
+        column_names = list(COVERAGE_DF_SCHEMA.keys())
+        df = pd.DataFrame(columns=column_names)
+        return df
+
     skeleton_file = "02_skeleton.csv"
     if use_skeleton:
         df = pd.read_csv(skeleton_file)
@@ -135,13 +142,7 @@ def prepare_dataframe_for_processing(source_csv=None, use_skeleton=USE_SKELETON)
     spud_df = restrict_to_mda(spud_df)
     print(f"Restricting spud_df to mda (Earthscope) entries: {len(spud_df)} rows")
 
-
-
-    xml_source = "data"
-
-    # Careful in this loop, it is associated with one station (that has a TF, but may have many remotes)
     for i_row, row in spud_df.iterrows():
-
         # Ignore XML that cannot be read
         if row[f"{xml_source}_error"] is True:
             print(f"Skipping {row.emtf_id} for now, tf not reading in")
@@ -158,6 +159,7 @@ def prepare_dataframe_for_processing(source_csv=None, use_skeleton=USE_SKELETON)
         all_stations = [row.station_id,] + remotes
         network_id = row.network_id
         for original_station_id in all_stations:
+            # handle wonky station_ids, ignore ambigous or incorrect labels
             station_id = analyse_station_id(original_station_id)
             if not station_id:
                 continue
