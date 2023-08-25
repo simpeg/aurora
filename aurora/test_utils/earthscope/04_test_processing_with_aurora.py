@@ -15,6 +15,7 @@ from aurora.test_utils.earthscope.helpers import DATA_PATH
 from aurora.test_utils.earthscope.helpers import EXPERIMENT_PATH
 from aurora.test_utils.earthscope.helpers import SUMMARY_TABLES_PATH
 from aurora.test_utils.earthscope.helpers import AURORA_TF_PATH
+from aurora.test_utils.earthscope.helpers import AURORA_Z_PATH
 from aurora.test_utils.earthscope.helpers import load_most_recent_summary
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
 from aurora.test_utils.earthscope.helpers import get_summary_table_schema
@@ -133,8 +134,8 @@ def prepare_dataframe_for_processing(use_skeleton=USE_SKELETON):
 
 
 def enrich_row(row):
-    data_file_base = f"{row.network_id}_{row.station_id}.h5"
-    data_file = DATA_PATH.joinpath(data_file_base)
+    mth5_file_base = f"{row.network_id}_{row.station_id}.h5"
+    data_file = DATA_PATH.joinpath(mth5_file_base)
     if row.remote_id:
         remote_file_base = f"{row.network_id}_{row.remote_id}.h5"
         rr_file = DATA_PATH.joinpath(remote_file_base)
@@ -161,11 +162,12 @@ def enrich_row(row):
         cc = ConfigCreator()
         config = cc.create_from_kernel_dataset(kernel_dataset)
         show_plot = False
+        z_file = AURORA_Z_PATH.joinpath(row.filename.replace("xml", "zrr"))
         tf_cls = process_mth5(config,
                               kernel_dataset,
                               units="MT",
                               show_plot=show_plot,
-                              z_file_path=None,
+                              z_file_path=z_file,
                               )
         xml_file_path = AURORA_TF_PATH.joinpath(row.filename)
         tf_cls.write(fn=xml_file_path, file_type="emtfxml")
@@ -182,7 +184,7 @@ def enrich_row(row):
 def batch_process():
 
     df = prepare_dataframe_for_processing()
-    df = df.iloc[0:1]
+    #df = df.iloc[0:1]
     if not N_PARTITIONS:
         enriched_df = df.apply(enrich_row, axis=1)
 
@@ -190,6 +192,7 @@ def batch_process():
         import dask.dataframe as dd
         ddf = dd.from_pandas(df, npartitions=N_PARTITIONS)
         n_rows = len(df)
+        print(f"nrows ---> {n_rows}")
         df_schema = get_summary_table_schema(2)
         enriched_df = ddf.apply(enrich_row, axis=1, meta=df_schema).compute()
 
@@ -198,10 +201,26 @@ def batch_process():
 
 
 
+def compare_graphics():
+    from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
+    compare_two_z_files(
+        "/home/kkappler/Downloads/ORF08bc_G8.zrr",
+        "EM_ORF08_RRORG08.zrr",
+        angle2=0.0,
+        label1="emtf",
+        label2="aurora",
+        scale_factor1=1,
+        out_file="",
+        markersize=3,
+        rho_ylims=[1e0, 1e9],
+        # rho_ylims=[1e-8, 1e6],
+        xlims=[1, 5000],
+    )
 
 def main():
-    # ucpf = prepare_dataframe_for_processing()
     batch_process()
+    #compare_graphics()
+    #ucpf = prepare_dataframe_for_processing()
 
 if __name__ == "__main__":
     main()

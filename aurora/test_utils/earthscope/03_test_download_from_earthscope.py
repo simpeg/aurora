@@ -112,7 +112,8 @@ def prepare_dataframe_for_scraping(restrict_to_first_n_rows=False, drop_exceptio
     print("dropping impossible files")
     df = df[df.exception == "nan"]
     df.reset_index(inplace=True, drop=True)
-
+    n_rows = len(df)
+    info_str = f"There are {n_rows} network-station pairs after dropping impossible cases"
 
     if restrict_to_first_n_rows:
         df = df.iloc[:restrict_to_first_n_rows]

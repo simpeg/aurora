@@ -46,6 +46,8 @@ EXPERIMENT_PATH.mkdir(parents=True, exist_ok=True)
 # Transfer Functions
 AURORA_TF_PATH = CACHE_PATH.joinpath("aurora_transfer_functions")
 AURORA_TF_PATH.mkdir(parents=True, exist_ok=True)
+AURORA_Z_PATH = AURORA_TF_PATH.joinpath("Z")
+AURORA_Z_PATH.mkdir(parents=True, exist_ok=True)
 
 # Summary tables
 SUMMARY_TABLES_PATH = CACHE_PATH.joinpath("summary_tables")
