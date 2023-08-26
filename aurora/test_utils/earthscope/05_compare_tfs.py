@@ -152,7 +152,8 @@ def batch_compare(xml_source="data_xml_path"):
                 ratio = spud_1d.data / aurora_1d.data
                 ratio = ratio[np.isnan(ratio) == False]
                 ratio = np.abs(ratio)
-                ratio = np.linalg.norm(ratio)
+                #ratio = np.linalg.norm(ratio)/np.sqrt(len(ratio))
+                ratio = np.median(ratio)
                 col_name = in_out_str("ratio", input, output)
                 new_row[col_name] = ratio
         tf_df = tf_df.append(new_row, ignore_index=True)
@@ -162,7 +163,7 @@ def batch_compare(xml_source="data_xml_path"):
         #     new_row["exception"] =  e.__class__.__name__
         #     new_row["exception"] =   e.args[0],
 
-        if np.mod(i_row,10)==0:
+        if np.mod(i_row,25)==0:
            tf_df.to_csv(tf_summary_csv, index=False)
 
 
