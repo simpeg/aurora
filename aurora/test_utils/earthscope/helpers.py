@@ -189,6 +189,32 @@ def get_remotes_from_tf(tf_obj):
     return remotes
 
 
+def get_summary_table_schema_v2(stage_number):
+    """
+    Update the summary_table_schema to use mt_metadata style standards and csv schema defns
+
+    Rather than providing dicts with key:dtype its better to have:
+    col.name = 'emtf_id'
+    col.dtype = "int64"
+    col.default = -1
+    etc.
+    
+    Parameters
+    ----------
+    stage_number
+
+    Returns
+    -------
+
+    """
+    if stage_number in [0,]:
+        from aurora.test_utils.earthscope.metadata import make_schema_list
+        schema = make_schema_list(stage_number)
+        return schema
+    else:
+        raise NotImplementedError
+
+
 def get_summary_table_schema(stage_number):
     """
     A place where the columns of the various summary tables are defined.
@@ -198,13 +224,6 @@ def get_summary_table_schema(stage_number):
     If we were going to properly formalize this flow, it would be good to make a json of the schema, where each column
     was associated with a dtype, a description, and a default_value.  In that way, the same script could run to prepare
     a table at any stage, taking only the schema as input.
-
-    This
-    Stage 0
-    Args:
-        stage_number:
-
-    Returns:
 
     """
     # Stages 0 and 1

@@ -1,0 +1,8 @@
+name,dtype,default
+emtf_id,int64,-1
+data_id,int64,-1
+fail,bool,0
+emtf_file_size,int64,0
+emtf_xml_filebase,string,
+data_file_size,int64,0
+data_xml_filebase,string,

@@ -1,0 +1,35 @@
+{
+    "name": {
+        "type": "string",
+        "required": true,
+        "style": "free form",
+        "units": null,
+        "description": "Column name for metadata table",  
+        "options": [],
+        "alias": [],
+        "example": "emtf_id",
+		"default": null
+    },
+    "dtype": {
+        "type": "string",
+        "required": true,
+        "style": "controlled vocabulary",
+        "units": null,
+        "description": "Description of the column type.",
+        "options": ["int64", "bool", "string"],
+        "alias": [],
+        "example": "int64",
+		"default": null
+    },
+    "default": {
+        "type": "string",
+        "required": true,
+        "style": "free form",
+        "units": null,
+        "description": "What to set the column to when initializing it.",
+        "options": [],
+        "alias": [],
+        "example": "-1",
+		"default": null
+    }
+}

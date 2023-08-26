@@ -4,10 +4,10 @@ Python version of Laura's bash script to scrape SPUD emtf xml
 Stripping the xml tags after grepping:
 https://stackoverflow.com/questions/3662142/how-to-remove-tags-from-a-string-in-python-using-regular-expressions-not-in-ht
 
+Argparse tutorial: https://docs.python.org/3/howto/argparse.html
 """
 
 import argparse
-import numpy as np
 import pandas as pd
 import pathlib
 import re
@@ -18,6 +18,7 @@ from aurora.general_helper_functions import AURORA_PATH
 from aurora.test_utils.earthscope.helpers import SPUD_XML_PATHS
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
 from aurora.test_utils.earthscope.helpers import get_summary_table_schema
+from aurora.test_utils.earthscope.helpers import get_summary_table_schema_v2
 from aurora.test_utils.earthscope.helpers import get_via_curl
 from aurora.test_utils.earthscope.helpers import strip_xml_tags
 
@@ -30,6 +31,9 @@ target_dir_emtf = SPUD_XML_PATHS["emtf"]
 # There are two potential sources for SPUD XML sheets
 EMTF_URL = "https://ds.iris.edu/spudservice/emtf"
 DATA_URL = "https://ds.iris.edu/spudservice/data"
+
+STAGE_ID = 0
+DF_SCHEMA = get_summary_table_schema_v2(STAGE_ID)
 
 # class EMTFXML(object):
 # 	def __init__(self, **kwargs):
@@ -55,8 +59,44 @@ def extract_network_and_station_from_mda_info(emtf_filepath):
 			station = url_parts[idx + 2]
 	return network, station
 
+def extract_data_id_from_emtf(emtf_filepath):
+	"""
+
+	Parameters
+	----------
+	emtf_filepath: str or pathlib.Path
+		Location of a TF XML file from SPUD EMTF archive
+
+	Returns
+	-------
+	data_id: str
+		String (that looks like an int) that tells us how ot access the data XML
+	"""
+	cmd = f"grep 'SourceData id' {emtf_filepath} | awk -F'"'"'"' '{print $2}'"
+	qq = subprocess.check_output([cmd], shell=True)
+	data_id = int(qq.decode().strip())
+
+	cmd = f"grep 'SourceData id' {emtf_filepath}"
+	qq = subprocess.check_output([cmd], shell=True)
+	data_id2 = int(qq.decode().strip().split('"')[1])
+	assert data_id2==data_id
+
+	return data_id
+
+def to_download_or_not_to_download(filepath, force_download, emtf_or_data=""):
+	if filepath.exists():
+		download = False
+		print(f"XML {emtf_or_data} file {filepath} already exists")
+		if force_download:
+			download = True
+			print(f"Forcing download of {emtf_or_data} file")
+	else:
+		download = True
+	return download
+
 def prepare_dataframe_for_scraping(restrict_to_first_n_rows=False):
 	"""
+	Reads in list of spud emtf_ids and initializes a dataframe
 	Define columns and default values
 	Args:
 		restrict_to_first_n_rows:
@@ -64,14 +104,22 @@ def prepare_dataframe_for_scraping(restrict_to_first_n_rows=False):
 	Returns:
 
 	"""
-	# Read in list of spud emtf_ids and initialize a dataframe
+	schema = get_summary_table_schema_v2(STAGE_ID)
 	df = pd.read_csv(input_spud_ids_file, names=["emtf_id", ])
-	df["data_id"] = 0
-	df["fail"] = False
-	df["emtf_file_size"] = 0
-	df["emtf_xml_filebase"] = ""
-	df["data_file_size"] = 0
-	df["data_xml_filebase"] = ""
+	schema.pop(0) #emtf_id already defined
+	for col in schema:
+		default = col.default
+		if col.dtype == "int64":
+			default = int(default)
+		if col.dtype == "bool":
+			default = bool(int(default))
+		df[col.name] = default
+	# df["data_id"] = 0
+	# df["fail"] = False
+	# df["emtf_file_size"] = 0
+	# df["emtf_xml_filebase"] = ""
+	# df["data_file_size"] = 0
+	# df["data_xml_filebase"] = ""
 	n_rows = len(df)
 	info_str = f"There are {n_rows} spud files"
 	print(f"There are {n_rows} spud files")
@@ -83,61 +131,55 @@ def prepare_dataframe_for_scraping(restrict_to_first_n_rows=False):
 	return df
 
 def enrich_row(row):
-	#print("row",row)
+	"""
+	Downloads emtf xml and archives it, extracts info about data xml and then dowloads and archives that as well
+
+	Parameters
+	----------
+	row: pandas.core.series.Series
+		A row of a data frame
+
+	Returns
+	-------
+	row: pandas.core.series.Series
+		Same as input, but modified in-place with updated info.
+
+	"""
 	print(f"Getting {row.emtf_id}")
-	source_url = f"{EMTF_URL}/{row.emtf_id}"
+	spud_emtf_url = f"{EMTF_URL}/{row.emtf_id}"
 	emtf_filebase = f"{row.emtf_id}.xml"
 	emtf_filepath = target_dir_emtf.joinpath(emtf_filebase)
 
-	# To download on not to download - that is the question:
-	if emtf_filepath.exists():
-		download_emtf = False
-		print(f"XML emtf_file {emtf_filepath} already exists")
-		if force_download_emtf:
-			download_emtf = True
-			print("Forcing download of EMTF file")
-	else:
-		download_emtf = True
-
+	download_emtf = to_download_or_not_to_download(emtf_filepath, force_download_emtf, emtf_or_data="EMTF")
 	if download_emtf:
 		try:
-			get_via_curl(source_url, emtf_filepath)
+			get_via_curl(spud_emtf_url, emtf_filepath)
 		except:
 			row["fail"] = True
+			return row
 
 	file_size = emtf_filepath.lstat().st_size
 	row["emtf_file_size"] = file_size
 	row["emtf_xml_filebase"] = emtf_filebase
 
 	# Extract source ID from DATA_URL, and add to df
-	print(emtf_filepath)
-	cmd = f"grep 'SourceData id' {emtf_filepath} | awk -F'"'"'"' '{print $2}'"
-	qq = subprocess.check_output([cmd], shell=True)
-	data_id = int(qq.decode().strip())
-
-	cmd = f"grep 'SourceData id' {emtf_filepath}"
-	qq = subprocess.check_output([cmd], shell=True)
-	data_id2 = int(qq.decode().strip().split('"')[1])
-
-	assert data_id2==data_id
-
-	print(f"source_data_id = {data_id}")
+	data_id = extract_data_id_from_emtf(emtf_filepath)
 	row["data_id"] = data_id
 
 	# Extract Station Name info if IRIS provides it
 	network, station = extract_network_and_station_from_mda_info(emtf_filepath)
 
 	data_filebase = "_".join([str(row.emtf_id), network, station]) + ".xml"
-	source_url = f"{DATA_URL}/{data_id}"
+	spud_data_url = f"{DATA_URL}/{data_id}"
 	data_filepath = target_dir_data.joinpath(data_filebase)
-	if data_filepath.exists():
-		if force_download_data:
-			print("Forcing download of DATA file")
-			get_via_curl(source_url, data_filepath)
-		else:
-			print(f"XML data_file {data_filepath} already exists - skipping")
-	else:
-		get_via_curl(source_url, data_filepath)
+
+	download_data = to_download_or_not_to_download(data_filepath, force_download_data, emtf_or_data="DATA")
+	if download_data:
+		try:
+			get_via_curl(spud_data_url, emtf_filepath)
+		except:
+			row["fail"] = True
+			return row
 
 	if data_filepath.exists():
 		file_size = data_filepath.lstat().st_size
@@ -174,8 +216,10 @@ def scrape_spud(force_download_data=False,
 		import dask.dataframe as dd
 		ddf = dd.from_pandas(df, npartitions=npartitions)
 		n_rows = len(df)
-		df_schema = get_summary_table_schema(0)
-		enriched_df = ddf.apply(enrich_row, axis=1, meta=df_schema).compute()
+		#meta = get_summary_table_schema(0)
+		schema = get_summary_table_schema_v2(0)
+		meta = {x.name:x.dtype for x in schema}
+		enriched_df = ddf.apply(enrich_row, axis=1, meta=meta).compute()
 
 	if save_final:
 		spud_xml_csv = get_summary_table_filename(0)
@@ -184,12 +228,10 @@ def scrape_spud(force_download_data=False,
 
 def main():
 	"""
-	Follows this great argparse tutorial: https://docs.python.org/3/howto/argparse.html
-	:return:
 	"""
 	parser = argparse.ArgumentParser(description="Scrape XML files from SPUD")
 	parser.add_argument("--nrows", help="process only the first n rows of the df", type=int, default=0)
-	parser.add_argument("--npart", help="how many partitions to use (triggers dask dataframe if > 0", type=int,  default=0)
+	parser.add_argument("--npart", help="how many partitions to use (triggers dask dataframe if > 0", type=int,  default=1)
 	args, unknown = parser.parse_known_args()
 	print(f"nrows = {args.nrows}")
 	print(f"npartitions = {args.npart}")
