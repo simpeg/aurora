@@ -67,7 +67,7 @@ def enrich_row(row):
 
         mth5_filename = fdsn_object.make_mth5_from_fdsn_client(request_df,
                                                                interact=False,
-                                                               path=DATA_PATH)
+                                                               path=DATA_PATH) #augment=True
         if TRY_REPAIR_MISSING_FILTERS:
             repair_missing_filters(mth5_filename, MTH5_VERSION, triage_units=True, add_filters_where_none=False)
         row.at["data_mth5_size"] = expected_file_name.stat().st_size
@@ -184,8 +184,7 @@ def main():
     output_csv = get_summary_table_filename(STAGE_ID)
     # batch_download_mth5(output_csv=output_csv, restrict_to_first_n_rows=3, npartitions=1)
     batch_download_mth5(output_csv=output_csv, npartitions=1)
-    #batch_download_mth5(output_csv=output_csv, npartitions=20)
-    #batch_download_mth5(output_csv=output_csv)
+    
     #review_results()
     print("all done!")
 

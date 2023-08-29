@@ -212,7 +212,7 @@ def compare_graphics():
         scale_factor1=1,
         out_file="",
         markersize=3,
-        rho_ylims=[1e0, 1e9],
+        rho_ylims=[1e0, 1e3],
         # rho_ylims=[1e-8, 1e6],
         xlims=[1, 5000],
     )

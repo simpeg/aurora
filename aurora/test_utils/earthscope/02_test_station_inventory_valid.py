@@ -384,6 +384,8 @@ def exception_analyser():
     # batch_download_metadata_v2(row_start=613, row_end=614)  # EM OHM52 FDSNTimeoutException
     #batch_download_metadata_v2(row_start=1443, row_end=1444)  # 8P REU09 TypeError
     batch_download_metadata_v2(row_start=1487, row_end=1488)  # 8P REX11 IndexError
+    #Not all channels are present in the archive for the duration of the stations existence.
+
 
 
 def main():

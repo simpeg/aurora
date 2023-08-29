@@ -290,6 +290,8 @@ def build_request_df(network_id, station_id, channels=None,
     print(f"request_list: {request_list}")
 
     request_df = pd.DataFrame(request_list, columns=fdsn_object.request_columns)
+    # workaround for having a channel with missing run
+    # request_df["start"] = request_df["start"].max()
     return request_df
 
 

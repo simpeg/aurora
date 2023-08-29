@@ -45,7 +45,7 @@ def extract_network_and_station_from_mda_info(emtf_filepath):
 	try:
 		qq = subprocess.check_output([cmd], shell=True)
 	except subprocess.CalledProcessError as e:
-		print("GREP found no mda string-- assuming data are archived elsewhere")
+		print("grep found no mda string -- assuming data are archived elsewhere")
 		qq = None
 	network = ""
 	station = ""
@@ -61,7 +61,7 @@ def extract_network_and_station_from_mda_info(emtf_filepath):
 
 def extract_data_id_from_emtf(emtf_filepath):
 	"""
-
+	modified to check if grep returns empty
 	Parameters
 	----------
 	emtf_filepath: str or pathlib.Path
@@ -74,14 +74,16 @@ def extract_data_id_from_emtf(emtf_filepath):
 	"""
 	cmd = f"grep 'SourceData id' {emtf_filepath} | awk -F'"'"'"' '{print $2}'"
 	qq = subprocess.check_output([cmd], shell=True)
-	data_id = int(qq.decode().strip())
+	if qq:
+		data_id = int(qq.decode().strip())
 
-	cmd = f"grep 'SourceData id' {emtf_filepath}"
-	qq = subprocess.check_output([cmd], shell=True)
-	data_id2 = int(qq.decode().strip().split('"')[1])
-	assert data_id2==data_id
-
-	return data_id
+		cmd = f"grep 'SourceData id' {emtf_filepath}"
+		qq = subprocess.check_output([cmd], shell=True)
+		data_id2 = int(qq.decode().strip().split('"')[1])
+		assert data_id2==data_id
+		return data_id
+	else:
+		return False
 
 def to_download_or_not_to_download(filepath, force_download, emtf_or_data=""):
 	if filepath.exists():
