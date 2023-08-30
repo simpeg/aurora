@@ -205,7 +205,7 @@ def compare_graphics():
     from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
     compare_two_z_files(
         "/home/kkappler/Downloads/ORF08bc_G8.zrr",
-        "EM_ORF08_RRORG08.zrr",
+        "Z/EM_ORF08_RRORG08.zrr",
         angle2=0.0,
         label1="emtf",
         label2="aurora",
