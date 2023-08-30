@@ -135,8 +135,7 @@ def process_tf_decimation_level(
 def export_tf(
     tf_collection,
     channel_nomenclature,
-    station_metadata_dict={},
-    survey_dict={},
+    survey_metadata={},
 ):
     """
     This method may wind up being embedded in the TF class
@@ -173,9 +172,10 @@ def export_tf(
     res_cov = res_cov.rename(renamer_dict)
     tf_cls.residual_covariance = res_cov
 
-    tf_cls.station_metadata._runs = ListDict()
-    tf_cls.station_metadata.from_dict(station_metadata_dict)
-    tf_cls.survey_metadata.from_dict(survey_dict)
+    # Set key as first el't of dict, nor currently supporting mixed surveys in TF
+    key = list(survey_metadata.keys())[0]
+    tf_cls.survey_metadata = survey_metadata[key]
+
     return tf_cls
 
 def enrich_row(row):
@@ -366,8 +366,7 @@ def process_mth5(
         tf_cls = export_tf(
             tf_collection,
             tfk.config.channel_nomenclature,
-            station_metadata_dict=station_metadata.to_dict(),
-            survey_dict=survey_dict,
+            survey_metadata=tfk_dataset.survey_metadata
         )
         tfk_dataset.close_mths_objs()
         return tf_cls

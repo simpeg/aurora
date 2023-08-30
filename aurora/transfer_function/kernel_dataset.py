@@ -112,6 +112,7 @@ class KernelDataset:
             "end",
             "duration",
         ]
+        self.survey_metadata = {}
 
     def clone(self):
         return copy.deepcopy(self)
@@ -349,6 +350,18 @@ class KernelDataset:
             run_ts = run_obj.to_runts(start=row.start, end=row.end)
             xr_ds = run_ts.dataset
             self.df["run_dataarray"].at[i] = xr_ds.to_array("channel")
+
+
+            # but what if RR proc with RR from other survey?
+            if i == 0:
+                if run_ts.survey_metadata.id in self.survey_metadata.keys():
+                    pass
+                self.survey_metadata[run_ts.survey_metadata.id] = run_ts.survey_metadata
+            elif i > 0:
+                self.survey_metadata[run_ts.survey_metadata.id].stations[0].add_run(run_ts.run_metadata)
+            if len(self.survey_metadata.keys()) > 1:
+                raise NotImplementedError
+
         print("DATASET DF POPULATED")
 
     def add_columns_for_processing(self, mth5_objs):
