@@ -48,7 +48,7 @@ class TransferFunctionKernel(object):
             self.initialize_mth5s()
         return self._mth5_objs
 
-    def initialize_mth5s(self):
+    def initialize_mth5s(self, mode="r"):
         """
         returns a dict of open mth5 objects, keyed by
         Consder moving the initialize_mth5s() method out of config, since it depends on mth5.
@@ -62,7 +62,7 @@ class TransferFunctionKernel(object):
             remote station id: mth5.mth5.MTH5
         """
 
-        local_mth5_obj = initialize_mth5(self.config.stations.local.mth5_path, mode="r")
+        local_mth5_obj = initialize_mth5(self.config.stations.local.mth5_path, mode=mode)
         if self.config.stations.remote:
             remote_path = self.config.stations.remote[0].mth5_path
             remote_mth5_obj = initialize_mth5(remote_path, mode="r")
