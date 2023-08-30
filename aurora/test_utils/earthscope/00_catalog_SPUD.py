@@ -20,6 +20,7 @@ from aurora.test_utils.earthscope.helpers import get_summary_table_filename
 from aurora.test_utils.earthscope.helpers import get_summary_table_schema
 from aurora.test_utils.earthscope.helpers import get_summary_table_schema_v2
 from aurora.test_utils.earthscope.helpers import get_via_curl
+from aurora.test_utils.earthscope.helpers import none_or_str
 from aurora.test_utils.earthscope.helpers import strip_xml_tags
 
 force_download_data = False
@@ -116,12 +117,6 @@ def prepare_dataframe_for_scraping(restrict_to_first_n_rows=False):
 		if col.dtype == "bool":
 			default = bool(int(default))
 		df[col.name] = default
-	# df["data_id"] = 0
-	# df["fail"] = False
-	# df["emtf_file_size"] = 0
-	# df["emtf_xml_filebase"] = ""
-	# df["data_file_size"] = 0
-	# df["data_xml_filebase"] = ""
 	n_rows = len(df)
 	info_str = f"There are {n_rows} spud files"
 	print(f"There are {n_rows} spud files")
@@ -178,7 +173,7 @@ def enrich_row(row):
 	download_data = to_download_or_not_to_download(data_filepath, force_download_data, emtf_or_data="DATA")
 	if download_data:
 		try:
-			get_via_curl(spud_data_url, emtf_filepath)
+			get_via_curl(spud_data_url, data_filepath)
 		except:
 			row["fail"] = True
 			return row
@@ -189,7 +184,8 @@ def enrich_row(row):
 		row.at["data_xml_filebase"] = data_filebase
 	return row
 
-def scrape_spud(force_download_data=False,
+def scrape_spud(row_start=0, row_end=None,
+				force_download_data=False,
 				force_download_emtf=False,
 				restrict_to_first_n_rows=False,
 				save_final=True,
@@ -212,6 +208,11 @@ def scrape_spud(force_download_data=False,
 
 	"""
 	df = prepare_dataframe_for_scraping(restrict_to_first_n_rows=restrict_to_first_n_rows)
+
+	if row_end is None:
+		row_end = len(df)
+	df = df[row_start:row_end]
+
 	if not npartitions:
 		enriched_df = df.apply(enrich_row, axis=1)
 	else:
@@ -234,14 +235,25 @@ def main():
 	parser = argparse.ArgumentParser(description="Scrape XML files from SPUD")
 	parser.add_argument("--nrows", help="process only the first n rows of the df", type=int, default=0)
 	parser.add_argument("--npart", help="how many partitions to use (triggers dask dataframe if > 0", type=int,  default=1)
+	parser.add_argument("--startrow", help="First row to process (zero-indexed)", type=int, default=0)
+	# parser.add_argument('category', type=none_or_str, nargs='?', default=None,
+	# 					help='the category of the stuff')
+	parser.add_argument("--endrow", help="Last row to process (zero-indexed)", type=none_or_str, default=None, nargs='?',)
+
 	args, unknown = parser.parse_known_args()
 	print(f"nrows = {args.nrows}")
 	print(f"npartitions = {args.npart}")
+	print(f"startrow = {args.startrow}")
+	print(f"endrow = {args.endrow}")
+	if isinstance(args.endrow, str):
+		args.endrow = int(args.endrow)
+	# print(f"type(endrow) = {type(args.endrow)}")
 
 	t0 = time.time()
 
 	# normal usage
-	scrape_spud(restrict_to_first_n_rows=args.nrows, save_final=True, npartitions=args.npart)
+	scrape_spud(restrict_to_first_n_rows=args.nrows, save_final=True, npartitions=args.npart,
+				row_start=args.startrow, row_end=args.endrow)
 
 	# debugging
 	#df= scrape_spud(force_download_emtf=False, restrict_to_first_n_rows=5,

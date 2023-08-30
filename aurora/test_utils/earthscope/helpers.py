@@ -406,6 +406,14 @@ def restrict_to_mda(df, RR=None, keep_columns=KEEP_COLUMNS):
     return mda_df
 
 
+def none_or_str(value):
+    """
+    argparse helper that allows us to cast to None, see FraggaMuffin's response in this link:
+    https://stackoverflow.com/questions/48295246/how-to-pass-none-keyword-as-command-line-argument
+    """
+    if value == 'None':
+        return None
+    return value
 
 def test_summary_table_schema():
     get_summary_table_schema(0)
