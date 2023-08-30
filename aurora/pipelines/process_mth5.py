@@ -223,7 +223,7 @@ def process_mth5(
     tfk = TransferFunctionKernel(dataset=tfk_dataset, config=config)
     tfk.make_processing_summary()
     tfk.validate()
-    tfk.initialize_mth5s()
+    tfk.initialize_mth5s(mode="a")
     # Look at the processing Config and check whether the as-yet-nonexistant arg build_fc_layers is True.
     # If build_fc_layers is True we should also have a flag: force_rebuild_fcs, normally False that will verify
     # check_if_fc_levels_already_exist.  if check_if_fc_levels_already_exist returns True, skip building
