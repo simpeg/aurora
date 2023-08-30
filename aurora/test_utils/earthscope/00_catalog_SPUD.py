@@ -41,6 +41,7 @@ DF_SCHEMA = get_summary_table_schema_v2(STAGE_ID)
 # 		self.filepath = kwargs.get("filepath", "")
 
 def extract_network_and_station_from_mda_info(emtf_filepath):
+	"""based on part of a bash script recievd from Laura, could use a desciption of the expected mda line format"""
 	# cmd = f"grep 'mda' {emtf_file} | awk -F'"'"'"' '{print $2}'"
 	cmd = f"grep 'mda' {emtf_filepath}"
 	try:
@@ -166,8 +167,8 @@ def enrich_row(row):
 	# Extract Station Name info if IRIS provides it
 	network, station = extract_network_and_station_from_mda_info(emtf_filepath)
 
-	data_filebase = "_".join([str(row.emtf_id), network, station]) + ".xml"
 	spud_data_url = f"{DATA_URL}/{data_id}"
+	data_filebase = "_".join([str(row.emtf_id), network, station]) + ".xml"
 	data_filepath = target_dir_data.joinpath(data_filebase)
 
 	download_data = to_download_or_not_to_download(data_filepath, force_download_data, emtf_or_data="DATA")
@@ -229,18 +230,19 @@ def scrape_spud(row_start=0, row_end=None,
 		enriched_df.to_csv(spud_xml_csv, index=False)
 	return enriched_df
 
-def main():
-	"""
-	"""
+def parsey_mcparse():
 	parser = argparse.ArgumentParser(description="Scrape XML files from SPUD")
 	parser.add_argument("--nrows", help="process only the first n rows of the df", type=int, default=0)
-	parser.add_argument("--npart", help="how many partitions to use (triggers dask dataframe if > 0", type=int,  default=1)
+	parser.add_argument("--npart", help="how many partitions to use (triggers dask dataframe if > 0", type=int,
+						default=1)
 	parser.add_argument("--startrow", help="First row to process (zero-indexed)", type=int, default=0)
 	# parser.add_argument('category', type=none_or_str, nargs='?', default=None,
 	# 					help='the category of the stuff')
-	parser.add_argument("--endrow", help="Last row to process (zero-indexed)", type=none_or_str, default=None, nargs='?',)
+	parser.add_argument("--endrow", help="Last row to process (zero-indexed)", type=none_or_str, default=None,
+						nargs='?', )
 
 	args, unknown = parser.parse_known_args()
+
 	print(f"nrows = {args.nrows}")
 	print(f"npartitions = {args.npart}")
 	print(f"startrow = {args.startrow}")
@@ -248,6 +250,12 @@ def main():
 	if isinstance(args.endrow, str):
 		args.endrow = int(args.endrow)
 	# print(f"type(endrow) = {type(args.endrow)}")
+	return args
+
+def main():
+	"""
+	"""
+	args = parsey_mcparse()
 
 	t0 = time.time()
 
@@ -256,8 +264,12 @@ def main():
 				row_start=args.startrow, row_end=args.endrow)
 
 	# debugging
-	#df= scrape_spud(force_download_emtf=False, restrict_to_first_n_rows=5,
-   # 					save_final=False, npartitions=0)
+
+	# expect to find data
+	# row_start = 25; row_end = 26 # expect to find data_id, and Earthscope mda
+	# row_start = 0; row_end = 1 # expect to find data_id, but not an Earthscope mda
+	# df= scrape_spud(force_download_emtf=False, restrict_to_first_n_rows=100, row_start=25, row_end=26,
+	# 				save_final=False, npartitions=0)
 
 	# re-scrape emtf
 	# scrape_spud(force_download_emtf=True, save_final=False)
