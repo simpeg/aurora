@@ -41,6 +41,10 @@ class TestSyntheticProcessing(unittest.TestCase):
             config_keyword="test1_tfk", z_file_path=z_file_path
         )
         tf_cls.write(fn=xml_file_name, file_type="emtfxml")
+        tf_cls.write(
+            fn=z_file_path.parent.joinpath(f"{z_file_path.stem}_from_tf.zss"),
+            file_type="zss",
+        )
 
         xml_file_base = "syn1r2_tfk.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
@@ -55,23 +59,33 @@ class TestSyntheticProcessing(unittest.TestCase):
 
     def test_can_use_channel_nomenclature(self):
         channel_nomencalture = "LEMI12"
-        z_file_path = AURORA_RESULTS_PATH.joinpath(f"syn1-{channel_nomencalture}.zss")
+        z_file_path = AURORA_RESULTS_PATH.joinpath(
+            f"syn1-{channel_nomencalture}.zss"
+        )
         tf_cls = process_synthetic_1(
             z_file_path=z_file_path,
             file_version=self.file_version,
             channel_nomenclature=channel_nomencalture,
         )
-        xml_file_base = f"syn1_mth5-{self.file_version}_{channel_nomencalture}.xml"
+        xml_file_base = (
+            f"syn1_mth5-{self.file_version}_{channel_nomencalture}.xml"
+        )
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
         tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
     def test_can_use_mth5_file_version_020(self):
         file_version = "0.2.0"
         z_file_path = AURORA_RESULTS_PATH.joinpath(f"syn1-{file_version}.zss")
-        tf_cls = process_synthetic_1(z_file_path=z_file_path, file_version=file_version)
+        tf_cls = process_synthetic_1(
+            z_file_path=z_file_path, file_version=file_version
+        )
         xml_file_base = f"syn1_mth5v{file_version}.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
         tf_cls.write(fn=xml_file_name, file_type="emtfxml")
+        tf_cls.write(
+            fn=z_file_path.parent.joinpath(f"{z_file_path.stem}_from_tf.zss"),
+            file_type="zss",
+        )
 
     def test_can_use_scale_factor_dictionary(self):
         """
@@ -91,16 +105,26 @@ class TestSyntheticProcessing(unittest.TestCase):
             z_file_path=z_file_path,
             test_scale_factor=True,
         )
+        tf_cls.write(
+            fn=z_file_path.parent.joinpath(f"{z_file_path.stem}_from_tf.zss"),
+            file_type="zss",
+        )
         assert tf_cls.transfer_function.data.shape == (25, 3, 2)
 
     def test_simultaneous_regression(self):
-        z_file_path = AURORA_RESULTS_PATH.joinpath("syn1_simultaneous_estimate.zss")
+        z_file_path = AURORA_RESULTS_PATH.joinpath(
+            "syn1_simultaneous_estimate.zss"
+        )
         tf_cls = process_synthetic_1(
             z_file_path=z_file_path, simultaneous_regression=True
         )
         xml_file_base = "syn1_simultaneous_estimate.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
         tf_cls.write(fn=xml_file_name, file_type="emtfxml")
+        tf_cls.write(
+            fn=z_file_path.parent.joinpath(f"{z_file_path.stem}_from_tf.zss"),
+            file_type="zss",
+        )
 
     def test_can_process_other_station(self):
         tf_cls = process_synthetic_2()
@@ -212,7 +236,9 @@ def process_synthetic_1(
     if return_collection:
         z_figure_name = z_file_path.name.replace("zss", "png")
         for xy_or_yx in ["xy", "yx"]:
-            ttl_str = f"{xy_or_yx} component, test_scale_factor = {test_scale_factor}"
+            ttl_str = (
+                f"{xy_or_yx} component, test_scale_factor = {test_scale_factor}"
+            )
             out_png_name = f"{xy_or_yx}_{z_figure_name}"
             tf_result.rho_phi_plot(
                 xy_or_yx=xy_or_yx,
