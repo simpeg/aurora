@@ -133,9 +133,17 @@ class TransferFunctionKernel(object):
 
     def check_if_fc_levels_already_exist(self):
         """
-        Iterate over the processing summary_df, grouping by unique "Station-Run"s.
+        Iterate over the processing summary_df, grouping by unique "Survey-Station-Run"s.
         When all FC Levels for a given station-run are already built, mark the RunSummary with a True in
-        the (yet-to-be-built) mth5_has_FCs column
+        the (yet-to-be-built) mth5_has_FCs column.
+
+        Note 1:  Because decimation is a cascading operation, we avoid the case where some (valid) decimation
+        levels exist in the mth5 FC archive and others do not.  The maximum granularity tolerated will be at the
+        "station-run level, so for a given run, either all relevant FCs are packed into the h5 or we treat as if none
+        of them are.  Sounds harsh, but if you want to add the logic otherwise, feel free.  If one wanted to support
+        variations at the decimation-level, an appropriate way to address would be to store teh decimated time series
+        in the archive as well (they would simply be runs with different sample rates, and some extra filters).
+        
         Returns:
 
         """

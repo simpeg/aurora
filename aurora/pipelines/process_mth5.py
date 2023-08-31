@@ -193,6 +193,12 @@ def process_mth5(
     This is the main method used to transform a processing_config,
     and a kernel_dataset into a transfer function estimate.
 
+    Note 1: Logic for building FC layers:
+    If the processing config decimation_level.save_fcs_type = "h5" and fc_levels_already_exist is False, then open
+    in append mode, else open in read mode.  We should support a flag: force_rebuild_fcs, normally False.  This flag
+    is only needed when save_fcs_type=="h5".  If True, then we open in append mode, regarless of fc_levels_already_exist
+    The task of setting mode="a", mode="r" can be handled by tfk (maybe in tfk.validate())
+
 
 
     Parameters
@@ -223,27 +229,13 @@ def process_mth5(
     tfk = TransferFunctionKernel(dataset=tfk_dataset, config=config)
     tfk.make_processing_summary()
     tfk.validate()
+    # See Note #1
     tfk.initialize_mth5s(mode="a")
-    # Look at the processing Config and check whether the as-yet-nonexistant arg build_fc_layers is True.
-    # If build_fc_layers is True we should also have a flag: force_rebuild_fcs, normally False that will verify
-    # check_if_fc_levels_already_exist.  if check_if_fc_levels_already_exist returns True, skip building
-    # unless force_rebuild_fcs is True, in which case it regenerates them.
     tfk.check_if_fc_levels_already_exist()
     print(
         f"Processing config indicates {len(tfk.config.decimations)} "
         f"decimation levels "
     )
-
-    # Add a check here that examines the mth5 files and determines if FC Levels already exist, and
-    # if so, can they support the processing.
-    # If True, Use existing, if False, compute on the fly.
-    # This could later, further be modified to have a kwarg for storing the computed on the fly
-    # Ultimately, we will probably want to store the decimated time series in some applications too :/
-
-    # Because decimation is a cascading operation, I would rather not treat the case where some (valid) decimation
-    # levels exist in the mth5 FC archive and others do not.  The maximum granularity tolerated will be at the
-    # "station-run level, so for a given run, either all relevant FCs are packed into the h5 or we treat as if none of
-    # them are.  Sounds harsh, but if you want to add the logic otherwise, feel free.
 
     tf_dict = {}
 
@@ -294,13 +286,13 @@ def process_mth5(
                         print("Can't write, maybe close and reopen in append mode")
                         print("But note that to modify the ROW, does not modify the parent DF")
                         print("dev solution: open in append mode during init if any save_fcs_type is h5, and warn")
-                    # fc_group = station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id)
-                    # fc_decimation_level = fc_group.add_decimation_level(f"{i_dec_level}")
-                    # fc_decimation_level.from_xarray(stft_obj)
-                    # fc_decimation_level.update_metadata()
-                    # fc_group.update_metadata()
+                    fc_group = station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id)
+                    fc_decimation_level = fc_group.add_decimation_level(f"{i_dec_level}")
+                    fc_decimation_level.from_xarray(stft_obj)
+                    fc_decimation_level.update_metadata()
+                    fc_group.update_metadata()
                     # print("OK")
-                    raise NotImplementedError
+                    #raise NotImplementedError
 
 
             if row.station_id == tfk.config.stations.local.id:
