@@ -27,7 +27,9 @@ import xarray as xr
 
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
-from aurora.pipelines.transfer_function_helpers import process_transfer_functions
+from aurora.pipelines.transfer_function_helpers import (
+    process_transfer_functions,
+)
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
 
 from aurora.transfer_function.transfer_function_collection import (
@@ -81,7 +83,9 @@ def make_stft_objects(
         ].channel_scale_factors
     elif station_id == processing_config.stations.remote[0].id:
         scale_factors = (
-            processing_config.stations.remote[0].run_dict[run_id].channel_scale_factors
+            processing_config.stations.remote[0]
+            .run_dict[run_id]
+            .channel_scale_factors
         )
 
     stft_obj = calibrate_stft_obj(
@@ -123,10 +127,16 @@ def process_tf_decimation_level(
         The transfer function values packed into an object
     """
     frequency_bands = config.decimations[i_dec_level].frequency_bands_obj()
-    transfer_function_obj = TTFZ(i_dec_level, frequency_bands, processing_config=config)
+    transfer_function_obj = TTFZ(
+        i_dec_level, frequency_bands, processing_config=config
+    )
 
     transfer_function_obj = process_transfer_functions(
-        config, i_dec_level, local_stft_obj, remote_stft_obj, transfer_function_obj
+        config,
+        i_dec_level,
+        local_stft_obj,
+        remote_stft_obj,
+        transfer_function_obj,
     )
 
     return transfer_function_obj
@@ -135,7 +145,7 @@ def process_tf_decimation_level(
 def export_tf(
     tf_collection,
     channel_nomenclature,
-    survey_metadata={},
+    survey_metadata,
 ):
     """
     This method may wind up being embedded in the TF class
@@ -153,10 +163,11 @@ def export_tf(
     tf_cls: mt_metadata.transfer_functions.core.TF
         Transfer function container
     """
-    from mt_metadata.utils.list_dict import ListDict
 
     merged_tf_dict = tf_collection.get_merged_dict(channel_nomenclature)
-    channel_nomenclature_dict = channel_nomenclature.to_dict()["channel_nomenclature"]
+    channel_nomenclature_dict = channel_nomenclature.to_dict()[
+        "channel_nomenclature"
+    ]
     tf_cls = TF(channel_nomenclature=channel_nomenclature_dict)
     renamer_dict = {"output_channel": "output", "input_channel": "input"}
     tmp = merged_tf_dict["tf"].rename(renamer_dict)
@@ -173,13 +184,14 @@ def export_tf(
     tf_cls.residual_covariance = res_cov
 
     # Set key as first el't of dict, nor currently supporting mixed surveys in TF
-    key = list(survey_metadata.keys())[0]
-    tf_cls.survey_metadata = survey_metadata[key]
+    tf_cls.survey_metadata = survey_metadata
 
     return tf_cls
 
+
 def enrich_row(row):
     pass
+
 
 def process_mth5(
     config,
@@ -268,12 +280,19 @@ def process_mth5(
             run_xrds = row["run_dataarray"].to_dataset("channel")
             run_obj = row.mth5_obj.from_reference(row.run_reference)
             stft_obj = make_stft_objects(
-                tfk.config, i_dec_level, run_obj, run_xrds, units, row.station_id
+                tfk.config,
+                i_dec_level,
+                run_obj,
+                run_xrds,
+                units,
+                row.station_id,
             )
             # ToDo: add proper FC packing into here
             if dec_level_config.save_fcs:
                 if dec_level_config.save_fcs_type == "csv":
-                    print("WARNING: Unless you are debugging or running the tests, saving FCs to csv is unexpected")
+                    print(
+                        "WARNING: Unless you are debugging or running the tests, saving FCs to csv is unexpected"
+                    )
                     csv_name = f"{row.station_id}_dec_level_{i_dec_level}.csv"
                     stft_df = stft_obj.to_dataframe()
                     stft_df.to_csv(csv_name)
@@ -281,19 +300,29 @@ def process_mth5(
                     # Access the station object:
                     # This if/else could be avoided by replacing the text string "none" with a None object in survay column
                     if row.survey == "none":
-                        station_obj = row.mth5_obj.stations_group.get_station(row.station_id)
+                        station_obj = row.mth5_obj.stations_group.get_station(
+                            row.station_id
+                        )
                     else:
-                        station_obj = row.mth5_obj.stations_group.get_station(row.station_id, survey=row.survey)
+                        station_obj = row.mth5_obj.stations_group.get_station(
+                            row.station_id, survey=row.survey
+                        )
 
-                    #better to check if this already exists, but should get caught by mth5
+                    # better to check if this already exists, but should get caught by mth5
                     # ValueError: Unable to create group (no write intent on file)
                     # Hmm, looks like I need to open in append mode (if save_fcs==True and save_fcs_type=="h5")
                     # Could close the mth5 and reopen in append mode, then close again and reopen in read mode ...
                     # That is safest, if not a little uglier, but will station obj stay relevant
                     if not row.mth5_obj.h5_is_write():
-                        print("Can't write, maybe close and reopen in append mode")
-                        print("But note that to modify the ROW, does not modify the parent DF")
-                        print("dev solution: open in append mode during init if any save_fcs_type is h5, and warn")
+                        print(
+                            "Can't write, maybe close and reopen in append mode"
+                        )
+                        print(
+                            "But note that to modify the ROW, does not modify the parent DF"
+                        )
+                        print(
+                            "dev solution: open in append mode during init if any save_fcs_type is h5, and warn"
+                        )
                     # fc_group = station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id)
                     # fc_decimation_level = fc_group.add_decimation_level(f"{i_dec_level}")
                     # fc_decimation_level.from_xarray(stft_obj)
@@ -301,7 +330,6 @@ def process_mth5(
                     # fc_group.update_metadata()
                     # print("OK")
                     raise NotImplementedError
-
 
             if row.station_id == tfk.config.stations.local.id:
                 local_stfts.append(stft_obj)
@@ -326,7 +354,9 @@ def process_mth5(
             local_merged_stft_obj,
             remote_merged_stft_obj,
         )
-        tf_obj.apparent_resistivity(tfk.config.channel_nomenclature, units=units)
+        tf_obj.apparent_resistivity(
+            tfk.config.channel_nomenclature, units=units
+        )
         tf_dict[i_dec_level] = tf_obj
 
         if show_plot:
@@ -338,7 +368,6 @@ def process_mth5(
         tf_dict=tf_dict, processing_config=tfk.config
     )
 
-
     if z_file_path:
         # local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
         local_run_obj = tfk_dataset.get_run_object(0)
@@ -349,24 +378,16 @@ def process_mth5(
         tfk_dataset.close_mths_objs()
         return tf_collection
     else:
-        local_station_id = tfk.config.stations.local.id
-        station_metadata = tfk_dataset.get_station_metadata(local_station_id)
-        local_mth5_obj = tfk.mth5_objs[local_station_id]
-
-        if local_mth5_obj.file_version == "0.1.0":
-            survey_dict = local_mth5_obj.survey_group.metadata.to_dict()
-        elif local_mth5_obj.file_version == "0.2.0":
-            # this could be a method of tf_kernel.get_survey_dict()
-            survey_id = tfk.dataset_df[
-                tfk.dataset_df["station_id"] == local_station_id
-            ].survey.unique()[0]
-            survey_obj = local_mth5_obj.get_survey(survey_id)
-            survey_dict = survey_obj.metadata.to_dict()
-
+        # get the unique survey id that is not a remote reference
+        survey_id = tfk_dataset.df.loc[
+            tfk_dataset.df.remote == False
+        ].survey.unique()[0]
+        if survey_id in ["none"]:
+            survey_id = "0"
         tf_cls = export_tf(
             tf_collection,
             tfk.config.channel_nomenclature,
-            survey_metadata=tfk_dataset.survey_metadata
+            survey_metadata=tfk_dataset.survey_metadata[survey_id],
         )
         tfk_dataset.close_mths_objs()
         return tf_cls
