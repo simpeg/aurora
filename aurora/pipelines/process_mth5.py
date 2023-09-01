@@ -270,8 +270,8 @@ def process_mth5(
                     stft_df = stft_obj.to_dataframe()
                     stft_df.to_csv(csv_name)
                 elif dec_level_config.save_fcs_type == "h5":
-                    # Access the station object:
-                    # This if/else could be avoided by replacing the text string "none" with a None object in survay column
+                    # Access the station object
+                    # Note if/else could avoidable if replacing text string "none" with a None object in survey column
                     if row.survey == "none":
                         station_obj = row.mth5_obj.stations_group.get_station(row.station_id)
                     else:
