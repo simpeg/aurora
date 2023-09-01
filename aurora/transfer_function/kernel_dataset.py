@@ -47,12 +47,17 @@ cc = ConfigCreator()
 p = cc.create_from_kernel_dataset(kernel_dataset, emtf_band_file=emtf_band_setup_file)
 9. Edit the Processing Config appropriately,
 
+ToDo: Consider supporting a default value for 'channel_scale_factors' that is None,
 """
 
 import copy
 import pandas as pd
+
+from aurora.pipelines.run_summary import RUN_SUMMARY_COLUMNS
 from mt_metadata.utils.list_dict import ListDict
 
+# Add these to a standard, so we track add/subtract columns
+KERNEL_DATASET_COLUMNS = RUN_SUMMARY_COLUMNS + [ 'channel_scale_factors', 'duration', 'fc']
 
 class KernelDataset:
     """
@@ -162,6 +167,7 @@ class KernelDataset:
             print("Remote reference processing not a valid option")
         else:
             self._add_duration_column()
+        self.df["fc"] = False
 
     @property
     def mini_summary(self):
