@@ -6,11 +6,161 @@ import psutil
 from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.transfer_function.kernel_dataset import KernelDataset
+from mth5.utils.exceptions import MTH5Error
 from mth5.utils.helpers import initialize_mth5
+
 from mt_metadata.transfer_functions.processing.aurora import Processing
+def check_if_fcdecimation_group_has_fcs(fcdec_group, decimation_level, remote):
+    """
+    This could be made a method of mth5.groups.fourier_coefficients.FCDecimationGroup
+
+    The following are not required to check:
+    "decimation_factor",
+    "decimation_level",
+
+    ToDo: Add to github checklist:
+    - AAF should be
+    1. made None in dec_level 0 of processing config and
+    2. set to default in the FC Config
+    - "min_num_stft_windows" is not in ProcessingConfig, should be default==2
+
+
+    # FC GROUP METADATA
+    fcg_checkfields = ["anti_alias_filter", "channels_estimated", "decimation_factor",
+                       "decimation_level", "harmonic_indices_kept", "id", "method",
+                       "min_num_stft_windows", "pre_fft_detrend_type", "prewhitening_type",
+                       "sample_rate_decimation", "time_period.end", "time_period.start",
+                       "window.clock_zero_type", "window.num_samples", "window.overlap", "window.type"]
+    # PROCESSING CONFIG
+    pc_checkfields = ["anti_alias_filter", "bands", "decimation.factor", "decimation.level", "decimation.method",
+                      "decimation.sample_rate", "extra_pre_fft_detrend_type", "input_channels", "method",
+                      "output_channels", "pre_fft_detrend_type", "prewhitening_type", "recoloring", ]
+    Parameters
+    ----------
+    fcdec_group
+    decimation_level
+
+    Returns
+    -------
+
+    """
+    # "channels_estimated"
+    if remote:
+        required_channels = decimation_level.reference_channels
+    else:
+        required_channels = decimation_level.input_channels + decimation_level.output_channels
+    try:
+        assert set(fcdec_group.metadata.channels_estimated) == set(required_channels)
+    except AssertionError:
+        return False
+
+    # anti_alias_filter (AAF)
+    cond1 = decimation_level.anti_alias_filter == "default"
+    cond2 = fcdec_group.metadata.anti_alias_filter is None
+    if cond1 & cond2:
+        pass
+    else:
+        msg = "Antialias Filters Not Compatible -- need to add handling for "
+        msg =f"{msg} fcdec {fcdec_group.metadata.anti_alias_filter} and processing config:{decimation_level.anti_alias_filter}"
+        raise NotImplementedError(msg)
+
+    # Sample rate
+    try:
+        assert fcdec_group.metadata.sample_rate == decimation_level.sample_rate_decimation
+    except AssertionError:
+        msg = f"Sample rates do not agree: fc {fcdec_group.metadata.sample_rate} vs pc {decimation_level.sample_rate_decimation}"
+        return False
+
+    # Method (fft, wavelet, etc.)
+    try:
+        assert fcdec_group.metadata.method == decimation_level.method
+    except AssertionError:
+        msg = f"methods do not agree"
+        return False
+
+    # prewhitening_type (fft, wavelet, etc.)
+    try:
+        assert fcdec_group.metadata.prewhitening_type == decimation_level.prewhitening_type
+    except AssertionError:
+        msg = f"prewhitening_type does not agree"
+        return False
+
+    # recoloring
+    try:
+        assert fcdec_group.metadata.recoloring == decimation_level.recoloring
+    except AssertionError:
+        msg = f"recoloring does not agree"
+        return False
+
+    # pre_fft_detrend_type
+    try:
+        assert fcdec_group.metadata.pre_fft_detrend_type == decimation_level.pre_fft_detrend_type
+    except AssertionError:
+        msg = f"pre_fft_detrend_type does not agree"
+        return False
+
+    # window
+    try:
+        assert fcdec_group.metadata.window == decimation_level.window
+    except AssertionError:
+        msg = f"window does not agree {fcdec_group.metadata.window} vs {decimation_level.window}"
+        return False
+
+    # harmonic_indices_kept
+    # PAIRINGS:
+    # FC GROUP METADATA -- DECLEVEL
+
+    fcg_checkfields = [
+        "harmonic_indices_kept",
+        "min_num_stft_windows",
+        "time_period.end",
+        "time_period.start", ]
+    # PROCESSING CONFIG
+    pc_checkfields = [ "bands",
+                     ]
+    raise NotImplementedError
+
+
+def check_if_fcgroup_has_fcs_defined_by_processing_config(fc_group, processing_config, remote):
+    """
+    This could be made a method of mth5.groups.fourier_coefficients.FCGroup
+
+    As per Note #1 in check_if_fc_levels_already_exist(), this is an all-or-nothing check:
+    Either every (valid) decimation level in the processing config is available or we will build all FCs.
+
+
+    Parameters
+    ----------
+    fc_group
+    processing_config
+
+    Returns
+    -------
+
+    """
+    levels_present = np.full(processing_config.num_decimation_levels(), False)
+    for i, dec_level in enumerate(processing_config.decimations):
+        print(f"{i}")
+        print(f"{dec_level}")
+        while levels_present[i] == False:
+            print("iterate over fc_group decimations")
+            for fc_decimation_id in fc_group.groups_list:
+                fc_dec_group = fc_group.get_decimation_level(fc_decimation_id)
+                levels_present[i] = check_if_fcdecimation_group_has_fcs(fc_dec_group, dec_level, remote)
+    return levels_present.all()
+
+
+
 
 class TransferFunctionKernel(object):
     def __init__(self, dataset=None, config=None):
+        """
+
+        Parameters
+        ----------
+        dataset: aurora.transfer_function.kernel_dataset.KernelDataset
+        config: aurora.config.metadata.processing.Processing
+        """
         processing_config = initialize_config(config)
         self._config = processing_config
         self._dataset = dataset
@@ -109,10 +259,9 @@ class TransferFunctionKernel(object):
 
         """
         if i_dec_level == 0:
-            # Consider moving the line below into update_dataset_df.  This will allow bypassing loading of the data if
-            # FC Level of mth5 is used.
-            # Assign additional columns to dataset_df, populate with mth5_objs and xr_ts
             # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
+
+            # Assign additional columns to dataset_df, populate with mth5_objs and xr_ts
             self.dataset.initialize_dataframe_for_processing(self.mth5_objs)
 
             # APPLY TIMING CORRECTIONS HERE
@@ -134,8 +283,10 @@ class TransferFunctionKernel(object):
     def check_if_fc_levels_already_exist(self):
         """
         Iterate over the processing summary_df, grouping by unique "Survey-Station-Run"s.
-        When all FC Levels for a given station-run are already built, mark the RunSummary with a True in
-        the (yet-to-be-built) mth5_has_FCs column.
+        (Could also iterate over kernel_dataset.dataframe, to get the groupby).
+
+        If all FC Levels for a given station-run are already built, mark the RunSummary with a True in
+        the "fc" column.
 
         Note 1:  Because decimation is a cascading operation, we avoid the case where some (valid) decimation
         levels exist in the mth5 FC archive and others do not.  The maximum granularity tolerated will be at the
@@ -143,19 +294,26 @@ class TransferFunctionKernel(object):
         of them are.  Sounds harsh, but if you want to add the logic otherwise, feel free.  If one wanted to support
         variations at the decimation-level, an appropriate way to address would be to store teh decimated time series
         in the archive as well (they would simply be runs with different sample rates, and some extra filters).
-        
-        Returns:
+
+        Note 2: At this point in the logic, it is established that there are FCs associated with run_id and there are
+        at least as many FC decimation levels as we require as per the processing config.  The next step is to
+        assert whether it is True that the existing FCs conform to the recipe in the processing config.
+
+        Returns: None
+            Modifies self.dataset_df inplace, assigning bool to the "fc" column
 
         """
-        ps_df = self.processing_summary
         groupby = ['survey', 'station_id', 'run_id',]
-        grouper = ps_df.groupby(groupby)
-        print(len(grouper))
+        grouper = self.processing_summary.groupby(groupby)
+        # print(len(grouper))
         for (survey, station_id, run_id), df in grouper:
             cond1 = self.dataset_df.survey==survey
             cond2 = self.dataset_df.station_id == station_id
             cond3 = self.dataset_df.run_id == run_id
-            run_row = self.dataset_df[cond1 & cond2 & cond3].iloc[0]
+            associated_run_sub_df = self.dataset_df[cond1 & cond2 & cond3]
+            assert len(associated_run_sub_df) == 1 # should be unique
+            dataset_df_index = associated_run_sub_df.index[0]
+            run_row = associated_run_sub_df.iloc[0]
             print("Need to update mth5_objs dict so that it is keyed by survey, then station, otra vez might break when "
                   "mixing in data from other surveys (if the stations are named the same)")
             # When addresssing the above issue -- consider adding the mth5_obj to self.dataset_df instead of keeping
@@ -167,12 +325,29 @@ class TransferFunctionKernel(object):
             survey = mth5_obj.get_survey(survey)
             station_obj = survey.stations_group.get_station(station_id)
             if not station_obj.fourier_coefficients_group.groups_list:
-                print("Nothign to see here folks, return False")
-                return False
+                print("Prebuilt Fourier Coefficients not detected -- will need to build them ")
+                self.dataset_df["fc"].iat[dataset_df_index] = False
             else:
-                print(df)
                 print("New Logic for FC existence and satisfaction of processing requirements goes here")
-                raise NotImplementedError
+                # Assume FC Groups are keyed by run_id, check if there is a relevant group
+                try:
+                    # assert run_id in station_obj.fourier_coefficients_group.groups_list
+                    fc_group = station_obj.fourier_coefficients_group.get_fc_group(run_id)
+                except MTH5Error:
+                    self.dataset_df["fc"].iat[dataset_df_index] = False
+                    print(f"Run ID {run_id} not found in FC Groups, -- will need to build them ")
+                    continue
+
+                if len(fc_group.groups_list) < self.processing_config.num_decimation_levels():
+                    self.dataset_df["fc"].iat[dataset_df_index] = False
+                    print(f"Not enough FC Groups available -- will need to build them ")
+                    continue
+
+                # See note #2
+                fcs_already_there = check_if_fcgroup_has_fcs_defined_by_processing_config(fc_group, 
+                                                                                          self.processing_config, 
+                                                                                          run_row.remote)
+                self.dataset_df["fc"].iat[dataset_df_index] = fcs_already_there
 
         return
 
@@ -250,7 +425,7 @@ class TransferFunctionKernel(object):
         that have too few samples to be passed to the STFT algorithm.
 
         Strategy for handling this:
-        Mark as invlaid rows of the processing summary that do not yield long
+        Mark as invlaid any rows of the processing summary that do not yield long
         enough time series to window.  This way all other rows, with decimations up to
         the invalid cases will still process.
 
