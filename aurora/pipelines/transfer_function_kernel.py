@@ -25,16 +25,6 @@ def check_if_fcdecimation_group_has_fcs(fcdec_group, decimation_level, remote):
     - "min_num_stft_windows" is not in ProcessingConfig, should be default==2
 
 
-    # FC GROUP METADATA
-    fcg_checkfields = ["anti_alias_filter", "channels_estimated", "decimation_factor",
-                       "decimation_level", "harmonic_indices_kept", "id", "method",
-                       "min_num_stft_windows", "pre_fft_detrend_type", "prewhitening_type",
-                       "sample_rate_decimation", "time_period.end", "time_period.start",
-                       "window.clock_zero_type", "window.num_samples", "window.overlap", "window.type"]
-    # PROCESSING CONFIG
-    pc_checkfields = ["anti_alias_filter", "bands", "decimation.factor", "decimation.level", "decimation.method",
-                      "decimation.sample_rate", "extra_pre_fft_detrend_type", "input_channels", "method",
-                      "output_channels", "pre_fft_detrend_type", "prewhitening_type", "recoloring", ]
     Parameters
     ----------
     fcdec_group
@@ -107,6 +97,7 @@ def check_if_fcdecimation_group_has_fcs(fcdec_group, decimation_level, remote):
         return False
 
     # window
+    # decimation_level.window.type = "boxcar"; print("REMOVE DEBUG!!!!")
     try:
         assert fcdec_group.metadata.window == decimation_level.window
     except AssertionError:
@@ -114,17 +105,27 @@ def check_if_fcdecimation_group_has_fcs(fcdec_group, decimation_level, remote):
         return False
 
 
-    # harmonic_indices_kept
-    # PAIRINGS:
-    # FC GROUP METADATA -- DECLEVEL
+    # harmonic_indices
+    # Since agreement on sample_rate and window length is already established, we can use integer indices of FCs
+    # rather than work with frequencies explcitly.
+    # note that if harmonic_indices is -1, it means keep all so we can skip this check.
+    if -1 in fcdec_group.metadata.harmonic_indices:
+        return True
+    else:
+        harmonic_indices_requested = []
+        for band in decimation_level.bands:
+            print(band)
+            indices = list(np.arange(band.index_min, band.index_max+1))
+            harmonic_indices_requested += indices
+        print(f"determined that {harmonic_indices_requested} are the requested indices")
+        fcdec_group_set = set(fcdec_group.metadata.harmonic_indices)
+        processing_set = set(harmonic_indices_requested)
+        if processing_set.issubset(fcdec_group_set):
+            return True
+        else:
+            print(f"Processing FC indices {processing_set} is not contained in FC indices {fcdec_group_set}")
+            return False
 
-    fcg_checkfields = [
-        "harmonic_indices_kept",
-    ]
-    # PROCESSING CONFIG
-    pc_checkfields = [ "bands",
-                     ]
-    raise NotImplementedError
 
 
 def check_if_fcgroup_has_fcs_defined_by_processing_config(fc_group, processing_config, remote):
