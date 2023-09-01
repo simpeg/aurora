@@ -78,7 +78,7 @@ def check_if_fcdecimation_group_has_fcs(fcdec_group, decimation_level, remote):
         msg = f"methods do not agree"
         return False
 
-    # prewhitening_type (fft, wavelet, etc.)
+    # prewhitening_type
     try:
         assert fcdec_group.metadata.prewhitening_type == decimation_level.prewhitening_type
     except AssertionError:
@@ -120,9 +120,7 @@ def check_if_fcdecimation_group_has_fcs(fcdec_group, decimation_level, remote):
 
     fcg_checkfields = [
         "harmonic_indices_kept",
-        "min_num_stft_windows",
-        "time_period.end",
-        "time_period.start", ]
+    ]
     # PROCESSING CONFIG
     pc_checkfields = [ "bands",
                      ]
@@ -146,7 +144,7 @@ def check_if_fcgroup_has_fcs_defined_by_processing_config(fc_group, processing_c
     -------
 
     """
-    levels_present = np.full(processing_config.num_decimation_levels(), False)
+    levels_present = np.full(processing_config.num_decimation_levels, False)
     for i, dec_level in enumerate(processing_config.decimations):
         print(f"{i}")
         print(f"{dec_level}")
@@ -346,10 +344,17 @@ class TransferFunctionKernel(object):
                     print(f"Run ID {run_id} not found in FC Groups, -- will need to build them ")
                     continue
 
-                if len(fc_group.groups_list) < self.processing_config.num_decimation_levels():
+                if len(fc_group.groups_list) < self.processing_config.num_decimation_levels:
                     self.dataset_df["fc"].iat[dataset_df_index] = False
                     print(f"Not enough FC Groups available -- will need to build them ")
                     continue
+
+                # Can check time periods here if desired, but uniqueness of survey, station, run
+                # should make this unneeded
+                #processing_run = self.processing_config.stations.local.get_run("001")
+                # for tp in processing_run.time_periods:
+                #    assert tp in fc_group time periods
+
 
                 # See note #2
                 fcs_already_there = check_if_fcgroup_has_fcs_defined_by_processing_config(fc_group, 
