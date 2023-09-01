@@ -102,8 +102,8 @@ class TestSyntheticProcessing(unittest.TestCase):
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
         tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
-    def test_can_process_other_station(self):
-        tf_cls = process_synthetic_2()
+    def test_can_process_other_station(self, remake_if_exists=True):
+        tf_cls = process_synthetic_2(remake_if_exists=remake_if_exists)
         xml_file_name = AURORA_RESULTS_PATH.joinpath("syn2.xml")
         tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
@@ -224,9 +224,9 @@ def process_synthetic_1(
     return tf_result
 
 
-def process_synthetic_2():
+def process_synthetic_2(remake_if_exists=True):
     station_id = "test2"
-    mth5_path = create_test2_h5()
+    mth5_path = create_test2_h5(remake_if_exists=remake_if_exists)
     mth5_paths = [
         mth5_path,
     ]
@@ -237,6 +237,7 @@ def process_synthetic_2():
     processing_config = create_test_run_config(station_id, tfk_dataset)
     for decimation_level in processing_config.decimations:
         decimation_level.save_fcs = True
+        # decimation_level.save_fcs_type = "h5"
         decimation_level.save_fcs_type = "csv"
     tfc = process_mth5(processing_config, tfk_dataset=tfk_dataset)
     return tfc
@@ -270,9 +271,11 @@ def main():
     """
     Testing the processing of synthetic data
     """
-    # tmp = TestSyntheticProcessing()
-    # tmp.setUp()
-    # tmp.test_can_process_other_station() # makes FC csvs
+    tmp = TestSyntheticProcessing()
+    tmp.setUp()
+    # process_synthetic_2(remake_if_exists=True)
+    # process_synthetic_2(remake_if_exists=False)
+    # tmp.test_can_process_other_station(remake_) # makes FC csvs
 
     # tmp.test_can_output_tf_class_and_write_tf_xml()
     # tmp.test_no_crash_with_too_many_decimations()
