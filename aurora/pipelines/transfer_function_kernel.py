@@ -99,12 +99,20 @@ def check_if_fcdecimation_group_has_fcs(fcdec_group, decimation_level, remote):
         msg = f"pre_fft_detrend_type does not agree"
         return False
 
+    # min_num_stft_windows
+    try:
+        assert fcdec_group.metadata.min_num_stft_windows == decimation_level.min_num_stft_windows
+    except AssertionError:
+        msg = f"min_num_stft_windows do not agree {fcdec_group.metadata.min_num_stft_windows} vs {decimation_level.min_num_stft_windows}"
+        return False
+
     # window
     try:
         assert fcdec_group.metadata.window == decimation_level.window
     except AssertionError:
         msg = f"window does not agree {fcdec_group.metadata.window} vs {decimation_level.window}"
         return False
+
 
     # harmonic_indices_kept
     # PAIRINGS:
@@ -417,7 +425,7 @@ class TransferFunctionKernel(object):
         return processing_summary
 
     def validate_decimation_scheme_and_dataset_compatability(
-        self, min_num_stft_windows=2
+        self, min_num_stft_windows=None
     ):
         """
         Refers to issue #182 (and #103, and possibly #196 and #233).
@@ -443,6 +451,11 @@ class TransferFunctionKernel(object):
         -------
 
         """
+        if min_num_stft_windows is None:
+            min_stft_window_info = {x.decimation.level: x.min_num_stft_windows for x in self.processing_config.decimations}
+            min_stft_window_list = [min_stft_window_info[x] for x in self.processing_summary.dec_level]
+            min_num_stft_windows = pd.Series(min_stft_window_list)
+
         self.processing_summary["valid"] = (
             self.processing_summary.num_stft_windows >= min_num_stft_windows
         )
