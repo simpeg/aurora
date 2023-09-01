@@ -217,7 +217,7 @@ def create_test1_h5(file_version="0.1.0", channel_nomenclature="default"):
     return mth5_path
 
 
-def create_test2_h5(file_version="0.1.0", channel_nomenclature="default"):
+def create_test2_h5(file_version="0.1.0", channel_nomenclature="default", remake_if_exists=True):
     station_02_params = make_station_02(channel_nomenclature=channel_nomenclature)
     mth5_path = station_02_params.mth5_path
     station_params = [
@@ -228,6 +228,7 @@ def create_test2_h5(file_version="0.1.0", channel_nomenclature="default"):
         mth5_path,
         plot=False,
         file_version=file_version,
+        remake_if_exists=remake_if_exists
     )
     return mth5_path
 
