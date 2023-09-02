@@ -48,14 +48,17 @@ def check_if_fcdecimation_group_has_fcs(fcdec_group, decimation_level, remote):
         return False
 
     # anti_alias_filter (AAF)
-    cond1 = decimation_level.anti_alias_filter == "default"
-    cond2 = fcdec_group.metadata.anti_alias_filter is None
-    if cond1 & cond2:
-        pass
-    else:
-        msg = "Antialias Filters Not Compatible -- need to add handling for "
-        msg =f"{msg} fcdec {fcdec_group.metadata.anti_alias_filter} and processing config:{decimation_level.anti_alias_filter}"
-        raise NotImplementedError(msg)
+    try:
+        assert fcdec_group.metadata.anti_alias_filter == decimation_level.anti_alias_filter
+    except AssertionError:
+        cond1 = decimation_level.anti_alias_filter == "default"
+        cond2 = fcdec_group.metadata.anti_alias_filter is None
+        if cond1 & cond2:
+            pass
+        else:
+            msg = "Antialias Filters Not Compatible -- need to add handling for "
+            msg =f"{msg} fcdec {fcdec_group.metadata.anti_alias_filter} and processing config:{decimation_level.anti_alias_filter}"
+            raise NotImplementedError(msg)
 
     # Sample rate
     try:
@@ -122,23 +125,20 @@ def check_if_fcdecimation_group_has_fcs(fcdec_group, decimation_level, remote):
     # rather than work with frequencies explcitly.
     # note that if harmonic_indices is -1, it means keep all so we can skip this check.
     if -1 in fcdec_group.metadata.harmonic_indices:
-        return True
+        pass
     else:
-        harmonic_indices_requested = []
-        for band in decimation_level.bands:
-            print(band)
-            indices = list(np.arange(band.index_min, band.index_max+1))
-            harmonic_indices_requested += indices
+        harmonic_indices_requested = decimation_level.harmonic_indices()
         print(f"determined that {harmonic_indices_requested} are the requested indices")
         fcdec_group_set = set(fcdec_group.metadata.harmonic_indices)
         processing_set = set(harmonic_indices_requested)
         if processing_set.issubset(fcdec_group_set):
-            return True
+            pass
         else:
             msg = f"Processing FC indices {processing_set} is not contained in FC indices {fcdec_group_set}"
             print(msg)
             return False
-
+    #failed no checks if you get here
+    return True
 
 
 def check_if_fcgroup_supports_processing_config(fc_group, processing_config, remote):
@@ -150,7 +150,9 @@ def check_if_fcgroup_supports_processing_config(fc_group, processing_config, rem
 
     Currently using a nested for loop, but this can be made a bit quicker by checking if sample_rates
     are in agreement (if they aren't we don't need to check any other parameters)
+    Also, Once an fc_decimation_id is found to match a dec_level, we don't need to keep checking that fc_decimation_id
 
+    Note #1: The idea is to
     Parameters
     ----------
     fc_group
@@ -160,8 +162,10 @@ def check_if_fcgroup_supports_processing_config(fc_group, processing_config, rem
     -------
 
     """
+    fc_decimation_ids_to_check = fc_group.groups_list
     levels_present = np.full(processing_config.num_decimation_levels, False)
     for i, dec_level in enumerate(processing_config.decimations):
+        # See Note #1
         #print(f"{i}")
         #print(f"{dec_level}")
 
@@ -171,11 +175,14 @@ def check_if_fcgroup_supports_processing_config(fc_group, processing_config, rem
                 return False
 
         # iterate over fc_group decimations
-        for fc_decimation_id in fc_group.groups_list:
+        # This can be done smarter ... once an fc_decimation_id is found to
+        for fc_decimation_id in fc_decimation_ids_to_check:
             fc_dec_group = fc_group.get_decimation_level(fc_decimation_id)
             levels_present[i] = check_if_fcdecimation_group_has_fcs(fc_dec_group, dec_level, remote)
+
             if levels_present[i]:
-                continue #break inner loop
+                fc_decimation_ids_to_check.remove(fc_decimation_id) #no need to look at this one again
+                break #break inner loop
 
 
     return levels_present.all()
@@ -256,15 +263,12 @@ class TransferFunctionKernel(object):
         self._mth5_objs = mth5_objs
         return
 
-    def update_dataset_df(self,i_dec_level):
+    def update_dataset_df(self,i_dec_level, fc_existence_info=None):
         """
-        This could and probably should be moved to TFK.update_dataset_df()
-
         This function has two different modes.  The first mode, initializes values in the
         array, and could be placed into TFKDataset.initialize_time_series_data()
         The second mode, decimates. The function is kept in pipelines becasue it calls
         time series operations.
-
 
         Notes:
         1. When iterating over dataframe, (i)ndex must run from 0 to len(df), otherwise

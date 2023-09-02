@@ -181,6 +181,51 @@ def export_tf(
 def enrich_row(row):
     pass
 
+def make_fc_metadata_from_processing_config(fc_decimation_level,
+                                            dec_level_config,
+                                            ignore_harmonic_indices=True):
+    """
+    In future this should be a class method of FCDecimationLevel or DecimationLevel
+
+    Assigns values to an FCDecimationLevel object that come from an aurora processing
+    DecimationLevel object.
+
+    Ignore these props for now:
+    "channels_estimated" = []
+    "hdf5_reference": "<HDF5 object reference>",
+    "id": null,
+    "mth5_type": "FCDecimation",
+    "time_period.end": "1980-01-01T00:00:00+00:00",
+    "time_period.start": "1980-01-01T00:00:00+00:00",
+
+    Parameters
+    ----------
+    fc_decimation_level:
+    dec_level_config
+
+    Returns
+    -------
+    """
+    fc_decimation_level.metadata.anti_alias_filter = dec_level_config.anti_alias_filter
+    fc_decimation_level.metadata.decimation_factor = dec_level_config.decimation.factor
+    fc_decimation_level.metadata.decimation_level = dec_level_config.decimation.level
+    if ignore_harmonic_indices:
+        pass
+    else:
+        fc_decimation_level.metadata.harmonic_indices = dec_level_config.harmonic_indices()
+    fc_decimation_level.metadata.id = f"{dec_level_config.decimation.level}"
+    fc_decimation_level.metadata.method = dec_level_config.method
+    fc_decimation_level.metadata.min_num_stft_windows = dec_level_config.min_num_stft_windows
+    fc_decimation_level.metadata.pre_fft_detrend_type = dec_level_config.pre_fft_detrend_type
+    fc_decimation_level.metadata.prewhitening_type = dec_level_config.prewhitening_type
+    fc_decimation_level.metadata.recoloring = dec_level_config.recoloring
+    fc_decimation_level.metadata.sample_rate_decimation = dec_level_config.sample_rate_decimation
+    fc_decimation_level.metadata.window = dec_level_config.window
+    # DUPLCIATED PROPERTIES
+    fc_decimation_level.decimation_factor = dec_level_config.decimation.factor
+    fc_decimation_level.decimation_level = dec_level_config.decimation.level
+    return fc_decimation_level
+
 def process_mth5(
     config,
     tfk_dataset=None,
@@ -241,16 +286,16 @@ def process_mth5(
     tf_dict = {}
 
     for i_dec_level, dec_level_config in enumerate(tfk.valid_decimations()):
+        # Apply STFT to all runs
+        local_stfts = []
+        remote_stfts = []
 
+        # NOT sure this is needed if FCs already exist ... although there is no harm in doing it
         tfk.update_dataset_df(i_dec_level)
 
         # TFK 1: get clock-zero from data if needed
         if dec_level_config.window.clock_zero_type == "data start":
             dec_level_config.window.clock_zero = str(tfk.dataset_df.start.min())
-
-        # Apply STFT to all runs
-        local_stfts = []
-        remote_stfts = []
 
         # Check first if TS processing or accessing FC Levels
         for i, row in tfk.dataset_df.iterrows():
@@ -263,7 +308,7 @@ def process_mth5(
             stft_obj = make_stft_objects(
                 tfk.config, i_dec_level, run_obj, run_xrds, units, row.station_id
             )
-            # ToDo: add proper FC packing into here
+            # FC packing goes here
             if dec_level_config.save_fcs:
                 if dec_level_config.save_fcs_type == "csv":
                     print("WARNING: Unless you are debugging or running the tests, saving FCs to csv is unexpected")
@@ -282,12 +327,21 @@ def process_mth5(
                     if not row.mth5_obj.h5_is_write():
                         raise NotImplementedError("See Note #1 at top this method")
                     fc_group = station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id)
-                    fc_decimation_level = fc_group.add_decimation_level(f"{i_dec_level}")
-                    # print("fc_decimation_level MUST GET ITS METADATA FROM CONFIG THAT WAS USED TO MAKE STFT")
-                    # dec_level_config.id = "0"
-                    # fc_decimation_level = fc_group.add_decimation_level(f"{i_dec_level}",
-                    #                                                     decimation_level_metadata=dec_level_config)
-                    # THIS METHOD WILL BE SUPERCEDED BY ONE IN MTH5
+                    # See Technical Note posted on Aurora Issue #278, Sept 1, 2023
+
+                    # OLD
+                    # fc_decimation_level = fc_group.add_decimation_level(f"{i_dec_level}")
+
+                    # NEW
+                    # Make a dummy FC decimation level for a skeleton
+                    #from mt_metadata.transfer_functions.processing.fourier_coefficients import
+                    #from mth5.groups.fourier_coefficients import FCDecimationGroup
+                    dummy_fc_decimation_level = fc_group.add_decimation_level("-1")
+                    fc_group.remove_decimation_level("-1")
+                    updated_dummy_fcdl = make_fc_metadata_from_processing_config(dummy_fc_decimation_level, dec_level_config)
+                    fcdl_meta = updated_dummy_fcdl.metadata
+                    fc_decimation_level = fc_group.add_decimation_level(f"{i_dec_level}",
+                                                                         decimation_level_metadata=fcdl_meta)
 
                     fc_decimation_level.from_xarray(stft_obj)
                     fc_decimation_level.update_metadata()
