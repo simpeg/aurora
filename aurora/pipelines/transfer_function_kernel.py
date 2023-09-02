@@ -302,10 +302,16 @@ class TransferFunctionKernel(object):
             # APPLY TIMING CORRECTIONS HERE
         else:
             print(f"DECIMATION LEVEL {i_dec_level}")
+            print("UNDER CONSTRUCTION 20230902 -- Need to skip if FC TRUE")
             # See Note 1 top of module
             # See Note 2 top of module
             for i, row in self.dataset_df.iterrows():
                 if not self.is_valid_dataset(row, i_dec_level):
+                    continue
+                if row.fc:
+                    row_ssr_str = f"survey: {row.survey}, station_id: {row.station_id}, run_id: {row.run_id}"
+                    msg = f"FC already exists for {row_ssr_str} -- skipping decimation"
+                    print(msg)
                     continue
                 run_xrds = row["run_dataarray"].to_dataset("channel")
                 decimation = self.config.decimations[i_dec_level].decimation

@@ -270,6 +270,25 @@ def process_mth5(
     tf_cls: mt_metadata.transfer_functions.TF
         TF object
     """
+    def station_obj_from_row(row):
+        """
+        Access the station object
+        Note if/else could avoidable if replacing text string "none" with a None object in survey column
+
+        Parameters
+        ----------
+        row
+
+        Returns
+        -------
+
+        """
+        if row.survey == "none":
+            station_obj = row.mth5_obj.stations_group.get_station(row.station_id)
+        else:
+            station_obj = row.mth5_obj.stations_group.get_station(row.station_id, survey=row.survey)
+        return station_obj
+
     # Initialize config and mth5s
     tfk = TransferFunctionKernel(dataset=tfk_dataset, config=config)
     tfk.make_processing_summary()
@@ -303,6 +322,18 @@ def process_mth5(
             if not tfk.is_valid_dataset(row, i_dec_level):
                 continue
 
+            run_obj = row.mth5_obj.from_reference(row.run_reference)
+            if row.fc:
+                station_obj = station_obj_from_row(row)
+                fc_group = station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id)
+                fc_decimation_level = fc_group.get_decimation_level(f"{i_dec_level}")
+                stft_obj = fc_decimation_level.to_xarray()
+                if row.station_id == tfk.config.stations.local.id:
+                    local_stfts.append(stft_obj)
+                elif row.station_id == tfk.config.stations.remote[0].id:
+                    remote_stfts.append(stft_obj)
+                continue
+
             run_xrds = row["run_dataarray"].to_dataset("channel")
             run_obj = row.mth5_obj.from_reference(row.run_reference)
             stft_obj = make_stft_objects(
@@ -316,12 +347,7 @@ def process_mth5(
                     stft_df = stft_obj.to_dataframe()
                     stft_df.to_csv(csv_name)
                 elif dec_level_config.save_fcs_type == "h5":
-                    # Access the station object
-                    # Note if/else could avoidable if replacing text string "none" with a None object in survey column
-                    if row.survey == "none":
-                        station_obj = row.mth5_obj.stations_group.get_station(row.station_id)
-                    else:
-                        station_obj = row.mth5_obj.stations_group.get_station(row.station_id, survey=row.survey)
+                    station_obj = station_obj_from_row(row)
 
                     # See Note #1 at top this method (not module)
                     if not row.mth5_obj.h5_is_write():

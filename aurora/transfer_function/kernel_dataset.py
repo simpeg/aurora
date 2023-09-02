@@ -351,6 +351,11 @@ class KernelDataset:
                 row.station_id, row.run_id, survey=row.survey
             )
             self.df["run_reference"].at[i] = run_obj.hdf5_group.ref
+            if row.fc:
+                msg = f"row {row} already has fcs prescribed by processing confg "
+                msg += "-- skipping time series initialzation"
+                print(msg)
+                continue
             # the line below is not lazy, See Note #2
             run_ts = run_obj.to_runts(start=row.start, end=row.end)
             xr_ds = run_ts.dataset
