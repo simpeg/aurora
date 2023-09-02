@@ -231,7 +231,8 @@ def process_mth5(
     tfk.validate()
     # See Note #1
     tfk.initialize_mth5s(mode="a")
-    tfk.check_if_fc_levels_already_exist()
+    tfk.check_if_fc_levels_already_exist() # populate the "fc" column of dataset_df
+    print(f"fc_levels_already_exist = {tfk.dataset_df['fc']}")
     print(
         f"Processing config indicates {len(tfk.config.decimations)} "
         f"decimation levels "
@@ -282,6 +283,12 @@ def process_mth5(
                         raise NotImplementedError("See Note #1 at top this method")
                     fc_group = station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id)
                     fc_decimation_level = fc_group.add_decimation_level(f"{i_dec_level}")
+                    # print("fc_decimation_level MUST GET ITS METADATA FROM CONFIG THAT WAS USED TO MAKE STFT")
+                    # dec_level_config.id = "0"
+                    # fc_decimation_level = fc_group.add_decimation_level(f"{i_dec_level}",
+                    #                                                     decimation_level_metadata=dec_level_config)
+                    # THIS METHOD WILL BE SUPERCEDED BY ONE IN MTH5
+
                     fc_decimation_level.from_xarray(stft_obj)
                     fc_decimation_level.update_metadata()
                     fc_group.update_metadata()
