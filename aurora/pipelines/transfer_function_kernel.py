@@ -263,7 +263,7 @@ class TransferFunctionKernel(object):
         self._mth5_objs = mth5_objs
         return
 
-    def update_dataset_df(self,i_dec_level, fc_existence_info=None):
+    def update_dataset_df(self,i_dec_level):
         """
         This function has two different modes.  The first mode, initializes values in the
         array, and could be placed into TFKDataset.initialize_time_series_data()
@@ -302,7 +302,6 @@ class TransferFunctionKernel(object):
             # APPLY TIMING CORRECTIONS HERE
         else:
             print(f"DECIMATION LEVEL {i_dec_level}")
-            print("UNDER CONSTRUCTION 20230902 -- Need to skip if FC TRUE")
             # See Note 1 top of module
             # See Note 2 top of module
             for i, row in self.dataset_df.iterrows():
