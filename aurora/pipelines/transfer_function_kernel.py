@@ -11,135 +11,6 @@ from mth5.utils.helpers import initialize_mth5
 
 from mt_metadata.transfer_functions.processing.aurora import Processing
 
-def check_if_fcdecimation_group_has_fcs(fcdec_group, decimation_level, remote):
-    """
-    This could be made a method of mth5.groups.fourier_coefficients.FCDecimationGroup
-
-    The following are not required to check:
-    "decimation_factor",
-    "decimation_level",
-
-    ToDo: Add to github checklist:
-    - AAF should be
-    1. made None in dec_level 0 of processing config and
-    2. set to default in the FC Config
-    - "min_num_stft_windows" is not in ProcessingConfig, should be default==2
-
-
-    Parameters
-    ----------
-    fcdec_group
-    decimation_level
-
-    Returns
-    -------
-
-    """
-    # "channels_estimated"
-    if remote:
-        required_channels = decimation_level.reference_channels
-    else:
-        required_channels = decimation_level.input_channels + decimation_level.output_channels
-    try:
-        assert set(fcdec_group.metadata.channels_estimated) == set(required_channels)
-    except AssertionError:
-        msg = f"required_channels for processing {required_channels} not available in fc channels estimated {fcdec_group.metadata.channels_estimated}"
-        print(msg)
-        return False
-
-    # anti_alias_filter (AAF)
-    try:
-        assert fcdec_group.metadata.anti_alias_filter == decimation_level.anti_alias_filter
-    except AssertionError:
-        cond1 = decimation_level.anti_alias_filter == "default"
-        cond2 = fcdec_group.metadata.anti_alias_filter is None
-        if cond1 & cond2:
-            pass
-        else:
-            msg = "Antialias Filters Not Compatible -- need to add handling for "
-            msg =f"{msg} fcdec {fcdec_group.metadata.anti_alias_filter} and processing config:{decimation_level.anti_alias_filter}"
-            raise NotImplementedError(msg)
-
-    # Sample rate
-    try:
-        assert fcdec_group.metadata.sample_rate == decimation_level.sample_rate_decimation
-    except AssertionError:
-        msg = f"Sample rates do not agree: fc {fcdec_group.metadata.sample_rate} vs pc {decimation_level.sample_rate_decimation}"
-        print(msg)
-        return False
-
-    # Method (fft, wavelet, etc.)
-    try:
-        assert fcdec_group.metadata.method == decimation_level.method
-    except AssertionError:
-        msg = f"Transform methods do not agree"
-        print(msg)
-        return False
-
-    # prewhitening_type
-    try:
-        assert fcdec_group.metadata.prewhitening_type == decimation_level.prewhitening_type
-    except AssertionError:
-        msg = f"prewhitening_type does not agree"
-        print(msg)
-        return False
-
-    # recoloring
-    try:
-        assert fcdec_group.metadata.recoloring == decimation_level.recoloring
-    except AssertionError:
-        msg = f"recoloring does not agree"
-        print(msg)
-        return False
-
-    # pre_fft_detrend_type
-    try:
-        assert fcdec_group.metadata.pre_fft_detrend_type == decimation_level.pre_fft_detrend_type
-    except AssertionError:
-        msg = f"pre_fft_detrend_type does not agree"
-        print(msg)
-        return False
-
-    # min_num_stft_windows
-    try:
-        assert fcdec_group.metadata.min_num_stft_windows == decimation_level.min_num_stft_windows
-    except AssertionError:
-        msg = f"min_num_stft_windows do not agree {fcdec_group.metadata.min_num_stft_windows} vs {decimation_level.min_num_stft_windows}"
-        print(msg)
-        return False
-
-    # window
-    # decimation_level.window.type = "boxcar"; print("REMOVE DEBUG!!!!")
-    try:
-        assert fcdec_group.metadata.window == decimation_level.window
-    except AssertionError:
-        msg = "window does not agree:\n"
-        msg = f"{msg} FC Group: {fcdec_group.metadata.window}\n"
-        msg = f"{msg} Processing Config  {decimation_level.window}"
-        print(msg)
-        return False
-
-
-    # harmonic_indices
-    # Since agreement on sample_rate and window length is already established, we can use integer indices of FCs
-    # rather than work with frequencies explcitly.
-    # note that if harmonic_indices is -1, it means keep all so we can skip this check.
-    if -1 in fcdec_group.metadata.harmonic_indices:
-        pass
-    else:
-        harmonic_indices_requested = decimation_level.harmonic_indices()
-        print(f"determined that {harmonic_indices_requested} are the requested indices")
-        fcdec_group_set = set(fcdec_group.metadata.harmonic_indices)
-        processing_set = set(harmonic_indices_requested)
-        if processing_set.issubset(fcdec_group_set):
-            pass
-        else:
-            msg = f"Processing FC indices {processing_set} is not contained in FC indices {fcdec_group_set}"
-            print(msg)
-            return False
-    #failed no checks if you get here
-    return True
-
 
 def check_if_fcgroup_supports_processing_config(fc_group, processing_config, remote):
     """
@@ -178,7 +49,8 @@ def check_if_fcgroup_supports_processing_config(fc_group, processing_config, rem
         # This can be done smarter ... once an fc_decimation_id is found to
         for fc_decimation_id in fc_decimation_ids_to_check:
             fc_dec_group = fc_group.get_decimation_level(fc_decimation_id)
-            levels_present[i] = check_if_fcdecimation_group_has_fcs(fc_dec_group, dec_level, remote)
+            fc_decimation = fc_dec_group.metadata
+            levels_present[i] = fc_decimation.has_fcs_for_aurora_processing(dec_level, remote)
 
             if levels_present[i]:
                 fc_decimation_ids_to_check.remove(fc_decimation_id) #no need to look at this one again
@@ -263,7 +135,7 @@ class TransferFunctionKernel(object):
         self._mth5_objs = mth5_objs
         return
 
-    def update_dataset_df(self,i_dec_level, fc_existence_info=None):
+    def update_dataset_df(self,i_dec_level):
         """
         This function has two different modes.  The first mode, initializes values in the
         array, and could be placed into TFKDataset.initialize_time_series_data()
@@ -302,7 +174,6 @@ class TransferFunctionKernel(object):
             # APPLY TIMING CORRECTIONS HERE
         else:
             print(f"DECIMATION LEVEL {i_dec_level}")
-            print("UNDER CONSTRUCTION 20230902 -- Need to skip if FC TRUE")
             # See Note 1 top of module
             # See Note 2 top of module
             for i, row in self.dataset_df.iterrows():

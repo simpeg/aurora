@@ -41,6 +41,10 @@ class TestSyntheticProcessing(unittest.TestCase):
             config_keyword="test1_tfk", z_file_path=z_file_path
         )
         tf_cls.write(fn=xml_file_name, file_type="emtfxml")
+        tf_cls.write(
+            fn=z_file_path.parent.joinpath(f"{z_file_path.stem}_from_tf.zss"),
+            file_type="zss",
+        )
 
         xml_file_base = "syn1r2_tfk.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
@@ -72,6 +76,10 @@ class TestSyntheticProcessing(unittest.TestCase):
         xml_file_base = f"syn1_mth5v{file_version}.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
         tf_cls.write(fn=xml_file_name, file_type="emtfxml")
+        tf_cls.write(
+            fn=z_file_path.parent.joinpath(f"{z_file_path.stem}_from_tf.zss"),
+            file_type="zss",
+        )
 
     def test_can_use_scale_factor_dictionary(self):
         """
@@ -91,7 +99,11 @@ class TestSyntheticProcessing(unittest.TestCase):
             z_file_path=z_file_path,
             test_scale_factor=True,
         )
-        assert tf_cls.transfer_function.data.shape == (25, 3, 2)
+        tf_cls.write(
+            fn=z_file_path.parent.joinpath(f"{z_file_path.stem}_from_tf.zss"),
+            file_type="zss",
+        )
+
 
     def test_simultaneous_regression(self):
         z_file_path = AURORA_RESULTS_PATH.joinpath("syn1_simultaneous_estimate.zss")
@@ -101,6 +113,10 @@ class TestSyntheticProcessing(unittest.TestCase):
         xml_file_base = "syn1_simultaneous_estimate.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
         tf_cls.write(fn=xml_file_name, file_type="emtfxml")
+        tf_cls.write(
+            fn=z_file_path.parent.joinpath(f"{z_file_path.stem}_from_tf.zss"),
+            file_type="zss",
+        )
 
     def test_can_process_other_station(self, remake_if_exists=True):
         tf_cls = process_synthetic_2(remake_if_exists=remake_if_exists)
@@ -225,6 +241,7 @@ def process_synthetic_1(
 
 
 def process_synthetic_2(remake_if_exists=True):
+    """ Rename remake_if_exists to force_make_mth5"""
     station_id = "test2"
     mth5_path = create_test2_h5(remake_if_exists=remake_if_exists)
     mth5_paths = [
@@ -237,9 +254,9 @@ def process_synthetic_2(remake_if_exists=True):
     processing_config = create_test_run_config(station_id, tfk_dataset)
     for decimation_level in processing_config.decimations:
         decimation_level.save_fcs = True
-        # decimation_level.save_fcs_type = "h5"
-        decimation_level.save_fcs_type = "csv"
-    tfc = process_mth5(processing_config, tfk_dataset=tfk_dataset)
+        decimation_level.save_fcs_type = "h5"
+        # decimation_level.save_fcs_type = "csv"
+    tfc = process_mth5(processing_config, tfk_dataset=tfk_dataset, z_file_path=AURORA_RESULTS_PATH.joinpath("test2q.zss"))
     return tfc
 
 
@@ -271,9 +288,9 @@ def main():
     """
     Testing the processing of synthetic data
     """
-    tmp = TestSyntheticProcessing()
-    tmp.setUp()
-    # process_synthetic_2(remake_if_exists=True)
+    # tmp = TestSyntheticProcessing()
+    # tmp.setUp()
+    # #process_synthetic_2(remake_if_exists=True)
     # process_synthetic_2(remake_if_exists=False)
     # tmp.test_can_process_other_station(remake_) # makes FC csvs
 

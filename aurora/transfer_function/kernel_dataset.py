@@ -117,6 +117,7 @@ class KernelDataset:
             "end",
             "duration",
         ]
+        self.survey_metadata = {}
 
     def clone(self):
         return copy.deepcopy(self)
@@ -351,15 +352,40 @@ class KernelDataset:
                 row.station_id, row.run_id, survey=row.survey
             )
             self.df["run_reference"].at[i] = run_obj.hdf5_group.ref
+
+            # Ideally we would make the assignment of survey_metadata work with a run_obj, which would
+            # relax the need to access run_ts. However, run_obj.metadata has a null "id" field.
+            # Maybe there are other differences as well?
+            # also, the pass below should probably be followed by an else.
+            # but what if RR is from another survey?
+            # if i == 0:
+            #     if run_ts.survey_metadata.id in self.survey_metadata.keys():
+            #         pass
+            #     self.survey_metadata[run_ts.survey_metadata.id] = run_ts.survey_metadata
+            # elif i > 0:
+            #     self.survey_metadata[run_ts.survey_metadata.id].stations[0].add_run(run_ts.run_metadata)
+            # if len(self.survey_metadata.keys()) > 1:
+            #     raise NotImplementedError
+
             if row.fc:
                 msg = f"row {row} already has fcs prescribed by processing confg "
                 msg += "-- skipping time series initialzation"
                 print(msg)
-                continue
+            #    continue
             # the line below is not lazy, See Note #2
             run_ts = run_obj.to_runts(start=row.start, end=row.end)
             xr_ds = run_ts.dataset
             self.df["run_dataarray"].at[i] = xr_ds.to_array("channel")
+
+            if i == 0:
+                if run_ts.survey_metadata.id in self.survey_metadata.keys():
+                    pass
+                self.survey_metadata[run_ts.survey_metadata.id] = run_ts.survey_metadata
+            elif i > 0:
+                self.survey_metadata[run_ts.survey_metadata.id].stations[0].add_run(run_ts.run_metadata)
+            if len(self.survey_metadata.keys()) > 1:
+                raise NotImplementedError
+
         print("DATASET DF POPULATED")
 
     def add_columns_for_processing(self, mth5_objs):

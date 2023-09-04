@@ -88,8 +88,8 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
             read_back_fcs(mth5_path)
             # Confirm the file still processes fine with the fcs inside
             # This is currently failing due to tf_kernel checking if fcs already exist, NotImplementedError
-            # tfc = process_mth5(processing_config, tfk_dataset=tfk_dataset)
-            #return tfc
+            tfc = process_mth5(processing_config, tfk_dataset=tfk_dataset)
+            return tfc
         print("OK")
         print("NEXT STEP is add a Tap-Point into existing processing to create these levels")
         print("NEXT STEP AFTER THAT is to try processing data from the FC LEVEL")
