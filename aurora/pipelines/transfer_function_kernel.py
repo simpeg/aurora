@@ -13,10 +13,7 @@ from mt_metadata.transfer_functions.processing.aurora import Processing
 
 def fcdecimation_has_fcs_for_processing(fc_decimation, decimation_level, remote):
     """
-    ToDo: Add to github checklist:
-    - AAF should be
-    1. made None in dec_level 0 of processing config and
-    2. set to default in the FC Config
+    - AAF could be set to None in dec_level 0 of processing config and fcs
 
 
     Parameters
@@ -32,7 +29,7 @@ def fcdecimation_has_fcs_for_processing(fc_decimation, decimation_level, remote)
     if remote:
         required_channels = decimation_level.reference_channels
     else:
-        required_channels = decimation_level.input_channels + decimation_level.output_channels
+        required_channels = decimation_level.local_channels
     try:
         assert set(fc_decimation.channels_estimated) == set(required_channels)
     except AssertionError:
