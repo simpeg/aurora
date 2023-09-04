@@ -11,125 +11,6 @@ from mth5.utils.helpers import initialize_mth5
 
 from mt_metadata.transfer_functions.processing.aurora import Processing
 
-def fcdecimation_has_fcs_for_processing(fc_decimation, decimation_level, remote):
-    """
-    - AAF could be set to None in dec_level 0 of processing config and fcs
-
-
-    Parameters
-    ----------
-    fc_decimation: mt_metadata.transfer_functions.processing.fourier_coefficients.decimation.Decimation
-    decimation_level: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
-
-    Returns
-    -------
-
-    """
-    # "channels_estimated"
-    if remote:
-        required_channels = decimation_level.reference_channels
-    else:
-        required_channels = decimation_level.local_channels
-    try:
-        assert set(fc_decimation.channels_estimated) == set(required_channels)
-    except AssertionError:
-        msg = f"required_channels for processing {required_channels} not available in fc channels estimated {fcdec_group.metadata.channels_estimated}"
-        print(msg)
-        return False
-
-    # anti_alias_filter (AAF)
-    try:
-        assert fc_decimation.anti_alias_filter == decimation_level.anti_alias_filter
-    except AssertionError:
-        cond1 = decimation_level.anti_alias_filter == "default"
-        cond2 = fc_decimation.anti_alias_filter is None
-        if cond1 & cond2:
-            pass
-        else:
-            msg = "Antialias Filters Not Compatible -- need to add handling for "
-            msg =f"{msg} fcdec {fc_decimation.anti_alias_filter} and processing config:{decimation_level.anti_alias_filter}"
-            raise NotImplementedError(msg)
-
-    # Sample rate
-    try:
-        assert fc_decimation.sample_rate == decimation_level.sample_rate_decimation
-    except AssertionError:
-        msg = f"Sample rates do not agree: fc {fc_decimation.sample_rate} vs pc {decimation_level.sample_rate_decimation}"
-        print(msg)
-        return False
-
-    # Method (fft, wavelet, etc.)
-    try:
-        assert fc_decimation.method == decimation_level.method
-    except AssertionError:
-        msg = f"Transform methods do not agree"
-        print(msg)
-        return False
-
-    # prewhitening_type
-    try:
-        assert fc_decimation.prewhitening_type == decimation_level.prewhitening_type
-    except AssertionError:
-        msg = f"prewhitening_type does not agree"
-        print(msg)
-        return False
-
-    # recoloring
-    try:
-        assert fc_decimation.recoloring == decimation_level.recoloring
-    except AssertionError:
-        msg = f"recoloring does not agree"
-        print(msg)
-        return False
-
-    # pre_fft_detrend_type
-    try:
-        assert fc_decimation.pre_fft_detrend_type == decimation_level.pre_fft_detrend_type
-    except AssertionError:
-        msg = f"pre_fft_detrend_type does not agree"
-        print(msg)
-        return False
-
-    # min_num_stft_windows
-    try:
-        assert fc_decimation.min_num_stft_windows == decimation_level.min_num_stft_windows
-    except AssertionError:
-        msg = f"min_num_stft_windows do not agree {fc_decimation.min_num_stft_windows} vs {decimation_level.min_num_stft_windows}"
-        print(msg)
-        return False
-
-    # window
-    # decimation_level.window.type = "boxcar"; print("REMOVE DEBUG!!!!")
-    try:
-        assert fc_decimation.window == decimation_level.window
-    except AssertionError:
-        msg = "window does not agree:\n"
-        msg = f"{msg} FC Group: {fc_decimation.window}\n"
-        msg = f"{msg} Processing Config  {decimation_level.window}"
-        print(msg)
-        return False
-
-
-    # harmonic_indices
-    # Since agreement on sample_rate and window length is already established, we can use integer indices of FCs
-    # rather than work with frequencies explcitly.
-    # note that if harmonic_indices is -1, it means keep all so we can skip this check.
-    if -1 in fc_decimation.harmonic_indices:
-        pass
-    else:
-        harmonic_indices_requested = decimation_level.harmonic_indices()
-        print(f"determined that {harmonic_indices_requested} are the requested indices")
-        fcdec_group_set = set(fc_decimation.harmonic_indices)
-        processing_set = set(harmonic_indices_requested)
-        if processing_set.issubset(fcdec_group_set):
-            pass
-        else:
-            msg = f"Processing FC indices {processing_set} is not contained in FC indices {fcdec_group_set}"
-            print(msg)
-            return False
-    #failed no checks if you get here
-    return True
-
 
 def check_if_fcgroup_supports_processing_config(fc_group, processing_config, remote):
     """
@@ -169,7 +50,7 @@ def check_if_fcgroup_supports_processing_config(fc_group, processing_config, rem
         for fc_decimation_id in fc_decimation_ids_to_check:
             fc_dec_group = fc_group.get_decimation_level(fc_decimation_id)
             fc_decimation = fc_dec_group.metadata
-            levels_present[i] = fcdecimation_has_fcs_for_processing(fc_decimation, dec_level, remote)
+            levels_present[i] = fc_decimation.has_fcs_for_aurora_processing(dec_level, remote)
 
             if levels_present[i]:
                 fc_decimation_ids_to_check.remove(fc_decimation_id) #no need to look at this one again
