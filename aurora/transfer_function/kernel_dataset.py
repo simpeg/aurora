@@ -353,9 +353,11 @@ class KernelDataset:
             )
             self.df["run_reference"].at[i] = run_obj.hdf5_group.ref
 
+            # Ideally we would make the assignment of survey_metadata work with a run_obj, which would
+            # relax the need to access run_ts. However, run_obj.metadata has a null "id" field.
+            # Maybe there are other differences as well?
+            # also, the pass below should probably be followed by an else.
             # but what if RR is from another survey?
-            # NEED TO MAKE THIS WORK WITH RUN_OBJ, NOT RUN_TS, ONLY DIFF IS ID NOT ASSIGNED METHINKS
-            # THAT WAY WE WONT NEED TO
             # if i == 0:
             #     if run_ts.survey_metadata.id in self.survey_metadata.keys():
             #         pass
