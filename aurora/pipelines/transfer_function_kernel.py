@@ -12,47 +12,6 @@ from mth5.utils.helpers import initialize_mth5
 from mt_metadata.transfer_functions.processing.aurora import Processing
 
 
-def fcgroup_supports_processing_config(fc_group, processing_config, remote):
-    """
-    This could be made a method of mth5.groups.fourier_coefficients.FCGroup
-
-    This is an "all-or-nothing" check:
-    Either every (valid) decimation level in the processing config is available or we will build all FCs.
-
-
-    Parameters
-    ----------
-    fc_group: mth5.groups.fourier_coefficients.FCGroup
-    processing_config:
-
-    Returns
-    -------
-
-    """
-    fc_decimation_ids_to_check = fc_group.groups_list
-    levels_present = np.full(processing_config.num_decimation_levels, False)
-    for i, dec_level in enumerate(processing_config.decimations):
-        # All or nothing condition
-        if (i > 0):
-            if not levels_present[i - 1]:
-                return False
-
-        # iterate over fc_group decimations
-        for fc_decimation_id in fc_decimation_ids_to_check:
-            fc_dec_group = fc_group.get_decimation_level(fc_decimation_id)
-            fc_decimation = fc_dec_group.metadata
-            levels_present[i] = fc_decimation.has_fcs_for_aurora_processing(dec_level, remote)
-
-            if levels_present[i]:
-                fc_decimation_ids_to_check.remove(fc_decimation_id) #no need to look at this one again
-                break #break inner for-loop over decimations
-
-
-    return levels_present.all()
-
-
-
-
 class TransferFunctionKernel(object):
     def __init__(self, dataset=None, config=None):
         """
@@ -251,9 +210,8 @@ class TransferFunctionKernel(object):
 
 
                 # See note #2
-                fcs_already_there = fcgroup_supports_processing_config(fc_group,
-                                                                       self.processing_config,
-                                                                       run_row.remote)
+                fcs_already_there = fc_group.supports_aurora_processing_config(self.processing_config,
+                                                                               run_row.remote)
                 self.dataset_df["fc"].iat[dataset_df_index] = fcs_already_there
 
         return
