@@ -96,7 +96,7 @@ def create_mth5_synthetic_file(
     add_nan_values=False,
     file_version="0.1.0",
     channel_nomenclature="default",
-    remake_if_exists=True,
+    force_make_mth5=True,
 ):
     """
 
@@ -113,7 +113,7 @@ def create_mth5_synthetic_file(
     add_nan_values: bool
     file_version: string
     channel_nomenclature: string
-    remake_if_exists: bool
+    force_make_mth5: bool
 
 
     Returns
@@ -135,9 +135,7 @@ def create_mth5_synthetic_file(
         mth5_path = pathlib.Path(
             mth5_path.__str__().replace(".h5", f"_{channel_nomenclature}.h5")
         )
-    if remake_if_exists:
-        pass
-    else:
+    if not force_make_mth5:
         if mth5_path.exists():
             return mth5_path
 
@@ -217,7 +215,7 @@ def create_test1_h5(file_version="0.1.0", channel_nomenclature="default"):
     return mth5_path
 
 
-def create_test2_h5(file_version="0.1.0", channel_nomenclature="default", remake_if_exists=True):
+def create_test2_h5(file_version="0.1.0", channel_nomenclature="default", force_make_mth5=True):
     station_02_params = make_station_02(channel_nomenclature=channel_nomenclature)
     mth5_path = station_02_params.mth5_path
     station_params = [
@@ -228,7 +226,7 @@ def create_test2_h5(file_version="0.1.0", channel_nomenclature="default", remake
         mth5_path,
         plot=False,
         file_version=file_version,
-        remake_if_exists=remake_if_exists
+        force_make_mth5=force_make_mth5
     )
     return mth5_path
 
@@ -265,7 +263,7 @@ def create_test12rr_h5(file_version="0.1.0", channel_nomenclature="default"):
 
 
 def create_test3_h5(
-    file_version="0.1.0", channel_nomenclature="default", remake_if_exists=True
+    file_version="0.1.0", channel_nomenclature="default", force_make_mth5=True
 ):
 
     station_03_params = make_station_03(channel_nomenclature=channel_nomenclature)
@@ -276,7 +274,7 @@ def create_test3_h5(
         station_params,
         station_params[0].mth5_path,
         file_version=file_version,
-        remake_if_exists=remake_if_exists,
+        force_make_mth5=force_make_mth5,
     )
     return mth5_path
 

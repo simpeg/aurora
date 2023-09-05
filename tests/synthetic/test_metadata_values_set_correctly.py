@@ -22,7 +22,7 @@ class TestMetadataValuesSetCorrect(unittest.TestCase):
 
     def make_mth5(self):
         close_open_files()
-        mth5_path = create_test3_h5(remake_if_exists=self.remake_mth5_for_each_test)
+        mth5_path = create_test3_h5(force_make_mth5=self.remake_mth5_for_each_test)
         return mth5_path
 
     def make_run_summary(self):

@@ -118,8 +118,8 @@ class TestSyntheticProcessing(unittest.TestCase):
             file_type="zss",
         )
 
-    def test_can_process_other_station(self, remake_if_exists=True):
-        tf_cls = process_synthetic_2(remake_if_exists=remake_if_exists)
+    def test_can_process_other_station(self, force_make_mth5=True):
+        tf_cls = process_synthetic_2(force_make_mth5=force_make_mth5)
         xml_file_name = AURORA_RESULTS_PATH.joinpath("syn2.xml")
         tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
@@ -240,10 +240,10 @@ def process_synthetic_1(
     return tf_result
 
 
-def process_synthetic_2(remake_if_exists=True):
-    """ Rename remake_if_exists to force_make_mth5"""
+def process_synthetic_2(force_make_mth5=True):
+    """"""
     station_id = "test2"
-    mth5_path = create_test2_h5(remake_if_exists=remake_if_exists)
+    mth5_path = create_test2_h5(force_make_mth5=force_make_mth5)
     mth5_paths = [
         mth5_path,
     ]
@@ -290,9 +290,7 @@ def main():
     """
     # tmp = TestSyntheticProcessing()
     # tmp.setUp()
-    # #process_synthetic_2(remake_if_exists=True)
-    # process_synthetic_2(remake_if_exists=False)
-    # tmp.test_can_process_other_station(remake_) # makes FC csvs
+    # tmp.test_can_process_other_station() # makes FC csvs
 
     # tmp.test_can_output_tf_class_and_write_tf_xml()
     # tmp.test_no_crash_with_too_many_decimations()

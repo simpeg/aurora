@@ -61,6 +61,12 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
 
 
     def test_123(self):
+        """
+        This test adds FCs to each of the synthetic files that get built in setUpClass method
+        Returns
+        -------
+
+        """
         for mth5_path in self.mth5_paths:
             mth5_paths = [mth5_path, ]
             run_summary = RunSummary()
@@ -86,13 +92,10 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
             fc_decimations = [x.to_fc_decimation() for x in processing_config.decimations]
             add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=fc_decimations)
             read_back_fcs(mth5_path)
+
             # Confirm the file still processes fine with the fcs inside
-            # This is currently failing due to tf_kernel checking if fcs already exist, NotImplementedError
             tfc = process_mth5(processing_config, tfk_dataset=tfk_dataset)
             return tfc
-        print("OK")
-        print("NEXT STEP is add a Tap-Point into existing processing to create these levels")
-        print("NEXT STEP AFTER THAT is to try processing data from the FC LEVEL")
         return
 
 
@@ -100,10 +103,14 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
         cfgs = decimation_and_stft_config_creator(1.0)
         return cfgs
 
-
+    def test_create_then_use_stored_fcs_for_processing(self):
+        from test_processing import process_synthetic_2
+        process_synthetic_2(force_make_mth5=True)
+        process_synthetic_2(force_make_mth5=False)
 
 def main():
-    # test_case = TestAddFourierCoefficientsToSyntheticData()
+    #test_case = TestAddFourierCoefficientsToSyntheticData()
+    #test_case.test_create_then_use_stored_fcs_for_processing()
     # test_case.setUpClass()
     # test_case.test_123()
     # test_case.test_decimation_and_stft_config_creator()
