@@ -37,6 +37,7 @@ OUTPUT_CHANNELS = [
     "hz",
 ]
 RUN_SUMMARY_COLUMNS = [
+    "survey",
     "station_id",
     "run_id",
     "start",

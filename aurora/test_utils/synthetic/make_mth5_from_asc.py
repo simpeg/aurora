@@ -20,15 +20,15 @@ data/test1_LEMI12.h5
 
 import numpy as np
 import pandas as pd
-from pathlib import Path
+import pathlib
 
-from mt_metadata.transfer_functions.processing.aurora import ChannelNomenclature
 from aurora.test_utils.synthetic.station_config import make_filters
 from aurora.test_utils.synthetic.station_config import make_station_01
 from aurora.test_utils.synthetic.station_config import make_station_02
 from aurora.test_utils.synthetic.station_config import make_station_03
 from mth5.timeseries import ChannelTS, RunTS
 from mth5.mth5 import MTH5
+from mt_metadata.transfer_functions.processing.aurora import ChannelNomenclature
 
 np.random.seed(0)
 
@@ -130,9 +130,9 @@ def create_mth5_synthetic_file(
 
     # set name for output h5 file
     if add_nan_values:
-        mth5_path = Path(mth5_path.__str__().replace(".h5", "_nan.h5"))
+        mth5_path = pathlib.Path(mth5_path.__str__().replace(".h5", "_nan.h5"))
     if channel_nomenclature != "default":
-        mth5_path = Path(
+        mth5_path = pathlib.Path(
             mth5_path.__str__().replace(".h5", f"_{channel_nomenclature}.h5")
         )
     if remake_if_exists:
@@ -217,7 +217,7 @@ def create_test1_h5(file_version="0.1.0", channel_nomenclature="default"):
     return mth5_path
 
 
-def create_test2_h5(file_version="0.1.0", channel_nomenclature="default"):
+def create_test2_h5(file_version="0.1.0", channel_nomenclature="default", remake_if_exists=True):
     station_02_params = make_station_02(channel_nomenclature=channel_nomenclature)
     mth5_path = station_02_params.mth5_path
     station_params = [
@@ -228,6 +228,7 @@ def create_test2_h5(file_version="0.1.0", channel_nomenclature="default"):
         mth5_path,
         plot=False,
         file_version=file_version,
+        remake_if_exists=remake_if_exists
     )
     return mth5_path
 
@@ -259,6 +260,7 @@ def create_test12rr_h5(file_version="0.1.0", channel_nomenclature="default"):
         file_version=file_version,
         channel_nomenclature=channel_nomenclature,
     )
+    mth5_path = pathlib.Path(mth5_path)
     return mth5_path
 
 
@@ -279,8 +281,7 @@ def create_test3_h5(
     return mth5_path
 
 
-def main():
-    file_version = "0.1.0"
+def main(file_version="0.1.0"):
     # file_version = "0.2.0"
     create_test1_h5(file_version=file_version)
     create_test1_h5_with_nan(file_version=file_version)

@@ -135,8 +135,7 @@ def process_tf_decimation_level(
 def export_tf(
     tf_collection,
     channel_nomenclature,
-    station_metadata_dict={},
-    survey_dict={},
+    survey_metadata
 ):
     """
     This method may wind up being embedded in the TF class
@@ -154,7 +153,6 @@ def export_tf(
     tf_cls: mt_metadata.transfer_functions.core.TF
         Transfer function container
     """
-    from mt_metadata.utils.list_dict import ListDict
 
     merged_tf_dict = tf_collection.get_merged_dict(channel_nomenclature)
     channel_nomenclature_dict = channel_nomenclature.to_dict()["channel_nomenclature"]
@@ -173,13 +171,58 @@ def export_tf(
     res_cov = res_cov.rename(renamer_dict)
     tf_cls.residual_covariance = res_cov
 
-    tf_cls.station_metadata._runs = ListDict()
-    tf_cls.station_metadata.from_dict(station_metadata_dict)
-    tf_cls.survey_metadata.from_dict(survey_dict)
+    # Set key as first el't of dict, nor currently supporting mixed surveys in TF
+    tf_cls.survey_metadata = survey_metadata
+
     return tf_cls
 
 def enrich_row(row):
     pass
+
+def make_fc_metadata_from_processing_config(fc_decimation_level,
+                                            dec_level_config,
+                                            ignore_harmonic_indices=True):
+    """
+    In future this should be a class method of FCDecimationLevel or DecimationLevel
+
+    Assigns values to an FCDecimationLevel object that come from an aurora processing
+    DecimationLevel object.
+
+    Ignore these props for now:
+    "channels_estimated" = []
+    "hdf5_reference": "<HDF5 object reference>",
+    "id": null,
+    "mth5_type": "FCDecimation",
+    "time_period.end": "1980-01-01T00:00:00+00:00",
+    "time_period.start": "1980-01-01T00:00:00+00:00",
+
+    Parameters
+    ----------
+    fc_decimation_level:
+    dec_level_config
+
+    Returns
+    -------
+    """
+    fc_decimation_level.metadata.anti_alias_filter = dec_level_config.anti_alias_filter
+    fc_decimation_level.metadata.decimation_factor = dec_level_config.decimation.factor
+    fc_decimation_level.metadata.decimation_level = dec_level_config.decimation.level
+    if ignore_harmonic_indices:
+        pass
+    else:
+        fc_decimation_level.metadata.harmonic_indices = dec_level_config.harmonic_indices()
+    fc_decimation_level.metadata.id = f"{dec_level_config.decimation.level}"
+    fc_decimation_level.metadata.method = dec_level_config.method
+    fc_decimation_level.metadata.min_num_stft_windows = dec_level_config.min_num_stft_windows
+    fc_decimation_level.metadata.pre_fft_detrend_type = dec_level_config.pre_fft_detrend_type
+    fc_decimation_level.metadata.prewhitening_type = dec_level_config.prewhitening_type
+    fc_decimation_level.metadata.recoloring = dec_level_config.recoloring
+    fc_decimation_level.metadata.sample_rate_decimation = dec_level_config.sample_rate_decimation
+    fc_decimation_level.metadata.window = dec_level_config.window
+    # DUPLCIATED PROPERTIES
+    fc_decimation_level.decimation_factor = dec_level_config.decimation.factor
+    fc_decimation_level.decimation_level = dec_level_config.decimation.level
+    return fc_decimation_level
 
 def process_mth5(
     config,
@@ -188,11 +231,16 @@ def process_mth5(
     show_plot=False,
     z_file_path=None,
     return_collection=False,
-    save_fcs=False
 ):
     """
     This is the main method used to transform a processing_config,
     and a kernel_dataset into a transfer function estimate.
+
+    Note 1: Logic for building FC layers:
+    If the processing config decimation_level.save_fcs_type = "h5" and fc_levels_already_exist is False, then open
+    in append mode, else open in read mode.  We should support a flag: force_rebuild_fcs, normally False.  This flag
+    is only needed when save_fcs_type=="h5".  If True, then we open in append mode, regarless of fc_levels_already_exist
+    The task of setting mode="a", mode="r" can be handled by tfk (maybe in tfk.validate())
 
 
 
@@ -220,45 +268,49 @@ def process_mth5(
     tf_cls: mt_metadata.transfer_functions.TF
         TF object
     """
+    def station_obj_from_row(row):
+        """
+        Access the station object
+        Note if/else could avoidable if replacing text string "none" with a None object in survey column
+
+        Parameters
+        ----------
+        row
+
+        Returns
+        -------
+
+        """
+        if row.survey == "none":
+            station_obj = row.mth5_obj.stations_group.get_station(row.station_id)
+        else:
+            station_obj = row.mth5_obj.stations_group.get_station(row.station_id, survey=row.survey)
+        return station_obj
+
     # Initialize config and mth5s
     tfk = TransferFunctionKernel(dataset=tfk_dataset, config=config)
     tfk.make_processing_summary()
     tfk.validate()
-    tfk.initialize_mth5s()
-    # Look at the processing Config and check whether the as-yet-nonexistant arg build_fc_layers is True.
-    # If build_fc_layers is True we should also have a flag: force_rebuild_fcs, normally False that will verify
-    # check_if_fc_levels_already_exist.  if check_if_fc_levels_already_exist returns True, skip building
-    # unless force_rebuild_fcs is True, in which case it regenerates them.
-    tfk.check_if_fc_levels_already_exist()
+    # See Note #1
+    tfk.initialize_mth5s(mode="a")
+    tfk.check_if_fc_levels_already_exist() # populate the "fc" column of dataset_df
+    print(f"fc_levels_already_exist = {tfk.dataset_df['fc']}")
     print(
         f"Processing config indicates {len(tfk.config.decimations)} "
         f"decimation levels "
     )
 
-    # Add a check here that examines the mth5 files and determines if FC Levels already exist, and
-    # if so, can they support the processing.
-    # If True, Use existing, if False, compute on the fly.
-    # This could later, further be modified to have a kwarg for storing the computed on the fly
-    # Ultimately, we will probably want to store the decimated time series in some applications too :/
-
-    # Because decimation is a cascading operation, I would rather not treat the case where some (valid) decimation
-    # levels exist in the mth5 FC archive and others do not.  The maximum granularity tolerated will be at the
-    # "station-run level, so for a given run, either all relevant FCs are packed into the h5 or we treat as if none of
-    # them are.  Sounds harsh, but if you want to add the logic otherwise, feel free.
-
     tf_dict = {}
 
     for i_dec_level, dec_level_config in enumerate(tfk.valid_decimations()):
-
         tfk.update_dataset_df(i_dec_level)
+
+        local_stfts = []
+        remote_stfts = []
 
         # TFK 1: get clock-zero from data if needed
         if dec_level_config.window.clock_zero_type == "data start":
             dec_level_config.window.clock_zero = str(tfk.dataset_df.start.min())
-
-        # Apply STFT to all runs
-        local_stfts = []
-        remote_stfts = []
 
         # Check first if TS processing or accessing FC Levels
         for i, row in tfk.dataset_df.iterrows():
@@ -266,16 +318,50 @@ def process_mth5(
             if not tfk.is_valid_dataset(row, i_dec_level):
                 continue
 
+            run_obj = row.mth5_obj.from_reference(row.run_reference)
+            if row.fc:
+                station_obj = station_obj_from_row(row)
+                fc_group = station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id)
+                fc_decimation_level = fc_group.get_decimation_level(f"{i_dec_level}")
+                stft_obj = fc_decimation_level.to_xarray()
+                if row.station_id == tfk.config.stations.local.id:
+                    local_stfts.append(stft_obj)
+                elif row.station_id == tfk.config.stations.remote[0].id:
+                    remote_stfts.append(stft_obj)
+                continue
+
             run_xrds = row["run_dataarray"].to_dataset("channel")
             run_obj = row.mth5_obj.from_reference(row.run_reference)
             stft_obj = make_stft_objects(
                 tfk.config, i_dec_level, run_obj, run_xrds, units, row.station_id
             )
-            # ToDo: add proper FC packing into here
-            if save_fcs:
-                csv_name = f"{row.station_id}_dec_level_{i_dec_level}.csv"
-                stft_df = stft_obj.to_dataframe()
-                stft_df.to_csv(csv_name)
+            # Pack FCs into h5
+            if dec_level_config.save_fcs:
+                if dec_level_config.save_fcs_type == "csv":
+                    print("WARNING: Unless you are debugging or running the tests, saving FCs to csv is unexpected")
+                    csv_name = f"{row.station_id}_dec_level_{i_dec_level}.csv"
+                    stft_df = stft_obj.to_dataframe()
+                    stft_df.to_csv(csv_name)
+                elif dec_level_config.save_fcs_type == "h5":
+                    station_obj = station_obj_from_row(row)
+
+                    # See Note #1 at top this method (not module)
+                    if not row.mth5_obj.h5_is_write():
+                        raise NotImplementedError("See Note #1 at top this method")
+                    fc_group = station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id)
+                    # See Technical Note posted on Aurora Issue #278, Sept 1, 2023
+                    # Make a dummy FC decimation level for a skeleton
+                    #from mth5.groups.fourier_coefficients import FCDecimationGroup
+                    dummy_fc_decimation_level = fc_group.add_decimation_level("-1")
+                    fc_group.remove_decimation_level("-1")
+                    updated_dummy_fcdl = make_fc_metadata_from_processing_config(dummy_fc_decimation_level, dec_level_config)
+                    fcdl_meta = updated_dummy_fcdl.metadata
+                    fc_decimation_level = fc_group.add_decimation_level(f"{i_dec_level}",
+                                                                         decimation_level_metadata=fcdl_meta)
+
+                    fc_decimation_level.from_xarray(stft_obj)
+                    fc_decimation_level.update_metadata()
+                    fc_group.update_metadata()
 
 
             if row.station_id == tfk.config.stations.local.id:
@@ -324,25 +410,18 @@ def process_mth5(
         tfk_dataset.close_mths_objs()
         return tf_collection
     else:
-        local_station_id = tfk.config.stations.local.id
-        station_metadata = tfk_dataset.get_station_metadata(local_station_id)
-        local_mth5_obj = tfk.mth5_objs[local_station_id]
 
-        if local_mth5_obj.file_version == "0.1.0":
-            survey_dict = local_mth5_obj.survey_group.metadata.to_dict()
-        elif local_mth5_obj.file_version == "0.2.0":
-            # this could be a method of tf_kernel.get_survey_dict()
-            survey_id = tfk.dataset_df[
-                tfk.dataset_df["station_id"] == local_station_id
+        # get the unique survey id that is not a remote reference
+        survey_id = tfk_dataset.df.loc[
+            tfk_dataset.df.remote == False
             ].survey.unique()[0]
-            survey_obj = local_mth5_obj.get_survey(survey_id)
-            survey_dict = survey_obj.metadata.to_dict()
+        if survey_id in ["none"]:
+            survey_id = "0"
 
         tf_cls = export_tf(
             tf_collection,
             tfk.config.channel_nomenclature,
-            station_metadata_dict=station_metadata.to_dict(),
-            survey_dict=survey_dict,
+            survey_metadata=tfk_dataset.survey_metadata[survey_id],
         )
         tfk_dataset.close_mths_objs()
         return tf_cls
