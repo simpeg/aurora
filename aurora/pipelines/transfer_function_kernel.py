@@ -219,7 +219,7 @@ class TransferFunctionKernel(object):
             assert len(associated_run_sub_df) == 1 # should be unique
             dataset_df_index = associated_run_sub_df.index[0]
             run_row = associated_run_sub_df.iloc[0]
-            row_ssr_str = f"survey: {row.survey}, station_id: {row.station_id}, run_id: {row.run_id}"
+            row_ssr_str = f"survey: {run_row.survey}, station_id: {run_row.station_id}, run_id: {run_row.run_id}"
 
             # See Note #3 above
             mth5_obj = self.mth5_objs[station_id]
