@@ -179,50 +179,92 @@ def export_tf(
 def enrich_row(row):
     pass
 
-def make_fc_metadata_from_processing_config(fc_decimation_level,
-                                            dec_level_config,
-                                            ignore_harmonic_indices=True):
-    """
-    In future this should be a class method of FCDecimationLevel or DecimationLevel
+# def make_fc_decimation_from_processing_config(dec_level_config,
+#                                             ignore_harmonic_indices=True):
+#     """
+#     In future this should be a class method of
+#     mt_metadata.transfer_functions.processing.fourier_coefficients.decimation.Decimation
+#
+#     Ignoring for now these properties (as they do not have a direct correspondence to dec_level_config)
+#     "channels_estimated" = []
+#     "id": null,
+#     "time_period.end": "1980-01-01T00:00:00+00:00",
+#     "time_period.start": "1980-01-01T00:00:00+00:00",
+#
+#     Parameters
+#     ----------
+#     dec_level_config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
+#
+#     ignore_harmonic_indices: bool
+#
+#     Returns
+#     -------
+#     mt_metadata.transfer_functions.processing.fourier_coefficients.decimation.Decimation
+#     """
+#     from mt_metadata.transfer_functions.processing.fourier_coefficients.decimation import Decimation
+#     fc_decimation_level = Decimation()
+#     fc_decimation_level.anti_alias_filter = dec_level_config.anti_alias_filter
+#     fc_decimation_level.decimation_factor = dec_level_config.decimation.factor
+#     fc_decimation_level.decimation_level = dec_level_config.decimation.level
+#     if ignore_harmonic_indices:
+#         pass
+#     else:
+#         fc_decimation_level.harmonic_indices = dec_level_config.harmonic_indices()
+#     fc_decimation_level.id = f"{dec_level_config.decimation.level}"
+#     fc_decimation_level.method = dec_level_config.method
+#     fc_decimation_level.min_num_stft_windows = dec_level_config.min_num_stft_windows
+#     fc_decimation_level.pre_fft_detrend_type = dec_level_config.pre_fft_detrend_type
+#     fc_decimation_level.prewhitening_type = dec_level_config.prewhitening_type
+#     fc_decimation_level.recoloring = dec_level_config.recoloring
+#     fc_decimation_level.sample_rate_decimation = dec_level_config.sample_rate_decimation
+#     fc_decimation_level.window = dec_level_config.window
+#
+#     return fc_decimation_level
 
-    Assigns values to an FCDecimationLevel object that come from an aurora processing
-    DecimationLevel object.
-
-    Ignore these props for now:
-    "channels_estimated" = []
-    "hdf5_reference": "<HDF5 object reference>",
-    "id": null,
-    "mth5_type": "FCDecimation",
-    "time_period.end": "1980-01-01T00:00:00+00:00",
-    "time_period.start": "1980-01-01T00:00:00+00:00",
-
-    Parameters
-    ----------
-    fc_decimation_level:
-    dec_level_config
-
-    Returns
-    -------
-    """
-    fc_decimation_level.metadata.anti_alias_filter = dec_level_config.anti_alias_filter
-    fc_decimation_level.metadata.decimation_factor = dec_level_config.decimation.factor
-    fc_decimation_level.metadata.decimation_level = dec_level_config.decimation.level
-    if ignore_harmonic_indices:
-        pass
-    else:
-        fc_decimation_level.metadata.harmonic_indices = dec_level_config.harmonic_indices()
-    fc_decimation_level.metadata.id = f"{dec_level_config.decimation.level}"
-    fc_decimation_level.metadata.method = dec_level_config.method
-    fc_decimation_level.metadata.min_num_stft_windows = dec_level_config.min_num_stft_windows
-    fc_decimation_level.metadata.pre_fft_detrend_type = dec_level_config.pre_fft_detrend_type
-    fc_decimation_level.metadata.prewhitening_type = dec_level_config.prewhitening_type
-    fc_decimation_level.metadata.recoloring = dec_level_config.recoloring
-    fc_decimation_level.metadata.sample_rate_decimation = dec_level_config.sample_rate_decimation
-    fc_decimation_level.metadata.window = dec_level_config.window
-    # DUPLCIATED PROPERTIES
-    fc_decimation_level.decimation_factor = dec_level_config.decimation.factor
-    fc_decimation_level.decimation_level = dec_level_config.decimation.level
-    return fc_decimation_level
+# def make_fc_metadata_from_processing_config(fc_decimation_level,
+#                                             dec_level_config,
+#                                             ignore_harmonic_indices=True):
+#     """
+#     In future this should be a class method of FCDecimationLevel or DecimationLevel
+#
+#     Assigns values to an FCDecimationLevel object that come from an aurora processing
+#     DecimationLevel object.
+#
+#     Ignore these props for now:
+#     "channels_estimated" = []
+#     "hdf5_reference": "<HDF5 object reference>",
+#     "id": null,
+#     "mth5_type": "FCDecimation",
+#     "time_period.end": "1980-01-01T00:00:00+00:00",
+#     "time_period.start": "1980-01-01T00:00:00+00:00",
+#
+#     Parameters
+#     ----------
+#     fc_decimation_level:
+#     dec_level_config
+#
+#     Returns
+#     -------
+#     """
+#     fc_decimation_level.metadata.anti_alias_filter = dec_level_config.anti_alias_filter
+#     fc_decimation_level.metadata.decimation_factor = dec_level_config.decimation.factor
+#     fc_decimation_level.metadata.decimation_level = dec_level_config.decimation.level
+#     if ignore_harmonic_indices:
+#         pass
+#     else:
+#         fc_decimation_level.metadata.harmonic_indices = dec_level_config.harmonic_indices()
+#     fc_decimation_level.metadata.id = f"{dec_level_config.decimation.level}"
+#     fc_decimation_level.metadata.method = dec_level_config.method
+#     fc_decimation_level.metadata.min_num_stft_windows = dec_level_config.min_num_stft_windows
+#     fc_decimation_level.metadata.pre_fft_detrend_type = dec_level_config.pre_fft_detrend_type
+#     fc_decimation_level.metadata.prewhitening_type = dec_level_config.prewhitening_type
+#     fc_decimation_level.metadata.recoloring = dec_level_config.recoloring
+#     fc_decimation_level.metadata.sample_rate_decimation = dec_level_config.sample_rate_decimation
+#     fc_decimation_level.metadata.window = dec_level_config.window
+#     # DUPLCIATED PROPERTIES
+#     fc_decimation_level.decimation_factor = dec_level_config.decimation.factor
+#     fc_decimation_level.decimation_level = dec_level_config.decimation.level
+#     return fc_decimation_level
 
 def process_mth5(
     config,
@@ -349,16 +391,11 @@ def process_mth5(
                     if not row.mth5_obj.h5_is_write():
                         raise NotImplementedError("See Note #1 at top this method")
                     fc_group = station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id)
-                    # See Technical Note posted on Aurora Issue #278, Sept 1, 2023
-                    # Make a dummy FC decimation level for a skeleton
-                    #from mth5.groups.fourier_coefficients import FCDecimationGroup
-                    dummy_fc_decimation_level = fc_group.add_decimation_level("-1")
-                    fc_group.remove_decimation_level("-1")
-                    updated_dummy_fcdl = make_fc_metadata_from_processing_config(dummy_fc_decimation_level, dec_level_config)
-                    fcdl_meta = updated_dummy_fcdl.metadata
+                    # ARrrgh! I can actually just use the method I already have for this
+                    decimation_level_metadata = dec_level_config.to_fc_decimation()
+                    #decimation_level_metadata = make_fc_decimation_from_processing_config(dec_level_config)
                     fc_decimation_level = fc_group.add_decimation_level(f"{i_dec_level}",
-                                                                         decimation_level_metadata=fcdl_meta)
-
+                                                                         decimation_level_metadata=decimation_level_metadata)
                     fc_decimation_level.from_xarray(stft_obj)
                     fc_decimation_level.update_metadata()
                     fc_group.update_metadata()
