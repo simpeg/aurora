@@ -27,11 +27,11 @@ class TestMultiRunProcessing(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         """ Add a fresh h5 to start the test, sowe don't have FCs in there from other tests"""
-        create_test3_h5(remake_if_exists=True)
+        create_test3_h5(force_make_mth5=True)
 
     def make_mth5(self):
         close_open_files()
-        mth5_path = create_test3_h5(remake_if_exists=self.remake_mth5_for_each_test)
+        mth5_path = create_test3_h5(force_make_mth5=self.remake_mth5_for_each_test)
         return mth5_path
 
     def make_run_summary(self):
