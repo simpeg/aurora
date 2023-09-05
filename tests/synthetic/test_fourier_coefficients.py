@@ -83,7 +83,7 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
                 processing_config = cc.create_from_kernel_dataset(tfk_dataset)
 
             # Extract FC decimations from processing config and build the layer
-            fc_decimations = [x.to_fc_decimation("local") for x in processing_config.decimations]
+            fc_decimations = [x.to_fc_decimation() for x in processing_config.decimations]
             add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=fc_decimations)
             read_back_fcs(mth5_path)
             # Confirm the file still processes fine with the fcs inside
