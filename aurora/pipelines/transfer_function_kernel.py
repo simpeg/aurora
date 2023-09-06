@@ -6,11 +6,21 @@ import psutil
 from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.transfer_function.kernel_dataset import KernelDataset
+from mth5.utils.exceptions import MTH5Error
 from mth5.utils.helpers import initialize_mth5
+
 from mt_metadata.transfer_functions.processing.aurora import Processing
+
 
 class TransferFunctionKernel(object):
     def __init__(self, dataset=None, config=None):
+        """
+
+        Parameters
+        ----------
+        dataset: aurora.transfer_function.kernel_dataset.KernelDataset
+        config: aurora.config.metadata.processing.Processing
+        """
         processing_config = initialize_config(config)
         self._config = processing_config
         self._dataset = dataset
@@ -48,11 +58,11 @@ class TransferFunctionKernel(object):
             self.initialize_mth5s()
         return self._mth5_objs
 
-    def initialize_mth5s(self):
+    def initialize_mth5s(self, mode="r"):
         """
-        returns a dict of open mth5 objects, keyed by
-        Consder moving the initialize_mth5s() method out of config, since it depends on mth5.
-        In this way, we can keep the dependencies on mth5 out of the metadatd object (of which config is one)
+        returns a dict of open mth5 objects, keyed by station_id
+
+        A future version of this for multiple station processing may need nested dict with [survey_id][station_id]
 
         Returns
         -------
@@ -62,7 +72,7 @@ class TransferFunctionKernel(object):
             remote station id: mth5.mth5.MTH5
         """
 
-        local_mth5_obj = initialize_mth5(self.config.stations.local.mth5_path, mode="r")
+        local_mth5_obj = initialize_mth5(self.config.stations.local.mth5_path, mode=mode)
         if self.config.stations.remote:
             remote_path = self.config.stations.remote[0].mth5_path
             remote_mth5_obj = initialize_mth5(remote_path, mode="r")
@@ -73,24 +83,17 @@ class TransferFunctionKernel(object):
         if self.config.stations.remote:
             mth5_objs[self.config.stations.remote[0].id] = remote_mth5_obj
         self._mth5_objs = mth5_objs
-        return # mth5_objs
+        return
 
     def update_dataset_df(self,i_dec_level):
         """
-        This could and probably should be moved to TFK.update_dataset_df()
-
-        This function has two different modes.  The first mode, initializes values in the
+        This function has two different modes.  The first mode initializes values in the
         array, and could be placed into TFKDataset.initialize_time_series_data()
         The second mode, decimates. The function is kept in pipelines becasue it calls
         time series operations.
 
-
         Notes:
-        1. When iterating over dataframe, (i)ndex must run from 0 to len(df), otherwise
-        get indexing errors.  Maybe reset_index() before main loop? or push reindexing
-        into TF Kernel, so that this method only gets a cleanly indexed df, restricted to
-        only the runs to be processed for this specific TF?
-        2. When assigning xarrays to dataframe cells, df dislikes xr.Dataset,
+        1. When assigning xarrays to dataframe cells, df dislikes xr.Dataset,
         so we convert to DataArray before assignment
 
 
@@ -109,62 +112,107 @@ class TransferFunctionKernel(object):
 
         """
         if i_dec_level == 0:
-            # Consider moving the line below into update_dataset_df.  This will allow bypassing loading of the data if
-            # FC Level of mth5 is used.
-            # Assign additional columns to dataset_df, populate with mth5_objs and xr_ts
             # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
+
+            # Assign additional columns to dataset_df, populate with mth5_objs and xr_ts
             self.dataset.initialize_dataframe_for_processing(self.mth5_objs)
 
             # APPLY TIMING CORRECTIONS HERE
         else:
             print(f"DECIMATION LEVEL {i_dec_level}")
-            # See Note 1 top of module
-            # See Note 2 top of module
+
             for i, row in self.dataset_df.iterrows():
                 if not self.is_valid_dataset(row, i_dec_level):
+                    continue
+                if row.fc:
+                    row_ssr_str = f"survey: {row.survey}, station_id: {row.station_id}, run_id: {row.run_id}"
+                    msg = f"FC already exists for {row_ssr_str} -- skipping decimation"
+                    print(msg)
                     continue
                 run_xrds = row["run_dataarray"].to_dataset("channel")
                 decimation = self.config.decimations[i_dec_level].decimation
                 decimated_xrds = prototype_decimate(decimation, run_xrds)
-                self.dataset_df["run_dataarray"].at[i] = decimated_xrds.to_array("channel")
+                self.dataset_df["run_dataarray"].at[i] = decimated_xrds.to_array("channel") # See Note 1 above
 
         print("DATASET DF UPDATED")
         return
 
     def check_if_fc_levels_already_exist(self):
         """
-        Iterate over the processing summary_df, grouping by unique "Station-Run"s.
-        When all FC Levels for a given station-run are already built, mark the RunSummary with a True in
-        the (yet-to-be-built) mth5_has_FCs column
-        Returns:
+        Iterate over the processing summary_df, grouping by unique "Survey-Station-Run"s.
+        (Could also iterate over kernel_dataset.dataframe, to get the groupby).
+
+        If all FC Levels for a given station-run are already built, mark the RunSummary with a True in
+        the "fc" column.
+
+        Note 1:  Because decimation is a cascading operation, we avoid the case where some (valid) decimation
+        levels exist in the mth5 FC archive and others do not.  The maximum granularity tolerated will be at the
+        "station-run level, so for a given run, either all relevant FCs are packed into the h5 or we treat as if none
+        of them are.  Sounds harsh, but if you want to add the logic otherwise, feel free.  If one wanted to support
+        variations at the decimation-level, an appropriate way to address would be to store teh decimated time series
+        in the archive as well (they would simply be runs with different sample rates, and some extra filters).
+
+        Note 2: At this point in the logic, it is established that there are FCs associated with run_id and there are
+        at least as many FC decimation levels as we require as per the processing config.  The next step is to
+        assert whether it is True that the existing FCs conform to the recipe in the processing config.
+
+        Note #3: Need to update mth5_objs dict so that it is keyed by survey, then station, else might break when
+        mixing in data from other surveys (if the stations are named the same.  This can be addressed in
+        the initialize_mth5s() method of TFK.  When addresssing the above issue -- consider adding the mth5_obj to
+         self.dataset_df instead of keeping the dict around ..., the concern about doing this is that multiple rows
+         of the dataset_df may refernece the same h5, and I don't know if updating one row will have unintended
+         consequences.
+
+        Returns: None
+            Modifies self.dataset_df inplace, assigning bool to the "fc" column
 
         """
-        ps_df = self.processing_summary
         groupby = ['survey', 'station_id', 'run_id',]
-        grouper = ps_df.groupby(groupby)
-        print(len(grouper))
-        for (survey, station_id, run_id), df in grouper:
-            cond1 = self.dataset_df.survey==survey
+        grouper = self.processing_summary.groupby(groupby)
+
+        for (survey_id, station_id, run_id), df in grouper:
+            cond1 = self.dataset_df.survey == survey_id
             cond2 = self.dataset_df.station_id == station_id
             cond3 = self.dataset_df.run_id == run_id
-            run_row = self.dataset_df[cond1 & cond2 & cond3].iloc[0]
-            print("Need to update mth5_objs dict so that it is keyed by survey, then station, otra vez might break when "
-                  "mixing in data from other surveys (if the stations are named the same)")
-            # When addresssing the above issue -- consider adding the mth5_obj to self.dataset_df instead of keeping
-            # the dict around ...
+            associated_run_sub_df = self.dataset_df[cond1 & cond2 & cond3]
+            assert len(associated_run_sub_df) == 1 # should be unique
+            dataset_df_index = associated_run_sub_df.index[0]
+            run_row = associated_run_sub_df.iloc[0]
+            row_ssr_str = f"survey: {run_row.survey}, station_id: {run_row.station_id}, run_id: {run_row.run_id}"
+
+            # See Note #3 above
             mth5_obj = self.mth5_objs[station_id]
-            # Make compatible with v0.1.0 and v0.2.0:
-            # station_obj = mth5_obj.survey_group.stations_group.get_station(station_id)
-            # INSERT get_survey here so it works with v010 and v020
-            survey = mth5_obj.get_survey(survey)
-            station_obj = survey.stations_group.get_station(station_id)
+            survey_obj = mth5_obj.get_survey(survey_id)
+            station_obj = survey_obj.stations_group.get_station(station_id)
             if not station_obj.fourier_coefficients_group.groups_list:
-                print("Nothign to see here folks, return False")
-                return False
+                msg = f"Prebuilt Fourier Coefficients not detected for {row_ssr_str} -- will need to build them "
+                print(msg)
+                self.dataset_df["fc"].iat[dataset_df_index] = False
             else:
-                print(df)
-                print("New Logic for FC existence and satisfaction of processing requirements goes here")
-                raise NotImplementedError
+                print("Prebuilt Fourier Coefficients detected -- checking if they satisfy processing requirements...")
+                # Assume FC Groups are keyed by run_id, check if there is a relevant group
+                try:
+                    fc_group = station_obj.fourier_coefficients_group.get_fc_group(run_id)
+                except MTH5Error:
+                    self.dataset_df["fc"].iat[dataset_df_index] = False
+                    print(f"Run ID {run_id} not found in FC Groups, -- will need to build them ")
+                    continue
+
+                if len(fc_group.groups_list) < self.processing_config.num_decimation_levels:
+                    self.dataset_df["fc"].iat[dataset_df_index] = False
+                    print(f"Not enough FC Groups available for {row_ssr_str} -- will need to build them ")
+                    continue
+
+                # Can check time periods here if desired, but unique (survey, station, run) should make this unneeded
+                # processing_run = self.processing_config.stations.local.get_run(run_id)
+                # for tp in processing_run.time_periods:
+                #    assert tp in fc_group time periods
+
+
+                # See note #2
+                fcs_already_there = fc_group.supports_aurora_processing_config(self.processing_config,
+                                                                               run_row.remote)
+                self.dataset_df["fc"].iat[dataset_df_index] = fcs_already_there
 
         return
 
@@ -234,7 +282,7 @@ class TransferFunctionKernel(object):
         return processing_summary
 
     def validate_decimation_scheme_and_dataset_compatability(
-        self, min_num_stft_windows=2
+        self, min_num_stft_windows=None
     ):
         """
         Refers to issue #182 (and #103, and possibly #196 and #233).
@@ -242,7 +290,7 @@ class TransferFunctionKernel(object):
         that have too few samples to be passed to the STFT algorithm.
 
         Strategy for handling this:
-        Mark as invlaid rows of the processing summary that do not yield long
+        Mark as invlaid any rows of the processing summary that do not yield long
         enough time series to window.  This way all other rows, with decimations up to
         the invalid cases will still process.
 
@@ -260,6 +308,11 @@ class TransferFunctionKernel(object):
         -------
 
         """
+        if min_num_stft_windows is None:
+            min_stft_window_info = {x.decimation.level: x.min_num_stft_windows for x in self.processing_config.decimations}
+            min_stft_window_list = [min_stft_window_info[x] for x in self.processing_summary.dec_level]
+            min_num_stft_windows = pd.Series(min_stft_window_list)
+
         self.processing_summary["valid"] = (
             self.processing_summary.num_stft_windows >= min_num_stft_windows
         )
