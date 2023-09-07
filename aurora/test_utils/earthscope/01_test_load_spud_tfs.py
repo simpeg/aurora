@@ -52,7 +52,6 @@ STAGE_ID = 1
 
 # Config Params
 XML_SOURCES = ["emtf", "data"]
-USE_SECOND_WAY_OF_PARSING_REMOTES = False # Deprecated
 N_PARTITIONS = 1
 
 def prepare_dataframe_for_scraping(restrict_to_first_n_rows=False,):
@@ -73,8 +72,7 @@ def prepare_dataframe_for_scraping(restrict_to_first_n_rows=False,):
         spud_df[f"{xml_source}_error_message"] = ""
         spud_df[f"{xml_source}_remote_ref_type"] = ""
         spud_df[f"{xml_source}_remotes"] = ""
-        if USE_SECOND_WAY_OF_PARSING_REMOTES:
-            spud_df[f"{xml_source}_remotes_2"] = ""
+
 
     return spud_df
 
@@ -88,14 +86,20 @@ def enrich_row(row):
     for xml_source in XML_SOURCES:
         xml_path = SPUD_XML_PATHS[xml_source].joinpath(row[f"{xml_source}_xml_filebase"])
         try:
-            spud_tf = load_xml_tf(xml_path)
-            rr_type = get_rr_type(spud_tf)
+            tf = load_xml_tf(xml_path)
+            # OLD
+            rr_type = get_rr_type(tf)
             row[f"{xml_source}_remote_ref_type"] = rr_type
-            remotes = get_remotes_from_tf(spud_tf)
+            remotes = get_remotes_from_tf(tf)
             row[f"{xml_source}_remotes"] = ",".join(remotes)
-            if USE_SECOND_WAY_OF_PARSING_REMOTES:
-                remotes2 = get_remotes_from_tf_2(spud_tf)
-                row[f"{xml_source}_remotes_2"] = ",".join(remotes)
+
+            # NEW
+            # remotes = tf.station_metadata.transfer_function.remote_references
+            # remotes = [x for x in remotes if x != tf.station]
+            # Do we want the "self" station being returned in remotes
+            # rr_type = tf.station_metadata.transfer_function.processing_type
+            # row[f"{xml_source}_remote_ref_type"] = rr_type
+            # row[f"{xml_source}_remotes"] = ",".join(remotes)
 
         except Exception as e:
             row[f"{xml_source}_error"] = True
@@ -137,7 +141,7 @@ def summarize_errors():
 def main():
     # normal
     # results_df = batch_process(row_end=1)
-    results_df = batch_process()
+    results_df = batch_process()#row_end=100)
 
     # run only data
     #results_df = review_spud_tfs(xml_sources = ["data_xml_path", ])
