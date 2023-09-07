@@ -373,5 +373,6 @@ def process_mth5(
             tfk.config.channel_nomenclature,
             survey_metadata=tfk_dataset.survey_metadata[survey_id],
         )
+        tf_cls.station_metadata.transfer_function.processing_type = tfk.processing_type()
         tfk_dataset.close_mths_objs()
         return tf_cls
