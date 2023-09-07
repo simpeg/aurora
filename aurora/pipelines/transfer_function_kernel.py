@@ -393,6 +393,22 @@ class TransferFunctionKernel(object):
         is_valid = processing_row.valid.iloc[0]
         return is_valid
 
+    def processing_type(self):
+        """
+        A description of the processing, will get passed to TF object,
+        can be used for Z-file
+
+        Could add a version or a hashtag to this
+        Could also check dataset_df
+        If remote.all==False append "Single Station"
+        """
+        processing_type = "Aurora"
+        if self.dataset_df.remote.any():
+            processing_type = f"{processing_type}: Robust Remote Reference"
+        else:
+            processing_type = f"{processing_type}: Robust Single Station"
+        return processing_type
+
     def memory_warning(self):
         """
         Checks if we should be anitcipating a RAM issue
