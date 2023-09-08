@@ -33,8 +33,6 @@ import time
 from aurora.test_utils.earthscope.helpers import SPUD_XML_PATHS
 from aurora.test_utils.earthscope.helpers import load_xml_tf
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
-from aurora.test_utils.earthscope.helpers import get_summary_table_schema
-from aurora.test_utils.earthscope.helpers import get_summary_table_schema_v2
 from aurora.test_utils.earthscope.helpers import load_most_recent_summary
 from aurora.test_utils.earthscope.widescale_test import WidesScaleTest
 
@@ -148,8 +146,7 @@ class TestLoadSPUDTFs(WidesScaleTest):
 
 
 
-def summarize_errors():
-    xml_sources = ["data", "emtf"]
+def summarize_errors(xml_sources=DEFAULT_XML_SOURCES):
     df = load_most_recent_summary(STAGE_ID)
     for xml_source in xml_sources:
         print(f"{xml_source} error \n {df[f'{xml_source}_error'].value_counts()}\n\n")
