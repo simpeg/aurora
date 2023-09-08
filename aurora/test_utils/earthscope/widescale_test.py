@@ -24,6 +24,7 @@ class WidesScaleTest(object):
         self.parse_args()
         self.stage_id = kwargs.get("stage_id", None)
         self.jobs_df = None
+        self.save_csv = kwargs.get("save_csv", True)
 
 
     def prepare_jobs_dataframe(self):
@@ -69,12 +70,15 @@ class WidesScaleTest(object):
             meta = {x.name: x.dtype for x in schema}
             enriched_df = ddf.apply(self.enrich_row, axis=1, meta=meta).compute()
 
-        results_csv = self.summary_table_filename
-        enriched_df.to_csv(results_csv, index=False)
+        if self.save_csv:
+            results_csv = self.summary_table_filename
+            print(f"Saving results to {results_csv}")
+            enriched_df.to_csv(results_csv, index=False)
         print(f"Took {time.time() - t0}s to run STAGE {self.stage_id} with {self.n_partitions} partitions")
         return enriched_df
 
     def parse_args(self):
+        """Argparse tutorial: https://docs.python.org/3/howto/argparse.html"""
         parser = argparse.ArgumentParser(description="Wide Scale Earthscpe Test")
         parser.add_argument("--npart", help="how many partitions to use (triggers dask dataframe if > 0", type=int,
                             default=1)

@@ -145,6 +145,8 @@ def get_summary_table_schema_v2(stage_number):
         schema = make_schema_list(stage_number)
         return schema
     else:
+        msg = f"Schema not defined for stage_id {stage_number}"
+        print(msg)
         raise NotImplementedError
 
 
