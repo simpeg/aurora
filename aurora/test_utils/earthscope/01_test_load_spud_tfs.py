@@ -4,11 +4,6 @@ ingest into a mt_metadata TF object.
 
 There are two possible places to access an xml in each row, called emtf_xml_path and data_xml_path.
 
-It has been asserted that
-(df.data_remotes.astype(str)==df.data_remotes_2.astype(str)).all()
-(df.emtf_remotes.astype(str)==df.emtf_remotes_2.astype(str)).all()
-(df.emtf_remotes.astype(str) == df.data_remotes_2.astype(str)).all()
-which basically means we can deprecate one of get_remotes_from_tf, get_remotes_from_tf_2
 
 Dask Notes:
 - 0 partitions 720s
@@ -39,9 +34,6 @@ from aurora.test_utils.earthscope.helpers import SPUD_XML_PATHS
 from aurora.test_utils.earthscope.helpers import SUMMARY_TABLES_PATH
 from aurora.test_utils.earthscope.helpers import load_xml_tf
 from aurora.test_utils.earthscope.helpers import get_most_recent_summary_filepath
-from aurora.test_utils.earthscope.helpers import get_remotes_from_tf
-from aurora.test_utils.earthscope.helpers import get_remotes_from_tf_2
-from aurora.test_utils.earthscope.helpers import get_rr_type
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
 from aurora.test_utils.earthscope.helpers import get_summary_table_schema
 from aurora.test_utils.earthscope.helpers import load_most_recent_summary
@@ -53,6 +45,7 @@ STAGE_ID = 1
 # Config Params
 XML_SOURCES = ["emtf", "data"]
 N_PARTITIONS = 1
+
 
 def prepare_dataframe_for_scraping(restrict_to_first_n_rows=False,):
     """
@@ -87,19 +80,11 @@ def enrich_row(row):
         xml_path = SPUD_XML_PATHS[xml_source].joinpath(row[f"{xml_source}_xml_filebase"])
         try:
             tf = load_xml_tf(xml_path)
-            # OLD
-            rr_type = get_rr_type(tf)
-            row[f"{xml_source}_remote_ref_type"] = rr_type
-            remotes = get_remotes_from_tf(tf)
-            row[f"{xml_source}_remotes"] = ",".join(remotes)
 
-            # NEW
-            # remotes = tf.station_metadata.transfer_function.remote_references
-            # remotes = [x for x in remotes if x != tf.station]
-            # Do we want the "self" station being returned in remotes
-            # rr_type = tf.station_metadata.transfer_function.processing_type
-            # row[f"{xml_source}_remote_ref_type"] = rr_type
-            # row[f"{xml_source}_remotes"] = ",".join(remotes)
+            remotes = tf.station_metadata.transfer_function.remote_references
+            rr_type = tf.station_metadata.transfer_function.processing_type
+            row[f"{xml_source}_remote_ref_type"] = rr_type
+            row[f"{xml_source}_remotes"] = ",".join(remotes)
 
         except Exception as e:
             row[f"{xml_source}_error"] = True
