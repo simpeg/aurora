@@ -36,9 +36,6 @@ DATA_URL = "https://ds.iris.edu/spudservice/data"
 STAGE_ID = 0
 DF_SCHEMA = get_summary_table_schema_v2(STAGE_ID)
 
-# class EMTFXML(object):
-# 	def __init__(self, **kwargs):
-# 		self.filepath = kwargs.get("filepath", "")
 
 def extract_network_and_station_from_mda_info(emtf_filepath):
 	"""based on part of a bash script recievd from Laura, could use a desciption of the expected mda line format"""
@@ -221,7 +218,7 @@ def scrape_spud(row_start=0, row_end=None,
 		ddf = dd.from_pandas(df, npartitions=npartitions)
 		n_rows = len(df)
 		#meta = get_summary_table_schema(0)
-		schema = get_summary_table_schema_v2(0)
+		schema = get_summary_table_schema_v2(STAGE_ID)
 		meta = {x.name:x.dtype for x in schema}
 		enriched_df = ddf.apply(enrich_row, axis=1, meta=meta).compute()
 
