@@ -42,10 +42,9 @@ STAGE_ID = 1
 
 
 # Config Params
-XML_SOURCES = ["emtf", "data"]
-N_PARTITIONS = 1
+DEFAULT_XML_SOURCES = ["emtf", "data"]
 
-def define_dataframe_schema():
+def define_dataframe_schema(xml_sources=DEFAULT_XML_SOURCES):
     """
     builds the csv defining column names, dtypes, and default values, and saves in standards/
 
@@ -62,7 +61,7 @@ def define_dataframe_schema():
     df = pd.read_csv(schema_csv)
 
     # augment with new columns
-    for xml_source in XML_SOURCES:
+    for xml_source in xml_sources:
         name = f"{xml_source}_error"
         dtype = "bool"
         default = 0
@@ -99,7 +98,7 @@ class TestLoadSPUDTFs(WidesScaleTest):
         """
         #super(WidesScaleTest, self).__init__(**kwargs)
         super().__init__(**kwargs)
-        self._residual_variance = None
+        self.xml_sources = kwargs.get("xml_sources", DEFAULT_XML_SOURCES)
 
 
     def prepare_jobs_dataframe(self):
@@ -131,7 +130,7 @@ class TestLoadSPUDTFs(WidesScaleTest):
         Returns:
 
         """
-        for xml_source in XML_SOURCES:
+        for xml_source in self.xml_sources:
             xml_path = SPUD_XML_PATHS[xml_source].joinpath(row[f"{xml_source}_xml_filebase"])
             try:
                 tf = load_xml_tf(xml_path)
@@ -151,37 +150,35 @@ class TestLoadSPUDTFs(WidesScaleTest):
 
 def summarize_errors():
     xml_sources = ["data", "emtf"]
-    df = load_most_recent_summary(1)
+    df = load_most_recent_summary(STAGE_ID)
     for xml_source in xml_sources:
         print(f"{xml_source} error \n {df[f'{xml_source}_error'].value_counts()}\n\n")
 
-    print("OK")
+    n_xml = len(df)
+    is_not_mda = df.data_xml_filebase.str.contains("__")
+    n_non_mda = is_not_mda.sum()
+    n_mda = len(df) - n_non_mda
+    print(f"There are {n_mda} / {n_xml} files with mda string ")
+    print(f"There are {n_non_mda} / {n_xml} files without mda string ")
+    # non_mda_df = df[is_not_mda]
+    return
+
 
 def main():
     define_dataframe_schema()
-    tester = TestLoadSPUDTFs(stage_id=1)
-    tester.run_test(row_end=10)
-    # # normal
-    # # results_df = batch_process(row_end=1)
-    # results_df = batch_process()
-    #
-    # # run only data
-    # #results_df = review_spud_tfs(xml_sources = ["data_xml_path", ])
+
+    # normal
+    tester = TestLoadSPUDTFs(stage_id=STAGE_ID)
+    # tester.endrow = 5
+    tester.run_test()
 
     summarize_errors()
+    # run only data
+    # tester = TestLoadSPUDTFs(stage_id=STAGE_ID, xml_sources=["data",])
+    # tester.run_test()
+    # summarize_errors()
 
-
-    # # DEBUGGING
-    df = load_most_recent_summary(1)
-    # n_xml = len(df)
-    # is_not_mda = df.data_xml_path.str.contains("__")
-    # n_non_mda = is_not_mda.sum()
-    # n_mda = len(df) - n_non_mda
-    # print(f"There are {n_mda} / {n_xml} files with mda string ")
-    # print(f"There are {n_non_mda} / {n_xml} files without mda string ")
-    # non_mda_df = df[is_not_mda]
-    print("summarize")
-
+    return
     
 
 if __name__ == "__main__":

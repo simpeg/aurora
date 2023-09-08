@@ -12,20 +12,27 @@ def none_or_str(value):
         return None
     return value
 
+def none_or_int(value):
+    if value == 'None':
+        return None
+    return int(value)
 
 DEFAULT_N_PARTITIONS = 1
 class WidesScaleTest(object):
 
     def __init__(self, **kwargs):
+        self.parse_args()
         self.stage_id = kwargs.get("stage_id", None)
         self.jobs_df = None
-        self.n_partitions = kwargs.get("n_partitions", DEFAULT_N_PARTITIONS)
+
 
     def prepare_jobs_dataframe(self):
         """ Makes the dataframe that will be populated/iterated over """
-        pass
+        print("prepare_jobs_dataframe is not defined for Abstract Base Class")
+        raise NotImplementedError
 
     def enrich_row(self, row):
+        """ Will eventually get used by dask, but as a step we need to make this a method that works with df.apply()"""
         print("Enrich Row is not defined for Abstract Base Class")
         raise NotImplementedError
 
@@ -39,23 +46,16 @@ class WidesScaleTest(object):
         out_csv = get_summary_table_filename(self.stage_id)
         return out_csv
 
-    def run_test(self, row_start=0, row_end=None):
-
-
-        results_csv = self.summary_table_filename
-        enriched_df.to_csv(results_csv, index=False)
-        print(f"Took {time.time() - t0}s to review spud tfs, running with {N_PARTITIONS} partitions")
-        return enriched_df
-
-    def run_test(self, row_start=0, row_end=None, **kwargs):
+    def run_test(self):#, row_start=0, row_end=None, **kwargs):
         """ iterates over dataframe, enriching rows"""
         t0 = time.time()
         self.jobs_df = self.prepare_jobs_dataframe()
         df = copy.deepcopy(self.jobs_df)
 
-        if row_end is None:
-            row_end = len(df)
-        df = df[row_start:row_end]
+
+        if self.endrow is None:
+            self.endrow = len(df)
+        df = df[self.startrow:self.endrow]
         n_rows = len(df)
         print(f"nrows ---> {n_rows}")
 
@@ -72,6 +72,30 @@ class WidesScaleTest(object):
         enriched_df.to_csv(results_csv, index=False)
         print(f"Took {time.time() - t0}s to run STAGE {self.stage_id} with {self.n_partitions} partitions")
         return enriched_df
+
+    def parse_args(self):
+        parser = argparse.ArgumentParser(description="Wide Scale Earthscpe Test")
+        parser.add_argument("--npart", help="how many partitions to use (triggers dask dataframe if > 0", type=int,
+                            default=1)
+        parser.add_argument("--startrow", help="First row to process (zero-indexed)", type=int, default=0)
+        # parser.add_argument('category', type=none_or_str, nargs='?', default=None,
+        # 					help='the category of the stuff')
+        parser.add_argument("--endrow", help="Last row to process (zero-indexed)", type=none_or_int, default=None,
+                            nargs='?', )
+
+        args, unknown = parser.parse_known_args()
+
+
+        print(f"npartitions = {args.npart}")
+        self.n_partitions = args.npart
+        print(f"startrow = {args.startrow} {type(args.startrow)}")
+        self.startrow = args.startrow
+        print(f"endrow = {args.endrow} {type(args.endrow)}")
+        self.endrow = args.endrow
+        if isinstance(args.endrow, str):
+            args.endrow = int(args.endrow)
+
+        return args
 
     def report(self):
         pass
