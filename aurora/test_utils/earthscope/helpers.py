@@ -40,7 +40,7 @@ DATA_PATH = CACHE_PATH.joinpath("data")
 DATA_PATH.mkdir(parents=True, exist_ok=True)
 
 # MetaData (mth5s)
-EXPERIMENT_PATH = CACHE_PATH.joinpath("experiments")
+EXPERIMENT_PATH = CACHE_PATH.joinpath("dataless_mth5")
 EXPERIMENT_PATH.mkdir(parents=True, exist_ok=True)
 
 # Transfer Functions
@@ -140,7 +140,7 @@ def get_summary_table_schema_v2(stage_number):
     -------
 
     """
-    if stage_number in [0, 1, ]:
+    if stage_number in [0, 1, 2,]:
         from aurora.test_utils.earthscope.metadata import make_schema_list
         schema = make_schema_list(stage_number)
         return schema

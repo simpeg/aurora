@@ -30,39 +30,184 @@ from aurora.test_utils.earthscope.data_availability import url_maker
 from aurora.test_utils.earthscope.helpers import EXPERIMENT_PATH
 from aurora.test_utils.earthscope.helpers import get_most_recent_summary_filepath
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
-from aurora.test_utils.earthscope.helpers import get_summary_table_schema
 from aurora.test_utils.earthscope.helpers import restrict_to_mda
 from aurora.test_utils.earthscope.helpers import SUMMARY_TABLES_PATH
 from aurora.test_utils.earthscope.helpers import timestamp_now
 from aurora.test_utils.earthscope.helpers import USE_CHANNEL_WILDCARDS
+from aurora.test_utils.earthscope.widescale_test import WidesScaleTest
 from mth5.mth5 import MTH5
 from mth5.clients import FDSN
 
 STAGE_ID = 2
 KNOWN_NON_EARTHCSCOPE_STATIONS = ["FRD", ]
-COVERAGE_DF_SCHEMA = get_summary_table_schema(STAGE_ID)
 
 
 # CONFIG
 MTH5_VERSION = "0.2.0"
-VERBOSITY = 1
-AUGMENT_WITH_EXISTING = True
-USE_SKELETON = True # speeds up preparing the dataframe
-N_PARTITIONS = 1
-RAISE_EXCEPTION_IF_DATA_AVAILABILITY_EMPTY = True
-MAX_TRIES = 3
-
-if not USE_CHANNEL_WILDCARDS:
-    DATA_AVAILABILITY = DataAvailability()
 
 
+class TestDatalessMTH5(WidesScaleTest):
+
+    def __init__(self, **kwargs):
+        """
+        data_availability_exception: bool
+        If True, raise exception of DataAvailablty empty
+        """
+        #super(WidesScaleTest, self).__init__(**kwargs)
+        super().__init__(**kwargs)
+        self.augment_with_existing = kwargs.get("augment_with_existing", True)
+        self.use_skeleton = kwargs.get("use_skeleton", True) # speeds up preparation of dataframe
+        self.skeleton_file = "skeleton_02.csv"
+        self.xml_source = "data" # "data" or "emtf"
+        self._data_availability = None
+        self.use_channel_wildcards = kwargs.get("use_channel_wildcards", False)
+        self.data_availability_exception = kwargs.get("data_availability_exception", True)
+        self.max_number_download_attempts = kwargs.get("max_number_download_attempts", 3)
 
 
-def already_in_df(df, network_id, station_id):
-    cond1 = df.network_id.isin([network_id, ])
-    cond2 = df.station_id.isin([station_id, ])
-    sub_df = df[cond1 & cond2]
-    return len(sub_df)
+    @property
+    def data_availability(self):
+        if self._data_availability is None:
+            self._data_availability = DataAvailability()
+        return self._data_availability
+
+    def prepare_jobs_dataframe(self, source_csv=None):
+        """
+        Define the data structure that is output from this stage of processing
+        """
+        schema = self.get_dataframe_schema()
+        schema_defaults = {x.name:x.default for x in schema}
+        def initialize_metadata_df():
+            """ """
+            schema = self.get_dataframe_schema()
+            column_names = [x.name for x in schema]
+            df = pd.DataFrame(columns=column_names)
+            return df
+
+        if self.use_skeleton:
+            df = pd.read_csv(self.skeleton_file)
+            return df
+
+        # ?deprecate and force to start from scratch?
+        # try:
+        #     coverage_csv = get_summary_table_filename(STAGE_ID)
+        #     coverage_df = pd.read_csv(coverage_csv)
+        # except FileNotFoundError:
+        #     coverage_df = initialize_metadata_df()
+        coverage_df = initialize_metadata_df()
+
+        if not source_csv:
+            source_csv = get_most_recent_summary_filepath(1)
+        spud_df = pd.read_csv(source_csv)
+        spud_df = restrict_to_mda(spud_df)
+        print(f"Restricting spud_df to mda (Earthscope) entries: {len(spud_df)} rows")
+
+        for i_row, row in spud_df.iterrows():
+            # Ignore XML that cannot be read
+            if row[f"{self.xml_source}_error"] is True:
+                print(f"Skipping {row.emtf_id} for now, tf not reading in")
+                continue
+
+            # Sort out remotes
+            remotes = row.data_remotes.split(",")
+            if len(remotes) == 1:
+                if remotes[0] == "nan":
+                    remotes = []
+            if remotes:
+                print(f"remotes: {remotes} ")
+
+            all_stations = [row.station_id, ] + remotes
+            network_id = row.network_id
+            for original_station_id in all_stations:
+                # handle wonky station_ids, ignore ambigous or incorrect labels
+                station_id = analyse_station_id(original_station_id)
+                if not station_id:
+                    continue
+
+                #only assign known values, set other columns en masse later
+                new_row = {"station_id": station_id,
+                           "network_id": network_id,
+                           "emtf_id": row.emtf_id,
+                           "data_id": row.data_id,
+                           "data_xml_filebase": row.data_xml_filebase}
+                # of course we should collect all the dictionaries first and then build the df,
+                # this is inefficient, but tis a work in progress.
+                coverage_df = coverage_df.append(new_row, ignore_index=True)
+
+        # Now have coverage df, but need to uniquify it
+        print(len(coverage_df))
+        subset = ['network_id', 'station_id']
+        ucdf = coverage_df.drop_duplicates(subset=subset, keep='first')
+        print(len(ucdf))
+        # Assign default values to columns
+        for col in schema:
+            if not ucdf[col.name].any():
+                ucdf[col.name] = col.default
+                if col.dtype == "string":
+                    ucdf[col.name] = ""
+        ucdf.to_csv(self.skeleton_file, index=False)
+        return ucdf
+
+
+    def enrich_row(self, row):
+        """
+        This will eventually get used by dask, but as a step we need to make this a method
+        that works with df.apply()
+        Returns:
+
+        """
+        try:
+            request_df = row_to_request_df(row, self.data_availability, verbosity=1,
+                                           use_channel_wildcards=self.use_channel_wildcards,
+                                           raise_exception_if_data_availability_empty=self.data_availability_exception)
+
+        except Exception as e:
+            print(f"{e}")
+            row["num_channels_inventory"] = 0
+            row["num_channels_h5"] = 0
+            row["exception"] = e.__class__.__name__
+            row["error_message"] = e.args[0]
+            return row
+
+        fdsn_object = FDSN(mth5_version=MTH5_VERSION)
+        fdsn_object.client = "IRIS"
+        expected_file_name = EXPERIMENT_PATH.joinpath(fdsn_object.make_filename(request_df))
+
+        if expected_file_name.exists():
+            print(f"Already have data for {row.network_id}-{row.station_id}")
+
+            if self.augment_with_existing:
+                m = MTH5()
+                m.open_mth5(expected_file_name)
+                channel_summary_df = get_augmented_channel_summary(m)
+                m.close_mth5()
+                add_row_properties(expected_file_name, channel_summary_df, row)
+        else:
+            n_tries = 0
+            while n_tries < self.max_number_download_attempts:
+                try:
+                    inventory, data = fdsn_object.get_inventory_from_df(request_df, data=False)
+                    n_ch_inventory = len(inventory.networks[0].stations[0].channels)
+                    row["num_channels_inventory"] = n_ch_inventory
+                    experiment = get_experiment_from_obspy_inventory(inventory)
+                    m = mth5_from_experiment(experiment, expected_file_name)
+                    m.channel_summary.summarize()
+                    channel_summary_df = get_augmented_channel_summary(m)
+                    m.close_mth5()
+                    add_row_properties(expected_file_name, channel_summary_df, row)
+                    n_tries = self.max_number_download_attempts
+                except Exception as e:
+                    print(f"{e}")
+                    row["num_channels_inventory"] = 0
+                    row["num_channels_h5"] = 0
+                    row["exception"] = e.__class__.__name__
+                    row["error_message"] = e.args[0]
+                    n_tries += 1
+                    if e.__class__.__name__ == "DataAvailabilityException":
+                        n_tries = self.max_number_download_attempts
+        return row
+
+
 
 
 def analyse_station_id(station_id):
@@ -105,90 +250,6 @@ def analyse_station_id(station_id):
     return station_id
 
 
-def prepare_dataframe_for_processing(source_csv=None, use_skeleton=USE_SKELETON, xml_source="data"):
-    """
-    Towards parallelization, make the skeleton of the dataframe first, and then fill it in.
-    Previously, we had added rows to the dataframe on the fly.
-
-
-    Note 1: The main for-loop executes over each row of spud_df (the existing TFs) but the output df can have
-     appreciably more rows than spud_df because multiple reference stations maybe assocated with a given TF.
-
-    Returns
-    -------
-
-    """
-
-    def initialize_metadata_df():
-        """ """
-        column_names = list(COVERAGE_DF_SCHEMA.keys())
-        df = pd.DataFrame(columns=column_names)
-        return df
-
-    skeleton_file = "02_skeleton.csv"
-    if use_skeleton:
-        df = pd.read_csv(skeleton_file)
-        return df
-
-    try:
-        coverage_csv = get_summary_table_filename(STAGE_ID)
-        coverage_df = pd.read_csv(coverage_csv)
-    except FileNotFoundError:
-        coverage_df = initialize_metadata_df()
-
-    if not source_csv:
-        source_csv = get_most_recent_summary_filepath(1)
-    spud_df = pd.read_csv(source_csv)
-    spud_df = restrict_to_mda(spud_df)
-    print(f"Restricting spud_df to mda (Earthscope) entries: {len(spud_df)} rows")
-
-    for i_row, row in spud_df.iterrows():
-        # Ignore XML that cannot be read
-        if row[f"{xml_source}_error"] is True:
-            print(f"Skipping {row.emtf_id} for now, tf not reading in")
-            continue
-
-        # Sort out remotes
-        remotes = row.data_remotes.split(",")
-        if len(remotes)==1:
-            if remotes[0] == "nan":
-                remotes = []
-        if remotes:
-            print(f"remotes: {remotes} ")
-
-        all_stations = [row.station_id,] + remotes
-        network_id = row.network_id
-        for original_station_id in all_stations:
-            # handle wonky station_ids, ignore ambigous or incorrect labels
-            station_id = analyse_station_id(original_station_id)
-            if not station_id:
-                continue
-
-            new_row = {"station_id": station_id,
-                       "network_id": network_id,
-                       "emtf_id": row.emtf_id,
-                       "data_id": row.data_id,
-                       "data_xml_filebase": row.data_xml_filebase}
-            new_row["filename"] = ""
-            new_row["filesize"] = ""
-            new_row["num_channels_inventory"] = -1
-            new_row["num_filterless_channels"] = -1
-            new_row["filter_units_in_details"] = ""
-            new_row["filter_units_out_details"]  = ""
-            new_row["num_channels_h5"] = -1
-            new_row["exception"] = ""
-            new_row["error_message"] = ""
-            # of course we should collect all the dictionaries first and then build the df,
-            # this is inefficient, but tis a work in progress.
-            coverage_df = coverage_df.append(new_row, ignore_index=True)
-
-    # Now you have coverage df, but you need to uniquify it
-    print(len(coverage_df))
-    subset = ['network_id', 'station_id']
-    ucdf = coverage_df.drop_duplicates(subset=subset, keep='first')
-    print(len(ucdf))
-    ucdf.to_csv("02_skeleton.csv", index=False)
-    return ucdf
 
 def get_augmented_channel_summary(m):
     channel_summary_df = m.channel_summary.to_dataframe()
@@ -219,85 +280,7 @@ def add_row_properties(expected_file_name, channel_summary_df, row):
     row["error_message"] = ""
     #return row
 
-def get_from_iris():
-    """Tool for multitry"""
-    pass
 
-def enrich_row(row):
-    try:
-        request_df = row_to_request_df(row, DATA_AVAILABILITY, verbosity=1, use_channel_wildcards=USE_CHANNEL_WILDCARDS,
-                          raise_exception_if_data_availability_empty=RAISE_EXCEPTION_IF_DATA_AVAILABILITY_EMPTY)
-
-    except Exception as e:
-        print(f"{e}")
-        row["num_channels_inventory"] = 0
-        row["num_channels_h5"] = 0
-        row["exception"] = e.__class__.__name__
-        row["error_message"] = e.args[0]
-        return row
-
-    fdsn_object = FDSN(mth5_version=MTH5_VERSION)
-    fdsn_object.client = "IRIS"
-    expected_file_name = EXPERIMENT_PATH.joinpath(fdsn_object.make_filename(request_df))
-
-    if expected_file_name.exists():
-        print(f"Already have data for {row.network_id}-{row.station_id}")
-
-        if AUGMENT_WITH_EXISTING:
-            m = MTH5()
-            m.open_mth5(expected_file_name)
-            channel_summary_df = get_augmented_channel_summary(m)
-            m.close_mth5()
-            add_row_properties(expected_file_name, channel_summary_df, row)
-    else:
-        n_tries = 0
-        while n_tries < MAX_TRIES:
-            try:
-                inventory, data = fdsn_object.get_inventory_from_df(request_df, data=False)
-                n_ch_inventory = len(inventory.networks[0].stations[0].channels)
-                row["num_channels_inventory"] = n_ch_inventory
-                experiment = get_experiment_from_obspy_inventory(inventory)
-                m = mth5_from_experiment(experiment, expected_file_name)
-                m.channel_summary.summarize()
-                channel_summary_df = get_augmented_channel_summary(m)
-                m.close_mth5()
-                add_row_properties(expected_file_name, channel_summary_df, row)
-                n_tries = MAX_TRIES
-            except Exception as e:
-                print(f"{e}")
-                row["num_channels_inventory"] = 0
-                row["num_channels_h5"] = 0
-                row["exception"] = e.__class__.__name__
-                row["error_message"] = e.args[0]
-                n_tries += 1
-                if e.__class__.__name__ == "DataAvailabilityException":
-                    n_tries = MAX_TRIES
-    return row
-
-
-def batch_download_metadata_v2(row_start=0, row_end=None):
-    if USE_CHANNEL_WILDCARDS:
-        availabile_channels = ["*Q*", "*F*", ]
-    else:
-        DATA_AVAILABILITY = DataAvailability()
-
-    df = prepare_dataframe_for_processing()
-
-    if row_end is None:
-        row_end = len(df)
-    df = df[row_start:row_end]
-
-    if not N_PARTITIONS:
-        enriched_df = df.apply(enrich_row, axis=1)
-    else:
-        import dask.dataframe as dd
-        ddf = dd.from_pandas(df, npartitions=N_PARTITIONS)
-        n_rows = len(df)
-        df_schema = get_summary_table_schema(2)
-        enriched_df = ddf.apply(enrich_row, axis=1, meta=df_schema).compute()
-
-    coverage_csv = get_summary_table_filename(STAGE_ID)
-    enriched_df.to_csv(coverage_csv, index=False)
 
 def scan_data_availability_exceptions():
     """
@@ -330,7 +313,6 @@ def review_results():
 
     coverage_csv = get_summary_table_filename(STAGE_ID)
     df = pd.read_csv(coverage_csv)
-    df = df[COVERAGE_DF_SCHEMA] #sort columns in desired order
 
     to_str_cols = ["network_id", "station_id", "exception"]
     for str_col in to_str_cols:
@@ -389,14 +371,21 @@ def exception_analyser():
 
 
 def main():
+    t0 = time.time()
+    tester = TestDatalessMTH5(stage_id=STAGE_ID,
+                              save_csv=True,
+                              data_availability_exception=True,
+                              use_channel_wildcards=USE_CHANNEL_WILDCARDS,
+                              use_skeleton=False,
+                              augment_with_existing=True,
+                              )
+    tester.endrow = 5
+    tester.run_test()
     # exception_analyser()
     # scan_data_availability_exceptions()
-    t0 = time.time()
-    batch_download_metadata_v2() # row_end=2)
-    print(f"Total scraping time {time.time() - t0} using {N_PARTITIONS} partitions")
     review_results()
     total_time_elapsed = time.time() - t0
-    print(f"Total scraping & review time {total_time_elapsed:.2f}s using {N_PARTITIONS} partitions")
+    print(f"Total scraping & review time {total_time_elapsed:.2f}s using {tester.n_partitions} partitions")
 
 if __name__ == "__main__":
     main()
