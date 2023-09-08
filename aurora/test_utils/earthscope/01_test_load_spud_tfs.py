@@ -34,7 +34,10 @@ from aurora.test_utils.earthscope.helpers import SPUD_XML_PATHS
 from aurora.test_utils.earthscope.helpers import load_xml_tf
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
 from aurora.test_utils.earthscope.helpers import load_most_recent_summary
+from aurora.test_utils.earthscope.standards import SCHEMA_CSVS
 from aurora.test_utils.earthscope.widescale_test import WidesScaleTest
+
+
 
 STAGE_ID = 1
 
@@ -162,7 +165,9 @@ def summarize_errors(xml_sources=DEFAULT_XML_SOURCES):
 
 
 def main():
-    define_dataframe_schema()
+    schema_csv = SCHEMA_CSVS[STAGE_ID]
+    if not schema_csv.exists():
+        define_dataframe_schema()
 
     # normal
     tester = TestLoadSPUDTFs(stage_id=STAGE_ID)
