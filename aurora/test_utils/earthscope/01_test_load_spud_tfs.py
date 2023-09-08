@@ -31,11 +31,10 @@ import pathlib
 import time
 
 from aurora.test_utils.earthscope.helpers import SPUD_XML_PATHS
-from aurora.test_utils.earthscope.helpers import SUMMARY_TABLES_PATH
 from aurora.test_utils.earthscope.helpers import load_xml_tf
-from aurora.test_utils.earthscope.helpers import get_most_recent_summary_filepath
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
 from aurora.test_utils.earthscope.helpers import get_summary_table_schema
+from aurora.test_utils.earthscope.helpers import get_summary_table_schema_v2
 from aurora.test_utils.earthscope.helpers import load_most_recent_summary
 
 
@@ -46,6 +45,15 @@ STAGE_ID = 1
 XML_SOURCES = ["emtf", "data"]
 N_PARTITIONS = 1
 
+def define_dataframe_schema():
+    """
+    builds the csv defining column names, dtypes, and default values, and saves in standards/
+
+    In this specific case, we start with the schema from the previous stage (0) and add columns
+
+    """
+
+    pass
 
 def prepare_dataframe_for_scraping(restrict_to_first_n_rows=False,):
     """
@@ -136,7 +144,6 @@ def main():
 
     # # DEBUGGING
     df = load_most_recent_summary(1)
-    # old_df = pd.read_csv(SUMMARY_TABLES_PATH.joinpath("01_spud_xml_review_2023-06-03_114350.csv"))
     # n_xml = len(df)
     # is_not_mda = df.data_xml_path.str.contains("__")
     # n_non_mda = is_not_mda.sum()
