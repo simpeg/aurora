@@ -140,7 +140,7 @@ def get_summary_table_schema_v2(stage_number):
     -------
 
     """
-    if stage_number in [0,]:
+    if stage_number in [0, 1, ]:
         from aurora.test_utils.earthscope.metadata import make_schema_list
         schema = make_schema_list(stage_number)
         return schema
@@ -159,6 +159,7 @@ def get_summary_table_schema(stage_number):
     a table at any stage, taking only the schema as input.
 
     """
+    print("TO BE DEPRECATED and replaced by CSV SCHEMA")
     # Stages 0 and 1
     schemata = {}
     schemata[0] = {'emtf_id': "int64", 'data_id': 'int64', 'fail': 'bool',
@@ -285,7 +286,7 @@ def load_most_recent_summary(stage_number):
 
 
 KEEP_COLUMNS = ['emtf_id', 'data_id','data_file_size','data_xml_filebase',
-                'data_error', 'data_remote_ref_type', 'data_remotes',]
+                'data_error', 'data_processing_type', 'data_remotes',]
 
 def restrict_to_mda(df, RR=None, keep_columns=KEEP_COLUMNS):
     """
@@ -307,7 +308,7 @@ def restrict_to_mda(df, RR=None, keep_columns=KEEP_COLUMNS):
 
 
     if RR:
-        is_rrr = mda_df.data_remote_ref_type == RR
+        is_rrr = mda_df.data_processing_type == RR
         mda_df = mda_df[is_rrr]
         mda_df.reset_index(drop=True, inplace=True)
 

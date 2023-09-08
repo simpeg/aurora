@@ -51,31 +51,70 @@ def define_dataframe_schema():
 
     In this specific case, we start with the schema from the previous stage (0) and add columns
 
+    Flow:
+        - read previous CSV
+        - augment with new columns
+        - save with a new name
     """
+    #read previous CSV
+    from aurora.test_utils.earthscope.standards import SCHEMA_CSVS
+    schema_csv = SCHEMA_CSVS[0]
+    df = pd.read_csv(schema_csv)
 
-    pass
+    # augment with new columns
+    for xml_source in XML_SOURCES:
+        name = f"{xml_source}_error"
+        dtype = "bool"
+        default = 0
+        df.loc[len(df)] = [name, dtype, default]
 
-def prepare_dataframe_for_scraping(restrict_to_first_n_rows=False,):
+        name = f"{xml_source}_exception"
+        dtype = "string"
+        default = ""
+        df.loc[len(df)] = [name, dtype, default]
+
+        name = f"{xml_source}_error_message"
+        dtype = "string"
+        default = ""
+        df.loc[len(df)] = [name, dtype, default]
+
+        name = f"{xml_source}_processing_type" # was _remote_ref_type
+        dtype = "string"
+        default = ""
+        df.loc[len(df)] = [name, dtype, default]
+        print("DONT FORGET TO ADD HANDLING FOR THE CHANGE IN COLUMN NAME")
+        print("LEGACY: _remote_ref_type, MODERN _processing_type")
+        name = f"{xml_source}_remotes"
+        dtype = "string"
+        default = ""
+        df.loc[len(df)] = [name, dtype, default]
+
+    # save with a new name
+    new_schema_csv = schema_csv.__str__().replace("00", "01")
+    df.to_csv(new_schema_csv)
+
+
+def prepare_dataframe():
     """
     Define the data structure that is output from this stage of processing
     It is basically the df from the prvious stage (0) with some new rows added.
-
-    :param restrict_to_first_n_rows:
-    :return:
     """
     spud_xml_csv = get_summary_table_filename(0)
-    spud_df = pd.read_csv(spud_xml_csv)
+    df = pd.read_csv(spud_xml_csv)
 
-    # Set Up Schema with default values
-    for xml_source in XML_SOURCES:
-        spud_df[f"{xml_source}_error"] = False
-        spud_df[f"{xml_source}_exception"] = ""
-        spud_df[f"{xml_source}_error_message"] = ""
-        spud_df[f"{xml_source}_remote_ref_type"] = ""
-        spud_df[f"{xml_source}_remotes"] = ""
+    schema = get_summary_table_schema_v2(1)
+    for col in schema:
+        default = col.default
+        if col.dtype == "int64":
+            default = int(default)
+        if col.dtype == "bool":
+            default = bool(int(default))
+        if col.name not in df.columns:
+            df[col.name] = default
+            if col.dtype == "string":
+                df[col.name] = ""
 
-
-    return spud_df
+    return df
 
 def enrich_row(row):
     """
@@ -88,10 +127,9 @@ def enrich_row(row):
         xml_path = SPUD_XML_PATHS[xml_source].joinpath(row[f"{xml_source}_xml_filebase"])
         try:
             tf = load_xml_tf(xml_path)
-
             remotes = tf.station_metadata.transfer_function.remote_references
             rr_type = tf.station_metadata.transfer_function.processing_type
-            row[f"{xml_source}_remote_ref_type"] = rr_type
+            row[f"{xml_source}_processing_type"] = rr_type
             row[f"{xml_source}_remotes"] = ",".join(remotes)
 
         except Exception as e:
@@ -103,7 +141,7 @@ def enrich_row(row):
 
 def batch_process(row_start=0, row_end=None):
     t0 = time.time()
-    df = prepare_dataframe_for_scraping()
+    df = prepare_dataframe()
     if row_end is None:
         row_end = len(df)
     df = df[row_start:row_end]
@@ -114,8 +152,11 @@ def batch_process(row_start=0, row_end=None):
         ddf = dd.from_pandas(df, npartitions=N_PARTITIONS)
         n_rows = len(df)
         print(f"nrows ---> {n_rows}")
-        df_schema = get_summary_table_schema(STAGE_ID)
-        enriched_df = ddf.apply(enrich_row, axis=1, meta=df_schema).compute()
+        # df_schema = get_summary_table_schema(STAGE_ID)
+        # enriched_df = ddf.apply(enrich_row, axis=1, meta=df_schema).compute()
+        schema = get_summary_table_schema_v2(STAGE_ID)
+        meta = {x.name: x.dtype for x in schema}
+        enriched_df = ddf.apply(enrich_row, axis=1, meta=meta).compute()
 
     results_csv = get_summary_table_filename(STAGE_ID)
     enriched_df.to_csv(results_csv, index=False)
@@ -132,9 +173,10 @@ def summarize_errors():
     print("OK")
 
 def main():
+    define_dataframe_schema()
     # normal
     # results_df = batch_process(row_end=1)
-    results_df = batch_process()#row_end=100)
+    results_df = batch_process()
 
     # run only data
     #results_df = review_spud_tfs(xml_sources = ["data_xml_path", ])
