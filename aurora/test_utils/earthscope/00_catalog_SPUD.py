@@ -95,7 +95,7 @@ def to_download_or_not_to_download(filepath, force_download, emtf_or_data=""):
 		download = True
 	return download
 
-def prepare_dataframe_for_scraping(restrict_to_first_n_rows=False):
+def prepare_dataframe(restrict_to_first_n_rows=False):
 	"""
 	Reads in list of spud emtf_ids and initializes a dataframe
 	Define columns and default values
@@ -205,7 +205,7 @@ def scrape_spud(row_start=0, row_end=None,
 	-------
 
 	"""
-	df = prepare_dataframe_for_scraping(restrict_to_first_n_rows=restrict_to_first_n_rows)
+	df = prepare_dataframe(restrict_to_first_n_rows=restrict_to_first_n_rows)
 
 	if row_end is None:
 		row_end = len(df)
