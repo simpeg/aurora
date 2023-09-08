@@ -51,13 +51,14 @@ class WidesScaleTest(object):
         t0 = time.time()
         self.jobs_df = self.prepare_jobs_dataframe()
         df = copy.deepcopy(self.jobs_df)
-
-
+        info_str = f"There are {len(df)} rows in jobs dataframe"
         if self.endrow is None:
             self.endrow = len(df)
+        if (self.startrow != 0) or (self.endrow != len(df)):
+            info_str += f"\n restricting df to df[{self.startrow}:{self.endrow}] for testing"
         df = df[self.startrow:self.endrow]
-        n_rows = len(df)
-        print(f"nrows ---> {n_rows}")
+        info_str += f"\n Processing {len(df)} rows"
+        print(info_str)
 
         if not self.n_partitions:
             enriched_df = df.apply(self.enrich_row, axis=1)
