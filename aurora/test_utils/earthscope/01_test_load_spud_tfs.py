@@ -36,7 +36,7 @@ from aurora.test_utils.earthscope.helpers import get_summary_table_filename
 from aurora.test_utils.earthscope.helpers import get_summary_table_schema
 from aurora.test_utils.earthscope.helpers import get_summary_table_schema_v2
 from aurora.test_utils.earthscope.helpers import load_most_recent_summary
-
+from aurora.test_utils.earthscope.widescale_test import WidesScaleTest
 
 STAGE_ID = 1
 
@@ -82,8 +82,6 @@ def define_dataframe_schema():
         dtype = "string"
         default = ""
         df.loc[len(df)] = [name, dtype, default]
-        print("DONT FORGET TO ADD HANDLING FOR THE CHANGE IN COLUMN NAME")
-        print("LEGACY: _remote_ref_type, MODERN _processing_type")
         name = f"{xml_source}_remotes"
         dtype = "string"
         default = ""
@@ -93,75 +91,62 @@ def define_dataframe_schema():
     new_schema_csv = schema_csv.__str__().replace("00", "01")
     df.to_csv(new_schema_csv)
 
+class TestLoadSPUDTFs(WidesScaleTest):
 
-def prepare_dataframe():
-    """
-    Define the data structure that is output from this stage of processing
-    It is basically the df from the prvious stage (0) with some new rows added.
-    """
-    spud_xml_csv = get_summary_table_filename(0)
-    df = pd.read_csv(spud_xml_csv)
+    def __init__(self, **kwargs):
+        """
 
-    schema = get_summary_table_schema_v2(1)
-    for col in schema:
-        default = col.default
-        if col.dtype == "int64":
-            default = int(default)
-        if col.dtype == "bool":
-            default = bool(int(default))
-        if col.name not in df.columns:
-            df[col.name] = default
-            if col.dtype == "string":
-                df[col.name] = ""
-
-    return df
-
-def enrich_row(row):
-    """
-    This will eventually get used by dask, but as a step we need to make this a method
-    that works with df.apply()
-    Returns:
-
-    """
-    for xml_source in XML_SOURCES:
-        xml_path = SPUD_XML_PATHS[xml_source].joinpath(row[f"{xml_source}_xml_filebase"])
-        try:
-            tf = load_xml_tf(xml_path)
-            remotes = tf.station_metadata.transfer_function.remote_references
-            rr_type = tf.station_metadata.transfer_function.processing_type
-            row[f"{xml_source}_processing_type"] = rr_type
-            row[f"{xml_source}_remotes"] = ",".join(remotes)
-
-        except Exception as e:
-            row[f"{xml_source}_error"] = True
-            row[f"{xml_source}_exception"] = e.__class__.__name__
-            row[f"{xml_source}_error_message"] = e.args[0]
-    return row
+        """
+        #super(WidesScaleTest, self).__init__(**kwargs)
+        super().__init__(**kwargs)
+        self._residual_variance = None
 
 
-def batch_process(row_start=0, row_end=None):
-    t0 = time.time()
-    df = prepare_dataframe()
-    if row_end is None:
-        row_end = len(df)
-    df = df[row_start:row_end]
-    if not N_PARTITIONS:
-        enriched_df = df.apply(enrich_row, axis=1)
-    else:
-        import dask.dataframe as dd
-        ddf = dd.from_pandas(df, npartitions=N_PARTITIONS)
-        n_rows = len(df)
-        print(f"nrows ---> {n_rows}")
-        # df_schema = get_summary_table_schema(STAGE_ID)
-        # enriched_df = ddf.apply(enrich_row, axis=1, meta=df_schema).compute()
-        schema = get_summary_table_schema_v2(STAGE_ID)
-        meta = {x.name: x.dtype for x in schema}
-        enriched_df = ddf.apply(enrich_row, axis=1, meta=meta).compute()
+    def prepare_jobs_dataframe(self):
+        """
+        Define the data structure that is output from this stage of processing
+        It is basically the df from the prvious stage (0) with some new rows added.
+        """
+        spud_xml_csv = get_summary_table_filename(0)
+        df = pd.read_csv(spud_xml_csv)
 
-    results_csv = get_summary_table_filename(STAGE_ID)
-    enriched_df.to_csv(results_csv, index=False)
-    print(f"Took {time.time()-t0}s to review spud tfs, running with {N_PARTITIONS} partitions")
-    return enriched_df
+        schema = self.get_dataframe_schema()
+        for col in schema:
+            default = col.default
+            if col.dtype == "int64":
+                default = int(default)
+            if col.dtype == "bool":
+                default = bool(int(default))
+            if col.name not in df.columns:
+                df[col.name] = default
+                if col.dtype == "string":
+                    df[col.name] = ""
+
+        return df
+
+    def enrich_row(self, row):
+        """
+        This will eventually get used by dask, but as a step we need to make this a method
+        that works with df.apply()
+        Returns:
+
+        """
+        for xml_source in XML_SOURCES:
+            xml_path = SPUD_XML_PATHS[xml_source].joinpath(row[f"{xml_source}_xml_filebase"])
+            try:
+                tf = load_xml_tf(xml_path)
+                remotes = tf.station_metadata.transfer_function.remote_references
+                rr_type = tf.station_metadata.transfer_function.processing_type
+                row[f"{xml_source}_processing_type"] = rr_type
+                row[f"{xml_source}_remotes"] = ",".join(remotes)
+
+            except Exception as e:
+                row[f"{xml_source}_error"] = True
+                row[f"{xml_source}_exception"] = e.__class__.__name__
+                row[f"{xml_source}_error_message"] = e.args[0]
+        return row
+
+
 
 
 def summarize_errors():
@@ -174,12 +159,14 @@ def summarize_errors():
 
 def main():
     define_dataframe_schema()
-    # normal
-    # results_df = batch_process(row_end=1)
-    results_df = batch_process()
-
-    # run only data
-    #results_df = review_spud_tfs(xml_sources = ["data_xml_path", ])
+    tester = TestLoadSPUDTFs(stage_id=1)
+    tester.run_test(row_end=10)
+    # # normal
+    # # results_df = batch_process(row_end=1)
+    # results_df = batch_process()
+    #
+    # # run only data
+    # #results_df = review_spud_tfs(xml_sources = ["data_xml_path", ])
 
     summarize_errors()
 
