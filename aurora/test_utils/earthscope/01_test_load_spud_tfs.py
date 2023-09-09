@@ -131,6 +131,7 @@ class TestLoadSPUDTFs(WidesScaleTest):
         Returns:
 
         """
+        print(f"Processing row {row.name}")
         for xml_source in self.xml_sources:
             xml_path = SPUD_XML_PATHS[xml_source].joinpath(row[f"{xml_source}_xml_filebase"])
             try:
@@ -171,7 +172,7 @@ def main():
 
     # normal
     tester = TestLoadSPUDTFs(stage_id=STAGE_ID)
-    # tester.endrow = 5
+    # tester.endrow = 5; tester.save_csv = False;
     tester.run_test()
 
     summarize_errors()
