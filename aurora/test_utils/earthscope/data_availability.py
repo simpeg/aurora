@@ -7,7 +7,7 @@ from aurora.test_utils.earthscope.helpers import DATA_AVAILABILITY_PATHS
 def load_data_availability_dfs(public_or_restricted="public"):
     data_availability_path = DATA_AVAILABILITY_PATHS[public_or_restricted]
     output = {}
-    globby = data_availability_path.glob("*txt")
+    globby = data_availability_path.glob("mt_availability_*txt")
     for txt_file in globby:
         print(txt_file)
         network_id = txt_file.name.split("_")[-1].split(".txt")[0]
