@@ -27,13 +27,14 @@ CACHE_PATH.mkdir(parents=True, exist_ok=True)
 ## PLACEHOLDER FOR CONFIG
 
 # Data Availability
-DATA_AVAILABILITY_PATH = CACHE_PATH.joinpath("data_availability")
-DATA_AVAILABILITY_PATH.mkdir(parents=True, exist_ok=True)
-PUBLIC_DATA_AVAILABILITY_PATH = DATA_AVAILABILITY_PATH.joinpath("public")
-PUBLIC_DATA_AVAILABILITY_PATH.mkdir(parents=True, exist_ok=True)
-RESTRICTED_DATA_AVAILABILITY_PATH = DATA_AVAILABILITY_PATH.joinpath("restricted")
-RESTRICTED_DATA_AVAILABILITY_PATH.mkdir(parents=True, exist_ok=True)
-DATA_AVAILABILITY_CSV = DATA_AVAILABILITY_PATH.joinpath("MT_acquisitions.csv")
+DATA_AVAILABILITY_PATHS = {}
+DATA_AVAILABILITY_PATHS["base"] = CACHE_PATH.joinpath("data_availability")
+DATA_AVAILABILITY_PATHS["base"].mkdir(parents=True, exist_ok=True)
+DATA_AVAILABILITY_PATHS["public"] = DATA_AVAILABILITY_PATHS["base"].joinpath("public")
+DATA_AVAILABILITY_PATHS["public"].mkdir(parents=True, exist_ok=True)
+DATA_AVAILABILITY_PATHS["restricted"] = DATA_AVAILABILITY_PATHS["base"].joinpath("restricted")
+DATA_AVAILABILITY_PATHS["restricted"].mkdir(parents=True, exist_ok=True)
+DATA_AVAILABILITY_CSV = DATA_AVAILABILITY_PATHS["base"].joinpath("MT_acquisitions.csv")
 
 # Data (mth5s)
 DATA_PATH = CACHE_PATH.joinpath("data")

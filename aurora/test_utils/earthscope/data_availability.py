@@ -1,12 +1,13 @@
 import pandas as pd
 
 from aurora.sandbox.mth5_helpers import build_request_df
-from aurora.test_utils.earthscope.helpers import PUBLIC_DATA_AVAILABILITY_PATH
+from aurora.test_utils.earthscope.helpers import DATA_AVAILABILITY_PATHS
 
 
-def load_data_availability_dfs():
+def load_data_availability_dfs(public_or_restricted="public"):
+    data_availability_path = DATA_AVAILABILITY_PATHS[public_or_restricted]
     output = {}
-    globby = PUBLIC_DATA_AVAILABILITY_PATH.glob("*txt")
+    globby = data_availability_path.glob("*txt")
     for txt_file in globby:
         print(txt_file)
         network_id = txt_file.name.split("_")[-1].split(".txt")[0]
