@@ -14,7 +14,7 @@ import re
 import socket
 import subprocess
 
-## PLACEHOLDER FOR CONFIG
+# PLACEHOLDER FOR CONFIG
 USE_CHANNEL_WILDCARDS = False
 HOSTNAME = socket.gethostname()
 HOME = pathlib.Path().home()
@@ -24,7 +24,7 @@ if "gadi" in HOSTNAME:
 else:
     CACHE_PATH = HOME.joinpath(".cache").joinpath("earthscope")
 CACHE_PATH.mkdir(parents=True, exist_ok=True)
-## PLACEHOLDER FOR CONFIG
+
 
 # Data Availability
 DATA_AVAILABILITY_PATHS = {}
@@ -141,7 +141,7 @@ def get_summary_table_schema_v2(stage_number):
     -------
 
     """
-    if stage_number in [0, 1, 2,]:
+    if stage_number in [0, 1, 2, 3,]:
         from aurora.test_utils.earthscope.metadata import make_schema_list
         schema = make_schema_list(stage_number)
         return schema
@@ -355,11 +355,9 @@ def none_or_str(value):
 def test_summary_table_schema():
     get_summary_table_schema(0)
     get_summary_table_schema(1)
+    get_summary_table_schema(2)
+    get_summary_table_schema(3)
     print("OK")
 
 if __name__ == "__main__":
-    try:
-        assert(1==0)
-    except Exception as e:
-        raise DataAvailabilityException("put message here")
     test_summary_table_schema()

@@ -23,8 +23,10 @@ class WidesScaleTest(object):
     def __init__(self, **kwargs):
         self.parse_args()
         self.stage_id = kwargs.get("stage_id", None)
+        self.stage_name = kwargs.get("stage_name", None)
         self.jobs_df = None
         self.save_csv = kwargs.get("save_csv", True)
+        # self.add_timestamp_to_csv_filename = kwargs.get("add_timestamp_to_csv_filename", False)
 
 
     def prepare_jobs_dataframe(self):
