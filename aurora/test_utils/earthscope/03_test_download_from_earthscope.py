@@ -182,7 +182,7 @@ def main():
                               data_availability_exception=RAISE_EXCEPTION_IF_DATA_AVAILABILITY_EMPTY,
                               try_repair_missing_filters=TRY_REPAIR_MISSING_FILTERS,
                               )
-    tester.endrow = 5
+    #tester.endrow = 5
     tester.run_test()
     review_results()
     total_time_elapsed = time.time() - t0
