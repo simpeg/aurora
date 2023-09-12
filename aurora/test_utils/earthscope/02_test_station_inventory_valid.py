@@ -29,7 +29,6 @@ from aurora.test_utils.earthscope.data_availability import row_to_request_df
 from aurora.test_utils.earthscope.data_availability import url_maker
 from aurora.test_utils.earthscope.helpers import EXPERIMENT_PATH
 from aurora.test_utils.earthscope.helpers import get_most_recent_summary_filepath
-from aurora.test_utils.earthscope.helpers import get_summary_table_filename
 from aurora.test_utils.earthscope.helpers import restrict_to_mda
 from aurora.test_utils.earthscope.helpers import SUMMARY_TABLES_PATH
 from aurora.test_utils.earthscope.helpers import timestamp_now
@@ -88,9 +87,9 @@ class TestDatalessMTH5(WidesScaleTest):
             df = pd.read_csv(self.skeleton_file)
             return df
 
-        # ?deprecate and force to start from scratch?
+        # ? Allow to start from a previous, partially  filled csv?
         # try:
-        #     coverage_csv = get_summary_table_filename(STAGE_ID)
+        #     coverage_csv = get_most_recent_summary_filepath(STAGE_ID)
         #     coverage_df = pd.read_csv(coverage_csv)
         # except FileNotFoundError:
         #     coverage_df = initialize_metadata_df()
@@ -215,6 +214,35 @@ def analyse_station_id(station_id):
     Helper function that is not very robust, but specific to handling station_ids in the 2023 earthscope tests,
     in particular, parsing non-schema defined reference stations from SPUD TF XML.
 
+    Most of the station ids at IRIS/Earthscope have the following format:
+    [ST][L][ZZ] where ST is the standard two-digit abbreviation for state, L is a letter [A-Z], and ZZ is an integer,
+    zero-padded to two chars [01-99].
+
+    In the initial run of widescale tests the were not very many exceptions to this rule and they were handled here.
+    However, not that the XML reader has matured, there are many new cases.
+
+    Some exceptions:
+    CAM01 has reference K1x.
+    It maybe reasonable to assume this means CAK01
+
+    IDA11 has reference A10x.
+    It maybe reasonable to assume this means IDA10
+
+    IDJ10 has reference L6x.
+    It maybe reasonable to assume this means IDL06
+
+    ORH02 has reference M1x.
+    It maybe reasonable to assume this means ORM01
+
+    There are a lot of exceptions however, and it looks as though
+    we may want to add an extra function or stage that validates the station codes make sense.
+
+    Three character codes
+    Four character codes
+
+
+
+
     Parameters
     ----------
     station_id
@@ -229,12 +257,13 @@ def analyse_station_id(station_id):
     if len(station_id) == 0:
         print("NO Station ID")
         return None
-    if len(station_id) == 1:
-        print(f"This ust be a typo or something station_id={station_id}")
-
+    if len(station_id) in [1,2]:
+        print(f"Unexpected station_id {station_id} of length {len(station_id)}")
         return None
+    elif station_id[-1] == "x":
+        print(f"Expected number at end of station_id {station_id}, but found a lowercase x")
     elif len(station_id) == 3:
-        print(f"Probably forgot to archive the TWO-CHAR STATE CODE onto station_id {station_id}")
+        print(f"Maybe forgot to archive the TWO-CHAR STATE CODE onto station_id {station_id}")
     elif len(station_id) == 4:
         print(f"?? Typo in station_id {station_id}??")
     elif len(station_id) > 5:
@@ -289,7 +318,7 @@ def scan_data_availability_exceptions():
     -------
 
     """
-    coverage_csv = get_summary_table_filename(STAGE_ID)
+    coverage_csv = get_most_recent_summary_filepath(STAGE_ID)
     df = pd.read_csv(coverage_csv)
     sub_df = df[df["exception"]=="DataAvailabilityException"]
     #sub_df = df
@@ -311,7 +340,7 @@ def review_results():
     exceptions_summary_filepath = SUMMARY_TABLES_PATH.joinpath(exceptions_summary_filebase)
 
 
-    coverage_csv = get_summary_table_filename(STAGE_ID)
+    coverage_csv = get_most_recent_summary_filepath(STAGE_ID)
     df = pd.read_csv(coverage_csv)
 
     to_str_cols = ["network_id", "station_id", "exception"]
@@ -379,7 +408,7 @@ def main():
                               use_skeleton=False,
                               augment_with_existing=True,
                               )
-    tester.endrow = 5
+    # tester.endrow = 5
     tester.run_test()
     # exception_analyser()
     # scan_data_availability_exceptions()
