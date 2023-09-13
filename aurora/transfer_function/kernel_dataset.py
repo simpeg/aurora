@@ -53,11 +53,16 @@ ToDo: Consider supporting a default value for 'channel_scale_factors' that is No
 import copy
 import pandas as pd
 
-from aurora.pipelines.run_summary import RUN_SUMMARY_COLUMNS
+from aurora.pipelines.run_summary import RUN_SUMMARY_COLUMNS, RunSummary
 from mt_metadata.utils.list_dict import ListDict
 
 # Add these to a standard, so we track add/subtract columns
-KERNEL_DATASET_COLUMNS = RUN_SUMMARY_COLUMNS + [ 'channel_scale_factors', 'duration', 'fc']
+KERNEL_DATASET_COLUMNS = RUN_SUMMARY_COLUMNS + [
+    "channel_scale_factors",
+    "duration",
+    "fc",
+]
+
 
 class KernelDataset:
     """
@@ -124,6 +129,24 @@ class KernelDataset:
 
     def clone_dataframe(self):
         return copy.deepcopy(self.df)
+
+    def create_run_summary(mth5_list):
+        """
+        Create a run summary from a list of MTH5.  This is just a helper
+        function to allow the user to skip the intermediate step of creating
+        a run summary.
+
+        :param mth5_list: list of paths to MTH5 files
+        :type mth5_list: list of paths
+        :return: RunSummary object
+        :rtype: :class:`aurora.pipelines.run_summary.RunSummary`
+
+        """
+        run_summary = RunSummary()
+        run_summary.from_mth5s(mth5_list)
+        run_summary.add_duration()
+
+        return run_summary
 
     def from_run_summary(
         self, run_summary, local_station_id, remote_station_id=None
@@ -368,7 +391,9 @@ class KernelDataset:
             #     raise NotImplementedError
 
             if row.fc:
-                msg = f"row {row} already has fcs prescribed by processing confg "
+                msg = (
+                    f"row {row} already has fcs prescribed by processing confg "
+                )
                 msg += "-- skipping time series initialzation"
                 print(msg)
             #    continue
@@ -380,9 +405,13 @@ class KernelDataset:
             if i == 0:
                 if run_ts.survey_metadata.id in self.survey_metadata.keys():
                     pass
-                self.survey_metadata[run_ts.survey_metadata.id] = run_ts.survey_metadata
+                self.survey_metadata[
+                    run_ts.survey_metadata.id
+                ] = run_ts.survey_metadata
             elif i > 0:
-                self.survey_metadata[run_ts.survey_metadata.id].stations[0].add_run(run_ts.run_metadata)
+                self.survey_metadata[run_ts.survey_metadata.id].stations[
+                    0
+                ].add_run(run_ts.run_metadata)
             if len(self.survey_metadata.keys()) > 1:
                 raise NotImplementedError
 
