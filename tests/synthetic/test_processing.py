@@ -126,8 +126,8 @@ class TestSyntheticProcessing(unittest.TestCase):
             file_type="zss",
         )
 
-    def test_can_process_other_station(self):
-        tf_cls = process_synthetic_2()
+    def test_can_process_other_station(self, force_make_mth5=True):
+        tf_cls = process_synthetic_2(force_make_mth5=force_make_mth5)
         xml_file_name = AURORA_RESULTS_PATH.joinpath("syn2.xml")
         tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
@@ -250,9 +250,10 @@ def process_synthetic_1(
     return tf_result
 
 
-def process_synthetic_2():
+def process_synthetic_2(force_make_mth5=True):
+    """"""
     station_id = "test2"
-    mth5_path = create_test2_h5()
+    mth5_path = create_test2_h5(force_make_mth5=force_make_mth5)
     mth5_paths = [
         mth5_path,
     ]
@@ -263,8 +264,9 @@ def process_synthetic_2():
     processing_config = create_test_run_config(station_id, tfk_dataset)
     for decimation_level in processing_config.decimations:
         decimation_level.save_fcs = True
-        decimation_level.save_fcs_type = "csv"
-    tfc = process_mth5(processing_config, tfk_dataset=tfk_dataset)
+        decimation_level.save_fcs_type = "h5"
+        # decimation_level.save_fcs_type = "csv"
+    tfc = process_mth5(processing_config, tfk_dataset=tfk_dataset, z_file_path=AURORA_RESULTS_PATH.joinpath("test2q.zss"))
     return tfc
 
 
