@@ -1,0 +1,9 @@
+,name,dtype,default
+0,data_id,int64,-1
+1,network_id,string,
+2,station_id,string,
+3,remote_id,string,
+4,filename,string,
+5,exception,string,
+6,error_message,string,
+7,data_xml_filebase,string,

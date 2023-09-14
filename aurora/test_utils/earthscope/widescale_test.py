@@ -26,6 +26,7 @@ class WidesScaleTest(object):
         self.stage_name = kwargs.get("stage_name", None)
         self.jobs_df = None
         self.save_csv = kwargs.get("save_csv", True)
+        self._df_schema = None
         # self.add_timestamp_to_csv_filename = kwargs.get("add_timestamp_to_csv_filename", False)
 
 
@@ -39,7 +40,18 @@ class WidesScaleTest(object):
         print("Enrich Row is not defined for Abstract Base Class")
         raise NotImplementedError
 
+    @property
+    def df_schema(self):
+        if self._df_schema is None:
+            self._df_schema = get_summary_table_schema_v2(self.stage_id)
+        return self._df_schema
+
+    @property
+    def df_schema_dtypes(self):
+        return {x.name:x.dtype for x in self.df_schema}
+
     def get_dataframe_schema(self):
+        print("TO BE DEPRECATED -- USE self.df_schema property instead")
         #df_schema = get_summary_table_schema(self.stage_id)
         df_schema = get_summary_table_schema_v2(self.stage_id)
         return df_schema

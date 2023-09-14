@@ -141,7 +141,7 @@ def get_summary_table_schema_v2(stage_number):
     -------
 
     """
-    if stage_number in [0, 1, 2, 3,]:
+    if stage_number in [0, 1, 2, 3, 4]:
         from aurora.test_utils.earthscope.metadata import make_schema_list
         schema = make_schema_list(stage_number)
         return schema
@@ -276,10 +276,10 @@ def get_most_recent_summary_filepath(stage_number):
     return globby[-1]
 
 
-def load_most_recent_summary(stage_number):
+def load_most_recent_summary(stage_number, dtypes=None):
     review_csv = get_most_recent_summary_filepath(stage_number)
     print(f"loading {review_csv}")
-    results_df = pd.read_csv(review_csv)
+    results_df = pd.read_csv(review_csv, dtype=dtypes)
     return results_df
 
 
@@ -321,7 +321,10 @@ def restrict_to_mda(df, RR=None, keep_columns=KEEP_COLUMNS):
     for col in fix_nans_in_columns:
         if col in mda_df.columns:
             mda_df[col] = mda_df[col].astype(str)
-            mda_df[mda_df[col]=="nan"][col] = ""
+            # OLD
+            # mda_df[mda_df[col]=="nan"][col] = ""
+            # NEW
+            mda_df[mda_df[col].isin(["<NA>", "nan"])][col] = ""
 
     print("ADD NETWORK/STATION COLUMNS for convenience")
     print("Consdier PUSH THIS BACK TO TASK 01 once all XML are reading successfully")
