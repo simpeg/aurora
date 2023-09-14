@@ -74,7 +74,13 @@ class RunSummary:
         self.column_dtypes = [str, str, pd.Timestamp, pd.Timestamp]
         self._input_dict = kwargs.get("input_dict", None)
         self.df = kwargs.get("df", None)
-        self._mini_summary_columns = ["survey", "station_id", "run_id", "start", "end"]
+        self._mini_summary_columns = [
+            "survey",
+            "station_id",
+            "run_id",
+            "start",
+            "end",
+        ]
 
     def clone(self):
         """
@@ -201,7 +207,9 @@ def channel_summary_to_run_summary(
     channel_scale_factors = n_station_runs * [None]
     i = 0
     for group_values, group in grouper:
-        group_info = dict(zip(group_by_columns, group_values))  # handy for debug
+        group_info = dict(
+            zip(group_by_columns, group_values)
+        )  # handy for debug
         # for k, v in group_info.items():
         #     print(f"{k} = {v}")
         survey_ids[i] = group_info["survey"]
@@ -212,9 +220,15 @@ def channel_summary_to_run_summary(
         sample_rates[i] = group.sample_rate.iloc[0]
         channels_list = group.component.to_list()
         num_channels = len(channels_list)
-        input_channels[i] = [x for x in channels_list if x in allowed_input_channels]
-        output_channels[i] = [x for x in channels_list if x in allowed_output_channels]
-        channel_scale_factors[i] = dict(zip(channels_list, num_channels * [1.0]))
+        input_channels[i] = [
+            x for x in channels_list if x in allowed_input_channels
+        ]
+        output_channels[i] = [
+            x for x in channels_list if x in allowed_output_channels
+        ]
+        channel_scale_factors[i] = dict(
+            zip(channels_list, num_channels * [1.0])
+        )
         i += 1
 
     data_dict = {}
@@ -252,7 +266,9 @@ def extract_run_summary_from_mth5(mth5_obj, summary_type="run"):
     channel_summary_df = mth5_obj.channel_summary.to_dataframe()
     # check that the mth5 has been summarized already
     if len(channel_summary_df) < 2:
-        print("Channel summary maybe not initialized yet, 3 or more channels expected.")
+        print(
+            "Channel summary maybe not initialized yet, 3 or more channels expected."
+        )
         mth5_obj.channel_summary.summarize()
         channel_summary_df = mth5_obj.channel_summary.to_dataframe()
     if summary_type == "run":
@@ -263,7 +279,9 @@ def extract_run_summary_from_mth5(mth5_obj, summary_type="run"):
     return out_df
 
 
-def extract_run_summaries_from_mth5s(mth5_list, summary_type="run", deduplicate=True):
+def extract_run_summaries_from_mth5s(
+    mth5_list, summary_type="run", deduplicate=True
+):
     """
     ToDo: Move this method into mth5? or mth5_helpers?
     ToDo: Make this a class so that the __repr__ is a nice visual representation of the
@@ -300,12 +318,11 @@ def extract_run_summaries_from_mth5s(mth5_list, summary_type="run", deduplicate=
             mth5_obj = mth5_elt
         else:  # mth5_elt is a path or a string
             mth5_obj = initialize_mth5(mth5_elt, mode="a")
+        with mth5_obj:
+            df = extract_run_summary_from_mth5(
+                mth5_obj, summary_type=summary_type
+            )
 
-        df = extract_run_summary_from_mth5(mth5_obj, summary_type=summary_type)
-
-        # close it back up if you opened it
-        if not isinstance(mth5_elt, mth5.mth5.MTH5):
-            mth5_obj.close_mth5()
         dfs[i] = df
 
     # merge all summaries into a super_summary
