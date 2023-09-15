@@ -5,11 +5,8 @@ import psutil
 
 from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.time_series_helpers import prototype_decimate
-from aurora.transfer_function.kernel_dataset import KernelDataset
 from mth5.utils.exceptions import MTH5Error
 from mth5.utils.helpers import initialize_mth5
-
-from mt_metadata.transfer_functions.processing.aurora import Processing
 
 
 class TransferFunctionKernel(object):
@@ -21,8 +18,9 @@ class TransferFunctionKernel(object):
         dataset: aurora.transfer_function.kernel_dataset.KernelDataset
         config: aurora.config.metadata.processing.Processing
         """
-        processing_config = initialize_config(config)
-        self._config = processing_config
+        if config is not None:
+            config = initialize_config(config)
+        self._config = config
         self._dataset = dataset
         self._mth5_objs = None
         self.survey_metadata = None
@@ -59,7 +57,13 @@ class TransferFunctionKernel(object):
             self.initialize_mth5s()
         return self._mth5_objs
 
-    def _get_survey_metadata(self):
+    def _get_survey_key(self):
+        if self.dataset is not None:
+            return self.dataset.df.iloc[
+                0, self.dataset.df.station == self.config.stations.local.id
+            ].survey
+
+    def _get_survey_metadata(self, local_mth5_obj):
         """
         Get survey metadata here
         """
@@ -206,10 +210,12 @@ class TransferFunctionKernel(object):
 
             if len(associated_run_sub_df) > 1:
                 # See Note #4
-                print("Warning -- not all runs will processed as a continuous chunk -- in future may need to loop over runlets to check for FCs")
+                print(
+                    "Warning -- not all runs will processed as a continuous chunk -- in future may need to loop over runlets to check for FCs"
+                )
 
             dataset_df_indices = np.r_[associated_run_sub_df.index]
-            #dataset_df_indices = associated_run_sub_df.index.to_numpy()
+            # dataset_df_indices = associated_run_sub_df.index.to_numpy()
             run_row = associated_run_sub_df.iloc[0]
             row_ssr_str = f"survey: {run_row.survey}, station_id: {run_row.station_id}, run_id: {run_row.run_id}"
 
@@ -234,12 +240,19 @@ class TransferFunctionKernel(object):
                     )
                 except MTH5Error:
                     self.dataset_df.loc[dataset_df_indices, "fc"] = False
-                    print(f"Run ID {run_id} not found in FC Groups, -- will need to build them ")
+                    print(
+                        f"Run ID {run_id} not found in FC Groups, -- will need to build them "
+                    )
                     continue
 
-                if len(fc_group.groups_list) < self.processing_config.num_decimation_levels:
+                if (
+                    len(fc_group.groups_list)
+                    < self.processing_config.num_decimation_levels
+                ):
                     self.dataset_df.loc[dataset_df_indices, "fc"] = False
-                    print(f"Not enough FC Groups available for {row_ssr_str} -- will need to build them ")
+                    print(
+                        f"Not enough FC Groups available for {row_ssr_str} -- will need to build them "
+                    )
                     continue
 
                 # Can check time periods here if desired, but unique (survey, station, run) should make this unneeded
@@ -248,9 +261,12 @@ class TransferFunctionKernel(object):
                 #    assert tp in fc_group time periods
 
                 # See note #2
-                fcs_already_there = fc_group.supports_aurora_processing_config(self.processing_config,
-                                                                               run_row.remote)
-                self.dataset_df.loc[dataset_df_indices, "fc"] = fcs_already_there
+                fcs_already_there = fc_group.supports_aurora_processing_config(
+                    self.processing_config, run_row.remote
+                )
+                self.dataset_df.loc[
+                    dataset_df_indices, "fc"
+                ] = fcs_already_there
 
         return
 
@@ -315,9 +331,7 @@ class TransferFunctionKernel(object):
                     num_samples_window=row.num_samples_window,
                     num_samples_overlap=row.num_samples_overlap,
                 )
-                num_windows[i] = ws.available_number_of_windows(
-                    row.num_samples
-                )
+                num_windows[i] = ws.available_number_of_windows(row.num_samples)
             df["num_stft_windows"] = num_windows
             groups.append(df)
 
