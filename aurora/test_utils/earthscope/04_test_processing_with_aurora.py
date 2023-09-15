@@ -60,9 +60,7 @@ class TestAuroraProcessing(WidesScaleTest):
         # try:
         #     processing_df = pd.read_csv(processing_summary_csv)
         # except FileNotFoundError:
-        schema = self.df_schema
-        column_names = [x.name for x in schema]
-        processing_df = pd.DataFrame(columns=column_names) # Doesn't support multidtype on init (appraetnly sas the docs)
+        processing_df = pd.DataFrame(columns=self.df_column_names) # Doesn't support multidtype on init (appraetnly sas the docs)
 
         for i_row, row in spud_df.iterrows():
             print(row)  # station_id = row.station_id; network_id = row.network_id
@@ -128,25 +126,28 @@ class TestAuroraProcessing(WidesScaleTest):
         #         processing_df[col.name] = processing_df[col.name].astype(str)
 
         processing_df.to_csv(self.skeleton_file, index=False)
-        print("reread and handle nan")
-        return processing_df
+        # reread and handle nan
+        df = pd.read_csv(self.skeleton_file, dtype=self.df_schema_dtypes)
+        return df
+
 
 
     def enrich_row(self, row):
         mth5_file_base = f"{row.network_id}_{row.station_id}.h5"
         data_file = DATA_PATH.joinpath(mth5_file_base)
-        if row.remote_id:
+        if pd.isna(row.remote_id):
+            rr_file = None
+        else:
             remote_file_base = f"{row.network_id}_{row.remote_id}.h5"
             rr_file = DATA_PATH.joinpath(remote_file_base)
-            mth5_files = [data_file, rr_file]
-        else:
-            mth5_files = [data_file, ]
+        mth5_files = [data_file, rr_file]
+        mth5_files = [x for x in mth5_files if x is not None]
+
 
         mth5_run_summary = RunSummary()
-        mth5s = [data_file, rr_file]
-        mth5s = [x for x in mth5s if x is not None]
-        mth5_run_summary.from_mth5s(mth5s)
+        mth5_run_summary.from_mth5s(mth5_files)
         run_summary = mth5_run_summary.clone()
+        run_summary.check_runs_are_valid(drop=True)
         # run_summary.mini_summary
 
         kernel_dataset = KernelDataset()

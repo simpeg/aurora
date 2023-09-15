@@ -50,6 +50,10 @@ class WidesScaleTest(object):
     def df_schema_dtypes(self):
         return {x.name:x.dtype for x in self.df_schema}
 
+    @property
+    def df_column_names(self):
+        return [x.name for x in self.df_schema]
+
     def get_dataframe_schema(self):
         print("TO BE DEPRECATED -- USE self.df_schema property instead")
         #df_schema = get_summary_table_schema(self.stage_id)
@@ -95,7 +99,7 @@ class WidesScaleTest(object):
         """Argparse tutorial: https://docs.python.org/3/howto/argparse.html"""
         parser = argparse.ArgumentParser(description="Wide Scale Earthscpe Test")
         parser.add_argument("--npart", help="how many partitions to use (triggers dask dataframe if > 0", type=int,
-                            default=1)
+                            default=DEFAULT_N_PARTITIONS)
         parser.add_argument("--startrow", help="First row to process (zero-indexed)", type=int, default=0)
         # parser.add_argument('category', type=none_or_str, nargs='?', default=None,
         # 					help='the category of the stuff')
