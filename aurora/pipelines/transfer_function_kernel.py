@@ -63,6 +63,7 @@ class TransferFunctionKernel(object):
         """
         Get survey metadata here
         """
+        pass
 
     def initialize_mth5s(self, mode="r"):
         """
@@ -81,6 +82,7 @@ class TransferFunctionKernel(object):
         local_mth5_obj = initialize_mth5(
             self.config.stations.local.mth5_path, mode=mode
         )
+        # get survey metadta here
         if self.config.stations.remote:
             remote_path = self.config.stations.remote[0].mth5_path
             remote_mth5_obj = initialize_mth5(remote_path, mode="r")
