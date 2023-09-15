@@ -137,9 +137,11 @@ class TestAuroraProcessing(WidesScaleTest):
         data_file = DATA_PATH.joinpath(mth5_file_base)
         if pd.isna(row.remote_id):
             rr_file = None
+            remote_id = None
         else:
             remote_file_base = f"{row.network_id}_{row.remote_id}.h5"
             rr_file = DATA_PATH.joinpath(remote_file_base)
+            remote_id = row.remote_id
         mth5_files = [data_file, rr_file]
         mth5_files = [x for x in mth5_files if x is not None]
 
@@ -151,8 +153,8 @@ class TestAuroraProcessing(WidesScaleTest):
         # run_summary.mini_summary
 
         kernel_dataset = KernelDataset()
-        kernel_dataset.from_run_summary(run_summary, row.station_id, row.remote_id)
-
+        kernel_dataset.from_run_summary(run_summary, row.station_id, remote_id)
+        #kernel_dataset.drop_runs_shorter_than(5000)
         if len(kernel_dataset.df) == 0:
             print("No RR Coverage, casting to single station processing")
             kernel_dataset.from_run_summary(run_summary, row.station_id)
@@ -204,9 +206,9 @@ def main():
                                   save_csv=True,
                                   use_skeleton=True)
     #qq = tester.read_skeleton_with_dtype()
-    #tester.startrow = 1357
-    #tester.startrow = 1
-    tester.endrow = 3
+    # tester.startrow = 1306
+    # tester.startrow = 1
+    # tester.endrow = 1307
     #jdf = tester.prepare_jobs_dataframe()
     tester.run_test()
 
