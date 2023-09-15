@@ -130,7 +130,7 @@ class KernelDataset:
     def clone_dataframe(self):
         return copy.deepcopy(self.df)
 
-    def create_run_summary(mth5_list):
+    def create_run_summary(self, mth5_list):
         """
         Create a run summary from a list of MTH5.  This is just a helper
         function to allow the user to skip the intermediate step of creating
