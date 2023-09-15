@@ -227,6 +227,7 @@ def nan_to_mean(xrds):
     """
     for ch in xrds.keys():
         if not (xrds[ch].isnull() == False).all().data:
+            print("Null values detected in xrds -- this is not expected and should be examined")
             value = np.nan_to_num(np.nanmean(xrds[ch].data))
             xrds[ch] = xrds[ch].fillna(value)
     return xrds
