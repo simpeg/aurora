@@ -299,9 +299,15 @@ class TransferFunctionKernel(object):
             print(group)
             print(df)
             try:
-                assert (
-                    df.dec_level.diff()[1:] == 1
-                ).all()  # dec levels increment by 1
+                try:
+                    assert (
+                        df.dec_level.diff()[1:] == 1
+                    ).all()  # dec levels increment by 1
+                except AssertionError:
+                    print(
+                        f"Skipping {group} because decimation levels are messy."
+                    )
+                    continue
                 assert df.dec_factor.iloc[0] == 1
                 assert df.dec_level.iloc[0] == 0
             except AssertionError:
