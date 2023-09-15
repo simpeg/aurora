@@ -60,7 +60,9 @@ def apply_prewhitening(decimation_obj, run_xrds_input):
         run_xrds = run_xrds_input.differentiate("time")
 
     else:
-        print(f"{decimation_obj.prewhitening_type} pre-whitening not implemented")
+        print(
+            f"{decimation_obj.prewhitening_type} pre-whitening not implemented"
+        )
         raise NotImplementedError
     return run_xrds
 
@@ -85,11 +87,12 @@ def apply_recoloring(decimation_obj, stft_obj):
         return stft_obj
     if not decimation_obj.recoloring:
         return stft_obj
-    
+
     if decimation_obj.prewhitening_type == "first difference":
         # replace below with decimation_obj.get_fft_harmonics() ?
         freqs = get_fft_harmonics(
-            decimation_obj.window.num_samples, decimation_obj.sample_rate_decimation
+            decimation_obj.window.num_samples,
+            decimation_obj.sample_rate_decimation,
         )
         prewhitening_correction = 1.0j * 2 * np.pi * freqs  # jw
 
@@ -105,7 +108,9 @@ def apply_recoloring(decimation_obj, stft_obj):
     #     MA = 4 # add this to processing config
 
     else:
-        print(f"{decimation_obj.prewhitening_type} recoloring not yet implemented")
+        print(
+            f"{decimation_obj.prewhitening_type} recoloring not yet implemented"
+        )
         raise NotImplementedError
 
     return stft_obj
@@ -194,7 +199,9 @@ def truncate_to_clock_zero(decimation_obj, run_xrds):
             pass  # time series start is already clock zero
         else:
             windowing_scheme = window_scheme_from_decimation(decimation_obj)
-            number_of_steps = delta_t_seconds / windowing_scheme.duration_advance
+            number_of_steps = (
+                delta_t_seconds / windowing_scheme.duration_advance
+            )
             n_partial_steps = number_of_steps - np.floor(number_of_steps)
             n_clip = n_partial_steps * windowing_scheme.num_samples_advance
             n_clip = int(np.round(n_clip))
@@ -206,6 +213,23 @@ def truncate_to_clock_zero(decimation_obj, run_xrds):
             )
             run_xrds = run_xrds.where(cond1, drop=True)
     return run_xrds
+
+
+def nan_to_mean(xrds):
+    """
+    Set Nan values to mean value
+
+    :param xrds: DESCRIPTION
+    :type xrds: TYPE
+    :return: DESCRIPTION
+    :rtype: TYPE
+
+    """
+    for ch in xrds.keys():
+        if not (xrds[ch].isnull() == False).all().data:
+            value = np.nan_to_num(np.nanmean(xrds[ch].data))
+            xrds[ch] = xrds[ch].fillna(value)
+    return xrds
 
 
 def run_ts_to_stft(decimation_obj, run_xrds_orig):
@@ -225,6 +249,9 @@ def run_ts_to_stft(decimation_obj, run_xrds_orig):
         recoloring. This really doesn't matter since we don't use the DC harmonic for
         anything.
     """
+    # need to remove any nans before windowing, or else if there is a single
+    # nan then the whole channel becomes nan.
+    run_xrds = nan_to_mean(run_xrds_orig)
     run_xrds = apply_prewhitening(decimation_obj, run_xrds_orig)
     run_xrds = truncate_to_clock_zero(decimation_obj, run_xrds)
     windowing_scheme = window_scheme_from_decimation(decimation_obj)
@@ -234,7 +261,9 @@ def run_ts_to_stft(decimation_obj, run_xrds_orig):
     if not np.prod(windowed_obj.to_array().data.shape):
         raise ValueError
 
-    windowed_obj = WindowedTimeSeries.detrend(data=windowed_obj, detrend_type="linear")
+    windowed_obj = WindowedTimeSeries.detrend(
+        data=windowed_obj, detrend_type="linear"
+    )
     tapered_obj = windowed_obj * windowing_scheme.taper
     stft_obj = windowing_scheme.apply_fft(
         tapered_obj, detrend_type=decimation_obj.extra_pre_fft_detrend_type
@@ -244,7 +273,9 @@ def run_ts_to_stft(decimation_obj, run_xrds_orig):
     return stft_obj
 
 
-def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None):
+def calibrate_stft_obj(
+    stft_obj, run_obj, units="MT", channel_scale_factors=None
+):
     """
 
     Parameters
@@ -272,8 +303,12 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
             print("WARNING UNEXPECTED CHANNEL WITH NO FILTERS")
             if channel_id == "hy":
                 print("Channel HY has no filters, try using filters from HX")
-                channel_filter = run_obj.get_channel("hx").channel_response_filter
-        calibration_response = channel_filter.complex_response(stft_obj.frequency.data)
+                channel_filter = run_obj.get_channel(
+                    "hx"
+                ).channel_response_filter
+        calibration_response = channel_filter.complex_response(
+            stft_obj.frequency.data
+        )
         if channel_scale_factors:
             try:
                 channel_scale_factor = channel_scale_factors[channel_id]
@@ -314,7 +349,9 @@ def prototype_decimate(config, run_xrds):
     num_channels = len(channel_labels)
     new_data = np.full((num_observations, num_channels), np.nan)
     for i_ch, ch_label in enumerate(channel_labels):
-        new_data[:, i_ch] = ssig.decimate(run_xrds[ch_label], int(config.factor))
+        new_data[:, i_ch] = ssig.decimate(
+            run_xrds[ch_label], int(config.factor)
+        )
 
     xr_da = xr.DataArray(
         new_data,
@@ -348,7 +385,9 @@ def prototype_decimate_2(config, run_xrds):
     xr_ds: xr.Dataset
         Decimated version of the input run_xrds
     """
-    new_xr_ds = run_xrds.coarsen(time=int(config.factor), boundary="trim").mean()
+    new_xr_ds = run_xrds.coarsen(
+        time=int(config.factor), boundary="trim"
+    ).mean()
     attr_dict = run_xrds.attrs
     attr_dict["sample_rate"] = config.sample_rate
     new_xr_ds.attrs = attr_dict
