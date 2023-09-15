@@ -399,9 +399,8 @@ class KernelDataset:
             #    continue
             # the line below is not lazy, See Note #2
             run_ts = run_obj.to_runts(start=row.start, end=row.end)
-            xr_ds = run_ts.dataset
-            self.df["run_dataarray"].at[i] = xr_ds.to_array("channel")
-            # but what if RR proc with RR from other survey?
+            self.df["run_dataarray"].at[i] = run_ts.dataset.to_array("channel")
+
             if i == 0:
                 if run_ts.survey_metadata.id in self.survey_metadata.keys():
                     pass

@@ -300,6 +300,7 @@ def process_mth5(
                 continue
 
             run_xrds = row["run_dataarray"].to_dataset("channel")
+            print(f"DEBUG Issue 289: TS {row.station_id} {row.run_id} {run_xrds.time.shape} {row.start} {row.end}")
             run_obj = row.mth5_obj.from_reference(row.run_reference)
             stft_obj = make_stft_objects(
                 tfk.config,
@@ -309,6 +310,7 @@ def process_mth5(
                 units,
                 row.station_id,
             )
+            print(f"DEBUG Issue 289: FC {row.station_id} {row.run_id} {stft_obj.time.shape} {stft_obj.time.min()} {stft_obj.time.max()}")
             # Pack FCs into h5
             if dec_level_config.save_fcs:
                 if dec_level_config.save_fcs_type == "csv":
@@ -338,6 +340,26 @@ def process_mth5(
                 remote_stfts.append(stft_obj)
 
         # Merge STFTs
+
+        # Timing Error Workaround See Aurora Issue #289
+        if tfk.config.stations.remote:
+            n_chunks = len(local_stfts)
+            for i_chunk in range(n_chunks):
+                ok = local_stfts[i_chunk].time.shape == remote_stfts[i_chunk].time.shape
+                if not ok:
+                    print(f"Mismatch in FC array lengths detected -- Issue #289")
+                    glb = max(local_stfts[i_chunk].time.min(), remote_stfts[i_chunk].time.min())
+                    lub = min(local_stfts[i_chunk].time.max(), remote_stfts[i_chunk].time.max())
+                    cond1 = local_stfts[i_chunk].time >= glb
+                    cond2 = local_stfts[i_chunk].time <= lub
+                    local_stfts[i_chunk] = local_stfts[i_chunk].where(cond1 & cond2, drop=True)
+                    cond1 = remote_stfts[i_chunk].time >= glb
+                    cond2 = remote_stfts[i_chunk].time <= lub
+                    remote_stfts[i_chunk] = remote_stfts[i_chunk].where(cond1 & cond2, drop=True)
+                    assert (local_stfts[i_chunk].time.shape==remote_stfts[i_chunk].time.shape)
+
+
+
         local_merged_stft_obj = xr.concat(local_stfts, "time")
 
         if tfk.config.stations.remote:

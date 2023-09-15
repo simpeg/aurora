@@ -117,6 +117,27 @@ class RunSummary:
         df["duration"] = durations
         return
 
+    def check_runs_are_valid(self, drop=False, **kwargs):
+        """ kwargs can tell us what sorts of conditions to check, for example all_zero, there are nan, etc."""
+        check_for_all_zero_runs = True
+        for i_row, row in self.df.iterrows():
+            print(f"Checking row for zeros {row}")
+            m = mth5.mth5.MTH5()
+            m.open_mth5(row.mth5_path)
+            run_obj = m.get_run(row.station_id, row.run_id, row.survey)
+            runts = run_obj.to_runts()
+            if runts.dataset.to_array().data.__abs__().sum() == 0:
+                print("CRITICAL: Detected a run with all zero values")
+                self.df["valid"].at[i_row] = False
+            # load each run, and take the median of the sum of the absolute values
+        if drop:
+            self.drop_invalid_rows()
+        return
+
+    def drop_invalid_rows(self):
+        self.df = self.df[self.df.valid]
+        self.df.reset_index(drop=True, inplace=True)
+
     # BELOW FUNCTION CAN BE COPIED FROM METHOD IN KernelDataset()
     # def drop_runs_shorter_than(self, duration, units="s"):
     #     if units != "s":
@@ -241,6 +262,7 @@ def channel_summary_to_run_summary(
     data_dict["input_channels"] = input_channels
     data_dict["output_channels"] = output_channels
     data_dict["channel_scale_factors"] = channel_scale_factors
+    data_dict["valid"] = True
 
     run_summary_df = pd.DataFrame(data=data_dict)
     if sortby:
