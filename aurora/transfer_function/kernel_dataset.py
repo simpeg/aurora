@@ -185,6 +185,10 @@ class KernelDataset:
             survey_id = "0"
         return survey_id
 
+    @property
+    def local_survey_metadata(self):
+        return self.survey_metadata[self.local_survey_id]
+
     def _add_duration_column(self):
         """ """
         timedeltas = self.df.end - self.df.start

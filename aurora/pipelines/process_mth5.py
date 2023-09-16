@@ -382,12 +382,11 @@ def process_mth5(
         tfk_dataset.close_mths_objs()
         return tf_collection
     else:
-        survey_id = tfk_dataset.local_survey_id
 
         tf_cls = export_tf(
             tf_collection,
             tfk.config.channel_nomenclature,
-            survey_metadata=tfk_dataset.survey_metadata[survey_id],
+            survey_metadata=tfk_dataset.local_survey_metadata,
         )
         tf_cls.station_metadata.transfer_function.processing_type = tfk.processing_type()
         tfk_dataset.close_mths_objs()
