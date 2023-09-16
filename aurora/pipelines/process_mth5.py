@@ -132,50 +132,6 @@ def process_tf_decimation_level(
     return transfer_function_obj
 
 
-def export_tf(
-    tf_collection,
-    channel_nomenclature,
-    survey_metadata
-):
-    """
-    This method may wind up being embedded in the TF class
-    Assign transfer_function, residual_covariance, inverse_signal_power, station, survey
-
-    Parameters
-    ----------
-    tf_collection: aurora.transfer_function.transfer_function_collection
-    .TransferFunctionCollection
-    station_metadata_dict: dict
-    survey_dict: dict
-
-    Returns
-    -------
-    tf_cls: mt_metadata.transfer_functions.core.TF
-        Transfer function container
-    """
-
-    merged_tf_dict = tf_collection.get_merged_dict(channel_nomenclature)
-    channel_nomenclature_dict = channel_nomenclature.to_dict()["channel_nomenclature"]
-    tf_cls = TF(channel_nomenclature=channel_nomenclature_dict)
-    renamer_dict = {"output_channel": "output", "input_channel": "input"}
-    tmp = merged_tf_dict["tf"].rename(renamer_dict)
-    tf_cls.transfer_function = tmp
-
-    isp = merged_tf_dict["cov_ss_inv"]
-    renamer_dict = {"input_channel_1": "input", "input_channel_2": "output"}
-    isp = isp.rename(renamer_dict)
-    tf_cls.inverse_signal_power = isp
-
-    res_cov = merged_tf_dict["cov_nn"]
-    renamer_dict = {"output_channel_1": "input", "output_channel_2": "output"}
-    res_cov = res_cov.rename(renamer_dict)
-    tf_cls.residual_covariance = res_cov
-
-    # Set key as first el't of dict, nor currently supporting mixed surveys in TF
-    tf_cls.survey_metadata = survey_metadata
-
-    return tf_cls
-
 def enrich_row(row):
     pass
 
@@ -383,11 +339,6 @@ def process_mth5(
         return tf_collection
     else:
 
-        tf_cls = export_tf(
-            tf_collection,
-            tfk.config.channel_nomenclature,
-            survey_metadata=tfk.dataset.local_survey_metadata,
-        )
-        tf_cls.station_metadata.transfer_function.processing_type = tfk.processing_type()
+        tf_cls = tfk.export_tf_collection(tf_collection)
         tfk.dataset.close_mths_objs()
         return tf_cls

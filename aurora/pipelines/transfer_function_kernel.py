@@ -9,6 +9,7 @@ from aurora.transfer_function.kernel_dataset import KernelDataset
 from mth5.utils.exceptions import MTH5Error
 from mth5.utils.helpers import initialize_mth5
 
+from mt_metadata.transfer_functions.core import TF
 from mt_metadata.transfer_functions.processing.aurora import Processing
 
 
@@ -459,6 +460,7 @@ class TransferFunctionKernel(object):
         is_valid = processing_row.valid.iloc[0]
         return is_valid
 
+    @property
     def processing_type(self):
         """
         A description of the processing, will get passed to TF object,
@@ -474,6 +476,43 @@ class TransferFunctionKernel(object):
         else:
             processing_type = f"{processing_type}: Robust Single Station"
         return processing_type
+
+    def export_tf_collection(self, tf_collection):
+        """
+        Assign transfer_function, residual_covariance, inverse_signal_power, station, survey
+
+        Parameters
+        ----------
+        tf_collection: aurora.transfer_function.transfer_function_collection.TransferFunctionCollection
+            Contains TF estimates, covariance, and signal power values
+
+        Returns
+        -------
+        tf_cls: mt_metadata.transfer_functions.core.TF
+            Transfer function container
+        """
+        channel_nomenclature = self.config.channel_nomenclature
+        channel_nomenclature_dict = self.config.channel_nomenclature.to_dict()["channel_nomenclature"]
+        merged_tf_dict = tf_collection.get_merged_dict(channel_nomenclature)
+        tf_cls = TF(channel_nomenclature=channel_nomenclature_dict)
+        renamer_dict = {"output_channel": "output", "input_channel": "input"}
+        tmp = merged_tf_dict["tf"].rename(renamer_dict)
+        tf_cls.transfer_function = tmp
+
+        isp = merged_tf_dict["cov_ss_inv"]
+        renamer_dict = {"input_channel_1": "input", "input_channel_2": "output"}
+        isp = isp.rename(renamer_dict)
+        tf_cls.inverse_signal_power = isp
+
+        res_cov = merged_tf_dict["cov_nn"]
+        renamer_dict = {"output_channel_1": "input", "output_channel_2": "output"}
+        res_cov = res_cov.rename(renamer_dict)
+        tf_cls.residual_covariance = res_cov
+
+        # Set key as first el't of dict, nor currently supporting mixed surveys in TF
+        tf_cls.survey_metadata = self.dataset.local_survey_metadata
+        tf_cls.station_metadata.transfer_function.processing_type = self.processing_type
+        return tf_cls
 
     def memory_warning(self):
         """
