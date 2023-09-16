@@ -374,20 +374,20 @@ def process_mth5(
 
     if z_file_path:
         # local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
-        local_run_obj = tfk_dataset.get_run_object(0)
+        local_run_obj = tfk.dataset.get_run_object(0)
         tf_collection.write_emtf_z_file(z_file_path, run_obj=local_run_obj)
 
     if return_collection:
         # this is now really only to be used for debugging and may be deprecated soon
-        tfk_dataset.close_mths_objs()
+        tfk.dataset.close_mths_objs()
         return tf_collection
     else:
 
         tf_cls = export_tf(
             tf_collection,
             tfk.config.channel_nomenclature,
-            survey_metadata=tfk_dataset.local_survey_metadata,
+            survey_metadata=tfk.dataset.local_survey_metadata,
         )
         tf_cls.station_metadata.transfer_function.processing_type = tfk.processing_type()
-        tfk_dataset.close_mths_objs()
+        tfk.dataset.close_mths_objs()
         return tf_cls
