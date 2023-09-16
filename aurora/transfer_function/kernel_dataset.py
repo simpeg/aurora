@@ -178,6 +178,13 @@ class KernelDataset:
     def print_mini_summary(self):
         print(self.mini_summary)
 
+    @property
+    def local_survey_id(self):
+        survey_id = self.df.loc[self.df.remote == False].survey.unique()[0]
+        if survey_id in ["none"]:
+            survey_id = "0"
+        return survey_id
+
     def _add_duration_column(self):
         """ """
         timedeltas = self.df.end - self.df.start
@@ -352,20 +359,6 @@ class KernelDataset:
                 row.station_id, row.run_id, survey=row.survey
             )
             self.df["run_reference"].at[i] = run_obj.hdf5_group.ref
-
-            # Ideally we would make the assignment of survey_metadata work with a run_obj, which would
-            # relax the need to access run_ts. However, run_obj.metadata has a null "id" field.
-            # Maybe there are other differences as well?
-            # also, the pass below should probably be followed by an else.
-            # but what if RR is from another survey?
-            # if i == 0:
-            #     if run_ts.survey_metadata.id in self.survey_metadata.keys():
-            #         pass
-            #     self.survey_metadata[run_ts.survey_metadata.id] = run_ts.survey_metadata
-            # elif i > 0:
-            #     self.survey_metadata[run_ts.survey_metadata.id].stations[0].add_run(run_ts.run_metadata)
-            # if len(self.survey_metadata.keys()) > 1:
-            #     raise NotImplementedError
 
             if row.fc:
                 msg = f"row {row} already has fcs prescribed by processing confg "

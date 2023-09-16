@@ -382,13 +382,7 @@ def process_mth5(
         tfk_dataset.close_mths_objs()
         return tf_collection
     else:
-
-        # get the unique survey id that is not a remote reference
-        survey_id = tfk_dataset.df.loc[
-            tfk_dataset.df.remote == False
-            ].survey.unique()[0]
-        if survey_id in ["none"]:
-            survey_id = "0"
+        survey_id = tfk_dataset.local_survey_id
 
         tf_cls = export_tf(
             tf_collection,
