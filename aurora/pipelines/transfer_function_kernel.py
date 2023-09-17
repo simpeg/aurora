@@ -8,7 +8,6 @@ from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.transfer_function.kernel_dataset import KernelDataset
 from mth5.utils.exceptions import MTH5Error
 from mth5.utils.helpers import initialize_mth5
-
 from mt_metadata.transfer_functions.core import TF
 from mt_metadata.transfer_functions.processing.aurora import Processing
 
@@ -491,10 +490,52 @@ class TransferFunctionKernel(object):
         tf_cls: mt_metadata.transfer_functions.core.TF
             Transfer function container
         """
+        def make_decimation_dict_for_tf(tf_collection, processing_config):
+            """
+            Decimation dict is used by mt_metadata's TF class when it is writng z-files.
+            If no z-files will be written this is not needed
+
+            sample element of decimation_dict:
+            '1514.70134': {'level': 4, 'bands': (5, 6), 'npts': 386, 'df': 0.015625}}
+
+            Note #1:  The line that does
+            period_value["npts"] = tf_collection.tf_dict[i_dec].num_segments.data[0, i_band]
+            doesn't feel very robust ... it would be better to explicitly select based on the num_segments
+            xarray location where period==fb.center_period.  This is a placeholder for now.  In future,
+            the TTFZ class is likely to be deprecated in favour of directly packing mt_metadata TFs during processing.
+
+            Parameters
+            ----------
+            tfc
+
+            Returns
+            -------
+
+            """
+            from mt_metadata.transfer_functions.processing.aurora.frequency_band import FrequencyBand
+            from mt_metadata.transfer_functions.io.zfiles.zmm import PERIOD_FORMAT
+
+            decimation_dict = {}
+
+            for i_dec, dec_level_cfg in enumerate(processing_config.decimations):
+                for i_band, band in enumerate(dec_level_cfg.bands):
+                    fb = FrequencyBand(left=band.frequency_min, right=band.frequency_max)
+                    period_key = f"{fb.center_period:{PERIOD_FORMAT}}"
+                    period_value = {}
+                    period_value["level"] = i_dec + 1 # +1 to match EMTF standard
+                    period_value["bands"] = tuple(band.harmonic_indices()[np.r_[0, -1]])
+                    period_value["npts"] = tf_collection.tf_dict[i_dec].num_segments.data[0, i_band]
+                    period_value["sample_rate"] = dec_level_cfg.sample_rate_decimation
+                    decimation_dict[period_key] = period_value
+
+            return decimation_dict
+
         channel_nomenclature = self.config.channel_nomenclature
-        channel_nomenclature_dict = self.config.channel_nomenclature.to_dict()["channel_nomenclature"]
+        channel_nomenclature_dict = channel_nomenclature.to_dict()["channel_nomenclature"]
         merged_tf_dict = tf_collection.get_merged_dict(channel_nomenclature)
-        tf_cls = TF(channel_nomenclature=channel_nomenclature_dict)
+        decimation_dict = make_decimation_dict_for_tf(tf_collection, self.processing_config)
+
+        tf_cls = TF(channel_nomenclature=channel_nomenclature_dict, decimation_dict=decimation_dict)
         renamer_dict = {"output_channel": "output", "input_channel": "input"}
         tmp = merged_tf_dict["tf"].rename(renamer_dict)
         tf_cls.transfer_function = tmp
