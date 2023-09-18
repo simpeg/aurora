@@ -185,61 +185,10 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
         clip_bands_from_z_file(z_file_path, n_periods_clip, n_sensors=5)
 
 
-    # NEW
-    tfobj2 = TF()
-    tfobj2.from_zmm(z_file_path)
+    tf_obj_from_z_file = TF()
+    tf_obj_from_z_file.from_zmm(z_file_path)
     archived_tf = TF()
     archived_tf.from_zmm(archived_z_file_path)
-    assert np.isclose(tfobj2.transfer_function.data, archived_tf.transfer_function.data, rtol=1e-3).all()
+    assert np.isclose(tf_obj_from_z_file.transfer_function.data, archived_tf.transfer_function.data, rtol=1e-3).all()
 
-    # # OLD
-    # zfile = read_z_file(z_file_path)
-    # archived_zfile = read_z_file(archived_z_file_path)
-    # zfile.apparent_resistivity(angle=0)
-    # archived_zfile.apparent_resistivity(angle=0)
-    # assert np.isclose(archived_zfile.rxy, archived_zfile.rxy).all()
-    # assert np.isclose(archived_zfile.ryx, archived_zfile.ryx).all()
-    # assert np.isclose(archived_zfile.pxy, archived_zfile.pxy).all()
-    # assert np.isclose(archived_zfile.pyx, archived_zfile.pyx).all()
-    #
-    # if make_plot:
-    #     scl = 1.0
-    #     fig, axs = plt.subplots(nrows=2, figsize=(11, 8.5), dpi=300, sharex=True)
-    #     markersize = 1
-    #     plot_rho(
-    #         axs[0],
-    #         zfile.periods,
-    #         zfile.rxy * scl,
-    #         label="rxy",
-    #         markersize=markersize,
-    #         color="red",
-    #     )
-    #     plot_rho(
-    #         axs[0],
-    #         zfile.periods,
-    #         zfile.ryx * scl,
-    #         label="ryx",
-    #         markersize=markersize,
-    #         color="blue",
-    #     )
-    #     axs[0].legend()
-    #     plot_phi(
-    #         axs[1],
-    #         zfile.periods,
-    #         zfile.pxy,
-    #         label="pxy",
-    #         markersize=markersize,
-    #         color="red",
-    #     )
-    #     plot_phi(
-    #         axs[1],
-    #         zfile.periods,
-    #         zfile.pyx,
-    #         label="pyx",
-    #         markersize=markersize,
-    #         color="blue",
-    #     )
-    #     axs[0].set_ylim(1, 1000)
-    #     axs[0].set_xlim(1, 10000)
-    #     plt.show()
     print("success!")
