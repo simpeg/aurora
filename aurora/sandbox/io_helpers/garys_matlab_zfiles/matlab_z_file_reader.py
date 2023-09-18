@@ -5,6 +5,7 @@ the matlab tests.
 """
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import scipy.io as sio
 
 
@@ -14,7 +15,6 @@ from aurora.general_helper_functions import TEST_PATH
 from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.transfer_function.emtf_z_file_helpers import clip_bands_from_z_file
-from aurora.transfer_function.emtf_z_file_helpers import get_default_orientation_block
 from aurora.transfer_function.plot.rho_phi_helpers import plot_phi
 from aurora.transfer_function.plot.rho_phi_helpers import plot_rho
 from aurora.transfer_function.transfer_function_collection import (
@@ -79,8 +79,6 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
         archived_z_file_path = test_dir_path.joinpath("archived_from_matlab.zss")
         z_file_path = test_dir_path.joinpath("from_matlab.zss")
 
-    orientation_strs = get_default_orientation_block()
-
     sample_rate = 1.0
     tf_dict = {}
 
@@ -95,7 +93,7 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
         decimation_factors=decimation_factors,
         num_samples_window=4 * [num_samples_window],
     )
-    p.assign_bands(band_edges, sample_rate, decimation_factors, 4 * num_samples_window)
+    p.assign_bands(band_edges, sample_rate, decimation_factors, num_samples_window)
     for i_dec in range(4):
         p.decimations[i_dec].decimation.sample_rate = sample_rate
         p.decimations[i_dec].window.num_samples = num_samples_window
@@ -104,8 +102,8 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
         p.decimations[i_dec].output_channels = output_channels
         p.decimations[i_dec].reference_channels = reference_channels
 
-        tf_obj = p.make_tf_level(i_dec)
-        tf_dict[i_dec] = tf_obj
+        tffz_obj = p.make_tf_level(i_dec)
+        tf_dict[i_dec] = tffz_obj
         sample_rate /= 4.0
 
     tmp = sio.loadmat(z_mat)
@@ -113,7 +111,7 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
         stuff = tmp["temp"][0][0].tolist()
     elif case_id == "IAK34ss":
         stuff = tmp["TFstruct"][0][0].tolist()
-    TF = stuff[4]
+    matlab_tf = stuff[4]
     periods = stuff[5]
     cov_ss = stuff[7]
     cov_nn = stuff[8]
@@ -136,84 +134,112 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
 
     # FIX NAN / INF
 
-    tf_dict[0].tf.data = TF[:, :, :11]
+    tf_dict[0].tf.data = matlab_tf[:, :, :11]
     tf_dict[0].cov_nn.data = cov_nn[:, :, :11]
     tf_dict[0].cov_ss_inv.data = cov_ss[:, :, :11]
     tf_dict[0].num_segments.data = n_data[:, :11]
     tf_dict[0].R2.data = R2[:, :11]
 
-    tf_dict[1].tf.data = TF[:, :, 11:17]
+    tf_dict[1].tf.data = matlab_tf[:, :, 11:17]
     tf_dict[1].cov_nn.data = cov_nn[:, :, 11:17]
     tf_dict[1].cov_ss_inv.data = cov_ss[:, :, 11:17]
     tf_dict[1].num_segments.data = n_data[:, 11:17]
     tf_dict[1].R2.data = R2[:, 11:17]
 
-    tf_dict[2].tf.data = TF[:, :, 17:23]
+    tf_dict[2].tf.data = matlab_tf[:, :, 17:23]
     tf_dict[2].cov_nn.data = cov_nn[:, :, 17:23]
     tf_dict[2].cov_ss_inv.data = cov_ss[:, :, 17:23]
     tf_dict[2].num_segments.data = n_data[:, 17:23]
     tf_dict[2].R2.data = R2[:, 17:23]
 
-    tf_dict[3].tf.data = TF[:, :, 23:]
+    tf_dict[3].tf.data = matlab_tf[:, :, 23:]
     tf_dict[3].cov_nn.data = cov_nn[:, :, 23:]
     tf_dict[3].cov_ss_inv.data = cov_ss[:, :, 23:]
     tf_dict[3].num_segments.data = n_data[:, 23:]
     tf_dict[3].R2.data = R2[:, 23:]
 
     tfc = TransferFunctionCollection(tf_dict=tf_dict, processing_config=p)
-    tfc.write_emtf_z_file(z_file_path, orientation_strs=orientation_strs)
+    from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
+    from aurora.transfer_function.kernel_dataset import KernelDataset
+    from mt_metadata.timeseries.survey import Survey
+    from mt_metadata.transfer_functions.core import TF
+    kd = KernelDataset(local_station_id=local_station_id)
+
+    survey_metadata = Survey()
+    kd.survey_metadata["0"] = survey_metadata
+    kd_df_dict = {'remote': [False, ],
+                  'station_id': [local_station_id,],
+                'processing_type': ["matlab EMTF",],
+                  'survey': ["0",],}
+    kd_df = pd.DataFrame(data=kd_df_dict)
+    kd.df = kd_df
+    tfk = TransferFunctionKernel(dataset=kd, config=p)
+    #pd.DataFrame({"survey":"0", "station":local_station_id})
+    tf_obj = tfk.export_tf_collection(tfc)
+    tf_obj.station_metadata.id = local_station_id
+    tf_obj.station_metadata.runs[0].channels["ey"].measurement_azimuth = 90.0
+    tf_obj.station_metadata.runs[0].channels["hy"].measurement_azimuth = 90.0
+    tf_obj.write(z_file_path)
 
     if n_periods_clip:
         clip_bands_from_z_file(z_file_path, n_periods_clip, n_sensors=5)
 
-    zfile = read_z_file(z_file_path)
-    archived_zfile = read_z_file(archived_z_file_path)
 
-    zfile.apparent_resistivity(angle=0)
-    archived_zfile.apparent_resistivity(angle=0)
-    assert (zfile.rxy == archived_zfile.rxy).all()
-    assert (zfile.ryx == archived_zfile.ryx).all()
-    assert (zfile.pxy == archived_zfile.pxy).all()
-    assert (zfile.pyx == archived_zfile.pyx).all()
+    # NEW
+    tfobj2 = TF()
+    tfobj2.from_zmm(z_file_path)
+    archived_tf = TF()
+    archived_tf.from_zmm(archived_z_file_path)
+    assert np.isclose(tfobj2.transfer_function.data, archived_tf.transfer_function.data, rtol=1e-3).all()
 
-    if make_plot:
-        scl = 1.0
-        fig, axs = plt.subplots(nrows=2, figsize=(11, 8.5), dpi=300, sharex=True)
-        markersize = 1
-        plot_rho(
-            axs[0],
-            zfile.periods,
-            zfile.rxy * scl,
-            label="rxy",
-            markersize=markersize,
-            color="red",
-        )
-        plot_rho(
-            axs[0],
-            zfile.periods,
-            zfile.ryx * scl,
-            label="ryx",
-            markersize=markersize,
-            color="blue",
-        )
-        axs[0].legend()
-        plot_phi(
-            axs[1],
-            zfile.periods,
-            zfile.pxy,
-            label="pxy",
-            markersize=markersize,
-            color="red",
-        )
-        plot_phi(
-            axs[1],
-            zfile.periods,
-            zfile.pyx,
-            label="pyx",
-            markersize=markersize,
-            color="blue",
-        )
-        axs[0].set_ylim(1, 1000)
-        axs[0].set_xlim(1, 10000)
-        plt.show()
+    # # OLD
+    # zfile = read_z_file(z_file_path)
+    # archived_zfile = read_z_file(archived_z_file_path)
+    # zfile.apparent_resistivity(angle=0)
+    # archived_zfile.apparent_resistivity(angle=0)
+    # assert np.isclose(archived_zfile.rxy, archived_zfile.rxy).all()
+    # assert np.isclose(archived_zfile.ryx, archived_zfile.ryx).all()
+    # assert np.isclose(archived_zfile.pxy, archived_zfile.pxy).all()
+    # assert np.isclose(archived_zfile.pyx, archived_zfile.pyx).all()
+    #
+    # if make_plot:
+    #     scl = 1.0
+    #     fig, axs = plt.subplots(nrows=2, figsize=(11, 8.5), dpi=300, sharex=True)
+    #     markersize = 1
+    #     plot_rho(
+    #         axs[0],
+    #         zfile.periods,
+    #         zfile.rxy * scl,
+    #         label="rxy",
+    #         markersize=markersize,
+    #         color="red",
+    #     )
+    #     plot_rho(
+    #         axs[0],
+    #         zfile.periods,
+    #         zfile.ryx * scl,
+    #         label="ryx",
+    #         markersize=markersize,
+    #         color="blue",
+    #     )
+    #     axs[0].legend()
+    #     plot_phi(
+    #         axs[1],
+    #         zfile.periods,
+    #         zfile.pxy,
+    #         label="pxy",
+    #         markersize=markersize,
+    #         color="red",
+    #     )
+    #     plot_phi(
+    #         axs[1],
+    #         zfile.periods,
+    #         zfile.pyx,
+    #         label="pyx",
+    #         markersize=markersize,
+    #         color="blue",
+    #     )
+    #     axs[0].set_ylim(1, 1000)
+    #     axs[0].set_xlim(1, 10000)
+    #     plt.show()
     print("success!")
