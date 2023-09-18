@@ -309,36 +309,32 @@ def process_mth5(
 
         # Could downweight bad FCs here
 
-        tf_obj = process_tf_decimation_level(
+        ttfz_obj = process_tf_decimation_level(
             tfk.config,
             i_dec_level,
             local_merged_stft_obj,
             remote_merged_stft_obj,
         )
-        tf_obj.apparent_resistivity(tfk.config.channel_nomenclature, units=units)
-        tf_dict[i_dec_level] = tf_obj
+        ttfz_obj.apparent_resistivity(tfk.config.channel_nomenclature, units=units)
+        tf_dict[i_dec_level] = ttfz_obj
 
         if show_plot:
             from aurora.sandbox.plot_helpers import plot_tf_obj
 
-            plot_tf_obj(tf_obj, out_filename="out")
+            plot_tf_obj(ttfz_obj, out_filename="out")
 
     tf_collection = TransferFunctionCollection(
         tf_dict=tf_dict, processing_config=tfk.config
     )
 
+    tf_cls = tfk.export_tf_collection(tf_collection)
 
     if z_file_path:
-        # local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
-        local_run_obj = tfk.dataset.get_run_object(0)
-        tf_collection.write_emtf_z_file(z_file_path, run_obj=local_run_obj)
+        tf_cls.write(z_file_path)
 
+    tfk.dataset.close_mths_objs()
     if return_collection:
         # this is now really only to be used for debugging and may be deprecated soon
-        tfk.dataset.close_mths_objs()
         return tf_collection
     else:
-
-        tf_cls = tfk.export_tf_collection(tf_collection)
-        tfk.dataset.close_mths_objs()
         return tf_cls
