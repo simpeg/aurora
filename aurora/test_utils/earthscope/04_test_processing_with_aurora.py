@@ -48,8 +48,12 @@ class TestAuroraProcessing(WidesScaleTest):
 
     def prepare_jobs_dataframe(self):
         if self.use_skeleton:
-            df = pd.read_csv(self.skeleton_file, dtype=self.df_schema_dtypes)
-            return df
+            try:
+                df = pd.read_csv(self.skeleton_file, dtype=self.df_schema_dtypes)
+                return df
+            except FileNotFoundError:
+                print(f"File {self.skeleton_file} not found - will build it")
+
 
 
         spud_schema = get_summary_table_schema_v2(1)

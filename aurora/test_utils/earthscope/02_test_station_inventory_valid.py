@@ -56,7 +56,7 @@ class TestDatalessMTH5(WidesScaleTest):
         super().__init__(**kwargs)
         self.augment_with_existing = kwargs.get("augment_with_existing", True)
         self.use_skeleton = kwargs.get("use_skeleton", True) # speeds up preparation of dataframe
-        self.skeleton_file = "skeleton_02.csv"
+        self.skeleton_file = f"skeleton_{str(STAGE_ID).zfill(2)}.csv"
         self.xml_source = "data" # "data" or "emtf"
         self._data_availability = None
         self.use_channel_wildcards = kwargs.get("use_channel_wildcards", False)
