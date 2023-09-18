@@ -474,6 +474,9 @@ class TransferFunctionKernel(object):
             processing_type = f"{processing_type}: Robust Remote Reference"
         else:
             processing_type = f"{processing_type}: Robust Single Station"
+        if "processing_type" in self.dataset_df.columns:
+            processing_type = self.dataset_df["processing_type"].iloc[0]
+
         return processing_type
 
     def export_tf_collection(self, tf_collection):
