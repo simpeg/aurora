@@ -157,7 +157,7 @@ def triage_issue_289(local_stfts, remote_stfts):
                 cond1 & cond2, drop=True
             )
             assert local_stfts[i_chunk].time.shape == remote_stfts[i_chunk].time.shape
-    return  # local_stfts, remote_stfts
+    return local_stfts, remote_stfts
 
 
 def merge_stfts(stfts, tfk):
