@@ -6,22 +6,15 @@ For each such row,
     extract the network/station_id (if the metadata exist)
     download data
 
-Handy steps for debugging:
-# metadata_local = EXPERIMENT_PATH.joinpath(data_file_base)
-# metadata_local.exists()
-# m = MTH5()
-# m.open_mth5(metadata_local)
-# m.channel_summary
-# m.close_mth5()
-# m.open_mth5(data_file)
-# m.channel_summary
+
+
 """
 
 
 import pandas as pd
 import time
 
-from aurora.sandbox.mth5_helpers import repair_missing_filters
+from aurora.sandbox.earthscope_mth5_helpers import repair_missing_filters
 
 from aurora.test_utils.earthscope.data_availability import DataAvailability
 from aurora.test_utils.earthscope.data_availability import row_to_request_df
@@ -122,7 +115,7 @@ class TestBuildMTH5(WidesScaleTest):
             mth5_filename = fdsn_object.make_mth5_from_fdsn_client(request_df,
                                                                    interact=False,
                                                                    path=DATA_PATH)
-            if TRY_REPAIR_MISSING_FILTERS:
+            if self.try_repair_missing_filters:
                 repair_missing_filters(mth5_filename, MTH5_VERSION, triage_units=True, add_filters_where_none=False)
             row.at["data_mth5_size"] = expected_file_name.stat().st_size
             row.at["data_mth5_name"] = expected_file_name.name
