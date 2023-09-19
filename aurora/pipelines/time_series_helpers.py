@@ -60,9 +60,7 @@ def apply_prewhitening(decimation_obj, run_xrds_input):
         run_xrds = run_xrds_input.differentiate("time")
 
     else:
-        print(
-            f"{decimation_obj.prewhitening_type} pre-whitening not implemented"
-        )
+        print(f"{decimation_obj.prewhitening_type} pre-whitening not implemented")
         raise NotImplementedError
     return run_xrds
 
@@ -108,9 +106,7 @@ def apply_recoloring(decimation_obj, stft_obj):
     #     MA = 4 # add this to processing config
 
     else:
-        print(
-            f"{decimation_obj.prewhitening_type} recoloring not yet implemented"
-        )
+        print(f"{decimation_obj.prewhitening_type} recoloring not yet implemented")
         raise NotImplementedError
 
     return stft_obj
@@ -199,9 +195,7 @@ def truncate_to_clock_zero(decimation_obj, run_xrds):
             pass  # time series start is already clock zero
         else:
             windowing_scheme = window_scheme_from_decimation(decimation_obj)
-            number_of_steps = (
-                delta_t_seconds / windowing_scheme.duration_advance
-            )
+            number_of_steps = delta_t_seconds / windowing_scheme.duration_advance
             n_partial_steps = number_of_steps - np.floor(number_of_steps)
             n_clip = n_partial_steps * windowing_scheme.num_samples_advance
             n_clip = int(np.round(n_clip))
@@ -226,8 +220,11 @@ def nan_to_mean(xrds):
 
     """
     for ch in xrds.keys():
-        if not (xrds[ch].isnull() == False).all().data:
-            print("Null values detected in xrds -- this is not expected and should be examined")
+        null_values_present = xrds[ch].isnull().any()
+        if null_values_present:
+            print(
+                "Null values detected in xrds -- this is not expected and should be examined"
+            )
             value = np.nan_to_num(np.nanmean(xrds[ch].data))
             xrds[ch] = xrds[ch].fillna(value)
     return xrds
@@ -262,9 +259,7 @@ def run_ts_to_stft(decimation_obj, run_xrds_orig):
     if not np.prod(windowed_obj.to_array().data.shape):
         raise ValueError
 
-    windowed_obj = WindowedTimeSeries.detrend(
-        data=windowed_obj, detrend_type="linear"
-    )
+    windowed_obj = WindowedTimeSeries.detrend(data=windowed_obj, detrend_type="linear")
     tapered_obj = windowed_obj * windowing_scheme.taper
     stft_obj = windowing_scheme.apply_fft(
         tapered_obj, detrend_type=decimation_obj.extra_pre_fft_detrend_type
@@ -274,9 +269,7 @@ def run_ts_to_stft(decimation_obj, run_xrds_orig):
     return stft_obj
 
 
-def calibrate_stft_obj(
-    stft_obj, run_obj, units="MT", channel_scale_factors=None
-):
+def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None):
     """
 
     Parameters
@@ -304,12 +297,8 @@ def calibrate_stft_obj(
             print("WARNING UNEXPECTED CHANNEL WITH NO FILTERS")
             if channel_id == "hy":
                 print("Channel HY has no filters, try using filters from HX")
-                channel_filter = run_obj.get_channel(
-                    "hx"
-                ).channel_response_filter
-        calibration_response = channel_filter.complex_response(
-            stft_obj.frequency.data
-        )
+                channel_filter = run_obj.get_channel("hx").channel_response_filter
+        calibration_response = channel_filter.complex_response(stft_obj.frequency.data)
         if channel_scale_factors:
             try:
                 channel_scale_factor = channel_scale_factors[channel_id]
@@ -350,9 +339,7 @@ def prototype_decimate(config, run_xrds):
     num_channels = len(channel_labels)
     new_data = np.full((num_observations, num_channels), np.nan)
     for i_ch, ch_label in enumerate(channel_labels):
-        new_data[:, i_ch] = ssig.decimate(
-            run_xrds[ch_label], int(config.factor)
-        )
+        new_data[:, i_ch] = ssig.decimate(run_xrds[ch_label], int(config.factor))
 
     xr_da = xr.DataArray(
         new_data,
@@ -386,9 +373,7 @@ def prototype_decimate_2(config, run_xrds):
     xr_ds: xr.Dataset
         Decimated version of the input run_xrds
     """
-    new_xr_ds = run_xrds.coarsen(
-        time=int(config.factor), boundary="trim"
-    ).mean()
+    new_xr_ds = run_xrds.coarsen(time=int(config.factor), boundary="trim").mean()
     attr_dict = run_xrds.attrs
     attr_dict["sample_rate"] = config.sample_rate
     new_xr_ds.attrs = attr_dict

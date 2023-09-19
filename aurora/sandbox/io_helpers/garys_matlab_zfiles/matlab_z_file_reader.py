@@ -21,6 +21,7 @@ from aurora.transfer_function.transfer_function_collection import (
 from mt_metadata.timeseries.survey import Survey
 from mt_metadata.transfer_functions.core import TF
 
+
 def read_matlab_z_file(case_id, z_mat):
     tmp = sio.loadmat(z_mat)
     if case_id == "synthetic":
@@ -28,6 +29,7 @@ def read_matlab_z_file(case_id, z_mat):
     elif case_id == "IAK34ss":
         tmp = tmp["TFstruct"][0][0].tolist()
     return tmp
+
 
 def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
     """
@@ -100,12 +102,16 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
     p.stations.local.id = local_station_id
     if remote_station_id:
         p.stations.remote.id = remote_station_id
-    emtf_band_setup = EMTFBandSetupFile(filepath=band_setup_file, sample_rate=field_data_sample_rate)
+    emtf_band_setup = EMTFBandSetupFile(
+        filepath=band_setup_file, sample_rate=field_data_sample_rate
+    )
     band_edges = emtf_band_setup.compute_band_edges(
         decimation_factors=decimation_factors,
         num_samples_window=4 * [num_samples_window],
     )
-    p.assign_bands(band_edges, field_data_sample_rate, decimation_factors, num_samples_window)
+    p.assign_bands(
+        band_edges, field_data_sample_rate, decimation_factors, num_samples_window
+    )
 
     # 3. populate decimation levels of processing config
     tf_dict = {}
@@ -176,10 +182,20 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
     kd = KernelDataset(local_station_id=local_station_id)
     survey_metadata = Survey()
     kd.survey_metadata["0"] = survey_metadata
-    kd_df_dict = {'remote': [False, ],
-                  'station_id': [local_station_id,],
-                'processing_type': ["matlab EMTF",],
-                  'survey': ["0",],}
+    kd_df_dict = {
+        "remote": [
+            False,
+        ],
+        "station_id": [
+            local_station_id,
+        ],
+        "processing_type": [
+            "matlab EMTF",
+        ],
+        "survey": [
+            "0",
+        ],
+    }
     kd_df = pd.DataFrame(data=kd_df_dict)
     kd.df = kd_df
     tfk = TransferFunctionKernel(dataset=kd, config=p)
@@ -195,12 +211,15 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
     if n_periods_clip:
         clip_bands_from_z_file(z_file_path, n_periods_clip, n_sensors=5)
 
-
     # 8. Compare z-file written by TF object to the archived version
     tf_obj_from_z_file = TF()
     tf_obj_from_z_file.from_zmm(z_file_path)
     archived_tf = TF()
     archived_tf.from_zmm(archived_z_file_path)
-    assert np.isclose(tf_obj_from_z_file.transfer_function.data, archived_tf.transfer_function.data, rtol=1e-3).all()
+    assert np.isclose(
+        tf_obj_from_z_file.transfer_function.data,
+        archived_tf.transfer_function.data,
+        rtol=1e-3,
+    ).all()
 
     print("success!")

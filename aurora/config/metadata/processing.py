@@ -18,7 +18,6 @@ class Processing(Processing):
         # super().__init__(attr_dict=attr_dict, **kwargs)
         super().__init__(**kwargs)
 
-
     def window_scheme(self, as_type="df"):
         """
         Make a dataframe of processing parameters one row per decimation level.

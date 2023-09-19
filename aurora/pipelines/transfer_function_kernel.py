@@ -134,14 +134,18 @@ class TransferFunctionKernel(object):
                 run_xrds = row["run_dataarray"].to_dataset("channel")
                 decimation = self.config.decimations[i_dec_level].decimation
                 decimated_xrds = prototype_decimate(decimation, run_xrds)
-                self.dataset_df["run_dataarray"].at[
-                    i
-                ] = decimated_xrds.to_array(
+                self.dataset_df["run_dataarray"].at[i] = decimated_xrds.to_array(
                     "channel"
                 )  # See Note 1 above
 
         print("DATASET DF UPDATED")
         return
+
+    def apply_clock_zero(self, dec_level_config):
+        """get clock-zero from data if needed"""
+        if dec_level_config.window.clock_zero_type == "data start":
+            dec_level_config.window.clock_zero = str(self.dataset_df.start.min())
+        return dec_level_config
 
     def check_if_fc_levels_already_exist(self):
         """
@@ -221,10 +225,8 @@ class TransferFunctionKernel(object):
                 )
                 # Assume FC Groups are keyed by run_id, check if there is a relevant group
                 try:
-                    fc_group = (
-                        station_obj.fourier_coefficients_group.get_fc_group(
-                            run_id
-                        )
+                    fc_group = station_obj.fourier_coefficients_group.get_fc_group(
+                        run_id
                     )
                 except MTH5Error:
                     self.dataset_df.loc[dataset_df_indices, "fc"] = False
@@ -252,9 +254,7 @@ class TransferFunctionKernel(object):
                 fcs_already_there = fc_group.supports_aurora_processing_config(
                     self.processing_config, run_row.remote
                 )
-                self.dataset_df.loc[
-                    dataset_df_indices, "fc"
-                ] = fcs_already_there
+                self.dataset_df.loc[dataset_df_indices, "fc"] = fcs_already_there
 
         return
 
@@ -276,15 +276,11 @@ class TransferFunctionKernel(object):
         decimation_info = self.config.decimation_info()
         for i_dec, dec_factor in decimation_info.items():
             tmp[i_dec] = dec_factor
-        tmp = tmp.melt(
-            id_vars=id_vars, value_name="dec_factor", var_name="dec_level"
-        )
+        tmp = tmp.melt(id_vars=id_vars, value_name="dec_factor", var_name="dec_level")
         sortby = ["survey", "station_id", "run_id", "start", "dec_level"]
         tmp.sort_values(by=sortby, inplace=True)
         tmp.reset_index(drop=True, inplace=True)
-        tmp.drop(
-            "sample_rate", axis=1, inplace=True
-        )  # not valid for decimated data
+        tmp.drop("sample_rate", axis=1, inplace=True)  # not valid for decimated data
 
         # Add window info
         group_by = [
@@ -304,16 +300,12 @@ class TransferFunctionKernel(object):
                         df.dec_level.diff()[1:] == 1
                     ).all()  # dec levels increment by 1
                 except AssertionError:
-                    print(
-                        f"Skipping {group} because decimation levels are messy."
-                    )
+                    print(f"Skipping {group} because decimation levels are messy.")
                     continue
                 assert df.dec_factor.iloc[0] == 1
                 assert df.dec_level.iloc[0] == 0
             except AssertionError:
-                raise AssertionError(
-                    "Decimation levels not structured as expected"
-                )
+                raise AssertionError("Decimation levels not structured as expected")
             # df.sample_rate /= np.cumprod(df.dec_factor)  # better to take from config
             window_params_df = self.config.window_scheme(as_type="df")
             df.reset_index(inplace=True, drop=True)
@@ -369,8 +361,7 @@ class TransferFunctionKernel(object):
                 for x in self.processing_config.decimations
             }
             min_stft_window_list = [
-                min_stft_window_info[x]
-                for x in self.processing_summary.dec_level
+                min_stft_window_info[x] for x in self.processing_summary.dec_level
             ]
             min_num_stft_windows = pd.Series(min_stft_window_list)
 
@@ -419,12 +410,8 @@ class TransferFunctionKernel(object):
         valid_levels = tmp.dec_level.unique()
 
         dec_levels = [x for x in self.config.decimations]
-        dec_levels = [
-            x for x in dec_levels if x.decimation.level in valid_levels
-        ]
-        print(
-            f"After validation there are {len(dec_levels)} valid decimation levels"
-        )
+        dec_levels = [x for x in dec_levels if x.decimation.level in valid_levels]
+        print(f"After validation there are {len(dec_levels)} valid decimation levels")
         return dec_levels
 
     def is_valid_dataset(self, row, i_dec):
@@ -493,6 +480,7 @@ class TransferFunctionKernel(object):
         tf_cls: mt_metadata.transfer_functions.core.TF
             Transfer function container
         """
+
         def make_decimation_dict_for_tf(tf_collection, processing_config):
             """
             Decimation dict is used by mt_metadata's TF class when it is writng z-files.
@@ -515,21 +503,27 @@ class TransferFunctionKernel(object):
             -------
 
             """
-            from mt_metadata.transfer_functions.processing.aurora.frequency_band import FrequencyBand
+            from mt_metadata.transfer_functions.processing.aurora.frequency_band import (
+                FrequencyBand,
+            )
             from mt_metadata.transfer_functions.io.zfiles.zmm import PERIOD_FORMAT
 
             decimation_dict = {}
 
             for i_dec, dec_level_cfg in enumerate(processing_config.decimations):
                 for i_band, band in enumerate(dec_level_cfg.bands):
-                    fb = FrequencyBand(left=band.frequency_min, right=band.frequency_max)
+                    fb = FrequencyBand(
+                        left=band.frequency_min, right=band.frequency_max
+                    )
                     period_key = f"{fb.center_period:{PERIOD_FORMAT}}"
                     period_value = {}
-                    period_value["level"] = i_dec + 1 # +1 to match EMTF standard
+                    period_value["level"] = i_dec + 1  # +1 to match EMTF standard
                     period_value["bands"] = tuple(band.harmonic_indices()[np.r_[0, -1]])
                     period_value["sample_rate"] = dec_level_cfg.sample_rate_decimation
                     try:
-                        period_value["npts"] = tf_collection.tf_dict[i_dec].num_segments.data[0, i_band]
+                        period_value["npts"] = tf_collection.tf_dict[
+                            i_dec
+                        ].num_segments.data[0, i_band]
                     except KeyError:
                         print("Possibly invalid decimation level")
                         period_value["npts"] = 0
@@ -538,11 +532,18 @@ class TransferFunctionKernel(object):
             return decimation_dict
 
         channel_nomenclature = self.config.channel_nomenclature
-        channel_nomenclature_dict = channel_nomenclature.to_dict()["channel_nomenclature"]
+        channel_nomenclature_dict = channel_nomenclature.to_dict()[
+            "channel_nomenclature"
+        ]
         merged_tf_dict = tf_collection.get_merged_dict(channel_nomenclature)
-        decimation_dict = make_decimation_dict_for_tf(tf_collection, self.processing_config)
+        decimation_dict = make_decimation_dict_for_tf(
+            tf_collection, self.processing_config
+        )
 
-        tf_cls = TF(channel_nomenclature=channel_nomenclature_dict, decimation_dict=decimation_dict)
+        tf_cls = TF(
+            channel_nomenclature=channel_nomenclature_dict,
+            decimation_dict=decimation_dict,
+        )
         renamer_dict = {"output_channel": "output", "input_channel": "input"}
         tmp = merged_tf_dict["tf"].rename(renamer_dict)
         tf_cls.transfer_function = tmp
