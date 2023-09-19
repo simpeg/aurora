@@ -8,8 +8,8 @@ from aurora.transfer_function.plot.rho_phi_helpers import plot_rho
 def compare_two_z_files(
     z_path1,
     z_path2,
-    angle1 = 0.0,
-    angle2 = 0.0,
+    angle1=0.0,
+    angle2=0.0,
     label1="",
     label2="",
     scale_factor1=1.0,

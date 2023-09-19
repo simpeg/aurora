@@ -25,9 +25,7 @@ def test_can_slice_a_run_ts_using_timestamp():
     run_ts_01 = run_001.to_runts()
     start = df.iloc[0].start
     end = df.iloc[0].end
-    print(
-        " Workaround for mt_metadata issue #86 - remove once that is resolved"
-    )
+    print(" Workaround for mt_metadata issue #86 - remove once that is resolved")
     start = fix_time(start)
     end = fix_time(end)
     run_ts_02 = run_001.to_runts(start=start, end=end)

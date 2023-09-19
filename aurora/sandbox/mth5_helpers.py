@@ -16,6 +16,7 @@ from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 from mth5.clients import FDSN
 from mth5.utils.helpers import initialize_mth5
 
+
 def enrich_channel_summary(mth5_object, df, keyword):
     """
 
@@ -34,14 +35,17 @@ def enrich_channel_summary(mth5_object, df, keyword):
         The channel summary df with the new column
     """
     df[keyword] = -1
-    if keyword=="num_filters":
+    if keyword == "num_filters":
         for i_row, row in df.iterrows():
-            channel = mth5_object.get_channel(row.station, row.run, row.component, row.survey)
+            channel = mth5_object.get_channel(
+                row.station, row.run, row.component, row.survey
+            )
             num_filters = len(channel.channel_response_filter.filters_list)
             df[keyword].iat[i_row] = num_filters
     return df
 
-def augmented_channel_summary(mth5_object, df=None):#, **kwargs):
+
+def augmented_channel_summary(mth5_object, df=None):  # , **kwargs):
     """
     Consider supportig kwargs, such as a list of keyords that tell what columns to add
     For now, we only want to add n_filters
@@ -58,7 +62,9 @@ def augmented_channel_summary(mth5_object, df=None):#, **kwargs):
         df = mth5_object.channel_summary.to_dataframe()
     df["n_filters"] = -1
     for i_row, row in df.iterrows():
-        channel = mth5_object.get_channel(row.station, row.run, row.component, row.survey)
+        channel = mth5_object.get_channel(
+            row.station, row.run, row.component, row.survey
+        )
         n_filters = len(channel.channel_response_filter.filters_list)
         df.n_filters.iat[i_row] = n_filters
     return df
@@ -85,11 +91,10 @@ def build_request_df(network_id, station_id, channels=None, start=None, end=None
         A formatted dataframe that can be passed to mth5.clients.FDSN to request metdata or data.
 
     """
-    from mth5.clients import FDSN
-    fdsn_object = FDSN(mth5_version='0.2.0')
+    fdsn_object = FDSN(mth5_version="0.2.0")
     fdsn_object.client = "IRIS"
     if start is None:
-        start = '1970-01-01 00:00:00'
+        start = "1970-01-01 00:00:00"
     if end is None:
         end = datetime.datetime.now()
         end = end.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -97,7 +102,7 @@ def build_request_df(network_id, station_id, channels=None, start=None, end=None
 
     request_list = []
     for channel in channels:
-        request_list.append([network_id, station_id, '', channel, start, end])
+        request_list.append([network_id, station_id, "", channel, start, end])
 
     print(f"request_list: {request_list}")
 
@@ -126,7 +131,6 @@ def mth5_from_experiment(experiment, h5_path=None):
     mth5_obj = initialize_mth5(h5_path)
     mth5_obj.from_experiment(experiment)
     return mth5_obj
-
 
 
 def get_channel_summary(h5_path):

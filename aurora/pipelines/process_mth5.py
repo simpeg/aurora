@@ -29,12 +29,10 @@ from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.transfer_function_helpers import process_transfer_functions
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
-
 from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
 )
 from aurora.transfer_function.TTFZ import TTFZ
-
 from mt_metadata.transfer_functions.core import TF
 
 
@@ -136,6 +134,47 @@ def enrich_row(row):
     pass
 
 
+def triage_issue_289(local_stfts, remote_stfts):
+    n_chunks = len(local_stfts)
+    for i_chunk in range(n_chunks):
+        ok = local_stfts[i_chunk].time.shape == remote_stfts[i_chunk].time.shape
+        if not ok:
+            print("Mismatch in FC array lengths detected -- Issue #289")
+            glb = max(
+                local_stfts[i_chunk].time.min(),
+                remote_stfts[i_chunk].time.min(),
+            )
+            lub = min(
+                local_stfts[i_chunk].time.max(),
+                remote_stfts[i_chunk].time.max(),
+            )
+            cond1 = local_stfts[i_chunk].time >= glb
+            cond2 = local_stfts[i_chunk].time <= lub
+            local_stfts[i_chunk] = local_stfts[i_chunk].where(cond1 & cond2, drop=True)
+            cond1 = remote_stfts[i_chunk].time >= glb
+            cond2 = remote_stfts[i_chunk].time <= lub
+            remote_stfts[i_chunk] = remote_stfts[i_chunk].where(
+                cond1 & cond2, drop=True
+            )
+            assert local_stfts[i_chunk].time.shape == remote_stfts[i_chunk].time.shape
+    return local_stfts, remote_stfts
+
+
+def merge_stfts(stfts, tfk):
+    # Timing Error Workaround See Aurora Issue #289
+    local_stfts = stfts["local"]
+    remote_stfts = stfts["remote"]
+    if tfk.config.stations.remote:
+        local_stfts, remote_stfts = triage_issue_289(local_stfts, remote_stfts)
+
+    local_merged_stft_obj = xr.concat(local_stfts, "time")
+
+    if tfk.config.stations.remote:
+        remote_merged_stft_obj = xr.concat(remote_stfts, "time")
+    else:
+        remote_merged_stft_obj = None
+    return local_merged_stft_obj, remote_merged_stft_obj
+
 
 def process_mth5(
     config,
@@ -181,6 +220,7 @@ def process_mth5(
     tf_cls: mt_metadata.transfer_functions.TF
         TF object
     """
+
     def station_obj_from_row(row):
         """
         Access the station object
@@ -197,8 +237,17 @@ def process_mth5(
         if row.survey == "none":
             station_obj = row.mth5_obj.stations_group.get_station(row.station_id)
         else:
-            station_obj = row.mth5_obj.stations_group.get_station(row.station_id, survey=row.survey)
+            station_obj = row.mth5_obj.stations_group.get_station(
+                row.station_id, survey=row.survey
+            )
         return station_obj
+
+    def append_stft(stfts, stft_obj, row):
+        if row.remote:
+            stfts["remote"].append(stft_obj)
+        else:
+            stfts["local"].append(stft_obj)
+        return stfts
 
     # Initialize config and mth5s
     tfk = TransferFunctionKernel(dataset=tfk_dataset, config=config)
@@ -206,7 +255,7 @@ def process_mth5(
     tfk.validate()
     # See Note #1
     tfk.initialize_mth5s(mode="a")
-    tfk.check_if_fc_levels_already_exist() # populate the "fc" column of dataset_df
+    tfk.check_if_fc_levels_already_exist()  # populate the "fc" column of dataset_df
     print(f"fc_levels_already_exist = {tfk.dataset_df['fc']}")
     print(
         f"Processing config indicates {len(tfk.config.decimations)} "
@@ -217,16 +266,15 @@ def process_mth5(
 
     for i_dec_level, dec_level_config in enumerate(tfk.valid_decimations()):
         tfk.update_dataset_df(i_dec_level)
+        dec_level_config = tfk.apply_clock_zero(dec_level_config)
 
-        local_stfts = []
-        remote_stfts = []
-
-        # TFK 1: get clock-zero from data if needed
-        if dec_level_config.window.clock_zero_type == "data start":
-            dec_level_config.window.clock_zero = str(tfk.dataset_df.start.min())
+        stfts = {}
+        stfts["local"] = []
+        stfts["remote"] = []
 
         # Check first if TS processing or accessing FC Levels
         for i, row in tfk.dataset_df.iterrows():
+            # This iterator could be updated to iterate over row-pairs if remote is True, corresponding to simultaneous data
 
             if not tfk.is_valid_dataset(row, i_dec_level):
                 continue
@@ -234,26 +282,29 @@ def process_mth5(
             run_obj = row.mth5_obj.from_reference(row.run_reference)
             if row.fc:
                 station_obj = station_obj_from_row(row)
-                fc_group = station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id)
+                fc_group = station_obj.fourier_coefficients_group.add_fc_group(
+                    run_obj.metadata.id
+                )
                 fc_decimation_level = fc_group.get_decimation_level(f"{i_dec_level}")
                 stft_obj = fc_decimation_level.to_xarray()
-                if row.station_id == tfk.config.stations.local.id:
-                    local_stfts.append(stft_obj)
-                elif row.station_id == tfk.config.stations.remote[0].id:
-                    remote_stfts.append(stft_obj)
+                stfts = append_stft(stfts, stft_obj, row)
+                # if row.station_id == tfk.config.stations.local.id:
+                #     local_stfts.append(stft_obj)
+                # elif row.station_id == tfk.config.stations.remote[0].id:
+                #     remote_stfts.append(stft_obj)
                 continue
 
             run_xrds = row["run_dataarray"].to_dataset("channel")
-            print(f"DEBUG Issue 289: TS {row.station_id} {row.run_id} {run_xrds.time.shape} {row.start} {row.end}")
             run_obj = row.mth5_obj.from_reference(row.run_reference)
             stft_obj = make_stft_objects(
                 tfk.config, i_dec_level, run_obj, run_xrds, units, row.station_id
             )
-            print(f"DEBUG Issue 289: FC {row.station_id} {row.run_id} {stft_obj.time.shape} {stft_obj.time.min()} {stft_obj.time.max()}")
             # Pack FCs into h5
             if dec_level_config.save_fcs:
                 if dec_level_config.save_fcs_type == "csv":
-                    print("WARNING: Unless you are debugging or running the tests, saving FCs to csv is unexpected")
+                    print(
+                        "WARNING: Unless you are debugging or running the tests, saving FCs to csv is unexpected"
+                    )
                     csv_name = f"{row.station_id}_dec_level_{i_dec_level}.csv"
                     stft_df = stft_obj.to_dataframe()
                     stft_df.to_csv(csv_name)
@@ -263,47 +314,38 @@ def process_mth5(
                     # See Note #1 at top this method (not module)
                     if not row.mth5_obj.h5_is_write():
                         raise NotImplementedError("See Note #1 at top this method")
-                    fc_group = station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id)
+                    fc_group = station_obj.fourier_coefficients_group.add_fc_group(
+                        run_obj.metadata.id
+                    )
                     decimation_level_metadata = dec_level_config.to_fc_decimation()
-                    fc_decimation_level = fc_group.add_decimation_level(f"{i_dec_level}",
-                                                                         decimation_level_metadata=decimation_level_metadata)
+                    fc_decimation_level = fc_group.add_decimation_level(
+                        f"{i_dec_level}",
+                        decimation_level_metadata=decimation_level_metadata,
+                    )
                     fc_decimation_level.from_xarray(stft_obj)
                     fc_decimation_level.update_metadata()
                     fc_group.update_metadata()
 
-
-            if row.station_id == tfk.config.stations.local.id:
-                local_stfts.append(stft_obj)
-            elif row.station_id == tfk.config.stations.remote[0].id:
-                remote_stfts.append(stft_obj)
+            stfts = append_stft(stfts, stft_obj, row)
+            # if row.station_id == tfk.config.stations.local.id:
+            #     local_stfts.append(stft_obj)
+            # elif row.station_id == tfk.config.stations.remote[0].id:
+            #     remote_stfts.append(stft_obj)
 
         # Merge STFTs
-
-        # Timing Error Workaround See Aurora Issue #289
-        if tfk.config.stations.remote:
-            n_chunks = len(local_stfts)
-            for i_chunk in range(n_chunks):
-                ok = local_stfts[i_chunk].time.shape == remote_stfts[i_chunk].time.shape
-                if not ok:
-                    print(f"Mismatch in FC array lengths detected -- Issue #289")
-                    glb = max(local_stfts[i_chunk].time.min(), remote_stfts[i_chunk].time.min())
-                    lub = min(local_stfts[i_chunk].time.max(), remote_stfts[i_chunk].time.max())
-                    cond1 = local_stfts[i_chunk].time >= glb
-                    cond2 = local_stfts[i_chunk].time <= lub
-                    local_stfts[i_chunk] = local_stfts[i_chunk].where(cond1 & cond2, drop=True)
-                    cond1 = remote_stfts[i_chunk].time >= glb
-                    cond2 = remote_stfts[i_chunk].time <= lub
-                    remote_stfts[i_chunk] = remote_stfts[i_chunk].where(cond1 & cond2, drop=True)
-                    assert (local_stfts[i_chunk].time.shape==remote_stfts[i_chunk].time.shape)
-
-
-
-        local_merged_stft_obj = xr.concat(local_stfts, "time")
-
-        if tfk.config.stations.remote:
-            remote_merged_stft_obj = xr.concat(remote_stfts, "time")
-        else:
-            remote_merged_stft_obj = None
+        local_merged_stft_obj, remote_merged_stft_obj = merge_stfts(stfts, tfk)
+        # # Timing Error Workaround See Aurora Issue #289
+        # local_stfts = stfts["local"]
+        # remote_stfts = stfts["remote"]
+        # if tfk.config.stations.remote:
+        #     triage_issue_289(stfts["local"], stfts["remote"])
+        #
+        # local_merged_stft_obj = xr.concat(local_stfts, "time")
+        #
+        # if tfk.config.stations.remote:
+        #     remote_merged_stft_obj = xr.concat(remote_stfts, "time")
+        # else:
+        #     remote_merged_stft_obj = None
 
         # FC TF Interface here (see Note #3)
 

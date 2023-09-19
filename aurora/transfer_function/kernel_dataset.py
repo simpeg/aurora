@@ -57,7 +57,12 @@ from aurora.pipelines.run_summary import RUN_SUMMARY_COLUMNS
 from mt_metadata.utils.list_dict import ListDict
 
 # Add these to a standard, so we track add/subtract columns
-KERNEL_DATASET_COLUMNS = RUN_SUMMARY_COLUMNS + [ 'channel_scale_factors', 'duration', 'fc']
+KERNEL_DATASET_COLUMNS = RUN_SUMMARY_COLUMNS + [
+    "channel_scale_factors",
+    "duration",
+    "fc",
+]
+
 
 class KernelDataset:
     """
@@ -125,9 +130,7 @@ class KernelDataset:
     def clone_dataframe(self):
         return copy.deepcopy(self.df)
 
-    def from_run_summary(
-        self, run_summary, local_station_id, remote_station_id=None
-    ):
+    def from_run_summary(self, run_summary, local_station_id, remote_station_id=None):
         """
 
         Parameters
@@ -151,9 +154,7 @@ class KernelDataset:
         ]
         if remote_station_id:
             station_ids.append(remote_station_id)
-        df = restrict_to_station_list(
-            run_summary.df, station_ids, inplace=False
-        )
+        df = restrict_to_station_list(run_summary.df, station_ids, inplace=False)
         df["remote"] = False
         if remote_station_id:
             cond = df.station_id == remote_station_id
@@ -180,7 +181,7 @@ class KernelDataset:
 
     @property
     def local_survey_id(self):
-        survey_id = self.df.loc[self.df.remote == False].survey.unique()[0]
+        survey_id = self.df.loc[~self.df.remote].survey.unique()[0]
         if survey_id in ["none"]:
             survey_id = "0"
         return survey_id
@@ -378,7 +379,9 @@ class KernelDataset:
                     pass
                 self.survey_metadata[run_ts.survey_metadata.id] = run_ts.survey_metadata
             elif i > 0:
-                self.survey_metadata[run_ts.survey_metadata.id].stations[0].add_run(run_ts.run_metadata)
+                self.survey_metadata[run_ts.survey_metadata.id].stations[0].add_run(
+                    run_ts.run_metadata
+                )
             if len(self.survey_metadata.keys()) > 1:
                 raise NotImplementedError
 

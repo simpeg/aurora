@@ -37,7 +37,7 @@ def extract_band(frequency_band, fft_obj, epsilon=1e-7):
     cond2 = fft_obj.frequency <= frequency_band.upper_bound + epsilon
     try:
         band = fft_obj.where(cond1 & cond2, drop=True)
-    except TypeError: #see Note #1
+    except TypeError:  # see Note #1
         tmp = fft_obj.to_array()
         band = tmp.where(cond1 & cond2, drop=True)
         band = band.to_dataset("variable")

@@ -44,7 +44,7 @@ class EffectiveDegreesOfFreedom(object):
         Threshold applied to edf.  All edf below  this value
         are set to weight=0
         """
-        return self.c1 * (self.n_data ** self.alpha)
+        return self.c1 * (self.n_data**self.alpha)
 
     @property
     def p2(self):
@@ -52,7 +52,7 @@ class EffectiveDegreesOfFreedom(object):
         Threshold applied to edf.  All edf above th  this value
         are set to weight=0
         """
-        return self.c2 * (self.n_data ** self.alpha)
+        return self.c2 * (self.n_data**self.alpha)
 
     def compute_weights(self, X, use):
         """
