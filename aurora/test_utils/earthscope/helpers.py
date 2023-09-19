@@ -141,7 +141,7 @@ def get_summary_table_schema_v2(stage_number):
     -------
 
     """
-    if stage_number in [0, 1, 2, 3, 4]:
+    if stage_number in [0, 1, 2, 3, 4, 5]:
         from aurora.test_utils.earthscope.metadata import make_schema_list
         schema = make_schema_list(stage_number)
         return schema

@@ -16,7 +16,7 @@
         "style": "controlled vocabulary",
         "units": null,
         "description": "Description of the column type.",
-        "options": ["int64", "bool", "string"],
+        "options": ["int64", "bool", "string", "float"],
         "alias": [],
         "example": "int64",
 		"default": null

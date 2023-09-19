@@ -108,7 +108,7 @@ class TestAuroraProcessing(WidesScaleTest):
                 "data_id": row.data_id,
                 "network_id": row.network_id,
                 "station_id": row.station_id,
-                "filename": xml_file_base,
+                "aurora_xml_filebase": xml_file_base,
                 "exception": "",
                 "error_message": "",
                 "data_xml_filebase": row.data_xml_filebase}
@@ -167,14 +167,14 @@ class TestAuroraProcessing(WidesScaleTest):
             cc = ConfigCreator()
             config = cc.create_from_kernel_dataset(kernel_dataset)
             show_plot = False
-            z_file = AURORA_Z_PATH.joinpath(row.filename.replace("xml", "zrr"))
+            z_file = AURORA_Z_PATH.joinpath(row.aurora_xml_filebase.replace("xml", "zrr"))
             tf_cls = process_mth5(config,
                                   kernel_dataset,
                                   units="MT",
                                   show_plot=show_plot,
                                   z_file_path=z_file,
                                   )
-            xml_file_path = AURORA_TF_PATH.joinpath(row.filename)
+            xml_file_path = AURORA_TF_PATH.joinpath(row.aurora_xml_filebase)
             tf_cls.write(fn=xml_file_path, file_type="emtfxml")
         except Exception as e:
             row.exception = e.__class__.__name__
