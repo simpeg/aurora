@@ -1,12 +1,85 @@
 import pandas as pd
 
 from aurora.sandbox.mth5_helpers import build_request_df
-from aurora.test_utils.earthscope.helpers import PUBLIC_DATA_AVAILABILITY_PATH
+from aurora.test_utils.earthscope.helpers import DATA_AVAILABILITY_PATHS
 
 
-def load_data_availability_dfs():
+def make_data_availability_txts():
+    """Exceutes the main code from get_MT_numbers.ipynb"""
+    import time
+    include_restricted = False
+    if include_restricted:
+        public_or_restricted = "restricted"
+    else:
+        public_or_restricted = "public"
+    out_folder = DATA_AVAILABILITY_PATHS[public_or_restricted]
+    print(out_folder.absolute())
+    filebase = "mt_availability"
+    outfile = out_folder.joinpath(f"{filebase}.txt")
+    fdsn_URL = "http://service.iris.edu/fdsnws"
+    channels = ['?FE', '?FN', '?FZ', '?F1', '?F2', '?QE', '?QN', '?QZ', '?Q1', '?Q2']
+    channels = ','.join(channels)
+
+    with open(outfile, 'w') as f:
+        f.write("net.sta,chan,hours")
+
+    sta_URL = f"{fdsn_URL}/station/1/query?cha={channels}&level=channel&format=text&includecomments=true&nodata=204"
+    print(sta_URL)
+
+    try:
+        network_df = pd.read_csv(sta_URL, sep='|')
+    except Exception as e:
+        print(f"ERROR with station service {sta_URL}")
+        print(f"ERROR: {e}")
+        quit()
+
+    network_df
+    networks = network_df['#Network '].unique()
+    print(f"Identified {len(networks)} unique networks: \n {networks}")
+    # grouped = stations.groupby(by=['#Network ', ' Station '])
+    # grouped = network_df.groupby(by='#Network ')
+
+    for network in networks:
+        print(network)
+        netfile = f'{filebase}_{network}.txt'
+        netfile = out_folder.joinpath(netfile)
+
+        av_URL = f"{fdsn_URL}/availability/1/query?format=text&net={network}&cha={channels}&orderby=nslc_time_quality_samplerate&includerestricted={include_restricted}&nodata=204"
+
+        print(av_URL)
+        try:
+            avail = pd.read_csv(av_URL, sep=" ")
+        except Exception as e:
+            print(f"ERROR with availability service {av_URL} ")
+            print(f"ERROR: {e}")
+            with open(outfile, 'a') as f:
+                f.write(f"\n#ERROR with {network}")
+            time.sleep(2)
+            continue
+
+        avail.columns = avail.columns.str.strip()
+        avail['Latest'] = pd.to_datetime(avail['Latest'], format="%Y-%m-%dT%H:%M:%S.%f")
+        avail['Earliest'] = pd.to_datetime(avail['Earliest'], format="%Y-%m-%dT%H:%M:%S.%f")
+        avail['Span'] = avail.Latest - avail.Earliest
+
+        avail.to_csv(netfile, index=False)
+
+        grouped_chan = avail.groupby(by=['Station', 'Channel'])
+        for name, group in grouped_chan:
+            station = name[0]
+            channel = name[1]
+            total_time = group['Span'].sum()
+            with open(outfile, 'a') as f:
+                f.write(f"\n{network}.{station},{channel},{'%.2f' % (total_time / pd.Timedelta(hours=1))}")
+        #                 f.write(f"\n{network}.{station},{channel},{total_time}")
+
+        time.sleep(5)
+        print("DONE")
+
+def load_data_availability_dfs(public_or_restricted="public"):
+    data_availability_path = DATA_AVAILABILITY_PATHS[public_or_restricted]
     output = {}
-    globby = PUBLIC_DATA_AVAILABILITY_PATH.glob("*txt")
+    globby = data_availability_path.glob("mt_availability_*txt")
     for txt_file in globby:
         print(txt_file)
         network_id = txt_file.name.split("_")[-1].split(".txt")[0]
@@ -110,3 +183,10 @@ def row_to_request_df(row, data_availability_obj, verbosity=1, use_channel_wildc
     if verbosity > 1:
         print(f"request_df: \n {request_df}")
     return request_df
+
+
+def main():
+    make_data_availability_txts()
+
+if __name__ == "__main__":
+    main()

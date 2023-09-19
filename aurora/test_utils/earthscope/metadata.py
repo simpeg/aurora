@@ -60,6 +60,8 @@ def make_schema_list(stage_id):
             row_dict["default"] = int(row_dict["default"])
         if row_dict["dtype"] == "bool":
             row_dict["default"] = bool(int(row_dict["default"]))
+        if row_dict["dtype"] == "float":
+            row_dict["default"] = float(row_dict["default"])
         tmp.from_dict(row_dict)
         schema_list.append(tmp)
     return schema_list

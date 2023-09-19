@@ -30,80 +30,101 @@ from aurora.test_utils.earthscope.helpers import AURORA_TF_PATH
 from aurora.test_utils.earthscope.helpers import load_xml_tf
 from aurora.test_utils.earthscope.helpers import load_most_recent_summary
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
+from aurora.test_utils.earthscope.helpers import get_summary_table_schema_v2
 from aurora.test_utils.earthscope.helpers import restrict_to_mda
 from aurora.test_utils.earthscope.helpers import SPUD_XML_PATHS
+from aurora.test_utils.earthscope.widescale_test import WidesScaleTest
 
-spud_df = load_most_recent_summary(1)
-spud_df = restrict_to_mda(spud_df, RR="Robust Remote Reference")
 
 STAGE_ID = 5
 
 
-processing_summary_df = load_most_recent_summary(4)
-processing_summary_df.exception[processing_summary_df.exception.isna()] = "" #dtype handling :/
-tf_summary_csv = get_summary_table_filename(STAGE_ID)
-print(tf_summary_csv)
 
 def in_out_str(measurand, ch_in, ch_out):
     col_name = f"{measurand}_{ch_in}_{ch_out}"
     return col_name
 
-def make_tf_report_schema():
-    tf_report_schema = ["data_id", "station_id", "network_id", "remote_id",
-                        "aurora_xml_path", "exception", "error_message", "data_xml_path", ]
+def define_dataframe_schema():
+    """
+        builds the csv defining column names, dtypes, and default values, and saves in standards/
+
+        In this specific case, we start with the schema from the previous stage (0) and add columns
+
+        Flow:
+            - read previous CSV
+            - augment with new columns
+            - save with a new name
+        """
+    # read previous CSV
+    from aurora.test_utils.earthscope.standards import SCHEMA_CSVS
+    schema_csv = SCHEMA_CSVS[4]
+    df = pd.read_csv(schema_csv)
+
+    # augment with new columns
     inputs = ['hx', 'hy']
     outputs = ['ex', 'ey', 'hz']
     for ch_in in inputs:
         for ch_out in outputs:
-            col_name = in_out_str("delta", ch_in, ch_out)
-            col_name = in_out_str("ratio", ch_in, ch_out)
-            tf_report_schema.append(col_name)
-    return  tf_report_schema
-
-TF_REPORT_SCHEMA = make_tf_report_schema()
-
-def initialize_tf_df():
-    tf_report_schema = make_tf_report_schema()
-    df = pd.DataFrame(columns=tf_report_schema)
-    return df
-
-def make_tf_row_dict():
-    n_cols = len(TF_REPORT_SCHEMA)
-    return dict(zip(TF_REPORT_SCHEMA, n_cols*["",]))
+            for comparison in ["delta", "ratio",]:
+                name = in_out_str(comparison, ch_in, ch_out)
+                dtype = "float"
+                default = 0
+                df.loc[len(df)] = [name, dtype, default]
 
 
+    # save with a new name
+    print("OK")
+    new_schema_csv = schema_csv.__str__().replace("04", "05")
+    df.to_csv(new_schema_csv, index=False)
 
-def batch_compare(xml_source="data_xml_path"):
-    """
+class TestCompareTFs(WidesScaleTest):
+    def __init__(self, **kwargs):
+        """
+        """
+        super().__init__(**kwargs)
+        # self.augment_with_existing = kwargs.get("augment_with_existing", True)
+        self.skeleton_file = f"skeleton_{str(STAGE_ID).zfill(2)}.csv"
+
+    def prepare_jobs_dataframe(self):
+
+        stage_04_schema = get_summary_table_schema_v2(4)
+        dtypes = {x.name: x.dtype for x in stage_04_schema}
+        stage_04_df = load_most_recent_summary(4, dtypes=dtypes)
+        if "data_xml_path" in stage_04_df.columns:
+            stage_04_df.drop(["data_xml_path",], axis=1, inplace=True)
+        tf_report_df = pd.DataFrame(columns=self.df_column_names)
+
+        for i_row, row in stage_04_df.iterrows():
+            #print(row)  # station_id = row.station_id; network_id = row.network_id
+
+            # check for exception
+            if pd.isna(row.exception):
+                pass
+            else:
+                print(f"Skipping {row} for now, Exceptiion detected ")
+                continue
+
+            # Otherwise, populate a row of jobs df
+            for col in tf_report_df.columns:
+                if col not in row.keys():
+                    row[col] = 0.0
+            tf_report_df = tf_report_df.append(row, ignore_index=True)
+        # Finally cast dtypes on rows
+
+        # save skeleton
+        tf_report_df.to_csv(self.skeleton_file, index=False)
+        # reread and handle nan
+        df = pd.read_csv(self.skeleton_file, dtype=self.df_schema_dtypes)
+        return df
 
 
-    """
-    tf_df = initialize_tf_df()
-
-    for i_row, row in processing_summary_df.iterrows():
-
-        print(i_row)
-        print(row)
-        if bool(row.exception):
-            print(f"SKIPPING EXCEPTION in processing {row.exception}")
-            continue
-
-        new_row = make_tf_row_dict()
-        new_row["data_id"] = row["data_id"]
-        new_row["network_id"] = row["network_id"]
-        new_row["station_id"] = row["station_id"]
-        new_row["remote_id"] = row["remote_id"]
-        new_row["aurora_xml_path"] = row["filename"]
-
+    def enrich_row(self, row):
         spud_tf = load_xml_tf(SPUD_XML_PATHS["data"].joinpath(row.data_xml_filebase))
-        aurora_tf = load_xml_tf(AURORA_TF_PATH.joinpath(row.filename))
-
+        aurora_tf = load_xml_tf(AURORA_TF_PATH.joinpath(row.aurora_xml_filebase))
 
         # Find Overlap of Periods where both TFs are defined
         print("TODO: Add some accounting here for how much is dropped from each")
         # Selecting glb and lub
-        #lowest_freq = max(aurora_tf.frequency.min(), spud_tf.frequency.min())
-        #highest_freq = min(aurora_tf.frequency.max(), spud_tf.frequency.max())
         shortest_period = max(aurora_tf.transfer_function.period.data.min(),
                               spud_tf.transfer_function.period.data.min())
         longest_period = min(aurora_tf.transfer_function.period.data.max(),
@@ -147,7 +168,7 @@ def batch_compare(xml_source="data_xml_path"):
                 # THIS IS THE ANSWER
                 delta = np.linalg.norm(delta_along_dim)
                 col_name = in_out_str("delta", input, output)
-                new_row[col_name] = delta
+                row[col_name] = delta
 
                 ratio = spud_1d.data / aurora_1d.data
                 ratio = ratio[np.isnan(ratio) == False]
@@ -155,26 +176,16 @@ def batch_compare(xml_source="data_xml_path"):
                 #ratio = np.linalg.norm(ratio)/np.sqrt(len(ratio))
                 ratio = np.median(ratio)
                 col_name = in_out_str("ratio", input, output)
-                new_row[col_name] = ratio
-        tf_df = tf_df.append(new_row, ignore_index=True)
+                row[col_name] = ratio
+        return row
 
 
-        # except Exception as e:
-        #     new_row["exception"] =  e.__class__.__name__
-        #     new_row["exception"] =   e.args[0],
-
-        if np.mod(i_row,25)==0:
-           tf_df.to_csv(tf_summary_csv, index=False)
-
-
-def main():
-    batch_compare()
-    df = pd.read_csv(tf_summary_csv)
+def review_results(df):
     print("get some stats")
     delta_cols = [x for x in df.columns if "delta" in x]
     ratio_cols = [x for x in df.columns if "ratio" in x]
     for delta_col in delta_cols:
-        fig,ax = plt.subplots()
+        fig, ax = plt.subplots()
         ax.hist(np.log10(df[delta_col]), 100)
         ax.set_title(f"Average difference between archvied SPUD and Aurora-computed TF \n {delta_col}")
         ax.set_xlabel("log_{10}(diff)")
@@ -187,8 +198,24 @@ def main():
         ax.set_xlabel("log_{10}(diff)")
         ax.set_ylabel(f"num_occurences / {len(df)}")
         plt.savefig(f"{ratio_col}.png")
-        #plt.show()
+        # plt.show()
     print("DONE")
+
+def main():
+    # df = pd.read_csv("/home/kkappler/.cache/earthscope/summary_tables/05_tf_comparison_review.csv")
+    # review_results(df)
+
+    define_dataframe_schema()
+    t0 = time.time()
+    tester = TestCompareTFs(stage_id=STAGE_ID,
+                              save_csv=True,
+                            use_skeleton=True)
+
+    # tester.startrow = 1679
+    # tester.endrow = 1680
+    df = tester.run_test()
+    review_results(df)
+    total_time_elapsed = time.time() - t0
 
 if __name__ == "__main__":
     main()

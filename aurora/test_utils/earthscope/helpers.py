@@ -14,7 +14,7 @@ import re
 import socket
 import subprocess
 
-## PLACEHOLDER FOR CONFIG
+# PLACEHOLDER FOR CONFIG
 USE_CHANNEL_WILDCARDS = False
 HOSTNAME = socket.gethostname()
 HOME = pathlib.Path().home()
@@ -24,23 +24,24 @@ if "gadi" in HOSTNAME:
 else:
     CACHE_PATH = HOME.joinpath(".cache").joinpath("earthscope")
 CACHE_PATH.mkdir(parents=True, exist_ok=True)
-## PLACEHOLDER FOR CONFIG
+
 
 # Data Availability
-DATA_AVAILABILITY_PATH = CACHE_PATH.joinpath("data_availability")
-DATA_AVAILABILITY_PATH.mkdir(parents=True, exist_ok=True)
-PUBLIC_DATA_AVAILABILITY_PATH = DATA_AVAILABILITY_PATH.joinpath("public")
-PUBLIC_DATA_AVAILABILITY_PATH.mkdir(parents=True, exist_ok=True)
-RESTRICTED_DATA_AVAILABILITY_PATH = DATA_AVAILABILITY_PATH.joinpath("restricted")
-RESTRICTED_DATA_AVAILABILITY_PATH.mkdir(parents=True, exist_ok=True)
-DATA_AVAILABILITY_CSV = DATA_AVAILABILITY_PATH.joinpath("MT_acquisitions.csv")
+DATA_AVAILABILITY_PATHS = {}
+DATA_AVAILABILITY_PATHS["base"] = CACHE_PATH.joinpath("data_availability")
+DATA_AVAILABILITY_PATHS["base"].mkdir(parents=True, exist_ok=True)
+DATA_AVAILABILITY_PATHS["public"] = DATA_AVAILABILITY_PATHS["base"].joinpath("public")
+DATA_AVAILABILITY_PATHS["public"].mkdir(parents=True, exist_ok=True)
+DATA_AVAILABILITY_PATHS["restricted"] = DATA_AVAILABILITY_PATHS["base"].joinpath("restricted")
+DATA_AVAILABILITY_PATHS["restricted"].mkdir(parents=True, exist_ok=True)
+DATA_AVAILABILITY_CSV = DATA_AVAILABILITY_PATHS["base"].joinpath("MT_acquisitions.csv")
 
 # Data (mth5s)
 DATA_PATH = CACHE_PATH.joinpath("data")
 DATA_PATH.mkdir(parents=True, exist_ok=True)
 
 # MetaData (mth5s)
-EXPERIMENT_PATH = CACHE_PATH.joinpath("experiments")
+EXPERIMENT_PATH = CACHE_PATH.joinpath("dataless_mth5")
 EXPERIMENT_PATH.mkdir(parents=True, exist_ok=True)
 
 # Transfer Functions
@@ -140,11 +141,13 @@ def get_summary_table_schema_v2(stage_number):
     -------
 
     """
-    if stage_number in [0, 1, ]:
+    if stage_number in [0, 1, 2, 3, 4, 5]:
         from aurora.test_utils.earthscope.metadata import make_schema_list
         schema = make_schema_list(stage_number)
         return schema
     else:
+        msg = f"Schema not defined for stage_id {stage_number}"
+        print(msg)
         raise NotImplementedError
 
 
@@ -273,10 +276,10 @@ def get_most_recent_summary_filepath(stage_number):
     return globby[-1]
 
 
-def load_most_recent_summary(stage_number):
+def load_most_recent_summary(stage_number, dtypes=None):
     review_csv = get_most_recent_summary_filepath(stage_number)
     print(f"loading {review_csv}")
-    results_df = pd.read_csv(review_csv)
+    results_df = pd.read_csv(review_csv, dtype=dtypes)
     return results_df
 
 
@@ -318,7 +321,10 @@ def restrict_to_mda(df, RR=None, keep_columns=KEEP_COLUMNS):
     for col in fix_nans_in_columns:
         if col in mda_df.columns:
             mda_df[col] = mda_df[col].astype(str)
-            mda_df[mda_df[col]=="nan"][col] = ""
+            # OLD
+            # mda_df[mda_df[col]=="nan"][col] = ""
+            # NEW
+            mda_df[mda_df[col].isin(["<NA>", "nan"])][col] = ""
 
     print("ADD NETWORK/STATION COLUMNS for convenience")
     print("Consdier PUSH THIS BACK TO TASK 01 once all XML are reading successfully")
@@ -352,11 +358,9 @@ def none_or_str(value):
 def test_summary_table_schema():
     get_summary_table_schema(0)
     get_summary_table_schema(1)
+    get_summary_table_schema(2)
+    get_summary_table_schema(3)
     print("OK")
 
 if __name__ == "__main__":
-    try:
-        assert(1==0)
-    except Exception as e:
-        raise DataAvailabilityException("put message here")
     test_summary_table_schema()
