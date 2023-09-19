@@ -372,7 +372,9 @@ def review_results():
             f.write("".join(msg) + "\n\n")
             exception_counts[exception_type] = len(exception_df)
             if exception_type == "IndexError":
-                exception_df.to_csv("02_do_these_exist.csv", index=False)
+                out_csv_filebase = f"02_index_error_exceptions__questionable_data_availability.csv"
+                out_csv = SUMMARY_TABLES_PATH.joinpath(out_csv_filebase)
+                exception_df.to_csv(out_csv, index=False)
 
         grouper = df.groupby(["network_id", "station_id"])
         msg = f"\n\nThere were {len(grouper)} unique network-station pairs in {len(df)} rows\n\n"
