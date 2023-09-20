@@ -149,21 +149,20 @@ class TestAuroraProcessing(WidesScaleTest):
         mth5_files = [data_file, rr_file]
         mth5_files = [x for x in mth5_files if x is not None]
 
-
-        mth5_run_summary = RunSummary()
-        mth5_run_summary.from_mth5s(mth5_files)
-        run_summary = mth5_run_summary.clone()
-        run_summary.check_runs_are_valid(drop=True)
-        # run_summary.mini_summary
-
-        kernel_dataset = KernelDataset()
-        kernel_dataset.from_run_summary(run_summary, row.station_id, remote_id)
-        #kernel_dataset.drop_runs_shorter_than(5000)
-        if len(kernel_dataset.df) == 0:
-            print("No RR Coverage, casting to single station processing")
-            kernel_dataset.from_run_summary(run_summary, row.station_id)
-
         try:
+            mth5_run_summary = RunSummary()
+            mth5_run_summary.from_mth5s(mth5_files)
+            run_summary = mth5_run_summary.clone()
+            run_summary.check_runs_are_valid(drop=True)
+            # run_summary.mini_summary
+
+            kernel_dataset = KernelDataset()
+            kernel_dataset.from_run_summary(run_summary, row.station_id, remote_id)
+            #kernel_dataset.drop_runs_shorter_than(5000)
+            if len(kernel_dataset.df) == 0:
+                print("No RR Coverage, casting to single station processing")
+                kernel_dataset.from_run_summary(run_summary, row.station_id)
+
             cc = ConfigCreator()
             config = cc.create_from_kernel_dataset(kernel_dataset)
             show_plot = False
