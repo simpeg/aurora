@@ -458,9 +458,9 @@ class TransferFunctionKernel(object):
         """
         processing_type = "Aurora"
         if self.dataset_df.remote.any():
-            processing_type = f"{processing_type}: Robust Remote Reference"
+            processing_type = f"{processing_type} Robust Remote Reference"
         else:
-            processing_type = f"{processing_type}: Robust Single Station"
+            processing_type = f"{processing_type} Robust Single Station"
         if "processing_type" in self.dataset_df.columns:
             processing_type = self.dataset_df["processing_type"].iloc[0]
 
