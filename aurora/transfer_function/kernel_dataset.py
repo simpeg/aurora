@@ -57,7 +57,12 @@ from aurora.pipelines.run_summary import RUN_SUMMARY_COLUMNS
 from mt_metadata.utils.list_dict import ListDict
 
 # Add these to a standard, so we track add/subtract columns
-KERNEL_DATASET_COLUMNS = RUN_SUMMARY_COLUMNS + [ 'channel_scale_factors', 'duration', 'fc']
+KERNEL_DATASET_COLUMNS = RUN_SUMMARY_COLUMNS + [
+    "channel_scale_factors",
+    "duration",
+    "fc",
+]
+
 
 class KernelDataset:
     """
@@ -125,9 +130,7 @@ class KernelDataset:
     def clone_dataframe(self):
         return copy.deepcopy(self.df)
 
-    def from_run_summary(
-        self, run_summary, local_station_id, remote_station_id=None
-    ):
+    def from_run_summary(self, run_summary, local_station_id, remote_station_id=None):
         """
 
         Parameters
@@ -151,9 +154,7 @@ class KernelDataset:
         ]
         if remote_station_id:
             station_ids.append(remote_station_id)
-        df = restrict_to_station_list(
-            run_summary.df, station_ids, inplace=False
-        )
+        df = restrict_to_station_list(run_summary.df, station_ids, inplace=False)
         df["remote"] = False
         if remote_station_id:
             cond = df.station_id == remote_station_id
@@ -177,6 +178,17 @@ class KernelDataset:
     @property
     def print_mini_summary(self):
         print(self.mini_summary)
+
+    @property
+    def local_survey_id(self):
+        survey_id = self.df.loc[~self.df.remote].survey.unique()[0]
+        if survey_id in ["none"]:
+            survey_id = "0"
+        return survey_id
+
+    @property
+    def local_survey_metadata(self):
+        return self.survey_metadata[self.local_survey_id]
 
     def _add_duration_column(self):
         """ """
@@ -353,20 +365,6 @@ class KernelDataset:
             )
             self.df["run_reference"].at[i] = run_obj.hdf5_group.ref
 
-            # Ideally we would make the assignment of survey_metadata work with a run_obj, which would
-            # relax the need to access run_ts. However, run_obj.metadata has a null "id" field.
-            # Maybe there are other differences as well?
-            # also, the pass below should probably be followed by an else.
-            # but what if RR is from another survey?
-            # if i == 0:
-            #     if run_ts.survey_metadata.id in self.survey_metadata.keys():
-            #         pass
-            #     self.survey_metadata[run_ts.survey_metadata.id] = run_ts.survey_metadata
-            # elif i > 0:
-            #     self.survey_metadata[run_ts.survey_metadata.id].stations[0].add_run(run_ts.run_metadata)
-            # if len(self.survey_metadata.keys()) > 1:
-            #     raise NotImplementedError
-
             if row.fc:
                 msg = f"row {row} already has fcs prescribed by processing confg "
                 msg += "-- skipping time series initialzation"
@@ -381,7 +379,9 @@ class KernelDataset:
                     pass
                 self.survey_metadata[run_ts.survey_metadata.id] = run_ts.survey_metadata
             elif i > 0:
-                self.survey_metadata[run_ts.survey_metadata.id].stations[0].add_run(run_ts.run_metadata)
+                self.survey_metadata[run_ts.survey_metadata.id].stations[0].add_run(
+                    run_ts.run_metadata
+                )
             if len(self.survey_metadata.keys()) > 1:
                 raise NotImplementedError
 

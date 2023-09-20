@@ -62,9 +62,7 @@ class TestZFileReadWrite(unittest.TestCase):
         tf = self.tf_obj
         # check numeric values
         assert (
-            np.isclose(
-                tf_z.transfer_function.data, tf.transfer_function.data, 1e-4
-            )
+            np.isclose(tf_z.transfer_function.data, tf.transfer_function.data, 1e-4)
         ).all()
         # check metadata
         print("add metadata checks for station name, azimuths and tilts")

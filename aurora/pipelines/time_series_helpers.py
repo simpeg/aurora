@@ -85,11 +85,12 @@ def apply_recoloring(decimation_obj, stft_obj):
         return stft_obj
     if not decimation_obj.recoloring:
         return stft_obj
-    
+
     if decimation_obj.prewhitening_type == "first difference":
         # replace below with decimation_obj.get_fft_harmonics() ?
         freqs = get_fft_harmonics(
-            decimation_obj.window.num_samples, decimation_obj.sample_rate_decimation
+            decimation_obj.window.num_samples,
+            decimation_obj.sample_rate_decimation,
         )
         prewhitening_correction = 1.0j * 2 * np.pi * freqs  # jw
 
@@ -208,6 +209,27 @@ def truncate_to_clock_zero(decimation_obj, run_xrds):
     return run_xrds
 
 
+def nan_to_mean(xrds):
+    """
+    Set Nan values to mean value
+
+    :param xrds: DESCRIPTION
+    :type xrds: TYPE
+    :return: DESCRIPTION
+    :rtype: TYPE
+
+    """
+    for ch in xrds.keys():
+        null_values_present = xrds[ch].isnull().any()
+        if null_values_present:
+            print(
+                "Null values detected in xrds -- this is not expected and should be examined"
+            )
+            value = np.nan_to_num(np.nanmean(xrds[ch].data))
+            xrds[ch] = xrds[ch].fillna(value)
+    return xrds
+
+
 def run_ts_to_stft(decimation_obj, run_xrds_orig):
     """
 
@@ -225,6 +247,9 @@ def run_ts_to_stft(decimation_obj, run_xrds_orig):
         recoloring. This really doesn't matter since we don't use the DC harmonic for
         anything.
     """
+    # need to remove any nans before windowing, or else if there is a single
+    # nan then the whole channel becomes nan.
+    run_xrds = nan_to_mean(run_xrds_orig)
     run_xrds = apply_prewhitening(decimation_obj, run_xrds_orig)
     run_xrds = truncate_to_clock_zero(decimation_obj, run_xrds)
     windowing_scheme = window_scheme_from_decimation(decimation_obj)

@@ -21,6 +21,6 @@ def tf_obj_from_synthetic_data(mth5_path):
         config,
         kernel_dataset,
         units="MT",
-        z_file_path="zzz.zz",
+        z_file_path="test1_RRtest2.zrr",
     )
     return tf_cls
