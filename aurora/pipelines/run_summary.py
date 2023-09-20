@@ -112,8 +112,8 @@ class RunSummary:
         return
 
     def check_runs_are_valid(self, drop=False, **kwargs):
-        """ kwargs can tell us what sorts of conditions to check, for example all_zero, there are nan, etc."""
-        check_for_all_zero_runs = True
+        """kwargs can tell us what sorts of conditions to check, for example all_zero, there are nan, etc."""
+        # check_for_all_zero_runs
         for i_row, row in self.df.iterrows():
             print(f"Checking row for zeros {row}")
             m = mth5.mth5.MTH5()

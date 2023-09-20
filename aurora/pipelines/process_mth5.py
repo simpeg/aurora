@@ -29,12 +29,10 @@ from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.transfer_function_helpers import process_transfer_functions
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
-
 from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
 )
 from aurora.transfer_function.TTFZ import TTFZ
-
 from mt_metadata.transfer_functions.core import TF
 
 
@@ -92,6 +90,28 @@ def make_stft_objects(
     )
     return stft_obj
 
+def station_obj_from_row(row):
+    """
+    Access the station object
+    Note if/else could avoidable if replacing text string "none" with a None object in survey column
+
+    Parameters
+    ----------
+    row: pd.Series
+        A row of tfk.dataset_df
+
+    Returns
+    -------
+    station_obj:
+
+    """
+    if row.survey == "none":
+        station_obj = row.mth5_obj.stations_group.get_station(row.station_id)
+    else:
+        station_obj = row.mth5_obj.stations_group.get_station(
+            row.station_id, survey=row.survey
+        )
+    return station_obj
 
 def process_tf_decimation_level(
     config, i_dec_level, local_stft_obj, remote_stft_obj, units="MT"
@@ -132,54 +152,103 @@ def process_tf_decimation_level(
     return transfer_function_obj
 
 
-def export_tf(
-    tf_collection,
-    channel_nomenclature,
-    survey_metadata
-):
-    """
-    This method may wind up being embedded in the TF class
-    Assign transfer_function, residual_covariance, inverse_signal_power, station, survey
-
-    Parameters
-    ----------
-    tf_collection: aurora.transfer_function.transfer_function_collection
-    .TransferFunctionCollection
-    station_metadata_dict: dict
-    survey_dict: dict
-
-    Returns
-    -------
-    tf_cls: mt_metadata.transfer_functions.core.TF
-        Transfer function container
-    """
-
-    merged_tf_dict = tf_collection.get_merged_dict(channel_nomenclature)
-    channel_nomenclature_dict = channel_nomenclature.to_dict()["channel_nomenclature"]
-    tf_cls = TF(channel_nomenclature=channel_nomenclature_dict)
-    renamer_dict = {"output_channel": "output", "input_channel": "input"}
-    tmp = merged_tf_dict["tf"].rename(renamer_dict)
-    tf_cls.transfer_function = tmp
-
-    isp = merged_tf_dict["cov_ss_inv"]
-    renamer_dict = {"input_channel_1": "input", "input_channel_2": "output"}
-    isp = isp.rename(renamer_dict)
-    tf_cls.inverse_signal_power = isp
-
-    res_cov = merged_tf_dict["cov_nn"]
-    renamer_dict = {"output_channel_1": "input", "output_channel_2": "output"}
-    res_cov = res_cov.rename(renamer_dict)
-    tf_cls.residual_covariance = res_cov
-
-    # Set key as first el't of dict, nor currently supporting mixed surveys in TF
-    tf_cls.survey_metadata = survey_metadata
-
-    return tf_cls
-
 def enrich_row(row):
     pass
 
 
+def triage_issue_289(local_stfts, remote_stfts):
+    """
+    Timing Error Workaround See Aurora Issue #289: seems associated with getting one fewer sample than expected
+    from the edge of a run.
+    """
+    n_chunks = len(local_stfts)
+    for i_chunk in range(n_chunks):
+        ok = local_stfts[i_chunk].time.shape == remote_stfts[i_chunk].time.shape
+        if not ok:
+            print("Mismatch in FC array lengths detected -- Issue #289")
+            glb = max(
+                local_stfts[i_chunk].time.min(),
+                remote_stfts[i_chunk].time.min(),
+            )
+            lub = min(
+                local_stfts[i_chunk].time.max(),
+                remote_stfts[i_chunk].time.max(),
+            )
+            cond1 = local_stfts[i_chunk].time >= glb
+            cond2 = local_stfts[i_chunk].time <= lub
+            local_stfts[i_chunk] = local_stfts[i_chunk].where(cond1 & cond2, drop=True)
+            cond1 = remote_stfts[i_chunk].time >= glb
+            cond2 = remote_stfts[i_chunk].time <= lub
+            remote_stfts[i_chunk] = remote_stfts[i_chunk].where(
+                cond1 & cond2, drop=True
+            )
+            assert local_stfts[i_chunk].time.shape == remote_stfts[i_chunk].time.shape
+    return local_stfts, remote_stfts
+
+
+def merge_stfts(stfts, tfk):
+    # Timing Error Workaround See Aurora Issue #289
+    local_stfts = stfts["local"]
+    remote_stfts = stfts["remote"]
+    if tfk.config.stations.remote:
+        local_stfts, remote_stfts = triage_issue_289(local_stfts, remote_stfts)
+        remote_merged_stft_obj = xr.concat(remote_stfts, "time")
+    else:
+        remote_merged_stft_obj = None
+
+    local_merged_stft_obj = xr.concat(local_stfts, "time")
+
+    return local_merged_stft_obj, remote_merged_stft_obj
+
+
+def append_chunk_to_stfts(stfts, chunk, remote):
+    if remote:
+        stfts["remote"].append(chunk)
+    else:
+        stfts["local"].append(chunk)
+    return stfts
+
+
+def load_stft_obj_from_mth5(i_dec_level, row, run_obj):
+    # Load stft_obj from mth5 (instead of compute)
+    station_obj = station_obj_from_row(row)
+    fc_group = station_obj.fourier_coefficients_group.add_fc_group(
+        run_obj.metadata.id
+    )
+    fc_decimation_level = fc_group.get_decimation_level(f"{i_dec_level}")
+    stft_obj = fc_decimation_level.to_xarray()
+    return stft_obj
+
+
+def save_fourier_coefficients(dec_level_config, i_dec_level, row, run_obj, stft_obj):
+    if not dec_level_config.save_fcs:
+        msg = "Skip saving FCs. dec_level_config.save_fc = "
+        print(f"{msg} {dec_level_config.save_fcs}")
+        return
+    if dec_level_config.save_fcs_type == "csv":
+        msg = "Unless debugging or testing, saving FCs to csv unexpected"
+        print(f"WARNING: {msg}")
+        csv_name = f"{row.station_id}_dec_level_{i_dec_level}.csv"
+        stft_df = stft_obj.to_dataframe()
+        stft_df.to_csv(csv_name)
+    elif dec_level_config.save_fcs_type == "h5":
+        station_obj = station_obj_from_row(row)
+
+        # See Note #1 at top this method (not module)
+        if not row.mth5_obj.h5_is_write():
+            raise NotImplementedError("See Note #1 at top this method")
+        fc_group = station_obj.fourier_coefficients_group.add_fc_group(
+            run_obj.metadata.id
+        )
+        decimation_level_metadata = dec_level_config.to_fc_decimation()
+        fc_decimation_level = fc_group.add_decimation_level(
+            f"{i_dec_level}",
+            decimation_level_metadata=decimation_level_metadata,
+        )
+        fc_decimation_level.from_xarray(stft_obj)
+        fc_decimation_level.update_metadata()
+        fc_group.update_metadata()
+    return
 
 def process_mth5(
     config,
@@ -198,7 +267,6 @@ def process_mth5(
     in append mode, else open in read mode.  We should support a flag: force_rebuild_fcs, normally False.  This flag
     is only needed when save_fcs_type=="h5".  If True, then we open in append mode, regarless of fc_levels_already_exist
     The task of setting mode="a", mode="r" can be handled by tfk (maybe in tfk.validate())
-
 
 
     Parameters
@@ -225,24 +293,6 @@ def process_mth5(
     tf_cls: mt_metadata.transfer_functions.TF
         TF object
     """
-    def station_obj_from_row(row):
-        """
-        Access the station object
-        Note if/else could avoidable if replacing text string "none" with a None object in survey column
-
-        Parameters
-        ----------
-        row
-
-        Returns
-        -------
-
-        """
-        if row.survey == "none":
-            station_obj = row.mth5_obj.stations_group.get_station(row.station_id)
-        else:
-            station_obj = row.mth5_obj.stations_group.get_station(row.station_id, survey=row.survey)
-        return station_obj
 
     # Initialize config and mth5s
     tfk = TransferFunctionKernel(dataset=tfk_dataset, config=config)
@@ -250,7 +300,7 @@ def process_mth5(
     tfk.validate()
     # See Note #1
     tfk.initialize_mth5s(mode="a")
-    tfk.check_if_fc_levels_already_exist() # populate the "fc" column of dataset_df
+    tfk.check_if_fc_levels_already_exist()  # populate the "fc" column of dataset_df
     print(f"fc_levels_already_exist = {tfk.dataset_df['fc']}")
     print(
         f"Processing config indicates {len(tfk.config.decimations)} "
@@ -260,141 +310,68 @@ def process_mth5(
     tf_dict = {}
 
     for i_dec_level, dec_level_config in enumerate(tfk.valid_decimations()):
+        #i_dec_level = dec_level_config.decimation.level
         tfk.update_dataset_df(i_dec_level)
+        dec_level_config = tfk.apply_clock_zero(dec_level_config)
 
-        local_stfts = []
-        remote_stfts = []
-
-        # TFK 1: get clock-zero from data if needed
-        if dec_level_config.window.clock_zero_type == "data start":
-            dec_level_config.window.clock_zero = str(tfk.dataset_df.start.min())
+        stfts = {}
+        stfts["local"] = []
+        stfts["remote"] = []
 
         # Check first if TS processing or accessing FC Levels
         for i, row in tfk.dataset_df.iterrows():
+            # This iterator could be updated to iterate over row-pairs if remote is True, corresponding to simultaneous data
 
             if not tfk.is_valid_dataset(row, i_dec_level):
                 continue
 
             run_obj = row.mth5_obj.from_reference(row.run_reference)
             if row.fc:
-                station_obj = station_obj_from_row(row)
-                fc_group = station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id)
-                fc_decimation_level = fc_group.get_decimation_level(f"{i_dec_level}")
-                stft_obj = fc_decimation_level.to_xarray()
-                if row.station_id == tfk.config.stations.local.id:
-                    local_stfts.append(stft_obj)
-                elif row.station_id == tfk.config.stations.remote[0].id:
-                    remote_stfts.append(stft_obj)
+                stft_obj = load_stft_obj_from_mth5(i_dec_level, row, run_obj)
+                stfts = append_chunk_to_stfts(stfts, stft_obj, row.remote)
                 continue
 
             run_xrds = row["run_dataarray"].to_dataset("channel")
-            print(f"DEBUG Issue 289: TS {row.station_id} {row.run_id} {run_xrds.time.shape} {row.start} {row.end}")
             run_obj = row.mth5_obj.from_reference(row.run_reference)
             stft_obj = make_stft_objects(
                 tfk.config, i_dec_level, run_obj, run_xrds, units, row.station_id
             )
-            print(f"DEBUG Issue 289: FC {row.station_id} {row.run_id} {stft_obj.time.shape} {stft_obj.time.min()} {stft_obj.time.max()}")
             # Pack FCs into h5
-            if dec_level_config.save_fcs:
-                if dec_level_config.save_fcs_type == "csv":
-                    print("WARNING: Unless you are debugging or running the tests, saving FCs to csv is unexpected")
-                    csv_name = f"{row.station_id}_dec_level_{i_dec_level}.csv"
-                    stft_df = stft_obj.to_dataframe()
-                    stft_df.to_csv(csv_name)
-                elif dec_level_config.save_fcs_type == "h5":
-                    station_obj = station_obj_from_row(row)
+            save_fourier_coefficients(dec_level_config, i_dec_level, row, run_obj, stft_obj)
 
-                    # See Note #1 at top this method (not module)
-                    if not row.mth5_obj.h5_is_write():
-                        raise NotImplementedError("See Note #1 at top this method")
-                    fc_group = station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id)
-                    decimation_level_metadata = dec_level_config.to_fc_decimation()
-                    fc_decimation_level = fc_group.add_decimation_level(f"{i_dec_level}",
-                                                                         decimation_level_metadata=decimation_level_metadata)
-                    fc_decimation_level.from_xarray(stft_obj)
-                    fc_decimation_level.update_metadata()
-                    fc_group.update_metadata()
+            stfts = append_chunk_to_stfts(stfts, stft_obj, row.remote)
 
-
-            if row.station_id == tfk.config.stations.local.id:
-                local_stfts.append(stft_obj)
-            elif row.station_id == tfk.config.stations.remote[0].id:
-                remote_stfts.append(stft_obj)
-
-        # Merge STFTs
-
-        # Timing Error Workaround See Aurora Issue #289
-        if tfk.config.stations.remote:
-            n_chunks = len(local_stfts)
-            for i_chunk in range(n_chunks):
-                ok = local_stfts[i_chunk].time.shape == remote_stfts[i_chunk].time.shape
-                if not ok:
-                    print(f"Mismatch in FC array lengths detected -- Issue #289")
-                    glb = max(local_stfts[i_chunk].time.min(), remote_stfts[i_chunk].time.min())
-                    lub = min(local_stfts[i_chunk].time.max(), remote_stfts[i_chunk].time.max())
-                    cond1 = local_stfts[i_chunk].time >= glb
-                    cond2 = local_stfts[i_chunk].time <= lub
-                    local_stfts[i_chunk] = local_stfts[i_chunk].where(cond1 & cond2, drop=True)
-                    cond1 = remote_stfts[i_chunk].time >= glb
-                    cond2 = remote_stfts[i_chunk].time <= lub
-                    remote_stfts[i_chunk] = remote_stfts[i_chunk].where(cond1 & cond2, drop=True)
-                    assert (local_stfts[i_chunk].time.shape==remote_stfts[i_chunk].time.shape)
-
-
-
-        local_merged_stft_obj = xr.concat(local_stfts, "time")
-
-        if tfk.config.stations.remote:
-            remote_merged_stft_obj = xr.concat(remote_stfts, "time")
-        else:
-            remote_merged_stft_obj = None
+        local_merged_stft_obj, remote_merged_stft_obj = merge_stfts(stfts, tfk)
 
         # FC TF Interface here (see Note #3)
-
         # Could downweight bad FCs here
 
-        tf_obj = process_tf_decimation_level(
+        ttfz_obj = process_tf_decimation_level(
             tfk.config,
             i_dec_level,
             local_merged_stft_obj,
             remote_merged_stft_obj,
         )
-        tf_obj.apparent_resistivity(tfk.config.channel_nomenclature, units=units)
-        tf_dict[i_dec_level] = tf_obj
+        ttfz_obj.apparent_resistivity(tfk.config.channel_nomenclature, units=units)
+        tf_dict[i_dec_level] = ttfz_obj
 
         if show_plot:
             from aurora.sandbox.plot_helpers import plot_tf_obj
 
-            plot_tf_obj(tf_obj, out_filename="out")
+            plot_tf_obj(ttfz_obj, out_filename="out")
 
     tf_collection = TransferFunctionCollection(
         tf_dict=tf_dict, processing_config=tfk.config
     )
 
+    tf_cls = tfk.export_tf_collection(tf_collection)
 
     if z_file_path:
-        # local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
-        local_run_obj = tfk_dataset.get_run_object(0)
-        tf_collection.write_emtf_z_file(z_file_path, run_obj=local_run_obj)
+        tf_cls.write(z_file_path)
 
+    tfk.dataset.close_mths_objs()
     if return_collection:
         # this is now really only to be used for debugging and may be deprecated soon
-        tfk_dataset.close_mths_objs()
         return tf_collection
     else:
-
-        # get the unique survey id that is not a remote reference
-        survey_id = tfk_dataset.df.loc[
-            tfk_dataset.df.remote == False
-            ].survey.unique()[0]
-        if survey_id in ["none"]:
-            survey_id = "0"
-
-        tf_cls = export_tf(
-            tf_collection,
-            tfk.config.channel_nomenclature,
-            survey_metadata=tfk_dataset.survey_metadata[survey_id],
-        )
-        tf_cls.station_metadata.transfer_function.processing_type = tfk.processing_type()
-        tfk_dataset.close_mths_objs()
         return tf_cls

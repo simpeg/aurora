@@ -34,9 +34,11 @@ def enrich_channel_summary(mth5_object, df, keyword):
         The channel summary df with the new column
     """
     df[keyword] = -1
-    if keyword=="num_filters":
+    if keyword == "num_filters":
         for i_row, row in df.iterrows():
-            channel = mth5_object.get_channel(row.station, row.run, row.component, row.survey)
+            channel = mth5_object.get_channel(
+                row.station, row.run, row.component, row.survey
+            )
             num_filters = len(channel.channel_response_filter.filters_list)
             df[keyword].iat[i_row] = num_filters
     elif keyword=="filter_units_in":
@@ -51,7 +53,8 @@ def enrich_channel_summary(mth5_object, df, keyword):
             df[keyword].iat[i_row] = units_out
     return df
 
-def augmented_channel_summary(mth5_object, df=None):#, **kwargs):
+
+def augmented_channel_summary(mth5_object, df=None):  # , **kwargs):
     """
     Consider supportig kwargs, such as a list of keyords that tell what columns to add
     For now, we only want to add n_filters
@@ -68,7 +71,9 @@ def augmented_channel_summary(mth5_object, df=None):#, **kwargs):
         df = mth5_object.channel_summary.to_dataframe()
     df["n_filters"] = -1
     for i_row, row in df.iterrows():
-        channel = mth5_object.get_channel(row.station, row.run, row.component, row.survey)
+        channel = mth5_object.get_channel(
+            row.station, row.run, row.component, row.survey
+        )
         n_filters = len(channel.channel_response_filter.filters_list)
         df.n_filters.iat[i_row] = n_filters
     return df
