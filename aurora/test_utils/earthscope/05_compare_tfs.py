@@ -33,7 +33,7 @@ from aurora.test_utils.earthscope.helpers import get_summary_table_filename
 from aurora.test_utils.earthscope.helpers import get_summary_table_schema_v2
 from aurora.test_utils.earthscope.helpers import restrict_to_mda
 from aurora.test_utils.earthscope.helpers import SPUD_XML_PATHS
-from aurora.test_utils.earthscope.widescale_test import WidesScaleTest
+from aurora.test_utils.earthscope.widescale import WidesScaleTest
 
 
 STAGE_ID = 5
