@@ -374,14 +374,17 @@ class KernelDataset:
             run_ts = run_obj.to_runts(start=row.start, end=row.end)
             self.df["run_dataarray"].at[i] = run_ts.dataset.to_array("channel")
 
+            # wrangle survey_metadata into kernel_dataset
+            survey_id = run_ts.survey_metadata.id
             if i == 0:
-                if run_ts.survey_metadata.id in self.survey_metadata.keys():
-                    pass
-                self.survey_metadata[run_ts.survey_metadata.id] = run_ts.survey_metadata
+                self.survey_metadata[survey_id] = run_ts.survey_metadata
             elif i > 0:
-                self.survey_metadata[run_ts.survey_metadata.id].stations[0].add_run(
-                    run_ts.run_metadata
-                )
+                if row.station_id in self.survey_metadata[survey_id].stations.keys():
+                    self.survey_metadata[survey_id].stations[row.station_id].add_run(
+                        run_ts.run_metadata
+                    )
+                else:
+                    self.survey_metadata[survey_id].add_station(run_ts.station_metadata)
             if len(self.survey_metadata.keys()) > 1:
                 raise NotImplementedError
 
