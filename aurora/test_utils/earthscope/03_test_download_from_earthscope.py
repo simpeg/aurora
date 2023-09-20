@@ -14,10 +14,9 @@ For each such row,
 import pandas as pd
 import time
 
-from aurora.sandbox.earthscope_mth5_helpers import repair_missing_filters
-
 from aurora.test_utils.earthscope.data_availability import DataAvailability
 from aurora.test_utils.earthscope.data_availability import row_to_request_df
+from aurora.test_utils.earthscope.filter_repair import repair_missing_filters
 from aurora.test_utils.earthscope.helpers import DATA_PATH
 from aurora.test_utils.earthscope.helpers import get_most_recent_summary_filepath
 #from aurora.test_utils.earthscope.helpers import get_summary_table_schema
