@@ -16,7 +16,7 @@ from aurora.test_utils.earthscope.helpers import SPUD_XML_PATHS
 from aurora.test_utils.earthscope.helpers import get_summary_table_schema_v2
 from aurora.test_utils.earthscope.helpers import get_via_curl
 from aurora.test_utils.earthscope.helpers import strip_xml_tags
-from aurora.test_utils.earthscope.widescale_test import WidesScaleTest
+from aurora.test_utils.earthscope.widescale import WidesScaleTest
 
 
 input_spud_ids_file = AURORA_PATH.joinpath(

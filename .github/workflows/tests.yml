@@ -44,8 +44,9 @@ jobs:
 
     - name: Run Tests
       run: |
-        # pytest -s -v tests/synthetic/*.py --cov=./ --cov-report=xml --cov=aurora
         pytest -s -v --cov=./ --cov-report=xml --cov=aurora
+        # pytest -s -v tests/synthetic/*.py --cov=./ --cov-report=xml --cov=aurora
+        # pytest -s -v tests/io/test_issue_139.py --cov=./ --cov-report=xml --cov=aurora
 
     - name: "Upload coverage to Codecov"
       uses: codecov/codecov-action@v1

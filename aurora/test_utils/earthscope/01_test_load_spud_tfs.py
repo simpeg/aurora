@@ -35,7 +35,7 @@ from aurora.test_utils.earthscope.helpers import load_xml_tf
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
 from aurora.test_utils.earthscope.helpers import load_most_recent_summary
 from aurora.test_utils.earthscope.standards import SCHEMA_CSVS
-from aurora.test_utils.earthscope.widescale_test import WidesScaleTest
+from aurora.test_utils.earthscope.widescale import WidesScaleTest
 
 
 

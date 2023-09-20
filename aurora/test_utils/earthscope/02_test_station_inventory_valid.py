@@ -33,7 +33,7 @@ from aurora.test_utils.earthscope.helpers import restrict_to_mda
 from aurora.test_utils.earthscope.helpers import SUMMARY_TABLES_PATH
 from aurora.test_utils.earthscope.helpers import timestamp_now
 from aurora.test_utils.earthscope.helpers import USE_CHANNEL_WILDCARDS
-from aurora.test_utils.earthscope.widescale_test import WidesScaleTest
+from aurora.test_utils.earthscope.widescale import WidesScaleTest
 from mth5.mth5 import MTH5
 from mth5.clients import FDSN
 

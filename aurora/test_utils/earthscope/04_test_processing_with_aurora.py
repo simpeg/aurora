@@ -18,7 +18,7 @@ from aurora.test_utils.earthscope.helpers import restrict_to_mda
 from aurora.config.config_creator import ConfigCreator
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
-from aurora.test_utils.earthscope.widescale_test import WidesScaleTest
+from aurora.test_utils.earthscope.widescale import WidesScaleTest
 from aurora.transfer_function.kernel_dataset import KernelDataset
 
 from mth5.clients import FDSN, MakeMTH5
