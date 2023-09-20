@@ -36,10 +36,8 @@ from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test2_h5
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test3_h5
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
-
-# from aurora.test_utils.synthetic.make_mth5_from_asc import main as make_all_h5
 from aurora.test_utils.synthetic.make_processing_configs import create_test_run_config
-
+from aurora.test_utils.synthetic.paths import AURORA_RESULTS_PATH
 from aurora.transfer_function.kernel_dataset import KernelDataset
 from mth5.helpers import close_open_files
 
@@ -115,10 +113,14 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
         return cfgs
 
     def test_create_then_use_stored_fcs_for_processing(self):
+        """"""
         from test_processing import process_synthetic_2
 
-        process_synthetic_2(force_make_mth5=True)
-        process_synthetic_2(force_make_mth5=False)
+        z_file_path_1 = AURORA_RESULTS_PATH.joinpath("test2.zss")
+        z_file_path_2 = AURORA_RESULTS_PATH.joinpath("test2_from_stored_fc.zss")
+        tf1 = process_synthetic_2(force_make_mth5=True, z_file_path=z_file_path_1)
+        tf2 = process_synthetic_2(force_make_mth5=False, z_file_path=z_file_path_2)
+        assert tf1==tf2
 
 
 def main():
