@@ -1,0 +1,9 @@
+name,dtype,default
+data_id,int64,-1
+network_id,string,
+station_id,string,
+remote_id,string,
+aurora_xml_filebase,string,
+exception,string,
+error_message,string,
+data_xml_filebase,string,

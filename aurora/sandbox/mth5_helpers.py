@@ -166,6 +166,7 @@ def mth5_from_experiment(experiment, h5_path=None):
     return mth5_obj
 
 
+
 def get_channel_summary(h5_path):
     """
 
