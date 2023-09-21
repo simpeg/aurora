@@ -53,14 +53,15 @@ def test_generate_time_axis(t0, n_samples, sample_rate):
     which drops 1ns per second if we scale a nanoseconds=np.arange(N)
     The issue here is that the nanoseconds granularity forces a roundoff error
 
-    Args:
-        t0 (_type_): _description_
-        n_samples (_type_): _description_
-        sample_rate (_type_): _description_
-
-    Returns:
-        _type_: _description_
-    """
+    :param t0: _description_
+    :type t0: _type_
+    :param n_samples: _description_
+    :type n_samples: _type_
+    :param sample_rate: _description_
+    :type sample_rate: _type_
+    :return: _description_
+    :rtype: _type_
+    """    
 
     # ""tim
     t0 = np.datetime64(t0)
