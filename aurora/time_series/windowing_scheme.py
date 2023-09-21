@@ -74,8 +74,7 @@ from mt_metadata.transfer_functions.processing.aurora.frequency_band import (
 
 
 class WindowingScheme(ApodizationWindow):
-    """
-    20210415: Casting window length, overlap, advance, etc. in terms of number
+    """20210415: Casting window length, overlap, advance, etc. in terms of number
     of samples or "points" here as this is common signal processing the
     nomenclature.  We may provide an interface to define these things in terms
     of percent, duration in seconds etc. in a supporting module.
@@ -84,7 +83,25 @@ class WindowingScheme(ApodizationWindow):
     window ... still not sure if we want to make sample_rate an attr here
     or if its better to put properties like window_duration() as a method of
     some composition of time series and windowing scheme.
-    """
+
+    :param ApodizationWindow: _description_
+    :type ApodizationWindow: _type_
+    :raises Exception: _description_
+    :raises Exception: _description_
+    :return: _description_
+    :rtype: _type_
+    """    
+    # """
+    # 20210415: Casting window length, overlap, advance, etc. in terms of number
+    # of samples or "points" here as this is common signal processing the
+    # nomenclature.  We may provide an interface to define these things in terms
+    # of percent, duration in seconds etc. in a supporting module.
+
+    # Note that sample_rate is actually a property of the data and not of the
+    # window ... still not sure if we want to make sample_rate an attr here
+    # or if its better to put properties like window_duration() as a method of
+    # some composition of time series and windowing scheme.
+    # """
 
     def __init__(self, **kwargs):
         super(WindowingScheme, self).__init__(**kwargs)
@@ -108,30 +125,48 @@ class WindowingScheme(ApodizationWindow):
 
     @property
     def num_samples_advance(self):
-        """
-        A derived property.  If we made this a fundamental defined property
+        """A derived property.  If we made this a fundamental defined property
         then overlap would become a derived property.  Overlap is more
         conventional than advance in the literature however so we choose it as
         our property label.
-        """
+
+        :return: _description_
+        :rtype: _type_
+        # """        
+        # """
+        # A derived property.  If we made this a fundamental defined property
+        # then overlap would become a derived property.  Overlap is more
+        # conventional than advance in the literature however so we choose it as
+        # our property label.
+        # """
         return self.num_samples_window - self.num_samples_overlap
 
     def available_number_of_windows(self, num_samples_data):
-        """
+        """_summary_
 
-        Parameters
-        ----------
-        num_samples_data : int
-            The number of samples in the time series to be windowed by self.
-
-        Returns
-        -------
-        number_of_windows : int
-           Count of the number of windows returned from time series of
+        :param num_samples_data:  The number of samples in the time series to be windowed by self.
+        :type num_samples_data: int
+        :return: number_of_windows Count of the number of windows returned from time series of
            num_samples_data.  Only take as many windows as available without
            wrapping.  Start with one window for free, move forward by
            num_samples_advance and don't walk over the cliff.
-        """
+        :rtype: int
+        """        
+        # """
+
+        # Parameters
+        # ----------
+        # num_samples_data : int
+        #     The number of samples in the time series to be windowed by self.
+
+        # Returns
+        # -------
+        # number_of_windows : int
+        #    Count of the number of windows returned from time series of
+        #    num_samples_data.  Only take as many windows as available without
+        #    wrapping.  Start with one window for free, move forward by
+        #    num_samples_advance and don't walk over the cliff.
+        # """
         return available_number_of_windows_in_array(
             num_samples_data, self.num_samples_window, self.num_samples_advance
         )
@@ -139,27 +174,43 @@ class WindowingScheme(ApodizationWindow):
     def apply_sliding_window(
         self, data, time_vector=None, dt=None, return_xarray=False
     ):
-        """
-        I would like this method to support numpy arrays as well as xarrays.
+        """I would like this method to support numpy arrays as well as xarrays.
 
-        Parameters
-        ----------
-        data: 1D numpy array, xr.DataArray, xr.Dataset
-            The data to break into ensembles.
-        time_vector: 1D numpy array
-            The time axis of the data.
-        dt: float
-            The sample interval of the data (reciprocal of sample_rate)
-        return_xarray: boolean
-            If True will return an xarray object, even if the input object was a
-            numpy array
-
-        Returns
-        -------
-        windowed_obj: arraylike
-            Normally an object of type xarray.core.dataarray.DataArray
+        :param data: The data to break into ensembles.
+        :type data: 1D numpy array, xr.DataArray, xr.Dataset
+        :param time_vector: The time axis of the data., defaults to None
+        :type time_vector: 1D numpy array, optional
+        :param dt: The sample interval of the data (reciprocal of sample_rate), defaults to None
+        :type dt: float, optional
+        :param return_xarray: If True will return an xarray object, even if the input object was a
+            numpy array, defaults to False
+        :type return_xarray: bool, optional
+        :raises Exception: _description_
+        :return: windowed_obj Normally an object of type xarray.core.dataarray.DataArray
             Could be numpy array as well.
-        """
+        :rtype: arraylike
+        """        
+        # """
+        # I would like this method to support numpy arrays as well as xarrays.
+
+        # Parameters
+        # ----------
+        # data: 1D numpy array, xr.DataArray, xr.Dataset
+        #     The data to break into ensembles.
+        # time_vector: 1D numpy array
+        #     The time axis of the data.
+        # dt: float
+        #     The sample interval of the data (reciprocal of sample_rate)
+        # return_xarray: boolean
+        #     If True will return an xarray object, even if the input object was a
+        #     numpy array
+
+        # Returns
+        # -------
+        # windowed_obj: arraylike
+        #     Normally an object of type xarray.core.dataarray.DataArray
+        #     Could be numpy array as well.
+        # """
         if isinstance(data, np.ndarray):
             windowed_obj = self._apply_sliding_window_numpy(
                 data, time_vector=time_vector, dt=dt, return_xarray=return_xarray
@@ -193,27 +244,42 @@ class WindowingScheme(ApodizationWindow):
     def _apply_sliding_window_numpy(
         self, data, time_vector=None, dt=None, return_xarray=False
     ):
-        """
+        """_summary_
 
-        Parameters
-        ----------
-        data: numpy.ndarray
-            A channel of time series data
-        time_vector: numpy.ndarray or None
-            Time coordinate of xarray.  If None is passed we just assign integer counts
-        dt: float or None
-            Sampling interval
-        return_xarray: bool
-            If True an xarray is returned,
-            If False we just return a numpy array of the windowed data
-
-
-        Returns
-        -------
-        output: xr.DataArray or np.ndarray
-            The windowed time series, bound to time axis or just as numpy array,
+        :param data: A channel of time series data
+        :type data: numpy.ndarray
+        :param time_vector:  Time coordinate of xarray.  If None is passed we just assign integer counts, defaults to None
+        :type time_vector:  numpy.ndarray or None, optional
+        :param dt: Sampling interval, defaults to None
+        :type dt: float, optional
+        :param return_xarray:If True an xarray is returned,
+            If False we just return a numpy array of the windowed data, defaults to False
+        :type return_xarray: bool, optional
+        :return:The windowed time series, bound to time axis or just as numpy array,
             depending on the value of return_xarray
-        """
+        :rtype: xr.DataArray or np.ndarray
+        """        
+        # """
+
+        # Parameters
+        # ----------
+        # data: numpy.ndarray
+        #     A channel of time series data
+        # time_vector: numpy.ndarray or None
+        #     Time coordinate of xarray.  If None is passed we just assign integer counts
+        # dt: float or None
+        #     Sampling interval
+        # return_xarray: bool
+        #     If True an xarray is returned,
+        #     If False we just return a numpy array of the windowed data
+
+
+        # Returns
+        # -------
+        # output: xr.DataArray or np.ndarray
+        #     The windowed time series, bound to time axis or just as numpy array,
+        #     depending on the value of return_xarray
+        # """
         sliding_window_function = SLIDING_WINDOW_FUNCTIONS[self.striding_function_label]
         windowed_array = sliding_window_function(
             data, self.num_samples_window, self.num_samples_advance
@@ -234,19 +300,30 @@ class WindowingScheme(ApodizationWindow):
         return output
 
     def cast_windowed_data_to_xarray(self, windowed_array, time_vector, dt=None):
-        """
-        TODO?: Factor this method to a standalone function in window_helpers?
+        """TODO: Factor this method to a standalone function in window_helpers?
 
-        Parameters
-        ----------
-        windowed_array
-        time_vector
-        dt
+        :param windowed_array: _description_
+        :type windowed_array: _type_
+        :param time_vector: _description_
+        :type time_vector: _type_
+        :param dt: _description_, defaults to None
+        :type dt: _type_, optional
+        :return: _description_
+        :rtype: _type_
+        """        
+        # """
+        # TODO?: Factor this method to a standalone function in window_helpers?
 
-        Returns
-        -------
+        # Parameters
+        # ----------
+        # windowed_array
+        # time_vector
+        # dt
 
-        """
+        # Returns
+        # -------
+
+        # """
         # Get within-window_time_axis coordinate
         if dt is None:
             print("Warning dt not defined, using dt=1")
@@ -275,24 +352,37 @@ class WindowingScheme(ApodizationWindow):
         return self._left_hand_window_edge_indices
 
     def downsample_time_axis(self, time_axis):
-        """
-        Parameters
-        ----------
-        time_axis : arraylike
-            This is the time axis associated with the time-series prior to
-            the windowing operation.
+        """_summary_
 
-        Returns
-        -------
-        window_time_axis : array-like
-            This is a time axis for the windowed data.  Say that we had 1Hz
+        :param time_axis: This is the time axis associated with the time-series prior to
+            the windowing operation.
+        :type time_axis: arraylike
+        :return: This is a time axis for the windowed data.  Say that we had 1Hz
             data starting at t=0 and 100 samples.  Then we window,
             with window length 10, and advance 10, the window time axis is
-             [0, 10, 20 , ... 90].  Say the same window length, but now
-             advance is 5.  Then [0, 5, 10, 15, ... 90] is the result.
+            [0, 10, 20 , ... 90].  Say the same window length, but now
+            advance is 5.  Then [0, 5, 10, 15, ... 90] is the result.
+
+        :rtype: array-like
+        """        
+        # """
+        # Parameters
+        # ----------
+        # time_axis : arraylike
+        #     This is the time axis associated with the time-series prior to
+        #     the windowing operation.
+
+        # Returns
+        # -------
+        # window_time_axis : array-like
+        #     This is a time axis for the windowed data.  Say that we had 1Hz
+        #     data starting at t=0 and 100 samples.  Then we window,
+        #     with window length 10, and advance 10, the window time axis is
+        #      [0, 10, 20 , ... 90].  Say the same window length, but now
+        #      advance is 5.  Then [0, 5, 10, 15, ... 90] is the result.
 
 
-        """
+        # """
         lhwe = self.left_hand_window_edge_indices(len(time_axis))
         window_time_axis = time_axis[lhwe]
         return window_time_axis
@@ -311,24 +401,38 @@ class WindowingScheme(ApodizationWindow):
         return fft_harmonics
 
     def apply_fft(self, data, spectral_density_correction=True, detrend_type="linear"):
-        """
-
-        Parameters
-        ----------
-        data: xarray.core.dataset.Dataset
-        spectral_density_correction: boolean
-        detrend_type: string
-
-        Returns
-        -------
-        spectral_ds:
-
-
-        Assume we have already applied sliding window and taper.
+        """Assume we have already applied sliding window and taper.
         Things to think about:
         We want to assign the frequency axis during this method
 
-        """
+        :param data: _description_
+        :type data: xarray.core.dataset.Dataset
+        :param spectral_density_correction: _description_, defaults to True
+        :type spectral_density_correction: bool, optional
+        :param detrend_type: _description_, defaults to "linear"
+        :type detrend_type: str, optional
+        :raises Exception: _description_
+        :return: _description_
+        :rtype: _type_
+        """        
+        # """
+
+        # Parameters
+        # ----------
+        # data: xarray.core.dataset.Dataset
+        # spectral_density_correction: boolean
+        # detrend_type: string
+
+        # Returns
+        # -------
+        # spectral_ds:
+
+
+        # Assume we have already applied sliding window and taper.
+        # Things to think about:
+        # We want to assign the frequency axis during this method
+
+        # """
         # ONLY SUPPORTS DATASET AT THIS POINT
         if isinstance(data, xr.Dataset):
             spectral_ds = fft_xr_ds(data, self.sample_rate, detrend_type=detrend_type)
@@ -347,16 +451,23 @@ class WindowingScheme(ApodizationWindow):
         return spectral_ds
 
     def apply_spectral_density_calibration(self, dataset):
-        """
-        Parameters
-        ----------
-        dataset
+        """_summary_
 
-        Returns
-        -------
+        :param dataset: _description_
+        :type dataset: _type_
+        :return: _description_
+        :rtype: _type_
+        """        
+        # """
+        # Parameters
+        # ----------
+        # dataset
+
+        # Returns
+        # -------
 
 
-        """
+        # """
         scale_factor = self.linear_spectral_density_calibration_factor
         dataset *= scale_factor
         return dataset
@@ -384,20 +495,24 @@ class WindowingScheme(ApodizationWindow):
 
     @property
     def linear_spectral_density_calibration_factor(self):
-        """
-        Returns
-        -------
-        calibration_factor : float
-            Following Hienzel et al 2002, Equations 24 and 25 for Linear
+        """_summary_
+
+        :return: Following Hienzel et al 2002, Equations 24 and 25 for Linear
             Spectral Density correction for a single sided spectrum.
-        """
+        :rtype: float
+        """        
+        # """
+        # Returns
+        # -------
+        # calibration_factor : float
+        #     Following Hienzel et al 2002, Equations 24 and 25 for Linear
+        #     Spectral Density correction for a single sided spectrum.
+        # """
         return np.sqrt(2 / (self.sample_rate * self.S2))
 
 
 def fft_xr_ds(dataset, sample_rate, detrend_type=None, prewhitening=None):
-    """
-
-    This should call window_helpers.apply_fft_to_windowed_array
+    """This should call window_helpers.apply_fft_to_windowed_array
     or get moved to window_helpers.py
 
     The returned harmonics do not include the Nyquist frequency. To modify this
@@ -406,19 +521,41 @@ def fft_xr_ds(dataset, sample_rate, detrend_type=None, prewhitening=None):
     For each channel within the Dataset, fft is applied along the
     within-window-time axis of the associated numpy array
 
-    Parameters
-    ----------
-    dataset : xr.Dataset
-        Data are 2D (windowed univariate time series).
-    sample_rate: float
+    :param dataset: Data are 2D (windowed univariate time series).
+    :type dataset: xr.Dataset
+    :param sample_rate: _description_
+    :type sample_rate: float
+    :param detrend_type: _description_, defaults to None
+    :type detrend_type: _type_, optional
+    :param prewhitening: _description_, defaults to None
+    :type prewhitening: _type_, optional
+    :return: _description_
+    :rtype: _type_
+    """    
+    # """
 
-    detrend_type
-    prewhitening
+    # This should call window_helpers.apply_fft_to_windowed_array
+    # or get moved to window_helpers.py
 
-    Returns
-    -------
+    # The returned harmonics do not include the Nyquist frequency. To modify this
+    # add +1 to n_fft_harmonics.  Also, only 1-sided ffts are returned.
 
-    """
+    # For each channel within the Dataset, fft is applied along the
+    # within-window-time axis of the associated numpy array
+
+    # Parameters
+    # ----------
+    # dataset : xr.Dataset
+    #     Data are 2D (windowed univariate time series).
+    # sample_rate: float
+
+    # detrend_type
+    # prewhitening
+
+    # Returns
+    # -------
+
+    # """
     # TODO: Modify this so that demeaning and detrending is happening before
     # application of the tapering window.  Add a second demean right before the FFT
 
@@ -451,18 +588,26 @@ def fft_xr_ds(dataset, sample_rate, detrend_type=None, prewhitening=None):
 
 
 def window_scheme_from_decimation(decimation):
-    """
-    Helper function to workaround mt_metadata to not import form aurora
+    """Helper function to workaround mt_metadata to not import form aurora
 
-    Parameters
-    ----------
-    decimation: mt_metadata.transfer_function.processing.aurora.decimation_level
-    .DecimationLevel
 
-    Returns
-    -------
-        windowing_scheme aurora.time_series.windowing_scheme.WindowingScheme
-    """
+    :param decimation: _description_
+    :type decimation: _type_
+    :return: windowing_scheme
+    :rtype: aurora.time_series.windowing_scheme.WindowingScheme
+    """    
+    # """
+    # Helper function to workaround mt_metadata to not import form aurora
+
+    # Parameters
+    # ----------
+    # decimation: mt_metadata.transfer_function.processing.aurora.decimation_level
+    # .DecimationLevel
+
+    # Returns
+    # -------
+    #     windowing_scheme aurora.time_series.windowing_scheme.WindowingScheme
+    # """
     from aurora.time_series.windowing_scheme import WindowingScheme
 
     windowing_scheme = WindowingScheme(

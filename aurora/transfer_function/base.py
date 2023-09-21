@@ -10,36 +10,62 @@ from mt_metadata.base import Base
 
 
 class TransferFunction(Base):
-    """
-    Class to contain transfer function array.
+    """Class to contain transfer function array.
 
-    Parameters:
-    TF : numpy array
-        array of transfer functions: TF(Nout, Nin, Nperiods)
-    T : numpy array
-        list of periods
-    Header : transfer_function_header.TransferFunctionHeader object.
-        TF header contains local site header, remote site header if
+    :param TF: array of transfer functions: TF(Nout, Nin, Nperiods)
+    :type TF: numpy array
+    :param T: list of periods
+    :type T: numpy array
+    :param Header: TF header contains local site header, remote site header if
         appropriate, and information about estimation approach???
-    cov_ss_inv : numpy array
-        inverse signal power matrix.  aka Cov_SS in EMTF matlab codes
-    cov_nn : numpy array
-        noise covariance matrix: aka Cov_NN in EMTF matlab codes
-    num_segments : integer array?
-        Number of samples used to estimate TF for each band, and for each \
+    :type Header: transfer_function_header.TransferFunctionHeader object
+    :param cov_ss_inv: inverse signal power matrix.  aka Cov_SS in EMTF matlab codes
+    :type cov_ss_inv: numpy array
+    :param cov_nn: noise covariance matrix: aka Cov_NN in EMTF matlab codes
+    :type cov_nn: numpy array
+    :param num_segments: Number of samples used to estimate TF for each band, and for each \
         output channel (might be different for different channels)
-    R2 : xarray.DataArray
-        multiple coherence for each output channel / band
-    FullCov : boolean
-        true if full covariance is provided
+    :type num_segments: integer array
+    :param R2:  multiple coherence for each output channel / band
+    :type R2:  xarray.DataArray
+    :param FullCov: true if full covariance is provided
+    :type FullCov: boolean
+    :param : 
+    :type : 
+    :raises Exception: _description_
+    :return: _description_
+    :rtype: _type_
+    """    
+    # """
+    # Class to contain transfer function array.
 
-    properties (Dependent)
-    StdErr % standard errors of TF components, same size and order as TF
-    NBands
-    freqs % inverse of period
-    Nout
-    Nin
-    """
+    # Parameters:
+    # TF : numpy array
+    #     array of transfer functions: TF(Nout, Nin, Nperiods)
+    # T : numpy array
+    #     list of periods
+    # Header : transfer_function_header.TransferFunctionHeader object.
+    #     TF header contains local site header, remote site header if
+    #     appropriate, and information about estimation approach???
+    # cov_ss_inv : numpy array
+    #     inverse signal power matrix.  aka Cov_SS in EMTF matlab codes
+    # cov_nn : numpy array
+    #     noise covariance matrix: aka Cov_NN in EMTF matlab codes
+    # num_segments : integer array?
+    #     Number of samples used to estimate TF for each band, and for each \
+    #     output channel (might be different for different channels)
+    # R2 : xarray.DataArray
+    #     multiple coherence for each output channel / band
+    # FullCov : boolean
+    #     true if full covariance is provided
+
+    # properties (Dependent)
+    # StdErr % standard errors of TF components, same size and order as TF
+    # NBands
+    # freqs % inverse of period
+    # Nout
+    # Nin
+    # """
 
     def __init__(self, decimation_level_id, frequency_bands, **kwargs):
         """
