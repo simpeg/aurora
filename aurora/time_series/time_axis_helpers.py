@@ -62,14 +62,12 @@ def test_generate_time_axis(t0, n_samples, sample_rate):
         time_stamps = do_it_the_slow_way()
     return time_stamps
 
-    Parameters
-    ----------
-    t0
-    n_samples
-    sample_rate
 
-    Returns
-    -------
+    :parameter t0: 
+    :parameter n_samples: 
+    :parameter sample_rate:
+
+    :return: 
 
     """
     t0 = np.datetime64(t0)
