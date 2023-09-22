@@ -1,4 +1,4 @@
-data_id,network_id,station_id,remote_id,filename,exception,error_message,data_xml_filebase
+data_id,network_id,station_id,remote_id,aurora_xml_filebase,exception,error_message,data_xml_filebase
 14856036,EM,ORF08,ORG08,EM_ORF08_RRORG08.xml,,,14856037_EM_ORF08.xml
 14856258,EM,ORF09,ORH09,EM_ORF09_RRORH09.xml,,,14856259_EM_ORF09.xml
 14856480,EM,ORF10,ORG10,EM_ORF10_RRORG10.xml,,,14856481_EM_ORF10.xml
