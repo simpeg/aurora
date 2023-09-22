@@ -1,63 +1,63 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-"""
-The windowing scheme defines the chunking and chopping of the time series for
-the Short Time Fourier Transform.  Often referred to as a "sliding window" or
-a "striding window".  Iin its most basic form it is a taper with a rule to
-say how far to advance at each stride (or step).
+# """
+# The windowing scheme defines the chunking and chopping of the time series for
+# the Short Time Fourier Transform.  Often referred to as a "sliding window" or
+# a "striding window".  Iin its most basic form it is a taper with a rule to
+# say how far to advance at each stride (or step).
 
-To generate an array of data-windows from a data series we only need the
-two parameters window_length (L) and window_overlap (V).  The parameter
-"window_advance" (L-V) can be used in lieu of overlap.  Sliding windows are
-normally described terms of overlap but it is cleaner to code in terms of
-advance.
+# To generate an array of data-windows from a data series we only need the
+# two parameters window_length (L) and window_overlap (V).  The parameter
+# "window_advance" (L-V) can be used in lieu of overlap.  Sliding windows are
+# normally described terms of overlap but it is cleaner to code in terms of
+# advance.
 
-Choices L and V are usually made with some knowledge of time series sample
-rate, duration, and the frequency band of interest.  In aurora because this is used
-to prep for STFT, L is typically a power of 2.
+# Choices L and V are usually made with some knowledge of time series sample
+# rate, duration, and the frequency band of interest.  In aurora because this is used
+# to prep for STFT, L is typically a power of 2.
 
-In general we will need one instance of this class per decimation level,
-but in practice often leave the windowing scheme the same for each decimation level.
+# In general we will need one instance of this class per decimation level,
+# but in practice often leave the windowing scheme the same for each decimation level.
 
-This class is a key part of the "gateway" to frequency domain, so it has been given
-a sampling_rate attribute.  While sampling rate is a property of the data, and not
-the windowing scheme per se, it is good for this class to be aware of the sampling
-rate.
+# This class is a key part of the "gateway" to frequency domain, so it has been given
+# a sampling_rate attribute.  While sampling rate is a property of the data, and not
+# the windowing scheme per se, it is good for this class to be aware of the sampling
+# rate.
 
-Future modifications could involve:
-- binding this class with a time series.
-- Making a subclass with only L, V, and then having an extension with sample_rate
-
-
-When 2D arrays are generated how should we index them?
-[[ 0  1  2]
- [ 2  3  4]
- [ 4  5  6]
- [ 6  7  8]
- [ 8  9 10]
- [10 11 12]
- [12 13 14]]
-In this example the rows are indexing the individual windows ... and so they
-should be associated with the time of each window.  We will need to set a
-standard for this.  Obvious options are center_time of window and time_of_first
-sample. I prefer time_of_first sample.  This can always be transformed to
-center time or another standard later.  We can call this the "window time
-axis".  The columns are indexing "steps of delta-t".  The actual times are
-different for every row, so it would be best to use something like
-[0, dt, 2*dt] for that axis to keep it general.  We can call this the
-"within-window sample time axis"
+# Future modifications could involve:
+# - binding this class with a time series.
+# - Making a subclass with only L, V, and then having an extension with sample_rate
 
 
-TODO: Regarding the optional time_vector input to self.apply_sliding_window()
-... this current implementation takes as input numpy array data.  We need to
-also allow for an xarray to be implemented. In the simplest case we would
-take an xarray in and extract its "time" axis as time vector
+# When 2D arrays are generated how should we index them?
+# [[ 0  1  2]
+#  [ 2  3  4]
+#  [ 4  5  6]
+#  [ 6  7  8]
+#  [ 8  9 10]
+#  [10 11 12]
+#  [12 13 14]]
+# In this example the rows are indexing the individual windows ... and so they
+# should be associated with the time of each window.  We will need to set a
+# standard for this.  Obvious options are center_time of window and time_of_first
+# sample. I prefer time_of_first sample.  This can always be transformed to
+# center time or another standard later.  We can call this the "window time
+# axis".  The columns are indexing "steps of delta-t".  The actual times are
+# different for every row, so it would be best to use something like
+# [0, dt, 2*dt] for that axis to keep it general.  We can call this the
+# "within-window sample time axis"
 
-20210529
-This class is going to be modified to only accept xarray as input data.
-We can force any incoming numpy arrays to be either xr.DataArray or xr.Dataset.
-Similarly, output will be only xr.DataArray or xr.Dataset
-"""
+
+# TODO: Regarding the optional time_vector input to self.apply_sliding_window()
+# ... this current implementation takes as input numpy array data.  We need to
+# also allow for an xarray to be implemented. In the simplest case we would
+# take an xarray in and extract its "time" axis as time vector
+
+# 20210529
+# This class is going to be modified to only accept xarray as input data.
+# We can force any incoming numpy arrays to be either xr.DataArray or xr.Dataset.
+# Similarly, output will be only xr.DataArray or xr.Dataset
+# """
 
 import copy
 import numpy as np
