@@ -23,15 +23,13 @@ class TransferFunction(Base):
     :type cov_ss_inv: numpy array
     :param cov_nn: noise covariance matrix: aka Cov_NN in EMTF matlab codes
     :type cov_nn: numpy array
-    :param num_segments: Number of samples used to estimate TF for each band, and for each \
+    :param num_segments: Number of samples used to estimate TF for each band, and for each 
         output channel (might be different for different channels)
     :type num_segments: integer array
     :param R2:  multiple coherence for each output channel / band
     :type R2:  xarray.DataArray
     :param FullCov: true if full covariance is provided
-    :type FullCov: boolean
-    :param : 
-    :type : 
+    :type FullCov: boolean 
     :raises Exception: _description_
     :return: _description_
     :rtype: _type_
