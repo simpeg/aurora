@@ -124,12 +124,14 @@ class WindowingScheme(ApodizationWindow):
         return info_string
 
     @property
-    def num_samples_advance(self):
+    def num_samples_advance(self):        
         """A derived property.  If we made this a fundamental defined property
         then overlap would become a derived property.  Overlap is more
         conventional than advance in the literature however so we choose it as
         our property label.
 
+        :param _name_:  _description_
+        :type _name_: _type_
         :return: _description_
         :rtype: _type_
         # """        
