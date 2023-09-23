@@ -105,7 +105,6 @@ class TransferFunction(Base):
         periods = self.frequency_bands.band_centers(frequency_or_period="period")
         periods = np.flipud(periods)
         return periods
-        # return self.frequency_bands.band_centers(frequency_or_period="period")
 
     def _initialize_arrays(self):
         """

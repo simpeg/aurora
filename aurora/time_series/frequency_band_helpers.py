@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from mt_metadata.transfer_functions.processing.aurora.frequency_band import (
+from mt_metadata.transfer_functions.processing.aurora.band import (
     FrequencyBands,
 )
 
