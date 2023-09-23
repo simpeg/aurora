@@ -140,7 +140,6 @@ class TransferFunction(Base):
             tf_array,
             dims=["output_channel", "input_channel", "period"],  # frequency"],
             coords={
-                # "frequency": self.frequency_bands.band_centers(),
                 "period": self.periods,
                 "output_channel": self.tf_header.output_channels,
                 "input_channel": self.tf_header.input_channels,
