@@ -1,48 +1,26 @@
-from pathlib import Path
-
-from aurora.config.metadata.processing import Processing
-from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.process_mth5 import process_mth5
 
 
-def process_synthetic_data(
-    processing_config, tfk_dataset, units="MT", z_file_path="", return_collection=False
-):
-    """
+def tf_obj_from_synthetic_data(mth5_path):
+    """Helper function for test_issue_139"""
+    from aurora.config.config_creator import ConfigCreator
+    from aurora.pipelines.run_summary import RunSummary
+    from aurora.transfer_function.kernel_dataset import KernelDataset
 
-    Parameters
-    ----------
-    processing_config: str or Path, or a Processing() object
-        where the processing configuration file is found
-    tfk_dataset: aurora.tf_kernel.dataset.Dataset
-        class that has a df that describes the runs to be processed.
-    z_file_path: str or Path
-        Optional, a place to store the output TF in EMTF z-file format.
+    run_summary = RunSummary()
+    run_summary.from_mth5s(list((mth5_path,)))
 
-    Returns
-    -------
-    tf_collection:
-    aurora.transfer_function.transfer_function_collection.TransferFunctionCollection
-        Container for TF.  TransferFunctionCollection will probably be deprecated.
+    kernel_dataset = KernelDataset()
+    kernel_dataset.from_run_summary(run_summary, "test1", "test2")
 
-    """
-    cond1 = isinstance(processing_config, str)
-    cond2 = isinstance(processing_config, Path)
-    if cond1 or cond2:
-        # load from a json path or string
-        print("Not tested since implementation of new mt_metadata Processing object")
-        config = initialize_config(processing_config)
-    elif isinstance(processing_config, Processing):
-        config = processing_config
-    else:
-        print(f"processing_config has unexpected type {type(processing_config)}")
-        raise Exception
+    # Define the processing Configuration
+    cc = ConfigCreator()
+    config = cc.create_from_kernel_dataset(kernel_dataset)
 
-    tf_collection = process_mth5(
+    tf_cls = process_mth5(
         config,
-        tfk_dataset,
-        units=units,
-        z_file_path=z_file_path,
-        return_collection=return_collection,
+        kernel_dataset,
+        units="MT",
+        z_file_path="test1_RRtest2.zrr",
     )
-    return tf_collection
+    return tf_cls

@@ -1,3 +1,4 @@
+from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
@@ -8,9 +9,6 @@ from aurora.test_utils.synthetic.make_processing_configs import (
 )
 from aurora.test_utils.synthetic.paths import AURORA_RESULTS_PATH
 from aurora.test_utils.synthetic.paths import EMTF_OUTPUT_PATH
-from aurora.test_utils.synthetic.processing_helpers import (
-    process_synthetic_data,
-)
 from aurora.test_utils.synthetic.rms_helpers import assert_rms_misfit_ok
 from aurora.test_utils.synthetic.rms_helpers import compute_rms
 from aurora.test_utils.synthetic.rms_helpers import get_expected_rms_misfit
@@ -74,17 +72,15 @@ def aurora_vs_emtf(
     expected_rms_misfit = get_expected_rms_misfit(test_case_id, emtf_version)
     z_file_path = AURORA_RESULTS_PATH.joinpath(z_file_base)
 
-    tf_collection = process_synthetic_data(
+    tf_collection = process_mth5(
         processing_config,
-        tfk_dataset,
+        tfk_dataset=tfk_dataset,
         z_file_path=z_file_path,
         return_collection=True,
     )
 
     aux_data = read_z_file(auxilliary_z_file)
-    aurora_rho_phi = merge_tf_collection_to_match_z_file(
-        aux_data, tf_collection
-    )
+    aurora_rho_phi = merge_tf_collection_to_match_z_file(aux_data, tf_collection)
 
     for xy_or_yx in ["xy", "yx"]:
         aurora_rho = aurora_rho_phi["rho"][xy_or_yx]
@@ -137,9 +133,7 @@ def run_test1(emtf_version, ds_df):
     test_case_id = "test1"
     auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test1.zss")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zss"
-    aurora_vs_emtf(
-        test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df
-    )
+    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df)
     return
 
 

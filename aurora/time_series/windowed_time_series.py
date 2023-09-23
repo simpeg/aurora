@@ -1,14 +1,16 @@
 import numpy as np
-from scipy.interpolate import interp1d
 import scipy.signal as ssig
+
+from scipy.interpolate import interp1d
+
 from aurora.time_series.decorators import can_use_xr_dataarray
 
 
 def validate_coordinate_ordering_time_domain(dataset):
     """
-    Check that the data dimensions are what you expect.  THis may evolve some
-    but for now, I just want to make sure that we are operating along the
-    correct axes when we demean, detrend, taper, etc.
+    Check that the data dimensions are what you expect.  This may evolve, but for now,
+    just want to make sure that we are operating along the correct axes when we
+    demean, detrend, taper, etc.
     Parameters
     ----------
     dataset : xarray.Dataset

@@ -8,12 +8,11 @@ change.
 """
 from pathlib import Path
 
-from aurora.config import Processing, Station, Run, BANDS_DEFAULT_FILE
-from aurora.config.metadata.window import Window
+from aurora.config.metadata.processing import Processing
+from aurora.config import BANDS_DEFAULT_FILE
+from mt_metadata.transfer_functions.processing.aurora import Station, Run
+from mt_metadata.transfer_functions.processing.aurora.window import Window
 from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
-
-# def extract_default_values_from_processing_metadata():
-#     from aurora.config.metadata.window import Window
 
 
 class ConfigCreator:

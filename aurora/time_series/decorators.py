@@ -1,7 +1,4 @@
-import functools
-import xarray as xr
-
-
+"""
 # Here is the decorator pattern
 def decorator(func):
     @functools.wraps(func)
@@ -12,6 +9,10 @@ def decorator(func):
         return value
 
     return wrapper_decorator
+"""
+
+import functools
+import xarray as xr
 
 
 def can_use_xr_dataarray(func):

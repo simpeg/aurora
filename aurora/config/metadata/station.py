@@ -18,6 +18,8 @@ from .run import Run
 # =============================================================================
 attr_dict = get_schema("station", SCHEMA_FN_PATHS)
 # =============================================================================
+
+
 class Station(Base):
     __doc__ = write_lines(attr_dict)
 

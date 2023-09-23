@@ -26,17 +26,13 @@ Note 3: This point in the loop marks the interface between _generation_ of the F
 import xarray as xr
 
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
-from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.transfer_function_helpers import process_transfer_functions
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
-
 from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
 )
 from aurora.transfer_function.TTFZ import TTFZ
-
-from mt_metadata.utils.list_dict import ListDict
 from mt_metadata.transfer_functions.core import TF
 
 
@@ -55,7 +51,7 @@ def make_stft_objects(
 
     Parameters
     ----------
-    processing_config: aurora.config.metadata.processing.Processing
+    processing_config: mt_metadata.transfer_functions.processing.aurora.Processing
         Metadata about the processing to be applied
     i_dec_level: int
         The decimation level to process
@@ -76,10 +72,6 @@ def make_stft_objects(
     """
     stft_config = processing_config.get_decimation_level(i_dec_level)
     stft_obj = run_ts_to_stft(stft_config, run_xrds)
-    # if stft_obj is None:
-    #    # not enough data to FFT
-    #    return stft_obj
-    # stft_obj = run_ts_to_stft_scipy(stft_config, run_xrds)
     run_id = run_obj.metadata.id
     if station_id == processing_config.stations.local.id:
         scale_factors = processing_config.stations.local.run_dict[
@@ -98,6 +90,28 @@ def make_stft_objects(
     )
     return stft_obj
 
+def station_obj_from_row(row):
+    """
+    Access the station object
+    Note if/else could avoidable if replacing text string "none" with a None object in survey column
+
+    Parameters
+    ----------
+    row: pd.Series
+        A row of tfk.dataset_df
+
+    Returns
+    -------
+    station_obj:
+
+    """
+    if row.survey == "none":
+        station_obj = row.mth5_obj.stations_group.get_station(row.station_id)
+    else:
+        station_obj = row.mth5_obj.stations_group.get_station(
+            row.station_id, survey=row.survey
+        )
+    return station_obj
 
 def process_tf_decimation_level(
     config, i_dec_level, local_stft_obj, remote_stft_obj, units="MT"
@@ -111,7 +125,7 @@ def process_tf_decimation_level(
 
     Parameters
     ----------
-    config: aurora.config.metadata.decimation_level.DecimationLevel
+    config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
         Config for a single decimation level
     i_dec_level: int
         decimation level_id
@@ -129,8 +143,7 @@ def process_tf_decimation_level(
         The transfer function values packed into an object
     """
     frequency_bands = config.decimations[i_dec_level].frequency_bands_obj()
-    tf_header = config.make_tf_header(i_dec_level)
-    transfer_function_obj = TTFZ(tf_header, frequency_bands, processing_config=config)
+    transfer_function_obj = TTFZ(i_dec_level, frequency_bands, processing_config=config)
 
     transfer_function_obj = process_transfer_functions(
         config, i_dec_level, local_stft_obj, remote_stft_obj, transfer_function_obj
@@ -139,102 +152,103 @@ def process_tf_decimation_level(
     return transfer_function_obj
 
 
-def export_tf(
-    tf_collection,
-    channel_nomenclature,
-    station_metadata_dict={},
-    survey_dict={},
-):
+def enrich_row(row):
+    pass
+
+
+def triage_issue_289(local_stfts, remote_stfts):
     """
-    This method may wind up being embedded in the TF class
-    Assign transfer_function, residual_covariance, inverse_signal_power, station, survey
-
-    Parameters
-    ----------
-    tf_collection: aurora.transfer_function.transfer_function_collection
-    .TransferFunctionCollection
-    station_metadata_dict: dict
-    survey_dict: dict
-
-    Returns
-    -------
-    tf_cls: mt_metadata.transfer_functions.core.TF
-        Transfer function container
+    Timing Error Workaround See Aurora Issue #289: seems associated with getting one fewer sample than expected
+    from the edge of a run.
     """
-    merged_tf_dict = tf_collection.get_merged_dict(channel_nomenclature)
-    channel_nomenclature_dict = channel_nomenclature.to_dict()["channel_nomenclature"]
-    tf_cls = TF(channel_nomenclature=channel_nomenclature_dict)
-    renamer_dict = {"output_channel": "output", "input_channel": "input"}
-    tmp = merged_tf_dict["tf"].rename(renamer_dict)
-    tf_cls.transfer_function = tmp
-
-    isp = merged_tf_dict["cov_ss_inv"]
-    renamer_dict = {"input_channel_1": "input", "input_channel_2": "output"}
-    isp = isp.rename(renamer_dict)
-    tf_cls.inverse_signal_power = isp
-
-    res_cov = merged_tf_dict["cov_nn"]
-    renamer_dict = {"output_channel_1": "input", "output_channel_2": "output"}
-    res_cov = res_cov.rename(renamer_dict)
-    tf_cls.residual_covariance = res_cov
-
-    tf_cls.station_metadata._runs = ListDict()
-    tf_cls.station_metadata.from_dict(station_metadata_dict)
-    tf_cls.survey_metadata.from_dict(survey_dict)
-    return tf_cls
-
-
-def update_dataset_df(i_dec_level, tfk):
-    """
-    This function has two different modes.  The first mode, initializes values in the
-    array, and could be placed into TFKDataset.initialize_time_series_data()
-    The second mode, decimates. The function is kept in pipelines becasue it calls
-    time series operations.
+    n_chunks = len(local_stfts)
+    for i_chunk in range(n_chunks):
+        ok = local_stfts[i_chunk].time.shape == remote_stfts[i_chunk].time.shape
+        if not ok:
+            print("Mismatch in FC array lengths detected -- Issue #289")
+            glb = max(
+                local_stfts[i_chunk].time.min(),
+                remote_stfts[i_chunk].time.min(),
+            )
+            lub = min(
+                local_stfts[i_chunk].time.max(),
+                remote_stfts[i_chunk].time.max(),
+            )
+            cond1 = local_stfts[i_chunk].time >= glb
+            cond2 = local_stfts[i_chunk].time <= lub
+            local_stfts[i_chunk] = local_stfts[i_chunk].where(cond1 & cond2, drop=True)
+            cond1 = remote_stfts[i_chunk].time >= glb
+            cond2 = remote_stfts[i_chunk].time <= lub
+            remote_stfts[i_chunk] = remote_stfts[i_chunk].where(
+                cond1 & cond2, drop=True
+            )
+            assert local_stfts[i_chunk].time.shape == remote_stfts[i_chunk].time.shape
+    return local_stfts, remote_stfts
 
 
-    Notes:
-    1. When iterating over dataframe, (i)ndex must run from 0 to len(df), otherwise
-    get indexing errors.  Maybe reset_index() before main loop? or push reindexing
-    into TF Kernel, so that this method only gets a cleanly indexed df, restricted to
-    only the runs to be processed for this specific TF?
-    2. When assigning xarrays to dataframe cells, df dislikes xr.Dataset,
-    so we convert to DataArray before assignment
-
-
-    Parameters
-    ----------
-    i_dec_level: int
-        decimation level id, indexed from zero
-    config: aurora.config.metadata.decimation_level.DecimationLevel
-        decimation level config
-
-    Returns
-    -------
-    dataset_df: pd.DataFrame
-        Same df that was input to the function but now has columns:
-
-
-    """
-    if i_dec_level == 0:
-        pass
-        # replaced with kernel_dataset.initialize_dataframe_for_processing()
-
-        # APPLY TIMING CORRECTIONS HERE
+def merge_stfts(stfts, tfk):
+    # Timing Error Workaround See Aurora Issue #289
+    local_stfts = stfts["local"]
+    remote_stfts = stfts["remote"]
+    if tfk.config.stations.remote:
+        local_stfts, remote_stfts = triage_issue_289(local_stfts, remote_stfts)
+        remote_merged_stft_obj = xr.concat(remote_stfts, "time")
     else:
-        print(f"DECIMATION LEVEL {i_dec_level}")
-        # See Note 1 top of module
-        # See Note 2 top of module
-        for i, row in tfk.dataset_df.iterrows():
-            if not tfk.is_valid_dataset(row, i_dec_level):
-                continue
-            run_xrds = row["run_dataarray"].to_dataset("channel")
-            decimation = tfk.config.decimations[i_dec_level].decimation
-            decimated_xrds = prototype_decimate(decimation, run_xrds)
-            tfk.dataset_df["run_dataarray"].at[i] = decimated_xrds.to_array("channel")
+        remote_merged_stft_obj = None
 
-    print("DATASET DF UPDATED")
+    local_merged_stft_obj = xr.concat(local_stfts, "time")
+
+    return local_merged_stft_obj, remote_merged_stft_obj
+
+
+def append_chunk_to_stfts(stfts, chunk, remote):
+    if remote:
+        stfts["remote"].append(chunk)
+    else:
+        stfts["local"].append(chunk)
+    return stfts
+
+
+def load_stft_obj_from_mth5(i_dec_level, row, run_obj):
+    # Load stft_obj from mth5 (instead of compute)
+    station_obj = station_obj_from_row(row)
+    fc_group = station_obj.fourier_coefficients_group.add_fc_group(
+        run_obj.metadata.id
+    )
+    fc_decimation_level = fc_group.get_decimation_level(f"{i_dec_level}")
+    stft_obj = fc_decimation_level.to_xarray()
+    return stft_obj
+
+
+def save_fourier_coefficients(dec_level_config, i_dec_level, row, run_obj, stft_obj):
+    if not dec_level_config.save_fcs:
+        msg = "Skip saving FCs. dec_level_config.save_fc = "
+        print(f"{msg} {dec_level_config.save_fcs}")
+        return
+    if dec_level_config.save_fcs_type == "csv":
+        msg = "Unless debugging or testing, saving FCs to csv unexpected"
+        print(f"WARNING: {msg}")
+        csv_name = f"{row.station_id}_dec_level_{i_dec_level}.csv"
+        stft_df = stft_obj.to_dataframe()
+        stft_df.to_csv(csv_name)
+    elif dec_level_config.save_fcs_type == "h5":
+        station_obj = station_obj_from_row(row)
+
+        # See Note #1 at top this method (not module)
+        if not row.mth5_obj.h5_is_write():
+            raise NotImplementedError("See Note #1 at top this method")
+        fc_group = station_obj.fourier_coefficients_group.add_fc_group(
+            run_obj.metadata.id
+        )
+        decimation_level_metadata = dec_level_config.to_fc_decimation()
+        fc_decimation_level = fc_group.add_decimation_level(
+            f"{i_dec_level}",
+            decimation_level_metadata=decimation_level_metadata,
+        )
+        fc_decimation_level.from_xarray(stft_obj)
+        fc_decimation_level.update_metadata()
+        fc_group.update_metadata()
     return
-
 
 def process_mth5(
     config,
@@ -248,11 +262,16 @@ def process_mth5(
     This is the main method used to transform a processing_config,
     and a kernel_dataset into a transfer function estimate.
 
+    Note 1: Logic for building FC layers:
+    If the processing config decimation_level.save_fcs_type = "h5" and fc_levels_already_exist is False, then open
+    in append mode, else open in read mode.  We should support a flag: force_rebuild_fcs, normally False.  This flag
+    is only needed when save_fcs_type=="h5".  If True, then we open in append mode, regarless of fc_levels_already_exist
+    The task of setting mode="a", mode="r" can be handled by tfk (maybe in tfk.validate())
 
 
     Parameters
     ----------
-    config: aurora.config.metadata.processing.Processing or path to json
+    config: mt_metadata.transfer_functions.processing.aurora.Processing or path to json
         All processing parameters
     tfk_dataset: aurora.tf_kernel.dataset.Dataset or None
         Specifies what datasets to process according to config
@@ -274,16 +293,15 @@ def process_mth5(
     tf_cls: mt_metadata.transfer_functions.TF
         TF object
     """
+
     # Initialize config and mth5s
     tfk = TransferFunctionKernel(dataset=tfk_dataset, config=config)
     tfk.make_processing_summary()
     tfk.validate()
-    mth5_objs = tfk.config.initialize_mth5s()
-
-    # Assign additional columns to dataset_df, populate with mth5_objs and xr_ts
-    # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
-    tfk.dataset.initialize_dataframe_for_processing(mth5_objs)
-
+    # See Note #1
+    tfk.initialize_mth5s(mode="a")
+    tfk.check_if_fc_levels_already_exist()  # populate the "fc" column of dataset_df
+    print(f"fc_levels_already_exist = {tfk.dataset_df['fc']}")
     print(
         f"Processing config indicates {len(tfk.config.decimations)} "
         f"decimation levels "
@@ -292,19 +310,25 @@ def process_mth5(
     tf_dict = {}
 
     for i_dec_level, dec_level_config in enumerate(tfk.valid_decimations()):
+        #i_dec_level = dec_level_config.decimation.level
+        tfk.update_dataset_df(i_dec_level)
+        dec_level_config = tfk.apply_clock_zero(dec_level_config)
 
-        update_dataset_df(i_dec_level, tfk)
+        stfts = {}
+        stfts["local"] = []
+        stfts["remote"] = []
 
-        # TFK 1: get clock-zero from data if needed
-        if dec_level_config.window.clock_zero_type == "data start":
-            dec_level_config.window.clock_zero = str(tfk.dataset_df.start.min())
-
-        # Apply STFT to all runs
-        local_stfts = []
-        remote_stfts = []
+        # Check first if TS processing or accessing FC Levels
         for i, row in tfk.dataset_df.iterrows():
+            # This iterator could be updated to iterate over row-pairs if remote is True, corresponding to simultaneous data
 
             if not tfk.is_valid_dataset(row, i_dec_level):
+                continue
+
+            run_obj = row.mth5_obj.from_reference(row.run_reference)
+            if row.fc:
+                stft_obj = load_stft_obj_from_mth5(i_dec_level, row, run_obj)
+                stfts = append_chunk_to_stfts(stfts, stft_obj, row.remote)
                 continue
 
             run_xrds = row["run_dataarray"].to_dataset("channel")
@@ -312,72 +336,42 @@ def process_mth5(
             stft_obj = make_stft_objects(
                 tfk.config, i_dec_level, run_obj, run_xrds, units, row.station_id
             )
+            # Pack FCs into h5
+            save_fourier_coefficients(dec_level_config, i_dec_level, row, run_obj, stft_obj)
 
-            if row.station_id == tfk.config.stations.local.id:
-                local_stfts.append(stft_obj)
-            elif row.station_id == tfk.config.stations.remote[0].id:
-                remote_stfts.append(stft_obj)
+            stfts = append_chunk_to_stfts(stfts, stft_obj, row.remote)
 
-        # Merge STFTs
-        local_merged_stft_obj = xr.concat(local_stfts, "time")
-
-        if tfk.config.stations.remote:
-            remote_merged_stft_obj = xr.concat(remote_stfts, "time")
-        else:
-            remote_merged_stft_obj = None
+        local_merged_stft_obj, remote_merged_stft_obj = merge_stfts(stfts, tfk)
 
         # FC TF Interface here (see Note #3)
-
         # Could downweight bad FCs here
 
-        tf_obj = process_tf_decimation_level(
+        ttfz_obj = process_tf_decimation_level(
             tfk.config,
             i_dec_level,
             local_merged_stft_obj,
             remote_merged_stft_obj,
         )
-        tf_obj.apparent_resistivity(tfk.config.channel_nomenclature, units=units)
-        tf_dict[i_dec_level] = tf_obj
+        ttfz_obj.apparent_resistivity(tfk.config.channel_nomenclature, units=units)
+        tf_dict[i_dec_level] = ttfz_obj
 
         if show_plot:
             from aurora.sandbox.plot_helpers import plot_tf_obj
 
-            plot_tf_obj(tf_obj, out_filename="out")
+            plot_tf_obj(ttfz_obj, out_filename="out")
 
     tf_collection = TransferFunctionCollection(
         tf_dict=tf_dict, processing_config=tfk.config
     )
 
-    # local_run_obj = mth5_obj.get_run(run_config["local_station_id"], run_id)
-    local_run_obj = tfk_dataset.get_run_object(0)
+    tf_cls = tfk.export_tf_collection(tf_collection)
 
     if z_file_path:
-        tf_collection.write_emtf_z_file(z_file_path, run_obj=local_run_obj)
+        tf_cls.write(z_file_path)
 
+    tfk.dataset.close_mths_objs()
     if return_collection:
         # this is now really only to be used for debugging and may be deprecated soon
-        tfk_dataset.close_mths_objs()
         return tf_collection
     else:
-        local_station_id = tfk.config.stations.local.id
-        station_metadata = tfk_dataset.get_station_metadata(local_station_id)
-        local_mth5_obj = mth5_objs[local_station_id]
-
-        if local_mth5_obj.file_version == "0.1.0":
-            survey_dict = local_mth5_obj.survey_group.metadata.to_dict()
-        elif local_mth5_obj.file_version == "0.2.0":
-            # this could be a method of tf_kernel.get_survey_dict()
-            survey_id = tfk.dataset_df[
-                tfk.dataset_df["station_id"] == local_station_id
-            ].survey.unique()[0]
-            survey_obj = local_mth5_obj.get_survey(survey_id)
-            survey_dict = survey_obj.metadata.to_dict()
-
-        tf_cls = export_tf(
-            tf_collection,
-            tfk.config.channel_nomenclature,
-            station_metadata_dict=station_metadata.to_dict(),
-            survey_dict=survey_dict,
-        )
-        tfk_dataset.close_mths_objs()
         return tf_cls

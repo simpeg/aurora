@@ -4,7 +4,9 @@ Players on the stage:  One or more mth5s.
 Each mth5 has a mth5_obj.channel_summary dataframe which tells what data are available.
 Here we use a compressed view of this df with one line per acquisition run. I've been
 calling that a "run_summary".  That object could be moved to mth5, so that each mth5
-has a mth5_obj.run_summary dataframe.
+has a mth5_obj.run_summary dataframe.  As of Mar 29, 2023 a RunSummary is available at the
+station level in mth5, but the aurora version is still being used.  This should be merged if possible
+so that aurora uses the built-in mth5 method.
 
 The run_summary provides options for the local and possibly remote reference stations.
  Candidates for local station are the unique value in the station column.
@@ -45,11 +47,21 @@ cc = ConfigCreator()
 p = cc.create_from_kernel_dataset(kernel_dataset, emtf_band_file=emtf_band_setup_file)
 9. Edit the Processing Config appropriately,
 
+ToDo: Consider supporting a default value for 'channel_scale_factors' that is None,
 """
 
 import copy
 import pandas as pd
+
+from aurora.pipelines.run_summary import RUN_SUMMARY_COLUMNS
 from mt_metadata.utils.list_dict import ListDict
+
+# Add these to a standard, so we track add/subtract columns
+KERNEL_DATASET_COLUMNS = RUN_SUMMARY_COLUMNS + [
+    "channel_scale_factors",
+    "duration",
+    "fc",
+]
 
 
 class KernelDataset:
@@ -110,6 +122,7 @@ class KernelDataset:
             "end",
             "duration",
         ]
+        self.survey_metadata = {}
 
     def clone(self):
         return copy.deepcopy(self)
@@ -150,7 +163,13 @@ class KernelDataset:
         self.df = df
         if remote_station_id:
             self.restrict_run_intervals_to_simultaneous()
-        self._add_duration_column()
+        # ADD A CHECK HERE df is non-empty
+        if len(self.df) == 0:
+            print("No Overlap between local and remote station data streams")
+            print("Remote reference processing not a valid option")
+        else:
+            self._add_duration_column()
+        self.df["fc"] = False
 
     @property
     def mini_summary(self):
@@ -159,6 +178,17 @@ class KernelDataset:
     @property
     def print_mini_summary(self):
         print(self.mini_summary)
+
+    @property
+    def local_survey_id(self):
+        survey_id = self.df.loc[~self.df.remote].survey.unique()[0]
+        if survey_id in ["none"]:
+            survey_id = "0"
+        return survey_id
+
+    @property
+    def local_survey_metadata(self):
+        return self.survey_metadata[self.local_survey_id]
 
     def _add_duration_column(self):
         """ """
@@ -257,6 +287,7 @@ class KernelDataset:
                     # print(f"NOVERLAP {i_local}, {i_remote}")
         df = pd.DataFrame(output_sub_runs)
         df = df.reset_index(drop=True)
+
         self.df = df
         return
 
@@ -287,7 +318,7 @@ class KernelDataset:
         for i, row in sub_df.iterrows():
             local_run_obj = self.get_run_object(row)
             if station_metadata is None:
-                station_metadata = local_run_obj.station_group.metadata
+                station_metadata = local_run_obj.station_metadata
                 station_metadata.runs = ListDict()
             run_metadata = local_run_obj.metadata
             station_metadata.add_run(run_metadata)
@@ -300,8 +331,9 @@ class KernelDataset:
     @property
     def sample_rate(self):
         if self.num_sample_rates != 1:
-            print("Aurora does not yet process data from mixed sample rates")
-            raise NotImplementedError
+            msg = "Aurora does not yet process data from mixed sample rates"
+            print(f"{msg}")
+            raise NotImplementedError(msg)
         sample_rate = self.df.sample_rate.unique()[0]
         return sample_rate
 
@@ -310,8 +342,15 @@ class KernelDataset:
         Adds extra columns needed for processing, populates them with mth5 objects,
         run_reference, and xr.Datasets.
 
-        When assigning xarrays to dataframe cells, df dislikes xr.Dataset,
+        Note #1: When assigning xarrays to dataframe cells, df dislikes xr.Dataset,
         so we convert to xr.DataArray before packing df
+
+        Note #2: [OPTIMIZATION] By accesssing the run_ts and packing the "run_dataarray" column of the df with it, we
+         perform a non-lazy operation, and essentially forcing the entire decimation_level=0 dataset to be
+         loaded into memory.  Seeking a lazy method to handle this maybe worthwhile.  For example, using
+         a df.apply() approach to initialize only ione row at a time would allow us to gernerate the FCs one
+         row at a time and never ingest more than one run of data at a time ...
+
 
         Parameters
         ----------
@@ -325,9 +364,30 @@ class KernelDataset:
                 row.station_id, row.run_id, survey=row.survey
             )
             self.df["run_reference"].at[i] = run_obj.hdf5_group.ref
+
+            if row.fc:
+                msg = f"row {row} already has fcs prescribed by processing confg "
+                msg += "-- skipping time series initialzation"
+                print(msg)
+            #    continue
+            # the line below is not lazy, See Note #2
             run_ts = run_obj.to_runts(start=row.start, end=row.end)
-            xr_ds = run_ts.dataset
-            self.df["run_dataarray"].at[i] = xr_ds.to_array("channel")
+            self.df["run_dataarray"].at[i] = run_ts.dataset.to_array("channel")
+
+            # wrangle survey_metadata into kernel_dataset
+            survey_id = run_ts.survey_metadata.id
+            if i == 0:
+                self.survey_metadata[survey_id] = run_ts.survey_metadata
+            elif i > 0:
+                if row.station_id in self.survey_metadata[survey_id].stations.keys():
+                    self.survey_metadata[survey_id].stations[row.station_id].add_run(
+                        run_ts.run_metadata
+                    )
+                else:
+                    self.survey_metadata[survey_id].add_station(run_ts.station_metadata)
+            if len(self.survey_metadata.keys()) > 1:
+                raise NotImplementedError
+
         print("DATASET DF POPULATED")
 
     def add_columns_for_processing(self, mth5_objs):
@@ -512,7 +572,7 @@ def overlap(t1start, t1end, t2start, t2end):
     elif t2start <= t1start <= t1end <= t2end:
         return t1start, t1end
     else:
-        return None
+        return None, None
 
 
 def main():

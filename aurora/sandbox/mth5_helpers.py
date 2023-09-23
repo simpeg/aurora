@@ -8,15 +8,139 @@ I would also like to use some of these functions from time-to-time, so I am putt
 them here for now, until we can decide what to move to mth5 and what to keep in
 aurora (and what to throw out).
 """
-import hashlib
-import json
+import datetime
 import pandas as pd
 
-from obspy import UTCDateTime
-from typing import Dict, Any
-
 from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
+from mth5.clients import FDSN
 from mth5.utils.helpers import initialize_mth5
+
+
+def enrich_channel_summary(mth5_object, df, keyword):
+    """
+
+    Parameters
+    ----------
+    mth5_object: mth5.mth5.MTH5
+    df: pd.DataFrame
+        A channel summary dataframe
+    keyword: str
+        supported keywords are ["num_filters",]
+        "num_filters" computes the number of filters associated with each row (channel-run) and adds that "num_filters" column of df
+
+    Returns
+    -------
+    df: pd.DataFrame
+        The channel summary df with the new column
+    """
+    df[keyword] = -1
+    if keyword == "num_filters":
+        for i_row, row in df.iterrows():
+            channel = mth5_object.get_channel(
+                row.station, row.run, row.component, row.survey
+            )
+            num_filters = len(channel.channel_response_filter.filters_list)
+            df[keyword].iat[i_row] = num_filters
+    elif keyword=="filter_units_in":
+        for i_row, row in df.iterrows():
+            channel = mth5_object.get_channel(row.station, row.run, row.component, row.survey)
+            units_in = [x.units_in for x in channel.channel_response_filter.filters_list]
+            df[keyword].iat[i_row] = units_in
+    elif keyword=="filter_units_out":
+        for i_row, row in df.iterrows():
+            channel = mth5_object.get_channel(row.station, row.run, row.component, row.survey)
+            units_out = [x.units_out for x in channel.channel_response_filter.filters_list]
+            df[keyword].iat[i_row] = units_out
+    return df
+
+
+def augmented_channel_summary(mth5_object, df=None):  # , **kwargs):
+    """
+    Consider supportig kwargs, such as a list of keyords that tell what columns to add
+    For now, we only want to add n_filters
+    Parameters
+    ----------
+    df: channel summary dataframe
+
+
+    Returns
+    -------
+
+    """
+    if not df:
+        df = mth5_object.channel_summary.to_dataframe()
+    df["n_filters"] = -1
+    for i_row, row in df.iterrows():
+        channel = mth5_object.get_channel(
+            row.station, row.run, row.component, row.survey
+        )
+        n_filters = len(channel.channel_response_filter.filters_list)
+        df.n_filters.iat[i_row] = n_filters
+    return df
+
+
+def build_request_df(network_id, station_id, channels=None,
+                     start=None, end=None, time_period_dict={},
+                     mth5_version='0.2.0'):
+    """
+
+    Parameters
+    ----------
+    network_id: string
+        Two-character network identifier string fro FDSN.
+    station_id: string
+        Short identifier code used by FDSN, e.g. CAS04, NVR11
+    channels: list or None
+        3-character channel identifiers, e.g. ["LQ2", "MFZ"],
+        support for wildcards of the form ["*F*", "*Q*",] is experimental
+        Does not support wildcards of the form ["*",]
+    start: string
+        ISO-8601 representation of a timestamp
+    end: string
+        ISO-8601 representation of a timestamp
+    time_period_dict: dict
+        Keyed by same values as channels, this gives explicit start/end times for each of the channels
+    mth5_version: str
+        From ["0.1.0", "0.2.0"]
+
+    Returns
+    -------
+
+
+    Returns:
+        request_df: pd.DataFrame
+        A formatted dataframe that can be passed to mth5.clients.FDSN to request metdata or data.
+
+    """
+    from mth5.clients import FDSN
+    def get_time_period_bounds(ch):
+        if ch in time_period_dict.keys():
+            time_interval = time_period_dict[ch]
+            ch_start = time_period_dict[ch].left.isoformat()
+            ch_end = time_period_dict[ch].right.isoformat()
+        else:
+            if start is None:
+                ch_start = '1970-01-01 00:00:00'
+            if end is None:
+                ch_end = datetime.datetime.now()
+                ch_end = ch_end.replace(hour=0, minute=0, second=0, microsecond=0)
+                ch_end = str(ch_end)
+        return ch_start, ch_end
+
+    fdsn_object = FDSN(mth5_version=mth5_version)
+    fdsn_object.client = "IRIS"
+
+    request_list = []
+    for channel in channels:
+        ch_start, ch_end = get_time_period_bounds(channel)
+        request_list.append([network_id, station_id, '', channel, ch_start, ch_end])
+
+    print(f"request_list: {request_list}")
+
+    request_df = pd.DataFrame(request_list, columns=fdsn_object.request_columns)
+    # workaround for having a channel with missing run
+    # request_df["start"] = request_df["start"].max()
+    return request_df
 
 
 def get_experiment_from_obspy_inventory(inventory):
@@ -42,186 +166,24 @@ def mth5_from_experiment(experiment, h5_path=None):
     return mth5_obj
 
 
-#
-# def dict_hash(dictionary: Dict[str, Any]) -> str:
-#     """MD5 hash of a dictionary.
-#     source:
-#     https://www.doc.ic.ac.uk/~nuric/coding/how-to-hash-a-dictionary-in-python.html
-#     There could be any values, such as lists, floats and other types.
-#     Note the two following assumptions:
-#     We will assume any value is serialisable as a string.
-#     We assume the keys are strings which allows us to order them.
-#     """
-#
-#     dhash = hashlib.md5()
-#     # We need to sort arguments so {'a': 1, 'b': 2} is
-#     # the same as {'b': 2, 'a': 1}
-#     encoded = json.dumps(dictionary, sort_keys=True).encode()
-#     dhash.update(encoded)
-#     return dhash.hexdigest()
-
-
-# def get_channel_from_row(client, row):
-#     """
-#     A helper function that uses obspy client to get a station inventory.  Although
-#     this could theoretically return muliple stations, as the name of this function
-#     suggests, it is intended to return only one single channel.
-#
-#     Parameters
-#     ----------
-#     client: obspy.clients.fdsn.client.Clien
-#     row: pandas.core.frame.Pandas
-#         A row of a dataframe
-#
-#     Returns
-#     -------
-#
-#     """
-#     channel_inventory = client.get_stations(
-#         row.start,
-#         row.end,
-#         network=row.network,
-#         station=row.station,
-#         loc=row.location,
-#         channel=row.channel,
-#         level="response",
-#     )
-#     return channel_inventory
-
-
-# def get_network_uuid(network):
-#     print("this fails because ")
-#     print("TypeError: Object of type Comment is not JSON serializable")
-#     try:
-#         uuid = dict_hash(network.__dict__)
-#     except TypeError:
-#         uuid = None
-#     return uuid
-
-
-# def make_network_inventory(df, client):
-#     """
-#     20220109: This can be made more robust.  The issue here is that the same network
-#     can be returned multiple times, if the dataframe calls data from the same network
-#     with mutiple start times.  The way to simplify the situationis to return only
-#     the unique netowrks.  This however is going to require a re-keying of the
-#     dictionary.  See comments in issue#76
-#
-#     Parameters
-#     ----------
-#     df
-#     client
-#
-#     Returns
-#     -------
-#     Dictionary keyed first by network_id, and then by starttime of desired streams.
-#     """
-#     print("Making Network Inventory")
-#     df["netork_uuid"] = ""
-#     networks = {}
-#     for network_id in df.network.unique():
-#         networks[network_id] = {}
-#     for network_id in networks.keys():
-#         sub_df = df[df.network == network_id]
-#         for row in sub_df.itertuples():
-#             print(row)
-#             if row.start not in networks[network_id].keys():
-#                 print("client.get_stations is super fricken slow!")
-#                 net_inv = client.get_stations(
-#                     row.start, row.end, network=row.network, level="network"
-#                 )
-#                 networks[network_id][row.start] = net_inv.networks[0]
-#                 # HERE is where you tranlate network into a UUID
-#                 # that UUID is appended to
-#                 # network = net_inv.networks[0]
-#                 # uuid = get_network_uuid(network)
-#                 # if uuid is None:
-#                 #     uuid = f"{network_id}_{row.start}"
-#                 # sub_df["network_uuid"] = uuid
-#     return networks
-
-
-# def make_station_inventory(df, client):
-#     """
-#
-#     Parameters
-#     ----------
-#     df
-#     client
-#
-#     Returns
-#     -------
-#     Dictionary keyed first by station_id, then by network_id, and then by
-#     starttime of desired streams.
-#     """
-#     print("Making Station Inventory")
-#     stations = {}
-#     for station_id in df.station.unique():
-#         # print(f"station_id = {station_id}")
-#         stations[station_id] = {}
-#
-#     for row in df.itertuples():
-#         # make sure that there is a subdict for the active network
-#         if stations[row.station] == {}:
-#             stations[row.station][row.network] = {}
-#
-#     for station_id in stations.keys():
-#         sub_df = df[df.station == station_id]
-#         for row in sub_df.itertuples():
-#             if row.start not in stations[station_id][row.network].keys():
-#                 sta_inv = client.get_stations(
-#                     row.start,
-#                     row.end,
-#                     network=row.network,
-#                     station=row.station,
-#                     level="station",
-#                 )
-#                 station = sta_inv.networks[0].stations[0]
-#                 stations[station_id][row.network][row.start] = station
-#     return stations
-
-
-def augment_streams(row, streams, client):
+def get_channel_summary(h5_path):
     """
 
-    Returns
-    -------
-
-    """
-    streams = (
-        client.get_waveforms(
-            row.network,
-            row.station,
-            row.location,
-            row.channel,
-            UTCDateTime(row.start),
-            UTCDateTime(row.end),
-        )
-        + streams
-    )
-    return streams
-
-
-def get_trace_start_end_times(msstreams):
-    """
-    usage: trace_start_times, trace_end_times = get_trace_start_end_times(msstreams)
     Parameters
     ----------
-    msstreams
+    h5_path: pathlib.Path
+        Where is the h5
 
     Returns
     -------
-
+    channel_summary_df: pd.DataFrame
+        channel summary from mth5
     """
-    trace_start_times = sorted(
-        list(set([tr.stats.starttime.isoformat() for tr in msstreams]))
+    mth5_obj = initialize_mth5(
+        h5_path=h5_path,
     )
-    trace_end_times = sorted(
-        list(set([tr.stats.endtime.isoformat() for tr in msstreams]))
-    )
-    if len(trace_start_times) != len(trace_end_times):
-        raise ValueError(
-            f"Do not have the same number of start {len(trace_start_times)}"
-            f" and end times {len(trace_end_times)} from streams"
-        )
-    return trace_start_times, trace_end_times
+    mth5_obj.channel_summary.summarize()
+    channel_summary_df = mth5_obj.channel_summary.to_dataframe()
+    mth5_obj.close_mth5()
+    print(channel_summary_df)
+    return channel_summary_df

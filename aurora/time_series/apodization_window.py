@@ -169,7 +169,7 @@ class ApodizationWindow(object):
     def S2(self):
         """sum of squares of the window coefficients"""
         if getattr(self, "_S2", None) is None:
-            self._S2 = sum(self.taper ** 2)
+            self._S2 = sum(self.taper**2)
         return self._S2
 
     @property
@@ -181,7 +181,7 @@ class ApodizationWindow(object):
     def nenbw(self):
         """NENBW Normalized Equivalent Noise BandWidth, see Equation (21) in
         Heinzel et al 2002"""
-        return self.num_samples_window * self.S2 / (self.S1 ** 2)
+        return self.num_samples_window * self.S2 / (self.S1**2)
 
     def enbw(self, fs):
         """
@@ -198,7 +198,7 @@ class ApodizationWindow(object):
         """
         """Effective Noise BandWidth = fs*NENBW/N = fs S2/(S1**2)"""
 
-        return fs * self.S2 / (self.S1 ** 2)
+        return fs * self.S2 / (self.S1**2)
 
     def test_linear_spectral_density_factor(self):
         """
@@ -244,44 +244,3 @@ class ApodizationWindow(object):
         if self._apodization_factor is None:
             self._apodization_factor = np.sqrt(self.nenbw) * self.coherent_gain
         return self._apodization_factor
-
-
-def test_can_inititalize_apodization_window():
-    """
-
-    Returns
-    -------
-
-    """
-    apodization_window = ApodizationWindow(num_samples_window=4)
-    print(apodization_window.summary)
-    apodization_window = ApodizationWindow(
-        taper_family="hamming", num_samples_window=128
-    )
-    print(apodization_window.summary)
-    apodization_window = ApodizationWindow(
-        taper_family="blackmanharris", num_samples_window=256
-    )
-    print(apodization_window.summary)
-    apodization_window = ApodizationWindow(
-        taper_family="kaiser", num_samples_window=128, taper_additional_args={"beta": 8}
-    )
-    print(apodization_window.summary)
-    apodization_window = ApodizationWindow(
-        taper_family="dpss", num_samples_window=64, taper_additional_args={"alpha": 3}
-    )
-    print(apodization_window.summary)
-    apodization_window = ApodizationWindow(
-        taper_family="custom", num_samples_window=64, taper=np.abs(np.random.randn(64))
-    )
-    print(apodization_window.summary)
-
-
-def main():
-    """ """
-    test_can_inititalize_apodization_window()
-    print("fin")
-
-
-if __name__ == "__main__":
-    main()

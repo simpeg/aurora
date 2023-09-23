@@ -15,6 +15,7 @@ tests/synthetic/aurora_results/*
 tests/synthetic/backup/*
 tests/synthetic/config/*
 tests/synthetic/data/*h5
+tests/synthetic/test2*csv
 tests/synthetic/out.png
 
 # Byte-compiled / optimized / DLL files

@@ -9,56 +9,6 @@ import numpy as np
 EMTF_CHANNEL_ORDER = ["hx", "hy", "hz", "ex", "ey"]
 
 
-def make_orientation_block_of_z_file(run_obj, channel_list=None):
-    """
-    Replicates emtz z-file metadata about orientation like this:
-    1     0.00     0.00 tes  Hx
-    2    90.00     0.00 tes  Hy
-    3     0.00     0.00 tes  Hz
-    4     0.00     0.00 tes  Ex
-    5    90.00     0.00 tes  Ey
-
-    based on this fortran snippet:
-            write(3, 115) k, orient(1, k), orient(2, k), stname(1: 3), chid(k)
-    format(i5, 1x, f8.2, 1x, f8.2, 1x, a3, 2x, a6) #Fortran Format
-
-    Parameters
-    ----------
-    run_obj: mth5.groups.master_station_run_channel.RunGroup
-        Container with metadata about the channels
-
-    Returns
-    -------
-    output_strings: list (of strings)
-        Each element of the list corresponds to one channel, and is a block of text for
-        the emtf z-file with the channel orientation, name and associated station
-    """
-    output_strings = []
-    ff_format = ff.FortranRecordWriter("(i5, 1x, f8.2, 1x, f8.2, 1x, " "a3, 1x, a3)")
-    if channel_list is None:
-        channel_ids = EMTF_CHANNEL_ORDER
-    else:
-        channel_ids = channel_list
-    for i_ch, channel_id in enumerate(channel_ids):
-        # try:
-        channel = run_obj.get_channel(channel_id)
-        azimuth = channel.metadata.measurement_azimuth
-        tilt = channel.metadata.measurement_tilt
-        station_id = run_obj.station_group.name
-        emtf_channel_id = channel_id.capitalize()
-        fortran_str = ff_format.write(
-            [i_ch + 1, azimuth, tilt, station_id, emtf_channel_id]
-        )
-        out_str = f"{fortran_str}\n"
-        output_strings.append(out_str)
-
-    if not output_strings:
-        print("No channels found in run_object")
-        raise Exception
-
-    return output_strings
-
-
 def get_default_orientation_block(n_ch=5):
     """
     Helper function used when working with matlab structs which do not have enough

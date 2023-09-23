@@ -318,7 +318,7 @@ class MEstimator(RegressionEstimator):
         """
         res_clean = self.Yc - self.Y_hat
         SSR_clean = np.conj(res_clean.conj().T @ res_clean)
-        inv_psi_prime2 = np.diag(1.0 / (self.expectation_psi_prime ** 2))
+        inv_psi_prime2 = np.diag(1.0 / (self.expectation_psi_prime**2))
         cov_nn = inv_psi_prime2 @ SSR_clean / self.degrees_of_freedom
 
         self.cov_nn = xr.DataArray(

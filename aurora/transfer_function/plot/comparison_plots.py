@@ -8,6 +8,8 @@ from aurora.transfer_function.plot.rho_phi_helpers import plot_rho
 def compare_two_z_files(
     z_path1,
     z_path2,
+    angle1=0.0,
+    angle2=0.0,
     label1="",
     label2="",
     scale_factor1=1.0,
@@ -25,21 +27,28 @@ def compare_two_z_files(
     ----------
     z_path1: str or pathlib.Path
     z_path2: str or pathlib.Path
+    angle1: float
+    angle2: float
     label1: str
     label2: str
     scale_factor1
     scale_factor2
+    out_file
+    show_plot
+    use_ylims
+    use_xlims
 
-    **kwargs
+    kwargs
     rho_ylims
     xlims
+
 
     Returns
     -------
 
     """
-    zfile1 = read_z_file(z_path1)
-    zfile2 = read_z_file(z_path2)
+    zfile1 = read_z_file(z_path1, angle=angle1)
+    zfile2 = read_z_file(z_path2, angle=angle2)
     print(f"scale_factor1: {scale_factor1}")
     fig, axs = plt.subplots(nrows=2, dpi=300, sharex=True)  # figsize=(8, 6.),
     markersize = kwargs.get("markersize", 3)

@@ -266,7 +266,7 @@ def plot_tf_obj(tf_obj, out_filename=None, show=True):
 
     plotter = RhoPlot(tf_obj)
     fig, axs = plt.subplots(nrows=2)
-    ttl_str = tf_obj.tf_header.local_station_id
+    ttl_str = tf_obj.tf_header.local_station.id
     plotter.rho_sub_plot(axs[0], ttl_str=ttl_str)
     plotter.phase_sub_plot(axs[1], ttl_str=ttl_str)
     if out_filename:
