@@ -68,7 +68,7 @@ from aurora.time_series.windowed_time_series import WindowedTimeSeries
 from aurora.time_series.window_helpers import available_number_of_windows_in_array
 from aurora.time_series.window_helpers import SLIDING_WINDOW_FUNCTIONS
 
-from mt_metadata.transfer_functions.processing.aurora.frequency_band import (
+from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
     get_fft_harmonics,
 )
 
