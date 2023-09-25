@@ -39,6 +39,7 @@ class TestAuroraProcessing(WidesScaleTest):
         self.use_skeleton = kwargs.get("use_skeleton", False)
         self.skeleton_file = f"skeleton_{str(STAGE_ID).zfill(2)}.csv"
         self.xml_source = kwargs.get("xml_source", "data")
+        self.force_reprocess = kwargs.get("force_reprocess", False)
 
 
     def read_skeleton_with_dtype(self):
@@ -149,6 +150,14 @@ class TestAuroraProcessing(WidesScaleTest):
         mth5_files = [data_file, rr_file]
         mth5_files = [x for x in mth5_files if x is not None]
 
+        xml_file_path = AURORA_TF_PATH.joinpath(row.aurora_xml_filebase)
+        if xml_file_path.exists():
+            if not self.force_reprocess:
+                print("WARNING: Skipping processing as xml results alread exist")
+                print("set force_reprocess True to avoid this")
+                return row
+
+
         try:
             mth5_run_summary = RunSummary()
             mth5_run_summary.from_mth5s(mth5_files)
@@ -175,6 +184,7 @@ class TestAuroraProcessing(WidesScaleTest):
                                   )
             xml_file_path = AURORA_TF_PATH.joinpath(row.aurora_xml_filebase)
             tf_cls.write(fn=xml_file_path, file_type="emtfxml")
+            # consider add xml_file_path.timestamp to columns??
         except Exception as e:
             row.exception = e.__class__.__name__
             row.error_message = e.args[0]
@@ -207,7 +217,8 @@ def main():
     t0 = time.time()
     tester = TestAuroraProcessing(stage_id=STAGE_ID,
                                   save_csv=True,
-                                  use_skeleton=True)
+                                  use_skeleton=True,
+                                  force_reprocess=True)
     #qq = tester.read_skeleton_with_dtype()
     # tester.startrow = 1306
     # tester.startrow = 1
