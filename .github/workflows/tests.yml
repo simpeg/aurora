@@ -41,6 +41,25 @@ jobs:
       run: |
         pip install -e .
         conda list
+        
+    - name: Install Jupyter and dependencies
+      run: |
+        pip install jupyter
+        # Install any other dependencies you need
+
+    - name: Execute Jupyter Notebooks
+      run: |
+        jupyter nbconvert --to notebook --execute tests/test_run_on_commit.ipynb
+        # Replace "notebook.ipynb" with your notebook's filename
+
+    - name: Commit changes (if any)
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git commit -a -m "Execute Jupyter notebook"
+        git push
+      if: ${{ success() }}
+
 
     - name: Run Tests
       run: |
