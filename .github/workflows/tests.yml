@@ -45,6 +45,8 @@ jobs:
     - name: Install Jupyter and dependencies
       run: |
         pip install jupyter
+        pip install ipykernel
+        python -m ipykernel install --user --name aurora-test
         # Install any other dependencies you need
 
     - name: Execute Jupyter Notebooks
