@@ -123,7 +123,7 @@ def load_xml_tf(file_path):
 
 
 
-def get_summary_table_schema_v2(stage_number):
+def get_summary_table_schema(stage_number):
     """
     A place where the columns of the various summary tables are defined.
     Stages 0 and 1 are related in the sense that the summary_table of stage 1 simply involves adding columns to the
@@ -288,12 +288,12 @@ def none_or_str(value):
         return None
     return value
 
-def test_summary_table_schema_v2():
-    get_summary_table_schema_v2(0)
-    get_summary_table_schema_v2(1)
-    get_summary_table_schema_v2(2)
-    get_summary_table_schema_v2(3)
+def test_summary_table_schema():
+    get_summary_table_schema(0)
+    get_summary_table_schema(1)
+    get_summary_table_schema(2)
+    get_summary_table_schema(3)
     print("OK")
 
 if __name__ == "__main__":
-    test_summary_table_schema_v2()
+    test_summary_table_schema()

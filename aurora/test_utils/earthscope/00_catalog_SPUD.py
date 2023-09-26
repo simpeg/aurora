@@ -13,7 +13,7 @@ import time
 
 from aurora.general_helper_functions import AURORA_PATH
 from aurora.test_utils.earthscope.helpers import SPUD_XML_PATHS
-from aurora.test_utils.earthscope.helpers import get_summary_table_schema_v2
+from aurora.test_utils.earthscope.helpers import get_summary_table_schema
 from aurora.test_utils.earthscope.helpers import get_via_curl
 from aurora.test_utils.earthscope.helpers import strip_xml_tags
 from aurora.test_utils.earthscope.widescale import WidesScaleTest
@@ -112,7 +112,7 @@ class TestScrapeSPUD(WidesScaleTest):
         -------
 
         """
-        schema = get_summary_table_schema_v2(self.stage_id)
+        schema = get_summary_table_schema(self.stage_id)
         df = pd.read_csv(
             input_spud_ids_file,
             names=[

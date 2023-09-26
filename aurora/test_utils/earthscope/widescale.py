@@ -3,7 +3,7 @@ import copy
 import time
 
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
-from aurora.test_utils.earthscope.helpers import get_summary_table_schema_v2
+from aurora.test_utils.earthscope.helpers import get_summary_table_schema
 
 
 def none_or_str(value):
@@ -42,7 +42,7 @@ class WidesScaleTest(object):
     @property
     def df_schema(self):
         if self._df_schema is None:
-            self._df_schema = get_summary_table_schema_v2(self.stage_id)
+            self._df_schema = get_summary_table_schema(self.stage_id)
         return self._df_schema
 
     @property
@@ -55,7 +55,7 @@ class WidesScaleTest(object):
 
     def get_dataframe_schema(self):
         print("TO BE DEPRECATED -- USE self.df_schema property instead")
-        df_schema = get_summary_table_schema_v2(self.stage_id)
+        df_schema = get_summary_table_schema(self.stage_id)
         return df_schema
 
     @property
@@ -82,7 +82,7 @@ class WidesScaleTest(object):
         else:
             import dask.dataframe as dd
             ddf = dd.from_pandas(df, npartitions=self.n_partitions)
-            schema = get_summary_table_schema_v2(self.stage_id)
+            schema = get_summary_table_schema(self.stage_id)
             meta = {x.name: x.dtype for x in schema}
             enriched_df = ddf.apply(self.enrich_row, axis=1, meta=meta).compute()
 

@@ -30,7 +30,7 @@ from aurora.test_utils.earthscope.helpers import AURORA_TF_PATH
 from aurora.test_utils.earthscope.helpers import load_xml_tf
 from aurora.test_utils.earthscope.helpers import load_most_recent_summary
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
-from aurora.test_utils.earthscope.helpers import get_summary_table_schema_v2
+from aurora.test_utils.earthscope.helpers import get_summary_table_schema
 from aurora.test_utils.earthscope.helpers import restrict_to_mda
 from aurora.test_utils.earthscope.helpers import SPUD_XML_PATHS
 from aurora.test_utils.earthscope.widescale import WidesScaleTest
@@ -87,7 +87,7 @@ class TestCompareTFs(WidesScaleTest):
 
     def prepare_jobs_dataframe(self):
 
-        stage_04_schema = get_summary_table_schema_v2(4)
+        stage_04_schema = get_summary_table_schema(4)
         dtypes = {x.name: x.dtype for x in stage_04_schema}
         stage_04_df = load_most_recent_summary(4, dtypes=dtypes)
         if "data_xml_path" in stage_04_df.columns:

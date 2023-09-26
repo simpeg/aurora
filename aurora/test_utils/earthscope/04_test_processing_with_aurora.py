@@ -12,7 +12,7 @@ from aurora.test_utils.earthscope.helpers import AURORA_TF_PATH
 from aurora.test_utils.earthscope.helpers import AURORA_Z_PATH
 from aurora.test_utils.earthscope.helpers import load_most_recent_summary
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
-from aurora.test_utils.earthscope.helpers import get_summary_table_schema_v2
+from aurora.test_utils.earthscope.helpers import get_summary_table_schema
 from aurora.test_utils.earthscope.helpers import restrict_to_mda
 
 from aurora.config.config_creator import ConfigCreator
@@ -57,7 +57,7 @@ class TestAuroraProcessing(WidesScaleTest):
 
 
 
-        spud_schema = get_summary_table_schema_v2(1)
+        spud_schema = get_summary_table_schema(1)
         dtypes = {x.name:x.dtype for x in spud_schema}
         spud_df = load_most_recent_summary(1, dtypes=dtypes)
         spud_df = restrict_to_mda(spud_df, RR="Robust Remote Reference")
