@@ -512,7 +512,7 @@ class TransferFunctionKernel(object):
                     period_key = f"{band.center_period:{PERIOD_FORMAT}}"
                     period_value = {}
                     period_value["level"] = i_dec + 1  # +1 to match EMTF standard
-                    period_value["bands"] = tuple(band.harmonic_indices()[np.r_[0, -1]])
+                    period_value["bands"] = tuple(band.harmonic_indices[np.r_[0, -1]])
                     period_value["sample_rate"] = dec_level_cfg.sample_rate_decimation
                     try:
                         period_value["npts"] = tf_collection.tf_dict[
