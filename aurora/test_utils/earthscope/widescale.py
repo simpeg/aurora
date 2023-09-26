@@ -3,7 +3,6 @@ import copy
 import time
 
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
-from aurora.test_utils.earthscope.helpers import get_summary_table_schema
 from aurora.test_utils.earthscope.helpers import get_summary_table_schema_v2
 
 
@@ -56,7 +55,6 @@ class WidesScaleTest(object):
 
     def get_dataframe_schema(self):
         print("TO BE DEPRECATED -- USE self.df_schema property instead")
-        #df_schema = get_summary_table_schema(self.stage_id)
         df_schema = get_summary_table_schema_v2(self.stage_id)
         return df_schema
 

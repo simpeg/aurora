@@ -19,7 +19,6 @@ from aurora.test_utils.earthscope.data_availability import row_to_request_df
 from aurora.test_utils.earthscope.filter_repair import repair_missing_filters
 from aurora.test_utils.earthscope.helpers import DATA_PATH
 from aurora.test_utils.earthscope.helpers import get_most_recent_summary_filepath
-#from aurora.test_utils.earthscope.helpers import get_summary_table_schema
 from aurora.test_utils.earthscope.helpers import USE_CHANNEL_WILDCARDS
 from aurora.test_utils.earthscope.widescale import WidesScaleTest
 from mth5.mth5 import MTH5

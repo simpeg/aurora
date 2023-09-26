@@ -125,6 +125,10 @@ def load_xml_tf(file_path):
 
 def get_summary_table_schema_v2(stage_number):
     """
+    A place where the columns of the various summary tables are defined.
+    Stages 0 and 1 are related in the sense that the summary_table of stage 1 simply involves adding columns to the
+    summmary from stage 0.  The same relationship exists between stages 2 and 3.
+
     Update the summary_table_schema to use mt_metadata style standards and csv schema defns
 
     Rather than providing dicts with key:dtype its better to have:
@@ -151,78 +155,7 @@ def get_summary_table_schema_v2(stage_number):
         raise NotImplementedError
 
 
-def get_summary_table_schema(stage_number):
-    """
-    A place where the columns of the various summary tables are defined.
-    Stages 0 and 1 are related in the sense that the summary_table of stage 1 simply involves adding columns to the
-    summmary from stage 0.  The same relationship exists between stages 2 and 3.
 
-    If we were going to properly formalize this flow, it would be good to make a json of the schema, where each column
-    was associated with a dtype, a description, and a default_value.  In that way, the same script could run to prepare
-    a table at any stage, taking only the schema as input.
-
-    """
-    print("TO BE DEPRECATED and replaced by CSV SCHEMA")
-    # Stages 0 and 1
-    schemata = {}
-    schemata[0] = {'emtf_id': "int64", 'data_id': 'int64', 'fail': 'bool',
-                'emtf_file_size': 'int64', 'emtf_xml_filebase': 'string',
-                'data_file_size': 'int64', 'data_xml_filebase': 'string'}
-
-    new_01 = {'emtf_error': 'bool',
-              'emtf_exception': 'string',
-              'emtf_error_message': 'string',
-              'emtf_remote_ref_type': 'string',
-              'emtf_remotes': 'string',
-              'data_error': 'bool',
-              'data_exception': 'string',
-              'data_error_message': 'string',
-              'data_remote_ref_type': 'string',
-              'data_remotes': 'string',
-              }
-    schemata[1] = {**schemata[0], **new_01 }
-
-    # Stages 2 and 3
-    # Note emtf_id, data_id, data_xml_filebase are duplicated from schema 0
-    schemata[2] = {"network_id":"string",
-                   "station_id":"string",
-                   "filename":"string",
-                   "filesize":"int64",
-                   "num_channels_inventory": 'int64',
-                   "num_channels_h5":'int64',
-                   "num_filterless_channels":"int64",
-                   "num_filter_details": "string",
-                   "filter_units_in_details": "string",
-                   "filter_units_out_details": "string",
-                   "exception":'string',
-                   "error_message":'string',
-                   'emtf_id': "int64", 'data_id': 'int64','data_xml_filebase': 'string'
-                   }
-
-    schemata[3] = copy.deepcopy(schemata[2])
-    # rename filename,filesise to metadata_filename, metadata_filesize
-    schemata[3]["metadata_filename"] = schemata[3].pop("filename")
-    schemata[3]["metadata_filesize"] = schemata[3].pop("filesize")
-    schemata[3]["data_mth5_size"] = "int64"
-    schemata[3]["data_mth5_name"] = "string"
-    schemata[3]["data_mth5_exception"] = "string"
-    schemata[3]["data_mth5_error_message"] = "string"
-
-    schemata[4] = {}
-    schemata[4]["data_id"] = 'int64'
-    schemata[4]["network_id"] = "string"
-    schemata[4]["station_id"] = "string"
-    schemata[4]["remote_id"] = "string"
-    schemata[4]["filename"] = "string"
-    schemata[4]["exception"] = "string"
-    schemata[4]["error_message"] = "string"
-    schemata[4]["data_xml_filebase"] = "string"
-
-    try:
-        return schemata[stage_number]
-    except KeyError:
-        print(f"Schema for stage number {stage_number} is not defined")
-        return None
 
 def timestamp_now():
     """
@@ -355,12 +288,12 @@ def none_or_str(value):
         return None
     return value
 
-def test_summary_table_schema():
-    get_summary_table_schema(0)
-    get_summary_table_schema(1)
-    get_summary_table_schema(2)
-    get_summary_table_schema(3)
+def test_summary_table_schema_v2():
+    get_summary_table_schema_v2(0)
+    get_summary_table_schema_v2(1)
+    get_summary_table_schema_v2(2)
+    get_summary_table_schema_v2(3)
     print("OK")
 
 if __name__ == "__main__":
-    test_summary_table_schema()
+    test_summary_table_schema_v2()
