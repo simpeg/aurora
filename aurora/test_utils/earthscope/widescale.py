@@ -31,12 +31,15 @@ class WidesScaleTest(object):
 
     def prepare_jobs_dataframe(self):
         """ Makes the dataframe that will be populated/iterated over """
-        print("prepare_jobs_dataframe is not defined for Abstract Base Class")
+        print("ERROR: prepare_jobs_dataframe is not defined for Abstract Base Class")
         raise NotImplementedError
 
     def enrich_row(self, row):
-        """ Will eventually get used by dask, but as a step we need to make this a method that works with df.apply()"""
-        print("Enrich Row is not defined for Abstract Base Class")
+        """
+        Operation perfomed by df.apply()
+        Will eventually get used by dask
+        """
+        print("ERROR: Enrich Row is not defined for Abstract Base Class")
         raise NotImplementedError
 
     @property
@@ -52,11 +55,6 @@ class WidesScaleTest(object):
     @property
     def df_column_names(self):
         return [x.name for x in self.df_schema]
-
-    def get_dataframe_schema(self):
-        print("TO BE DEPRECATED -- USE self.df_schema property instead")
-        df_schema = get_summary_table_schema(self.stage_id)
-        return df_schema
 
     @property
     def summary_table_filename(self):

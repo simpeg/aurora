@@ -1,6 +1,5 @@
 """
-This script iterates over all of the scraped XML from SPUD and registers information about success or failure of
-ingest into a mt_metadata TF object.
+This script iterates over all of the scraped XML from SPUD and tries to use mt_metadata TF to read them.
 
 There are two possible places to access an xml in each row, called emtf_xml_path and data_xml_path.
 
@@ -94,23 +93,19 @@ def define_dataframe_schema(xml_sources=DEFAULT_XML_SOURCES):
 class TestLoadSPUDTFs(WidesScaleTest):
 
     def __init__(self, **kwargs):
-        """
-
-        """
-        #super(WidesScaleTest, self).__init__(**kwargs)
         super().__init__(**kwargs)
         self.xml_sources = kwargs.get("xml_sources", DEFAULT_XML_SOURCES)
 
 
     def prepare_jobs_dataframe(self):
         """
-        Define the data structure that is output from this stage of processing
-        It is basically the df from the prvious stage (0) with some new rows added.
+        Define the table that is output from this stage of processing
+        It is basically the df from the prvious stage (0) with some new columns added.
         """
         spud_xml_csv = get_summary_table_filename(0)
         df = pd.read_csv(spud_xml_csv)
 
-        schema = self.get_dataframe_schema()
+        schema = self.df_schema
         for col in schema:
             default = col.default
             if col.dtype == "int64":
@@ -125,12 +120,7 @@ class TestLoadSPUDTFs(WidesScaleTest):
         return df
 
     def enrich_row(self, row):
-        """
-        This will eventually get used by dask, but as a step we need to make this a method
-        that works with df.apply()
-        Returns:
-
-        """
+        """Operation perfomed by df.apply()"""
         print(f"Processing row {row.name}")
         for xml_source in self.xml_sources:
             xml_path = SPUD_XML_PATHS[xml_source].joinpath(row[f"{xml_source}_xml_filebase"])

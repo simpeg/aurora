@@ -74,10 +74,10 @@ class TestDatalessMTH5(WidesScaleTest):
         """
         Define the data structure that is output from this stage of processing
         """
-        schema = self.get_dataframe_schema()
+        schema = self.df_schema
         def initialize_metadata_df():
             """ """
-            schema = self.get_dataframe_schema()
+            schema = self.df_schema
             column_names = [x.name for x in schema]
             df = pd.DataFrame(columns=column_names)
             return df

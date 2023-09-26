@@ -55,7 +55,7 @@ class TestBuildMTH5(WidesScaleTest):
         return self._data_availability
 
     def prepare_jobs_dataframe(self):
-        schema = self.get_dataframe_schema()
+        schema = self.df_schema
         source_csv = get_most_recent_summary_filepath(2)
         source_df = pd.read_csv(source_csv)
         df = source_df.copy(deep=True)
