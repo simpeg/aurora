@@ -52,6 +52,7 @@ jobs:
     - name: Execute Jupyter Notebooks
       run: |
         jupyter nbconvert --to notebook --execute tests/test_run_on_commit.ipynb
+        jupyter nbconvert --to notebook --execute tutorials/pole_zero_fitting/lemi_pole_zero_fitting_example.ipynb
         # Replace "notebook.ipynb" with your notebook's filename
 
     - name: Commit changes (if any)
