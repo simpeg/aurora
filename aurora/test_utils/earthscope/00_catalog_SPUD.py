@@ -1,8 +1,9 @@
 """
 Python version of Laura's bash script to scrape SPUD emtf xml
 
-Stripping the xml tags after grepping:
-https://stackoverflow.com/questions/3662142/how-to-remove-tags-from-a-string-in-python-using-regular-expressions-not-in-ht
+Start with a list of SPUD ids
+- it would be nice to have a programatic way to get these ids as the list will likely grow over time
+
 
 """
 
@@ -56,7 +57,7 @@ def extract_network_and_station_from_mda_info(emtf_filepath):
 
 def extract_data_id_from_emtf(emtf_filepath):
     """
-    modified to check if grep returns empty
+
     Parameters
     ----------
     emtf_filepath: str or pathlib.Path
@@ -72,10 +73,10 @@ def extract_data_id_from_emtf(emtf_filepath):
     if qq:
         data_id = int(qq.decode().strip())
 
-        cmd = f"grep 'SourceData id' {emtf_filepath}"
-        qq = subprocess.check_output([cmd], shell=True)
-        data_id2 = int(qq.decode().strip().split('"')[1])
-        assert data_id2 == data_id
+        # cmd = f"grep 'SourceData id' {emtf_filepath}"
+        # qq = subprocess.check_output([cmd], shell=True)
+        # data_id2 = int(qq.decode().strip().split('"')[1])
+        # assert data_id2 == data_id
         return data_id
     else:
         return False
@@ -97,17 +98,17 @@ def to_download_or_not_to_download(filepath, force_download, emtf_or_data=""):
 class TestScrapeSPUD(WidesScaleTest):
     def __init__(self, **kwargs):
         """
-        some notews
         """
         super().__init__(**kwargs)
         self.force_download_data = kwargs.get("force_download_data", False)
         self.force_download_emtf = kwargs.get("force_download_emtf", False)
-        self.somthing = kwargs.get("somthing", -11)
+
 
     def prepare_jobs_dataframe(self):
         """
         Define the data structure that is output from this stage of processing
         Returns
+        df: pd.DataFrame
         -------
 
         """

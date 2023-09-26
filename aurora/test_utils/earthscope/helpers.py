@@ -64,6 +64,9 @@ SPUD_XML_PATHS["emtf"].mkdir(parents=True, exist_ok=True)
 
 def strip_xml_tags(some_string):
     """
+    Stripping the xml tags after grepping:
+    https://stackoverflow.com/questions/3662142/how-to-remove-tags-from-a-string-in-python-using-regular-expressions-not-in-ht
+
     Allows simplification of less intuitive (albeit faster) commands such as:
     cmd = f"grep 'SourceData id' {emtf_filepath} | awk -F'"'"'"' '{print $2}'"
     qq = subprocess.check_output([cmd], shell=True)
