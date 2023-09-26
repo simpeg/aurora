@@ -55,13 +55,13 @@ jobs:
         jupyter nbconvert --to notebook --execute tutorials/pole_zero_fitting/lemi_pole_zero_fitting_example.ipynb
         # Replace "notebook.ipynb" with your notebook's filename
 
-    - name: Commit changes (if any)
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git commit -a -m "Execute Jupyter notebook"
-        git push
-      if: ${{ success() }}
+#    - name: Commit changes (if any)
+#      run: |
+#        git config --local user.email "action@github.com"
+#        git config --local user.name "GitHub Action"
+#        git commit -a -m "Execute Jupyter notebook"
+#        git push
+#      if: ${{ success() }}
 
 
     - name: Run Tests
