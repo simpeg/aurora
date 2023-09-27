@@ -4,10 +4,8 @@ import pandas as pd
 import scipy.signal as ssig
 import xarray as xr
 
-from aurora.time_series.frequency_domain_helpers import get_fft_harmonics
 from aurora.time_series.windowed_time_series import WindowedTimeSeries
 from aurora.time_series.windowing_scheme import window_scheme_from_decimation
-
 
 def validate_sample_rate(run_ts, expected_sample_rate, tol=1e-4):
     """
@@ -87,11 +85,7 @@ def apply_recoloring(decimation_obj, stft_obj):
         return stft_obj
 
     if decimation_obj.prewhitening_type == "first difference":
-        # replace below with decimation_obj.get_fft_harmonics() ?
-        freqs = get_fft_harmonics(
-            decimation_obj.window.num_samples,
-            decimation_obj.sample_rate_decimation,
-        )
+        freqs = decimation_obj.fft_frequecies
         prewhitening_correction = 1.0j * 2 * np.pi * freqs  # jw
 
         stft_obj /= prewhitening_correction
