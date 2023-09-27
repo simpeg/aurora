@@ -16,37 +16,36 @@ import xarray as xr
 
 
 def can_use_xr_dataarray(func):
-    """Intended as a decorator.  Most of the windowed time series methods are
-    intended to work with xarray.Dataset class.  But I would like to be able
-    to pass them xarray.DataArray objects.  This class casts a DataArray to a
-    Dataset, runs it through func and casts back to a DataArray.
-
-    A simuilar decorator should be written for numpy arrays.
-
-    :param func: _description_
-    :type func: _type_
-    :return: _description_
-    :rtype: _type_
-    """    
-    # """
-    # Intended as a decorator.  Most of the windowed time series methods are
+    # """Intended as a decorator.  Most of the windowed time series methods are
     # intended to work with xarray.Dataset class.  But I would like to be able
     # to pass them xarray.DataArray objects.  This class casts a DataArray to a
     # Dataset, runs it through func and casts back to a DataArray.
 
     # A simuilar decorator should be written for numpy arrays.
-    # Parameters
-    # ----------
-    # func
 
-    # Returns
-    # -------
+    # :param func: _description_
+    # :type func: _type_
+    # :return: _description_
+    # :rtype: _type_
+    # """    
+    """
+    Intended as a decorator.  Most of the windowed time series methods are
+    intended to work with xarray.Dataset class.  But I would like to be able
+    to pass them xarray.DataArray objects.  This class casts a DataArray to a
+    Dataset, runs it through func and casts back to a DataArray.
 
-    # """
+    A simuilar decorator should be written for numpy arrays.
+    Parameters
+    ----------
+    func
+
+    Returns
+    -------
+
+    """
 
     @functools.wraps(func)
     def wrapper_decorator(*args, **kwargs):
-
         if isinstance(kwargs["data"], xr.DataArray):
             kwargs["data"] = kwargs["data"].to_dataset("channel")
             input_was_dataarray = True

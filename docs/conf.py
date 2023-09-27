@@ -46,6 +46,7 @@ extensions = [
     "numpydoc",
     "nbsphinx",
     "sphinx_gallery.gen_gallery",
+    'sphinx.ext.napoleon',
 ]
 
 # Test out whether this allows tests to pass
