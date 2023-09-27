@@ -51,6 +51,7 @@ jobs:
 
     - name: Execute Jupyter Notebooks
       run: |
+        jupyter nbconvert --to notebook --execute docs/examples/make_cas04_single_station_h5.ipynb
         jupyter nbconvert --to notebook --execute docs/examples/dataset_definition.ipynb
         jupyter nbconvert --to notebook --execute tests/test_run_on_commit.ipynb
         jupyter nbconvert --to notebook --execute tutorials/pole_zero_fitting/lemi_pole_zero_fitting_example.ipynb
