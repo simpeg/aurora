@@ -67,7 +67,7 @@ def apply_recoloring(decimation_obj, stft_obj):
     """
     Parameters
     ----------
-    decimation_obj : mt_metadata.transfer_functions.processing.aurora.DecimationLevel
+    decimation_obj : mt_metadata.transfer_functions.processing.fourier_coefficients.decimation.Decimation
         Information about how the decimation level is to be processed
     stft_obj : xarray.core.dataset.Dataset
         Time series of Fourier coefficients to be recoloured
@@ -85,7 +85,7 @@ def apply_recoloring(decimation_obj, stft_obj):
         return stft_obj
 
     if decimation_obj.prewhitening_type == "first difference":
-        freqs = decimation_obj.fft_frequecies
+        freqs = decimation_obj.fft_frequencies
         prewhitening_correction = 1.0j * 2 * np.pi * freqs  # jw
 
         stft_obj /= prewhitening_correction
