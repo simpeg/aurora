@@ -73,6 +73,13 @@ class TransferFunction(Base):
 
     @property
     def emtf_tf_header(self):
+        """_summary_
+
+        Returns
+        -------
+        _type_
+            _description_
+        """        
         if self.processing_config is None:
             print("No header is available without a processing config")
             self._emtf_tf_header = None
@@ -84,24 +91,46 @@ class TransferFunction(Base):
 
     @property
     def tf_header(self):
+        """_summary_
+
+        Returns
+        -------
+        _type_
+            _description_
+        """        
         return self.emtf_tf_header
 
     @property
     def tf(self):
+        """_summary_
+
+        Returns
+        -------
+        _type_
+            _description_
+        """        
         return self.transfer_function
 
     @property
     def num_bands(self):
-        """
-        Returns num_bands : int
-            a count of the frequency bands associated with the TF
-        -------
+        """_summary_
 
+        Returns
+        -------
+        num_bands: int
+            a count of the frequency bands associated with the TF
         """
         return self.frequency_bands.number_of_bands
 
     @property
     def periods(self):
+        """_summary_
+
+        Returns
+        -------
+        _type_
+            _description_
+        """        
         periods = self.frequency_bands.band_centers(frequency_or_period="period")
         periods = np.flipud(periods)
         return periods
@@ -199,18 +228,46 @@ class TransferFunction(Base):
 
     @property
     def minimum_period(self):
+        """_summary_
+
+        Returns
+        -------
+        _type_
+            _description_
+        """        
         return np.min(self.periods)
 
     @property
     def maximum_period(self):
+        """_summary_
+
+        Returns
+        -------
+        _type_
+            _description_
+        """        
         return np.max(self.periods)
 
     @property
     def num_channels_in(self):
+        """_summary_
+
+        Returns
+        -------
+        _type_
+            _description_
+        """        
         return len(self.tf_header.input_channels)
 
     @property
     def num_channels_out(self):
+        """_summary_
+
+        Returns
+        -------
+        _type_
+            _description_
+        """        
         return len(self.tf_header.output_channels)
 
     def frequency_index(self, frequency):
@@ -220,6 +277,7 @@ class TransferFunction(Base):
         # return frequency_index
 
     def period_index(self, period):
+        
         period_index = np.isclose(self.num_segments.period, period)
         period_index = np.where(period_index)[0][0]
         return period_index
