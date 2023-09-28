@@ -45,11 +45,9 @@ def make_time_axis(t0, n_samples, sample_rate):
 
 
 def test_generate_time_axis(t0, n_samples, sample_rate):
-    
-    """
-    Two obvious ways to generate an axis of timestanps here. One method is slow and
-    more precise, the other is fast but drops some nanoseconds due to integer
-    roundoff error.
+    """Two obvious ways to generate an axis of timestanps here. One method is slow and
+        more precise, the other is fast but drops some nanoseconds due to integer
+        roundoff error.
 
     To see this, consider the example of say 3Hz, we are 333333333ns between samples,
         which drops 1ns per second if we scale a nanoseconds=np.arange(N)
@@ -57,19 +55,19 @@ def test_generate_time_axis(t0, n_samples, sample_rate):
 
 
     Probably will use logic like:
-    if there_are_integer_ns_per_sample:
-        time_stamps = do_it_the_fast_way()
+    if there\_are\_integer\_ns\_per\_sample:
+        time_stamps = do\_it\_the\_fast\_way()
     else:
-        time_stamps = do_it_the_slow_way()
+        time_stamps = do\_it\_the\_slow\_way()
     return time_stamps
 
     Parameters
     ----------
-    t0: _type_
+    t0 : _type_
         _description_
-    n_samples: _type_
+    n_samples : _type_
         _description_
-    sample_rate: _type_ 
+    sample_rate : _type_ 
         _description_
     Returns
     -------
