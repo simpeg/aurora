@@ -18,9 +18,6 @@ class TransferFunction(Base):
         array of transfer functions: TF(Nout, Nin, Nperiods)
     T : numpy array
         list of periods
-    Header : transfer_function_header.TransferFunctionHeader object.
-        TF header contains local site header, remote site header if
-        appropriate, and information about estimation approach???
     cov_ss_inv : numpy array
         inverse signal power matrix.  aka Cov_SS in EMTF matlab codes
     cov_nn : numpy array
@@ -51,6 +48,8 @@ class TransferFunction(Base):
 
         Parameters
         ----------
+        _emtf_header : legacy header information used by Egbert's matlab class.  Header contains
+        local site header, remote site header if appropriate, and information about estimation approach
         decimation_level_id: int
             Identifies the relevant decimation level.  Used for accessing the
             appropriate info in self.processing config.
@@ -105,7 +104,6 @@ class TransferFunction(Base):
         periods = self.frequency_bands.band_centers(frequency_or_period="period")
         periods = np.flipud(periods)
         return periods
-        # return self.frequency_bands.band_centers(frequency_or_period="period")
 
     def _initialize_arrays(self):
         """
@@ -140,7 +138,6 @@ class TransferFunction(Base):
             tf_array,
             dims=["output_channel", "input_channel", "period"],  # frequency"],
             coords={
-                # "frequency": self.frequency_bands.band_centers(),
                 "period": self.periods,
                 "output_channel": self.tf_header.output_channels,
                 "input_channel": self.tf_header.input_channels,

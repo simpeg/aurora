@@ -3,7 +3,9 @@
 
 """
 import scipy.signal as ssig
-from aurora.time_series.frequency_domain_helpers import get_fft_harmonics
+from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
+    get_fft_harmonics,
+)
 
 
 def butter_bandpass(low_cut, high_cut, sample_rate, order=5):

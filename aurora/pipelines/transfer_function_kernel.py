@@ -503,22 +503,16 @@ class TransferFunctionKernel(object):
             -------
 
             """
-            from mt_metadata.transfer_functions.processing.aurora.frequency_band import (
-                FrequencyBand,
-            )
             from mt_metadata.transfer_functions.io.zfiles.zmm import PERIOD_FORMAT
 
             decimation_dict = {}
 
             for i_dec, dec_level_cfg in enumerate(processing_config.decimations):
                 for i_band, band in enumerate(dec_level_cfg.bands):
-                    fb = FrequencyBand(
-                        left=band.frequency_min, right=band.frequency_max
-                    )
-                    period_key = f"{fb.center_period:{PERIOD_FORMAT}}"
+                    period_key = f"{band.center_period:{PERIOD_FORMAT}}"
                     period_value = {}
                     period_value["level"] = i_dec + 1  # +1 to match EMTF standard
-                    period_value["bands"] = tuple(band.harmonic_indices()[np.r_[0, -1]])
+                    period_value["bands"] = tuple(band.harmonic_indices[np.r_[0, -1]])
                     period_value["sample_rate"] = dec_level_cfg.sample_rate_decimation
                     try:
                         period_value["npts"] = tf_collection.tf_dict[
