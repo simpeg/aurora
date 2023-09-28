@@ -11,9 +11,6 @@ for local_station and one for reference station.
 import numpy as np
 import xarray as xr
 
-from pathlib import Path
-
-from aurora.time_series.frequency_domain_helpers import get_fft_harmonics
 from aurora.transfer_function.plot.rho_phi_helpers import plot_phi
 from aurora.transfer_function.plot.rho_phi_helpers import plot_rho
 

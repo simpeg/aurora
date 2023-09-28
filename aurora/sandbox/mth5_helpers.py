@@ -121,10 +121,14 @@ def build_request_df(network_id, station_id, channels=None,
         else:
             if start is None:
                 ch_start = '1970-01-01 00:00:00'
+            else:
+                ch_start = start
             if end is None:
                 ch_end = datetime.datetime.now()
                 ch_end = ch_end.replace(hour=0, minute=0, second=0, microsecond=0)
                 ch_end = str(ch_end)
+            else:
+                ch_end = end
         return ch_start, ch_end
 
     fdsn_object = FDSN(mth5_version=mth5_version)
