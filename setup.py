@@ -11,8 +11,6 @@ with open("README.rst") as readme_file:
 #    history = history_file.read()
 
 requirements = [
-    "dask",
-    "deprecated",
     "matplotlib",
     "mth5",
     "mt_metadata",
@@ -23,7 +21,6 @@ requirements = [
     "pandas<1.5",
     "scipy",
     "xarray",
-    "fortranformat",
 ]
 
 setup_requirements = [

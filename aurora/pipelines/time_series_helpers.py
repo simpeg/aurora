@@ -1,4 +1,3 @@
-from deprecated import deprecated
 import numpy as np
 import pandas as pd
 import scipy.signal as ssig
