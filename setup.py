@@ -12,7 +12,6 @@ with open("README.rst") as readme_file:
 
 requirements = [
     "dask",
-    "deprecated",
     "matplotlib",
     "mth5",
     "mt_metadata",
@@ -23,7 +22,6 @@ requirements = [
     "pandas<1.5",
     "scipy",
     "xarray",
-    "fortranformat",
 ]
 
 setup_requirements = [

@@ -3,7 +3,6 @@ These methods can possibly be moved under mt_metadata, or mth5
 
 They extract info needed to setup emtf_z files.
 """
-import fortranformat as ff
 import numpy as np
 
 EMTF_CHANNEL_ORDER = ["hx", "hy", "hz", "ex", "ey"]
