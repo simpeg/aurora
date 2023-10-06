@@ -18,9 +18,6 @@ class TransferFunction(Base):
         array of transfer functions: TF(Nout, Nin, Nperiods)
     T : numpy array
         list of periods
-    Header : transfer_function_header.TransferFunctionHeader object.
-        TF header contains local site header, remote site header if
-        appropriate, and information about estimation approach???
     cov_ss_inv : numpy array
         inverse signal power matrix.  aka Cov_SS in EMTF matlab codes
     cov_nn : numpy array
@@ -51,6 +48,8 @@ class TransferFunction(Base):
 
         Parameters
         ----------
+        _emtf_header : legacy header information used by Egbert's matlab class.  Header contains
+        local site header, remote site header if appropriate, and information about estimation approach
         decimation_level_id: int
             Identifies the relevant decimation level.  Used for accessing the
             appropriate info in self.processing config.
@@ -72,7 +71,7 @@ class TransferFunction(Base):
                 self._initialize_arrays()
 
     @property
-    def emtf_tf_header(self):      
+    def emtf_tf_header(self):
         if self.processing_config is None:
             print("No header is available without a processing config")
             self._emtf_tf_header = None
@@ -83,11 +82,11 @@ class TransferFunction(Base):
         return self._emtf_tf_header
 
     @property
-    def tf_header(self):    
+    def tf_header(self):
         return self.emtf_tf_header
 
     @property
-    def tf(self):     
+    def tf(self):
         return self.transfer_function
 
     @property
@@ -102,11 +101,10 @@ class TransferFunction(Base):
         return self.frequency_bands.number_of_bands
 
     @property
-    def periods(self):   
+    def periods(self):
         periods = self.frequency_bands.band_centers(frequency_or_period="period")
         periods = np.flipud(periods)
         return periods
-        # return self.frequency_bands.band_centers(frequency_or_period="period")
 
     def _initialize_arrays(self):
         """
@@ -141,7 +139,6 @@ class TransferFunction(Base):
             tf_array,
             dims=["output_channel", "input_channel", "period"],  # frequency"],
             coords={
-                # "frequency": self.frequency_bands.band_centers(),
                 "period": self.periods,
                 "output_channel": self.tf_header.output_channels,
                 "input_channel": self.tf_header.input_channels,
@@ -199,19 +196,19 @@ class TransferFunction(Base):
         self.initialized = True
 
     @property
-    def minimum_period(self):     
+    def minimum_period(self):
         return np.min(self.periods)
 
     @property
-    def maximum_period(self):      
+    def maximum_period(self):
         return np.max(self.periods)
 
     @property
-    def num_channels_in(self):    
+    def num_channels_in(self):
         return len(self.tf_header.input_channels)
 
     @property
-    def num_channels_out(self):      
+    def num_channels_out(self):
         return len(self.tf_header.output_channels)
 
     def frequency_index(self, frequency):
@@ -221,7 +218,6 @@ class TransferFunction(Base):
         # return frequency_index
 
     def period_index(self, period):
-        
         period_index = np.isclose(self.num_segments.period, period)
         period_index = np.where(period_index)[0][0]
         return period_index

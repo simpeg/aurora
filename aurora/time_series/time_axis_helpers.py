@@ -45,13 +45,13 @@ def make_time_axis(t0, n_samples, sample_rate):
 
 
 def test_generate_time_axis(t0, n_samples, sample_rate):
-    """Two obvious ways to generate an axis of timestanps here. One method is slow and
-       more precise, the other is fast but drops some nanoseconds due to integer
-       roundoff error.
+    """Two obvious ways to generate an axis of timestamps here. One method is slow and
+    more precise, the other is fast but drops some nanoseconds due to integer
+    roundoff error.
 
     To see this, consider the example of say 3Hz, we are 333333333ns between samples,
     which drops 1ns per second if we scale a nanoseconds=np.arange(N)
-    The issue here is that the nanoseconds granularity forces a roundoff error,
+    The issue here is that the nanoseconds granularity forces a roundoff error
 
 
     Probably will use logic like:
@@ -75,20 +75,20 @@ def test_generate_time_axis(t0, n_samples, sample_rate):
     """
     t0 = np.datetime64(t0)
 
-    # <SLOW>
+    # SLOW
     tt = time.time()
     time_index_1 = slow_comprehension(t0, n_samples, sample_rate)
     processing_time_1 = tt - time.time()
     print(f"processing_time_1 = {processing_time_1}")
-    # </SLOW>
+    
 
-    # <FAST>
+    # FAST
     tt = time.time()
     time_index_2 = fast_arange(t0, n_samples, sample_rate)
     processing_time_2 = tt - time.time()
     print(f"processing_time_2 {processing_time_2}")
     print(f"ratio of processing times {processing_time_1/processing_time_2}")
-    # </FAST>
+    
     if (np.abs(time_index_2 - time_index_1)).sum() == 0:
         pass
     else:

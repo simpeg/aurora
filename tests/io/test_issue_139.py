@@ -57,33 +57,25 @@ class TestZFileReadWrite(unittest.TestCase):
     def tf_z_obj(self):
         return self._tf_z_obj
 
+
     def test_tf_obj_from_zrr(self):
         tf_z = self._tf_z_obj
         tf = self.tf_obj
         # check numeric values
         assert (
-            np.isclose(
-                tf_z.transfer_function.data, tf.transfer_function.data, 1e-4
-            )
+            np.isclose(tf_z.transfer_function.data, tf.transfer_function.data, 1e-4)
         ).all()
-        # check metadata
-        print("add metadata checks for station name, azimuths and tilts")
         return tf
 
     def test_tf_read_and_write(self):
+        """Checks that an ingested z-file is written back out the same """
+        import filecmp
         tf_z = self._tf_z_obj
         out_file_name = str(self.zrr_file_base).replace(".zrr", "_rewrite.zrr")
         out_file_path = pathlib.Path(out_file_name)
         tf_z.write(out_file_path)
+        assert filecmp.cmp(self.zrr_file_base, out_file_path)
         print("Add assert statement that the zrr are the same")
-
-    # def test_tf_write_and_read(self):
-    #     tf_obj = self.tf_obj
-    #     tf_obj.write(fn=self.xml_file_base, file_type="emtfxml")
-    #     tf_obj.logger.info(f"TF Object written to {tf_obj.fn}")
-    #     tf_obj2 = TF()
-    #     tf_obj2.read(fn=self.xml_file_base)
-    #     print("ASSERT tfobj==tfob2 everywhere it should")
 
 
 def main():

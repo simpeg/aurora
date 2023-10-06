@@ -104,7 +104,6 @@ class TestSyntheticProcessing(unittest.TestCase):
             file_type="zss",
         )
 
-
     def test_simultaneous_regression(self):
         z_file_path = AURORA_RESULTS_PATH.joinpath("syn1_simultaneous_estimate.zss")
         tf_cls = process_synthetic_1(
@@ -240,7 +239,7 @@ def process_synthetic_1(
     return tf_result
 
 
-def process_synthetic_2(force_make_mth5=True):
+def process_synthetic_2(force_make_mth5=True, z_file_path=None):
     """"""
     station_id = "test2"
     mth5_path = create_test2_h5(force_make_mth5=force_make_mth5)
@@ -256,7 +255,11 @@ def process_synthetic_2(force_make_mth5=True):
         decimation_level.save_fcs = True
         decimation_level.save_fcs_type = "h5"
         # decimation_level.save_fcs_type = "csv"
-    tfc = process_mth5(processing_config, tfk_dataset=tfk_dataset, z_file_path=AURORA_RESULTS_PATH.joinpath("test2q.zss"))
+    tfc = process_mth5(
+        processing_config,
+        tfk_dataset=tfk_dataset,
+        z_file_path=z_file_path,
+    )
     return tfc
 
 

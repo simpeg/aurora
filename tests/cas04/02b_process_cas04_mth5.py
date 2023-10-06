@@ -70,7 +70,7 @@ CONFIG_PATH.mkdir(exist_ok=True)
 DATA_PATH = CAS04_PATH.joinpath("data")
 # H5_PATH = DATA_PATH.joinpath("8P_CAS04_CAV07_NVR11_REV06.h5")
 H5_PATH = DATA_PATH.joinpath("8P_CAS04_NVR11_REV06_v2.h5")
-#H5_PATH = pathlib.Path("/home/kkappler/.cache/earthscope/data/8P_CAS04.h5")
+# H5_PATH = pathlib.Path("/home/kkappler/.cache/earthscope/data/8P_CAS04.h5")
 DEFAULT_EMTF_FILE = "emtf_results/CAS04-CAS04bcd_REV06-CAS04bcd_NVR08.zmm"
 AURORA_RESULTS_PATH = CAS04_PATH.joinpath("aurora_results")
 EMTF_RESULTS_PATH = CAS04_PATH.joinpath("emtf_results")
@@ -235,7 +235,9 @@ def process_all_runs_individually(station_id="CAS04", reprocess=True):
             process_station_runs(station_id, station_runs=station_runs)
         z_file_name = station_runs.z_file_name(AURORA_RESULTS_PATH)
         png_name = str(z_file_name).replace(".zss", ".png")
-        compare_results(station_runs.z_file_name(AURORA_RESULTS_PATH), out_file=png_name)
+        compare_results(
+            station_runs.z_file_name(AURORA_RESULTS_PATH), out_file=png_name
+        )
 
 
 def process_run_list(station_id, run_list, reprocess=True):
@@ -256,7 +258,9 @@ def process_run_list(station_id, run_list, reprocess=True):
     compare_results(station_runs.z_file_name(AURORA_RESULTS_PATH))
 
 
-def process_with_remote(h5_paths, local, remote=None, band_setup_file="band_setup_emtf_nims.txt"):
+def process_with_remote(
+    h5_paths, local, remote=None, band_setup_file="band_setup_emtf_nims.txt"
+):
     """
     How this works:
     1. Make Run Summary
@@ -351,28 +355,34 @@ def compare_aurora_vs_emtf(local_station_id, remote_station_id, coh=False):
 
 
 def old_main():
-    h5_paths = [H5_PATH, ]
-    #process_all_runs_individually()  # reprocess=False)
-    #process_run_list("CAS04", ["b", "c", "d"])  # , reprocess=False)
-    #process_with_remote(h5_paths, "CAS04", "CAV07")
-    #process_with_remote(h5_paths, "CAS04", "NVR11", band_setup_file=BANDS_DEFAULT_FILE)
+    h5_paths = [
+        H5_PATH,
+    ]
+    # process_all_runs_individually()  # reprocess=False)
+    # process_run_list("CAS04", ["b", "c", "d"])  # , reprocess=False)
+    # process_with_remote(h5_paths, "CAS04", "CAV07")
+    # process_with_remote(h5_paths, "CAS04", "NVR11", band_setup_file=BANDS_DEFAULT_FILE)
     process_with_remote(h5_paths, "CAS04", "REV06")
 
-    #for RR in ["CAV07", "NVR11", "REV06"]:
-    for RR in ["REV06",]:
+    # for RR in ["CAV07", "NVR11", "REV06"]:
+    for RR in [
+        "REV06",
+    ]:
         compare_aurora_vs_emtf("CAS04", RR, coh=False)
-        #compare_aurora_vs_emtf("CAS04", RR, coh=True)
+        # compare_aurora_vs_emtf("CAS04", RR, coh=True)
 
 
 def main():
     old_main()
+
+
 #    process_all_runs_individually(reprocess=False)
 
-    # h5_paths = [H5_PATH,]
-    # RR = None# "REV06"
-    # process_with_remote(h5_paths, "CAS04", RR)
-    # print("OK")
-    # compare_aurora_vs_emtf("CAS04", RR, coh=False)
+# h5_paths = [H5_PATH,]
+# RR = None# "REV06"
+# process_with_remote(h5_paths, "CAS04", RR)
+# print("OK")
+# compare_aurora_vs_emtf("CAS04", RR, coh=False)
 
 if __name__ == "__main__":
     main()

@@ -80,9 +80,7 @@ def aurora_vs_emtf(
     )
 
     aux_data = read_z_file(auxilliary_z_file)
-    aurora_rho_phi = merge_tf_collection_to_match_z_file(
-        aux_data, tf_collection
-    )
+    aurora_rho_phi = merge_tf_collection_to_match_z_file(aux_data, tf_collection)
 
     for xy_or_yx in ["xy", "yx"]:
         aurora_rho = aurora_rho_phi["rho"][xy_or_yx]
@@ -135,9 +133,7 @@ def run_test1(emtf_version, ds_df):
     test_case_id = "test1"
     auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test1.zss")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zss"
-    aurora_vs_emtf(
-        test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df
-    )
+    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df)
     return
 
 

@@ -11,8 +11,6 @@ with open("README.rst") as readme_file:
 #    history = history_file.read()
 
 requirements = [
-    "dask",
-    "deprecated",
     "matplotlib",
     "mth5",
     "mt_metadata",
@@ -23,7 +21,6 @@ requirements = [
     "pandas<1.5",
     "scipy",
     "xarray",
-    "fortranformat",
 ]
 
 setup_requirements = [
@@ -61,6 +58,6 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/simpeg/aurora",
-    version="0.2.0",
+    version="0.3.3",
     zip_safe=False,
 )

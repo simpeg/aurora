@@ -8,7 +8,7 @@ from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.transfer_function.kernel_dataset import KernelDataset
 from mth5.utils.exceptions import MTH5Error
 from mth5.utils.helpers import initialize_mth5
-
+from mt_metadata.transfer_functions.core import TF
 from mt_metadata.transfer_functions.processing.aurora import Processing
 
 
@@ -72,7 +72,9 @@ class TransferFunctionKernel(object):
             remote station id: mth5.mth5.MTH5
         """
 
-        local_mth5_obj = initialize_mth5(self.config.stations.local.mth5_path, mode=mode)
+        local_mth5_obj = initialize_mth5(
+            self.config.stations.local.mth5_path, mode=mode
+        )
         if self.config.stations.remote:
             remote_path = self.config.stations.remote[0].mth5_path
             remote_mth5_obj = initialize_mth5(remote_path, mode="r")
@@ -85,7 +87,7 @@ class TransferFunctionKernel(object):
         self._mth5_objs = mth5_objs
         return
 
-    def update_dataset_df(self,i_dec_level):
+    def update_dataset_df(self, i_dec_level):
         """
         This function has two different modes.  The first mode initializes values in the
         array, and could be placed into TFKDataset.initialize_time_series_data()
@@ -132,10 +134,18 @@ class TransferFunctionKernel(object):
                 run_xrds = row["run_dataarray"].to_dataset("channel")
                 decimation = self.config.decimations[i_dec_level].decimation
                 decimated_xrds = prototype_decimate(decimation, run_xrds)
-                self.dataset_df["run_dataarray"].at[i] = decimated_xrds.to_array("channel") # See Note 1 above
+                self.dataset_df["run_dataarray"].at[i] = decimated_xrds.to_array(
+                    "channel"
+                )  # See Note 1 above
 
         print("DATASET DF UPDATED")
         return
+
+    def apply_clock_zero(self, dec_level_config):
+        """get clock-zero from data if needed"""
+        if dec_level_config.window.clock_zero_type == "data start":
+            dec_level_config.window.clock_zero = str(self.dataset_df.start.min())
+        return dec_level_config
 
     def check_if_fc_levels_already_exist(self):
         """
@@ -143,7 +153,7 @@ class TransferFunctionKernel(object):
         (Could also iterate over kernel_dataset.dataframe, to get the groupby).
 
         If all FC Levels for a given station-run are already built, mark the RunSummary with a True in
-        the "fc" column.
+        the "fc" column.  Otherwise its False
 
         Note 1:  Because decimation is a cascading operation, we avoid the case where some (valid) decimation
         levels exist in the mth5 FC archive and others do not.  The maximum granularity tolerated will be at the
@@ -163,11 +173,25 @@ class TransferFunctionKernel(object):
          of the dataset_df may refernece the same h5, and I don't know if updating one row will have unintended
          consequences.
 
+        Note #4: associated_run_sub_df may have multiple rows, even though the run id is unique.
+        This could happen for example when you have a long run at the local station, but multiple (say two) shorter runs
+        at the reference station.  In that case, the processing summary will have a separate row for the
+        intersection of the long run with each of the remote runs. We ignore this for now, selecting only the first
+        element of the associated_run_sub_df, under the assumption that FCs have been created for the entire run,
+        or not at all.  This assumption can be relaxed in future by using the time_period attribute of the FC layer.
+        For now, we proceed with the all-or-none logic.  That is, if a ['survey', 'station_id', 'run_id',] has FCs,
+        assume that the FCs are present for the entire run. We assign the "fc" column of dataset_df to have the same
+         boolean value for all rows of same  ['survey', 'station_id', 'run_id',] .
+
         Returns: None
-            Modifies self.dataset_df inplace, assigning bool to the "fc" column
+            Modifies self.dataset_df inplace, assigning bools to the "fc" column
 
         """
-        groupby = ['survey', 'station_id', 'run_id',]
+        groupby = [
+            "survey",
+            "station_id",
+            "run_id",
+        ]
         grouper = self.processing_summary.groupby(groupby)
 
         for (survey_id, station_id, run_id), df in grouper:
@@ -175,32 +199,50 @@ class TransferFunctionKernel(object):
             cond2 = self.dataset_df.station_id == station_id
             cond3 = self.dataset_df.run_id == run_id
             associated_run_sub_df = self.dataset_df[cond1 & cond2 & cond3]
-            assert len(associated_run_sub_df) == 1 # should be unique
-            dataset_df_index = associated_run_sub_df.index[0]
+
+            if len(associated_run_sub_df) > 1:
+                # See Note #4
+                print(
+                    "Warning -- not all runs will processed as a continuous chunk -- in future may need to loop over runlets to check for FCs"
+                )
+
+            dataset_df_indices = np.r_[associated_run_sub_df.index]
+            # dataset_df_indices = associated_run_sub_df.index.to_numpy()
             run_row = associated_run_sub_df.iloc[0]
             row_ssr_str = f"survey: {run_row.survey}, station_id: {run_row.station_id}, run_id: {run_row.run_id}"
 
-            # See Note #3 above
+            # See Note #3 above relating to mixing multiple surveys in a processing scheme
             mth5_obj = self.mth5_objs[station_id]
             survey_obj = mth5_obj.get_survey(survey_id)
             station_obj = survey_obj.stations_group.get_station(station_id)
             if not station_obj.fourier_coefficients_group.groups_list:
                 msg = f"Prebuilt Fourier Coefficients not detected for {row_ssr_str} -- will need to build them "
                 print(msg)
-                self.dataset_df["fc"].iat[dataset_df_index] = False
+                self.dataset_df.loc[dataset_df_indices, "fc"] = False
             else:
-                print("Prebuilt Fourier Coefficients detected -- checking if they satisfy processing requirements...")
+                print(
+                    "Prebuilt Fourier Coefficients detected -- checking if they satisfy processing requirements..."
+                )
                 # Assume FC Groups are keyed by run_id, check if there is a relevant group
                 try:
-                    fc_group = station_obj.fourier_coefficients_group.get_fc_group(run_id)
+                    fc_group = station_obj.fourier_coefficients_group.get_fc_group(
+                        run_id
+                    )
                 except MTH5Error:
-                    self.dataset_df["fc"].iat[dataset_df_index] = False
-                    print(f"Run ID {run_id} not found in FC Groups, -- will need to build them ")
+                    self.dataset_df.loc[dataset_df_indices, "fc"] = False
+                    print(
+                        f"Run ID {run_id} not found in FC Groups, -- will need to build them "
+                    )
                     continue
 
-                if len(fc_group.groups_list) < self.processing_config.num_decimation_levels:
-                    self.dataset_df["fc"].iat[dataset_df_index] = False
-                    print(f"Not enough FC Groups available for {row_ssr_str} -- will need to build them ")
+                if (
+                    len(fc_group.groups_list)
+                    < self.processing_config.num_decimation_levels
+                ):
+                    self.dataset_df.loc[dataset_df_indices, "fc"] = False
+                    print(
+                        f"Not enough FC Groups available for {row_ssr_str} -- will need to build them "
+                    )
                     continue
 
                 # Can check time periods here if desired, but unique (survey, station, run) should make this unneeded
@@ -208,14 +250,13 @@ class TransferFunctionKernel(object):
                 # for tp in processing_run.time_periods:
                 #    assert tp in fc_group time periods
 
-
                 # See note #2
-                fcs_already_there = fc_group.supports_aurora_processing_config(self.processing_config,
-                                                                               run_row.remote)
-                self.dataset_df["fc"].iat[dataset_df_index] = fcs_already_there
+                fcs_already_there = fc_group.supports_aurora_processing_config(
+                    self.processing_config, run_row.remote
+                )
+                self.dataset_df.loc[dataset_df_indices, "fc"] = fcs_already_there
 
         return
-
 
     def make_processing_summary(self):
         """
@@ -254,7 +295,13 @@ class TransferFunctionKernel(object):
             print(group)
             print(df)
             try:
-                assert (df.dec_level.diff()[1:] == 1).all()  # dec levels increment by 1
+                try:
+                    assert (
+                        df.dec_level.diff()[1:] == 1
+                    ).all()  # dec levels increment by 1
+                except AssertionError:
+                    print(f"Skipping {group} because decimation levels are messy.")
+                    continue
                 assert df.dec_factor.iloc[0] == 1
                 assert df.dec_level.iloc[0] == 0
             except AssertionError:
@@ -309,8 +356,13 @@ class TransferFunctionKernel(object):
 
         """
         if min_num_stft_windows is None:
-            min_stft_window_info = {x.decimation.level: x.min_num_stft_windows for x in self.processing_config.decimations}
-            min_stft_window_list = [min_stft_window_info[x] for x in self.processing_summary.dec_level]
+            min_stft_window_info = {
+                x.decimation.level: x.min_num_stft_windows
+                for x in self.processing_config.decimations
+            }
+            min_stft_window_list = [
+                min_stft_window_info[x] for x in self.processing_summary.dec_level
+            ]
             min_num_stft_windows = pd.Series(min_stft_window_list)
 
         self.processing_summary["valid"] = (
@@ -389,9 +441,121 @@ class TransferFunctionKernel(object):
 
         cond = cond1 & cond2 & cond3 & cond4 & cond5
         processing_row = self.processing_summary[cond]
-        assert len(processing_row) == 1
+        if len(processing_row) != 1:
+            return False
         is_valid = processing_row.valid.iloc[0]
         return is_valid
+
+    @property
+    def processing_type(self):
+        """
+        A description of the processing, will get passed to TF object,
+        can be used for Z-file
+
+        Could add a version or a hashtag to this
+        Could also check dataset_df
+        If remote.all==False append "Single Station"
+        """
+        processing_type = "Aurora"
+        if self.dataset_df.remote.any():
+            processing_type = f"{processing_type} Robust Remote Reference"
+        else:
+            processing_type = f"{processing_type} Robust Single Station"
+        if "processing_type" in self.dataset_df.columns:
+            processing_type = self.dataset_df["processing_type"].iloc[0]
+
+        return processing_type
+
+    def export_tf_collection(self, tf_collection):
+        """
+        Assign transfer_function, residual_covariance, inverse_signal_power, station, survey
+
+        Parameters
+        ----------
+        tf_collection: aurora.transfer_function.transfer_function_collection.TransferFunctionCollection
+            Contains TF estimates, covariance, and signal power values
+
+        Returns
+        -------
+        tf_cls: mt_metadata.transfer_functions.core.TF
+            Transfer function container
+        """
+
+        def make_decimation_dict_for_tf(tf_collection, processing_config):
+            """
+            Decimation dict is used by mt_metadata's TF class when it is writng z-files.
+            If no z-files will be written this is not needed
+
+            sample element of decimation_dict:
+            '1514.70134': {'level': 4, 'bands': (5, 6), 'npts': 386, 'df': 0.015625}}
+
+            Note #1:  The line that does
+            period_value["npts"] = tf_collection.tf_dict[i_dec].num_segments.data[0, i_band]
+            doesn't feel very robust ... it would be better to explicitly select based on the num_segments
+            xarray location where period==fb.center_period.  This is a placeholder for now.  In future,
+            the TTFZ class is likely to be deprecated in favour of directly packing mt_metadata TFs during processing.
+
+            Parameters
+            ----------
+            tfc
+
+            Returns
+            -------
+
+            """
+            from mt_metadata.transfer_functions.io.zfiles.zmm import PERIOD_FORMAT
+
+            decimation_dict = {}
+
+            for i_dec, dec_level_cfg in enumerate(processing_config.decimations):
+                for i_band, band in enumerate(dec_level_cfg.bands):
+                    period_key = f"{band.center_period:{PERIOD_FORMAT}}"
+                    period_value = {}
+                    period_value["level"] = i_dec + 1  # +1 to match EMTF standard
+                    period_value["bands"] = tuple(band.harmonic_indices[np.r_[0, -1]])
+                    period_value["sample_rate"] = dec_level_cfg.sample_rate_decimation
+                    try:
+                        period_value["npts"] = tf_collection.tf_dict[
+                            i_dec
+                        ].num_segments.data[0, i_band]
+                    except KeyError:
+                        print("Possibly invalid decimation level")
+                        period_value["npts"] = 0
+                    decimation_dict[period_key] = period_value
+
+            return decimation_dict
+
+        channel_nomenclature = self.config.channel_nomenclature
+        channel_nomenclature_dict = channel_nomenclature.to_dict()[
+            "channel_nomenclature"
+        ]
+        merged_tf_dict = tf_collection.get_merged_dict(channel_nomenclature)
+        decimation_dict = make_decimation_dict_for_tf(
+            tf_collection, self.processing_config
+        )
+
+        tf_cls = TF(
+            channel_nomenclature=channel_nomenclature_dict,
+            decimation_dict=decimation_dict,
+        )
+        renamer_dict = {"output_channel": "output", "input_channel": "input"}
+        tmp = merged_tf_dict["tf"].rename(renamer_dict)
+        tf_cls.transfer_function = tmp
+
+        isp = merged_tf_dict["cov_ss_inv"]
+        renamer_dict = {"input_channel_1": "input", "input_channel_2": "output"}
+        isp = isp.rename(renamer_dict)
+        tf_cls.inverse_signal_power = isp
+
+        res_cov = merged_tf_dict["cov_nn"]
+        renamer_dict = {"output_channel_1": "input", "output_channel_2": "output"}
+        res_cov = res_cov.rename(renamer_dict)
+        tf_cls.residual_covariance = res_cov
+
+        # Set key as first el't of dict, nor currently supporting mixed surveys in TF
+        tf_cls.survey_metadata = self.dataset.local_survey_metadata
+        tf_cls.station_metadata.transfer_function.processing_type = self.processing_type
+        return tf_cls
 
     def memory_warning(self):
         """

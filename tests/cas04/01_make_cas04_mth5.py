@@ -46,15 +46,32 @@ XML_PATH = CAS04_PATH.joinpath("cas04_from_tim_20211203.xml")
 
 # Define args for data getter
 NETWORK_ID = "8P"
-STATION_IDS = ["CAS04",  "NVR11", "REV06",] # "CAV07",] # skip CAV07 until exception fixed in mth5/metadata
-CHANNELS = ["LQE", "LQN", "LFE", "LFN", "LFZ",]
+STATION_IDS = [
+    "CAS04",
+    "NVR11",
+    "REV06",
+]  # "CAV07",] # skip CAV07 until exception fixed in mth5/metadata
+CHANNELS = [
+    "LQE",
+    "LQN",
+    "LFE",
+    "LFN",
+    "LFZ",
+]
 START = "2020-06-02T19:00:00"
 END = "2020-07-13T19:00:00"
 # Test use very large time interval to build all (passes)
 # START = "2000-06-02T19:00:00"
 # END = "2023-07-13T19:00:00"
 
-def make_merged_request_dataframe(station_ids=STATION_IDS, network_id=NETWORK_ID, channels=CHANNELS, start=START, end=END):
+
+def make_merged_request_dataframe(
+    station_ids=STATION_IDS,
+    network_id=NETWORK_ID,
+    channels=CHANNELS,
+    start=START,
+    end=END,
+):
     """
     Consider moving this to sandbox
     Args:
@@ -69,29 +86,39 @@ def make_merged_request_dataframe(station_ids=STATION_IDS, network_id=NETWORK_ID
     """
     df_list = []
     for station_id in station_ids:
-        df = build_request_df(network_id, station_id, channels=channels, start=start, end=end)
+        df = build_request_df(
+            network_id, station_id, channels=channels, start=start, end=end
+        )
         df_list.append(df)
     output_df = pd.concat(df_list)
     output_df.reset_index(inplace=True, drop=True)
     return output_df
 
 
-
-def make_all_stations_individually(mth5_version="0.1.0",):
+def make_all_stations_individually(
+    mth5_version="0.1.0",
+):
     """
     Makes 1 h5 for each station in STATION_IDS
     Args:
         mth5_version:
     """
     for station_id in STATION_IDS:
-        #request_df = build_request_df(NETWORK_ID, station_id, channels=["*F*", "*Q*", ], start=None, end=None)
-        request_df = build_request_df(NETWORK_ID, station_id, channels=CHANNELS, start=None, end=None)
+        # request_df = build_request_df(NETWORK_ID, station_id, channels=["*F*", "*Q*", ], start=None, end=None)
+        request_df = build_request_df(
+            NETWORK_ID, station_id, channels=CHANNELS, start=None, end=None
+        )
         fdsn_object = FDSN(mth5_version=mth5_version)
         fdsn_object.client = "IRIS"
-        mth5_filename = fdsn_object.make_mth5_from_fdsn_client(request_df, interact=False, path=DATA_PATH)
+        fdsn_object.make_mth5_from_fdsn_client(
+            request_df, interact=False, path=DATA_PATH
+        )
     return
 
-def make_all_stations_together(mth5_version="0.1.0", return_obj=False, force_download=False):
+
+def make_all_stations_together(
+    mth5_version="0.1.0", return_obj=False, force_download=False
+):
     """
 
     Parameters
@@ -117,12 +144,11 @@ def make_all_stations_together(mth5_version="0.1.0", return_obj=False, force_dow
             download = True
     if download:
         print("getting...", request_df)
-        mth5_filename = fdsn_object.make_mth5_from_fdsn_client(request_df,interact=False, path=DATA_PATH)
-
-
+        mth5_filename = fdsn_object.make_mth5_from_fdsn_client(
+            request_df, interact=False, path=DATA_PATH
+        )
 
     return mth5_filename
-
 
 
 def test_make_mth5(mth5_version="0.1.0"):
@@ -134,7 +160,9 @@ def test_make_mth5(mth5_version="0.1.0"):
         Where the built mth5 lives
     """
     # make_all_stations_individually()
-    mth5_path = make_all_stations_together(mth5_version=mth5_version, force_download=True)
+    mth5_path = make_all_stations_together(
+        mth5_version=mth5_version, force_download=True
+    )
     if mth5_version == "0.1.0":
         new_filepath = str(mth5_path).replace(".h5", "_v1.h5")
     elif mth5_version == "0.2.0":

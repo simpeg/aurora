@@ -75,16 +75,20 @@ from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
 from mth5.mth5 import MTH5
 import mt_metadata.timeseries.time_period
-from mt_metadata.transfer_functions.processing.fourier_coefficients import Decimation as FCDecimation
+from mt_metadata.transfer_functions.processing.fourier_coefficients import (
+    Decimation as FCDecimation,
+)
 
 
 # =============================================================================
 FILE_VERSION = "you need to set this, and ideally cycle over 0.1.0, 0.2.0"
 DEFAULT_TIME = "1980-01-01T00:00:00+00:00"
-GROUPBY_COLUMNS = ["survey", "station", "sample_rate"] # See Question 1
+GROUPBY_COLUMNS = ["survey", "station", "sample_rate"]  # See Question 1
 
 
-def decimation_and_stft_config_creator(initial_sample_rate, max_levels=6, decimation_factors=None, time_period=None):
+def decimation_and_stft_config_creator(
+    initial_sample_rate, max_levels=6, decimation_factors=None, time_period=None
+):
     """
     Based on the number of samples in the run, we can compute the maximum number of valid decimation levels.
     This would re-use code in processing summary ... or we could just decimate until we cant anymore?
@@ -114,11 +118,9 @@ def decimation_and_stft_config_creator(initial_sample_rate, max_levels=6, decima
         decimation_factors = max_levels * [default_decimation_factor]
         decimation_factors[0] = 1
 
-    num_decimations = len(decimation_factors)
-
     # See Note 1
     decimation_and_stft_config = []
-    for i_dec_level , decimation_factor in enumerate(decimation_factors):
+    for i_dec_level, decimation_factor in enumerate(decimation_factors):
         dd = FCDecimation()
         dd.decimation_level = i_dec_level
         dd.decimation_factor = decimation_factor
@@ -168,14 +170,17 @@ def add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=None):
         if not decimation_and_stft_configs:
             msg = "FC config not supplied, using default, creating on the fly"
             print(f"{msg}")
-            decimation_and_stft_configs = decimation_and_stft_config_creator(sample_rate, time_period=None)
-            decimation_info = {x.decimation_level: x.decimation_factor for x in decimation_and_stft_configs}
+            decimation_and_stft_configs = decimation_and_stft_config_creator(
+                sample_rate, time_period=None
+            )
 
         # Make this a function that can be done using df.apply()
         # I wonder if daskifiying that will cause issues with multiple threads trying to
         # write to the hdf5 file -- will need testing
         for i_run_row, run_row in run_summary.iterrows():
-            print(f"survey: {survey}, station: {station}, sample_rate {sample_rate}, i_run_row {i_run_row}")
+            print(
+                f"survey: {survey}, station: {station}, sample_rate {sample_rate}, i_run_row {i_run_row}"
+            )
             # Access Run
             run_obj = m.from_reference(run_row.hdf5_reference)
 
@@ -183,27 +188,37 @@ def add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=None):
             for decimation_and_stft_config in decimation_and_stft_configs:
                 decimation_and_stft_config.time_period = run_obj.metadata.time_period
 
-            runts = run_obj.to_runts(start=decimation_and_stft_config.time_period.start,
-                                     end=decimation_and_stft_config.time_period.end)
+            runts = run_obj.to_runts(
+                start=decimation_and_stft_config.time_period.start,
+                end=decimation_and_stft_config.time_period.end,
+            )
             # runts = run_obj.to_runts() # skip setting time_period explcitly
 
             run_xrds = runts.dataset
             # access container for FCs
-            fc_group = station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id)
+            fc_group = station_obj.fourier_coefficients_group.add_fc_group(
+                run_obj.metadata.id
+            )
 
             print(" TIMING CORRECTIONS WOULD GO HERE ")
 
-            for i_dec_level, decimation_stft_obj in enumerate(decimation_and_stft_configs):
+            for i_dec_level, decimation_stft_obj in enumerate(
+                decimation_and_stft_configs
+            ):
                 if i_dec_level != 0:
                     # Apply decimation
                     run_xrds = prototype_decimate(decimation_stft_obj, run_xrds)
                 print(f"type decimation_stft_obj = {type(decimation_stft_obj)}")
-                if not decimation_stft_obj.is_valid_for_time_series_length(run_xrds.time.shape[0]):
-                    print(f"Decimation Level {i_dec_level} invalid, TS of {run_xrds.time.shape[0]} samples too short")
+                if not decimation_stft_obj.is_valid_for_time_series_length(
+                    run_xrds.time.shape[0]
+                ):
+                    print(
+                        f"Decimation Level {i_dec_level} invalid, TS of {run_xrds.time.shape[0]} samples too short"
+                    )
                     continue
 
                 stft_obj = run_ts_to_stft_scipy(decimation_stft_obj, run_xrds)
-                stft_obj = calibrate_stft_obj(stft_obj,run_obj)
+                stft_obj = calibrate_stft_obj(stft_obj, run_obj)
 
                 # print("Pack FCs into h5 and update metadata")
                 decimation_level = fc_group.add_decimation_level(f"{i_dec_level}")
@@ -213,6 +228,7 @@ def add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=None):
 
     m.close_mth5()
     return
+
 
 def read_back_fcs(mth5_path):
     """
@@ -244,16 +260,18 @@ def read_back_fcs(mth5_path):
             dec_level_ids = fc_group.groups_list
             for dec_level_id in dec_level_ids:
                 dec_level = fc_group.get_decimation_level(dec_level_id)
-                print(f"dec_level {dec_level_id}")# channel_summary {dec_level.channel_summary}")
+                print(
+                    f"dec_level {dec_level_id}"
+                )  # channel_summary {dec_level.channel_summary}")
                 xrds = dec_level.to_xarray(["hx", "hy"])
                 print(f"Time axis shape {xrds.time.data.shape}")
                 print(f"Freq axis shape {xrds.frequency.data.shape}")
     return True
 
 
-
 def main():
     pass
+
 
 if __name__ == "__main__":
     main()

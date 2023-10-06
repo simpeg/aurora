@@ -18,10 +18,14 @@ def read_fc_csv(csv_name, as_xarray=True):
     -------
 
     """
-    df = pd.read_csv(csv_name,
-                     index_col=[0,1],
-                     parse_dates=["time",],
-                     skipinitialspace=True)
+    df = pd.read_csv(
+        csv_name,
+        index_col=[0, 1],
+        parse_dates=[
+            "time",
+        ],
+        skipinitialspace=True,
+    )
     for col in df.columns:
         df[col] = np.complex128(df[col])
     if as_xarray:

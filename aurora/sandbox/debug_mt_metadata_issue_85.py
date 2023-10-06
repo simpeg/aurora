@@ -20,10 +20,6 @@ def test_can_add_location():
     m.open_mth5("location_test.h5", mode="w")
     station_group = m.add_station("eureka")
 
-    # Try assign location
-    # Reported this conundrum https://github.com/kujaku11/mt_metadata/issues/85
-    from mt_metadata.timeseries.location import Location
-
     location = Location()
     location.latitude = 17.996
     station_group.metadata.location = location
