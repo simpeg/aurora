@@ -208,17 +208,20 @@ class TransferFunctionCollection(object):
         Sample output for a band:
         period :      4.65455    decimation level   1    freq. band from   25 to   30
         number of data point   2489 sampling freq.   1.000 Hz
-         Transfer Functions
-          0.2498E+00  0.1966E-03  0.3859E-04  0.2519E+00
-         -0.1458E-01 -0.2989E-01 -0.7283E+01 -0.7313E+01
-          0.7311E+01  0.7338E+01 -0.4087E-01 -0.1031E-01
-         Inverse Coherent Signal Power Matrix
-          0.3809E-07 -0.6261E-18
-         -0.3095E-09  0.4505E-09  0.3764E-07  0.7792E-17
-         Residual Covariance
-          0.3639E+02  0.0000E+00
-         -0.2604E+03  0.2280E+03  0.3090E+05  0.0000E+00
-          0.2483E+03  0.2688E+03  0.2660E+03 -0.6791E+03  0.3161E+05  0.0000E+00
+
+        Transfer Functions
+        0.2498E+00  0.1966E-03  0.3859E-04  0.2519E+00
+        -0.1458E-01 -0.2989E-01 -0.7283E+01 -0.7313E+01
+        0.7311E+01  0.7338E+01 -0.4087E-01 -0.1031E-01
+
+        Inverse Coherent Signal Power Matrix
+        0.3809E-07   -0.6261E-18
+        -0.3095E-09  0.4505E-09  0.3764E-07  0.7792E-17
+
+        Residual Covariance
+        0.3639E+02   0.0000E+00
+        -0.2604E+03  0.2280E+03  0.3090E+05  0.0000E+00
+        0.2483E+03   0.2688E+03  0.2660E+03 -0.6791E+03  0.3161E+05  0.0000E+00
 
         Returns
         -------

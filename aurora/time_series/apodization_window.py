@@ -5,18 +5,18 @@ Module to manage windowing prior to FFT.  Intended to support most
 apodization  windows available via scipy.signal.get_window()
 
 
-    Supported Window types = ['boxcar', 'triang', 'blackman', 'hamming', 'hann',
-      'bartlett', 'flattop', 'parzen', 'bohman', 'blackmanharris',
-      'nuttall', 'barthann', 'kaiser', 'gaussian', 'general_gaussian',
-      'slepian', 'chebwin']
+Supported Window types = ['boxcar', 'triang', 'blackman', 'hamming', 'hann',
+'bartlett', 'flattop', 'parzen', 'bohman', 'blackmanharris',
+'nuttall', 'barthann', 'kaiser', 'gaussian', 'general_gaussian',
+'slepian', 'chebwin']
 
-    have_additional_args = {
-      'kaiser' : 'beta',
-      'gaussian' : 'std',
-      'general_gaussian' : ('power', 'width'),
-      'slepian' : 'width',
-      'chebwin' : 'attenuation',
-    }
+have_additional_args = {
+'kaiser' : 'beta',
+'gaussian' : 'std',
+'general_gaussian' : ('power', 'width'),
+'slepian' : 'width',
+'chebwin' : 'attenuation',
+}
 
 The Taper Config has 2 possible forms:
 1. Standard form for accessing scipy.signal:
@@ -117,9 +117,9 @@ class ApodizationWindow(object):
         Returns
         -------
         out_str: str
-            String comprised of the taper_family, number_of_samples, and True/False
-            if self.taper is not None
+            String comprised of the taper_family, number_of_samples, and True/False if self.taper is not None
         """
+
         self.test_linear_spectral_density_factor()
         string1 = f"{self.taper_family} {self.num_samples_window}"
         string1 += f" taper_exists = {bool(self.taper.any())}"
@@ -205,21 +205,22 @@ class ApodizationWindow(object):
         This is just a test to verify some algebra
         Claim:
         The lsd_calibration factors
-        A      (1./coherent_gain)*np.sqrt((2*dt)/(nenbw*N))
+        A      (1./coherent_gain)\*np.sqrt((2\*dt)/(nenbw\*N))
         and
-        B      np.sqrt(2/(sample_rate*self.S2))
+        B      np.sqrt(2/(sample_rate\*self.S2))
         are identical.
 
-        Note sqrt(2*dt)==sqrt(2*sample_rate) so we can cancel these terms and
+        Note sqrt(2\*dt)==sqrt(2\*sample_rate) so we can cancel these terms and
         A=B IFF
-        (1./coherent_gain) * np.sqrt(1/(nenbw*N)) == 1/np.sqrt(S2)
+        (1./coherent_gain) \* np.sqrt(1/(nenbw\*N)) == 1/np.sqrt(S2)
         which I show in githib aurora issue #3 via .
-        (CG**2) * NENBW *N   =  S2
+        (CG\*\*2) \* NENBW \*N   =  S2
 
         Returns
         -------
 
         """
+
         lsd_factor1 = (1.0 / self.coherent_gain) * np.sqrt(
             1.0 / (self.nenbw * self.num_samples_window)
         )

@@ -19,7 +19,7 @@ def make_orientation_block_of_z_file(run_obj, channel_list=None):
     5    90.00     0.00 tes  Ey
 
     based on this fortran snippet:
-            write(3, 115) k, orient(1, k), orient(2, k), stname(1: 3), chid(k)
+    write(3, 115) k, orient(1, k), orient(2, k), stname(1: 3), chid(k)
     format(i5, 1x, f8.2, 1x, f8.2, 1x, a3, 2x, a6) #Fortran Format
 
     Parameters
