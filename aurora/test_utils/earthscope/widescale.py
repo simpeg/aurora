@@ -1,5 +1,39 @@
+"""
+Notes on parallelization:
+
+In the approach in this module, a dataframe is used to keep track of the tasks to do.  Each row corresponds to a
+processing task.  The specific processing task is defined in the extension of the abstract base class WideScaleTest
+defined here.
+The row of the df is modified during the processing.  It turns out that this is a constraint
+(I didn't know that this would be restrictive).  It seems that modifying the df in-place makes the function not callable
+ via standard multiprocessing (or the pathos fork).  The three ways this can execute are:
+  df.apply()            # pandas (slow)
+  ddf.apply()           # dask data frame (slow and I don't understand why)
+  df.parallel_apply()   # pandarallel (fast)
+
+It is possible that I am doing something wrong however when I tried multiprocessing.
+
+In any case, the recommended usage is pandarallel for now.
+
+
+Link where I originally got into dask apply with partitions: ____find this again__
+
+But I am starting to suspect multiprocessing is the right solution..
+https://stackoverflow.com/questions/67457956/how-to-parallelize-the-row-wise-pandas-dataframes-apply-method
+but read this first:
+https://examples.dask.org/applications/embarrassingly-parallel.html
+
+2023-10-07
+https://stackoverflow.com/questions/26784164/pandas-multiprocessing-apply suggests using pandarallel
+This seems to give decent performance improvement (https://github.com/nalepae/pandarallel)
+
+Also, we are cautioned away from .apply() method in both pandas and dask here:
+https://stackoverflow.com/questions/31361721/python-dask-dataframe-support-for-trivially-parallelizable-row-apply
+"""
 import argparse
 import copy
+#import multiprocessing as mp
+from pandarallel import pandarallel
 import time
 
 from aurora.test_utils.earthscope.helpers import get_summary_table_filename
@@ -77,12 +111,21 @@ class WidesScaleTest(object):
 
         if not self.n_partitions:
             enriched_df = df.apply(self.enrich_row, axis=1)
-        else:
+        elif self._use_dask:
             import dask.dataframe as dd
             ddf = dd.from_pandas(df, npartitions=self.n_partitions)
             schema = get_summary_table_schema(self.stage_id)
             meta = {x.name: x.dtype for x in schema}
             enriched_df = ddf.apply(self.enrich_row, axis=1, meta=meta).compute()
+        elif self._use_pandarallel:
+            from pandarallel import pandarallel
+            pandarallel.initialize(verbose=3)
+            enriched_df = df.parallel_apply(self.enrich_row, axis=1)
+        else:
+            msg = "WARNING No dask, or pandrarallel specified --- using normal df.apply()"
+            print(msg)
+            enriched_df = df.apply(self.enrich_row, axis=1)
+
 
         if self.save_csv:
             results_csv = self.summary_table_filename
@@ -101,7 +144,10 @@ class WidesScaleTest(object):
         # 					help='the category of the stuff')
         parser.add_argument("--endrow", help="Last row to process (zero-indexed)", type=none_or_int, default=None,
                             nargs='?', )
-
+        parser.add_argument("--use_pandarallel", help="Will use default pandarallel if True", type=bool,
+                            default=False)
+        parser.add_argument("--use_dask", help="Will use dask if True, but you will need to define --npart", type=bool,
+                            default=False)
         args, unknown = parser.parse_known_args()
 
 
@@ -111,6 +157,11 @@ class WidesScaleTest(object):
         self.startrow = args.startrow
         print(f"endrow = {args.endrow} {type(args.endrow)}")
         self.endrow = args.endrow
+        print(f"use_dask = {args.use_dask} {type(args.use_dask)}")
+        self._use_dask = args.use_dask
+        print(f"use_pandarallel = {args.use_pandarallel} {type(args.use_pandarallel)}")
+        self._use_pandarallel = args.use_pandarallel
+
         if isinstance(args.endrow, str):
             args.endrow = int(args.endrow)
 

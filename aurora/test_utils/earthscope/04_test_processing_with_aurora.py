@@ -25,8 +25,6 @@ from mth5.clients import FDSN, MakeMTH5
 from mth5.helpers import close_open_files
 from mth5.mth5 import MTH5
 
-USE_SKELETON = True
-N_PARTITIONS = 0
 STAGE_ID = 4
 
 

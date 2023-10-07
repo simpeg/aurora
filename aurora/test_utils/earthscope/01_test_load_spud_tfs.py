@@ -14,12 +14,6 @@ Dask Notes:
 
 Not much difference.
 
-Link where I originally got into dask apply with partitions: ____find this again__
-
-But I am starting to suspect multiprocessing is the right solution..
-https://stackoverflow.com/questions/67457956/how-to-parallelize-the-row-wise-pandas-dataframes-apply-method
-but read this first:
-https://examples.dask.org/applications/embarrassingly-parallel.html
 """
 
 

@@ -11,13 +11,14 @@ with open("README.rst") as readme_file:
 #    history = history_file.read()
 
 requirements = [
-    "dask",
+    "dask[complete]",
     "matplotlib",
     "mth5",
     "mt_metadata",
     "numpy",
     "numba",
     "obspy",
+    "pandarallel",
     "psutil",
     "pandas<1.5",
     "scipy",
