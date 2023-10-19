@@ -21,10 +21,6 @@ from aurora.pipelines.run_summary import RunSummary
 from aurora.test_utils.earthscope.widescale import WidesScaleTest
 from aurora.transfer_function.kernel_dataset import KernelDataset
 
-from mth5.clients import FDSN, MakeMTH5
-from mth5.helpers import close_open_files
-from mth5.mth5 import MTH5
-
 STAGE_ID = 4
 
 
