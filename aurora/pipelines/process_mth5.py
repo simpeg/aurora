@@ -298,8 +298,14 @@ def process_mth5(
     tfk = TransferFunctionKernel(dataset=tfk_dataset, config=config)
     tfk.make_processing_summary()
     tfk.validate()
+
     # See Note #1
-    tfk.initialize_mth5s(mode="a")
+    if config.decimations[0].save_fcs:
+        mth5_mode = "a"
+    else:
+        mth5_mode = "r"
+    tfk.initialize_mth5s(mode=mth5_mode)
+        
     tfk.check_if_fc_levels_already_exist()  # populate the "fc" column of dataset_df
     print(f"fc_levels_already_exist = {tfk.dataset_df['fc']}")
     print(
