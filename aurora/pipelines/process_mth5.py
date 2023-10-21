@@ -298,20 +298,23 @@ def process_mth5(
     tfk = TransferFunctionKernel(dataset=tfk_dataset, config=config)
     tfk.make_processing_summary()
     tfk.validate()
-
     # See Note #1
     if config.decimations[0].save_fcs:
         mth5_mode = "a"
     else:
         mth5_mode = "r"
     tfk.initialize_mth5s(mode=mth5_mode)
-        
-    tfk.check_if_fc_levels_already_exist()  # populate the "fc" column of dataset_df
-    print(f"fc_levels_already_exist = {tfk.dataset_df['fc']}")
-    print(
-        f"Processing config indicates {len(tfk.config.decimations)} "
-        f"decimation levels "
-    )
+    try:
+        tfk.check_if_fc_levels_already_exist()  # populate the "fc" column of dataset_df
+        print(f"fc_levels_already_exist = {tfk.dataset_df['fc']}")
+        print(
+            f"Processing config indicates {len(tfk.config.decimations)} "
+            f"decimation levels "
+        )
+    except:
+        msg = "WARNING -- Unable to execute check for FC Levels"
+        msg = f"{msg} Possibly FCs not present at all (file from old MTH5 version)?"
+        print(f"{msg}")
 
     tf_dict = {}
 
@@ -339,6 +342,15 @@ def process_mth5(
 
             run_xrds = row["run_dataarray"].to_dataset("channel")
             run_obj = row.mth5_obj.from_reference(row.run_reference)
+
+            # Musgraves workaround for old MT data
+            try:
+                assert row.run_id == run_obj.metadata.id
+            except AssertionError:
+                print("WARNING Run ID in dataset_df does not match run_obj")
+                print("WARNING Forcing run metadata to match dataset_df")
+                run_obj.metadata.id = row.run_id
+                
             stft_obj = make_stft_objects(
                 tfk.config, i_dec_level, run_obj, run_xrds, units, row.station_id
             )
@@ -370,6 +382,7 @@ def process_mth5(
         tf_dict=tf_dict, processing_config=tfk.config
     )
 
+    # Force collection to HEXY
     tf_cls = tfk.export_tf_collection(tf_collection)
 
     if z_file_path:
