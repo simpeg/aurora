@@ -483,7 +483,7 @@ class TransferFunctionKernel(object):
 
         def make_decimation_dict_for_tf(tf_collection, processing_config):
             """
-            Decimation dict is used by mt_metadata's TF class when it is writng z-files.
+            Decimation dict is used by mt_metadata's TF class when it is writing z-files.
             If no z-files will be written this is not needed
 
             sample element of decimation_dict:

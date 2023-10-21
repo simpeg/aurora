@@ -188,7 +188,13 @@ class KernelDataset:
 
     @property
     def local_survey_metadata(self):
-        return self.survey_metadata[self.local_survey_id]
+        try:
+            return self.survey_metadata[self.local_survey_id]
+        except KeyError:
+            msg = f"Unexpected key {self.local_survey_id} not found in survey_metadata"
+            msg += f"{msg} WARNING -- Maybe old MTH5 -- trying to use key '0'"
+            print(msg)
+            return self.survey_metadata["0"]
 
     def _add_duration_column(self):
         """ """
