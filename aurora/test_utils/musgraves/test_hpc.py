@@ -1,3 +1,5 @@
+import argparse
+import pathlib
 import pandas as pd
 
 from aurora.config.config_creator import ConfigCreator
@@ -11,18 +13,24 @@ from aurora.transfer_function.kernel_dataset import KernelDataset
 USE_PANDARALEL = True
 RESULTS_PATH = get_results_dir()
 
-processing_df = pd.read_csv("/scratch/tq84/kk9397/musgraves/1_processing_list_with_workarounds.csv")
-processing_df
 
-# availability_df = get_musgraves_availability_df()
-# processing_df = availability_df
 
-processing_df = processing_df[0:2]
+def none_or_str(value):
+    if value == 'None':
+        return None
+    return value
 
+def none_or_int(value):
+    if value == 'None':
+        return None
+    return int(value)
 
 
 def enrich_row_with_processing(row):
     mth5_files = [row.path,]
+    print("path", row.path, "type", type(row.path))
+    my_h5 = pathlib.Path(row.path)
+    print(f"{my_h5.exists()} my_h5.exists()")
     xml_file_path = RESULTS_PATH.joinpath(f"{row.station_id}.xml")
     print(xml_file_path)
     # if xml_file_path.exists():
@@ -73,7 +81,7 @@ def enrich_row_with_processing(row):
 
 
 
-def process_lots_of_mth5s(df):
+def process_lots_of_mth5s(df, use_pandarallel=False):
     """
 
     Parameters
@@ -89,21 +97,49 @@ def process_lots_of_mth5s(df):
     """
     df["exception"] = ""
     df["error"] = ""
-    if USE_PANDARALEL:
+    if use_pandarallel:
         from pandarallel import pandarallel
         pandarallel.initialize(verbose=3)
         enriched_df = df.parallel_apply(enrich_row_with_processing, axis=1)
     else:
+        print("NO PANDARALEL")
+        #return None
         enriched_df = df.apply(enrich_row_with_processing, axis=1)
 
     return enriched_df
 
 
-enriched_df = process_lots_of_mth5s(processing_df)
-print(enriched_df)
+def parse_args():
+    """Argparse tutorial: https://docs.python.org/3/howto/argparse.html"""
+    parser = argparse.ArgumentParser(description="Wide Scale Musgraves Test")
+    parser.add_argument("--startrow", help="First row to process (zero-indexed)", type=int, default=0)
+    parser.add_argument("--endrow", help="Last row to process (zero-indexed)", type=none_or_int, default=None,
+                        nargs='?', )
+    parser.add_argument("--use_pandarallel", help="Will use default pandarallel if True", type=bool,
+                        default=False)
+    args, unknown = parser.parse_known_args()
 
-#enriched_df.error
 
+    print(f"startrow = {args.startrow}")
+    print(f"endrow = {args.endrow}")
+    print(f"use_pandarallel = {args.use_pandarallel}")
+    return args
+
+def main():
+    processing_df = pd.read_csv("/scratch/tq84/kk9397/musgraves/l1_processing_list_with_workarounds.csv")
+    print(processing_df)
+
+    # availability_df = get_musgraves_availability_df()
+    # processing_df = availability_df
+
+    #processing_df = processing_df[0:2]
+    args = parse_args()
+    enriched_df = process_lots_of_mth5s(processing_df, use_pandarallel=args.use_pandarallel)
+    print(enriched_df)
+
+
+if __name__ == "__main__":
+    main()
 
 
 
