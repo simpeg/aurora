@@ -382,7 +382,6 @@ def process_mth5(
         tf_dict=tf_dict, processing_config=tfk.config
     )
 
-    # Force collection to HEXY
     tf_cls = tfk.export_tf_collection(tf_collection)
 
     if z_file_path:
