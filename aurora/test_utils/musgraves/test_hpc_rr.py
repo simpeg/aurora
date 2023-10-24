@@ -16,7 +16,7 @@ MUSGRAVES_PATH = pathlib.Path("/g/data/my80/AuScope_MT_collection/AuScope_AusLAM
 
 def get_l1_path(station):
     l1_path = MUSGRAVES_PATH.joinpath(f"f{station[0:2]}")
-    l1_path = l1_path.joinpath("level_1","Concatenated_Resampled_Rotated_Time_Series_MTH5", f"{row.station_id}.h5")
+    l1_path = l1_path.joinpath("level_1","Concatenated_Resampled_Rotated_Time_Series_MTH5", f"{station}.h5")
     return l1_path
 def make_processing_df():
     from aurora.test_utils.musgraves.rr_mappings import station_combinations
