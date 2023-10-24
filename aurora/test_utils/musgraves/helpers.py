@@ -19,13 +19,18 @@ import pandas as pd
 import pathlib
 import socket
 
-def get_results_dir():
+def get_results_dir(ss_or_rr):
     hostname = socket.gethostname()
     print(f"hostname: {hostname}")
     if "gadi" in hostname:
         results_path = pathlib.Path("/scratch/tq84/kk9397/musgraves/aurora_results/level_1/single_station")
     elif hostname == "namazu":
         results_path = pathlib.Path("/home/kkappler/.cache/musgraves/aurora_results/level_1/single_station")
+
+    if ss_or_rr.upper()=="SS":
+        results_path = results_path.joinpath("single_station")
+    elif ss_or_rr.upper()=="RR":
+        results_path = results_path.joinpath("remote_reference")
     return results_path
 def get_data_dir():
 

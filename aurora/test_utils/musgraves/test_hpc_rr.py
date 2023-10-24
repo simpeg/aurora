@@ -3,16 +3,26 @@ import pathlib
 import pandas as pd
 
 from aurora.config.config_creator import ConfigCreator
-from aurora.config import BANDS_TEST_FAST_FILE
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
-from aurora.test_utils.musgraves.helpers import get_musgraves_availability_df
 from aurora.test_utils.musgraves.helpers import get_results_dir
+from aurora.test_utils.musgraves.rr_mappings import station_combinations
 from aurora.transfer_function.kernel_dataset import KernelDataset
 
 USE_PANDARALEL = True
-RESULTS_PATH = get_results_dir("SS")
+# RESULTS_PATH = get_results_dir()
+RESULTS_PATH = pathlib.Path("/scratch/tq84/kk9397/musgraves/aurora_results/level_1/remote_reference")
+L1_PATH = pathlib.Path("/g/data/my80/AuScope_MT_collection/AuScope_AusLAMP/Musgraves_APY/WA/level_1/Concatenated_Resampled_Rotated_Time_Series_MTH5")
 
+def make_processing_df():
+    from aurora.test_utils.musgraves.rr_mappings import station_combinations
+    n_combos = len(station_combinations)
+    df_dict = {"station_id":n_combos*[""], "remote_id":n_combos*[""], }
+    for i,combo in enumerate(station_combinations):
+        df_dict["station_id"][i] = combo[0]
+        df_dict["remote_id"][i] = combo[1]
+    df = pd.DataFrame(data=df_dict)
+    return df
 
 
 def none_or_str(value):
@@ -27,11 +37,15 @@ def none_or_int(value):
 
 
 def enrich_row_with_processing(row):
-    mth5_files = [row.path,]
-    print("path", row.path, "type", type(row.path))
-    my_h5 = pathlib.Path(row.path)
-    print(f"{my_h5.exists()} my_h5.exists()")
-    xml_file_path = RESULTS_PATH.joinpath(f"{row.station_id}.xml")
+    station_path = L1_PATH.joinpath(f"{row.station_id}.h5")
+    remote_path = L1_PATH.joinpath(f"{row.remote_id}.h5")
+    mth5_files = [station_path, remote_path]
+    #print("path", row.path, "type", type(row.path))
+    #my_h5 = pathlib.Path(row.path)
+    #print(f"{my_h5.exists()} my_h5.exists()")
+    print(f"{station_path.exists()} station_path.exists()")
+    print(f"{remote_path.exists()} remote_path.exists()")
+    xml_file_path = RESULTS_PATH.joinpath(f"{row.station_id}_RR{row.remote_id}.xml")
     print(xml_file_path)
     # if xml_file_path.exists():
     #     if not self.force_reprocess:
@@ -44,7 +58,7 @@ def enrich_row_with_processing(row):
         run_summary = mth5_run_summary.clone()
         #run_summary.check_runs_are_valid(drop=True)
         kernel_dataset = KernelDataset()
-        kernel_dataset.from_run_summary(run_summary, row.station_id, None)
+        kernel_dataset.from_run_summary(run_summary, row.station_id, row.remote_id)
         print("WORKAROUND")
         kernel_dataset.df["survey"] = "AusLAMP_Musgraves"
         kernel_dataset.df["run_id"] = "001"
@@ -65,7 +79,7 @@ def enrich_row_with_processing(row):
         config.set_default_input_output_channels()
         show_plot = False
               
-        z_file = str(xml_file_path).replace("xml", "zss")
+        z_file = str(xml_file_path).replace("xml", "zrr")
         tf_cls = process_mth5(config,
                               kernel_dataset,
                               units="MT",
@@ -126,11 +140,9 @@ def parse_args():
     return args
 
 def main():
-    processing_df = pd.read_csv("/scratch/tq84/kk9397/musgraves/l1_processing_list_with_workarounds.csv")
+    processing_df = make_processing_df()
+#    processing_df = pd.read_csv("/scratch/tq84/kk9397/musgraves/l1_processing_list_with_workarounds.csv")
     print(processing_df)
-
-    # availability_df = get_musgraves_availability_df()
-    # processing_df = availability_df
 
     #processing_df = processing_df[0:2]
     args = parse_args()
