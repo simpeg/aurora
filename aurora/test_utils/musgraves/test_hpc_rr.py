@@ -11,12 +11,16 @@ from aurora.transfer_function.kernel_dataset import KernelDataset
 
 USE_PANDARALEL = True
 RESULTS_PATH = get_results_dir("RR")
+if not RESULTS_PATH.exists():
+    print("RESULTS_PATH", RESULTS_PATH)
+    raise NotADirectoryError
 MUSGRAVES_PATH = pathlib.Path("/g/data/my80/AuScope_MT_collection/AuScope_AusLAMP/Musgraves_APY")
 #L1_PATH = pathlib.Path("/g/data/my80/AuScope_MT_collection/AuScope_AusLAMP/Musgraves_APY/WA/level_1/Concatenated_Resampled_Rotated_Time_Series_MTH5")
 
 def get_l1_path(station):
-    l1_path = MUSGRAVES_PATH.joinpath(f"f{station[0:2]}")
+    l1_path = MUSGRAVES_PATH.joinpath(f"{station[0:2]}")
     l1_path = l1_path.joinpath("level_1","Concatenated_Resampled_Rotated_Time_Series_MTH5", f"{station}.h5")
+    print(f"l1_path = {l1_path}")
     return l1_path
 def make_processing_df():
     from aurora.test_utils.musgraves.rr_mappings import station_combinations
