@@ -10,14 +10,18 @@ from aurora.test_utils.musgraves.rr_mappings import station_combinations
 from aurora.transfer_function.kernel_dataset import KernelDataset
 
 USE_PANDARALEL = True
-# RESULTS_PATH = get_results_dir()
-RESULTS_PATH = pathlib.Path("/scratch/tq84/kk9397/musgraves/aurora_results/level_1/remote_reference")
-L1_PATH = pathlib.Path("/g/data/my80/AuScope_MT_collection/AuScope_AusLAMP/Musgraves_APY/WA/level_1/Concatenated_Resampled_Rotated_Time_Series_MTH5")
+RESULTS_PATH = get_results_dir("RR")
+MUSGRAVES_PATH = pathlib.Path("/g/data/my80/AuScope_MT_collection/AuScope_AusLAMP/Musgraves_APY")
+#L1_PATH = pathlib.Path("/g/data/my80/AuScope_MT_collection/AuScope_AusLAMP/Musgraves_APY/WA/level_1/Concatenated_Resampled_Rotated_Time_Series_MTH5")
 
+def get_l1_path(station):
+    l1_path = MUSGRAVES_PATH.joinpath(f"f{station[0:2]}")
+    l1_path = l1_path.joinpath("level_1","Concatenated_Resampled_Rotated_Time_Series_MTH5", f"{row.station_id}.h5")
+    return l1_path
 def make_processing_df():
     from aurora.test_utils.musgraves.rr_mappings import station_combinations
     n_combos = len(station_combinations)
-    df_dict = {"station_id":n_combos*[""], "remote_id":n_combos*[""], }
+    df_dict = {"station_id":n_combos*[""], "remote_id":n_combos*[""], "remote_id":n_combos*[""], }
     for i,combo in enumerate(station_combinations):
         df_dict["station_id"][i] = combo[0]
         df_dict["remote_id"][i] = combo[1]
@@ -37,8 +41,9 @@ def none_or_int(value):
 
 
 def enrich_row_with_processing(row):
-    station_path = L1_PATH.joinpath(f"{row.station_id}.h5")
-    remote_path = L1_PATH.joinpath(f"{row.remote_id}.h5")
+
+    station_path = get_l1_path(row.station_id)
+    remote_path = get_l1_path(row.remote_id)
     mth5_files = [station_path, remote_path]
     #print("path", row.path, "type", type(row.path))
     #my_h5 = pathlib.Path(row.path)
@@ -147,6 +152,7 @@ def main():
     #processing_df = processing_df[0:2]
     args = parse_args()
     enriched_df = process_lots_of_mth5s(processing_df, use_pandarallel=args.use_pandarallel)
+
     print(enriched_df)
 
 
