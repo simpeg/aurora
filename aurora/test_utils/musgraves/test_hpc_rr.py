@@ -1,27 +1,31 @@
 import argparse
 import pathlib
 import pandas as pd
-
+import socket
 from aurora.config.config_creator import ConfigCreator
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
+from aurora.test_utils.musgraves.helpers import get_data_dir
 from aurora.test_utils.musgraves.helpers import get_results_dir
 from aurora.test_utils.musgraves.rr_mappings import station_combinations
 from aurora.transfer_function.kernel_dataset import KernelDataset
+
 
 USE_PANDARALEL = True
 RESULTS_PATH = get_results_dir("RR")
 if not RESULTS_PATH.exists():
     print("RESULTS_PATH", RESULTS_PATH)
     raise NotADirectoryError
-MUSGRAVES_PATH = pathlib.Path("/g/data/my80/AuScope_MT_collection/AuScope_AusLAMP/Musgraves_APY")
-#L1_PATH = pathlib.Path("/g/data/my80/AuScope_MT_collection/AuScope_AusLAMP/Musgraves_APY/WA/level_1/Concatenated_Resampled_Rotated_Time_Series_MTH5")
+
+DATA_DIR = get_data_dir()
+MUSGRAVES_PATH = DATA_DIR
 
 def get_l1_path(station):
     l1_path = MUSGRAVES_PATH.joinpath(f"{station[0:2]}")
     l1_path = l1_path.joinpath("level_1","Concatenated_Resampled_Rotated_Time_Series_MTH5", f"{station}.h5")
     print(f"l1_path = {l1_path}")
     return l1_path
+
 def make_processing_df():
     from aurora.test_utils.musgraves.rr_mappings import station_combinations
     n_combos = len(station_combinations)
@@ -86,6 +90,7 @@ def enrich_row_with_processing(row):
 #                                               emtf_band_file=BANDS_TEST_FAST_FILE)
         config.channel_nomenclature.keyword = "musgraves"
         config.set_default_input_output_channels()
+        config.set_default_reference_channels()
         show_plot = False
               
         z_file = str(xml_file_path).replace("xml", "zrr")

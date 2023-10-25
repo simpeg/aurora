@@ -19,27 +19,30 @@ import pandas as pd
 import pathlib
 import socket
 
+HOME = pathlib.Path.home()
+
 def get_results_dir(ss_or_rr):
     hostname = socket.gethostname()
     print(f"hostname: {hostname}")
     if "gadi" in hostname:
         l1_results_path = pathlib.Path("/scratch/tq84/kk9397/musgraves/aurora_results/level_1")
-    elif hostname == "namazu":
-        l1_results_path = pathlib.Path("/home/kkappler/.cache/musgraves/aurora_results/level_1")
+    else:
+        l1_results_path = HOME.joinpath(".cache/musgraves/aurora_results/level_1")
 
     if ss_or_rr.upper()=="SS":
         results_path = l1_results_path.joinpath("single_station")
     elif ss_or_rr.upper()=="RR":
         results_path = l1_results_path.joinpath("remote_reference")
     return results_path
+
 def get_data_dir():
 
     hostname = socket.gethostname()
     print(f"hostname: {hostname}")
     if "gadi" in hostname:
         my80_path = pathlib.Path("/g/data/my80")
-    elif hostname == "namazu":
-        my80_path = pathlib.Path("/home/kkappler/data/gadi/g/data/my80")
+    else:
+        my80_path = HOME.joinpath("data/gadi/g/data/my80")
 
     au_scope_mt_collection_path = my80_path.joinpath("AuScope_MT_collection")
     auslamp_path = au_scope_mt_collection_path.joinpath("AuScope_AusLAMP")
