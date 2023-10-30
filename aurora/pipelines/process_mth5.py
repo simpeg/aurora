@@ -161,6 +161,7 @@ def triage_issue_289(local_stfts, remote_stfts):
     Timing Error Workaround See Aurora Issue #289: seems associated with getting one fewer sample than expected
     from the edge of a run.
     """
+
     n_chunks = len(local_stfts)
     for i_chunk in range(n_chunks):
         ok = local_stfts[i_chunk].time.shape == remote_stfts[i_chunk].time.shape
@@ -207,7 +208,6 @@ def append_chunk_to_stfts(stfts, chunk, remote):
     else:
         stfts["local"].append(chunk)
     return stfts
-
 
 def load_stft_obj_from_mth5(i_dec_level, row, run_obj):
     # Load stft_obj from mth5 (instead of compute)
@@ -299,6 +299,7 @@ def process_mth5(
     tfk.make_processing_summary()
     tfk.validate()
     # See Note #1
+
     if config.decimations[0].save_fcs:
         mth5_mode = "a"
     else:
@@ -315,6 +316,7 @@ def process_mth5(
         msg = "WARNING -- Unable to execute check for FC Levels"
         msg = f"{msg} Possibly FCs not present at all (file from old MTH5 version)?"
         print(f"{msg}")
+
 
     tf_dict = {}
 

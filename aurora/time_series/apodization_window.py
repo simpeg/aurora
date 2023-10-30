@@ -207,13 +207,18 @@ class ApodizationWindow(object):
         A      (1./coherent\_gain)\*np.sqrt((2\*dt)/(nenbw\*N))
         and
         B      np.sqrt(2/(sample\_rate\*self.S2))
+
         are identical.
 
         Note sqrt(2\*dt)==sqrt(2\*sample_rate) so we can cancel these terms and
         A=B IFF
-        (1./coherent\_gain) * np.sqrt(1/(nenbw\*N)) == 1/np.sqrt(S2)
+
+        (1./coherent_gain) \* np.sqrt(1/(nenbw\*N)) == 1/np.sqrt(S2)
         which I show in githib aurora issue #3 via .
         (CG\*\*2) \* NENBW \*N   =  S2
+
+        Returns
+        -------
 
         
         """

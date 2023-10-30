@@ -55,18 +55,20 @@ def test_generate_time_axis(t0, n_samples, sample_rate):
 
 
     Probably will use logic like:
-    if there_are_integer_ns_per_sample:
-        time_stamps = do_it_the_fast_way()
-    else:
-        time_stamps = do_it_the_slow_way()
-    return time_stamps
+    | if there_are_integer_ns_per_sample:
+    |     time_stamps = do_it_the_fast_way()
+    | else:
+    |     time_stamps = do_it_the_slow_way()
+    | return time_stamps
 
     Parameters
     ----------
-    t0
-    n_samples
-    sample_rate
-
+    t0 : _type_
+        _description_
+    n_samples : _type_
+        _description_
+    sample_rate : _type_ 
+        _description_
     Returns
     -------
 

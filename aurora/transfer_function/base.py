@@ -91,11 +91,12 @@ class TransferFunction(Base):
 
     @property
     def num_bands(self):
-        """
-        Returns num_bands : int
-            a count of the frequency bands associated with the TF
-        -------
+        """_summary_
 
+        Returns
+        -------
+        num_bands: int
+            a count of the frequency bands associated with the TF
         """
         return self.frequency_bands.number_of_bands
 
