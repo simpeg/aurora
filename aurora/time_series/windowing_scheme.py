@@ -30,13 +30,14 @@ Future modifications could involve:
 
 
 When 2D arrays are generated how should we index them?
-[[ 0  1  2]
- [ 2  3  4]
- [ 4  5  6]
- [ 6  7  8]
- [ 8  9 10]
- [10 11 12]
- [12 13 14]]
+|    [[ 0  1  2]
+|    [ 2  3  4]
+|    [ 4  5  6]
+|    [ 6  7  8]
+|    [ 8  9 10]
+|    [10 11 12]
+|    [12 13 14]]
+
 In this example the rows are indexing the individual windows ... and so they
 should be associated with the time of each window.  We will need to set a
 standard for this.  Obvious options are center_time of window and time_of_first
@@ -288,8 +289,8 @@ class WindowingScheme(ApodizationWindow):
             This is a time axis for the windowed data.  Say that we had 1Hz
             data starting at t=0 and 100 samples.  Then we window,
             with window length 10, and advance 10, the window time axis is
-             [0, 10, 20 , ... 90].  Say the same window length, but now
-             advance is 5.  Then [0, 5, 10, 15, ... 90] is the result.
+            [0, 10, 20 , ... 90].  Say the same window length, but now
+            advance is 5.  Then [0, 5, 10, 15, ... 90] is the result.
 
 
         """
@@ -387,9 +388,10 @@ class WindowingScheme(ApodizationWindow):
         """
         Returns
         -------
-        calibration_factor : float
-            Following Hienzel et al 2002, Equations 24 and 25 for Linear
-            Spectral Density correction for a single sided spectrum.
+        float
+            calibration_factor: Following Hienzel et al 2002, 
+                Equations 24 and 25 for Linear Spectral Density 
+                correction for a single sided spectrum.
         """
         return np.sqrt(2 / (self.sample_rate * self.S2))
 

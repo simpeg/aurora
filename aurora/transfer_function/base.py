@@ -10,10 +10,11 @@ from mt_metadata.base import Base
 
 
 class TransferFunction(Base):
-    """
-    Class to contain transfer function array.
+    """Class to contain transfer function array.
+    
 
-    Parameters:
+    Parameters
+    ----------
     TF : numpy array
         array of transfer functions: TF(Nout, Nin, Nperiods)
     T : numpy array
@@ -30,6 +31,8 @@ class TransferFunction(Base):
     FullCov : boolean
         true if full covariance is provided
 
+    Returns
+    -------
     properties (Dependent)
     StdErr % standard errors of TF components, same size and order as TF
     NBands

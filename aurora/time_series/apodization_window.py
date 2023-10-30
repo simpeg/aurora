@@ -5,18 +5,18 @@ Module to manage windowing prior to FFT.  Intended to support most
 apodization  windows available via scipy.signal.get_window()
 
 
-    Supported Window types = ['boxcar', 'triang', 'blackman', 'hamming', 'hann',
-      'bartlett', 'flattop', 'parzen', 'bohman', 'blackmanharris',
-      'nuttall', 'barthann', 'kaiser', 'gaussian', 'general_gaussian',
-      'slepian', 'chebwin']
-
-    have_additional_args = {
-      'kaiser' : 'beta',
-      'gaussian' : 'std',
-      'general_gaussian' : ('power', 'width'),
-      'slepian' : 'width',
-      'chebwin' : 'attenuation',
-    }
+|    Supported Window types = ['boxcar', 'triang', 'blackman', 'hamming', 'hann',
+|      'bartlett', 'flattop', 'parzen', 'bohman', 'blackmanharris',
+|      'nuttall', 'barthann', 'kaiser', 'gaussian', 'general_gaussian',
+|      'slepian', 'chebwin']
+|
+|    have_additional_args = {
+|      'kaiser' : 'beta',
+|      'gaussian' : 'std',
+|      'general_gaussian' : ('power', 'width'),
+|      'slepian' : 'width',
+|      'chebwin' : 'attenuation',
+|    }
 
 The Taper Config has 2 possible forms:
 1. Standard form for accessing scipy.signal:
@@ -113,12 +113,10 @@ class ApodizationWindow(object):
     @property
     def summary(self):
         """
-
         Returns
         -------
         out_str: str
-            String comprised of the taper_family, number_of_samples, and True/False
-            if self.taper is not None
+            String comprised of the taper_family, number_of_samples, and True/False if self.taper is not None
         """
         self.test_linear_spectral_density_factor()
         string1 = f"{self.taper_family} {self.num_samples_window}"
