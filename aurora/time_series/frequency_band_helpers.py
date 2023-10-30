@@ -96,3 +96,4 @@ def frequency_band_edges(
     fence_posts = f_lower_bound * (bases**exponents)
     print(f"fence posts = {fence_posts}")
     return fence_posts
+

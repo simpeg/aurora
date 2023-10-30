@@ -23,19 +23,14 @@ maximize coverage of the local station runs is generated
 import copy
 import pandas as pd
 
+
+from mt_metadata.transfer_functions.processing.aurora.channel_nomenclature import ALLOWED_INPUT_CHANNELS
+from mt_metadata.transfer_functions.processing.aurora.channel_nomenclature import ALLOWED_OUTPUT_CHANNELS
 import mth5
 from mth5.utils.helpers import initialize_mth5
 
 
-INPUT_CHANNELS = [
-    "hx",
-    "hy",
-]
-OUTPUT_CHANNELS = [
-    "ex",
-    "ey",
-    "hz",
-]
+
 RUN_SUMMARY_COLUMNS = [
     "survey",
     "station_id",
@@ -149,8 +144,8 @@ class RunSummary:
 
 def channel_summary_to_run_summary(
     ch_summary,
-    allowed_input_channels=INPUT_CHANNELS,
-    allowed_output_channels=OUTPUT_CHANNELS,
+    allowed_input_channels=ALLOWED_INPUT_CHANNELS,
+    allowed_output_channels=ALLOWED_OUTPUT_CHANNELS,
     sortby=["station_id", "start"],
 ):
     """
@@ -321,7 +316,7 @@ def extract_run_summaries_from_mth5s(mth5_list, summary_type="run", deduplicate=
         if isinstance(mth5_elt, mth5.mth5.MTH5):
             mth5_obj = mth5_elt
         else:  # mth5_elt is a path or a string
-            mth5_obj = initialize_mth5(mth5_elt, mode="a")
+            mth5_obj = initialize_mth5(mth5_elt, mode="r")
 
         df = extract_run_summary_from_mth5(mth5_obj, summary_type=summary_type)
 

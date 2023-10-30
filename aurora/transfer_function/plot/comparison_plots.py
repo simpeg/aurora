@@ -52,43 +52,47 @@ def compare_two_z_files(
     print(f"scale_factor1: {scale_factor1}")
     fig, axs = plt.subplots(nrows=2, dpi=300, sharex=True)  # figsize=(8, 6.),
     markersize = kwargs.get("markersize", 3)
+    # Make LaTeX symbol strings
+    rho_phi_strings = {}
+    rho_phi_strings["rho"] = {}
+    rho_phi_strings["phi"] = {}
+    for xy_or_yx in ["xy", "yx"]:
+        rho_phi_strings["rho"][xy_or_yx] = f"$\\rho_{{{xy_or_yx}}}$"
+        rho_phi_strings["phi"][xy_or_yx] = f"$\phi_{{{xy_or_yx}}}$"
 
-    plot_rho(
-        axs[0],
-        zfile1.periods,
-        zfile1.rxy * scale_factor1,
-        label=f"{label1} rxy",
-        markersize=markersize,
-        marker="^",
-        color="red",
-    )
-    plot_rho(
-        axs[0],
-        zfile2.periods,
-        zfile2.rxy * scale_factor2,
-        label=f"{label2} rxy",
-        markersize=markersize,
-        marker="^",
-        color="black",
-    )
-    plot_rho(
-        axs[0],
-        zfile1.periods,
-        zfile1.ryx * scale_factor1,
-        label=f"{label1} ryx",
-        markersize=markersize,
-        color="blue",
-    )
-    plot_rho(
-        axs[0],
-        zfile2.periods,
-        zfile2.ryx,
-        label=f"{label2} ryx",
-        markersize=markersize,
-        color="black",
-    )
+    markers = {}
+    markers["xy"] = "^"
+    markers["yx"] = "o"
+    file1_colors = {}
+    file2_colors = {}
+    file1_colors["xy"] = "black"
+    file1_colors["yx"] = "black"
+    file2_colors["xy"] = "red"
+    file2_colors["yx"] = "blue"
+
+    rho_or_phi = "rho"
+    for xy_or_yx in ["xy", "yx"]:
+        plot_rho(
+            axs[0],
+            zfile1.periods,
+            zfile1.rho(xy_or_yx) * scale_factor1,
+            label=f"{label1} {rho_phi_strings[rho_or_phi][xy_or_yx]}",
+            markersize=markersize,
+            marker=markers[xy_or_yx],
+            color=file1_colors[xy_or_yx],
+        )
+        plot_rho(
+            axs[0],
+            zfile2.periods,
+            zfile2.rho(xy_or_yx) * scale_factor2,
+            label=f"{label2} {rho_phi_strings[rho_or_phi][xy_or_yx]}",
+            markersize=markersize,
+            marker=markers[xy_or_yx],
+            color=file2_colors[xy_or_yx],
+        )
+
     axs[0].legend(prop={"size": 6})
-    # axs[0].set_ylabel("$\rho_a$")
+    # axs[0].set_ylabel("$\\rho_a$")
     axs[0].set_ylabel("Apparent Resistivity $\Omega$-m")
     rho_ylims = kwargs.get("rho_ylims", [1, 1e3])
     if use_ylims:
@@ -97,44 +101,35 @@ def compare_two_z_files(
     if use_xlims:
         axs[0].set_xlim(xlims[0], xlims[1])
 
-    plot_phi(
-        axs[1],
-        zfile1.periods,
-        zfile1.pxy,
-        label=f"{label1} pxy",
-        markersize=markersize,
-        marker="^",
-        color="red",
-    )
-    plot_phi(
-        axs[1],
-        zfile2.periods,
-        zfile2.pxy,
-        label=f"{label2} pxy",
-        markersize=markersize,
-        marker="^",
-        color="black",
-    )
-    plot_phi(
-        axs[1],
-        zfile1.periods,
-        zfile1.pyx,
-        label=f"{label1} pyx",
-        markersize=markersize,
-        color="blue",
-    )
-    plot_phi(
-        axs[1],
-        zfile2.periods,
-        zfile2.pyx,
-        label=f"{label1} pyx",
-        markersize=markersize,
-        color="black",
-    )
+    rho_or_phi = "phi"
+    for xy_or_yx in ["xy", "yx"]:
+        plot_phi(
+            axs[1],
+            zfile1.periods,
+            zfile1.phi(xy_or_yx) * scale_factor1,
+            label=f"{label1} {rho_phi_strings[rho_or_phi][xy_or_yx]}",
+            markersize=markersize,
+            marker=markers[xy_or_yx],
+            color=file1_colors[xy_or_yx],
+        )
+        plot_phi(
+            axs[1],
+            zfile2.periods,
+            zfile2.phi(xy_or_yx) * scale_factor2,
+            label=f"{label2} {rho_phi_strings[rho_or_phi][xy_or_yx]}",
+            markersize=markersize,
+            marker=markers[xy_or_yx],
+            color=file2_colors[xy_or_yx],
+        )
+
+    axs[1].legend(prop={"size": 6})
     axs[1].set_xlabel("Period (s)")
     axs[1].set_ylabel("Phase (degrees)")
     phi_ylims = kwargs.get("phi_ylims", [0, 90])
     axs[1].set_ylim(phi_ylims[0], phi_ylims[1])
+
+    axs[0].grid(which = 'both', axis = 'both',)
+    axs[1].grid(which='both', axis='both', )
     if out_file:
         # if out_file[-3:] != ".png":
         #     out_file+=".png"

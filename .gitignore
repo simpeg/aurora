@@ -3,6 +3,7 @@ tests/io/from_matlab.zss
 *fix_issue*
 aurora/sandbox/config
 aurora/sandbox/data
+aurora/test_utils/earthscope/*png
 tests/cas04/aurora_results/*
 tests/cas04/config/*
 tests/cas04/data/*

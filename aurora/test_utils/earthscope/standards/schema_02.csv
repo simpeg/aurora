@@ -1,0 +1,16 @@
+,name,dtype,default
+0,network_id,string,
+1,station_id,string,
+2,filename,string,
+3,filesize,int64,-1
+4,num_channels_inventory,int64,-1
+5,num_channels_h5,int64,-1
+6,num_filterless_channels,int64,-1
+7,num_filter_details,string,
+8,filter_units_in_details,string,
+9,filter_units_out_details,string,
+10,exception,string,
+11,error_message,string,
+12,emtf_id,int64,-1
+13,data_id,int64,-1
+14,data_xml_filebase,string,
