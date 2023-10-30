@@ -57,13 +57,13 @@ Transfer Function Collection
     :undoc-members:
 
 
-Transfer Function Header
-************************
+.. Transfer Function Header
+.. ************************
 
-.. automodule:: aurora.transfer_function.transfer_function_header
-    :show-inheritance:
-    :members:
-    :undoc-members:
+.. .. automodule:: aurora.transfer_function.transfer_function_header
+..     :show-inheritance:
+..     :members:
+..     :undoc-members:
 
 
 TTFZ

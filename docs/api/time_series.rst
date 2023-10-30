@@ -30,13 +30,13 @@ Decorators
     :undoc-members:
 
 
-Frequency Band
-**************
+.. Frequency Band
+.. **************
 
-.. automodule:: aurora.time_series.frequency_band
-    :show-inheritance:
-    :members:
-    :undoc-members:
+.. .. automodule:: aurora.time_series.frequency_band
+..     :show-inheritance:
+..     :members:
+..     :undoc-members:
 
 
 Frequency Band Helpers
@@ -48,13 +48,13 @@ Frequency Band Helpers
     :undoc-members:
 
 
-Frequency Domain Helpers
-************************
+.. Frequency Domain Helpers
+.. ************************
 
-.. automodule:: aurora.time_series.frequency_domain_helpers
-    :show-inheritance:
-    :members:
-    :undoc-members:
+.. .. automodule:: aurora.time_series.frequency_domain_helpers
+..     :show-inheritance:
+..     :members:
+..     :undoc-members:
 
 
 Time Axis Helpers
