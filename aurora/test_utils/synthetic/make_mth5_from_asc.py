@@ -27,6 +27,7 @@ import pandas as pd
 import pathlib
 import scipy.signal as ssig
 
+from aurora.test_utils.synthetic.paths import DATA_PATH
 from aurora.test_utils.synthetic.station_config import make_filters
 from aurora.test_utils.synthetic.station_config import make_station_01
 from aurora.test_utils.synthetic.station_config import make_station_02
@@ -102,7 +103,8 @@ def create_run_ts_from_synthetic_run(run, df, channel_nomenclature="default"):
 
 def create_mth5_synthetic_file(
     station_cfgs,
-    mth5_path,
+    mth5_name,
+    target_folder=DATA_PATH,
     plot=False,
     add_nan_values=False,
     file_version="0.1.0",
@@ -143,7 +145,7 @@ def create_mth5_synthetic_file(
     mth5_path: pathlib.Path
         The path to the stored h5 file.
     """
-
+    mth5_path = target_folder.joinpath(mth5_name)
     # set name for output h5 file
     if add_nan_values:
         mth5_path = pathlib.Path(mth5_path.__str__().replace(".h5", "_nan.h5"))
@@ -226,13 +228,13 @@ def create_mth5_synthetic_file(
 
 def create_test1_h5(file_version="0.1.0", channel_nomenclature="default"):
     station_01_params = make_station_01(channel_nomenclature=channel_nomenclature)
-    mth5_path = station_01_params.mth5_path
+    mth5_name = station_01_params.mth5_name
     station_params = [
         station_01_params,
     ]
     mth5_path = create_mth5_synthetic_file(
         station_params,
-        mth5_path,
+        mth5_name,
         plot=False,
         file_version=file_version,
         channel_nomenclature=channel_nomenclature,
@@ -244,13 +246,13 @@ def create_test2_h5(
     file_version="0.1.0", channel_nomenclature="default", force_make_mth5=True
 ):
     station_02_params = make_station_02(channel_nomenclature=channel_nomenclature)
-    mth5_path = station_02_params.mth5_path
+    mth5_name = station_02_params.mth5_name
     station_params = [
         station_02_params,
     ]
     mth5_path = create_mth5_synthetic_file(
         station_params,
-        mth5_path,
+        mth5_name,
         plot=False,
         file_version=file_version,
         force_make_mth5=force_make_mth5,
@@ -260,13 +262,13 @@ def create_test2_h5(
 
 def create_test1_h5_with_nan(file_version="0.1.0", channel_nomenclature="default"):
     station_01_params = make_station_01(channel_nomenclature=channel_nomenclature)
-    mth5_path = station_01_params.mth5_path  # DATA_PATH.joinpath("test1.h5")
+    mth5_name = station_01_params.mth5_name  # DATA_PATH.joinpath("test1.h5")
     station_params = [
         station_01_params,
     ]
     mth5_path = create_mth5_synthetic_file(
         station_params,
-        mth5_path,
+        mth5_name,
         plot=False,
         add_nan_values=True,
         file_version=file_version,
@@ -278,10 +280,11 @@ def create_test12rr_h5(file_version="0.1.0", channel_nomenclature="default"):
     station_01_params = make_station_01(channel_nomenclature=channel_nomenclature)
     station_02_params = make_station_02(channel_nomenclature=channel_nomenclature)
     station_params = [station_01_params, station_02_params]
-    mth5_path = station_01_params.mth5_path.__str__().replace("test1.h5", "test12rr.h5")
+    #mth5_name = station_01_params.mth5_name.__str__().replace("test1.h5", "test12rr.h5")
+    mth5_name = "test12rr.h5"
     mth5_path = create_mth5_synthetic_file(
         station_params,
-        mth5_path,
+        mth5_name,
         file_version=file_version,
         channel_nomenclature=channel_nomenclature,
     )
@@ -299,7 +302,7 @@ def create_test3_h5(
     ]
     mth5_path = create_mth5_synthetic_file(
         station_params,
-        station_params[0].mth5_path,
+        station_params[0].mth5_name,
         file_version=file_version,
         force_make_mth5=force_make_mth5,
     )
@@ -307,10 +310,9 @@ def create_test3_h5(
 
 def create_test4_h5(file_version="0.1.0", channel_nomenclature="default"):
     station_04_params = make_station_04(channel_nomenclature=channel_nomenclature)
-    mth5_path = station_04_params.mth5_path
     mth5_path = create_mth5_synthetic_file(
         [station_04_params,],
-        mth5_path,
+        station_04_params.mth5_name,
         plot=False,
         file_version=file_version,
         channel_nomenclature=channel_nomenclature,

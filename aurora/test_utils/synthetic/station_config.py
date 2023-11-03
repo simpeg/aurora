@@ -102,7 +102,7 @@ class SyntheticStation(object):
         self.id = id
         self.latitude = kwargs.get("latitude", 0.0)
         self.runs = []
-        self.mth5_path = kwargs.get("mth5_path", None)  # not always used
+        self.mth5_name = kwargs.get("mth5_name", None)
 
 
 def make_station_01(channel_nomenclature="default"):
@@ -110,7 +110,7 @@ def make_station_01(channel_nomenclature="default"):
     channel_nomenclature_obj.keyword = channel_nomenclature
     EX, EY, HX, HY, HZ = channel_nomenclature_obj.unpack()
     station = SyntheticStation("test1")
-    station.mth5_path = DATA_PATH.joinpath("test1.h5")
+    station.mth5_name = "test1.h5"
 
     run_001 = SyntheticRun(
         "001",
@@ -147,8 +147,8 @@ def make_station_01(channel_nomenclature="default"):
 
 def make_station_02(channel_nomenclature="default"):
     test2 = make_station_01(channel_nomenclature=channel_nomenclature)
-    test2.mth5_path = DATA_PATH.joinpath("test2.h5")
     test2.id = "test2"
+    test2.mth5_name = "test2.h5"
     test2.runs[0].raw_data_path = DATA_PATH.joinpath("test2.asc")
     nan_indices = {}
     for channel in test2.runs[0].channels:
@@ -177,7 +177,7 @@ def make_station_03(channel_nomenclature="default"):
     channel_nomenclature_obj.keyword = channel_nomenclature
     EX, EY, HX, HY, HZ = channel_nomenclature_obj.unpack()
     station = SyntheticStation("test3")
-    station.mth5_path = DATA_PATH.joinpath("test3.h5")
+    station.mth5_name = "test3.h5"
     channels = channel_nomenclature_obj.channels
 
     nan_indices = {}
@@ -254,7 +254,7 @@ def make_station_04(channel_nomenclature="default"):
     channel_nomenclature_obj.keyword = channel_nomenclature
     EX, EY, HX, HY, HZ = channel_nomenclature_obj.unpack()
     station = SyntheticStation("test1")
-    station.mth5_path = DATA_PATH.joinpath("test_04_8Hz.h5")
+    station.mth5_name = "test_04_8Hz.h5"
 
     run_001 = SyntheticRun(
         "001",
