@@ -14,5 +14,4 @@ API Reference
     time_series
     transfer_function
     pipelines
-    interval
     general_helper_functions

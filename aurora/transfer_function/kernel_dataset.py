@@ -196,6 +196,7 @@ class KernelDataset:
             print(msg)
             return self.survey_metadata["0"]
 
+
     def _add_duration_column(self):
         """ """
         timedeltas = self.df.end - self.df.start
