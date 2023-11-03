@@ -5,7 +5,8 @@ Created on Fri Jun 25 16:03:21 2021
 @author: jpeacock
 
 This module is concerned with creating mth5 files from the synthetic test data
- that originally came from EMTF.
+ that originally came from EMTF -- test1.asc and test2.asc.  Each ascii file
+ represents five channels of data sampled at 1Hz at a synthetic station.
 
 Mirroring the original ascii files are:
 data/test1.h5
@@ -16,16 +17,21 @@ Also created are some files with the same data but other channel_nomenclature sc
 data/test12rr_LEMI34.h5
 data/test1_LEMI12.h5
 
+- 20231103: Added an 8Hz upsampled version of test1.  No spectral content was added
+so the band between the old and new Nyquist frequencies is bogus.
+
 """
 
 import numpy as np
 import pandas as pd
 import pathlib
+import scipy.signal as ssig
 
 from aurora.test_utils.synthetic.station_config import make_filters
 from aurora.test_utils.synthetic.station_config import make_station_01
 from aurora.test_utils.synthetic.station_config import make_station_02
 from aurora.test_utils.synthetic.station_config import make_station_03
+from aurora.test_utils.synthetic.station_config import make_station_04
 from mth5.timeseries import ChannelTS, RunTS
 from mth5.mth5 import MTH5
 from mt_metadata.transfer_functions.processing.aurora import ChannelNomenclature
@@ -49,7 +55,7 @@ def create_run_ts_from_synthetic_run(run, df, channel_nomenclature="default"):
     channel_nomenclature : string
         Keyword corresponding to channel nomenclature mapping in CHANNEL_MAPS variable
         from channel_nomenclature.py module in mt_metadata.
-        Supported values are ['default', 'lemi12', 'lemi34', 'phoenix123']
+        Supported values include ['default', 'lemi12', 'lemi34', 'phoenix123']
 
     Returns
     -------
@@ -102,6 +108,7 @@ def create_mth5_synthetic_file(
     file_version="0.1.0",
     channel_nomenclature="default",
     force_make_mth5=True,
+    upsample_factor=0,
 ):
     """
 
@@ -126,6 +133,9 @@ def create_mth5_synthetic_file(
     force_make_mth5: bool
         If set to true, the file will be made, even if it already exists.
         If false, and file already exists, skip the make job.
+    upsample_factor: int
+        Integer, only tested for 8, to make 8Hz data for testing.  If upsample_factor is set to
+        default (zero), then no upsampling takes place.
 
 
     Returns
@@ -160,6 +170,15 @@ def create_mth5_synthetic_file(
 
             # read in data
             df = pd.read_csv(run.raw_data_path, names=run.channels, sep="\s+")
+
+            # generate upsampled data if requested, store in df
+            if upsample_factor:
+                df_orig = df.copy(deep=True)
+                new_data_dict = {}
+                for i_ch,ch in enumerate(run.channels):
+                    data = df_orig[ch].to_numpy()
+                    new_data_dict[ch] = ssig.resample(data, upsample_factor * len(df_orig))
+                df = pd.DataFrame(data=new_data_dict)
 
             # add noise
             for col in run.channels:
@@ -286,6 +305,18 @@ def create_test3_h5(
     )
     return mth5_path
 
+def create_test4_h5(file_version="0.1.0", channel_nomenclature="default"):
+    station_04_params = make_station_04(channel_nomenclature=channel_nomenclature)
+    mth5_path = station_04_params.mth5_path
+    mth5_path = create_mth5_synthetic_file(
+        [station_04_params,],
+        mth5_path,
+        plot=False,
+        file_version=file_version,
+        channel_nomenclature=channel_nomenclature,
+        upsample_factor=8,
+    )
+    return mth5_path
 
 def main(file_version="0.1.0"):
     # file_version = "0.2.0"
@@ -294,6 +325,7 @@ def main(file_version="0.1.0"):
     create_test2_h5(file_version=file_version)
     create_test12rr_h5(file_version=file_version)
     create_test3_h5(file_version=file_version)
+    create_test4_h5(file_version=file_version)
 
 
 if __name__ == "__main__":
