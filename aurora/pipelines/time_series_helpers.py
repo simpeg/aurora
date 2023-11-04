@@ -3,6 +3,8 @@ import pandas as pd
 import scipy.signal as ssig
 import xarray as xr
 
+from loguru import logger
+
 from aurora.time_series.windowed_time_series import WindowedTimeSeries
 from aurora.time_series.windowing_scheme import window_scheme_from_decimation
 
@@ -243,7 +245,7 @@ def run_ts_to_stft(decimation_obj, run_xrds_orig):
     # need to remove any nans before windowing, or else if there is a single
     # nan then the whole channel becomes nan.
     run_xrds = nan_to_mean(run_xrds_orig)
-    run_xrds = apply_prewhitening(decimation_obj, run_xrds_orig)
+    run_xrds = apply_prewhitening(decimation_obj, run_xrds)
     run_xrds = truncate_to_clock_zero(decimation_obj, run_xrds)
     windowing_scheme = window_scheme_from_decimation(decimation_obj)
     windowed_obj = windowing_scheme.apply_sliding_window(
@@ -287,9 +289,11 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
         mth5_channel = run_obj.get_channel(channel_id)
         channel_filter = mth5_channel.channel_response_filter
         if not channel_filter.filters_list:
-            print("WARNING UNEXPECTED CHANNEL WITH NO FILTERS")
+            msg = f"Channel {channel_id} with empty filters list detected"
+            logger.warning(msg)
             if channel_id == "hy":
-                print("Channel HY has no filters, try using filters from HX")
+                msg = "Channel hy has no filters, try using filters from hx"
+                logger.warning("Channel HY has no filters, try using filters from HX")
                 channel_filter = run_obj.get_channel("hx").channel_response_filter
         calibration_response = channel_filter.complex_response(stft_obj.frequency.data)
         if channel_scale_factors:
