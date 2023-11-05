@@ -6,6 +6,7 @@ from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
 from aurora.test_utils.synthetic.paths import DATA_PATH
+from aurora.test_utils.synthetic.processing_helpers import get_example_kernel_dataset
 from aurora.transfer_function.kernel_dataset import KernelDataset
 from mth5.helpers import close_open_files
 
@@ -17,29 +18,10 @@ def test_can_declare_frequencies_directly_in_config():
     -------
 
     """
-    decimation_factors = [1, 4, 4, 4]
-
-    file_base = "test1.h5"
-
-    mth5_path = DATA_PATH.joinpath(file_base)
-    close_open_files()
-
-    if not mth5_path.exists():
-        create_test1_h5()
-
-    run_summary = RunSummary()
-    run_summary.from_mth5s(
-        [
-            mth5_path,
-        ]
-    )
-
-    kernel_dataset = KernelDataset()
-    kernel_dataset.from_run_summary(run_summary, "test1")
-
+    kernel_dataset = get_example_kernel_dataset()
     cc = ConfigCreator()
     cfg1 = cc.create_from_kernel_dataset(kernel_dataset, estimator={"engine": "RME"})
-
+    decimation_factors = list(cfg1.decimation_info().values())  # [1, 4, 4, 4]
     # Default Band edges, corresponds to DEFAULT_BANDS_FILE
     band_edges = cfg1.band_edges_dict
     cfg2 = cc.create_from_kernel_dataset(

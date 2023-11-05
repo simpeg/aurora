@@ -73,8 +73,8 @@ class ConfigCreator:
             self._band_specification_style = "EMTF"
         elif (self._emtf_band_file is not None) & (self._band_edges is not None):
             msg = "Bands defined twice, and possibly inconsistently"
-            logger.warning(msg)
-            raise Exception
+            logger.error(msg)
+            raise ValueError(msg)
         elif self._band_edges is not None:
             self._band_specification_style = "band_edges"
         elif self._emtf_band_file is not None:
