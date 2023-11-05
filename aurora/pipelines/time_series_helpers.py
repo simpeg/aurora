@@ -8,6 +8,7 @@ from loguru import logger
 from aurora.time_series.windowed_time_series import WindowedTimeSeries
 from aurora.time_series.windowing_scheme import window_scheme_from_decimation
 
+
 def validate_sample_rate(run_ts, expected_sample_rate, tol=1e-4):
     """
 
@@ -21,8 +22,10 @@ def validate_sample_rate(run_ts, expected_sample_rate, tol=1e-4):
 
     """
     if run_ts.sample_rate != expected_sample_rate:
-        msg = f"sample rate in run time series {run_ts.sample_rate} and "
+        msg = (
+            f"sample rate in run time series {run_ts.sample_rate} and "
             f"processing decimation_obj {expected_sample_rate} do not match"
+        )
         logger.warning(msg)
         delta = run_ts.sample_rate - expected_sample_rate
         if np.abs(delta) > tol:
@@ -197,8 +200,10 @@ def truncate_to_clock_zero(decimation_obj, run_xrds):
             n_clip = int(np.round(n_clip))
             t_clip = run_xrds.time[n_clip]
             cond1 = run_xrds.time >= t_clip
-            msg = f"dropping {n_clip} samples to agree with " \
-                  f"{decimation_obj.window.clock_zero_type} clock zero {clock_zero}"
+            msg = (
+                f"dropping {n_clip} samples to agree with "
+                f"{decimation_obj.window.clock_zero_type} clock zero {clock_zero}"
+            )
             logger.info(msg)
             run_xrds = run_xrds.where(cond1, drop=True)
     return run_xrds
