@@ -127,11 +127,14 @@ def add_filters(active_filters, m, survey_id):
 
 
 def get_set_survey_id(file_version, m):
-    if file_version == "0.2.0":
+    if m.file_version == "0.1.0":
+        survey_id = None
+    elif m.file_version == "0.2.0":
         survey_id = "EMTF Synthetic"
         m.add_survey(survey_id)
     else:
-        survey_id = None
+        msg = f"unexpected MTH5 file_version = {m.file_version}"
+        raise NotImplementedError(msg)
     return m, survey_id
 
 
@@ -241,16 +244,6 @@ def create_mth5_synthetic_file(
     # add filters
     active_filters = make_filters(as_list=True)
     add_filters(active_filters, m, survey_id)
-    # for fltr in active_filters:
-    #     if file_version == "0.1.0":
-    #         m.filters_group.add_filter(fltr)
-    #     elif file_version == "0.2.0":
-    #         survey = m.get_survey(survey_id)
-    #         survey.filters_group.add_filter(fltr)
-    #     else:
-    #         msg = f"unexpected MTH5 file_version = {file_version}"
-    #         raise NotImplementedError(msg)
-
     m.close_mth5()
     return mth5_path
 
