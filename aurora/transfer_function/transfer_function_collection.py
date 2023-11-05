@@ -13,6 +13,7 @@ import xarray as xr
 
 from aurora.transfer_function.plot.rho_phi_helpers import plot_phi
 from aurora.transfer_function.plot.rho_phi_helpers import plot_rho
+from aurora.general_helper_functions import FIGURES_PATH
 
 EMTF_REGRESSION_ENGINE_LABELS = {}
 EMTF_REGRESSION_ENGINE_LABELS["RME"] = "Robust Single Station"
@@ -199,6 +200,7 @@ class TransferFunctionCollection(object):
         markersize=10,
         rho_ylims=[10, 1000],
         phi_ylims=[0, 90],
+        figures_path=FIGURES_PATH,
         **kwargs,
     ):
         """
@@ -307,13 +309,14 @@ class TransferFunctionCollection(object):
         if phi_ylims is not None:
             axs[1].set_ylim(phi_ylims)
 
-        from aurora.general_helper_functions import FIGURES_PATH
-
-        default_figure_basename = f"{self.local_station_id}_{xy_or_yx}.png"
-        figure_basename = kwargs.get("figure_basename", default_figure_basename)
-        figure_path = kwargs.get("figure_path", FIGURES_PATH)
-        out_file = figure_path.joinpath(figure_basename)
-        plt.savefig(out_file)
-        if show:
-            plt.show()
-        plt.close(fig)
+        if figures_path is None:
+            print("figures path is not defined -- skipping saving figures")
+            return
+        else:
+            default_figure_basename = f"{self.local_station_id}_{xy_or_yx}.png"
+            figure_basename = kwargs.get("figure_basename", default_figure_basename)
+            out_file = figures_path.joinpath(figure_basename)
+            plt.savefig(out_file)
+            if show:
+                plt.show()
+            plt.close(fig)

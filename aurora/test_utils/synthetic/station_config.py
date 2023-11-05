@@ -102,7 +102,7 @@ class SyntheticStation(object):
         self.id = id
         self.latitude = kwargs.get("latitude", 0.0)
         self.runs = []
-        self.mth5_path = kwargs.get("mth5_path", None)  # not always used
+        self.mth5_name = kwargs.get("mth5_name", None)
 
 
 def make_station_01(channel_nomenclature="default"):
@@ -110,7 +110,7 @@ def make_station_01(channel_nomenclature="default"):
     channel_nomenclature_obj.keyword = channel_nomenclature
     EX, EY, HX, HY, HZ = channel_nomenclature_obj.unpack()
     station = SyntheticStation("test1")
-    station.mth5_path = DATA_PATH.joinpath("test1.h5")
+    station.mth5_name = "test1.h5"
 
     run_001 = SyntheticRun(
         "001",
@@ -147,8 +147,8 @@ def make_station_01(channel_nomenclature="default"):
 
 def make_station_02(channel_nomenclature="default"):
     test2 = make_station_01(channel_nomenclature=channel_nomenclature)
-    test2.mth5_path = DATA_PATH.joinpath("test2.h5")
     test2.id = "test2"
+    test2.mth5_name = "test2.h5"
     test2.runs[0].raw_data_path = DATA_PATH.joinpath("test2.asc")
     nan_indices = {}
     for channel in test2.runs[0].channels:
@@ -177,7 +177,7 @@ def make_station_03(channel_nomenclature="default"):
     channel_nomenclature_obj.keyword = channel_nomenclature
     EX, EY, HX, HY, HZ = channel_nomenclature_obj.unpack()
     station = SyntheticStation("test3")
-    station.mth5_path = DATA_PATH.joinpath("test3.h5")
+    station.mth5_name = "test3.h5"
     channels = channel_nomenclature_obj.channels
 
     nan_indices = {}
@@ -248,9 +248,41 @@ def make_station_03(channel_nomenclature="default"):
 
     return station
 
+def make_station_04(channel_nomenclature="default"):
+    """ Just like station 01, but data are resampled to 8Hz"""
+    channel_nomenclature_obj = ChannelNomenclature()
+    channel_nomenclature_obj.keyword = channel_nomenclature
+    EX, EY, HX, HY, HZ = channel_nomenclature_obj.unpack()
+    station = SyntheticStation("test1")
+    station.mth5_name = "test_04_8Hz.h5"
+
+    run_001 = SyntheticRun(
+        "001",
+        raw_data_path=DATA_PATH.joinpath("test1.asc"),
+        channel_nomenclature=channel_nomenclature,
+        start=None,
+        sample_rate=8.0,
+    )
+    run_001.nan_indices = {}
+
+    filters = {}
+    for ch in run_001.channels:
+        if ch in [EX, EY]:
+            filters[ch] = [
+                FILTERS["1x"].name,
+            ]
+        elif ch in [HX, HY, HZ]:
+            filters[ch] = [FILTERS["10x"].name, FILTERS["0.1x"].name]
+    run_001.filters = filters
+
+    station.runs = [
+        run_001,
+    ]
+
+    return station
 
 # def main():
-#     make_station_01()
+#     make_station_04()
 #
 # if __name__ == "__main__":
 #     main()

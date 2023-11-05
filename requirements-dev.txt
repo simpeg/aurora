@@ -6,4 +6,3 @@ pre-commit
 sphinx_gallery
 sphinx_rtd_theme
 ipython
-

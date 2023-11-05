@@ -1,10 +1,8 @@
 import logging
-import pathlib
 import unittest
 
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
-from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test2_h5
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5

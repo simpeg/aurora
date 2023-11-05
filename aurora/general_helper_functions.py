@@ -2,7 +2,6 @@ import inspect
 import os
 import scipy.io as sio
 import subprocess
-import xarray as xr
 
 from pathlib import Path
 
@@ -15,11 +14,15 @@ TEST_PATH = AURORA_PATH.joinpath("tests")
 SANDBOX = AURORA_PATH.joinpath("aurora", "sandbox")
 CONFIG_PATH = AURORA_PATH.joinpath("aurora", "config")
 BAND_SETUP_PATH = CONFIG_PATH.joinpath("emtf_band_setup")
-DATA_PATH = SANDBOX.joinpath("data")
-DATA_PATH.mkdir(exist_ok=True, parents=True)
-FIGURES_PATH = DATA_PATH.joinpath("figures")
-FIGURES_PATH.mkdir(exist_ok=True, parents=True)
-TEST_BAND_FILE = DATA_PATH.joinpath("bandtest.nc")
+try:
+    DATA_PATH = SANDBOX.joinpath("data")
+    DATA_PATH.mkdir(exist_ok=True, parents=True)
+    FIGURES_PATH = DATA_PATH.joinpath("figures")
+    FIGURES_PATH.mkdir(exist_ok=True, parents=True)
+    # TEST_BAND_FILE = DATA_PATH.joinpath("bandtest.nc")
+except OSError:
+    DATA_PATH = None
+    FIGURES_PATH = None
 mt_metadata_init = inspect.getfile(mt_metadata)
 MT_METADATA_DATA = Path(mt_metadata_init).parent.parent.joinpath("data")
 
@@ -98,38 +101,6 @@ def execute_command(cmd, **kwargs):
         if allow_exception:
             raise Exception(f"Failed to successfully execute \n {cmd}")
     os.chdir(cwd)
-
-
-# <HDF5 save/load complex valued data>
-def save_complex(data_array, *args, **kwargs):
-    """
-    netcdf and h5 do not handle complex values.  This method is a workaround.
-    https://stackoverflow.com/questions/47162983/how-to-save-xarray-dataarray-with-complex128-data-to-netcdf
-    Example Usage:
-    band_da is an xarray
-    save_complex(band_da, TEST_BAND_FILE)
-    band_da = read_complex(TEST_BAND_FILE)
-
-    Parameters
-    ----------
-    data_array
-    args
-    kwargs
-
-    Returns
-    -------
-
-    """
-    ds = xr.Dataset({"real": data_array.real, "imag": data_array.imag})
-    return ds.to_netcdf(*args, **kwargs)
-
-
-def read_complex(*args, **kwargs):
-    ds = xr.open_dataset(*args, **kwargs)
-    return ds["real"] + ds["imag"] * 1j
-
-
-# </HDF5 save/load complex valued data>
 
 
 def save_to_mat(data, variable_name, filename):

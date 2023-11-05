@@ -3,8 +3,11 @@ import pandas as pd
 import scipy.signal as ssig
 import xarray as xr
 
+from loguru import logger
+
 from aurora.time_series.windowed_time_series import WindowedTimeSeries
 from aurora.time_series.windowing_scheme import window_scheme_from_decimation
+
 
 def validate_sample_rate(run_ts, expected_sample_rate, tol=1e-4):
     """
@@ -14,25 +17,26 @@ def validate_sample_rate(run_ts, expected_sample_rate, tol=1e-4):
     run_ts: mth5.timeseries.run_ts.RunTS
         Time series object
     expected_sample_rate: float
-        The samepling rate the time series is expected to have. Normally taken from
+        The sample rate the time series is expected to have. Normally taken from
         the processing config
 
     """
     if run_ts.sample_rate != expected_sample_rate:
-        print(
+        msg = (
             f"sample rate in run time series {run_ts.sample_rate} and "
             f"processing decimation_obj {expected_sample_rate} do not match"
         )
+        logger.warning(msg)
         delta = run_ts.sample_rate - expected_sample_rate
         if np.abs(delta) > tol:
-            print(f"Delta sample rate {delta} > {tol} tolerance")
-            print("TOL should be a percentage")
-            raise Exception
+            msg = f"Delta sample rate {delta} > {tol} tolerance"
+            msg += "TOL should be a percentage"
+            raise Exception(msg)
 
 
 def apply_prewhitening(decimation_obj, run_xrds_input):
     """
-    Applys prewhitening to time series to avoid spectral leakage when FFT is applied.
+    Applies pre-whitening to time series to avoid spectral leakage when FFT is applied.
 
     If "first difference", may want to consider clipping first and last sample from
     the differentiated time series.
@@ -42,12 +46,12 @@ def apply_prewhitening(decimation_obj, run_xrds_input):
     decimation_obj : mt_metadata.transfer_functions.processing.aurora.DecimationLevel
         Information about how the decimation level is to be processed
     run_xrds_input : xarray.core.dataset.Dataset
-        Time series to be prewhitened
+        Time series to be pre-whitened
 
     Returns
     -------
     run_xrds : xarray.core.dataset.Dataset
-        prewhitened time series
+        pre-whitened time series
 
     """
     if not decimation_obj.prewhitening_type:
@@ -57,8 +61,9 @@ def apply_prewhitening(decimation_obj, run_xrds_input):
         run_xrds = run_xrds_input.differentiate("time")
 
     else:
-        print(f"{decimation_obj.prewhitening_type} pre-whitening not implemented")
-        raise NotImplementedError
+        msg = f"{decimation_obj.prewhitening_type} pre-whitening not implemented"
+        logger.exception(msg)
+        raise NotImplementedError(msg)
     return run_xrds
 
 
@@ -99,8 +104,9 @@ def apply_recoloring(decimation_obj, stft_obj):
     #     MA = 4 # add this to processing config
 
     else:
-        print(f"{decimation_obj.prewhitening_type} recoloring not yet implemented")
-        raise NotImplementedError
+        msg = f"{decimation_obj.prewhitening_type} recoloring not yet implemented"
+        logger.error(msg)
+        raise NotImplementedError(msg)
 
     return stft_obj
 
@@ -159,7 +165,7 @@ def run_ts_to_stft_scipy(decimation_obj, run_xrds_orig):
 
 def truncate_to_clock_zero(decimation_obj, run_xrds):
     """
-    Compute the time interval between the first data sample and the clockzero
+    Compute the time interval between the first data sample and the clock zero
     Identify the first sample in the xarray time series that corresponds to a
     window start sample.
 
@@ -194,10 +200,11 @@ def truncate_to_clock_zero(decimation_obj, run_xrds):
             n_clip = int(np.round(n_clip))
             t_clip = run_xrds.time[n_clip]
             cond1 = run_xrds.time >= t_clip
-            print(
+            msg = (
                 f"dropping {n_clip} samples to agree with "
                 f"{decimation_obj.window.clock_zero_type} clock zero {clock_zero}"
             )
+            logger.info(msg)
             run_xrds = run_xrds.where(cond1, drop=True)
     return run_xrds
 
@@ -243,7 +250,7 @@ def run_ts_to_stft(decimation_obj, run_xrds_orig):
     # need to remove any nans before windowing, or else if there is a single
     # nan then the whole channel becomes nan.
     run_xrds = nan_to_mean(run_xrds_orig)
-    run_xrds = apply_prewhitening(decimation_obj, run_xrds_orig)
+    run_xrds = apply_prewhitening(decimation_obj, run_xrds)
     run_xrds = truncate_to_clock_zero(decimation_obj, run_xrds)
     windowing_scheme = window_scheme_from_decimation(decimation_obj)
     windowed_obj = windowing_scheme.apply_sliding_window(
@@ -287,9 +294,11 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
         mth5_channel = run_obj.get_channel(channel_id)
         channel_filter = mth5_channel.channel_response_filter
         if not channel_filter.filters_list:
-            print("WARNING UNEXPECTED CHANNEL WITH NO FILTERS")
+            msg = f"Channel {channel_id} with empty filters list detected"
+            logger.warning(msg)
             if channel_id == "hy":
-                print("Channel HY has no filters, try using filters from HX")
+                msg = "Channel hy has no filters, try using filters from hx"
+                logger.warning("Channel HY has no filters, try using filters from HX")
                 channel_filter = run_obj.get_channel("hx").channel_response_filter
         calibration_response = channel_filter.complex_response(stft_obj.frequency.data)
         if channel_scale_factors:
