@@ -226,7 +226,7 @@ def create_mth5_synthetic_file(
     return mth5_path
 
 
-def create_test1_h5(file_version="0.1.0", channel_nomenclature="default"):
+def create_test1_h5(file_version="0.1.0", channel_nomenclature="default", target_folder=DATA_PATH):
     station_01_params = make_station_01(channel_nomenclature=channel_nomenclature)
     mth5_name = station_01_params.mth5_name
     station_params = [
@@ -238,12 +238,13 @@ def create_test1_h5(file_version="0.1.0", channel_nomenclature="default"):
         plot=False,
         file_version=file_version,
         channel_nomenclature=channel_nomenclature,
+        target_folder=target_folder
     )
     return mth5_path
 
 
 def create_test2_h5(
-    file_version="0.1.0", channel_nomenclature="default", force_make_mth5=True
+    file_version="0.1.0", channel_nomenclature="default", force_make_mth5=True, target_folder=DATA_PATH
 ):
     station_02_params = make_station_02(channel_nomenclature=channel_nomenclature)
     mth5_name = station_02_params.mth5_name
