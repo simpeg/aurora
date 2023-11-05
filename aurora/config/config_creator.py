@@ -6,11 +6,10 @@ change.
 
 
 """
-from pathlib import Path
+from loguru import logger
 
 from aurora.config.metadata.processing import Processing
 from aurora.config import BANDS_DEFAULT_FILE
-from mt_metadata.transfer_functions.processing.aurora import Station, Run
 from mt_metadata.transfer_functions.processing.aurora.window import Window
 from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
 
@@ -49,30 +48,27 @@ class ConfigCreator:
 
     def determine_band_specification_style(self):
         """
-        ? Should emtf_band_file path be stored in config?
-        It would support reproducability.
-
-        Parameters
-        ----------
-        emtf_band_file
-        band_edges
+        TODO: Should emtf_band_file path be stored in config to support reproducibility?
 
         """
 
         if (self._emtf_band_file is None) & (self._band_edges is None):
-            print("Bands not defined; setting to EMTF BANDS_DEFAULT_FILE")
+            msg = "Bands not defined; setting to EMTF BANDS_DEFAULT_FILE"
+            logger.info(msg)
             self._emtf_band_file = BANDS_DEFAULT_FILE
             self._band_specification_style = "EMTF"
         elif (self._emtf_band_file is not None) & (self._band_edges is not None):
-            print("Bands defined twice, and possibly inconsistantly")
+            msg = "Bands defined twice, and possibly inconsistently"
+            logger.warning(msg)
             raise Exception
         elif self._band_edges is not None:
             self._band_specification_style = "band_edges"
         elif self._emtf_band_file is not None:
             self._band_specification_style = "EMTF"
         else:
-            print("method of band specifciation is unrecognized")
-            raise NotImplementedError
+            msg = f"band specification style {self._band_specification_style} unrecognized"
+            logger.exception(msg)
+            raise NotImplementedError(msg)
 
     def create_from_kernel_dataset(
         self,
@@ -88,7 +84,7 @@ class ConfigCreator:
         Early on we want to know how may decimation levels there will be.
         This is defined either by:
          1. decimation_factors argument (normally accompanied by a bands_dict)
-         2. number of decimations implied by emtf band setup file.
+         2. number of decimations implied by EMTF band setup file.
         Theoretically, you could also use the number of decimations implied by
         bands_dict but this is sloppy, because it would be bad practice to assume
         the decimation factor.
