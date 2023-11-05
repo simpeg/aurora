@@ -13,9 +13,13 @@ from aurora.config import BANDS_DEFAULT_FILE
 from mt_metadata.transfer_functions.processing.aurora.window import Window
 from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
 
+SUPPORTED_BAND_SPECIFICATION_STYLES = ["EMTF", "band_edges"]
+
 
 class ConfigCreator:
     def __init__(self, **kwargs):
+        self._emtf_band_file = kwargs.get("emtf_band_file", None)
+        self._band_edges = kwargs.get("band_edges", None)
         self._band_specification_style = None
 
     def processing_id(self, kernel_dataset):
@@ -46,6 +50,16 @@ class ConfigCreator:
     def band_specification_style(self):
         return self._band_specification_style
 
+    @band_specification_style.setter
+    def band_specification_style(self, value):
+        if value not in SUPPORTED_BAND_SPECIFICATION_STYLES:
+            msg = f"Won't set band specification style to unrecognized value {value}"
+            logger.warning(msg)
+            raise NotImplementedError(msg)
+            # return
+        else:
+            self._band_specification_style = value
+
     def determine_band_specification_style(self):
         """
         TODO: Should emtf_band_file path be stored in config to support reproducibility?
@@ -65,10 +79,6 @@ class ConfigCreator:
             self._band_specification_style = "band_edges"
         elif self._emtf_band_file is not None:
             self._band_specification_style = "EMTF"
-        else:
-            msg = f"band specification style {self._band_specification_style} unrecognized"
-            logger.exception(msg)
-            raise NotImplementedError(msg)
 
     def create_from_kernel_dataset(
         self,
