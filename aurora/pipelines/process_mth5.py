@@ -213,7 +213,19 @@ def append_chunk_to_stfts(stfts, chunk, remote):
 
 
 def load_stft_obj_from_mth5(i_dec_level, row, run_obj):
-    # Load stft_obj from mth5 (instead of compute)
+    """
+    Load stft_obj from mth5 (instead of compute)
+
+    Parameters
+    ----------
+    i_dec_level: integer
+    row
+    run_obj
+
+    Returns
+    -------
+
+    """
     station_obj = station_obj_from_row(row)
     fc_group = station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id)
     fc_decimation_level = fc_group.get_decimation_level(f"{i_dec_level}")

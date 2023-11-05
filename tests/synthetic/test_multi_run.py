@@ -1,6 +1,5 @@
 import logging
 import unittest
-from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config.config_creator import ConfigCreator
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
@@ -26,7 +25,7 @@ class TestMultiRunProcessing(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        """ Add a fresh h5 to start the test, sowe don't have FCs in there from other tests"""
+        """Add a fresh h5 to start the test, sowe don't have FCs in there from other tests"""
         create_test3_h5(force_make_mth5=True)
 
     def make_mth5(self):

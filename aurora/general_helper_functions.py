@@ -2,7 +2,6 @@ import inspect
 import os
 import scipy.io as sio
 import subprocess
-import xarray as xr
 
 from pathlib import Path
 
@@ -102,38 +101,6 @@ def execute_command(cmd, **kwargs):
         if allow_exception:
             raise Exception(f"Failed to successfully execute \n {cmd}")
     os.chdir(cwd)
-
-
-# # <HDF5 save/load complex valued data>
-# def save_complex(data_array, *args, **kwargs):
-#     """
-#     netcdf and h5 do not handle complex values.  This method is a workaround.
-#     https://stackoverflow.com/questions/47162983/how-to-save-xarray-dataarray-with-complex128-data-to-netcdf
-#     Example Usage:
-#     band_da is an xarray
-#     save_complex(band_da, TEST_BAND_FILE)
-#     band_da = read_complex(TEST_BAND_FILE)
-#
-#     Parameters
-#     ----------
-#     data_array
-#     args
-#     kwargs
-#
-#     Returns
-#     -------
-#
-#     """
-#     ds = xr.Dataset({"real": data_array.real, "imag": data_array.imag})
-#     return ds.to_netcdf(*args, **kwargs)
-#
-#
-# def read_complex(*args, **kwargs):
-#     ds = xr.open_dataset(*args, **kwargs)
-#     return ds["real"] + ds["imag"] * 1j
-
-
-# </HDF5 save/load complex valued data>
 
 
 def save_to_mat(data, variable_name, filename):
