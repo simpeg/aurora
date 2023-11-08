@@ -34,7 +34,7 @@ test_requirements = [
 setup(
     author="Karl Kappler",
     author_email="karl.kappler@berkeley.edu",
-    python_requires=">=3.5",
+    python_requires=">=3.8",
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",
