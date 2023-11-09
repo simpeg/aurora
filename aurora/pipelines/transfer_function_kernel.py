@@ -2,14 +2,13 @@ import numpy as np
 import pandas as pd
 import psutil
 
+from loguru import logger
 
 from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.time_series_helpers import prototype_decimate
-from aurora.transfer_function.kernel_dataset import KernelDataset
 from mth5.utils.exceptions import MTH5Error
 from mth5.utils.helpers import initialize_mth5
 from mt_metadata.transfer_functions.core import TF
-from mt_metadata.transfer_functions.processing.aurora import Processing
 
 
 class TransferFunctionKernel(object):
@@ -138,7 +137,10 @@ class TransferFunctionKernel(object):
                     "channel"
                 )  # See Note 1 above
 
-        print("DATASET DF UPDATED")
+        msg = (
+            f"Dataset Dataframe Updated for decimation level {i_dec_level} Successfully"
+        )
+        logger.info(msg)
         return
 
     def apply_clock_zero(self, dec_level_config):
@@ -202,12 +204,11 @@ class TransferFunctionKernel(object):
 
             if len(associated_run_sub_df) > 1:
                 # See Note #4
-                print(
-                    "Warning -- not all runs will processed as a continuous chunk -- in future may need to loop over runlets to check for FCs"
-                )
+                msg = "Not all runs will processed as a continuous chunk "
+                msg += "-- in future may need to loop over runlets to check for FCs"
+                logger.warning(msg)
 
             dataset_df_indices = np.r_[associated_run_sub_df.index]
-            # dataset_df_indices = associated_run_sub_df.index.to_numpy()
             run_row = associated_run_sub_df.iloc[0]
             row_ssr_str = f"survey: {run_row.survey}, station_id: {run_row.station_id}, run_id: {run_row.run_id}"
 
@@ -216,13 +217,17 @@ class TransferFunctionKernel(object):
             survey_obj = mth5_obj.get_survey(survey_id)
             station_obj = survey_obj.stations_group.get_station(station_id)
             if not station_obj.fourier_coefficients_group.groups_list:
-                msg = f"Prebuilt Fourier Coefficients not detected for {row_ssr_str} -- will need to build them "
-                print(msg)
+                msg = f"Fourier coefficients not detected for {row_ssr_str}"
+                msg += "-- Fourier coefficients will be computed"
+                logger.info(msg)
                 self.dataset_df.loc[dataset_df_indices, "fc"] = False
             else:
-                print(
-                    "Prebuilt Fourier Coefficients detected -- checking if they satisfy processing requirements..."
+                msg = (
+                    "Fourier Coefficients detected -- "
+                    "checking if they satisfy processing requirements..."
                 )
+                logger.info(msg)
+
                 # Assume FC Groups are keyed by run_id, check if there is a relevant group
                 try:
                     fc_group = station_obj.fourier_coefficients_group.get_fc_group(
@@ -230,9 +235,8 @@ class TransferFunctionKernel(object):
                     )
                 except MTH5Error:
                     self.dataset_df.loc[dataset_df_indices, "fc"] = False
-                    print(
-                        f"Run ID {run_id} not found in FC Groups, -- will need to build them "
-                    )
+                    msg = f"Run ID {run_id} not found in FC Groups, -- will need to compute FCs"
+                    logger.info(msg)
                     continue
 
                 if (
@@ -257,6 +261,24 @@ class TransferFunctionKernel(object):
                 self.dataset_df.loc[dataset_df_indices, "fc"] = fcs_already_there
 
         return
+
+    def show_processing_summary(
+        self,
+        omit_columns=[
+            "mth5_path",
+            "channel_scale_factors",
+            "start",
+            "end",
+            "input_channels",
+            "output_channels",
+            "num_samples_overlap",
+            "num_samples_advance",
+        ],
+    ):
+        columns_to_show = self.processing_summary.columns
+        columns_to_show = [x for x in columns_to_show if x not in omit_columns]
+        logger.info("Processing Summary Dataframe:")
+        print(self.processing_summary[columns_to_show].to_string())
 
     def make_processing_summary(self):
         """
@@ -292,8 +314,6 @@ class TransferFunctionKernel(object):
         groups = []
         grouper = tmp.groupby(group_by)
         for group, df in grouper:
-            print(group)
-            print(df)
             try:
                 try:
                     assert (
@@ -305,7 +325,8 @@ class TransferFunctionKernel(object):
                 assert df.dec_factor.iloc[0] == 1
                 assert df.dec_level.iloc[0] == 0
             except AssertionError:
-                raise AssertionError("Decimation levels not structured as expected")
+                msg = "Decimation levels not structured as expected"
+                raise AssertionError(msg)
             # df.sample_rate /= np.cumprod(df.dec_factor)  # better to take from config
             window_params_df = self.config.window_scheme(as_type="df")
             df.reset_index(inplace=True, drop=True)
@@ -321,10 +342,8 @@ class TransferFunctionKernel(object):
             df["num_stft_windows"] = num_windows
             groups.append(df)
 
-            # tmp.loc[df.index, "sample_rate"] = df.sample_rate
         processing_summary = pd.concat(groups)
         processing_summary.reset_index(drop=True, inplace=True)
-        print(processing_summary)
         self._processing_summary = processing_summary
         return processing_summary
 
@@ -411,7 +430,8 @@ class TransferFunctionKernel(object):
 
         dec_levels = [x for x in self.config.decimations]
         dec_levels = [x for x in dec_levels if x.decimation.level in valid_levels]
-        print(f"After validation there are {len(dec_levels)} valid decimation levels")
+        msg = f"After validation there are {len(dec_levels)} valid decimation levels"
+        logger.info(msg)
         return dec_levels
 
     def is_valid_dataset(self, row, i_dec):

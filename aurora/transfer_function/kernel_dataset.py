@@ -53,6 +53,8 @@ ToDo: Consider supporting a default value for 'channel_scale_factors' that is No
 import copy
 import pandas as pd
 
+from loguru import logger
+
 from aurora.pipelines.run_summary import RUN_SUMMARY_COLUMNS
 from mt_metadata.utils.list_dict import ListDict
 
@@ -395,7 +397,7 @@ class KernelDataset:
             if len(self.survey_metadata.keys()) > 1:
                 raise NotImplementedError
 
-        print("DATASET DF POPULATED")
+        logger.info("Dataset dataframe initialized successfully")
 
     def add_columns_for_processing(self, mth5_objs):
         """

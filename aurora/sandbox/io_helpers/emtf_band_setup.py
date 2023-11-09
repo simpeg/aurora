@@ -1,3 +1,5 @@
+from loguru import logger
+
 import numpy as np
 import pandas as pd
 
@@ -39,9 +41,10 @@ class EMTFBandSetupFile:
     def load(self, filepath=None):
         if filepath is None:
             filepath = self.filepath
-        print(filepath)
-        f = open(str(filepath), "r")
-        num_bands = f.readline()
+        msg = f"loading band setup file {filepath}"
+        logger.debug(msg)
+        with open(str(filepath), "r") as f:
+            num_bands = f.readline()
         self._num_bands = int(num_bands)
         f.close()
         df = pd.read_csv(
@@ -51,8 +54,9 @@ class EMTFBandSetupFile:
             names=["decimation_level", "lower_bound_index", "upper_bound_index"],
         )
         if len(df) != self.num_bands:
-            print(f"unexpected number of bounds read in from {filepath}")
-            raise Exception
+            msg = f"unexpected number of bounds read in from {filepath}"
+            logger.exception(msg)
+            raise Exception(msg)
         self.df = df
 
     def get_decimation_level(self, decimation_level, order="ascending_frequency"):

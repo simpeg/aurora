@@ -73,7 +73,7 @@ def sliding_window_crude(
     return output_array
 
 
-@jit
+@jit(nopython=True)
 def sliding_window_numba(data, num_samples_window, num_samples_advance, num_windows):
     """
 

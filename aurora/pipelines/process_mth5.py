@@ -25,6 +25,8 @@ Note 3: This point in the loop marks the interface between _generation_ of the F
 
 import xarray as xr
 
+from loguru import logger
+
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.transfer_function_helpers import process_transfer_functions
@@ -33,7 +35,6 @@ from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
 )
 from aurora.transfer_function.TTFZ import TTFZ
-from mt_metadata.transfer_functions.core import TF
 
 
 # =============================================================================
@@ -90,6 +91,7 @@ def make_stft_objects(
     )
     return stft_obj
 
+
 def station_obj_from_row(row):
     """
     Access the station object
@@ -112,6 +114,7 @@ def station_obj_from_row(row):
             row.station_id, survey=row.survey
         )
     return station_obj
+
 
 def process_tf_decimation_level(
     config, i_dec_level, local_stft_obj, remote_stft_obj, units="MT"
@@ -210,11 +213,21 @@ def append_chunk_to_stfts(stfts, chunk, remote):
     return stfts
 
 def load_stft_obj_from_mth5(i_dec_level, row, run_obj):
-    # Load stft_obj from mth5 (instead of compute)
+    """
+    Load stft_obj from mth5 (instead of compute)
+
+    Parameters
+    ----------
+    i_dec_level: integer
+    row
+    run_obj
+
+    Returns
+    -------
+
+    """
     station_obj = station_obj_from_row(row)
-    fc_group = station_obj.fourier_coefficients_group.add_fc_group(
-        run_obj.metadata.id
-    )
+    fc_group = station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id)
     fc_decimation_level = fc_group.get_decimation_level(f"{i_dec_level}")
     stft_obj = fc_decimation_level.to_xarray()
     return stft_obj
@@ -223,11 +236,12 @@ def load_stft_obj_from_mth5(i_dec_level, row, run_obj):
 def save_fourier_coefficients(dec_level_config, i_dec_level, row, run_obj, stft_obj):
     if not dec_level_config.save_fcs:
         msg = "Skip saving FCs. dec_level_config.save_fc = "
-        print(f"{msg} {dec_level_config.save_fcs}")
+        msg = f"{msg} {dec_level_config.save_fcs}"
+        logger.info(f"{msg} {dec_level_config.save_fcs}")
         return
     if dec_level_config.save_fcs_type == "csv":
         msg = "Unless debugging or testing, saving FCs to csv unexpected"
-        print(f"WARNING: {msg}")
+        logger.warning(msg)
         csv_name = f"{row.station_id}_dec_level_{i_dec_level}.csv"
         stft_df = stft_obj.to_dataframe()
         stft_df.to_csv(csv_name)
@@ -249,6 +263,7 @@ def save_fourier_coefficients(dec_level_config, i_dec_level, row, run_obj, stft_
         fc_decimation_level.update_metadata()
         fc_group.update_metadata()
     return
+
 
 def process_mth5(
     config,
@@ -297,6 +312,7 @@ def process_mth5(
     # Initialize config and mth5s
     tfk = TransferFunctionKernel(dataset=tfk_dataset, config=config)
     tfk.make_processing_summary()
+    tfk.show_processing_summary()
     tfk.validate()
     # See Note #1
 
@@ -307,21 +323,22 @@ def process_mth5(
     tfk.initialize_mth5s(mode=mth5_mode)
     try:
         tfk.check_if_fc_levels_already_exist()  # populate the "fc" column of dataset_df
-        print(f"fc_levels_already_exist = {tfk.dataset_df['fc']}")
-        print(
+        msg = f"fc_levels_already_exist = {tfk.dataset_df['fc'].iloc[0]}"
+        logger.info(msg)
+        msg = (
             f"Processing config indicates {len(tfk.config.decimations)} "
-            f"decimation levels "
+            f"decimation levels"
         )
+        logger.info(msg)
     except:
         msg = "WARNING -- Unable to execute check for FC Levels"
         msg = f"{msg} Possibly FCs not present at all (file from old MTH5 version)?"
-        print(f"{msg}")
+        logger.warning(msg)
 
 
     tf_dict = {}
 
     for i_dec_level, dec_level_config in enumerate(tfk.valid_decimations()):
-        #i_dec_level = dec_level_config.decimation.level
         tfk.update_dataset_df(i_dec_level)
         dec_level_config = tfk.apply_clock_zero(dec_level_config)
 
@@ -331,7 +348,8 @@ def process_mth5(
 
         # Check first if TS processing or accessing FC Levels
         for i, row in tfk.dataset_df.iterrows():
-            # This iterator could be updated to iterate over row-pairs if remote is True, corresponding to simultaneous data
+            # This iterator could be updated to iterate over row-pairs if remote is True,
+            # corresponding to simultaneous data
 
             if not tfk.is_valid_dataset(row, i_dec_level):
                 continue
@@ -352,12 +370,14 @@ def process_mth5(
                 print("WARNING Run ID in dataset_df does not match run_obj")
                 print("WARNING Forcing run metadata to match dataset_df")
                 run_obj.metadata.id = row.run_id
-                
+
             stft_obj = make_stft_objects(
                 tfk.config, i_dec_level, run_obj, run_xrds, units, row.station_id
             )
             # Pack FCs into h5
-            save_fourier_coefficients(dec_level_config, i_dec_level, row, run_obj, stft_obj)
+            save_fourier_coefficients(
+                dec_level_config, i_dec_level, row, run_obj, stft_obj
+            )
 
             stfts = append_chunk_to_stfts(stfts, stft_obj, row.remote)
 
