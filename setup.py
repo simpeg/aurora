@@ -11,16 +11,9 @@ with open("README.rst") as readme_file:
 #    history = history_file.read()
 
 requirements = [
-    "matplotlib",
     "mth5",
-    "mt_metadata",
-    "numpy",
     "numba",
-    "obspy",
     "psutil",
-    "pandas<1.5",
-    "scipy",
-    "xarray",
 ]
 
 setup_requirements = [
