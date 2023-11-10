@@ -26,7 +26,6 @@ if not TEST_PATH.exists():
 try:
     FIGURES_PATH = DATA_PATH.joinpath("figures")
     FIGURES_PATH.mkdir(exist_ok=True, parents=True)
-    # TEST_BAND_FILE = DATA_PATH.joinpath("bandtest.nc")
 except OSError:
     FIGURES_PATH = None
 mt_metadata_init = inspect.getfile(mt_metadata)
