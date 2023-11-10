@@ -273,6 +273,7 @@ class TransferFunctionKernel(object):
             "output_channels",
             "num_samples_overlap",
             "num_samples_advance",
+            "run_dataarray",
         ],
     ):
         columns_to_show = self.processing_summary.columns
