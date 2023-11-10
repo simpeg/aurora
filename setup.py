@@ -11,16 +11,9 @@ with open("README.rst") as readme_file:
 #    history = history_file.read()
 
 requirements = [
-    "matplotlib",
     "mth5",
-    "mt_metadata",
-    "numpy",
     "numba",
-    "obspy",
     "psutil",
-    "pandas<1.5",
-    "scipy",
-    "xarray",
 ]
 
 setup_requirements = [
@@ -34,7 +27,7 @@ test_requirements = [
 setup(
     author="Karl Kappler",
     author_email="karl.kappler@berkeley.edu",
-    python_requires=">=3.5",
+    python_requires=">=3.8",
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",
@@ -58,6 +51,6 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/simpeg/aurora",
-    version="0.3.6",
+    version="0.3.7",
     zip_safe=False,
 )
