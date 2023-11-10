@@ -7,8 +7,7 @@ from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
 from aurora.test_utils.synthetic.make_processing_configs import (
     create_test_run_config,
 )
-from aurora.test_utils.synthetic.paths import AURORA_RESULTS_PATH
-from aurora.test_utils.synthetic.paths import EMTF_OUTPUT_PATH
+from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 from aurora.test_utils.synthetic.rms_helpers import assert_rms_misfit_ok
 from aurora.test_utils.synthetic.rms_helpers import compute_rms
 from aurora.test_utils.synthetic.rms_helpers import get_expected_rms_misfit
@@ -18,6 +17,11 @@ from aurora.transfer_function.emtf_z_file_helpers import (
 from aurora.transfer_function.kernel_dataset import KernelDataset
 from plot_helpers_synthetic import plot_rho_phi
 from mth5.helpers import close_open_files
+
+synthetic_test_paths = SyntheticTestPaths()
+synthetic_test_paths.mkdirs()
+AURORA_RESULTS_PATH = synthetic_test_paths.aurora_results_path
+EMTF_RESULTS_PATH = synthetic_test_paths.emtf_results_path
 
 
 def aurora_vs_emtf(
@@ -131,7 +135,7 @@ def run_test1(emtf_version, ds_df):
     """
     print(f"Test1 vs {emtf_version}")
     test_case_id = "test1"
-    auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test1.zss")
+    auxilliary_z_file = EMTF_RESULTS_PATH.joinpath("test1.zss")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zss"
     aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df)
     return
@@ -151,7 +155,7 @@ def run_test2r1(tfk_dataset):
     print("Test2r1")
     test_case_id = "test2r1"
     emtf_version = "fortran"
-    auxilliary_z_file = EMTF_OUTPUT_PATH.joinpath("test2r1.zrr")
+    auxilliary_z_file = EMTF_RESULTS_PATH.joinpath("test2r1.zrr")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zrr"
     aurora_vs_emtf(
         test_case_id, emtf_version, auxilliary_z_file, z_file_base, tfk_dataset

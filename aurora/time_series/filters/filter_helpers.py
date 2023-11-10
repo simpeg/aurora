@@ -2,7 +2,7 @@ from mt_metadata.timeseries.filters.coefficient_filter import CoefficientFilter
 from mt_metadata.timeseries.filters.frequency_response_table_filter import (
     FrequencyResponseTableFilter,
 )
-from aurora.general_helper_functions import TEST_PATH
+from aurora.general_helper_functions import DATA_PATH
 
 
 def make_coefficient_filter(gain=1.0, name="generic coefficient filter", **kwargs):
@@ -40,7 +40,7 @@ def make_frequency_response_table_filter(case="bf4"):
         import numpy as np
         import pandas as pd
 
-        bf4_path = TEST_PATH.joinpath("parkfield", "bf4_9819.csv")
+        bf4_path = DATA_PATH.joinpath("parkfield", "bf4_9819.csv")
         df = pd.read_csv(bf4_path)  # , skiprows=1)
         # Hz, V/nT, degrees
         fap_filter.frequencies = df["Frequency [Hz]"].values

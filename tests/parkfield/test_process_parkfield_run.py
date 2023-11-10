@@ -3,11 +3,7 @@ from aurora.config.config_creator import ConfigCreator
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
 from aurora.test_utils.parkfield.make_parkfield_mth5 import ensure_h5_exists
-from aurora.test_utils.parkfield.path_helpers import AURORA_RESULTS_PATH
-
-# from aurora.test_utils.parkfield.path_helpers import CONFIG_PATH
-from aurora.test_utils.parkfield.path_helpers import DATA_PATH
-from aurora.test_utils.parkfield.path_helpers import EMTF_RESULTS_PATH
+from aurora.test_utils.parkfield.path_helpers import PARKFIELD_PATHS
 from aurora.transfer_function.kernel_dataset import KernelDataset
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 
@@ -70,7 +66,7 @@ def test():
     logging.getLogger("matplotlib.font_manager").disabled = True
     logging.getLogger("matplotlib.ticker").disabled = True
 
-    z_file_path = AURORA_RESULTS_PATH.joinpath("pkd.zss")
+    z_file_path = PARKFIELD_PATHS["aurora_results"].joinpath("pkd.zss")
     tf_cls = test_processing(z_file_path=z_file_path)
     tf_cls.write("pkd_mt_metadata.zss", file_type="zss")
     test_processing(
@@ -80,7 +76,7 @@ def test():
     test_processing(z_file_path=z_file_path, test_clock_zero="data start")
 
     # COMPARE WITH ARCHIVED Z-FILE
-    auxilliary_z_file = EMTF_RESULTS_PATH.joinpath("PKD_272_00.zrr")
+    auxilliary_z_file = PARKFIELD_PATHS["emtf_results"].joinpath("PKD_272_00.zrr")
     if z_file_path.exists():
         compare_two_z_files(
             z_file_path,

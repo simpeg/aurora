@@ -1,15 +1,11 @@
-import mth5.mth5
-from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config.config_creator import ConfigCreator
-
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
 from aurora.sandbox.mth5_channel_summary_helpers import (
     channel_summary_to_make_mth5,
 )
 from aurora.test_utils.parkfield.make_parkfield_mth5 import ensure_h5_exists
-from aurora.test_utils.parkfield.path_helpers import AURORA_RESULTS_PATH
-from aurora.test_utils.parkfield.path_helpers import EMTF_RESULTS_PATH
+from aurora.test_utils.parkfield.path_helpers import PARKFIELD_PATHS
 from aurora.transfer_function.kernel_dataset import KernelDataset
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 
@@ -32,7 +28,6 @@ def test_stuff_that_belongs_elsewhere():
     close_open_files()
     h5_path = ensure_h5_exists()
 
-    mth5_obj = mth5.mth5.MTH5()
     mth5_obj = MTH5(file_version="0.1.0")
     mth5_obj.open_mth5(h5_path, mode="a")
     df = mth5_obj.channel_summary.to_dataframe()
@@ -91,11 +86,11 @@ def test():
     logging.getLogger("matplotlib.ticker").disabled = True
 
     test_stuff_that_belongs_elsewhere()
-    z_file_path = AURORA_RESULTS_PATH.joinpath("pkd.zrr")
+    z_file_path = PARKFIELD_PATHS["aurora_results"].joinpath("pkd.zrr")
     test_processing(z_file_path=z_file_path)
 
     # COMPARE WITH ARCHIVED Z-FILE
-    auxilliary_z_file = EMTF_RESULTS_PATH.joinpath("PKD_272_00.zrr")
+    auxilliary_z_file = PARKFIELD_PATHS["emtf_results"].joinpath("PKD_272_00.zrr")
     if z_file_path.exists():
         compare_two_z_files(
             z_file_path,
