@@ -3,6 +3,7 @@ import os
 import scipy.io as sio
 import subprocess
 
+from loguru import logger
 from pathlib import Path
 
 import aurora
@@ -10,18 +11,21 @@ import mt_metadata
 
 init_file = inspect.getfile(aurora)
 AURORA_PATH = Path(init_file).parent.parent
+DATA_PATH = AURORA_PATH.joinpath("data")
 TEST_PATH = AURORA_PATH.joinpath("tests")
-SANDBOX = AURORA_PATH.joinpath("aurora", "sandbox")
+# SANDBOX = AURORA_PATH.joinpath("aurora", "sandbox")
 CONFIG_PATH = AURORA_PATH.joinpath("aurora", "config")
 BAND_SETUP_PATH = CONFIG_PATH.joinpath("emtf_band_setup")
+
+if not TEST_PATH.exists():
+    msg = f"tests folder path does not exist ... To use tests you need to install from github, or you could create {TEST_PATH}"
+    logger.warning(msg)
+
 try:
-    DATA_PATH = SANDBOX.joinpath("data")
-    DATA_PATH.mkdir(exist_ok=True, parents=True)
     FIGURES_PATH = DATA_PATH.joinpath("figures")
     FIGURES_PATH.mkdir(exist_ok=True, parents=True)
     # TEST_BAND_FILE = DATA_PATH.joinpath("bandtest.nc")
 except OSError:
-    DATA_PATH = None
     FIGURES_PATH = None
 mt_metadata_init = inspect.getfile(mt_metadata)
 MT_METADATA_DATA = Path(mt_metadata_init).parent.parent.joinpath("data")
