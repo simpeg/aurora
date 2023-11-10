@@ -6,7 +6,7 @@ from aurora.test_utils.dataset_definitions import TEST_DATA_SET_CONFIGS
 from mth5.utils.helpers import read_back_data
 from mth5.helpers import close_open_files
 from aurora.sandbox.io_helpers.make_mth5_helpers import create_from_server_multistation
-from aurora.test_utils.parkfield.path_helpers import DATA_PATH
+from aurora.test_utils.parkfield.path_helpers import PARKFIELD_PATHS
 
 DATA_SOURCES = ["NCEDC", "https://service.ncedc.org/"]
 DATASET_ID = "pkd_sao_test_00"
@@ -39,7 +39,7 @@ def make_pkdsao_mth5(fdsn_dataset):
     fdsn_dataset.initialize_client()
     h5_path = create_from_server_multistation(
         fdsn_dataset,
-        target_folder=DATA_PATH,
+        target_folder=PARKFIELD_PATHS["data"],
         triage_units="V/m to mV/km",
     )
 
@@ -56,7 +56,8 @@ def ensure_h5_exists():
     -------
 
     """
-    h5_path = DATA_PATH.joinpath(FDSN_DATASET.h5_filebase)
+
+    h5_path = PARKFIELD_PATHS["data"].joinpath(FDSN_DATASET.h5_filebase)
     if h5_path.exists():
         return h5_path
 
