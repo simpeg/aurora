@@ -1,13 +1,14 @@
-from aurora.general_helper_functions import TEST_PATH
+from aurora.general_helper_functions import DATA_PATH
 
-PARKFIELD_PATH = TEST_PATH.joinpath("parkfield")
 
-AURORA_RESULTS_PATH = PARKFIELD_PATH.joinpath("aurora_results")
-CONFIG_PATH = PARKFIELD_PATH.joinpath("config")
-DATA_PATH = PARKFIELD_PATH.joinpath("data")
-EMTF_RESULTS_PATH = PARKFIELD_PATH.joinpath("emtf_results")
+def make_parkfield_paths():
+    base_path = DATA_PATH.joinpath("parkfield")
+    parkfield_paths = {}
+    parkfield_paths["data"] = DATA_PATH.joinpath("parkfield")
+    parkfield_paths["aurora_results"] = base_path.joinpath("aurora_results")
+    parkfield_paths["config"] = base_path.joinpath("config")
+    parkfield_paths["emtf_results"] = base_path.joinpath("emtf_results")
+    return parkfield_paths
 
-# May want to create results and data dir on init
-AURORA_RESULTS_PATH.mkdir(exist_ok=True)
-DATA_PATH.mkdir(exist_ok=True)
-CONFIG_PATH.mkdir(exist_ok=True)
+
+PARKFIELD_PATHS = make_parkfield_paths()

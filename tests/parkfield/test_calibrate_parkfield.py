@@ -4,8 +4,7 @@ from aurora.test_utils.parkfield.calibration_helpers import (
     parkfield_sanity_check,
 )
 from aurora.test_utils.parkfield.make_parkfield_mth5 import ensure_h5_exists
-from aurora.test_utils.parkfield.path_helpers import AURORA_RESULTS_PATH
-from aurora.test_utils.parkfield.path_helpers import DATA_PATH
+from aurora.test_utils.parkfield.path_helpers import PARKFIELD_PATHS
 
 
 def validate_bulk_spectra_have_correct_units(run_obj, run_ts_obj, show_spectra=False):
@@ -56,7 +55,7 @@ def validate_bulk_spectra_have_correct_units(run_obj, run_ts_obj, show_spectra=F
     parkfield_sanity_check(
         fft_obj,
         run_obj,
-        figures_path=AURORA_RESULTS_PATH,
+        figures_path=PARKFIELD_PATHS["aurora_results"],
         show_response_curves=show_response_curves,
         show_spectra=show_spectra,
         include_decimation=True,
