@@ -17,7 +17,10 @@ CONFIG_PATH = AURORA_PATH.joinpath("aurora", "config")
 BAND_SETUP_PATH = CONFIG_PATH.joinpath("emtf_band_setup")
 
 if not TEST_PATH.exists():
-    msg = f"tests folder path does not exist ... To use tests you need to install from github, or you could create {TEST_PATH}"
+    msg = (
+        f"tests folder path does not exist ... "
+        f"To use tests you need to install from github, or you could create {TEST_PATH}"
+    )
     logger.warning(msg)
 
 try:
