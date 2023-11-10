@@ -54,16 +54,14 @@ In the following, we set angle2=13.0 to undo the difference between aurora and S
 import os
 import pathlib
 from collections import UserDict
-from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config.config_creator import ConfigCreator
-from aurora.general_helper_functions import TEST_PATH
+from aurora.general_helper_functions import get_test_path
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 from aurora.transfer_function.kernel_dataset import KernelDataset
-from mth5.utils.helpers import initialize_mth5
 
-
+TEST_PATH = get_test_path()
 CAS04_PATH = TEST_PATH.joinpath("cas04")
 CONFIG_PATH = CAS04_PATH.joinpath("config")
 CONFIG_PATH.mkdir(exist_ok=True)

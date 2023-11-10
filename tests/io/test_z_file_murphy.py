@@ -20,3 +20,11 @@ class test_z_file_murphy(unittest.TestCase):
         z_obj = read_z_file(z_file_path)
         assert "Hx" in z_obj.channels
         return
+
+
+def main():
+    unittest.main()
+
+
+if __name__ == "__main__":
+    main()
