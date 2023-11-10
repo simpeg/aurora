@@ -147,6 +147,7 @@ def create_mth5_synthetic_file(
     station_cfgs,
     mth5_name,
     target_folder="",
+    source_folder="",
     plot=False,
     add_nan_values=False,
     file_version="0.1.0",
@@ -214,6 +215,8 @@ def create_mth5_synthetic_file(
     for station_cfg in station_cfgs:
         station_group = m.add_station(station_cfg.id, survey=survey_id)
         for run in station_cfg.runs:
+            if source_folder:
+                run.raw_data_path = source_folder.joinpath(run.raw_data_path.name)
 
             # read in data
             df = pd.read_csv(run.raw_data_path, names=run.channels, sep="\s+")
@@ -264,6 +267,7 @@ def create_test1_h5(
     file_version="0.1.0",
     channel_nomenclature="default",
     target_folder=MTH5_PATH,
+    source_folder="",
     force_make_mth5=True,
 ):
     station_01_params = make_station_01(channel_nomenclature=channel_nomenclature)
@@ -278,6 +282,7 @@ def create_test1_h5(
         file_version=file_version,
         channel_nomenclature=channel_nomenclature,
         target_folder=target_folder,
+        source_folder=source_folder,
         force_make_mth5=force_make_mth5,
     )
     return mth5_path
@@ -288,6 +293,7 @@ def create_test2_h5(
     channel_nomenclature="default",
     force_make_mth5=True,
     target_folder=MTH5_PATH,
+    source_folder="",
 ):
     station_02_params = make_station_02(channel_nomenclature=channel_nomenclature)
     mth5_name = station_02_params.mth5_name
@@ -301,6 +307,7 @@ def create_test2_h5(
         file_version=file_version,
         force_make_mth5=force_make_mth5,
         target_folder=target_folder,
+        source_folder=source_folder,
     )
     return mth5_path
 
@@ -309,6 +316,7 @@ def create_test1_h5_with_nan(
     file_version="0.1.0",
     channel_nomenclature="default",
     target_folder=MTH5_PATH,
+    source_folder="",
 ):
     station_01_params = make_station_01(channel_nomenclature=channel_nomenclature)
     mth5_name = station_01_params.mth5_name
@@ -322,6 +330,7 @@ def create_test1_h5_with_nan(
         add_nan_values=True,
         file_version=file_version,
         target_folder=target_folder,
+        source_folder=source_folder,
     )
     return mth5_path
 
@@ -330,11 +339,11 @@ def create_test12rr_h5(
     file_version="0.1.0",
     channel_nomenclature="default",
     target_folder=MTH5_PATH,
+    source_folder=None,
 ):
     station_01_params = make_station_01(channel_nomenclature=channel_nomenclature)
     station_02_params = make_station_02(channel_nomenclature=channel_nomenclature)
     station_params = [station_01_params, station_02_params]
-    # mth5_name = station_01_params.mth5_name.__str__().replace("test1.h5", "test12rr.h5")
     mth5_name = "test12rr.h5"
     mth5_path = create_mth5_synthetic_file(
         station_params,
@@ -342,6 +351,7 @@ def create_test12rr_h5(
         file_version=file_version,
         channel_nomenclature=channel_nomenclature,
         target_folder=target_folder,
+        source_folder=source_folder,
     )
     mth5_path = pathlib.Path(mth5_path)
     return mth5_path
@@ -352,6 +362,7 @@ def create_test3_h5(
     channel_nomenclature="default",
     force_make_mth5=True,
     target_folder=MTH5_PATH,
+    source_folder="",
 ):
 
     station_03_params = make_station_03(channel_nomenclature=channel_nomenclature)
@@ -364,6 +375,7 @@ def create_test3_h5(
         file_version=file_version,
         force_make_mth5=force_make_mth5,
         target_folder=target_folder,
+        source_folder=source_folder,
     )
     return mth5_path
 
@@ -372,6 +384,7 @@ def create_test4_h5(
     file_version="0.1.0",
     channel_nomenclature="default",
     target_folder=MTH5_PATH,
+    source_folder="",
 ):
     """8Hz data kluged from the 1Hz ... only freqs below 0.5Hz will make sense (100 Ohmm and 45deg)"""
     station_04_params = make_station_04(channel_nomenclature=channel_nomenclature)
@@ -384,6 +397,7 @@ def create_test4_h5(
         file_version=file_version,
         channel_nomenclature=channel_nomenclature,
         target_folder=target_folder,
+        source_folder=source_folder,
         upsample_factor=8,
     )
     return mth5_path
