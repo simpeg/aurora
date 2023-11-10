@@ -13,7 +13,6 @@ init_file = inspect.getfile(aurora)
 AURORA_PATH = Path(init_file).parent.parent
 DATA_PATH = AURORA_PATH.joinpath("data")
 TEST_PATH = AURORA_PATH.joinpath("tests")
-# SANDBOX = AURORA_PATH.joinpath("aurora", "sandbox")
 CONFIG_PATH = AURORA_PATH.joinpath("aurora", "config")
 BAND_SETUP_PATH = CONFIG_PATH.joinpath("emtf_band_setup")
 
