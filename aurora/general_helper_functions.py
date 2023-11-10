@@ -22,6 +22,13 @@ if not TEST_PATH.exists():
         f"To use tests you need to install from github, or you could create {TEST_PATH}"
     )
     logger.warning(msg)
+    # def no_test_path_error_message(self):
+    #     msg = f"Could not locate test directory {TEST_PATH}\n"
+    #     msg += "This is most likely because aurora was installed from pypi or conda forge\n"
+    #     msg += "but you are trying to use a method that belongs to 'tests/ or test_utils/"
+    #     msg += "Working around this by creating:"
+    #     return msg
+
 
 try:
     FIGURES_PATH = DATA_PATH.joinpath("figures")
