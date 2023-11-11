@@ -2,7 +2,6 @@ from mt_metadata.timeseries.filters.coefficient_filter import CoefficientFilter
 from mt_metadata.timeseries.filters.frequency_response_table_filter import (
     FrequencyResponseTableFilter,
 )
-from aurora.general_helper_functions import DATA_PATH
 
 
 def make_coefficient_filter(gain=1.0, name="generic coefficient filter", **kwargs):
@@ -35,6 +34,8 @@ def make_coefficient_filter(gain=1.0, name="generic coefficient filter", **kwarg
 
 
 def make_frequency_response_table_filter(case="bf4"):
+    from aurora.general_helper_functions import DATA_PATH
+
     fap_filter = FrequencyResponseTableFilter()
     if case == "bf4":
         import numpy as np

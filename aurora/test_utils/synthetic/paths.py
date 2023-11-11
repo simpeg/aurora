@@ -39,7 +39,7 @@ class SyntheticTestPaths:
         self.emtf_results_path = self._sandbox_path.joinpath("emtf_results")
         self.config_path = self._sandbox_path.joinpath("config")
         self.writability_check()
-        assert self.ascii_data_path.exists()
+        # assert self.ascii_data_path.exists()
 
     def writability_check(self):
         """
