@@ -19,10 +19,13 @@ import numpy as np
 import random
 
 from mt_metadata.transfer_functions.processing.aurora import ChannelNomenclature
-from aurora.test_utils.synthetic.paths import DATA_PATH
+from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 from aurora.time_series.filters.filter_helpers import make_coefficient_filter
 
 random.seed(0)
+
+synthetic_test_paths = SyntheticTestPaths()
+DATA_PATH = synthetic_test_paths.ascii_data_path
 
 
 def make_filters(as_list=False):
@@ -248,8 +251,9 @@ def make_station_03(channel_nomenclature="default"):
 
     return station
 
+
 def make_station_04(channel_nomenclature="default"):
-    """ Just like station 01, but data are resampled to 8Hz"""
+    """Just like station 01, but data are resampled to 8Hz"""
     channel_nomenclature_obj = ChannelNomenclature()
     channel_nomenclature_obj.keyword = channel_nomenclature
     EX, EY, HX, HY, HZ = channel_nomenclature_obj.unpack()
@@ -280,6 +284,7 @@ def make_station_04(channel_nomenclature="default"):
     ]
 
     return station
+
 
 # def main():
 #     make_station_04()

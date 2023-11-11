@@ -53,6 +53,6 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/simpeg/aurora",
-    version="0.3.7",
+    version="0.3.10",
     zip_safe=False,
 )

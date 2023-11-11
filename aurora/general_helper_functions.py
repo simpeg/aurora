@@ -3,6 +3,7 @@ import os
 import scipy.io as sio
 import subprocess
 
+from loguru import logger
 from pathlib import Path
 
 import aurora
@@ -10,18 +11,28 @@ import mt_metadata
 
 init_file = inspect.getfile(aurora)
 AURORA_PATH = Path(init_file).parent.parent
+DATA_PATH = AURORA_PATH.joinpath("data")
 TEST_PATH = AURORA_PATH.joinpath("tests")
-SANDBOX = AURORA_PATH.joinpath("aurora", "sandbox")
 CONFIG_PATH = AURORA_PATH.joinpath("aurora", "config")
 BAND_SETUP_PATH = CONFIG_PATH.joinpath("emtf_band_setup")
+
+
+def get_test_path():
+    test_path = AURORA_PATH.joinpath("tests")
+    if not test_path.exists():
+        msg = (
+            f"Could not locate test directory {TEST_PATH}\n "
+            f"This is most likely because aurora was installed from pypi or conda forge\n"
+            f"TEST_PATH should be replaced with DATA_PATH"
+        )
+        logger.warning(msg)
+    return test_path
+
+
 try:
-    DATA_PATH = SANDBOX.joinpath("data")
-    DATA_PATH.mkdir(exist_ok=True, parents=True)
     FIGURES_PATH = DATA_PATH.joinpath("figures")
     FIGURES_PATH.mkdir(exist_ok=True, parents=True)
-    # TEST_BAND_FILE = DATA_PATH.joinpath("bandtest.nc")
 except OSError:
-    DATA_PATH = None
     FIGURES_PATH = None
 mt_metadata_init = inspect.getfile(mt_metadata)
 MT_METADATA_DATA = Path(mt_metadata_init).parent.parent.joinpath("data")

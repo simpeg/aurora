@@ -3,14 +3,13 @@ One off method to help read in transfer function dumps provided by Gary from som
 the matlab tests.
 
 """
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scipy.io as sio
 
 from aurora.config.metadata.processing import Processing
 from aurora.config.emtf_band_setup import BANDS_256_29_FILE
-from aurora.general_helper_functions import TEST_PATH
+from aurora.general_helper_functions import get_test_path
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
 from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
 from aurora.transfer_function.emtf_z_file_helpers import clip_bands_from_z_file
@@ -20,6 +19,8 @@ from aurora.transfer_function.transfer_function_collection import (
 )
 from mt_metadata.timeseries.survey import Survey
 from mt_metadata.transfer_functions.core import TF
+
+TEST_PATH = get_test_path()
 
 
 def read_matlab_z_file(case_id, z_mat):

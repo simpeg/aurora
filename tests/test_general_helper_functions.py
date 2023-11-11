@@ -4,7 +4,9 @@ import unittest
 
 from aurora.general_helper_functions import count_lines
 from aurora.general_helper_functions import DotDict
-from aurora.general_helper_functions import TEST_PATH
+from aurora.general_helper_functions import get_test_path
+
+TEST_PATH = get_test_path()
 
 
 class TestGeneralHelperFunctions(unittest.TestCase):

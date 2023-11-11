@@ -26,19 +26,15 @@ CAV07 is the reason the build failed, CAV07 fails metadata pull with IndexError:
 
 import pandas as pd
 
-from aurora.general_helper_functions import TEST_PATH
+from aurora.general_helper_functions import get_test_path
 from aurora.general_helper_functions import execute_subprocess
-from aurora.sandbox.mth5_channel_summary_helpers import channel_summary_to_make_mth5
 from aurora.sandbox.mth5_helpers import build_request_df
 
-from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 from mth5.clients import FDSN
-from mth5.clients.make_mth5 import MakeMTH5
-from mth5.utils.helpers import initialize_mth5
 from mth5.utils.helpers import read_back_data
-from helper_functions import xml_to_mth5
 
 # Define paths
+TEST_PATH = get_test_path()
 CAS04_PATH = TEST_PATH.joinpath("cas04")
 DATA_PATH = CAS04_PATH.joinpath("data")
 DATA_PATH.mkdir(exist_ok=True)
@@ -48,9 +44,10 @@ XML_PATH = CAS04_PATH.joinpath("cas04_from_tim_20211203.xml")
 NETWORK_ID = "8P"
 STATION_IDS = [
     "CAS04",
+    "CAV07",
     "NVR11",
     "REV06",
-]  # "CAV07",] # skip CAV07 until exception fixed in mth5/metadata
+]
 CHANNELS = [
     "LQE",
     "LQN",

@@ -406,21 +406,3 @@ def read_z_file(z_file_path, angle=0.0):
     z_obj.load()
     z_obj.apparent_resistivity(angle=angle)
     return z_obj
-
-
-def test_reader(z_file_path=None):
-    from aurora.general_helper_functions import TEST_PATH
-
-    if z_file_path is None:
-        print("DEFAULT ZFILE FROM SYNTHETIC TEST BEING LOADED")
-        z_file_path = TEST_PATH.joinpath("synthetic", "emtf_output", "test1.zss")
-    z_obj = read_z_file(z_file_path)
-    return z_obj
-
-
-def main():
-    test_reader()
-
-
-if __name__ == "__main__":
-    main()

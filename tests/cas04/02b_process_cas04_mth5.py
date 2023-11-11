@@ -54,23 +54,19 @@ In the following, we set angle2=13.0 to undo the difference between aurora and S
 import os
 import pathlib
 from collections import UserDict
-from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config.config_creator import ConfigCreator
-from aurora.general_helper_functions import TEST_PATH
+from aurora.general_helper_functions import get_test_path
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 from aurora.transfer_function.kernel_dataset import KernelDataset
-from mth5.utils.helpers import initialize_mth5
 
-
+TEST_PATH = get_test_path()
 CAS04_PATH = TEST_PATH.joinpath("cas04")
 CONFIG_PATH = CAS04_PATH.joinpath("config")
 CONFIG_PATH.mkdir(exist_ok=True)
 DATA_PATH = CAS04_PATH.joinpath("data")
-# H5_PATH = DATA_PATH.joinpath("8P_CAS04_CAV07_NVR11_REV06.h5")
-H5_PATH = DATA_PATH.joinpath("8P_CAS04_NVR11_REV06_v2.h5")
-# H5_PATH = pathlib.Path("/home/kkappler/.cache/earthscope/data/8P_CAS04.h5")
+H5_PATH = DATA_PATH.joinpath("8P_CAS04_CAV07_NVR11_REV06_v1.h5")
 DEFAULT_EMTF_FILE = "emtf_results/CAS04-CAS04bcd_REV06-CAS04bcd_NVR08.zmm"
 AURORA_RESULTS_PATH = CAS04_PATH.joinpath("aurora_results")
 EMTF_RESULTS_PATH = CAS04_PATH.joinpath("emtf_results")

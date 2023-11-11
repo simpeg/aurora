@@ -1,8 +1,11 @@
 from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config import BANDS_256_26_FILE
 from aurora.config.config_creator import ConfigCreator
-from aurora.test_utils.synthetic.paths import CONFIG_PATH
-from aurora.test_utils.synthetic.paths import DATA_PATH
+from aurora.test_utils.synthetic.paths import SyntheticTestPaths
+
+synthetic_test_paths = SyntheticTestPaths()
+CONFIG_PATH = synthetic_test_paths.config_path
+MTH5_PATH = synthetic_test_paths.mth5_path
 
 
 def create_test_run_config(
@@ -132,7 +135,7 @@ def test_to_from_json():
     from aurora.transfer_function.kernel_dataset import KernelDataset
 
     # Specify path to mth5
-    data_path = DATA_PATH.joinpath("test1.h5")
+    data_path = MTH5_PATH.joinpath("test1.h5")
     if not data_path.exists():
         print("You need to run make_mth5_from_asc.py")
         raise Exception
