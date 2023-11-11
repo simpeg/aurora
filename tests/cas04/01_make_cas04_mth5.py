@@ -44,9 +44,10 @@ XML_PATH = CAS04_PATH.joinpath("cas04_from_tim_20211203.xml")
 NETWORK_ID = "8P"
 STATION_IDS = [
     "CAS04",
+    "CAV07",
     "NVR11",
     "REV06",
-]  # "CAV07",] # skip CAV07 until exception fixed in mth5/metadata
+]
 CHANNELS = [
     "LQE",
     "LQN",
