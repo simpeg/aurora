@@ -396,7 +396,7 @@ def process_mth5(
         if show_plot:
             from aurora.sandbox.plot_helpers import plot_tf_obj
 
-            plot_tf_obj(ttfz_obj, out_filename="out")
+            plot_tf_obj(ttfz_obj, out_filename="")
 
     tf_collection = TransferFunctionCollection(
         tf_dict=tf_dict, processing_config=tfk.config
