@@ -82,11 +82,11 @@ class EMTFBandSetupFile:
         lower_edges = pd.Series(index=self.df.index, dtype="float64")
         upper_edges = pd.Series(index=self.df.index, dtype="float64")
         if not self.sample_rate:
-            print("cannot define frequencies of sample rate undefined")
+            logger.info("cannot define frequencies of sample rate undefined")
             raise Exception
         if len(decimation_factors) != self.num_decimation_levels:
-            print("Number of decimation_factors must equal number of decimation lvels")
-            print(
+            logger.info("Number of decimation_factors must equal number of decimation lvels")
+            logger.info(
                 f"There are {len(decimation_factors)} decimation_factors but "
                 f"{self.num_decimation_levels} decimation lvels"
             )

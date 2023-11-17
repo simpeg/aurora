@@ -1,4 +1,5 @@
 import pandas as pd
+from loguru import logger
 
 
 def channel_summary_to_make_mth5(
@@ -37,13 +38,13 @@ def channel_summary_to_make_mth5(
 
     """
     if not network:
-        print("Network not specified")
-        print("this will cause IRIS data pull to fail")
+        logger.warning("Network not specified")
+        logger.warning("this will cause IRIS data pull to fail")
         raise ValueError
 
     ch_map = {"ex": "LQN", "ey": "LQE", "hx": "LFN", "hy": "LFE", "hz": "LFZ"}
     if channel_nomenclature is not None:
-        print("Need to add handling for channel nomenclature")
+        logger.info("Need to add handling for channel nomenclature")
         # either replace the keys in ch_map, or create a new ch_map
 
     num_rows = len(df)
@@ -57,7 +58,7 @@ def channel_summary_to_make_mth5(
     i = 0
     for group_id, group_df in df.groupby(["station", "run"]):
         if verbose:
-            print(
+            logger.info(
                 f"{group_id}, from "
                 f"{group_df.start.unique()[0]}, to "
                 f"{group_df.end.unique()[0]}"

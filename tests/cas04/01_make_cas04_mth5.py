@@ -32,6 +32,8 @@ from aurora.sandbox.mth5_helpers import build_request_df
 
 from mth5.clients import FDSN
 from mth5.utils.helpers import read_back_data
+from loguru import logger
+
 
 # Define paths
 TEST_PATH = get_test_path()
@@ -134,13 +136,13 @@ def make_all_stations_together(
     expected_file_name = DATA_PATH.joinpath(fdsn_object.make_filename(request_df))
     download = force_download
     if expected_file_name.exists():
-        print(f"Already have data for {expected_file_name.name}")
+        logger.info(f"Already have data for {expected_file_name.name}")
         download = False
         mth5_filename = expected_file_name
         if force_download:
             download = True
     if download:
-        print("getting...", request_df)
+        logger.info("getting...", request_df)
         mth5_filename = fdsn_object.make_mth5_from_fdsn_client(
             request_df, interact=False, path=DATA_PATH
         )
@@ -187,4 +189,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    print("OK")
+    logger.info("OK")

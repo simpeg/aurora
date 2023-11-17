@@ -72,6 +72,7 @@ from aurora.time_series.window_helpers import SLIDING_WINDOW_FUNCTIONS
 from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
     get_fft_harmonics,
 )
+from loguru import logger
 
 
 class WindowingScheme(ApodizationWindow):
@@ -95,6 +96,7 @@ class WindowingScheme(ApodizationWindow):
         self.striding_function_label = kwargs.get("striding_function_label", "crude")
         self._left_hand_window_edge_indices = None
         self.sample_rate = kwargs.get("sample_rate", None)
+        self.logger = logger
 
     def clone(cls):
         return copy.deepcopy(cls)
@@ -187,7 +189,7 @@ class WindowingScheme(ApodizationWindow):
             windowed_obj = ds
 
         else:
-            print(f"Unexpected Data type {type(data)}")
+            self.logger.error(f"Unexpected Data type {type(data)}")
             raise Exception
         return windowed_obj
 
@@ -250,7 +252,7 @@ class WindowingScheme(ApodizationWindow):
         """
         # Get within-window_time_axis coordinate
         if dt is None:
-            print("Warning dt not defined, using dt=1")
+            self.logger.warning("Warning dt not defined, using dt=1")
             dt = 1.0
         within_window_time_axis = dt * np.arange(self.num_samples_window)
 
@@ -342,7 +344,7 @@ class WindowingScheme(ApodizationWindow):
             return spectral_ds
 
         else:
-            print(f"fft of {type(data)} not yet supported")
+            self.logger.error(f"fft of {type(data)} not yet supported")
             raise Exception
 
         return spectral_ds

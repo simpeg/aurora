@@ -1,6 +1,6 @@
 from mt_metadata.timeseries.location import Location
 from mth5.mth5 import MTH5
-
+from loguru import logger
 
 def test_can_add_location():
     """
@@ -29,17 +29,17 @@ def test_can_add_location():
     run_group.station_group.metadata.location = location
     # setting latitude as above line does not wind up in the run either"
 
-    print("Why don't the following values agree??")
-    print(f"station group {station_group.metadata.location.latitude}")
-    print(f"Run Group {run_group.station_group.metadata.location.latitude}")
+    logger.info("Why don't the following values agree??")
+    logger.info(f"station group {station_group.metadata.location.latitude}")
+    logger.info(f"Run Group {run_group.station_group.metadata.location.latitude}")
     m.close_mth5()
 
-    print("Reopen the file and check if update was done on close()")
+    logger.info("Reopen the file and check if update was done on close()")
     m.open_mth5("location_test.h5", mode="r")
     eureka = m.get_station("eureka")
-    print(f"station group {eureka.metadata.location.latitude}")
+    logger.info(f"station group {eureka.metadata.location.latitude}")
     run_001 = eureka.get_run("001")
-    print(f"Run Group {run_001.station_group.metadata.location.latitude}")
+    logger.info(f"Run Group {run_001.station_group.metadata.location.latitude}")
     m.close_mth5()
     return
 

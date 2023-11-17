@@ -222,7 +222,7 @@ def nan_to_mean(xrds):
     for ch in xrds.keys():
         null_values_present = xrds[ch].isnull().any()
         if null_values_present:
-            print(
+            logger.info(
                 "Null values detected in xrds -- this is not expected and should be examined"
             )
             value = np.nan_to_num(np.nanmean(xrds[ch].data))
@@ -308,7 +308,7 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
                 channel_scale_factor = 1.0
             calibration_response /= channel_scale_factor
         if units == "SI":
-            print("Warning: SI Units are not robustly supported issue #36")
+            logger.warning("Warning: SI Units are not robustly supported issue #36")
 
         stft_obj[channel_id].data /= calibration_response
     return stft_obj

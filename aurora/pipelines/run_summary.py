@@ -28,6 +28,7 @@ from mt_metadata.transfer_functions.processing.aurora.channel_nomenclature impor
 from mt_metadata.transfer_functions.processing.aurora.channel_nomenclature import ALLOWED_OUTPUT_CHANNELS
 import mth5
 from mth5.utils.helpers import initialize_mth5
+from loguru import logger
 
 
 
@@ -70,6 +71,7 @@ class RunSummary:
         self._input_dict = kwargs.get("input_dict", None)
         self.df = kwargs.get("df", None)
         self._mini_summary_columns = ["survey", "station_id", "run_id", "start", "end"]
+        self.logger = logger
 
     def clone(self):
         """
@@ -89,7 +91,7 @@ class RunSummary:
 
     @property
     def print_mini_summary(self):
-        print(self.mini_summary)
+        self.logger.info(self.mini_summary)
 
     def add_duration(self, df=None):
         """
@@ -110,13 +112,13 @@ class RunSummary:
         """kwargs can tell us what sorts of conditions to check, for example all_zero, there are nan, etc."""
         # check_for_all_zero_runs
         for i_row, row in self.df.iterrows():
-            print(f"Checking row for zeros {row}")
+            self.logger.info(f"Checking row for zeros {row}")
             m = mth5.mth5.MTH5()
             m.open_mth5(row.mth5_path)
             run_obj = m.get_run(row.station_id, row.run_id, row.survey)
             runts = run_obj.to_runts()
             if runts.dataset.to_array().data.__abs__().sum() == 0:
-                print("CRITICAL: Detected a run with all zero values")
+                self.logger.critical("CRITICAL: Detected a run with all zero values")
                 self.df["valid"].at[i_row] = False
             # load each run, and take the median of the sum of the absolute values
         if drop:
@@ -269,7 +271,7 @@ def extract_run_summary_from_mth5(mth5_obj, summary_type="run"):
     channel_summary_df = mth5_obj.channel_summary.to_dataframe()
     # check that the mth5 has been summarized already
     if len(channel_summary_df) < 2:
-        print("Channel summary maybe not initialized yet, 3 or more channels expected.")
+        self.logger.info("Channel summary maybe not initialized yet, 3 or more channels expected.")
         mth5_obj.channel_summary.summarize()
         channel_summary_df = mth5_obj.channel_summary.to_dataframe()
     if summary_type == "run":

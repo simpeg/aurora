@@ -1,4 +1,5 @@
 from aurora.time_series.filters.filter_helpers import MT2SI_ELECTRIC_FIELD_FILTER
+from loguru import logger
 
 
 def triage_mt_units_electric_field(experiment):
@@ -15,7 +16,7 @@ def triage_mt_units_electric_field(experiment):
     -------
 
     """
-    print(
+    logger.info(
         f"Add MT2SI_ELECTRIC_FIELD_FILTER to electric channels for parkfield here"
         f" {MT2SI_ELECTRIC_FIELD_FILTER} "
     )
@@ -50,10 +51,10 @@ def triage_missing_coil_hollister(experiment):
             runs = station.runs
             for run in runs:
                 channels = run.channels
-                print(channels)
+                logger.info(channels)
                 for channel in channels:
-                    print(channel.id)
+                    logger.info(channel.id)
 
         # station = stations[i_station]
         runs = station.runs[0]
-        print("help")
+        logger.info("help")

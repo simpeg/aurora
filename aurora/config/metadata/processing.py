@@ -10,13 +10,13 @@ import pandas as pd
 from aurora.time_series.windowing_scheme import window_scheme_from_decimation
 from mt_metadata.transfer_functions.processing.aurora.processing import Processing
 from mt_metadata.utils.list_dict import ListDict
-
+from loguru import logger
 
 class Processing(Processing):
     def __init__(self, **kwargs):
-
         # super().__init__(attr_dict=attr_dict, **kwargs)
         super().__init__(**kwargs)
+        self.logger = logger
 
     def window_scheme(self, as_type="df"):
         """
@@ -42,7 +42,7 @@ class Processing(Processing):
             df = pd.DataFrame(data=data_dict)
             return df
         else:
-            print(f"unexpected rtype for window_scheme {as_type}")
+            self.logger.error(f"unexpected rtype for window_scheme {as_type}")
             raise TypeError
 
     def decimation_info(self):

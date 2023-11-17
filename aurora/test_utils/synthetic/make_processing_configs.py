@@ -2,6 +2,7 @@ from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config import BANDS_256_26_FILE
 from aurora.config.config_creator import ConfigCreator
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
+from loguru import logger
 
 synthetic_test_paths = SyntheticTestPaths()
 CONFIG_PATH = synthetic_test_paths.config_path
@@ -137,7 +138,7 @@ def test_to_from_json():
     # Specify path to mth5
     data_path = MTH5_PATH.joinpath("test1.h5")
     if not data_path.exists():
-        print("You need to run make_mth5_from_asc.py")
+        logger.error("You need to run make_mth5_from_asc.py")
         raise Exception
     mth5_paths = [
         data_path,
@@ -152,7 +153,7 @@ def test_to_from_json():
     p = Processing()
     json_fn = CONFIG_PATH.joinpath(processing_config.json_fn())
     p.from_json(json_fn)
-    print("Assert equal needed here")
+    logger.info("Assert equal needed here")
     return
 
 

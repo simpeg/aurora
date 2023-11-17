@@ -4,6 +4,8 @@ import pandas as pd
 from mt_metadata.transfer_functions.processing.aurora.band import (
     FrequencyBands,
 )
+from loguru import logger
+
 
 
 def extract_band(frequency_band, fft_obj, epsilon=1e-7):
@@ -75,7 +77,7 @@ def frequency_band_edges(
         f_lower_bound and f_upper_bound
     """
     if (num_bands is None) & (num_bands_per_decade is None):
-        print("Specify either number_of_bands or numnerbands_per_decade")
+        logger.error("Specify either number_of_bands or numnerbands_per_decade")
         raise Exception
 
     if num_bands is None:
@@ -88,12 +90,12 @@ def frequency_band_edges(
     base = np.exp((1.0 / num_bands) * np.log(f_upper_bound / f_lower_bound))
     # log - NOT log10!
 
-    print(f"base = {base}")
+    logger.info(f"base = {base}")
     bases = base * np.ones(num_bands + 1)
-    print(f"bases = {bases}")
+    logger.info(f"bases = {bases}")
     exponents = np.linspace(0, num_bands, num_bands + 1)
-    print(f"exponents = {exponents}")
+    logger.info(f"exponents = {exponents}")
     fence_posts = f_lower_bound * (bases**exponents)
-    print(f"fence posts = {fence_posts}")
+    logger.info(f"fence posts = {fence_posts}")
     return fence_posts
 

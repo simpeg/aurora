@@ -78,6 +78,8 @@ import mt_metadata.timeseries.time_period
 from mt_metadata.transfer_functions.processing.fourier_coefficients import (
     Decimation as FCDecimation,
 )
+from loguru import logger
+
 
 
 # =============================================================================
@@ -134,7 +136,7 @@ def decimation_and_stft_config_creator(
             if isinstance(mt_metadata.timeseries.time_period.TimePeriod, time_period):
                 dd.time_period = time_period
             else:
-                print(f"Not sure how to assign time_period with {time_period}")
+                logger.info(f"Not sure how to assign time_period with {time_period}")
                 raise NotImplementedError
 
         decimation_and_stft_config.append(dd)
@@ -159,17 +161,17 @@ def add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=None):
     channel_summary_df = m.channel_summary.to_dataframe()
 
     usssr_grouper = channel_summary_df.groupby(GROUPBY_COLUMNS)
-    print(f"DETECTED {len(usssr_grouper)} unique station-sample_rate instances")
+    logger.debug(f"DETECTED {len(usssr_grouper)} unique station-sample_rate instances")
 
     for (survey, station, sample_rate), usssr_group in usssr_grouper:
-        print(f"\n\n\nsurvey: {survey}, station: {station}, sample_rate {sample_rate}")
+        logger.info(f"\n\n\nsurvey: {survey}, station: {station}, sample_rate {sample_rate}")
         station_obj = m.get_station(station, survey)
         run_summary = station_obj.run_summary
 
         # Get the FC schemes
         if not decimation_and_stft_configs:
             msg = "FC config not supplied, using default, creating on the fly"
-            print(f"{msg}")
+            logger.info(f"{msg}")
             decimation_and_stft_configs = decimation_and_stft_config_creator(
                 sample_rate, time_period=None
             )
@@ -178,7 +180,7 @@ def add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=None):
         # I wonder if daskifiying that will cause issues with multiple threads trying to
         # write to the hdf5 file -- will need testing
         for i_run_row, run_row in run_summary.iterrows():
-            print(
+            logger.info(
                 f"survey: {survey}, station: {station}, sample_rate {sample_rate}, i_run_row {i_run_row}"
             )
             # Access Run
@@ -208,11 +210,11 @@ def add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=None):
                 if i_dec_level != 0:
                     # Apply decimation
                     run_xrds = prototype_decimate(decimation_stft_obj, run_xrds)
-                print(f"type decimation_stft_obj = {type(decimation_stft_obj)}")
+                logger.info(f"type decimation_stft_obj = {type(decimation_stft_obj)}")
                 if not decimation_stft_obj.is_valid_for_time_series_length(
                     run_xrds.time.shape[0]
                 ):
-                    print(
+                    logger.info(
                         f"Decimation Level {i_dec_level} invalid, TS of {run_xrds.time.shape[0]} samples too short"
                     )
                     continue
@@ -248,24 +250,24 @@ def read_back_fcs(mth5_path):
     m = MTH5()
     m.open_mth5(mth5_path)
     channel_summary_df = m.channel_summary.to_dataframe()
-    print(channel_summary_df)
+    logger.debug(channel_summary_df)
     usssr_grouper = channel_summary_df.groupby(GROUPBY_COLUMNS)
     for (survey, station, sample_rate), usssr_group in usssr_grouper:
-        print(f"survey: {survey}, station: {station}, sample_rate {sample_rate}")
+        logger.info(f"survey: {survey}, station: {station}, sample_rate {sample_rate}")
         station_obj = m.get_station(station, survey)
         fc_groups = station_obj.fourier_coefficients_group.groups_list
-        print(f"FC Groups: {fc_groups}")
+        logger.info(f"FC Groups: {fc_groups}")
         for run_id in fc_groups:
             fc_group = station_obj.fourier_coefficients_group.get_fc_group(run_id)
             dec_level_ids = fc_group.groups_list
             for dec_level_id in dec_level_ids:
                 dec_level = fc_group.get_decimation_level(dec_level_id)
-                print(
+                logger.info(
                     f"dec_level {dec_level_id}"
                 )  # channel_summary {dec_level.channel_summary}")
                 xrds = dec_level.to_xarray(["hx", "hy"])
-                print(f"Time axis shape {xrds.time.data.shape}")
-                print(f"Freq axis shape {xrds.frequency.data.shape}")
+                logger.info(f"Time axis shape {xrds.time.data.shape}")
+                logger.info(f"Freq axis shape {xrds.frequency.data.shape}")
     return True
 
 

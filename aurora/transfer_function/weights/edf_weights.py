@@ -4,6 +4,7 @@ from egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF
 """
 
 import numpy as np
+from loguru import logger
 
 
 class EffectiveDegreesOfFreedom(object):
@@ -37,6 +38,8 @@ class EffectiveDegreesOfFreedom(object):
         self.c2 = kwargs.get("c2", 10.0)
         self.p3 = kwargs.get("p3", 5)
         self.n_data = kwargs.get("n_data", 0)
+
+        self.logger = logger
 
     @property
     def p1(self):
@@ -160,7 +163,7 @@ def effective_degrees_of_freedom_weights(X, R, edf_obj=None, test=True):
     """
     num_channels = len(X.data_vars)
     if num_channels != 2:
-        print("edfwts only works for 2 input channels")
+        self.logger.error("edfwts only works for 2 input channels")
         raise Exception
     X = X.to_array(dim="channel")
     if R is not None:

@@ -4,6 +4,7 @@ iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_1
 """
 import numpy as np
 import xarray as xr
+from loguru import logger
 
 from aurora.transfer_function.base import TransferFunction
 
@@ -23,6 +24,7 @@ class TTFZ(TransferFunction):
 
     def __init__(self, *args, **kwargs):
         super(TTFZ, self).__init__(*args, **kwargs)
+        self.logger = logger
 
     def standard_error(self):
         """
@@ -96,7 +98,7 @@ class TTFZ(TransferFunction):
             rxy_se = 2 * np.sqrt(self.periods * rxy / 5) * Zxy_se
             ryx_se = 2 * np.sqrt(self.periods * ryx / 5) * Zyx_se
         else:
-            print("ERROR: only SI and MT units supported")
+            self.logger.error("ERROR: only SI and MT units supported")
             raise Exception
 
         self.rho[:, :] = np.vstack((rxy, ryx)).T
