@@ -80,7 +80,7 @@ def create_run_ts_from_synthetic_run(run, df, channel_nomenclature="default"):
             "time_period.start": run.start,
         }
         if col in [EX, EY]:
-
+            meta_dict["units"] = "millivolts per kilometer"
             chts = ChannelTS(
                 channel_type="electric", data=data, channel_metadata=meta_dict
             )
@@ -90,6 +90,7 @@ def create_run_ts_from_synthetic_run(run, df, channel_nomenclature="default"):
                 chts.channel_metadata.measurement_azimuth = 90.0
 
         elif col in [HX, HY, HZ]:
+            meta_dict["units"] = "nanotesla"
             chts = ChannelTS(
                 channel_type="magnetic", data=data, channel_metadata=meta_dict
             )
