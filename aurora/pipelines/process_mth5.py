@@ -41,7 +41,7 @@ from aurora.transfer_function.TTFZ import TTFZ
 
 
 def make_stft_objects(
-    processing_config, i_dec_level, run_obj, run_xrds, units, station_id
+    processing_config, i_dec_level, run_obj, run_xrds, station_id, units="MT"
 ):
     """
     Operates on a "per-run" basis
@@ -315,7 +315,7 @@ def process_mth5(
     tfk.show_processing_summary()
     tfk.validate()
     # See Note #1
-    if config.decimations[0].save_fcs:
+    if tfk.config.decimations[0].save_fcs:
         mth5_mode = "a"
     else:
         mth5_mode = "r"
@@ -359,7 +359,6 @@ def process_mth5(
                 continue
 
             run_xrds = row["run_dataarray"].to_dataset("channel")
-            run_obj = row.mth5_obj.from_reference(row.run_reference)
 
             # Musgraves workaround for old MT data
             try:
@@ -370,7 +369,7 @@ def process_mth5(
                 run_obj.metadata.id = row.run_id
 
             stft_obj = make_stft_objects(
-                tfk.config, i_dec_level, run_obj, run_xrds, units, row.station_id
+                tfk.config, i_dec_level, run_obj, run_xrds, row.station_id, units,
             )
             # Pack FCs into h5
             save_fourier_coefficients(
