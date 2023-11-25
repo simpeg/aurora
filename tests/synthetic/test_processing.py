@@ -240,7 +240,7 @@ def process_synthetic_1(
     return tf_result
 
 
-def process_synthetic_2(force_make_mth5=True, z_file_path=None):
+def process_synthetic_2(force_make_mth5=True, z_file_path=None, save_fc=False):
     """"""
     station_id = "test2"
     mth5_path = create_test2_h5(force_make_mth5=force_make_mth5)
@@ -253,8 +253,10 @@ def process_synthetic_2(force_make_mth5=True, z_file_path=None):
     tfk_dataset.from_run_summary(run_summary, station_id)
     processing_config = create_test_run_config(station_id, tfk_dataset)
     for decimation_level in processing_config.decimations:
-        decimation_level.save_fcs = True
-        decimation_level.save_fcs_type = "h5"
+        if save_fc:
+            decimation_level.save_fcs = True
+            decimation_level.save_fcs_type = "h5"
+        decimation_level.window.type = "boxcar"
         # decimation_level.save_fcs_type = "csv"
     tfc = process_mth5(
         processing_config,
