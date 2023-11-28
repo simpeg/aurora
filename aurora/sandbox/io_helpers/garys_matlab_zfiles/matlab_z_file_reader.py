@@ -146,7 +146,7 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
     for i in range(len(periods)):
         if np.isnan(cov_nn[:, :, i]).any():
             nan_cov_nn.append(i)
-            logger(f"NAN {i}")
+            logger.info(f"NAN {i}")
 
     if case_id == "synthetic":
         cov_nn[:, :, 28] = cov_nn[:, :, 27]
@@ -224,4 +224,4 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
         rtol=1e-3,
     ).all()
 
-    logger("success!")
+    logger.info("success!")
