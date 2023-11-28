@@ -31,7 +31,6 @@ class TRME_RR(MEstimator):
         self.check_for_enough_data_for_rr_estimate()
         self.check_reference_data_shape()
 
-        self.logger = logger
 
     def check_for_nan(self):
         cond1 = np.isnan(self.X).any()
@@ -39,7 +38,7 @@ class TRME_RR(MEstimator):
         cond3 = np.isnan(self.Z).any()
         nans_present = cond1 or cond2 or cond3
         if nans_present:
-            self.logger.error("Missing data not allowed for TRME_RR class")
+            logger.error("Missing data not allowed for TRME_RR class")
             raise Exception
 
     def check_for_enough_data_for_rr_estimate(self):
@@ -47,12 +46,12 @@ class TRME_RR(MEstimator):
             error_msg = "not enough data for RR estimate:"
             error_msg = f"{error_msg} n_channels_in = {self.n_channels_in}"
             error_msg = f"{error_msg} N_data = {self.n_data}"
-            self.logger.error(f"{error_msg}")
+            logger.error(f"{error_msg}")
             raise Exception
 
     def check_reference_data_shape(self):
         if self.Z.shape != self.X.shape:
-            self.logger.error("sizes of local and remote do not agree in RR estimation routine")
+            logger.error("sizes of local and remote do not agree in RR estimation routine")
             raise Exception
 
     def update_y_hat(self):

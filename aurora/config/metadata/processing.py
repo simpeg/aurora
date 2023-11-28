@@ -16,7 +16,6 @@ class Processing(Processing):
     def __init__(self, **kwargs):
         # super().__init__(attr_dict=attr_dict, **kwargs)
         super().__init__(**kwargs)
-        self.logger = logger
 
     def window_scheme(self, as_type="df"):
         """
@@ -42,7 +41,7 @@ class Processing(Processing):
             df = pd.DataFrame(data=data_dict)
             return df
         else:
-            self.logger.error(f"unexpected rtype for window_scheme {as_type}")
+            logger.error(f"unexpected rtype for window_scheme {as_type}")
             raise TypeError
 
     def decimation_info(self):

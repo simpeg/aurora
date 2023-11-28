@@ -74,12 +74,10 @@ class TransferFunction(Base):
             if self.num_bands is not None:
                 self._initialize_arrays()
 
-        self.logger = logger
-
     @property
     def emtf_tf_header(self):
         if self.processing_config is None:
-            self.logger.info("No header is available without a processing config")
+            logger.info("No header is available without a processing config")
             self._emtf_tf_header = None
         else:
             if self._emtf_tf_header is None:
@@ -135,7 +133,7 @@ class TransferFunction(Base):
 
         """
         if self.tf_header is None:
-            self.logger.error("header needed to allocate transfer function arrays")
+            logger.error("header needed to allocate transfer function arrays")
             raise Exception
 
         # <transfer function xarray>

@@ -41,7 +41,6 @@ class MEstimator(RegressionEstimator):
         self.Yc = deepcopy(self.Y)
         self._Y_hat = None
         self._residual_variance = None
-        self.logger = logger
 
     @property
     def QHYc(self):
@@ -59,13 +58,13 @@ class MEstimator(RegressionEstimator):
         return self._Y_hat
 
     def update_y_hat(self):
-        self.logger.error("Y_hat update method is not defined for abstract MEstimator class")
-        self.logger.error("Try using RME or RME_RR class instead")
+        logger.error("Y_hat update method is not defined for abstract MEstimator class")
+        logger.error("Try using RME or RME_RR class instead")
         raise Exception
 
     def update_residual_variance(self, correction_factor=1):
-        self.logger.error("update_residual_variance method not defined in abstract MEstimator")
-        self.logger.error("Try using RME or RME_RR class instead")
+        logger.error("update_residual_variance method not defined in abstract MEstimator")
+        logger.error("Try using RME or RME_RR class instead")
         raise Exception
 
     @property
@@ -143,9 +142,9 @@ class MEstimator(RegressionEstimator):
         try:
             assert (residual_variance > 0).all()
         except AssertionError:
-            self.logger.warning("WARNING - Negative error variances observed")
-            self.logger.warning(residual_variance)
-            self.logger.warning("Setting residual_variance to zero - Negative values observed")
+            logger.warning("WARNING - Negative error variances observed")
+            logger.warning(residual_variance)
+            logger.warning("Setting residual_variance to zero - Negative values observed")
             residual_variance *= 0
 
         return residual_variance

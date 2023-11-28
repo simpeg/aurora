@@ -41,7 +41,6 @@ class TransferFunctionCollection(object):
         self.merged_tf = None
         self.merged_cov_nn = None
         self.merged_cov_ss_inv = None
-        self.logger = logger
 
     @property
     def header(self):
@@ -313,7 +312,7 @@ class TransferFunctionCollection(object):
             axs[1].set_ylim(phi_ylims)
 
         if figures_path is None:
-            self.logger.info("figures path is not defined -- skipping saving figures")
+            logger.info("figures path is not defined -- skipping saving figures")
             return
         else:
             default_figure_basename = f"{self.local_station_id}_{xy_or_yx}.png"
