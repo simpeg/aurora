@@ -80,9 +80,9 @@ def create_run_ts_from_synthetic_run(run, df, channel_nomenclature="default"):
             "time_period.start": run.start,
         }
         if col in [EX, EY]:
-            meta_dict["units"] = "millivolts per kilometer"
+            channel_metadata = {"electric": meta_dict}
             chts = ChannelTS(
-                channel_type="electric", data=data, channel_metadata=meta_dict
+                channel_type="electric", data=data, channel_metadata=channel_metadata
             )
             # add metadata to the channel here
             chts.channel_metadata.dipole_length = 50
@@ -90,9 +90,9 @@ def create_run_ts_from_synthetic_run(run, df, channel_nomenclature="default"):
                 chts.channel_metadata.measurement_azimuth = 90.0
 
         elif col in [HX, HY, HZ]:
-            meta_dict["units"] = "nanotesla"
+            channel_metadata = {"magnetic": meta_dict}
             chts = ChannelTS(
-                channel_type="magnetic", data=data, channel_metadata=meta_dict
+                channel_type="magnetic", data=data, channel_metadata=channel_metadata
             )
             if col == HY:
                 chts.channel_metadata.measurement_azimuth = 90.0
@@ -406,11 +406,11 @@ def create_test4_h5(
 
 def main(file_version="0.1.0"):
     file_version = "0.2.0"
-    create_test1_h5(file_version=file_version)
-    create_test1_h5_with_nan(file_version=file_version)
-    create_test2_h5(file_version=file_version)
-    create_test12rr_h5(file_version=file_version)
-    create_test3_h5(file_version=file_version)
+    # create_test1_h5(file_version=file_version)
+    # create_test1_h5_with_nan(file_version=file_version)
+    # create_test2_h5(file_version=file_version)
+    # create_test12rr_h5(file_version=file_version)
+    # create_test3_h5(file_version=file_version)
     create_test4_h5(file_version=file_version)
 
 
