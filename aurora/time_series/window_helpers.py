@@ -8,6 +8,7 @@ import numpy as np
 from numpy.lib.stride_tricks import as_strided
 from numba import jit
 import time
+from loguru import logger
 
 
 # Window-to-timeseries relationshp
@@ -30,7 +31,7 @@ def available_number_of_windows_in_array(n_samples_array, n_samples_window, n_ad
     """
     stridable_samples = n_samples_array - n_samples_window
     if stridable_samples < 0:
-        print("CRITICAL Window is longer than the time series")
+        logger.critical("CRITICAL Window is longer than the time series")
         return 0
     available_number_of_strides = int(np.floor(stridable_samples / n_advance))
     available_number_of_strides += 1
@@ -155,7 +156,7 @@ def striding_window(data, num_samples_window, num_samples_advance, num_windows=N
     # print("output_shape", output_shape)
     strides_shape = (num_samples_advance * bytes_per_element, bytes_per_element)
     # strides_shape = None
-    print("strides_shape", strides_shape)
+    logger.info("strides_shape", strides_shape)
     strided_window = as_strided(
         data, shape=output_shape, strides=strides_shape
     )  # , writeable=False)
@@ -204,7 +205,7 @@ def check_all_sliding_window_functions_are_equivalent():
     results = {}
     for function_label, function in SLIDING_WINDOW_FUNCTIONS.items():
         results[function_label] = function(data, L, A, n_win)
-        print(results[function_label])
+        logger.info(results[function_label])
 
     for i, function_label in enumerate(results.keys()):
         if i == 0:
@@ -212,7 +213,7 @@ def check_all_sliding_window_functions_are_equivalent():
         else:
             difference = reference_result - results[function_label]
             if np.sum(np.abs(difference)) == 0:
-                print(f"OK {i}")
+                logger.info(f"OK {i}")
                 # put an assert here instead of OK
 
 
@@ -223,40 +224,40 @@ def do_some_tests():
     n_advance = n_samples_window - n_overlap
 
     sw = striding_window(np.arange(15), 3, 2, num_windows=4)
-    print(sw)
+    logger.info(sw)
 
     t0 = time.time()
     strided_window = striding_window(
         1.0 * np.arange(N), n_samples_window, n_advance
     )  # , num_windows=4)
     strided_window += 1
-    print("stride {}".format(time.time() - t0))
+    logger.info("stride {}".format(time.time() - t0))
 
-    print(strided_window)
+    logger.info(strided_window)
 
     t0 = time.time()
     slid_window = sliding_window_crude(
         1.0 * np.arange(N), n_samples_window, n_advance
     )  # , num_windows=4)
     slid_window += 1
-    print("crude  {}".format(time.time() - t0))
+    logger.info("crude  {}".format(time.time() - t0))
 
-    print(slid_window)
+    logger.info(slid_window)
 
     num_windows = available_number_of_windows_in_array(N, n_samples_window, n_advance)
-    print(num_windows)
+    logger.info(num_windows)
     t0 = time.time()
     numba_slid_window = sliding_window_numba(
         1.0 * np.arange(N), n_samples_window, n_advance, num_windows
     )  # , num_windows=4)
     numba_slid_window += 1
-    print("numba  {}".format(time.time() - t0))
+    logger.info("numba  {}".format(time.time() - t0))
 
     t0 = time.time()
     numba_slid_window = sliding_window_numba(
         1.0 * np.arange(N), n_samples_window, n_advance, num_windows
     )  # , num_windows=4)
-    print("numba  {}".format(time.time() - t0))
+    logger.info("numba  {}".format(time.time() - t0))
 
 
 def test_apply_taper():

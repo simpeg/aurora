@@ -3,6 +3,7 @@ import numpy as np
 
 from pathlib import Path
 from scipy.signal import medfilt
+from loguru import logger
 
 plt.ion()
 
@@ -111,10 +112,10 @@ def parkfield_sanity_check(
     frequencies = fft_obj.frequency.data[1:]  # drop DC, add flag for dropping DC
     figures_path.mkdir(parents=True, exist_ok=True)
     channel_keys = list(fft_obj.data_vars.keys())
-    print(f"channel_keys: {channel_keys}")
+    logger.info(f"channel_keys: {channel_keys}")
 
     for key in channel_keys:
-        print(f"calibrating channel {key}")
+        logger.info(f"calibrating channel {key}")
         if key[0].lower() == "h":
             bf4 = True
             spectral_units = "nT/sqrt(Hz)"
@@ -129,7 +130,7 @@ def parkfield_sanity_check(
         )
 
         if channel.channel_response_filter.units_in.lower() in ["t", "tesla"]:
-            print("WARNING: Expecting nT but got T")
+            logger.warning("WARNING: Expecting nT but got T")
 
         # Frequency response table response
         bf4_resp = None
@@ -149,8 +150,8 @@ def parkfield_sanity_check(
         if bf4_resp is not None:
             response_ratio = np.abs(pz_calibration_response) / np.abs(bf4_resp)
             if np.median(response_ratio) > 1.1:
-                print("ERROR in response calculation")
-                print("See issue #156")
+                logger.error("ERROR in response calculation")
+                logger.error("See issue #156")
                 raise Exception
         # create smoothed amplitude spectra
         n_smooth = 131  # use 1 for no smoothing
@@ -171,9 +172,9 @@ def parkfield_sanity_check(
             schumann_amplitude_pz = np.median(smooth_calibrated_data_pz[schumann_cond])
             schumann_ratio = schumann_amplitude_pz / schumann_amplitude_fap
             if (schumann_ratio > 10) | (schumann_ratio < 0.1):
-                print("ERROR in response calculation")
-                print("See issue #156")
-                print("Amplitude of field around Schumann band incorrect")
+                logger.error("ERROR in response calculation")
+                logger.error("See issue #156")
+                logger.error("Amplitude of field around Schumann band incorrect")
                 raise Exception
 
         # Do Plotting (can factor this out)

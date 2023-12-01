@@ -39,7 +39,6 @@ from aurora.transfer_function.TTFZ import TTFZ
 
 # =============================================================================
 
-
 def make_stft_objects(
     processing_config, i_dec_level, run_obj, run_xrds, units, station_id
 ):
@@ -168,7 +167,7 @@ def triage_issue_289(local_stfts, remote_stfts):
     for i_chunk in range(n_chunks):
         ok = local_stfts[i_chunk].time.shape == remote_stfts[i_chunk].time.shape
         if not ok:
-            print("Mismatch in FC array lengths detected -- Issue #289")
+            logger.warning("Mismatch in FC array lengths detected -- Issue #289")
             glb = max(
                 local_stfts[i_chunk].time.min(),
                 remote_stfts[i_chunk].time.min(),
@@ -365,8 +364,8 @@ def process_mth5(
             try:
                 assert row.run_id == run_obj.metadata.id
             except AssertionError:
-                print("WARNING Run ID in dataset_df does not match run_obj")
-                print("WARNING Forcing run metadata to match dataset_df")
+                logger.warning("WARNING Run ID in dataset_df does not match run_obj")
+                logger.warning("WARNING Forcing run metadata to match dataset_df")
                 run_obj.metadata.id = row.run_id
 
             stft_obj = make_stft_objects(

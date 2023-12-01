@@ -4,6 +4,7 @@ These methods can possibly be moved under mt_metadata, or mth5
 They extract info needed to setup emtf_z files.
 """
 import numpy as np
+from loguru import logger
 
 EMTF_CHANNEL_ORDER = ["hx", "hy", "hz", "ex", "ey"]
 
@@ -113,7 +114,7 @@ def clip_bands_from_z_file(z_path, n_bands_clip, output_z_path=None, n_sensors=5
         n_lines_per_period = 13
     elif n_sensors == 4:
         n_lines_per_period = 11
-        print("WARNING n_sensors==4 NOT TESTED")
+        logger.info("WARNING n_sensors==4 NOT TESTED")
 
     f = open(z_path, "r")
     lines = f.readlines()

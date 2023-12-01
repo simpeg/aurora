@@ -2,6 +2,7 @@ from mt_metadata.timeseries.filters.coefficient_filter import CoefficientFilter
 from mt_metadata.timeseries.filters.frequency_response_table_filter import (
     FrequencyResponseTableFilter,
 )
+from loguru import logger
 
 
 def make_coefficient_filter(gain=1.0, name="generic coefficient filter", **kwargs):
@@ -53,7 +54,7 @@ def make_frequency_response_table_filter(case="bf4"):
         fap_filter.name = "bf4"
         return fap_filter
     else:
-        print(f"case {case} not supported for FAP Table")
+        logger.error(f"case {case} not supported for FAP Table")
         raise Exception
 
 

@@ -1,6 +1,7 @@
 import datetime
 
 from obspy import UTCDateTime
+from loguru import logger
 
 
 def trim_streams_to_acquisition_run(streams):
@@ -40,14 +41,14 @@ def align_streams(streams, clock_start):
 
     """
     for stream in streams:
-        print(
+        logger.info(
             f"{stream.stats['station']}  {stream.stats['channel']} N="
             f"{len(stream.data)}  startime {stream.stats.starttime}"
         )
         dt_seconds = stream.stats.starttime - clock_start
-        print(f"stream offset seconds {dt_seconds}")
+        logger.info(f"stream offset seconds {dt_seconds}")
         dt = datetime.timedelta(seconds=dt_seconds)
-        print(f"stream timedelta {dt}")
+        logger.info(f"stream timedelta {dt}")
         stream.stats.starttime = stream.stats.starttime - dt
     return streams
 

@@ -9,6 +9,7 @@ from aurora.pipelines.time_series_helpers import prototype_decimate
 from mth5.utils.exceptions import MTH5Error
 from mth5.utils.helpers import initialize_mth5
 from mt_metadata.transfer_functions.core import TF
+from loguru import logger
 
 
 class TransferFunctionKernel(object):
@@ -120,7 +121,7 @@ class TransferFunctionKernel(object):
 
             # APPLY TIMING CORRECTIONS HERE
         else:
-            print(f"DECIMATION LEVEL {i_dec_level}")
+            logger.info(f"DECIMATION LEVEL {i_dec_level}")
 
             for i, row in self.dataset_df.iterrows():
                 if not self.is_valid_dataset(row, i_dec_level):
@@ -128,7 +129,7 @@ class TransferFunctionKernel(object):
                 if row.fc:
                     row_ssr_str = f"survey: {row.survey}, station_id: {row.station_id}, run_id: {row.run_id}"
                     msg = f"FC already exists for {row_ssr_str} -- skipping decimation"
-                    print(msg)
+                    logger.info(msg)
                     continue
                 run_xrds = row["run_dataarray"].to_dataset("channel")
                 decimation = self.config.decimations[i_dec_level].decimation
@@ -244,7 +245,7 @@ class TransferFunctionKernel(object):
                     < self.processing_config.num_decimation_levels
                 ):
                     self.dataset_df.loc[dataset_df_indices, "fc"] = False
-                    print(
+                    logger.info(
                         f"Not enough FC Groups available for {row_ssr_str} -- will need to build them "
                     )
                     continue
@@ -279,7 +280,7 @@ class TransferFunctionKernel(object):
         columns_to_show = self.processing_summary.columns
         columns_to_show = [x for x in columns_to_show if x not in omit_columns]
         logger.info("Processing Summary Dataframe:")
-        print(self.processing_summary[columns_to_show].to_string())
+        logger.info(self.processing_summary[columns_to_show].to_string())
 
     def make_processing_summary(self):
         """
@@ -321,7 +322,7 @@ class TransferFunctionKernel(object):
                         df.dec_level.diff()[1:] == 1
                     ).all()  # dec levels increment by 1
                 except AssertionError:
-                    print(f"Skipping {group} because decimation levels are messy.")
+                    logger.info(f"Skipping {group} because decimation levels are messy.")
                     continue
                 assert df.dec_factor.iloc[0] == 1
                 assert df.dec_level.iloc[0] == 0
@@ -403,13 +404,13 @@ class TransferFunctionKernel(object):
         if not self.config.stations.remote:
             for decimation in self.config.decimations:
                 if decimation.estimator.engine == "RME_RR":
-                    print("No RR station specified, switching RME_RR to RME")
+                    logger.info("No RR station specified, switching RME_RR to RME")
                     decimation.estimator.engine = "RME"
 
         # Make sure that a local station is defined
         if not self.config.stations.local.id:
-            print("WARNING: Local station not specified")
-            print("Setting local station from Kernel Dataset")
+            logger.warning("WARNING: Local station not specified")
+            logger.warning("Setting local station from Kernel Dataset")
             self.config.stations.from_dataset_dataframe(self.kernel_dataset.df)
 
     def validate(self):
@@ -540,7 +541,7 @@ class TransferFunctionKernel(object):
                             i_dec
                         ].num_segments.data[0, i_band]
                     except KeyError:
-                        print("Possibly invalid decimation level")
+                        logger.error("Possibly invalid decimation level")
                         period_value["npts"] = 0
                     decimation_dict[period_key] = period_value
 
@@ -596,14 +597,14 @@ class TransferFunctionKernel(object):
         total_memory = psutil.virtual_memory().total
 
         # print the total amount of RAM in GB
-        print(f"Total memory: {total_memory / (1024 ** 3):.2f} GB")
+        logger.info(f"Total memory: {total_memory / (1024 ** 3):.2f} GB")
         num_samples = self.dataset_df.duration * self.dataset_df.sample_rate
         total_samples = num_samples.sum()
         total_bytes = total_samples * bytes_per_sample
-        print(f"Total Bytes of Raw Data: {total_bytes / (1024 ** 3):.3f} GB")
+        logger.info(f"Total Bytes of Raw Data: {total_bytes / (1024 ** 3):.3f} GB")
 
         ram_fraction = 1.0 * total_bytes / total_memory
-        print(f"Raw Data will use: {100 * ram_fraction:.3f} % of memory")
+        logger.info(f"Raw Data will use: {100 * ram_fraction:.3f} % of memory")
 
         # Check a condition
         if total_bytes > memory_threshold * total_memory:

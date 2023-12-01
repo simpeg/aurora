@@ -10,6 +10,7 @@ from scipy.linalg import solve_triangular
 
 from aurora.transfer_function.regression.base import RegressionEstimator
 from aurora.transfer_function.regression.helper_functions import rme_beta
+from loguru import logger
 
 
 class MEstimator(RegressionEstimator):
@@ -57,13 +58,13 @@ class MEstimator(RegressionEstimator):
         return self._Y_hat
 
     def update_y_hat(self):
-        print("Y_hat update method is not defined for abstract MEstimator class")
-        print("Try using RME or RME_RR class instead")
+        logger.error("Y_hat update method is not defined for abstract MEstimator class")
+        logger.error("Try using RME or RME_RR class instead")
         raise Exception
 
     def update_residual_variance(self, correction_factor=1):
-        print("update_residual_variance method not defined in abstract MEstimator")
-        print("Try using RME or RME_RR class instead")
+        logger.error("update_residual_variance method not defined in abstract MEstimator")
+        logger.error("Try using RME or RME_RR class instead")
         raise Exception
 
     @property
@@ -141,9 +142,9 @@ class MEstimator(RegressionEstimator):
         try:
             assert (residual_variance > 0).all()
         except AssertionError:
-            print("WARNING - Negative error variances observed")
-            print(residual_variance)
-            print("Setting residual_variance to zero - Negative values observed")
+            logger.warning("WARNING - Negative error variances observed")
+            logger.warning(residual_variance)
+            logger.warning("Setting residual_variance to zero - Negative values observed")
             residual_variance *= 0
 
         return residual_variance

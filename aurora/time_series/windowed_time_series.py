@@ -2,6 +2,7 @@ import numpy as np
 import scipy.signal as ssig
 
 from scipy.interpolate import interp1d
+from loguru import logger
 
 from aurora.time_series.decorators import can_use_xr_dataarray
 
@@ -25,7 +26,7 @@ def validate_coordinate_ordering_time_domain(dataset):
     if cond1 & cond2:
         return True
     else:
-        print("Uncertain that xarray coordinates are correctly ordered")
+        logger.error("Uncertain that xarray coordinates are correctly ordered")
         raise Exception
 
 
@@ -45,7 +46,7 @@ def get_time_coordinate_axis(dataset):
     coordinate_labels = list(dataset.coords.keys())
 
     if len(coordinate_labels) != 2:
-        print("Warning - Expected two distinct coordinates")
+        logger.warning("Warning - Expected two distinct coordinates")
         # raise Exception
 
     return coordinate_labels.index("time")
@@ -137,9 +138,9 @@ class WindowedTimeSeries(object):
                         f"{data[channel].coords.indexes['time'][-1].isoformat()}."
                     )
                     if ensembles.size == 0:
-                        print(msg + " NO DATA")
+                        logger.error(msg + " NO DATA")
                     else:
-                        print(msg + "UNKOWN REASON:" + error)
+                        logger.error(msg + "UNKOWN REASON:" + error)
 
             if inplace:
                 if len(nanless_data.time) < len(data[channel].time):

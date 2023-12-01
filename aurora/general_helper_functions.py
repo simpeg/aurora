@@ -103,12 +103,12 @@ def execute_command(cmd, **kwargs):
     """
     exec_dir = kwargs.get("exec_dir", os.path.expanduser("~/"))
     allow_exception = kwargs.get("allow_exception", True)
-    print("executing from {}".format(exec_dir))
+    logger.info("executing from {}".format(exec_dir))
     cwd = os.getcwd()
     os.chdir(exec_dir)
     exit_status = os.system(cmd)
     if exit_status != 0:
-        print(f"exit_status of {cmd} = {exit_status}")
+        logger.info(f"exit_status of {cmd} = {exit_status}")
         if allow_exception:
             raise Exception(f"Failed to successfully execute \n {cmd}")
     os.chdir(cwd)

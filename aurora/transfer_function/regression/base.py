@@ -10,6 +10,7 @@ arrays to follow Gary's codes more easily since his are matlab arrays.
 import numpy as np
 import xarray as xr
 from aurora.transfer_function.regression.iter_control import IterControl
+from loguru import logger
 
 
 class RegressionEstimator(object):
@@ -168,7 +169,7 @@ class RegressionEstimator(object):
         S_inv = np.diag(1.0 / s)
         self.b = (V.T @ S_inv @ U.T) * self.Y
         if self.iter_control.return_covariance:
-            print("Warning covariances are not xarray, may break things downstream")
+            logger.warning("Warning covariances are not xarray, may break things downstream")
             self.cov_nn = np.zeros((self.n_channels_out, self.n_channels_out))
             self.cov_ss_inv = np.zeros((self.n_channels_in, self.n_channels_in))
 
@@ -176,7 +177,7 @@ class RegressionEstimator(object):
 
     def check_number_of_observations_xy_consistent(self):
         if self.Y.shape[0] != self.X.shape[0]:
-            print(
+            logger.info(
                 f"Design matrix (X) has {self.X.shape[0]} rows but data (Y) "
                 f"has {self.Y.shape[0]}"
             )
@@ -241,7 +242,7 @@ class RegressionEstimator(object):
             elif self.qr_input == "Z":
                 X = self.Z
             else:
-                print("Matrix to perform QR decompostion not specified")
+                logger.error("Matrix to perform QR decompostion not specified")
                 raise Exception
 
         Q, R = np.linalg.qr(X)
@@ -251,7 +252,7 @@ class RegressionEstimator(object):
             if np.isclose(np.matmul(Q, R) - X, 0).all():
                 pass
             else:
-                print("Failed QR decompostion sanity check")
+                logger.error("Failed QR decompostion sanity check")
                 raise Exception
         return Q, R
 
@@ -324,7 +325,7 @@ class RegressionEstimator(object):
             elif mode.lower() == "solve":
                 b = np.linalg.solve(XHX, XHY)
             else:
-                print(f"mode {mode} not recognized")
+                logger.error(f"mode {mode} not recognized")
                 raise Exception
         self.b = b
         return b

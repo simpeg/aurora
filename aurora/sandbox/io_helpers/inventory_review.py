@@ -1,3 +1,6 @@
+from loguru import logger
+
+
 def describe_inventory_stages(inventory, assign_names=False, verbose=False):
     """
     Scans inventory looking for stages.  Has option to assign names to stages,
@@ -24,18 +27,18 @@ def describe_inventory_stages(inventory, assign_names=False, verbose=False):
                         f"{network.code}-{station.code}-{channel.code}"
                         f" {len(stages)}-stage response"
                     )
-                    print(info)
+                    logger.info(info)
 
                 for i, stage in enumerate(stages):
                     if verbose:
-                        print(f"stagename {stage.name}")
+                        logger.info(f"stagename {stage.name}")
                     if stage.name is None:
                         if assign_names:
                             new_names_were_assigned = True
                             new_name = f"{station.code}_{channel.code}_{i}"
                             stage.name = new_name
                             if verbose:
-                                print(f"ASSIGNING stage {stage}, name {stage.name}")
+                                logger.info(f"ASSIGNING stage {stage}, name {stage.name}")
                     if hasattr(stage, "symmetry"):
                         pass
                         # import matplotlib.pyplot as plt
@@ -51,7 +54,7 @@ def describe_inventory_stages(inventory, assign_names=False, verbose=False):
                         # plt.show()
     if new_names_were_assigned:
         inventory.networks = networks
-        print("Inventory Networks Reassigned")
+        logger.info("Inventory Networks Reassigned")
     return
 
 
@@ -78,16 +81,16 @@ def scan_inventory_for_nonconformity(inventory, verbose=False):
         for station in network:
             channel_codes = [x.code[1:3] for x in station.channels]
             if verbose:
-                print(channel_codes)
+                logger.info(channel_codes)
 
             # Electric channel remap {Q2, Q3}-->{Q1, Q2}>
             if ("Q2" in channel_codes) & ("Q3" in channel_codes):
                 if verbose:
-                    print(
+                    logger.info(
                         "Detected a likely non-FDSN conformant convnetion "
                         "unless there is a vertical electric dipole"
                     )
-                    print("Fixing Electric channel codes")
+                    logger.info("Fixing Electric channel codes")
                 # run the loop twice so don't accidentally map Q3 to Q2 and Q2 to Q3
                 for channel in station.channels:
                     if channel.code[1:3] == "Q2":
@@ -96,7 +99,7 @@ def scan_inventory_for_nonconformity(inventory, verbose=False):
                     if channel.code[1:3] == "Q3":
                         channel._code = f"{channel.code[0]}Q2"
                 # print("Applied unstable fix to electric channel names")
-                print("{Q2, Q3} --> {Q1, Q2}")
+                logger.info("{Q2, Q3} --> {Q1, Q2}")
 
             # Magnetic channle remap {T1,T2,T3}-->{F1, F2, F3}
             cond1 = "T1" in channel_codes
@@ -104,14 +107,14 @@ def scan_inventory_for_nonconformity(inventory, verbose=False):
             cond3 = "T3" in channel_codes
             if cond1 or cond2 or cond3:
                 if verbose:
-                    print("Detected a likely non-FDSN conformant convention ")
+                    logger.info("Detected a likely non-FDSN conformant convention ")
                     # unless there is Tidal data (channel code T)
-                    print("Fixing Magnetic channel codes")
+                    logger.info("Fixing Magnetic channel codes")
                 for channel in station.channels:
                     if channel.code[1] == "T":
                         channel._code = f"{channel.code[0]}F{channel.code[2]}"
                 # print("Applied unstable fix to magnetic channel names")
-                print("{T1,T2,T3} --> {F1, F2, F3}")
+                logger.info("{T1,T2,T3} --> {F1, F2, F3}")
 
             # Tesla to nanoTesla
             for channel in station:
@@ -120,7 +123,7 @@ def scan_inventory_for_nonconformity(inventory, verbose=False):
                     if verbose:
                         msg = f"{channel.code} {stage.stage_sequence_number}"
                         msg = f"{msg} {stage.input_units}"
-                        print(msg)
+                        logger.info(msg)
                     if stage.input_units == "T":
                         stage.input_units = "nT"
                         stage.stage_gain *= 1e-9

@@ -1,6 +1,7 @@
 from aurora.sandbox.io_helpers.inventory_review import describe_inventory_stages
 from aurora.sandbox.io_helpers.inventory_review import scan_inventory_for_nonconformity
 from obspy.clients.fdsn import Client
+from loguru import logger
 
 
 class FDSNDataset(object):
@@ -70,9 +71,9 @@ class FDSNDataset(object):
         return streams
 
     def describe(self):
-        print(f"station_id = {self.station}")
-        print(f"network_id = {self.network}")
-        print(f"channel_ids = {self.channel_codes}")
+        logger.info(f"station_id = {self.station}")
+        logger.info(f"network_id = {self.network}")
+        logger.info(f"channel_ids = {self.channel_codes}")
 
     @property
     def h5_filebase(self):

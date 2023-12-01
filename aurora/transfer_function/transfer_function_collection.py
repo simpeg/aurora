@@ -10,10 +10,12 @@ for local_station and one for reference station.
 
 import numpy as np
 import xarray as xr
+from loguru import logger
 
 from aurora.transfer_function.plot.rho_phi_helpers import plot_phi
 from aurora.transfer_function.plot.rho_phi_helpers import plot_rho
 from aurora.general_helper_functions import FIGURES_PATH
+
 
 EMTF_REGRESSION_ENGINE_LABELS = {}
 EMTF_REGRESSION_ENGINE_LABELS["RME"] = "Robust Single Station"
@@ -310,7 +312,7 @@ class TransferFunctionCollection(object):
             axs[1].set_ylim(phi_ylims)
 
         if figures_path is None:
-            print("figures path is not defined -- skipping saving figures")
+            logger.info("figures path is not defined -- skipping saving figures")
             return
         else:
             default_figure_basename = f"{self.local_station_id}_{xy_or_yx}.png"

@@ -14,6 +14,7 @@ import pandas as pd
 from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 from mth5.clients import FDSN
 from mth5.utils.helpers import initialize_mth5
+from loguru import logger
 
 
 def enrich_channel_summary(mth5_object, df, keyword):
@@ -139,7 +140,7 @@ def build_request_df(network_id, station_id, channels=None,
         ch_start, ch_end = get_time_period_bounds(channel)
         request_list.append([network_id, station_id, '', channel, ch_start, ch_end])
 
-    print(f"request_list: {request_list}")
+    logger.info(f"request_list: {request_list}")
 
     request_df = pd.DataFrame(request_list, columns=fdsn_object.request_columns)
     # workaround for having a channel with missing run
@@ -189,5 +190,5 @@ def get_channel_summary(h5_path):
     mth5_obj.channel_summary.summarize()
     channel_summary_df = mth5_obj.channel_summary.to_dataframe()
     mth5_obj.close_mth5()
-    print(channel_summary_df)
+    logger.info(channel_summary_df)
     return channel_summary_df

@@ -167,8 +167,8 @@ class KernelDataset:
             self.restrict_run_intervals_to_simultaneous()
         # ADD A CHECK HERE df is non-empty
         if len(self.df) == 0:
-            print("No Overlap between local and remote station data streams")
-            print("Remote reference processing not a valid option")
+            logger.info("No Overlap between local and remote station data streams")
+            logger.info("Remote reference processing not a valid option")
         else:
             self._add_duration_column()
         self.df["fc"] = False
@@ -179,7 +179,7 @@ class KernelDataset:
 
     @property
     def print_mini_summary(self):
-        print(self.mini_summary)
+        logger.info(self.mini_summary)
 
     @property
     def local_survey_id(self):
@@ -195,7 +195,7 @@ class KernelDataset:
         except KeyError:
             msg = f"Unexpected key {self.local_survey_id} not found in survey_metadata"
             msg += f"{msg} WARNING -- Maybe old MTH5 -- trying to use key '0'"
-            print(msg)
+            logger.warning(msg)
             return self.survey_metadata["0"]
 
     def _add_duration_column(self):
@@ -340,7 +340,7 @@ class KernelDataset:
     def sample_rate(self):
         if self.num_sample_rates != 1:
             msg = "Aurora does not yet process data from mixed sample rates"
-            print(f"{msg}")
+            logger.error(f"{msg}")
             raise NotImplementedError(msg)
         sample_rate = self.df.sample_rate.unique()[0]
         return sample_rate
@@ -376,7 +376,7 @@ class KernelDataset:
             if row.fc:
                 msg = f"row {row} already has fcs prescribed by processing confg "
                 msg += "-- skipping time series initialzation"
-                print(msg)
+                logger.info(msg)
             #    continue
             # the line below is not lazy, See Note #2
             run_ts = run_obj.to_runts(start=row.start, end=row.end)

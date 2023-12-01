@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import time
+from loguru import logger
 
 
 def fast_arange(t0, n_samples, sample_rate):
@@ -79,20 +80,20 @@ def test_generate_time_axis(t0, n_samples, sample_rate):
     tt = time.time()
     time_index_1 = slow_comprehension(t0, n_samples, sample_rate)
     processing_time_1 = tt - time.time()
-    print(f"processing_time_1 = {processing_time_1}")
+    logger.info(f"processing_time_1 = {processing_time_1}")
     
 
     # FAST
     tt = time.time()
     time_index_2 = fast_arange(t0, n_samples, sample_rate)
     processing_time_2 = tt - time.time()
-    print(f"processing_time_2 {processing_time_2}")
-    print(f"ratio of processing times {processing_time_1/processing_time_2}")
+    logger.info(f"processing_time_2 {processing_time_2}")
+    logger.info(f"ratio of processing times {processing_time_1/processing_time_2}")
     
     if (np.abs(time_index_2 - time_index_1)).sum() == 0:
         pass
     else:
-        print("Time axes are not equal")
+        logger.info("Time axes are not equal")
     return time_index_1
 
 
@@ -105,7 +106,7 @@ def do_some_tests():
     sample_rate = 50.0  # Hz
     t0 = pd.Timestamp(1977, 3, 2, 6, 1, 44)
     time_axis = test_generate_time_axis(t0, n_samples, sample_rate)
-    print(f"{time_axis[0]} ...{time_axis[-1]}")
+    logger.info(f"{time_axis[0]} ...{time_axis[-1]}")
     sample_rate = 3.0  # Hz
     time_axis = test_generate_time_axis(t0, n_samples, sample_rate)
 
