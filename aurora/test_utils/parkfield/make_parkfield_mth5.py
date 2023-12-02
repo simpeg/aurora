@@ -7,6 +7,8 @@ from mth5.utils.helpers import read_back_data
 from mth5.helpers import close_open_files
 from aurora.sandbox.io_helpers.make_mth5_helpers import create_from_server_multistation
 from aurora.test_utils.parkfield.path_helpers import PARKFIELD_PATHS
+from loguru import logger
+
 
 DATA_SOURCES = ["NCEDC", "https://service.ncedc.org/"]
 DATASET_ID = "pkd_sao_test_00"
@@ -23,10 +25,10 @@ def select_data_source():
                 Client(base_url=data_source, force_redirect=True)
                 ok = True
             except:
-                print(f"Data source {data_source} not initializing")
+                logger.warning(f"Data source {data_source} not initializing")
     if not ok:
-        print("No data sources for Parkfield / Hollister initializing")
-        print("NCEDC probably down")
+        logger.error("No data sources for Parkfield / Hollister initializing")
+        logger.error("NCEDC probably down")
         raise ValueError
     else:
         return data_source
@@ -44,7 +46,7 @@ def make_pkdsao_mth5(fdsn_dataset):
     )
 
     for station in fdsn_dataset.station.split(","):
-        print(station)
+        logger.info(station)
         read_back_data(h5_path, station, "001")
     return h5_path
 
@@ -65,8 +67,8 @@ def ensure_h5_exists():
         h5_path = make_pkdsao_mth5(FDSN_DATASET)
         return h5_path
     except Exception as e:
-        print(f"Encountered {e} Exception - make_pkdsao_mth5 failed")
-        print("Check data server connection")
+        logger.error(f"Encountered {e} Exception - make_pkdsao_mth5 failed")
+        logger.error("Check data server connection")
         raise IOError
 
 

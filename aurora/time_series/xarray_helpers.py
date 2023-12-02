@@ -3,6 +3,7 @@ Placeholder module for methods manipulating xarray time series
 """
 
 import xarray as xr
+from loguru import logger
 
 
 def handle_nan(X, Y, RR, drop_dim=""):
@@ -59,11 +60,11 @@ def handle_nan(X, Y, RR, drop_dim=""):
     try:
         merged_xr = merged_xr.merge(RR, join="exact")
     except ValueError:
-        print("Coordinate alignment mismatch -- see aurora issue #228 ")
+        logger.error("Coordinate alignment mismatch -- see aurora issue #228 ")
         matches = X.time.values == RR.time.values
-        print(f"{matches.sum()}/{len(matches)} timestamps match exactly")
+        logger.error(f"{matches.sum()}/{len(matches)} timestamps match exactly")
         deltas = X.time.values - RR.time.values
-        print(f"Maximum offset is {deltas.__abs__().max()}ns")
+        logger.error(f"Maximum offset is {deltas.__abs__().max()}ns")
         #        print(f"X.time.[0]: {X.time[0].values}")
         #        print(f"RR.time.[0]: {RR.time[0].values}")
         merged_xr = merged_xr.merge(RR, join="left")

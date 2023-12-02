@@ -10,6 +10,7 @@ from aurora.sandbox.triage_metadata import triage_mt_units_electric_field
 from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 from mth5.utils.helpers import initialize_mth5
 from mth5.timeseries import RunTS
+from loguru import logger
 
 
 def create_from_server_multistation(
@@ -45,7 +46,7 @@ def create_from_server_multistation(
     #     return None
 
     except Exception as e:  # FDSNException:
-        print(f"Exception {e}")
+        logger.error(f"Exception {e}")
         # raise ValueError("NCEDC is Down, cannot build data")
         return
     translator = XMLInventoryMTExperiment()
@@ -69,7 +70,7 @@ def create_from_server_multistation(
     streams = fdsn_dataset.get_data_via_fdsn_client()
     streams = make_channel_labels_fdsn_compliant(streams)
     if force_align_streams:
-        print("WARNING: ALIGN STREAMS NOT ROBUSTLY TESTED")
+        logger.warning("WARNING: ALIGN STREAMS NOT ROBUSTLY TESTED")
         streams = align_streams(streams, fdsn_dataset.starttime)
     streams = trim_streams_to_acquisition_run(streams)
 

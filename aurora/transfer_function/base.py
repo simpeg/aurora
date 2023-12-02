@@ -7,6 +7,7 @@ import numpy as np
 import xarray as xr
 
 from mt_metadata.base import Base
+from loguru import logger
 
 
 class TransferFunction(Base):
@@ -76,7 +77,7 @@ class TransferFunction(Base):
     @property
     def emtf_tf_header(self):
         if self.processing_config is None:
-            print("No header is available without a processing config")
+            logger.info("No header is available without a processing config")
             self._emtf_tf_header = None
         else:
             if self._emtf_tf_header is None:
@@ -132,7 +133,7 @@ class TransferFunction(Base):
 
         """
         if self.tf_header is None:
-            print("header needed to allocate transfer function arrays")
+            logger.error("header needed to allocate transfer function arrays")
             raise Exception
 
         # <transfer function xarray>

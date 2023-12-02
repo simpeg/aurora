@@ -3,6 +3,7 @@ from matplotlib import pyplot as plt
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.transfer_function.plot.rho_phi_helpers import plot_phi
 from aurora.transfer_function.plot.rho_phi_helpers import plot_rho
+from loguru import logger
 
 
 def compare_two_z_files(
@@ -49,7 +50,7 @@ def compare_two_z_files(
     """
     zfile1 = read_z_file(z_path1, angle=angle1)
     zfile2 = read_z_file(z_path2, angle=angle2)
-    print(f"scale_factor1: {scale_factor1}")
+    logger.info(f"scale_factor1: {scale_factor1}")
     fig, axs = plt.subplots(nrows=2, dpi=300, sharex=True)  # figsize=(8, 6.),
     markersize = kwargs.get("markersize", 3)
     # Make LaTeX symbol strings

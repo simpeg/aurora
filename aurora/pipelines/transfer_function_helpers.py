@@ -10,6 +10,8 @@ from aurora.transfer_function.regression.base import RegressionEstimator
 from aurora.transfer_function.weights.edf_weights import (
     effective_degrees_of_freedom_weights,
 )
+from loguru import logger
+
 
 ESTIMATOR_LIBRARY = {"OLS": RegressionEstimator, "RME": TRME, "RME_RR": TRME_RR}
 
@@ -31,8 +33,8 @@ def get_estimator_class(estimation_engine):
     try:
         estimator_class = ESTIMATOR_LIBRARY[estimation_engine]
     except KeyError:
-        print(f"processing_scheme {estimation_engine} not supported")
-        print(f"processing_scheme must be one of {list(ESTIMATOR_LIBRARY.keys())}")
+        logger.error(f"processing_scheme {estimation_engine} not supported")
+        logger.error(f"processing_scheme must be one of {list(ESTIMATOR_LIBRARY.keys())}")
         raise Exception
     return estimator_class
 
@@ -87,7 +89,7 @@ def check_time_axes_synched(X, Y):
     if (X.time == Y.time).all():
         pass
     else:
-        print("WARNING - NAN Handling could fail if X,Y dont share time axes")
+        logger.warning("WARNING - NAN Handling could fail if X,Y dont share time axes")
         raise Exception
     return
 
@@ -121,7 +123,7 @@ def get_band_for_tf_estimate(
         being within the frequency band given as an input argument.
     """
     dec_level_config = config.decimations[0]
-    print(f"Processing band {band.center_period:.6f}s")
+    logger.info(f"Processing band {band.center_period:.6f}s")
     band_dataset = extract_band(band, local_stft_obj)
     X = band_dataset[dec_level_config.input_channels]
     Y = band_dataset[dec_level_config.output_channels]

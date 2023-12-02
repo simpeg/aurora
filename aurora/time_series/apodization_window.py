@@ -52,6 +52,7 @@ For example
 
 import numpy as np
 import scipy.signal as ssig
+from loguru import logger
 
 
 class ApodizationWindow(object):
@@ -225,8 +226,8 @@ class ApodizationWindow(object):
         )
         lsd_factor2 = 1.0 / np.sqrt(self.S2)
         if not np.isclose(lsd_factor1, lsd_factor2):
-            print(f"factor1 {lsd_factor1} vs factor2 {lsd_factor2}")
-            print("Incompatible spectral density factors")
+            logger.error(f"factor1 {lsd_factor1} vs factor2 {lsd_factor2}")
+            logger.error("Incompatible spectral density factors")
             raise Exception
 
     @property

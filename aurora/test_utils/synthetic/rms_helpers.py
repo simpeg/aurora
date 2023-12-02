@@ -1,4 +1,5 @@
 import numpy as np
+from loguru import logger
 
 
 def compute_rms(rho, phi, model_rho_a=100.0, model_phi=45.0, verbose=False):
@@ -28,8 +29,8 @@ def compute_rms(rho, phi, model_rho_a=100.0, model_phi=45.0, verbose=False):
     rho_rms = np.sqrt(np.mean((rho - model_rho_a) ** 2))
     phi_rms = np.sqrt(np.mean((phi - model_phi) ** 2))
     if verbose:
-        print(f"rho_rms = {rho_rms}")
-        print(f"phi_rms = {phi_rms}")
+        logger.info(f"rho_rms = {rho_rms}")
+        logger.info(f"phi_rms = {phi_rms}")
     return rho_rms, phi_rms
 
 
@@ -78,24 +79,24 @@ def assert_rms_misfit_ok(
     """
     expected_rms_rho = expected_rms_misfit["rho"][xy_or_yx]
     expected_rms_phi = expected_rms_misfit["phi"][xy_or_yx]
-    print(f"expected_rms_rho_{xy_or_yx} {expected_rms_rho}")
-    print(f"expected_rms_phi_{xy_or_yx} {expected_rms_phi}")
+    logger.info(f"expected_rms_rho_{xy_or_yx} {expected_rms_rho}")
+    logger.info(f"expected_rms_phi_{xy_or_yx} {expected_rms_phi}")
     if not np.isclose(rho_rms_aurora - expected_rms_rho, 0, atol=rho_tol):
-        print("==== AURORA ====\n")
-        print(rho_rms_aurora)
-        print("==== EXPECTED ====\n")
-        print(expected_rms_rho)
-        print("==== DIFFERENCE ====\n")
-        print(rho_rms_aurora - expected_rms_rho)
+        logger.error("==== AURORA ====\n")
+        logger.error(rho_rms_aurora)
+        logger.error("==== EXPECTED ====\n")
+        logger.error(expected_rms_rho)
+        logger.error("==== DIFFERENCE ====\n")
+        logger.error(rho_rms_aurora - expected_rms_rho)
         raise AssertionError("Expected misfit for resistivity is not correct")
 
     if not np.isclose(phi_rms_aurora - expected_rms_phi, 0, atol=rho_tol):
-        print("==== AURORA ====\n")
-        print(phi_rms_aurora)
-        print("==== EXPECTED ====\n")
-        print(expected_rms_phi)
-        print("==== DIFFERENCE ====\n")
-        print(phi_rms_aurora - expected_rms_phi)
+        logger.error("==== AURORA ====\n")
+        logger.error(phi_rms_aurora)
+        logger.error("==== EXPECTED ====\n")
+        logger.error(expected_rms_phi)
+        logger.error("==== DIFFERENCE ====\n")
+        logger.error(phi_rms_aurora - expected_rms_phi)
         raise AssertionError("Expected misfit for phase is not correct")
 
     return

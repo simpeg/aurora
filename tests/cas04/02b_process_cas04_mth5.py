@@ -61,6 +61,8 @@ from aurora.pipelines.run_summary import RunSummary
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 from aurora.transfer_function.kernel_dataset import KernelDataset
 
+from loguru import logger
+
 TEST_PATH = get_test_path()
 CAS04_PATH = TEST_PATH.joinpath("cas04")
 CONFIG_PATH = CAS04_PATH.joinpath("config")
@@ -163,7 +165,7 @@ def process_station_runs(local_station_id, remote_station_id="", station_runs={}
         tmp_station_runs = station_runs.restrict_to_stations(relevant_stations)
         kernel_dataset.select_station_runs(tmp_station_runs, "keep")
 
-    print(kernel_dataset.df)
+    logger.info(kernel_dataset.df)
 
     cc = ConfigCreator()
     pc = cc.create_from_kernel_dataset(kernel_dataset)
@@ -305,7 +307,7 @@ def process_with_remote(
         show_plot=show_plot,
         z_file_path=z_file_path,
     )
-    print(f"{tf_cls}")
+    logger.info(f"{tf_cls}")
     return
 
 
@@ -327,8 +329,8 @@ def compare_aurora_vs_emtf(local_station_id, remote_station_id, coh=False):
     """
     if remote_station_id is None:
         emtf_file_base = "CAS04bcd_REV06.zrr"
-        print("Warning: No Single station EMTF results were provided for CAS04 by USGS")
-        print(f"Using {emtf_file_base}")
+        logger.warning("Warning: No Single station EMTF results were provided for CAS04 by USGS")
+        logger.warning(f"Using {emtf_file_base}")
     else:
         emtf_file_base = f"{local_station_id}bcd_{remote_station_id}.zrr"
     emtf_file = EMTF_RESULTS_PATH.joinpath(emtf_file_base)
