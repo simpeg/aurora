@@ -73,7 +73,7 @@ def ensure_h5_exists():
 
 
 def main():
-    make_pkdsao_mth5()
+    make_pkdsao_mth5(FDSN_DATASET)
 
 
 if __name__ == "__main__":
