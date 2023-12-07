@@ -29,7 +29,7 @@ def triage_mt_units_electric_field(experiment):
         for channel in channels:
             if channel.component[0] == "e":
                 channel.filter.name.insert(0, filter_name)
-                channel.filter.applied.insert(0, False)
+                channel.filter.applied.insert(0, True)
     return experiment
 
 
