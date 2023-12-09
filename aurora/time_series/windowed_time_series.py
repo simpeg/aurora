@@ -201,7 +201,7 @@ class WindowedTimeSeries(object):
         # "NOT TESTED - PSEUDOCODE ONLY"
         for channel_id in dataset.keys():
             mth5_channel = run_obj.get_channel(channel_id)
-            channel_filter = mth5_channel.channel_response_filter
+            channel_filter = mth5_channel.channel_response
             delay_in_seconds = channel_filter.total_delay
             true_time_axis = dataset.time + delay_in_seconds
             interpolator = interp1d(

@@ -125,11 +125,12 @@ def parkfield_sanity_check(
         channel = run_obj.get_channel(key)
 
         # pole-zero calibration response
-        pz_calibration_response = channel.channel_response_filter.complex_response(
+
+        pz_calibration_response = channel.channel_response.complex_response(
             frequencies, include_decimation=include_decimation
         )
 
-        if channel.channel_response_filter.units_in.lower() in ["t", "tesla"]:
+        if channel.channel_response.units_in.lower() in ["t", "tesla"]:
             logger.warning("WARNING: Expecting nT but got T")
 
         # Frequency response table response

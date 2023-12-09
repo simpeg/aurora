@@ -40,17 +40,21 @@ def enrich_channel_summary(mth5_object, df, keyword):
             channel = mth5_object.get_channel(
                 row.station, row.run, row.component, row.survey
             )
-            num_filters = len(channel.channel_response_filter.filters_list)
+            num_filters = len(channel.channel_response.filters_list)
             df[keyword].iat[i_row] = num_filters
-    elif keyword=="filter_units_in":
+    elif keyword == "filter_units_in":
         for i_row, row in df.iterrows():
-            channel = mth5_object.get_channel(row.station, row.run, row.component, row.survey)
-            units_in = [x.units_in for x in channel.channel_response_filter.filters_list]
+            channel = mth5_object.get_channel(
+                row.station, row.run, row.component, row.survey
+            )
+            units_in = [x.units_in for x in channel.channel_response.filters_list]
             df[keyword].iat[i_row] = units_in
-    elif keyword=="filter_units_out":
+    elif keyword == "filter_units_out":
         for i_row, row in df.iterrows():
-            channel = mth5_object.get_channel(row.station, row.run, row.component, row.survey)
-            units_out = [x.units_out for x in channel.channel_response_filter.filters_list]
+            channel = mth5_object.get_channel(
+                row.station, row.run, row.component, row.survey
+            )
+            units_out = [x.units_out for x in channel.channel_response.filters_list]
             df[keyword].iat[i_row] = units_out
     return df
 
@@ -75,14 +79,20 @@ def augmented_channel_summary(mth5_object, df=None):  # , **kwargs):
         channel = mth5_object.get_channel(
             row.station, row.run, row.component, row.survey
         )
-        n_filters = len(channel.channel_response_filter.filters_list)
+        n_filters = len(channel.channel_response.filters_list)
         df.n_filters.iat[i_row] = n_filters
     return df
 
 
-def build_request_df(network_id, station_id, channels=None,
-                     start=None, end=None, time_period_dict={},
-                     mth5_version='0.2.0'):
+def build_request_df(
+    network_id,
+    station_id,
+    channels=None,
+    start=None,
+    end=None,
+    time_period_dict={},
+    mth5_version="0.2.0",
+):
     """
 
     Parameters
@@ -113,15 +123,15 @@ def build_request_df(network_id, station_id, channels=None,
         A formatted dataframe that can be passed to mth5.clients.FDSN to request metdata or data.
 
     """
-    from mth5.clients import FDSN
+
     def get_time_period_bounds(ch):
         if ch in time_period_dict.keys():
-            time_interval = time_period_dict[ch]
+            # time_interval = time_period_dict[ch]
             ch_start = time_period_dict[ch].left.isoformat()
             ch_end = time_period_dict[ch].right.isoformat()
         else:
             if start is None:
-                ch_start = '1970-01-01 00:00:00'
+                ch_start = "1970-01-01 00:00:00"
             else:
                 ch_start = start
             if end is None:
@@ -138,7 +148,7 @@ def build_request_df(network_id, station_id, channels=None,
     request_list = []
     for channel in channels:
         ch_start, ch_end = get_time_period_bounds(channel)
-        request_list.append([network_id, station_id, '', channel, ch_start, ch_end])
+        request_list.append([network_id, station_id, "", channel, ch_start, ch_end])
 
     logger.info(f"request_list: {request_list}")
 

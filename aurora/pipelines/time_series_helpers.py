@@ -292,14 +292,14 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
     """
     for channel_id in stft_obj.keys():
         mth5_channel = run_obj.get_channel(channel_id)
-        channel_filter = mth5_channel.channel_response_filter
+        channel_filter = mth5_channel.channel_response
         if not channel_filter.filters_list:
             msg = f"Channel {channel_id} with empty filters list detected"
             logger.warning(msg)
             if channel_id == "hy":
                 msg = "Channel hy has no filters, try using filters from hx"
                 logger.warning("Channel HY has no filters, try using filters from HX")
-                channel_filter = run_obj.get_channel("hx").channel_response_filter
+                channel_filter = run_obj.get_channel("hx").channel_response
         calibration_response = channel_filter.complex_response(stft_obj.frequency.data)
         if channel_scale_factors:
             try:
