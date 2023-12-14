@@ -145,6 +145,53 @@ def get_set_survey_id(m):
         raise NotImplementedError(msg)
     return m, survey_id
 
+def get_time_series_dataframe(run, source_folder, add_nan_values):
+    """
+    Parameters
+    ----------
+    run: aurora.test_utils.synthetic.station_config.SyntheticRun
+        Information needed to define/create the run
+
+    source_folder: pathlib.Path, or null
+
+    Up-samples data to run.sample_rate, which is treated as in integer.
+    Only tested for 8, to make 8Hz data for testing.  If run.sample_rate is default (1.0)
+    then no up-sampling takes place.
+
+    Returns
+    -------
+    df: pandas.DataFrame
+    The time series data for the synthetic run
+    """
+    # point to the ascii time series
+    if source_folder:
+        run.raw_data_path = source_folder.joinpath(run.raw_data_path.name)
+
+    # read in data
+    df = pd.read_csv(run.raw_data_path, names=run.channels, sep="\s+")
+
+    # upsample data if requested,
+    if run.sample_rate != 1.0:
+        df_orig = df.copy(deep=True)
+        new_data_dict = {}
+        for i_ch, ch in enumerate(run.channels):
+            data = df_orig[ch].to_numpy()
+            new_data_dict[ch] = ssig.resample(
+                data, int(run.sample_rate) * len(df_orig)
+            )
+        df = pd.DataFrame(data=new_data_dict)
+
+    # add noise
+    for col in run.channels:
+        if run.noise_scalars[col]:
+            df[col] += run.noise_scalars[col] * np.random.randn(len(df))
+
+    # add nan
+    if add_nan_values:
+        for col in run.channels:
+            for [ndx, num_nan] in run.nan_indices[col]:
+                df[col].loc[ndx: ndx + num_nan] = np.nan
+    return df
 
 def create_mth5_synthetic_file(
     station_cfgs,
@@ -156,7 +203,6 @@ def create_mth5_synthetic_file(
     file_version="0.1.0",
     channel_nomenclature="default",
     force_make_mth5=True,
-    upsample_factor=0,
 ):
     """
 
@@ -181,16 +227,21 @@ def create_mth5_synthetic_file(
     force_make_mth5: bool
         If set to true, the file will be made, even if it already exists.
         If false, and file already exists, skip the make job.
-    upsample_factor: int
-        Integer, only tested for 8, to make 8Hz data for testing.  If upsample_factor is set to
-        default (zero), then no upsampling takes place.
-
 
     Returns
     -------
     mth5_path: pathlib.Path
         The path to the stored h5 file.
     """
+    def update_mth5_path(mth5_path, add_nan_values, channel_nomenclature):
+        """set name for output h5 file"""
+        path_str = mth5_path.__str__()
+        if add_nan_values:
+            path_str = path_str.replace(".h5", "_nan.h5")
+        if channel_nomenclature != "default":
+            path_str = path_str.replace(".h5", f"_{channel_nomenclature}.h5")
+        return pathlib.Path(path_str)
+
     if not target_folder:
         msg = f"No target folder provided for making {mth5_name}"
         logger.warning("No target folder provided for making {}")
@@ -199,13 +250,8 @@ def create_mth5_synthetic_file(
         target_folder = MTH5_PATH
 
     mth5_path = target_folder.joinpath(mth5_name)
-    # set name for output h5 file
-    if add_nan_values:
-        mth5_path = pathlib.Path(mth5_path.__str__().replace(".h5", "_nan.h5"))
-    if channel_nomenclature != "default":
-        mth5_path = pathlib.Path(
-            mth5_path.__str__().replace(".h5", f"_{channel_nomenclature}.h5")
-        )
+    mth5_path = update_mth5_path(mth5_path, add_nan_values, channel_nomenclature)
+
     if not force_make_mth5:
         if mth5_path.exists():
             return mth5_path
@@ -218,33 +264,7 @@ def create_mth5_synthetic_file(
     for station_cfg in station_cfgs:
         station_group = m.add_station(station_cfg.id, survey=survey_id)
         for run in station_cfg.runs:
-            if source_folder:
-                run.raw_data_path = source_folder.joinpath(run.raw_data_path.name)
-
-            # read in data
-            df = pd.read_csv(run.raw_data_path, names=run.channels, sep="\s+")
-
-            # generate upsampled data if requested, store in df
-            if upsample_factor:
-                df_orig = df.copy(deep=True)
-                new_data_dict = {}
-                for i_ch, ch in enumerate(run.channels):
-                    data = df_orig[ch].to_numpy()
-                    new_data_dict[ch] = ssig.resample(
-                        data, upsample_factor * len(df_orig)
-                    )
-                df = pd.DataFrame(data=new_data_dict)
-
-            # add noise
-            for col in run.channels:
-                if run.noise_scalars[col]:
-                    df[col] += run.noise_scalars[col] * np.random.randn(len(df))
-
-            # add nan
-            if add_nan_values:
-                for col in run.channels:
-                    for [ndx, num_nan] in run.nan_indices[col]:
-                        df[col].loc[ndx : ndx + num_nan] = np.nan
+            df = get_time_series_dataframe(run, source_folder, add_nan_values)
 
             # cast to run_ts
             runts = create_run_ts_from_synthetic_run(
@@ -401,7 +421,6 @@ def create_test4_h5(
         channel_nomenclature=channel_nomenclature,
         target_folder=target_folder,
         source_folder=source_folder,
-        upsample_factor=8,
     )
     return mth5_path
 
