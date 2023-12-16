@@ -28,11 +28,13 @@ def load_bf4_fap_for_parkfield_test_using_mt_metadata(frequencies):
     -------
 
     """
+    from aurora.general_helper_functions import DATA_PATH
     from aurora.time_series.filters.filter_helpers import (
         make_frequency_response_table_filter,
     )
 
-    bf4_obj = make_frequency_response_table_filter(case="bf4")
+    bf4_file_path = DATA_PATH.joinpath("parkfield", "bf4_9819.csv")
+    bf4_obj = make_frequency_response_table_filter(bf4_file_path, case="bf4")
     bf4_resp = bf4_obj.complex_response(frequencies)
     bf4_resp *= 421721.0  # counts-per-volt compensation for PKD
     return bf4_resp

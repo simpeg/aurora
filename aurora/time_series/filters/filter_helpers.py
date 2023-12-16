@@ -34,16 +34,24 @@ def make_coefficient_filter(gain=1.0, name="generic coefficient filter", **kwarg
     return cf
 
 
-def make_frequency_response_table_filter(case="bf4"):
-    from aurora.general_helper_functions import DATA_PATH
+def make_frequency_response_table_filter(file_path, case="bf4"):
+    """
+    Parameters
+    ----------
+    filepath: pathlib.Path or string
+    case : string, placeholder for handlig different fap table formats.
 
+    Returns
+    -------
+    fap_filter: FrequencyResponseTableFilter
+    """
     fap_filter = FrequencyResponseTableFilter()
+
     if case == "bf4":
         import numpy as np
         import pandas as pd
 
-        bf4_path = DATA_PATH.joinpath("parkfield", "bf4_9819.csv")
-        df = pd.read_csv(bf4_path)  # , skiprows=1)
+        df = pd.read_csv(file_path)  # , skiprows=1)
         # Hz, V/nT, degrees
         fap_filter.frequencies = df["Frequency [Hz]"].values
         fap_filter.amplitudes = df["Amplitude [V/nT]"].values
