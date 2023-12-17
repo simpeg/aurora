@@ -68,10 +68,8 @@ def make_frequency_response_table_filter(file_path, case="bf4"):
 
 def make_volt_per_meter_to_millivolt_per_km_converter():
     """
-    This represents a filter that HAS ALREADY converted from mV/km to V/m.
-    This means it is as if the data were multiplied by 1e-6.  To correct for this
-    in the data we will want to multiply by 1e6 which is what will happen when we
-    divide by the filter gain.
+    This represents a filter that converts from mV/km to V/m.
+
     Returns
     -------
 
