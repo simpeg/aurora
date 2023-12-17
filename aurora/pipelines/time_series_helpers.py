@@ -305,11 +305,14 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
         indices_to_flip = channel_response.get_indices_of_filters_to_remove(
             include_decimation=True, include_delay=False
         )
+        indices_to_flip = [
+            i for i in indices_to_flip if channel.metadata.filter.applied[i]
+        ]
         filters_to_remove = [channel_response.filters_list[i] for i in indices_to_flip]
         if not filters_to_remove:
             logger.warning("No filters to remove")
         calibration_response = channel_response.complex_response(
-            stft_obj.frequency.data, filters_to_remove=filters_to_remove
+            stft_obj.frequency.data, filters_list=filters_to_remove
         )
         if channel_scale_factors:
             try:
