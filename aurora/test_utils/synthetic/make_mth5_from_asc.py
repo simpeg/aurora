@@ -77,6 +77,10 @@ def create_run_ts_from_synthetic_run(run, df, channel_nomenclature="default"):
             "component": col,
             "sample_rate": run.sample_rate,
             "filter.name": run.filters[col],
+            "filter.applied": len(run.filters[col])
+            * [
+                True,
+            ],
             "time_period.start": run.start,
         }
         if col in [EX, EY]:
@@ -145,6 +149,7 @@ def get_set_survey_id(m):
         raise NotImplementedError(msg)
     return m, survey_id
 
+
 def get_time_series_dataframe(run, source_folder, add_nan_values):
     """
     Parameters
@@ -176,9 +181,7 @@ def get_time_series_dataframe(run, source_folder, add_nan_values):
         new_data_dict = {}
         for i_ch, ch in enumerate(run.channels):
             data = df_orig[ch].to_numpy()
-            new_data_dict[ch] = ssig.resample(
-                data, int(run.sample_rate) * len(df_orig)
-            )
+            new_data_dict[ch] = ssig.resample(data, int(run.sample_rate) * len(df_orig))
         df = pd.DataFrame(data=new_data_dict)
 
     # add noise
@@ -190,8 +193,9 @@ def get_time_series_dataframe(run, source_folder, add_nan_values):
     if add_nan_values:
         for col in run.channels:
             for [ndx, num_nan] in run.nan_indices[col]:
-                df[col].loc[ndx: ndx + num_nan] = np.nan
+                df[col].loc[ndx : ndx + num_nan] = np.nan
     return df
+
 
 def create_mth5_synthetic_file(
     station_cfgs,
@@ -233,6 +237,7 @@ def create_mth5_synthetic_file(
     mth5_path: pathlib.Path
         The path to the stored h5 file.
     """
+
     def update_mth5_path(mth5_path, add_nan_values, channel_nomenclature):
         """set name for output h5 file"""
         path_str = mth5_path.__str__()
