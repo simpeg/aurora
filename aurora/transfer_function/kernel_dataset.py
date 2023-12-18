@@ -157,6 +157,12 @@ class KernelDataset:
         if remote_station_id:
             station_ids.append(remote_station_id)
         df = restrict_to_station_list(run_summary.df, station_ids, inplace=False)
+        # Check df is non-empty
+        if len(df) == 0:
+            msg = f"Restricting run_summary df to {station_ids} yields an empty set"
+            logger.critical(msg)
+            raise ValueError(msg)
+
         df["remote"] = False
         if remote_station_id:
             cond = df.station_id == remote_station_id
@@ -165,10 +171,14 @@ class KernelDataset:
         self.df = df
         if remote_station_id:
             self.restrict_run_intervals_to_simultaneous()
-        # ADD A CHECK HERE df is non-empty
+        # Again check df is non-empty
         if len(self.df) == 0:
-            logger.info("No Overlap between local and remote station data streams")
-            logger.info("Remote reference processing not a valid option")
+            msg = (
+                f"Local {local_station_id} and remote {remote_station_id} do not overlap, "
+                f"Remote reference processing not a valid option"
+            )
+            logger.warning(msg)
+            raise ValueError(msg)
         else:
             self._add_duration_column()
         self.df["fc"] = False
