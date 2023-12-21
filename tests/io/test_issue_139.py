@@ -19,13 +19,15 @@ import unittest
 import warnings
 
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
-from aurora.test_utils.synthetic.paths import DATA_PATH
+from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 from aurora.test_utils.synthetic.processing_helpers import (
     tf_obj_from_synthetic_data,
 )
 from mt_metadata.transfer_functions.core import TF
 
 warnings.filterwarnings("ignore")
+
+synthetic_test_paths = SyntheticTestPaths()
 
 
 def write_zrr(tf_obj, zrr_file_base):
@@ -38,7 +40,7 @@ class TestZFileReadWrite(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.xml_file_base = pathlib.Path("synthetic_test1.xml")
-        self.mth5_path = DATA_PATH.joinpath("test12rr.h5")
+        self.mth5_path = synthetic_test_paths.mth5_path.joinpath("test12rr.h5")
         self.zrr_file_base = pathlib.Path("synthetic_test1.zrr")
 
         if not self.mth5_path.exists():
@@ -57,7 +59,6 @@ class TestZFileReadWrite(unittest.TestCase):
     def tf_z_obj(self):
         return self._tf_z_obj
 
-
     def test_tf_obj_from_zrr(self):
         tf_z = self._tf_z_obj
         tf = self.tf_obj
@@ -68,8 +69,9 @@ class TestZFileReadWrite(unittest.TestCase):
         return tf
 
     def test_tf_read_and_write(self):
-        """Checks that an ingested z-file is written back out the same """
+        """Checks that an ingested z-file is written back out the same"""
         import filecmp
+
         tf_z = self._tf_z_obj
         out_file_name = str(self.zrr_file_base).replace(".zrr", "_rewrite.zrr")
         out_file_path = pathlib.Path(out_file_name)
