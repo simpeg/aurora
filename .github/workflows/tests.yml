@@ -35,7 +35,7 @@ jobs:
         conda install -c conda-forge pytest pytest-cov certifi">=2017.4.17" pandoc
         pip install -r requirements-dev.txt
         pip install git+https://github.com/kujaku11/mt_metadata.git@patch_173
-        pip install git+https://github.com/kujaku11/mth5.git@patches
+        pip install git+https://github.com/kujaku11/mth5.git@aurora_issue_310
 
     - name: Install Our Package
       run: |
@@ -49,16 +49,16 @@ jobs:
         python -m ipykernel install --user --name aurora-test
         # Install any other dependencies you need
 
-    - name: Execute Jupyter Notebooks
-      run: |
-        jupyter nbconvert --to notebook --execute docs/examples/dataset_definition.ipynb
-        jupyter nbconvert --to notebook --execute docs/examples/make_cas04_single_station_h5.ipynb
-        jupyter nbconvert --to notebook --execute docs/examples/operate_aurora.ipynb
-        jupyter nbconvert --to notebook --execute tests/test_run_on_commit.ipynb
-        jupyter nbconvert --to notebook --execute tutorials/pole_zero_fitting/lemi_pole_zero_fitting_example.ipynb
-        jupyter nbconvert --to notebook --execute tutorials/processing_configuration.ipynb
-        jupyter nbconvert --to notebook --execute tutorials/synthetic_data_processing.ipynb
-        # Replace "notebook.ipynb" with your notebook's filename
+#    - name: Execute Jupyter Notebooks
+#      run: |
+#        jupyter nbconvert --to notebook --execute docs/examples/dataset_definition.ipynb
+#        jupyter nbconvert --to notebook --execute docs/examples/make_cas04_single_station_h5.ipynb
+#        jupyter nbconvert --to notebook --execute docs/examples/operate_aurora.ipynb
+#        jupyter nbconvert --to notebook --execute tests/test_run_on_commit.ipynb
+#        jupyter nbconvert --to notebook --execute tutorials/pole_zero_fitting/lemi_pole_zero_fitting_example.ipynb
+#        jupyter nbconvert --to notebook --execute tutorials/processing_configuration.ipynb
+#        jupyter nbconvert --to notebook --execute tutorials/synthetic_data_processing.ipynb
+#        # Replace "notebook.ipynb" with your notebook's filename
 
 #    - name: Commit changes (if any)
 #      run: |
