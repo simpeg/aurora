@@ -87,7 +87,9 @@ def create_run_ts_from_synthetic_run(run, df, channel_nomenclature="default"):
             meta_dict["units"] = "millivolts per kilometer"
             channel_metadata = {"electric": meta_dict}
             chts = ChannelTS(
-                channel_type="electric", data=data, channel_metadata=channel_metadata
+                channel_type="electric",
+                data=data,
+                channel_metadata=channel_metadata,
             )
             # add metadata to the channel here
             chts.channel_metadata.dipole_length = 50
@@ -98,7 +100,9 @@ def create_run_ts_from_synthetic_run(run, df, channel_nomenclature="default"):
             meta_dict["units"] = "nanotesla"
             channel_metadata = {"magnetic": meta_dict}
             chts = ChannelTS(
-                channel_type="magnetic", data=data, channel_metadata=channel_metadata
+                channel_type="magnetic",
+                data=data,
+                channel_metadata=channel_metadata,
             )
             if col == HY:
                 chts.channel_metadata.measurement_azimuth = 90.0
@@ -181,7 +185,9 @@ def get_time_series_dataframe(run, source_folder, add_nan_values):
         new_data_dict = {}
         for i_ch, ch in enumerate(run.channels):
             data = df_orig[ch].to_numpy()
-            new_data_dict[ch] = ssig.resample(data, int(run.sample_rate) * len(df_orig))
+            new_data_dict[ch] = ssig.resample(
+                data, int(run.sample_rate) * len(df_orig)
+            )
         df = pd.DataFrame(data=new_data_dict)
 
     # add noise
@@ -263,7 +269,9 @@ def create_mth5_synthetic_file(
         logger.error(msg)
 
     mth5_path = target_folder.joinpath(mth5_name)
-    mth5_path = update_mth5_path(mth5_path, add_nan_values, channel_nomenclature)
+    mth5_path = update_mth5_path(
+        mth5_path, add_nan_values, channel_nomenclature
+    )
 
     if not force_make_mth5:
         if mth5_path.exists():
@@ -306,7 +314,9 @@ def create_test1_h5(
     source_folder="",
     force_make_mth5=True,
 ):
-    station_01_params = make_station_01(channel_nomenclature=channel_nomenclature)
+    station_01_params = make_station_01(
+        channel_nomenclature=channel_nomenclature
+    )
     mth5_name = station_01_params.mth5_name
     station_params = [
         station_01_params,
@@ -331,7 +341,9 @@ def create_test2_h5(
     target_folder=MTH5_PATH,
     source_folder="",
 ):
-    station_02_params = make_station_02(channel_nomenclature=channel_nomenclature)
+    station_02_params = make_station_02(
+        channel_nomenclature=channel_nomenclature
+    )
     mth5_name = station_02_params.mth5_name
     station_params = [
         station_02_params,
@@ -354,7 +366,9 @@ def create_test1_h5_with_nan(
     target_folder=MTH5_PATH,
     source_folder="",
 ):
-    station_01_params = make_station_01(channel_nomenclature=channel_nomenclature)
+    station_01_params = make_station_01(
+        channel_nomenclature=channel_nomenclature
+    )
     mth5_name = station_01_params.mth5_name
     station_params = [
         station_01_params,
@@ -377,8 +391,12 @@ def create_test12rr_h5(
     target_folder=MTH5_PATH,
     source_folder=None,
 ):
-    station_01_params = make_station_01(channel_nomenclature=channel_nomenclature)
-    station_02_params = make_station_02(channel_nomenclature=channel_nomenclature)
+    station_01_params = make_station_01(
+        channel_nomenclature=channel_nomenclature
+    )
+    station_02_params = make_station_02(
+        channel_nomenclature=channel_nomenclature
+    )
     station_params = [station_01_params, station_02_params]
     mth5_name = "test12rr.h5"
     mth5_path = create_mth5_synthetic_file(
@@ -400,8 +418,9 @@ def create_test3_h5(
     target_folder=MTH5_PATH,
     source_folder="",
 ):
-
-    station_03_params = make_station_03(channel_nomenclature=channel_nomenclature)
+    station_03_params = make_station_03(
+        channel_nomenclature=channel_nomenclature
+    )
     station_params = [
         station_03_params,
     ]
@@ -423,7 +442,9 @@ def create_test4_h5(
     source_folder="",
 ):
     """8Hz data kluged from the 1Hz ... only freqs below 0.5Hz will make sense (100 Ohmm and 45deg)"""
-    station_04_params = make_station_04(channel_nomenclature=channel_nomenclature)
+    station_04_params = make_station_04(
+        channel_nomenclature=channel_nomenclature
+    )
     mth5_path = create_mth5_synthetic_file(
         [
             station_04_params,
