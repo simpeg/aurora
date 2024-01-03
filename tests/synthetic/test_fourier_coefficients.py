@@ -122,15 +122,17 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
 
         z_file_path_1 = AURORA_RESULTS_PATH.joinpath("test2.zss")
         z_file_path_2 = AURORA_RESULTS_PATH.joinpath("test2_from_stored_fc.zss")
-        tf1 = process_synthetic_2(force_make_mth5=True, z_file_path=z_file_path_1, save_fc=True)
+        tf1 = process_synthetic_2(
+            force_make_mth5=True, z_file_path=z_file_path_1, save_fc=True
+        )
         tf2 = process_synthetic_2(force_make_mth5=False, z_file_path=z_file_path_2)
         assert tf1 == tf2
 
 
 def main():
     # test_case = TestAddFourierCoefficientsToSyntheticData()
-    # test_case.test_create_then_use_stored_fcs_for_processing()
     # test_case.setUpClass()
+    # test_case.test_create_then_use_stored_fcs_for_processing()
     # test_case.test_123()
     # test_case.test_decimation_and_stft_config_creator()
     # print("se funciona!")
