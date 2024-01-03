@@ -9,11 +9,11 @@ Following Jones and Jodicke, lets take the coherence of Ex and Hy
 and that of Ey and Hx.  This yields one single number.
 
 Then, iteratively remove each observation in turn and count whether that partial
-cohernece is bigger or smaller than the baseline and by how much
+coherence is bigger or smaller than the baseline and by how much
 
-Deflection downward means naughty data and defelction  upward means well-behaved data.
+Deflection downward means naughty data and deflection upward means well-behaved data.
 
-This leads to a coherence score for each obervation.  We can boot out all data that
+This leads to a coherence score for each observation.  We can boot out all data that
  say move the estimate down (worse than average)
 """
 
@@ -45,6 +45,15 @@ def coherence_from_fc_series(c_xy, c_xx, c_yy):
 
 def coherence_weights_v00(x, y, threshold=0.95):  # 975):#0.98
     """
+    Note 1: Extremely high coherence can be due to noise
+    Consider ways to pre-filter those events before this is called.
+    - That may need a min_fraction_to_keep=0.2-0.8, which guards against
+    generally poor data being completely discarded.
+    - Consider variations on coh-sorting threshold_min, and threshold_max
+    near perfect coherency can be expected when coherent noise is present
+    - 95% seems extreme for a threshold, maybe not yielding enogh
+    observations for robust statistics.
+
 
     Parameters
     ----------
@@ -101,9 +110,11 @@ def compute_coherence_weights(X, Y, RR, coh_type="local"):
     -------
 
     """
+    # these should be params in the config
     remote_threshold = 0.8
     local_threshold = 0.95
 
+    # redundant -these should already be dropped
     X = X.dropna(dim="observation")
     Y = Y.dropna(dim="observation")
     if RR is not None:
