@@ -1,11 +1,47 @@
 import numpy as np
-import pandas as pd
-
-from mt_metadata.transfer_functions.processing.aurora.band import (
-    FrequencyBands,
-)
 from loguru import logger
 
+
+def get_band_for_tf_estimate(band, config, local_stft_obj, remote_stft_obj):
+    """
+    Get data for TF estimation for a particular band.
+
+    Parameters
+    ----------
+    band : mt_metadata.transfer_functions.processing.aurora.FrequencyBands
+        object with lower_bound and upper_bound to tell stft object which
+        subarray to return
+    config : mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
+        information about the input and output channels needed for TF
+        estimation problem setup
+    local_stft_obj : xarray.core.dataset.Dataset or None
+        Time series of Fourier coefficients for the station whose TF is to be
+        estimated
+    remote_stft_obj : xarray.core.dataset.Dataset or None
+        Time series of Fourier coefficients for the remote reference station
+
+    Returns
+    -------
+    X, Y, RR : xarray.core.dataset.Dataset or None
+        data structures as local_stft_object and remote_stft_object, but
+        restricted only to input_channels, output_channels,
+        reference_channels and also the frequency axes are restricted to
+        being within the frequency band given as an input argument.
+    """
+    dec_level_config = config.decimations[0]
+    logger.info(f"Processing band {band.center_period:.6f}s")
+    band_dataset = extract_band(band, local_stft_obj)
+    X = band_dataset[dec_level_config.input_channels]
+    Y = band_dataset[dec_level_config.output_channels]
+    check_time_axes_synched(X, Y)
+    if config.stations.remote:
+        band_dataset = extract_band(band, remote_stft_obj)
+        RR = band_dataset[dec_level_config.reference_channels]
+        check_time_axes_synched(Y, RR)
+    else:
+        RR = None
+
+    return X, Y, RR
 
 
 def extract_band(frequency_band, fft_obj, epsilon=1e-7):
@@ -99,3 +135,30 @@ def frequency_band_edges(
     logger.info(f"fence posts = {fence_posts}")
     return fence_posts
 
+
+def check_time_axes_synched(X, Y):
+    """
+    Utility function for checking that time axes agree
+
+    Parameters
+    ----------
+    X : xarray
+    Y : xarray
+
+    Returns
+    -------
+
+    """
+    """
+    It is critical that X, Y, RR have the same time axes here
+
+    Returns
+    -------
+
+    """
+    if (X.time == Y.time).all():
+        pass
+    else:
+        logger.warning("WARNING - NAN Handling could fail if X,Y dont share time axes")
+        raise Exception
+    return
