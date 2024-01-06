@@ -96,7 +96,7 @@ def parkfield_sanity_check(
     show_response_curves=False,
     show_spectra=True,
     figures_path=Path(""),
-    include_decimation=True,
+    include_decimation=False,
 ):
     """
     loop over channels in fft obj and make calibrated spectral plots

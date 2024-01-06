@@ -60,7 +60,7 @@ def validate_bulk_spectra_have_correct_units(run_obj, run_ts_obj, show_spectra=F
         figures_path=PARKFIELD_PATHS["aurora_results"],
         show_response_curves=show_response_curves,
         show_spectra=show_spectra,
-        include_decimation=True,
+        include_decimation=False,
     )
     return
 
