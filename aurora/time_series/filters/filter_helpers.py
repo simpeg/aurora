@@ -83,7 +83,25 @@ def make_volt_per_meter_to_millivolt_per_km_converter():
     return coeff_filter
 
 
+def make_tesla_to_nanotesla_converter():
+    """
+    This represents a filter that converts from nt to T.
+
+    Returns
+    -------
+
+    """
+    coeff_filter = make_coefficient_filter(
+        gain=1e-9,
+        units_in="nanotesla",
+        units_out="tesla",
+        name="MT to SI magnetic field conversion",
+    )
+    return coeff_filter
+
+
 MT2SI_ELECTRIC_FIELD_FILTER = make_volt_per_meter_to_millivolt_per_km_converter()
+MT2SI_MAGNETIC_FIELD_FILTER = make_tesla_to_nanotesla_converter()
 
 
 def main():

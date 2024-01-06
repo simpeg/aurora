@@ -38,7 +38,9 @@ def describe_inventory_stages(inventory, assign_names=False, verbose=False):
                             new_name = f"{station.code}_{channel.code}_{i}"
                             stage.name = new_name
                             if verbose:
-                                logger.info(f"ASSIGNING stage {stage}, name {stage.name}")
+                                logger.info(
+                                    f"ASSIGNING stage {stage}, name {stage.name}"
+                                )
                     if hasattr(stage, "symmetry"):
                         pass
                         # import matplotlib.pyplot as plt
@@ -116,15 +118,17 @@ def scan_inventory_for_nonconformity(inventory, verbose=False):
                 # print("Applied unstable fix to magnetic channel names")
                 logger.info("{T1,T2,T3} --> {F1, F2, F3}")
 
-            # Tesla to nanoTesla
-            for channel in station:
-                response = channel.response
-                for stage in response.response_stages:
-                    if verbose:
-                        msg = f"{channel.code} {stage.stage_sequence_number}"
-                        msg = f"{msg} {stage.input_units}"
-                        logger.info(msg)
-                    if stage.input_units == "T":
-                        stage.input_units = "nT"
-                        stage.stage_gain *= 1e-9
+            # Below represents correct syntax for a valid, but not conventional way to correct units
+            # leaving the code (commented) for future reference
+            # # Tesla to nanoTesla
+            # for channel in station:
+            #     response = channel.response
+            #     for stage in response.response_stages:
+            #         if verbose:
+            #             msg = f"{channel.code} {stage.stage_sequence_number}"
+            #             msg = f"{msg} {stage.input_units}"
+            #             logger.info(msg)
+            #         if stage.input_units == "T":
+            #             stage.input_units = "nT"
+            #             stage.stage_gain *= 1e-9
     return inventory
