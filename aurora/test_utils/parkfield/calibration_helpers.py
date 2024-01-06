@@ -29,7 +29,7 @@ def load_bf4_fap_for_parkfield_test_using_mt_metadata(frequencies):
 
     """
     from aurora.general_helper_functions import DATA_PATH
-    from aurora.time_series.filters.filter_helpers import (
+    from mt_metadata.timeseries.filters.helper_functions import (
         make_frequency_response_table_filter,
     )
 

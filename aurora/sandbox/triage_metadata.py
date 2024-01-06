@@ -1,5 +1,5 @@
-from aurora.time_series.filters.filter_helpers import MT2SI_ELECTRIC_FIELD_FILTER
-from aurora.time_series.filters.filter_helpers import MT2SI_MAGNETIC_FIELD_FILTER
+from mt_metadata.timeseries.filters.helper_functions import MT2SI_ELECTRIC_FIELD_FILTER
+from mt_metadata.timeseries.filters.helper_functions import MT2SI_MAGNETIC_FIELD_FILTER
 
 from loguru import logger
 
