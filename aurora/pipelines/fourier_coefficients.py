@@ -55,11 +55,6 @@ Note 3: This point in the loop marks the interface between _generation_ of the F
  execute compute_transfer_function()
 
 
-
-Questions:
-1. How to assign default values to Decimation.time_period?
-Usually we will want to convert the entire run, so these should be assigned
-during processing when we knwo the run extents.  Thus the
 """
 # =============================================================================
 # Imports
