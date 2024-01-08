@@ -57,11 +57,7 @@ Note 3: This point in the loop marks the interface between _generation_ of the F
 
 
 Questions:
-1. Shouldn;t there be an experiment column in the channel_summary dataframe for a v0.2.0 file?
-GROUPBY_COLUMNS = ["survey", "station", "sample_rate"]
-If I use ["experiment", "survey", "station", "sample_rate"] instead (for a v0.2.0 file) encounter KeyError.
-
-2. How to assign default values to Decimation.time_period?
+1. How to assign default values to Decimation.time_period?
 Usually we will want to convert the entire run, so these should be assigned
 during processing when we knwo the run extents.  Thus the
 """
@@ -69,23 +65,20 @@ during processing when we knwo the run extents.  Thus the
 # Imports
 # =============================================================================
 
+import mt_metadata.timeseries.time_period
 
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
-from mth5.mth5 import MTH5
-import mt_metadata.timeseries.time_period
+from loguru import logger
+from mth5.utils.helpers import path_or_mth5_object
 from mt_metadata.transfer_functions.processing.fourier_coefficients import (
     Decimation as FCDecimation,
 )
-from loguru import logger
-
 
 
 # =============================================================================
-FILE_VERSION = "you need to set this, and ideally cycle over 0.1.0, 0.2.0"
-DEFAULT_TIME = "1980-01-01T00:00:00+00:00"
-GROUPBY_COLUMNS = ["survey", "station", "sample_rate"]  # See Question 1
+GROUPBY_COLUMNS = ["survey", "station", "sample_rate"]
 
 
 def decimation_and_stft_config_creator(
@@ -95,7 +88,7 @@ def decimation_and_stft_config_creator(
     Based on the number of samples in the run, we can compute the maximum number of valid decimation levels.
     This would re-use code in processing summary ... or we could just decimate until we cant anymore?
 
-    You can provide soemthing like: decimation_info = {0: 1.0, 1: 4.0, 2: 4.0, 3: 4.0}
+    You can provide something like: decimation_info = {0: 1.0, 1: 4.0, 2: 4.0, 3: 4.0}
 
     Note 1:  This does not yet work through the assignment of which bands to keep.  Refer to
     mt_metadata.transfer_functions.processing.Processing.assign_bands() to see how this was done in the past
@@ -136,35 +129,39 @@ def decimation_and_stft_config_creator(
             if isinstance(mt_metadata.timeseries.time_period.TimePeriod, time_period):
                 dd.time_period = time_period
             else:
-                logger.info(f"Not sure how to assign time_period with {time_period}")
-                raise NotImplementedError
+                msg = (
+                    f"Not sure how to assign time_period with type {type(time_period)}"
+                )
+                logger.info(msg)
+                raise NotImplementedError(msg)
 
         decimation_and_stft_config.append(dd)
 
     return decimation_and_stft_config
 
 
-def add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=None):
+@path_or_mth5_object
+def add_fcs_to_mth5(m, decimation_and_stft_configs=None):
     """
     usssr_grouper: output of a groupby on unique {survey, station, sample_rate} tuples
 
     Args:
-        mth5_path: str or pathlib.Path
-            Where the mth5 file is locatid
+        m: str or pathlib.Path, or MTH5 object
+            Where the mth5 file is located
         decimation_and_stft_configs:
 
     Returns:
 
     """
-    m = MTH5()
-    m.open_mth5(mth5_path)
     channel_summary_df = m.channel_summary.to_dataframe()
 
     usssr_grouper = channel_summary_df.groupby(GROUPBY_COLUMNS)
-    logger.debug(f"DETECTED {len(usssr_grouper)} unique station-sample_rate instances")
+    logger.debug(f"Detected {len(usssr_grouper)} unique station-sample_rate instances")
 
     for (survey, station, sample_rate), usssr_group in usssr_grouper:
-        logger.info(f"\n\n\nsurvey: {survey}, station: {station}, sample_rate {sample_rate}")
+        logger.info(
+            f"\n\n\nsurvey: {survey}, station: {station}, sample_rate {sample_rate}"
+        )
         station_obj = m.get_station(station, survey)
         run_summary = station_obj.run_summary
 
@@ -210,7 +207,7 @@ def add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=None):
                 if i_dec_level != 0:
                     # Apply decimation
                     run_xrds = prototype_decimate(decimation_stft_obj, run_xrds)
-                logger.info(f"type decimation_stft_obj = {type(decimation_stft_obj)}")
+                logger.debug(f"type decimation_stft_obj = {type(decimation_stft_obj)}")
                 if not decimation_stft_obj.is_valid_for_time_series_length(
                     run_xrds.time.shape[0]
                 ):
@@ -222,17 +219,16 @@ def add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=None):
                 stft_obj = run_ts_to_stft_scipy(decimation_stft_obj, run_xrds)
                 stft_obj = calibrate_stft_obj(stft_obj, run_obj)
 
-                # print("Pack FCs into h5 and update metadata")
+                # Pack FCs into h5 and update metadata
                 decimation_level = fc_group.add_decimation_level(f"{i_dec_level}")
                 decimation_level.from_xarray(stft_obj)
                 decimation_level.update_metadata()
                 fc_group.update_metadata()
-
-    m.close_mth5()
     return
 
 
-def read_back_fcs(mth5_path):
+@path_or_mth5_object
+def read_back_fcs(m):
     """
     This is mostly a helper function for tests.  It was used as a sanity check while debugging the FC files, and
     also is a good example for how to access the data at each level for each channel.
@@ -241,14 +237,12 @@ def read_back_fcs(mth5_path):
     (for now -- storing all fcs by default)
 
     Args:
-        mth5_path: str or pathlib.Path
+        m: pathlib.Path, str or an MTH5 object
             The path to an h5 file that we will scan the fcs from
 
     Returns:
 
     """
-    m = MTH5()
-    m.open_mth5(mth5_path)
     channel_summary_df = m.channel_summary.to_dataframe()
     logger.debug(channel_summary_df)
     usssr_grouper = channel_summary_df.groupby(GROUPBY_COLUMNS)
@@ -262,18 +256,10 @@ def read_back_fcs(mth5_path):
             dec_level_ids = fc_group.groups_list
             for dec_level_id in dec_level_ids:
                 dec_level = fc_group.get_decimation_level(dec_level_id)
-                logger.info(
-                    f"dec_level {dec_level_id}"
-                )  # channel_summary {dec_level.channel_summary}")
                 xrds = dec_level.to_xarray(["hx", "hy"])
-                logger.info(f"Time axis shape {xrds.time.data.shape}")
-                logger.info(f"Freq axis shape {xrds.frequency.data.shape}")
+                msg = f"dec_level {dec_level_id}"
+                msg = f"{msg} \n Time axis shape {xrds.time.data.shape}"
+                msg = f"{msg} \n Freq axis shape {xrds.frequency.data.shape}"
+                logger.debug(msg)
+
     return True
-
-
-def main():
-    pass
-
-
-if __name__ == "__main__":
-    main()
