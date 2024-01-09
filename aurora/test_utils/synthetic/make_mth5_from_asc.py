@@ -27,17 +27,17 @@ import pandas as pd
 import pathlib
 import scipy.signal as ssig
 
-from loguru import logger
-
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 from aurora.test_utils.synthetic.station_config import make_filters
 from aurora.test_utils.synthetic.station_config import make_station_01
 from aurora.test_utils.synthetic.station_config import make_station_02
 from aurora.test_utils.synthetic.station_config import make_station_03
 from aurora.test_utils.synthetic.station_config import make_station_04
-from mth5.timeseries import ChannelTS, RunTS
+from loguru import logger
 from mth5.mth5 import MTH5
+from mth5.timeseries import ChannelTS, RunTS
 from mt_metadata.transfer_functions.processing.aurora import ChannelNomenclature
+from mth5.utils.helpers import add_filters
 
 np.random.seed(0)
 
@@ -117,31 +117,6 @@ def create_run_ts_from_synthetic_run(run, df, channel_nomenclature="default"):
     return runts
 
 
-def add_filters(active_filters, m, survey_id):
-    """
-
-    Parameters
-    ----------
-    active_filters: list of filters
-    m: mth5.mth5.MTH5
-    survey_id: string
-
-    Returns
-    -------
-
-    """
-    for fltr in active_filters:
-        if m.file_version == "0.1.0":
-            m.filters_group.add_filter(fltr)
-        elif m.file_version == "0.2.0":
-            survey = m.get_survey(survey_id)
-            survey.filters_group.add_filter(fltr)
-        else:
-            msg = f"unexpected MTH5 file_version = {m.file_version}"
-            raise NotImplementedError(msg)
-    return m
-
-
 def get_set_survey_id(m):
     if m.file_version == "0.1.0":
         survey_id = None
@@ -185,9 +160,7 @@ def get_time_series_dataframe(run, source_folder, add_nan_values):
         new_data_dict = {}
         for i_ch, ch in enumerate(run.channels):
             data = df_orig[ch].to_numpy()
-            new_data_dict[ch] = ssig.resample(
-                data, int(run.sample_rate) * len(df_orig)
-            )
+            new_data_dict[ch] = ssig.resample(data, int(run.sample_rate) * len(df_orig))
         df = pd.DataFrame(data=new_data_dict)
 
     # add noise
@@ -269,9 +242,7 @@ def create_mth5_synthetic_file(
         logger.error(msg)
 
     mth5_path = target_folder.joinpath(mth5_name)
-    mth5_path = update_mth5_path(
-        mth5_path, add_nan_values, channel_nomenclature
-    )
+    mth5_path = update_mth5_path(mth5_path, add_nan_values, channel_nomenclature)
 
     if not force_make_mth5:
         if mth5_path.exists():
@@ -302,7 +273,7 @@ def create_mth5_synthetic_file(
 
     # add filters
     active_filters = make_filters(as_list=True)
-    add_filters(active_filters, m, survey_id)
+    add_filters(m, active_filters, survey_id)
     m.close_mth5()
     return mth5_path
 
@@ -314,9 +285,7 @@ def create_test1_h5(
     source_folder="",
     force_make_mth5=True,
 ):
-    station_01_params = make_station_01(
-        channel_nomenclature=channel_nomenclature
-    )
+    station_01_params = make_station_01(channel_nomenclature=channel_nomenclature)
     mth5_name = station_01_params.mth5_name
     station_params = [
         station_01_params,
@@ -341,9 +310,7 @@ def create_test2_h5(
     target_folder=MTH5_PATH,
     source_folder="",
 ):
-    station_02_params = make_station_02(
-        channel_nomenclature=channel_nomenclature
-    )
+    station_02_params = make_station_02(channel_nomenclature=channel_nomenclature)
     mth5_name = station_02_params.mth5_name
     station_params = [
         station_02_params,
@@ -366,9 +333,7 @@ def create_test1_h5_with_nan(
     target_folder=MTH5_PATH,
     source_folder="",
 ):
-    station_01_params = make_station_01(
-        channel_nomenclature=channel_nomenclature
-    )
+    station_01_params = make_station_01(channel_nomenclature=channel_nomenclature)
     mth5_name = station_01_params.mth5_name
     station_params = [
         station_01_params,
@@ -391,12 +356,8 @@ def create_test12rr_h5(
     target_folder=MTH5_PATH,
     source_folder=None,
 ):
-    station_01_params = make_station_01(
-        channel_nomenclature=channel_nomenclature
-    )
-    station_02_params = make_station_02(
-        channel_nomenclature=channel_nomenclature
-    )
+    station_01_params = make_station_01(channel_nomenclature=channel_nomenclature)
+    station_02_params = make_station_02(channel_nomenclature=channel_nomenclature)
     station_params = [station_01_params, station_02_params]
     mth5_name = "test12rr.h5"
     mth5_path = create_mth5_synthetic_file(
@@ -418,9 +379,7 @@ def create_test3_h5(
     target_folder=MTH5_PATH,
     source_folder="",
 ):
-    station_03_params = make_station_03(
-        channel_nomenclature=channel_nomenclature
-    )
+    station_03_params = make_station_03(channel_nomenclature=channel_nomenclature)
     station_params = [
         station_03_params,
     ]
@@ -442,9 +401,7 @@ def create_test4_h5(
     source_folder="",
 ):
     """8Hz data kluged from the 1Hz ... only freqs below 0.5Hz will make sense (100 Ohmm and 45deg)"""
-    station_04_params = make_station_04(
-        channel_nomenclature=channel_nomenclature
-    )
+    station_04_params = make_station_04(channel_nomenclature=channel_nomenclature)
     mth5_path = create_mth5_synthetic_file(
         [
             station_04_params,
@@ -461,11 +418,11 @@ def create_test4_h5(
 
 def main(file_version="0.1.0"):
     file_version = "0.2.0"
-    # create_test1_h5(file_version=file_version)
-    # create_test1_h5_with_nan(file_version=file_version)
-    # create_test2_h5(file_version=file_version)
-    # create_test12rr_h5(file_version=file_version)
-    # create_test3_h5(file_version=file_version)
+    #    create_test1_h5(file_version=file_version)
+    #     create_test1_h5_with_nan(file_version=file_version)
+    #     create_test2_h5(file_version=file_version)
+    #     create_test12rr_h5(file_version=file_version, channel_nomenclature="lemi12")
+    #     create_test3_h5(file_version=file_version)
     create_test4_h5(file_version=file_version)
 
 
