@@ -91,3 +91,26 @@ def triage_missing_coil_hollister(experiment):
         # station = stations[i_station]
         runs = station.runs[0]
         logger.info("help")
+
+
+def triage_run_id(expected_run_id, run_obj):
+    """
+    This situation was encounterd during the Musgraves processing in 2023 HPC workshopl
+    The MTH5 files being used were from a previous era, and the run_object metadata did not
+    contain the expected value for run_id.
+
+    Parameters
+    ----------
+    expected_run_id: string
+        The expected name of the run
+    run_obj: mth5.groups.run.RunGroup
+        The run object that should have correct name.
+
+    """
+    try:
+        assert expected_run_id == run_obj.metadata.id
+    except AssertionError:
+        logger.warning("WARNING Run ID in dataset_df does not match run_obj")
+        logger.warning("WARNING Forcing run metadata to match dataset_df")
+        run_obj.metadata.id = expected_run_id
+    return

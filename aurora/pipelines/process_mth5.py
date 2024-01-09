@@ -31,6 +31,7 @@ from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.transfer_function_helpers import process_transfer_functions
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
+from aurora.sandbox.triage_metadata import triage_run_id
 from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
 )
@@ -40,9 +41,7 @@ from aurora.transfer_function.TTFZ import TTFZ
 # =============================================================================
 
 
-def make_stft_objects(
-    processing_config, i_dec_level, run_obj, run_xrds, station_id, units="MT"
-):
+def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrds, units="MT"):
     """
     Operates on a "per-run" basis
 
@@ -74,11 +73,11 @@ def make_stft_objects(
     stft_config = processing_config.get_decimation_level(i_dec_level)
     stft_obj = run_ts_to_stft(stft_config, run_xrds)
     run_id = run_obj.metadata.id
-    if station_id == processing_config.stations.local.id:
+    if run_obj.station_metadata.id == processing_config.stations.local.id:
         scale_factors = processing_config.stations.local.run_dict[
             run_id
         ].channel_scale_factors
-    elif station_id == processing_config.stations.remote[0].id:
+    elif run_obj.station_metadata.id == processing_config.stations.remote[0].id:
         scale_factors = (
             processing_config.stations.remote[0].run_dict[run_id].channel_scale_factors
         )
@@ -362,19 +361,13 @@ def process_mth5(
             run_xrds = row["run_dataarray"].to_dataset("channel")
 
             # Musgraves workaround for old MT data
-            try:
-                assert row.run_id == run_obj.metadata.id
-            except AssertionError:
-                logger.warning("WARNING Run ID in dataset_df does not match run_obj")
-                logger.warning("WARNING Forcing run metadata to match dataset_df")
-                run_obj.metadata.id = row.run_id
+            triage_run_id(row.run_id, run_obj)
 
             stft_obj = make_stft_objects(
                 tfk.config,
                 i_dec_level,
                 run_obj,
                 run_xrds,
-                row.station_id,
                 units,
             )
             # Pack FCs into h5
