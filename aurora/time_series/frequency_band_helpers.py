@@ -2,7 +2,7 @@ import numpy as np
 from loguru import logger
 
 
-def get_band_for_tf_estimate(band, config, local_stft_obj, remote_stft_obj):
+def get_band_for_tf_estimate(band, dec_level_config, local_stft_obj, remote_stft_obj):
     """
     Get data for TF estimation for a particular band.
 
@@ -28,13 +28,12 @@ def get_band_for_tf_estimate(band, config, local_stft_obj, remote_stft_obj):
         reference_channels and also the frequency axes are restricted to
         being within the frequency band given as an input argument.
     """
-    dec_level_config = config.decimations[0]
     logger.info(f"Processing band {band.center_period:.6f}s")
     band_dataset = extract_band(band, local_stft_obj)
     X = band_dataset[dec_level_config.input_channels]
     Y = band_dataset[dec_level_config.output_channels]
     check_time_axes_synched(X, Y)
-    if config.stations.remote:
+    if dec_level_config.reference_channels:
         band_dataset = extract_band(band, remote_stft_obj)
         RR = band_dataset[dec_level_config.reference_channels]
         check_time_axes_synched(Y, RR)

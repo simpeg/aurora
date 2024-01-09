@@ -90,8 +90,7 @@ def select_channel(xrda, channel_label):
 
 
 def process_transfer_functions(
-    config,
-    i_dec_level,
+    dec_level_config,
     local_stft_obj,
     remote_stft_obj,
     transfer_function_obj,
@@ -103,7 +102,7 @@ def process_transfer_functions(
 
     Parameters
     ----------
-    config
+    dec_level_config
     local_stft_obj
     remote_stft_obj
     transfer_function_obj: aurora.transfer_function.TTFZ.TTFZ
@@ -129,12 +128,11 @@ def process_transfer_functions(
 
     """
     # PUT COHERENCE SORTING HERE IF WIDE BAND?
-    dec_level_config = config.decimations[i_dec_level]
     estimator_class = get_estimator_class(dec_level_config.estimator.engine)
     for band in transfer_function_obj.frequency_bands.bands():
         iter_control = set_up_iter_control(dec_level_config)
         X, Y, RR = get_band_for_tf_estimate(
-            band, config, local_stft_obj, remote_stft_obj
+            band, dec_level_config, local_stft_obj, remote_stft_obj
         )
         # if there are segment weights apply them here
         # if there are channel weights apply them here

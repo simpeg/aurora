@@ -39,6 +39,7 @@ from aurora.transfer_function.TTFZ import TTFZ
 
 # =============================================================================
 
+
 def make_stft_objects(
     processing_config, i_dec_level, run_obj, run_xrds, station_id, units="MT"
 ):
@@ -122,6 +123,7 @@ def process_tf_decimation_level(
     Processing pipeline for a single decimation_level
 
     TODO: Add a check that the processing config sample rates agree with the data
+    TODO: Add units to local_stft_obj, remote_stft_obj
     sampling rates otherwise raise Exception
     This method can be single station or remote based on the process cfg
 
@@ -146,9 +148,9 @@ def process_tf_decimation_level(
     """
     frequency_bands = config.decimations[i_dec_level].frequency_bands_obj()
     transfer_function_obj = TTFZ(i_dec_level, frequency_bands, processing_config=config)
-
+    dec_level_config = config.decimations[i_dec_level]
     transfer_function_obj = process_transfer_functions(
-        config, i_dec_level, local_stft_obj, remote_stft_obj, transfer_function_obj
+        dec_level_config, local_stft_obj, remote_stft_obj, transfer_function_obj
     )
 
     return transfer_function_obj
@@ -368,7 +370,12 @@ def process_mth5(
                 run_obj.metadata.id = row.run_id
 
             stft_obj = make_stft_objects(
-                tfk.config, i_dec_level, run_obj, run_xrds, row.station_id, units,
+                tfk.config,
+                i_dec_level,
+                run_obj,
+                run_xrds,
+                row.station_id,
+                units,
             )
             # Pack FCs into h5
             save_fourier_coefficients(
