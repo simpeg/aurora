@@ -1,7 +1,7 @@
 """
 There are several ways to go about this.  One reasonably straightforward one is:
 
-Take all the Fourier coefficients right before the go into regression (right before or
+Take all the Fourier coefficients right before they go into regression (right before or
 after we apply the effective degrees of freedom weights).  Data are strictly 2D at
 this point, you have each channel of data corresponding to a column, and each row
 to an observation.
@@ -18,6 +18,7 @@ This leads to a coherence score for each observation.  We can boot out all data 
 """
 
 import numpy as np
+from loguru import logger
 
 
 def drop_column(x, i_col):
@@ -43,7 +44,7 @@ def coherence_from_fc_series(c_xy, c_xx, c_yy):
     return coh
 
 
-def coherence_weights_v00(x, y, threshold=0.95):  # 975):#0.98
+def jackknife_coherence_weights(x, y, keep_fraction=0.95):  # 975):#0.98
     """
     Note 1: Extremely high coherence can be due to noise
     Consider ways to pre-filter those events before this is called.
@@ -59,7 +60,8 @@ def coherence_weights_v00(x, y, threshold=0.95):  # 975):#0.98
     ----------
     x: X["hx"].data
     y: Y["ey"].data
-    threshold : value in [0,1] to set what to keep / reject
+    keep_fraction : value in (0,1) to set what to keep / reject.
+    A value of 0.1 would keep 10% of the estimates, a val
 
     Returns
     -------
@@ -67,6 +69,10 @@ def coherence_weights_v00(x, y, threshold=0.95):  # 975):#0.98
     """
     # Initialize a weight vector the length = num_observations
     n_obs = len(x)
+    clip_fraction = 1 - keep_fraction
+    n_clip = int(clip_fraction * n_obs)
+    logger.info(f"removing worst {n_clip} of {n_obs} via jackknife coherence")
+
     partial_coh = np.zeros(n_obs)
     W = np.zeros(n_obs)  # for example
 
@@ -85,19 +91,28 @@ def coherence_weights_v00(x, y, threshold=0.95):  # 975):#0.98
         )
 
     worst_to_best = np.argsort(partial_coh)
-    # coh0 = coherence_from_fc_series(c_xy, c_xx, c_yy)
-    # relative_coherence = partial_coh / coh0
-    # sorted_partials = partial_coh[worst_to_best]
-    clip_point = int(threshold * n_obs)
-    keepers = worst_to_best[clip_point:]
+    keepers = worst_to_best[n_clip:]
     W[keepers] = 1
     return W
 
 
-def compute_coherence_weights(X, Y, RR, coh_type="local"):
+def coherence_weights_jj84(X, Y, RR, coh_type="local"):
     """
-    2022-09-09: This method is not yet supported.  It needs to be made
-    tolerant of channel_nomenclature.
+    This method loosely follows Jones and Jodicke 1984, at least inasfaras it uses a jackknife process.
+    However, the termination criteria for when to stop rejecting is given by a simple fraction of data to keep/reject
+    This is not what is done in JJ84. They use an SNR maximizing method, that could be added here.
+
+    The variables remote_threshold and local_threshold DO NOT refer to thresholds on the value of coherence!
+    Rather, the threshold refers to the fraction of the estimates to keep (1 - fraction to reject)
+
+    2022-09-09: This method is not yet supported.  It needs to be made tolerant of channel_nomenclature.  A not
+    unreasonable solution to this would be to make a decorator:
+    def use_channel_nomenclature():
+        Loops over input xarrays and maps channel names from current nomenclature
+        to hexy, and then, when it is done executing, maps the labels back.
+    However, it would cloud a lot of the math and readability if this was done all the time.  Suggest decorating
+    process_transfer_function
+
 
     Parameters
     ----------
@@ -111,30 +126,28 @@ def compute_coherence_weights(X, Y, RR, coh_type="local"):
 
     """
     # these should be params in the config
-    remote_threshold = 0.8
-    local_threshold = 0.95
+    remote_keep_fraction = 0.8
+    local_keep_fraction = 0.95
 
-    # redundant -these should already be dropped
+    # redundant - these should already be dropped
     X = X.dropna(dim="observation")
     Y = Y.dropna(dim="observation")
     if RR is not None:
         RR = RR.dropna(dim="observation")
 
-    # < INSERT COHERENCE SORTING HERE>    y_type = "remote"
-    null_indices = X["hx"].isnull()  # not robust -- hail mary
+    null_indices = X["hx"].isnull()
     finite_indices = ~null_indices
     W = np.zeros(len(X.observation))
 
-    x = X["hx"]  # .dropna(dim="observation").data
-
+    x = X["hx"]
     if coh_type == "local":
-        y = Y["ey"]  # .dropna(dim="observation").data
-        threshold = local_threshold
+        y = Y["ey"]
+        keep_fraction = local_keep_fraction
     elif coh_type == "remote":
-        y = RR["hx"]  # .dropna(dim="observation").data
-        threshold = remote_threshold
+        y = RR["hx"]
+        keep_fraction = remote_keep_fraction
 
-    W1 = coherence_weights_v00(x, y, threshold=threshold)
+    W1 = jackknife_coherence_weights(x, y, keep_fraction=keep_fraction)
 
     W[finite_indices] = W1
 
@@ -145,21 +158,18 @@ def compute_coherence_weights(X, Y, RR, coh_type="local"):
     # x = X["hy"].data
     # y = Y["ex"].data
     W = np.zeros(len(finite_indices))
-    x = X["hy"]  # .dropna(dim="observation").data
+    x = X["hy"]
     if coh_type == "local":
-        y = Y["ex"]  # .dropna(dim="observation").data
-        threshold = local_threshold
+        y = Y["ex"]
+        keep_fraction = local_keep_fraction
     elif coh_type == "remote":
-        y = RR["hy"]  # .dropna(dim="observation").data
-        threshold = remote_threshold
-    W2 = coherence_weights_v00(x, y)
+        y = RR["hy"]
+        keep_fraction = remote_keep_fraction
+    W2 = jackknife_coherence_weights(x, y, keep_fraction=keep_fraction)
     W[finite_indices] = W2
     W[W == 0] = np.nan
     X["hy"].data *= W
     Y["ex"].data *= W
-    # W = W*W2
-    # X *= W
-    # Y *= W
     if RR is not None:
         RR *= W
     return X, Y, RR

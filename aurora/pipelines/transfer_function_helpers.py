@@ -156,11 +156,11 @@ def process_transfer_functions(
         if RR is not None:
             RR = RR.dropna(dim="observation")
 
-        # <INSERT COHERENCE SORTING HERE>
+        # COHERENCE SORTING
         # coh_type = "local"
-        # if i_dec_level == 0:
-        #     from aurora.transfer_function.weights.coherence_weights import compute_coherence_weights
-        #     X, Y, RR = compute_coherence_weights(X,Y,RR, coh_type=coh_type)
+        # if dec_level_config.decimation.level == 0:
+        #     from aurora.transfer_function.weights.coherence_weights import coherence_weights_jj84
+        #     X, Y, RR = coherence_weights_jj84(X,Y,RR, coh_type=coh_type)
 
         if dec_level_config.estimator.estimate_per_channel:
             for ch in dec_level_config.output_channels:
