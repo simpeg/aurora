@@ -114,6 +114,11 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
 
     def test_decimation_and_stft_config_creator(self):
         cfgs = decimation_and_stft_config_creator(1.0)
+
+        # test time period must of of type
+        with self.assertRaises(NotImplementedError):
+            time_period = ["2023-01-01T17:48:59", "2023-01-09T08:54:08"]
+            decimation_and_stft_config_creator(1.0, time_period=time_period)
         return cfgs
 
     def test_create_then_use_stored_fcs_for_processing(self):

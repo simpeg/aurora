@@ -121,7 +121,7 @@ def decimation_and_stft_config_creator(
         dd.sample_rate_decimation = current_sample_rate
 
         if time_period:
-            if isinstance(mt_metadata.timeseries.time_period.TimePeriod, time_period):
+            if isinstance(time_period, mt_metadata.timeseries.time_period.TimePeriod):
                 dd.time_period = time_period
             else:
                 msg = (
