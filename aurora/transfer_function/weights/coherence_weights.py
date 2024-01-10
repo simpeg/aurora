@@ -44,7 +44,9 @@ def coherence_from_fc_series(c_xy, c_xx, c_yy):
     return coh
 
 
-def jackknife_coherence_weights(x, y, keep_fraction=0.95):  # 975):#0.98
+def jackknife_coherence_weights(
+    x, y, lower_quantile_cutoff=0.3, upper_quantile_cutoff=0.95
+):  # 975):#0.98
     """
     Note 1: Extremely high coherence can be due to noise
     Consider ways to pre-filter those events before this is called.
@@ -67,12 +69,15 @@ def jackknife_coherence_weights(x, y, keep_fraction=0.95):  # 975):#0.98
     -------
     W: Weights (currently set to be 0 or 1)
     """
-    # Initialize a weight vector the length = num_observations
     n_obs = len(x)
-    clip_fraction = 1 - keep_fraction
-    n_clip = int(clip_fraction * n_obs)
-    logger.info(f"removing worst {n_clip} of {n_obs} via jackknife coherence")
+    n_clip_low = int(lower_quantile_cutoff * n_obs)
+    n_clip_high = int(upper_quantile_cutoff * n_obs)
+    logger.info(f"removing worst {n_clip_low} of {n_obs} via jackknife coherence")
+    logger.info(
+        f"removing 'best' {n_obs - n_clip_high} of {n_obs} via jackknife coherence"
+    )
 
+    # Initialize a weight vector the length = num_observations
     partial_coh = np.zeros(n_obs)
     W = np.zeros(n_obs)  # for example
 
@@ -91,7 +96,7 @@ def jackknife_coherence_weights(x, y, keep_fraction=0.95):  # 975):#0.98
         )
 
     worst_to_best = np.argsort(partial_coh)
-    keepers = worst_to_best[n_clip:]
+    keepers = worst_to_best[n_clip_low:n_clip_high]
     W[keepers] = 1
     return W
 
@@ -126,8 +131,10 @@ def coherence_weights_jj84(X, Y, RR, coh_type="local"):
 
     """
     # these should be params in the config
-    remote_keep_fraction = 0.8
-    local_keep_fraction = 0.95
+    local_lower_quantile_cutoff = 0.5
+    local_upper_quantile_cutoff = 0.9
+    remote_lower_quantile_cutoff = 0.3
+    remote_upper_quantile_cutoff = 0.99
 
     # redundant - these should already be dropped
     X = X.dropna(dim="observation")
@@ -142,12 +149,19 @@ def coherence_weights_jj84(X, Y, RR, coh_type="local"):
     x = X["hx"]
     if coh_type == "local":
         y = Y["ey"]
-        keep_fraction = local_keep_fraction
+        lower_quantile_cutoff = local_lower_quantile_cutoff
+        upper_quantile_cutoff = local_upper_quantile_cutoff
     elif coh_type == "remote":
         y = RR["hx"]
-        keep_fraction = remote_keep_fraction
+        lower_quantile_cutoff = remote_lower_quantile_cutoff
+        upper_quantile_cutoff = remote_upper_quantile_cutoff
 
-    W1 = jackknife_coherence_weights(x, y, keep_fraction=keep_fraction)
+    W1 = jackknife_coherence_weights(
+        x,
+        y,
+        lower_quantile_cutoff=lower_quantile_cutoff,
+        upper_quantile_cutoff=upper_quantile_cutoff,
+    )
 
     W[finite_indices] = W1
 
@@ -155,17 +169,22 @@ def coherence_weights_jj84(X, Y, RR, coh_type="local"):
     X["hx"].data *= W
     Y["ey"].data *= W
 
-    # x = X["hy"].data
-    # y = Y["ex"].data
     W = np.zeros(len(finite_indices))
     x = X["hy"]
     if coh_type == "local":
         y = Y["ex"]
-        keep_fraction = local_keep_fraction
+        lower_quantile_cutoff = local_lower_quantile_cutoff
+        upper_quantile_cutoff = local_upper_quantile_cutoff
     elif coh_type == "remote":
         y = RR["hy"]
-        keep_fraction = remote_keep_fraction
-    W2 = jackknife_coherence_weights(x, y, keep_fraction=keep_fraction)
+        lower_quantile_cutoff = remote_lower_quantile_cutoff
+        upper_quantile_cutoff = remote_upper_quantile_cutoff
+    W2 = jackknife_coherence_weights(
+        x,
+        y,
+        lower_quantile_cutoff=lower_quantile_cutoff,
+        upper_quantile_cutoff=upper_quantile_cutoff,
+    )
     W[finite_indices] = W2
     W[W == 0] = np.nan
     X["hy"].data *= W
@@ -173,3 +192,9 @@ def coherence_weights_jj84(X, Y, RR, coh_type="local"):
     if RR is not None:
         RR *= W
     return X, Y, RR
+
+
+# def compute_multiple_coherence_weights(band, local_stft_obj, remote_stft_obj):
+#     print(band)
+#     print(band)
+#     pass
