@@ -15,14 +15,9 @@ Run level: 'run_id', name of the run
 Run level: 'sample_rate', 1.0
 
 """
-import numpy as np
-import random
-
-from mt_metadata.transfer_functions.processing.aurora import ChannelNomenclature
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
-from aurora.time_series.filters.filter_helpers import make_coefficient_filter
-
-random.seed(0)
+from mt_metadata.timeseries.filters.helper_functions import make_coefficient_filter
+from mt_metadata.transfer_functions.processing.aurora import ChannelNomenclature
 
 synthetic_test_paths = SyntheticTestPaths()
 DATA_PATH = synthetic_test_paths.ascii_data_path
@@ -36,7 +31,7 @@ def make_filters(as_list=False):
     Returns
     -------
     filters_list: list
-        filters that can be ussed to populate the filters lists of synthetic data
+        filters that can be used to populate the filters lists of synthetic data
     """
     unity_coeff_filter = make_coefficient_filter(name="1", gain=1.0)
     multipy_by_10_filter = make_coefficient_filter(gain=10.0, name="10")
@@ -79,7 +74,7 @@ class SyntheticRun(object):
         if self.noise_scalars is None:
             self.noise_scalars = {}
             for channel in self.channels:
-                self.noise_scalars[channel] = 0.0  # np.random.rand(1)
+                self.noise_scalars[channel] = 0.0
 
     @property
     def channel_map(self):

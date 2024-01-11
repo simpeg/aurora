@@ -1,6 +1,6 @@
 import numpy as np
 
-from aurora.time_series.frequency_band_helpers import extract_band
+from aurora.time_series.frequency_band_helpers import get_band_for_tf_estimate
 from aurora.time_series.xarray_helpers import handle_nan
 from aurora.transfer_function.regression.iter_control import IterControl
 from aurora.transfer_function.regression.TRME import TRME
@@ -34,7 +34,9 @@ def get_estimator_class(estimation_engine):
         estimator_class = ESTIMATOR_LIBRARY[estimation_engine]
     except KeyError:
         logger.error(f"processing_scheme {estimation_engine} not supported")
-        logger.error(f"processing_scheme must be one of {list(ESTIMATOR_LIBRARY.keys())}")
+        logger.error(
+            f"processing_scheme must be one of {list(ESTIMATOR_LIBRARY.keys())}"
+        )
         raise Exception
     return estimator_class
 
@@ -66,78 +68,6 @@ def set_up_iter_control(config):
     return iter_control
 
 
-def check_time_axes_synched(X, Y):
-    """
-    Utility function for checking that time axes agree
-
-    Parameters
-    ----------
-    X : xarray
-    Y : xarray
-
-    Returns
-    -------
-
-    """
-    """
-    It is critical that X, Y, RR have the same time axes here
-
-    Returns
-    -------
-
-    """
-    if (X.time == Y.time).all():
-        pass
-    else:
-        logger.warning("WARNING - NAN Handling could fail if X,Y dont share time axes")
-        raise Exception
-    return
-
-
-def get_band_for_tf_estimate(
-    band, config, i_dec_level, local_stft_obj, remote_stft_obj
-):
-    """
-    Get data for TF estimation for a particular band.
-
-    Parameters
-    ----------
-    band : mt_metadata.transfer_functions.processing.aurora.FrequencyBands
-        object with lower_bound and upper_bound to tell stft object which
-        subarray to return
-    config : mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
-        information about the input and output channels needed for TF
-        estimation problem setup
-    local_stft_obj : xarray.core.dataset.Dataset or None
-        Time series of Fourier coefficients for the station whose TF is to be
-        estimated
-    remote_stft_obj : xarray.core.dataset.Dataset or None
-        Time series of Fourier coefficients for the remote reference station
-
-    Returns
-    -------
-    X, Y, RR : xarray.core.dataset.Dataset or None
-        data structures as local_stft_object and remote_stft_object, but
-        restricted only to input_channels, output_channels,
-        reference_channels and also the frequency axes are restricted to
-        being within the frequency band given as an input argument.
-    """
-    dec_level_config = config.decimations[0]
-    logger.info(f"Processing band {band.center_period:.6f}s")
-    band_dataset = extract_band(band, local_stft_obj)
-    X = band_dataset[dec_level_config.input_channels]
-    Y = band_dataset[dec_level_config.output_channels]
-    check_time_axes_synched(X, Y)
-    if config.stations.remote:
-        band_dataset = extract_band(band, remote_stft_obj)
-        RR = band_dataset[dec_level_config.reference_channels]
-        check_time_axes_synched(Y, RR)
-    else:
-        RR = None
-
-    return X, Y, RR
-
-
 def select_channel(xrda, channel_label):
     """
     Extra helper function to make process_transfer_functions more readable without
@@ -160,20 +90,20 @@ def select_channel(xrda, channel_label):
 
 
 def process_transfer_functions(
-    config,
-    i_dec_level,
+    dec_level_config,
     local_stft_obj,
     remote_stft_obj,
     transfer_function_obj,
     segment_weights=None,
     channel_weights=None,
+    #    use_multiple_coherence_weights=False,
 ):
     """
     This method based on TTFestBand.m
 
     Parameters
     ----------
-    config
+    dec_level_config
     local_stft_obj
     remote_stft_obj
     transfer_function_obj: aurora.transfer_function.TTFZ.TTFZ
@@ -185,7 +115,7 @@ def process_transfer_functions(
 
 
     TODO:
-    1. Review the advantages of excuting the regression all at once vs
+    1. Review the advantages of executing the regression all at once vs
     channel-by-channel.  If there is not disadvantage to always
     using a channel-by-channel approach we can modify this to only support that
     method.  However, we still need a way to get residual covariances (see issue #87)
@@ -198,13 +128,14 @@ def process_transfer_functions(
     -------
 
     """
-    # PUT COHERENCE SORTING HERE IF WIDE BAND?
-    dec_level_config = config.decimations[i_dec_level]
     estimator_class = get_estimator_class(dec_level_config.estimator.engine)
+    iter_control = set_up_iter_control(dec_level_config)
     for band in transfer_function_obj.frequency_bands.bands():
-        iter_control = set_up_iter_control(dec_level_config)
+        # if use_multiple_coherence_weights:
+        #     from aurora.transfer_function.weights.coherence_weights import compute_multiple_coherence_weights
+        #     Wmc = compute_multiple_coherence_weights(band, local_stft_obj, remote_stft_obj)
         X, Y, RR = get_band_for_tf_estimate(
-            band, config, i_dec_level, local_stft_obj, remote_stft_obj
+            band, dec_level_config, local_stft_obj, remote_stft_obj
         )
         # if there are segment weights apply them here
         # if there are channel weights apply them here
@@ -215,6 +146,8 @@ def process_transfer_functions(
             RR = RR.stack(observation=("frequency", "time"))
 
         W = effective_degrees_of_freedom_weights(X, RR, edf_obj=None)
+        # if use_multiple_coherence_weights:
+        #     W *= Wmc
         W[W == 0] = np.nan  # use this to drop values in the handle_nan
         # apply weights
         X *= W
@@ -226,11 +159,11 @@ def process_transfer_functions(
         if RR is not None:
             RR = RR.dropna(dim="observation")
 
-        # INSERT COHERENCE SORTING HERE>
+        # COHERENCE SORTING
         # coh_type = "local"
-        # if i_dec_level == 0:
-        #     from aurora.transfer_function.weights.coherence_weights import compute_coherence_weights
-        #     X, Y, RR = compute_coherence_weights(X,Y,RR, coh_type=coh_type)
+        # if dec_level_config.decimation.level == 0:
+        #     from aurora.transfer_function.weights.coherence_weights import coherence_weights_jj84
+        #     X, Y, RR = coherence_weights_jj84(X,Y,RR, coh_type=coh_type)
 
         if dec_level_config.estimator.estimate_per_channel:
             for ch in dec_level_config.output_channels:

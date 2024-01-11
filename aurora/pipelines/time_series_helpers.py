@@ -291,16 +291,29 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
         Time series of calibrated Fourier coefficients
     """
     for channel_id in stft_obj.keys():
-        mth5_channel = run_obj.get_channel(channel_id)
-        channel_filter = mth5_channel.channel_response_filter
-        if not channel_filter.filters_list:
+
+        channel = run_obj.get_channel(channel_id)
+        channel_response = channel.channel_response
+        if not channel_response.filters_list:
             msg = f"Channel {channel_id} with empty filters list detected"
             logger.warning(msg)
             if channel_id == "hy":
                 msg = "Channel hy has no filters, try using filters from hx"
                 logger.warning("Channel HY has no filters, try using filters from HX")
-                channel_filter = run_obj.get_channel("hx").channel_response_filter
-        calibration_response = channel_filter.complex_response(stft_obj.frequency.data)
+                channel_response = run_obj.get_channel("hx").channel_response
+
+        indices_to_flip = channel_response.get_indices_of_filters_to_remove(
+            include_decimation=False, include_delay=False
+        )
+        indices_to_flip = [
+            i for i in indices_to_flip if channel.metadata.filter.applied[i]
+        ]
+        filters_to_remove = [channel_response.filters_list[i] for i in indices_to_flip]
+        if not filters_to_remove:
+            logger.warning("No filters to remove")
+        calibration_response = channel_response.complex_response(
+            stft_obj.frequency.data, filters_list=filters_to_remove
+        )
         if channel_scale_factors:
             try:
                 channel_scale_factor = channel_scale_factors[channel_id]
@@ -309,7 +322,6 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
             calibration_response /= channel_scale_factor
         if units == "SI":
             logger.warning("Warning: SI Units are not robustly supported issue #36")
-
         stft_obj[channel_id].data /= calibration_response
     return stft_obj
 

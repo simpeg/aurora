@@ -28,11 +28,13 @@ def load_bf4_fap_for_parkfield_test_using_mt_metadata(frequencies):
     -------
 
     """
-    from aurora.time_series.filters.filter_helpers import (
+    from aurora.general_helper_functions import DATA_PATH
+    from mt_metadata.timeseries.filters.helper_functions import (
         make_frequency_response_table_filter,
     )
 
-    bf4_obj = make_frequency_response_table_filter(case="bf4")
+    bf4_file_path = DATA_PATH.joinpath("parkfield", "bf4_9819.csv")
+    bf4_obj = make_frequency_response_table_filter(bf4_file_path, case="bf4")
     bf4_resp = bf4_obj.complex_response(frequencies)
     bf4_resp *= 421721.0  # counts-per-volt compensation for PKD
     return bf4_resp
@@ -94,7 +96,7 @@ def parkfield_sanity_check(
     show_response_curves=False,
     show_spectra=True,
     figures_path=Path(""),
-    include_decimation=True,
+    include_decimation=False,
 ):
     """
     loop over channels in fft obj and make calibrated spectral plots
@@ -125,11 +127,12 @@ def parkfield_sanity_check(
         channel = run_obj.get_channel(key)
 
         # pole-zero calibration response
-        pz_calibration_response = channel.channel_response_filter.complex_response(
+
+        pz_calibration_response = channel.channel_response.complex_response(
             frequencies, include_decimation=include_decimation
         )
 
-        if channel.channel_response_filter.units_in.lower() in ["t", "tesla"]:
+        if channel.channel_response.units_in.lower() in ["t", "tesla"]:
             logger.warning("WARNING: Expecting nT but got T")
 
         # Frequency response table response

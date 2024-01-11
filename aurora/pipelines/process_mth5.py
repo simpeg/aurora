@@ -31,6 +31,7 @@ from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.transfer_function_helpers import process_transfer_functions
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
+from aurora.sandbox.triage_metadata import triage_run_id
 from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
 )
@@ -39,9 +40,8 @@ from aurora.transfer_function.TTFZ import TTFZ
 
 # =============================================================================
 
-def make_stft_objects(
-    processing_config, i_dec_level, run_obj, run_xrds, units, station_id
-):
+
+def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrds, units="MT"):
     """
     Operates on a "per-run" basis
 
@@ -73,11 +73,11 @@ def make_stft_objects(
     stft_config = processing_config.get_decimation_level(i_dec_level)
     stft_obj = run_ts_to_stft(stft_config, run_xrds)
     run_id = run_obj.metadata.id
-    if station_id == processing_config.stations.local.id:
+    if run_obj.station_metadata.id == processing_config.stations.local.id:
         scale_factors = processing_config.stations.local.run_dict[
             run_id
         ].channel_scale_factors
-    elif station_id == processing_config.stations.remote[0].id:
+    elif run_obj.station_metadata.id == processing_config.stations.remote[0].id:
         scale_factors = (
             processing_config.stations.remote[0].run_dict[run_id].channel_scale_factors
         )
@@ -122,6 +122,7 @@ def process_tf_decimation_level(
     Processing pipeline for a single decimation_level
 
     TODO: Add a check that the processing config sample rates agree with the data
+    TODO: Add units to local_stft_obj, remote_stft_obj
     sampling rates otherwise raise Exception
     This method can be single station or remote based on the process cfg
 
@@ -146,9 +147,9 @@ def process_tf_decimation_level(
     """
     frequency_bands = config.decimations[i_dec_level].frequency_bands_obj()
     transfer_function_obj = TTFZ(i_dec_level, frequency_bands, processing_config=config)
-
+    dec_level_config = config.decimations[i_dec_level]
     transfer_function_obj = process_transfer_functions(
-        config, i_dec_level, local_stft_obj, remote_stft_obj, transfer_function_obj
+        dec_level_config, local_stft_obj, remote_stft_obj, transfer_function_obj
     )
 
     return transfer_function_obj
@@ -314,7 +315,7 @@ def process_mth5(
     tfk.show_processing_summary()
     tfk.validate()
     # See Note #1
-    if config.decimations[0].save_fcs:
+    if tfk.config.decimations[0].save_fcs:
         mth5_mode = "a"
     else:
         mth5_mode = "r"
@@ -358,18 +359,16 @@ def process_mth5(
                 continue
 
             run_xrds = row["run_dataarray"].to_dataset("channel")
-            run_obj = row.mth5_obj.from_reference(row.run_reference)
 
             # Musgraves workaround for old MT data
-            try:
-                assert row.run_id == run_obj.metadata.id
-            except AssertionError:
-                logger.warning("WARNING Run ID in dataset_df does not match run_obj")
-                logger.warning("WARNING Forcing run metadata to match dataset_df")
-                run_obj.metadata.id = row.run_id
+            triage_run_id(row.run_id, run_obj)
 
             stft_obj = make_stft_objects(
-                tfk.config, i_dec_level, run_obj, run_xrds, units, row.station_id
+                tfk.config,
+                i_dec_level,
+                run_obj,
+                run_xrds,
+                units,
             )
             # Pack FCs into h5
             save_fourier_coefficients(

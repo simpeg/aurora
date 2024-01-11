@@ -46,7 +46,9 @@ def validate_bulk_spectra_have_correct_units(run_obj, run_ts_obj, show_spectra=F
         num_samples_overlap=0,
         sample_rate=run_ts_obj.sample_rate,  # 40.0 sps
     )
-    windowed_obj = windowing_scheme.apply_sliding_window(run_ts_obj.dataset)
+    windowed_obj = windowing_scheme.apply_sliding_window(
+        run_ts_obj.dataset, dt=1.0 / run_ts_obj.sample_rate
+    )
     tapered_obj = windowing_scheme.apply_taper(windowed_obj)
 
     fft_obj = windowing_scheme.apply_fft(tapered_obj)
@@ -58,7 +60,7 @@ def validate_bulk_spectra_have_correct_units(run_obj, run_ts_obj, show_spectra=F
         figures_path=PARKFIELD_PATHS["aurora_results"],
         show_response_curves=show_response_curves,
         show_spectra=show_spectra,
-        include_decimation=True,
+        include_decimation=False,
     )
     return
 

@@ -5,11 +5,9 @@ see Notes in RME, RME_RR
 import numpy as np
 import xarray as xr
 
-from copy import deepcopy
-from scipy.linalg import solve_triangular
-
 from aurora.transfer_function.regression.base import RegressionEstimator
 from aurora.transfer_function.regression.helper_functions import rme_beta
+from copy import deepcopy
 from loguru import logger
 
 
@@ -63,7 +61,9 @@ class MEstimator(RegressionEstimator):
         raise Exception
 
     def update_residual_variance(self, correction_factor=1):
-        logger.error("update_residual_variance method not defined in abstract MEstimator")
+        logger.error(
+            "update_residual_variance method not defined in abstract MEstimator"
+        )
         logger.error("Try using RME or RME_RR class instead")
         raise Exception
 
@@ -144,7 +144,9 @@ class MEstimator(RegressionEstimator):
         except AssertionError:
             logger.warning("WARNING - Negative error variances observed")
             logger.warning(residual_variance)
-            logger.warning("Setting residual_variance to zero - Negative values observed")
+            logger.warning(
+                "Setting residual_variance to zero - Negative values observed"
+            )
             residual_variance *= 0
 
         return residual_variance
@@ -319,7 +321,7 @@ class MEstimator(RegressionEstimator):
         """
         res_clean = self.Yc - self.Y_hat
         SSR_clean = np.conj(res_clean.conj().T @ res_clean)
-        inv_psi_prime2 = np.diag(1.0 / (self.expectation_psi_prime ** 2))
+        inv_psi_prime2 = np.diag(1.0 / (self.expectation_psi_prime**2))
         cov_nn = inv_psi_prime2 @ SSR_clean / self.degrees_of_freedom
 
         self.cov_nn = xr.DataArray(

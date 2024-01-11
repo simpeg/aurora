@@ -42,7 +42,7 @@ def make_pkdsao_mth5(fdsn_dataset):
     h5_path = create_from_server_multistation(
         fdsn_dataset,
         target_folder=PARKFIELD_PATHS["data"],
-        triage_units="V/m to mV/km",
+        triage_units=["V/m to mV/km", "T to nT"],
     )
 
     for station in fdsn_dataset.station.split(","):
@@ -73,7 +73,7 @@ def ensure_h5_exists():
 
 
 def main():
-    make_pkdsao_mth5()
+    make_pkdsao_mth5(FDSN_DATASET)
 
 
 if __name__ == "__main__":

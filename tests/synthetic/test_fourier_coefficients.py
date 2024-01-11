@@ -114,6 +114,11 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
 
     def test_decimation_and_stft_config_creator(self):
         cfgs = decimation_and_stft_config_creator(1.0)
+
+        # test time period must of of type
+        with self.assertRaises(NotImplementedError):
+            time_period = ["2023-01-01T17:48:59", "2023-01-09T08:54:08"]
+            decimation_and_stft_config_creator(1.0, time_period=time_period)
         return cfgs
 
     def test_create_then_use_stored_fcs_for_processing(self):
@@ -122,15 +127,17 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
 
         z_file_path_1 = AURORA_RESULTS_PATH.joinpath("test2.zss")
         z_file_path_2 = AURORA_RESULTS_PATH.joinpath("test2_from_stored_fc.zss")
-        tf1 = process_synthetic_2(force_make_mth5=True, z_file_path=z_file_path_1)
+        tf1 = process_synthetic_2(
+            force_make_mth5=True, z_file_path=z_file_path_1, save_fc=True
+        )
         tf2 = process_synthetic_2(force_make_mth5=False, z_file_path=z_file_path_2)
         assert tf1 == tf2
 
 
 def main():
     # test_case = TestAddFourierCoefficientsToSyntheticData()
-    # test_case.test_create_then_use_stored_fcs_for_processing()
     # test_case.setUpClass()
+    # test_case.test_create_then_use_stored_fcs_for_processing()
     # test_case.test_123()
     # test_case.test_decimation_and_stft_config_creator()
     # print("se funciona!")

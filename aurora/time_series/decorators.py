@@ -7,7 +7,6 @@
 |        value = func\*args, \*\*kwargs)
 |        # Do something after
 |        return value
-|
 |    return wrapper_decorator
 """
 
@@ -22,7 +21,7 @@ def can_use_xr_dataarray(func):
     to pass them xarray.DataArray objects.  This class casts a DataArray to a
     Dataset, runs it through func and casts back to a DataArray.
 
-    A simuilar decorator should be written for numpy arrays.
+    A similar decorator could be written for numpy arrays.
     Parameters
     ----------
     func

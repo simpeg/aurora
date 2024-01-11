@@ -85,7 +85,10 @@ def aurora_vs_emtf(
 
     aux_data = read_z_file(auxilliary_z_file)
     aurora_rho_phi = merge_tf_collection_to_match_z_file(aux_data, tf_collection)
-
+    data_dict = {}
+    data_dict["period"] = aux_data.periods
+    data_dict["emtf_rho_xy"] = aux_data.rxy
+    data_dict["emtf_phi_xy"] = aux_data.pxy
     for xy_or_yx in ["xy", "yx"]:
         aurora_rho = aurora_rho_phi["rho"][xy_or_yx]
         aurora_phi = aurora_rho_phi["phi"][xy_or_yx]
@@ -95,7 +98,8 @@ def aurora_vs_emtf(
             aurora_rho, aurora_phi, verbose=True
         )
         rho_rms_emtf, phi_rms_emtf = compute_rms(aux_rho, aux_phi)
-
+        data_dict["aurora_rho_xy"] = aurora_rho
+        data_dict["aurora_phi_xy"] = aurora_phi
         if expected_rms_misfit is not None:
             assert_rms_misfit_ok(
                 expected_rms_misfit, xy_or_yx, rho_rms_aurora, phi_rms_aurora
@@ -207,6 +211,16 @@ def test_pipeline(merged=True):
 
     tfk_dataset = KernelDataset()
     tfk_dataset.from_run_summary(run_summary, "test2", "test1")
+    # Uncomment to sanity check the problem is linear
+    # scale_factors = {
+    #     "ex": 20.0,
+    #     "ey": 20.0,
+    #     "hx": 20.0,
+    #     "hy": 20.0,
+    #     "hz": 20.0,
+    # }
+    # tfk_dataset.df["channel_scale_factors"].at[0] = scale_factors
+    # tfk_dataset.df["channel_scale_factors"].at[1] = scale_factors
     run_test2r1(tfk_dataset)
 
 

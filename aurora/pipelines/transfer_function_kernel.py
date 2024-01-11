@@ -2,8 +2,6 @@ import numpy as np
 import pandas as pd
 import psutil
 
-from loguru import logger
-
 from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.time_series_helpers import prototype_decimate
 from mth5.utils.exceptions import MTH5Error
@@ -318,11 +316,11 @@ class TransferFunctionKernel(object):
         for group, df in grouper:
             try:
                 try:
-                    assert (
-                        df.dec_level.diff()[1:] == 1
-                    ).all()  # dec levels increment by 1
+                    cond = (df.dec_level.diff()[1:] == 1).all()
+                    assert cond  # dec levels increment by 1
                 except AssertionError:
-                    logger.info(f"Skipping {group} because decimation levels are messy.")
+                    msg = f"Skipping {group} because decimation levels are messy."
+                    logger.info(msg)
                     continue
                 assert df.dec_factor.iloc[0] == 1
                 assert df.dec_level.iloc[0] == 0
@@ -396,12 +394,14 @@ class TransferFunctionKernel(object):
         1. The default estimation engine from the json file is "RME_RR", which is fine (
         we expect to in general to do more RR processing than SS) but if there is only
         one station (no remote)then the RME_RR should be replaced by default with "RME".
+        - also if there is only one station, set reference channels to []
 
         2. make sure local station id is defined (correctly from kernel dataset)
         """
 
         # Make sure a RR method is not being called for a SS config
         if not self.config.stations.remote:
+            self.config.drop_reference_channels()
             for decimation in self.config.decimations:
                 if decimation.estimator.engine == "RME_RR":
                     logger.info("No RR station specified, switching RME_RR to RME")
