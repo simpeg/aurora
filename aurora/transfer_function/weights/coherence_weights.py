@@ -88,33 +88,23 @@ def jackknife_coherence_weights(
         f"removing 'best' {n_obs - n_clip_high} of {n_obs} via jackknife coherence"
     )
 
-    # Initialize a weight vector the length = num_observations
-    partial_coh = np.zeros(n_obs)
-    W = np.zeros(n_obs)  # for example
-
     c_xy = np.abs(x.conj() * y)
     c_xx = np.real(x.conj() * x)
     c_yy = np.real(y.conj() * y)
 
-    # "Jackknife" matrix; all ones but zero on the diagonal
-    J = np.ones((n_obs, n_obs)) - np.eye(n_obs)
-    ccc = np.vstack([c_xy, c_xx, c_yy])
-
-    for i in range(n_obs):
-        partial_series = drop_column(ccc, i)
-        partial_coh[i] = coherence_from_fc_series(
-            partial_series[0, :],
-            partial_series[1, :],
-            partial_series[2, :],
-        )
-
+    # "Jackknife" matrix; all ones but zero on the dia may need some memory checks and a lazy approach with hdf5
+    # J = np.ones((n_obs, n_obs)) - np.eye(n_obs)
+    J = np.ones((n_obs, n_obs), dtype=np.int8) - np.eye(n_obs, dtype=np.int8)
     p_xx = J @ c_xx.data
     p_xy = J @ c_xy.data
     p_yy = J @ c_yy.data
-    pc = p_xy**2 / (p_xx * p_yy)
-    assert np.isclose(pc, partial_coh).all()
+    p_xy**2 / (p_xx * p_yy)
+    partial_coh = p_xy**2 / (p_xx * p_yy)
+
     worst_to_best = np.argsort(partial_coh)
     keepers = worst_to_best[n_clip_low:n_clip_high]
+    # Initialize a weight vector the length = num_observations
+    W = np.zeros(n_obs)  # for example
     W[keepers] = 1
     return W
 
