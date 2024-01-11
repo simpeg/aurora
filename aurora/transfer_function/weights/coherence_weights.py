@@ -37,10 +37,10 @@ def drop_column(x, i_col):
 
 
 def coherence_from_fc_series(c_xy, c_xx, c_yy):
-    n_obs = len(c_xy)
+    # n_obs = len(c_xy)
     num = np.sum(c_xy) ** 2
-    den = np.sum(c_xx * c_yy)
-    coh = (num / den) / n_obs
+    den = np.sum(c_xx) * np.sum(c_yy)
+    coh = num / den
     return coh
 
 
@@ -48,6 +48,7 @@ def jackknife_coherence_weights(
     x, y, lower_quantile_cutoff=0.3, upper_quantile_cutoff=0.95
 ):  # 975):#0.98
     """
+
     Note 1: Extremely high coherence can be due to noise
     Consider ways to pre-filter those events before this is called.
     - That may need a min_fraction_to_keep=0.2-0.8, which guards against
@@ -56,6 +57,16 @@ def jackknife_coherence_weights(
     near perfect coherency can be expected when coherent noise is present
     - 95% seems extreme for a threshold, maybe not yielding enogh
     observations for robust statistics.
+
+    Note2: 2024-09-10: vectorization
+    Instead of repeatedly dropping 1 value from Cxy, Cxx, Cyy, we could try the following:
+    Make a "Jackknife" matrix J that is all ones but zero on the diagonal
+    Then we can just take the inner product of the crosspower with the nth row of J to
+    get the sum of all cross-powers but the nth... or multiply the crosspower vector J
+    to get the partial sums of all crosspowers except the nth element.
+    First of all, we will follow the convention of Bendat & Perisol (1980):
+    "The two-sided spectral density function between two random processes is defined
+    using X*Y and _not_ XY*.
 
 
     Parameters
@@ -81,10 +92,12 @@ def jackknife_coherence_weights(
     partial_coh = np.zeros(n_obs)
     W = np.zeros(n_obs)  # for example
 
-    c_xy = np.abs(x * np.conj(y))
-    c_xx = np.real(x * np.conj(x))
-    c_yy = np.real(y * np.conj(y))
+    c_xy = np.abs(x.conj() * y)
+    c_xx = np.real(x.conj() * x)
+    c_yy = np.real(y.conj() * y)
 
+    # "Jackknife" matrix; all ones but zero on the diagonal
+    J = np.ones((n_obs, n_obs)) - np.eye(n_obs)
     ccc = np.vstack([c_xy, c_xx, c_yy])
 
     for i in range(n_obs):
@@ -95,6 +108,11 @@ def jackknife_coherence_weights(
             partial_series[2, :],
         )
 
+    p_xx = J @ c_xx.data
+    p_xy = J @ c_xy.data
+    p_yy = J @ c_yy.data
+    pc = p_xy**2 / (p_xx * p_yy)
+    assert np.isclose(pc, partial_coh).all()
     worst_to_best = np.argsort(partial_coh)
     keepers = worst_to_best[n_clip_low:n_clip_high]
     W[keepers] = 1
