@@ -28,7 +28,9 @@ def get_band_for_tf_estimate(band, dec_level_config, local_stft_obj, remote_stft
         reference_channels and also the frequency axes are restricted to
         being within the frequency band given as an input argument.
     """
-    logger.info(f"Processing band {band.center_period:.6f}s")
+    logger.info(
+        f"Processing band {band.center_period:.6f}s  ({1./band.center_period:.6f}Hz)"
+    )
     band_dataset = extract_band(band, local_stft_obj)
     X = band_dataset[dec_level_config.input_channels]
     Y = band_dataset[dec_level_config.output_channels]

@@ -211,6 +211,16 @@ def test_pipeline(merged=True):
 
     tfk_dataset = KernelDataset()
     tfk_dataset.from_run_summary(run_summary, "test2", "test1")
+    # Uncomment to sanity check the problem is linear
+    # scale_factors = {
+    #     "ex": 20.0,
+    #     "ey": 20.0,
+    #     "hx": 20.0,
+    #     "hy": 20.0,
+    #     "hz": 20.0,
+    # }
+    # tfk_dataset.df["channel_scale_factors"].at[0] = scale_factors
+    # tfk_dataset.df["channel_scale_factors"].at[1] = scale_factors
     run_test2r1(tfk_dataset)
 
 

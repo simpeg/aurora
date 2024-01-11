@@ -5,13 +5,14 @@ https://docs.google.com/document/d/1CsRhSLXsRG8HQxM4lKNqVj-V9KA9iUQAvCOtouVzFs0/
 
 """
 import numpy as np
-from numpy.lib.stride_tricks import as_strided
-from numba import jit
 import time
+
 from loguru import logger
+from numba import jit
+from numpy.lib.stride_tricks import as_strided
 
 
-# Window-to-timeseries relationshp
+# Window-to-timeseries relationship
 def available_number_of_windows_in_array(n_samples_array, n_samples_window, n_advance):
     """
 

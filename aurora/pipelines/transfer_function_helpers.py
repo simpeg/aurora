@@ -96,6 +96,7 @@ def process_transfer_functions(
     transfer_function_obj,
     segment_weights=None,
     channel_weights=None,
+    #    use_multiple_coherence_weights=False,
 ):
     """
     This method based on TTFestBand.m
@@ -127,10 +128,12 @@ def process_transfer_functions(
     -------
 
     """
-    # PUT COHERENCE SORTING HERE IF WIDE BAND?
     estimator_class = get_estimator_class(dec_level_config.estimator.engine)
+    iter_control = set_up_iter_control(dec_level_config)
     for band in transfer_function_obj.frequency_bands.bands():
-        iter_control = set_up_iter_control(dec_level_config)
+        # if use_multiple_coherence_weights:
+        #     from aurora.transfer_function.weights.coherence_weights import compute_multiple_coherence_weights
+        #     Wmc = compute_multiple_coherence_weights(band, local_stft_obj, remote_stft_obj)
         X, Y, RR = get_band_for_tf_estimate(
             band, dec_level_config, local_stft_obj, remote_stft_obj
         )
@@ -143,6 +146,8 @@ def process_transfer_functions(
             RR = RR.stack(observation=("frequency", "time"))
 
         W = effective_degrees_of_freedom_weights(X, RR, edf_obj=None)
+        # if use_multiple_coherence_weights:
+        #     W *= Wmc
         W[W == 0] = np.nan  # use this to drop values in the handle_nan
         # apply weights
         X *= W

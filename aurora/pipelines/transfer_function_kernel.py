@@ -316,13 +316,11 @@ class TransferFunctionKernel(object):
         for group, df in grouper:
             try:
                 try:
-                    assert (
-                        df.dec_level.diff()[1:] == 1
-                    ).all()  # dec levels increment by 1
+                    cond = (df.dec_level.diff()[1:] == 1).all()
+                    assert cond  # dec levels increment by 1
                 except AssertionError:
-                    logger.info(
-                        f"Skipping {group} because decimation levels are messy."
-                    )
+                    msg = f"Skipping {group} because decimation levels are messy."
+                    logger.info(msg)
                     continue
                 assert df.dec_factor.iloc[0] == 1
                 assert df.dec_level.iloc[0] == 0
