@@ -233,12 +233,13 @@ def load_stft_obj_from_mth5(i_dec_level, row, run_obj):
     return stft_obj
 
 
-def save_fourier_coefficients(dec_level_config, i_dec_level, row, run_obj, stft_obj):
+def save_fourier_coefficients(dec_level_config, row, run_obj, stft_obj):
     if not dec_level_config.save_fcs:
         msg = "Skip saving FCs. dec_level_config.save_fc = "
         msg = f"{msg} {dec_level_config.save_fcs}"
-        logger.info(f"{msg} {dec_level_config.save_fcs}")
+        logger.info(f"{msg}")
         return
+    i_dec_level = dec_level_config.decimation.level
     if dec_level_config.save_fcs_type == "csv":
         msg = "Unless debugging or testing, saving FCs to csv unexpected"
         logger.warning(msg)
@@ -248,9 +249,9 @@ def save_fourier_coefficients(dec_level_config, i_dec_level, row, run_obj, stft_
     elif dec_level_config.save_fcs_type == "h5":
         station_obj = station_obj_from_row(row)
 
-        # See Note #1 at top this method (not module)
         if not row.mth5_obj.h5_is_write():
-            raise NotImplementedError("See Note #1 at top this method")
+            msg = "See Note #1: Logic for building FC layers"
+            raise NotImplementedError(msg)
         fc_group = station_obj.fourier_coefficients_group.add_fc_group(
             run_obj.metadata.id
         )
@@ -371,9 +372,7 @@ def process_mth5(
                 units,
             )
             # Pack FCs into h5
-            save_fourier_coefficients(
-                dec_level_config, i_dec_level, row, run_obj, stft_obj
-            )
+            save_fourier_coefficients(dec_level_config, row, run_obj, stft_obj)
 
             stfts = append_chunk_to_stfts(stfts, stft_obj, row.remote)
 
