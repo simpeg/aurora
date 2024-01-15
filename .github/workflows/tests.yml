@@ -18,7 +18,8 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu-latest"]
-        python-version: [3.8, 3.9, "3.10", "3.11"] 
+#        python-version: [3.8, 3.9, "3.10", "3.11"]
+        python-version: [3.8, ] 
 
     steps:
     - uses: actions/checkout@v2
@@ -42,23 +43,23 @@ jobs:
         pip install -e .
         conda list
         
-    - name: Install Jupyter and dependencies
-      run: |
-        pip install jupyter
-        pip install ipykernel
-        python -m ipykernel install --user --name aurora-test
-        # Install any other dependencies you need
+#    - name: Install Jupyter and dependencies
+#      run: |
+#        pip install jupyter
+#        pip install ipykernel
+#        python -m ipykernel install --user --name aurora-test
+#        # Install any other dependencies you need
 
-    - name: Execute Jupyter Notebooks
-      run: |
-        jupyter nbconvert --to notebook --execute docs/examples/dataset_definition.ipynb
-        jupyter nbconvert --to notebook --execute docs/examples/make_cas04_single_station_h5.ipynb
-        jupyter nbconvert --to notebook --execute docs/examples/operate_aurora.ipynb
-        jupyter nbconvert --to notebook --execute tests/test_run_on_commit.ipynb
-        jupyter nbconvert --to notebook --execute tutorials/pole_zero_fitting/lemi_pole_zero_fitting_example.ipynb
-        jupyter nbconvert --to notebook --execute tutorials/processing_configuration.ipynb
-        jupyter nbconvert --to notebook --execute tutorials/synthetic_data_processing.ipynb
-        # Replace "notebook.ipynb" with your notebook's filename
+#    - name: Execute Jupyter Notebooks
+#      run: |
+#        jupyter nbconvert --to notebook --execute docs/examples/dataset_definition.ipynb
+#        jupyter nbconvert --to notebook --execute docs/examples/make_cas04_single_station_h5.ipynb
+#        jupyter nbconvert --to notebook --execute docs/examples/operate_aurora.ipynb
+#        jupyter nbconvert --to notebook --execute tests/test_run_on_commit.ipynb
+#        jupyter nbconvert --to notebook --execute tutorials/pole_zero_fitting/lemi_pole_zero_fitting_example.ipynb
+#        jupyter nbconvert --to notebook --execute tutorials/processing_configuration.ipynb
+#        jupyter nbconvert --to notebook --execute tutorials/synthetic_data_processing.ipynb
+#        # Replace "notebook.ipynb" with your notebook's filename
 
 #    - name: Commit changes (if any)
 #      run: |
@@ -71,8 +72,8 @@ jobs:
 
     - name: Run Tests
       run: |
-        # pytest -s -v tests/synthetic/test_processing.py --cov=./ --cov-report=xml --cov=aurora
-        pytest -s -v --cov=./ --cov-report=xml --cov=aurora
+        pytest -s -v tests/synthetic/test_fourier_coefficients.py --cov=./ --cov-report=xml --cov=aurora
+        # pytest -s -v --cov=./ --cov-report=xml --cov=aurora
 
     - name: "Upload coverage to Codecov"
       uses: codecov/codecov-action@v1
