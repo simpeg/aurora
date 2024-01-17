@@ -136,7 +136,7 @@ def decimation_and_stft_config_creator(
 
 
 @path_or_mth5_object
-def add_fcs_to_mth5(m, decimation_and_stft_configs=None):
+def add_fcs_to_mth5(m, fc_configs=None):
     """
     usssr_grouper: output of a groupby on unique {survey, station, sample_rate} tuples
 
@@ -161,10 +161,10 @@ def add_fcs_to_mth5(m, decimation_and_stft_configs=None):
         run_summary = station_obj.run_summary
 
         # Get the FC schemes
-        if not decimation_and_stft_configs:
+        if not fc_configs:
             msg = "FC config not supplied, using default, creating on the fly"
             logger.info(f"{msg}")
-            decimation_and_stft_configs = decimation_and_stft_config_creator(
+            fc_configs = decimation_and_stft_config_creator(
                 sample_rate, time_period=None
             )
 
@@ -179,12 +179,12 @@ def add_fcs_to_mth5(m, decimation_and_stft_configs=None):
             run_obj = m.from_reference(run_row.hdf5_reference)
 
             # Set the time period:
-            for decimation_and_stft_config in decimation_and_stft_configs:
-                decimation_and_stft_config.time_period = run_obj.metadata.time_period
+            for fc_config in fc_configs:
+                fc_config.time_period = run_obj.metadata.time_period
 
             runts = run_obj.to_runts(
-                start=decimation_and_stft_config.time_period.start,
-                end=decimation_and_stft_config.time_period.end,
+                start=fc_config.time_period.start,
+                end=fc_config.time_period.end,
             )
             # runts = run_obj.to_runts() # skip setting time_period explcitly
 
@@ -196,14 +196,12 @@ def add_fcs_to_mth5(m, decimation_and_stft_configs=None):
 
             print(" TIMING CORRECTIONS WOULD GO HERE ")
 
-            for i_dec_level, decimation_stft_obj in enumerate(
-                decimation_and_stft_configs
-            ):
+            for i_dec_level, fc_config in enumerate(fc_configs):
                 if i_dec_level != 0:
                     # Apply decimation
-                    run_xrds = prototype_decimate(decimation_stft_obj, run_xrds)
-                logger.debug(f"type decimation_stft_obj = {type(decimation_stft_obj)}")
-                if not decimation_stft_obj.is_valid_for_time_series_length(
+                    run_xrds = prototype_decimate(fc_config, run_xrds)
+                logger.debug(f"type fc_config = {type(fc_config)}")
+                if not fc_config.is_valid_for_time_series_length(
                     run_xrds.time.shape[0]
                 ):
                     logger.info(
@@ -211,11 +209,14 @@ def add_fcs_to_mth5(m, decimation_and_stft_configs=None):
                     )
                     continue
 
-                stft_obj = run_ts_to_stft_scipy(decimation_stft_obj, run_xrds)
+                stft_obj = run_ts_to_stft_scipy(fc_config, run_xrds)
                 stft_obj = calibrate_stft_obj(stft_obj, run_obj)
 
                 # Pack FCs into h5 and update metadata
-                decimation_level = fc_group.add_decimation_level(f"{i_dec_level}")
+
+                decimation_level = fc_group.add_decimation_level(
+                    f"{i_dec_level}", decimation_level_metadata=fc_config
+                )
                 decimation_level.from_xarray(stft_obj)
                 decimation_level.update_metadata()
                 fc_group.update_metadata()

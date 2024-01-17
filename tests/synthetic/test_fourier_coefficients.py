@@ -104,7 +104,7 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
             fc_decimations = [
                 x.to_fc_decimation() for x in processing_config.decimations
             ]
-            add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=fc_decimations)
+            add_fcs_to_mth5(mth5_path, fc_configs=fc_decimations)
             read_back_fcs(mth5_path)
 
             # Confirm the file still processes fine with the fcs inside
