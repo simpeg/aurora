@@ -316,6 +316,8 @@ def process_mth5(
     tfk.make_processing_summary()
     tfk.show_processing_summary()
     tfk.validate()
+    tfk.check_if_fc_levels_already_exist()
+    # Check if FC Levels Exist Then Initialize mth5s
 
     # See Note #1
     if tfk.config.decimations[0].save_fcs:
@@ -323,20 +325,12 @@ def process_mth5(
     else:
         mth5_mode = "r"
     tfk.initialize_mth5s(mode=mth5_mode)
-    try:
-        tfk.check_if_fc_levels_already_exist()  # populate the "fc" column of dataset_df
-        msg = f"fc_levels_already_exist = {tfk.dataset_df['fc'].iloc[0]}"
-        logger.info(msg)
-        msg = (
-            f"Processing config indicates {len(tfk.config.decimations)} "
-            f"decimation levels"
-        )
-        logger.info(msg)
-    except:
-        msg = "WARNING -- Unable to execute check for FC Levels"
-        msg = f"{msg} Possibly FCs not present at all (file from old MTH5 version)?"
-        logger.warning(msg)
 
+    msg = (
+        f"Processing config indicates {len(tfk.config.decimations)} "
+        f"decimation levels"
+    )
+    logger.info(msg)
     tf_dict = {}
 
     for i_dec_level, dec_level_config in enumerate(tfk.valid_decimations()):
