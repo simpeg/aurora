@@ -181,7 +181,7 @@ class KernelDataset:
             raise ValueError(msg)
         else:
             self._add_duration_column()
-        self.df["fc"] = False
+        self.df["fc"] = None
 
     @property
     def mini_summary(self):

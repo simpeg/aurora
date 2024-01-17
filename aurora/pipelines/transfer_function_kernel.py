@@ -57,7 +57,7 @@ class TransferFunctionKernel(object):
             self.initialize_mth5s()
         return self._mth5_objs
 
-    def initialize_mth5s(self, mode="r"):
+    def initialize_mth5s(self):
         """
         returns a dict of open mth5 objects, keyed by station_id
 
@@ -70,7 +70,7 @@ class TransferFunctionKernel(object):
             local station id : mth5.mth5.MTH5
             remote station id: mth5.mth5.MTH5
         """
-
+        mode = self.get_mth5_file_open_mode()
         local_mth5_obj = initialize_mth5(
             self.config.stations.local.mth5_path, mode=mode
         )
@@ -149,7 +149,17 @@ class TransferFunctionKernel(object):
             dec_level_config.window.clock_zero = str(self.dataset_df.start.min())
         return dec_level_config
 
-    def check_if_fc_levels_already_exist(self):
+    @property
+    def all_fcs_already_exist(self):
+        if self.kernel_dataset.df["fc"].isna().any():
+            self.check_if_fcs_already_exist()
+
+        # these should all be booleans now
+        assert not self.kernel_dataset.df["fc"].isna().any()
+
+        return self.kernel_dataset.df.fc.all()
+
+    def check_if_fcs_already_exist(self):
         """
         Fills out the "fc" column of dataset dataframe with True/False.
 
@@ -374,7 +384,8 @@ class TransferFunctionKernel(object):
         self.validate_processing()
         self.validate_decimation_scheme_and_dataset_compatability()
         if self.memory_warning():
-            raise Exception
+            raise Exception("Job requires too much memory")
+        self.validate_save_fc_settings()
 
     def valid_decimations(self):
         """
@@ -392,6 +403,22 @@ class TransferFunctionKernel(object):
         msg = f"After validation there are {len(dec_levels)} valid decimation levels"
         logger.info(msg)
         return dec_levels
+
+    def validate_save_fc_settings(self):
+        if self.all_fcs_already_exist:
+            msg = "FC Layer already exists -- forcing processing config save_fcs=False"
+            logger.info(msg)
+            for dec_level_config in self.config.decimations:
+                # if dec_level_config.save_fcs:
+                dec_level_config.save_fcs = False
+
+    def get_mth5_file_open_mode(self):
+        if self.all_fcs_already_exist:
+            return "r"
+        elif self.config.decimations[0].save_fcs:
+            return "a"
+        else:
+            return "r"
 
     def is_valid_dataset(self, row, i_dec):
         """

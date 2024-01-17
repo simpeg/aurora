@@ -235,6 +235,27 @@ def load_stft_obj_from_mth5(i_dec_level, row, run_obj):
 
 
 def save_fourier_coefficients(dec_level_config, row, run_obj, stft_obj):
+    """
+
+
+    Note #1: Logic for building FC layers:
+    If the processing config decimation_level.save_fcs_type = "h5" and fc_levels_already_exist is False, then open
+    in append mode, else open in read mode.  We should support a flag: force_rebuild_fcs, normally False.  This flag
+    is only needed when save_fcs_type=="h5".  If True, then we open in append mode, regarless of fc_levels_already_exist
+    The task of setting mode="a", mode="r" can be handled by tfk (maybe in tfk.validate())
+
+    Parameters
+    ----------
+    dec_level_config
+    row
+    run_obj
+    stft_obj
+
+    Returns
+    -------
+
+    """
+
     if not dec_level_config.save_fcs:
         msg = "Skip saving FCs. dec_level_config.save_fc = "
         msg = f"{msg} {dec_level_config.save_fcs}"
@@ -279,13 +300,6 @@ def process_mth5(
     This is the main method used to transform a processing_config,
     and a kernel_dataset into a transfer function estimate.
 
-    Note 1: Logic for building FC layers:
-    If the processing config decimation_level.save_fcs_type = "h5" and fc_levels_already_exist is False, then open
-    in append mode, else open in read mode.  We should support a flag: force_rebuild_fcs, normally False.  This flag
-    is only needed when save_fcs_type=="h5".  If True, then we open in append mode, regarless of fc_levels_already_exist
-    The task of setting mode="a", mode="r" can be handled by tfk (maybe in tfk.validate())
-
-
     Parameters
     ----------
     config: mt_metadata.transfer_functions.processing.aurora.Processing or path to json
@@ -316,15 +330,8 @@ def process_mth5(
     tfk.make_processing_summary()
     tfk.show_processing_summary()
     tfk.validate()
-    tfk.check_if_fc_levels_already_exist()
-    # Check if FC Levels Exist Then Initialize mth5s
 
-    # See Note #1
-    if tfk.config.decimations[0].save_fcs:
-        mth5_mode = "a"
-    else:
-        mth5_mode = "r"
-    tfk.initialize_mth5s(mode=mth5_mode)
+    tfk.initialize_mth5s()
 
     msg = (
         f"Processing config indicates {len(tfk.config.decimations)} "
@@ -334,6 +341,7 @@ def process_mth5(
     tf_dict = {}
 
     for i_dec_level, dec_level_config in enumerate(tfk.valid_decimations()):
+        # if not tfk.all_fcs_already_exist():
         tfk.update_dataset_df(i_dec_level)
         dec_level_config = tfk.apply_clock_zero(dec_level_config)
 
