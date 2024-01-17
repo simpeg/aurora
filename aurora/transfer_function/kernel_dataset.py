@@ -449,10 +449,9 @@ class KernelDataset:
         run_obj = row.mth5_obj.from_reference(row.run_reference)
         return run_obj
 
-    def close_mths_objs(self):
+    def close_mth5s(self):
         """
-        Loop over all unique mth5_objs in the df and make sure they are closed
-
+        Loop over all unique mth5_objs in dataset df and make sure they are closed.+
         """
         mth5_objs = self.df["mth5_obj"].unique()
         for mth5_obj in mth5_objs:

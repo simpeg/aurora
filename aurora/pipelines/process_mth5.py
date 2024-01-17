@@ -148,6 +148,7 @@ def process_tf_decimation_level(
     frequency_bands = config.decimations[i_dec_level].frequency_bands_obj()
     transfer_function_obj = TTFZ(i_dec_level, frequency_bands, processing_config=config)
     dec_level_config = config.decimations[i_dec_level]
+    # segment_weights = coherence_weights(dec_level_config, local_stft_obj, remote_stft_obj)
     transfer_function_obj = process_transfer_functions(
         dec_level_config, local_stft_obj, remote_stft_obj, transfer_function_obj
     )
@@ -315,6 +316,7 @@ def process_mth5(
     tfk.make_processing_summary()
     tfk.show_processing_summary()
     tfk.validate()
+
     # See Note #1
     if tfk.config.decimations[0].save_fcs:
         mth5_mode = "a"
@@ -404,7 +406,7 @@ def process_mth5(
     if z_file_path:
         tf_cls.write(z_file_path)
 
-    tfk.dataset.close_mths_objs()
+    tfk.dataset.close_mth5s()
     if return_collection:
         # this is now really only to be used for debugging and may be deprecated soon
         return tf_collection
