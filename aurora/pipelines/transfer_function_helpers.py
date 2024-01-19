@@ -90,7 +90,7 @@ def select_channel(xrda, channel_label):
     return ch
 
 
-def dropna(X, Y, RR):
+def drop_nans(X, Y, RR):
     """
     Just a helper intended to enhance readability
     TODO: document the implications of dropna on index of xarray for other weights
@@ -121,7 +121,7 @@ def apply_weights(X, Y, RR, W, segment=False, dropna=False):
         RR *= W
 
     if dropna:
-        X, Y, RR = dropna(X, Y, RR)
+        X, Y, RR = drop_nans(X, Y, RR)
 
     return X, Y, RR
 
@@ -195,7 +195,7 @@ def process_transfer_functions(
         X, Y, RR = stack_fcs(X, Y, RR)
 
         # Should only be needed if weights were applied
-        X, Y, RR = dropna(X, Y, RR)
+        X, Y, RR = drop_nans(X, Y, RR)
 
         W = effective_degrees_of_freedom_weights(X, RR, edf_obj=None)
         X, Y, RR = apply_weights(X, Y, RR, W, segment=False, dropna=True)
