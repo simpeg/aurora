@@ -1,3 +1,8 @@
+"""
+Note #1: repeatedly applying edf_weights seems to have no effect at all.
+tested 20240118 and found that test_compare in synthetic passed whether this was commented
+or not.  TODO confirm this is a one-and-done add doc about why this is so.
+"""
 import numpy as np
 
 from aurora.time_series.frequency_band_helpers import get_band_for_tf_estimate
@@ -206,8 +211,10 @@ def process_transfer_functions(
 
                 X_, Y_, RR_ = handle_nan(X, Y_ch, RR, drop_dim="observation")
 
-                W = effective_degrees_of_freedom_weights(X_, RR_, edf_obj=None)
-                X_, Y_, RR_ = apply_weights(X_, Y_, RR_, W, segment=False)
+                # see note #1
+                # if RR is not None:
+                #     W = effective_degrees_of_freedom_weights(X_, RR_, edf_obj=None)
+                #     X_, Y_, RR_ = apply_weights(X_, Y_, RR_, W, segment=False)
 
                 regression_estimator = estimator_class(
                     X=X_, Y=Y_, Z=RR_, iter_control=iter_control
