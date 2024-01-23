@@ -217,7 +217,9 @@ def add_fcs_to_mth5(m, fc_configs=None):
                 decimation_level = fc_group.add_decimation_level(
                     f"{i_dec_level}", decimation_level_metadata=fc_config
                 )
-                decimation_level.from_xarray(stft_obj)
+                decimation_level.from_xarray(
+                    stft_obj, decimation_level.metadata.sample_rate_decimation
+                )
                 decimation_level.update_metadata()
                 fc_group.update_metadata()
     return
