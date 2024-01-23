@@ -108,7 +108,26 @@ def drop_nans(X, Y, RR):
 
 
 def stack_fcs(X, Y, RR):
-    """Reshape 2D arrays of frequency and time to 1D"""
+    """
+    Reshape 2D arrays of frequency and time to 1D
+
+    Context:
+    When the data for a frequency band are extracted from the Spectrogram, each channel
+    is a 2D array, one axis is time (the time of the window that was FFT-ed) and the
+    other axis is frequency.  However if we make no distinction between the harmonics
+    (bins) within a band in regression, then all the FCs for each channel can be
+    put into a 1D array.  This method performs that reshaping (ravelling) operation.
+    **It is not important how we unravel the FCs but it is important that
+    we use the same scheme for X and Y.
+
+    TODO: Make this take a list and return a list rather than X,Y,RR
+    TODO: Decorate this with @dataset_or_dataarray
+        if isinstance(X, xr.Dataset):
+        tmp = X.to_array("channel")
+        tmp = tmp.stack()
+        or similar
+
+    """
     X = X.stack(observation=("frequency", "time"))
     Y = Y.stack(observation=("frequency", "time"))
     if RR is not None:
