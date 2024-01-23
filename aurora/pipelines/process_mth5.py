@@ -269,6 +269,7 @@ def save_fourier_coefficients(dec_level_config, row, run_obj, stft_obj):
         stft_df = stft_obj.to_dataframe()
         stft_df.to_csv(csv_name)
     elif dec_level_config.save_fcs_type == "h5":
+        logger.info(("Saving FC level"))
         station_obj = station_obj_from_row(row)
 
         if not row.mth5_obj.h5_is_write():
@@ -282,7 +283,7 @@ def save_fourier_coefficients(dec_level_config, row, run_obj, stft_obj):
             f"{i_dec_level}",
             decimation_level_metadata=decimation_level_metadata,
         )
-        fc_decimation_level.from_xarray(stft_obj)
+        fc_decimation_level.from_xarray(stft_obj, decimation_level_metadata.sample_rate)
         fc_decimation_level.update_metadata()
         fc_group.update_metadata()
     return
