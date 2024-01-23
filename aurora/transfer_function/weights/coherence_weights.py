@@ -132,114 +132,6 @@ def jackknife_coherence_weights(
     return W
 
 
-# def coherence_weights_jj84(X, Y, RR, coh_type="local"):
-#     """
-#     This method loosely follows Jones and Jodicke 1984, at least inasfaras it uses a jackknife process.
-#     However, the termination criteria for when to stop rejecting is given by a simple fraction of data to keep/reject
-#     This is not what is done in JJ84. They use an SNR maximizing method, that could be added here.
-#
-#     The variables remote_threshold and local_threshold DO NOT refer to thresholds on the value of coherence!
-#     Rather, the threshold refers to the fraction of the estimates to keep (1 - fraction to reject)
-#
-#     2022-09-09: This method is not yet supported.  It needs to be made tolerant of channel_nomenclature.  A not
-#     unreasonable solution to this would be to make a decorator:
-#     def use_channel_nomenclature():
-#         Loops over input xarrays and maps channel names from current nomenclature
-#         to hexy, and then, when it is done executing, maps the labels back.
-#     However, it would cloud a lot of the math and readability if this was done all the time.  Suggest decorating
-#     process_transfer_function
-#
-#
-#     Parameters
-#     ----------
-#     Note 20240115
-#     - These arrays were previously 1D, which is OK, but it is creating unnecesarily large matrices
-#     - We wish to identify ensemble weights here, not weight the contributions of individual FCs within
-#     a single ensemble ... therefore the cross powers need tobe taken according to, for example:
-#     hx=X.get("hx")
-#     hxhx = (np.real(hx.data.conj() * hx.data)).sum(axis=1)
-#     probably we want to make a list of needed cross powers for coh_type=local and coh_type=remote
-#     Local1: local-hx,  local-ey
-#     Local2: local-hy,  local-ex
-#     Remote1: local-hx,  remote-hx
-#     Remote2: local-hy,  remote-hy
-#     In each of these four cases, "Jackknife coherence weights are computed on the
-#     X:
-#     Y
-#     RR
-#     coh_type: "local" or "remote"
-#
-#     Returns
-#     -------
-#
-#     """
-#     X, Y, RR = get_band_for_coherence_sorting(
-#         band, dec_level_config, local_stft_obj, remote_stft_obj
-#     )
-#     # these should be params in the config
-#     local_lower_quantile_cutoff = 0.5
-#     local_upper_quantile_cutoff = 0.9
-#     remote_lower_quantile_cutoff = 0.3
-#     remote_upper_quantile_cutoff = 0.99
-#
-#     # redundant - these should already be dropped
-#     X = X.dropna(dim="observation")
-#     Y = Y.dropna(dim="observation")
-#     if RR is not None:
-#         RR = RR.dropna(dim="observation")
-#
-#     null_indices = X["hx"].isnull()
-#     finite_indices = ~null_indices
-#     W = np.zeros(len(X.observation))
-#
-#     x = X["hx"]
-#     if coh_type == "local":
-#         y = Y["ey"]
-#         lower_quantile_cutoff = local_lower_quantile_cutoff
-#         upper_quantile_cutoff = local_upper_quantile_cutoff
-#     elif coh_type == "remote":
-#         y = RR["hx"]
-#         lower_quantile_cutoff = remote_lower_quantile_cutoff
-#         upper_quantile_cutoff = remote_upper_quantile_cutoff
-#
-#     W1 = jackknife_coherence_weights(
-#         x,
-#         y,
-#         lower_quantile_cutoff=lower_quantile_cutoff,
-#         upper_quantile_cutoff=upper_quantile_cutoff,
-#     )
-#
-#     W[finite_indices] = W1
-#
-#     W[W == 0] = np.nan
-#     X["hx"].data *= W
-#     Y["ey"].data *= W
-#
-#     W = np.zeros(len(finite_indices))
-#     x = X["hy"]
-#     if coh_type == "local":
-#         y = Y["ex"]
-#         lower_quantile_cutoff = local_lower_quantile_cutoff
-#         upper_quantile_cutoff = local_upper_quantile_cutoff
-#     elif coh_type == "remote":
-#         y = RR["hy"]
-#         lower_quantile_cutoff = remote_lower_quantile_cutoff
-#         upper_quantile_cutoff = remote_upper_quantile_cutoff
-#     W2 = jackknife_coherence_weights(
-#         x,
-#         y,
-#         lower_quantile_cutoff=lower_quantile_cutoff,
-#         upper_quantile_cutoff=upper_quantile_cutoff,
-#     )
-#     W[finite_indices] = W2
-#     W[W == 0] = np.nan
-#     X["hy"].data *= W
-#     Y["ex"].data *= W
-#     if RR is not None:
-#         RR *= W
-#     return X, Y, RR
-
-
 # def compute_multiple_coherence_weights(band, local_stft_obj, remote_stft_obj):
 #     print(band)
 #     print(band)
@@ -323,17 +215,36 @@ def coherence_weights_jj84(
     widening_rule="min3",
 ):
     """
+         This method loosely follows Jones and Jodicke 1984, at least inasfaras it uses a jackknife process.
+    However, the termination criteria for when to stop rejecting is given by a simple fraction of data to keep/reject
+    This is not what is done in JJ84. They use an SNR maximizing method, that could be added here.
+
+    The thresholds here are NOT values of coherence, they are quantiles to reject.
+
+    This method is not yet supported.  It needs to be made tolerant of channel_nomenclature.  A not
+    unreasonable solution to this would be to make a decorator:
+    def use_channel_nomenclature():
+        Loops over input xarrays and maps channel names from current nomenclature
+        to hexy, and then, when it is done executing, maps the labels back.
+    However, it would cloud a lot of the math and readability if this was done all the time.  Suggest decorating
+    process_transfer_function
+
     This is a form of "simple coherence", i.e. it just uses two channels at a time.
     Thus it can take the form of C_xy, C_xx, C_yy
+
     FLOW:
-    1. Get the band defined
-    2. Decide on what channels you need
+    1. Define rejection quantiles
+    2. Define conjugate channel pairs (should be imported from elsewhere, as they are reusable)
+    3. Define the band -- this needs to be factored out (need to have multiple harmonics in a band)
+    4. Extract the FCs for band
+    5. Loop over channels pairs
         Standard pairings are:
         "local_ex": X,Y --> local["ex"], local["hy"]
         "local_ey": X,Y --> local["ey"], local["hx"]
         "remote_hx": X,Y --> local["hx"], local["hx"]
         "remote_hy": X,Y --> local["hy"], local["hy"]
-
+    6. compute weights
+    7. update cumulative weights
     Parameters
     ----------
     frequency_band
@@ -344,10 +255,11 @@ def coherence_weights_jj84(
 
     Returns
     -------
+    cumulative_weights: arraylike
 
     """
 
-    # these should be params in the config
+    # Define rejection quantiles: these should be params in the config
     quantile_cutoffs = {}
     quantile_cutoffs["local"] = {}
     quantile_cutoffs["local"]["lower"] = 0.2
@@ -356,6 +268,7 @@ def coherence_weights_jj84(
     quantile_cutoffs["remote"]["lower"] = 0.1
     quantile_cutoffs["remote"]["upper"] = 0.99
 
+    # define conjugate channel pairs
     Channel = namedtuple("Channel", ["local_or_remote", "component"])
     paired_channels = {}
     paired_channels["local"] = {}
