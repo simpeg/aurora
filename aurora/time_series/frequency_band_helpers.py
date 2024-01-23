@@ -165,6 +165,33 @@ def check_time_axes_synched(X, Y):
     return
 
 
+def adjust_band_for_coherence_sorting(frequency_band, spectrogram, rule="min3"):
+    """
+
+    Parameters
+    ----------
+    frequency_band
+    spectrogram: Spectrogram
+    rule
+
+    Returns
+    -------
+
+    """
+    band = frequency_band.copy()
+    if spectrogram.num_harmonics_in_band(band) == 1:
+        logger.warning("Cant evaluate coherence with only 1 harmonic")
+        logger.info(f"Widening band according to {rule} rule")
+        if rule == "min3":
+            band.frequency_min -= spectrogram.df
+            band.frequency_max += spectrogram.df
+        else:
+            msg = f"Band adjustment rule {rule} not recognized"
+            logger.error(msg)
+            raise NotImplementedError(msg)
+    return band
+
+
 def get_band_for_coherence_sorting(
     frequency_band,
     dec_level_config,

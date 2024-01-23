@@ -19,22 +19,38 @@ This leads to a coherence score for each observation.  We can boot out all data 
 
 import numpy as np
 
+from aurora.time_series.frequency_band_helpers import adjust_band_for_coherence_sorting
 from aurora.time_series.frequency_band_helpers import Spectrogram
 from collections import namedtuple
 from loguru import logger
 
+# convenience class used in coherence calculations
+# not to be confused with Channel classes in mt_metdata and mth5
+CoherenceChannel = namedtuple("Channel", ["local_or_remote", "component"])
+
+
+def simple_coherence_channel_pairs():
+    # define conjugate channel pairs
+    paired_channels = {}
+    paired_channels["local"] = {}
+    paired_channels["local"]["ex"] = CoherenceChannel("local", "hy")
+    paired_channels["local"]["ey"] = CoherenceChannel("local", "hx")
+    paired_channels["remote"] = {}
+    paired_channels["remote"]["hx"] = CoherenceChannel("local", "hx")
+    paired_channels["remote"]["hy"] = CoherenceChannel("local", "hy")
+    return paired_channels
+
 
 def drop_column(x, i_col):
     """
-
     Parameters
     ----------
-    x
-    i_drop
+    x: numpy array
+    i_drop: integer index of column to drop
 
     Returns
     -------
-
+    numpy array same as input without i_col
     """
     return np.hstack([x[:, 0:i_col], x[:, i_col + 1 : :]])
 
@@ -171,7 +187,26 @@ def estimate_simple_coherence(X, Y):
     return coherence
 
 
-def estimate_jackknife_coherence(X, Y):
+def estimate_jackknife_coherence(X, Y, ttl=""):
+    """
+    A reasonably efficient way to estimate the coherence between X,Y
+    where the estimate is made by using all but one value in X, Y.
+
+     N.B. This method seeks to identify the ensembles that most influence the sum of all coherences
+     The "worst" value is not necessarily the ensemble with the lowest coherence ... it may also matter the
+     amplitude of the FCs within.
+      We are not just removing the lowest or highest coherence - that is an amplitude independent
+    # measure... we are removing
+
+    Parameters
+    ----------
+    X
+    Y
+
+    Returns
+    -------
+
+    """
     # Estimate Gxy, Gxx, Gyy (Bendat and Piersol, Eqn 3.46, 3.47) - factors of 2/T drop out when we take ratios
     xHy = (np.real(X.data.conj() * Y.data)).sum(axis=1)
     xHx = (np.real(X.data.conj() * X.data)).sum(axis=1)
@@ -195,6 +230,7 @@ def estimate_jackknife_coherence(X, Y):
     # Estimate jackknife coherence
     jackknife_coherence = np.abs(Jxy) / np.sqrt(Jxx * Jyy)
 
+    # Sanity check stuffs:
     print("the largest partial coherence is due to removing the worst segment")
     worst = np.argmax(jackknife_coherence)
     worst_coh = np.abs(xHy[worst]) / np.sqrt(xHx[worst] * yHy[worst])
@@ -204,7 +240,24 @@ def estimate_jackknife_coherence(X, Y):
     best_coh = np.abs(xHy[best]) / np.sqrt(xHx[best] * yHy[best])
     print(f"Which has value {best_coh}")
 
+    # sc = np.abs(xHy) / np.sqrt(xHx * yHy)
+    # import matplotlib.pyplot as plt
+    # plt.hist(sc, 1000);
+    # plt.xlabel("Simple Coherence");
+    # plt.ylabel("# Occurrences")
+    # if ttl:
+    #     plt.title(ttl)
     return jackknife_coherence
+
+
+def simple_coherence_weights(
+    frequency_band,
+    local_stft_obj,
+    remote_stft_obj,
+    coh_types=[("local", "ex"), ("local", "ey"), ("remote", "hx"), ("remote", "hy")],
+    widening_rule="min3",
+):
+    pass
 
 
 def coherence_weights_jj84(
@@ -269,14 +322,7 @@ def coherence_weights_jj84(
     quantile_cutoffs["remote"]["upper"] = 0.99
 
     # define conjugate channel pairs
-    Channel = namedtuple("Channel", ["local_or_remote", "component"])
-    paired_channels = {}
-    paired_channels["local"] = {}
-    paired_channels["local"]["ex"] = Channel("local", "hy")
-    paired_channels["local"]["ey"] = Channel("local", "hx")
-    paired_channels["remote"] = {}
-    paired_channels["remote"]["hx"] = Channel("local", "hx")
-    paired_channels["remote"]["hy"] = Channel("local", "hy")
+    paired_channels = simple_coherence_channel_pairs()
 
     # initialize a dict to hold the weights
     weights = {}
@@ -285,29 +331,14 @@ def coherence_weights_jj84(
             weights[local_or_remote] = {}
         weights[local_or_remote][component] = None
 
-    # Define the band
-    band = frequency_band.copy()
-    logger.info(
-        f"Processing band {band.center_period:.6f}s  ({1. / band.center_period:.6f}Hz)"
-    )
+    # Widen the band if needed
     local_stft = Spectrogram(local_stft_obj)
     remote_stft = Spectrogram(remote_stft_obj)
-    if local_stft.num_harmonics_in_band(band) == 1:
-        logger.warning("Cant evaluate coherence with only 1 harmonic")
-        logger.info(f"Widening band according to {widening_rule} rule")
-        if widening_rule == "min3":
-            band.frequency_min -= local_stft.df
-            band.frequency_max += local_stft.df
-        else:
-            msg = f"Widening rule {widening_rule} not recognized"
-            logger.error(msg)
-            raise NotImplementedError(msg)
+    band = adjust_band_for_coherence_sorting(frequency_band, local_stft, rule="min3")
 
     # Extract the FCs for band
     band_datasets = {}
-    band_datasets["local"] = local_stft.extract_band(
-        band,
-    )
+    band_datasets["local"] = local_stft.extract_band(band)
     band_datasets["remote"] = remote_stft.extract_band(band)
     n_obs = band_datasets["local"].time.shape[0]
 
@@ -316,14 +347,19 @@ def coherence_weights_jj84(
     # Define the channel pair
     for (local_or_remote, component) in coh_types:
 
-        ch1 = Channel(local_or_remote, component)
+        ch1 = CoherenceChannel(local_or_remote, component)
         ch2 = paired_channels[local_or_remote][component]
-        print(f"ch1: {ch1}; ch2: {ch2}")
+        msg = (
+            f"ch1: {ch1.local_or_remote} {ch1.component}; "
+            f"ch2: {ch2.local_or_remote} {ch2.component}; "
+            f"{band.center_frequency:.3f}Hz"
+        )
+        logger.info(f"\n{msg}")
 
         X = band_datasets[ch1.local_or_remote][ch1.component]
         Y = band_datasets[ch2.local_or_remote][ch2.component]
 
-        jackknife_coherence = estimate_jackknife_coherence(X, Y)
+        jackknife_coherence = estimate_jackknife_coherence(X, Y)  # , ttl=msg)
 
         # Sanity checking
         # from matplotlib import pyplot as plt
@@ -349,6 +385,7 @@ def coherence_weights_jj84(
         keepers = worst_to_best[n_clip_low:n_clip_high]
 
         # Uncomment for sanity check
+        # (np.sign(np.diff(jackknife_coherence[worst_to_best])) < 0).all()
         simple_coherence = estimate_simple_coherence(X, Y)
         print("the largest partial coherence is due to removing the worst segment")
         worst_ndx = worst_to_best[0]
