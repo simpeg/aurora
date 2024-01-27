@@ -411,6 +411,7 @@ class TransferFunctionKernel(object):
             for dec_level_config in self.config.decimations:
                 # if dec_level_config.save_fcs:
                 dec_level_config.save_fcs = False
+        return
 
     def get_mth5_file_open_mode(self):
         if self.all_fcs_already_exist:
