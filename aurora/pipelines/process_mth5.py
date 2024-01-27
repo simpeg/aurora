@@ -106,12 +106,11 @@ def station_obj_from_row(row):
     station_obj:
 
     """
-    if row.survey == "none":
+    if row.mth5_obj.file_version == "0.1.0":
         station_obj = row.mth5_obj.stations_group.get_station(row.station_id)
-    else:
-        station_obj = row.mth5_obj.stations_group.get_station(
-            row.station_id, survey=row.survey
-        )
+    elif row.mth5_obj.file_version == "0.1.0":
+        survey_group = row.mth5_obj.surveys_group.get_survey(row.survey)
+        station_obj = survey_group.stations_group.get_station(row.station_id)
     return station_obj
 
 
