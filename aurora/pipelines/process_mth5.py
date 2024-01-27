@@ -212,6 +212,16 @@ def append_chunk_to_stfts(stfts, chunk, remote):
     return stfts
 
 
+# def load_spectrogram_from_station_object(station_obj, fc_group_id, fc_decimation_id):
+#     """
+#     Placeholder.  This could also be a method in mth5
+#     Returns
+#     -------
+#
+#     """
+#     return station_obj.fourier_coefficients_group.get_fc_group(fc_group_id).get_decimation_level(fc_decimation_id)
+
+
 def load_stft_obj_from_mth5(i_dec_level, row, run_obj):
     """
     Load stft_obj from mth5 (instead of compute)
@@ -227,7 +237,7 @@ def load_stft_obj_from_mth5(i_dec_level, row, run_obj):
 
     """
     station_obj = station_obj_from_row(row)
-    fc_group = station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id)
+    fc_group = station_obj.fourier_coefficients_group.get_fc_group(run_obj.metadata.id)
     fc_decimation_level = fc_group.get_decimation_level(f"{i_dec_level}")
     stft_obj = fc_decimation_level.to_xarray()
     return stft_obj
@@ -274,14 +284,29 @@ def save_fourier_coefficients(dec_level_config, row, run_obj, stft_obj):
         if not row.mth5_obj.h5_is_write():
             msg = "See Note #1: Logic for building FC layers"
             raise NotImplementedError(msg)
-        fc_group = station_obj.fourier_coefficients_group.add_fc_group(
-            run_obj.metadata.id
-        )
+
+        # Get FC group (create if needed)
+        if run_obj.metadata.id in station_obj.fourier_coefficients_group.groups_list:
+            fc_group = station_obj.fourier_coefficients_group.get_fc_group(
+                run_obj.metadata.id
+            )
+        else:
+            fc_group = station_obj.fourier_coefficients_group.add_fc_group(
+                run_obj.metadata.id
+            )
+
         decimation_level_metadata = dec_level_config.to_fc_decimation()
-        fc_decimation_level = fc_group.add_decimation_level(
-            f"{i_dec_level}",
-            decimation_level_metadata=decimation_level_metadata,
-        )
+
+        # Get FC Decimation Level (create if needed)
+        dec_level_name = f"{i_dec_level}"
+        if dec_level_name in fc_group.groups_list:
+            fc_decimation_level = fc_group.get_decimation_level(dec_level_name)
+            fc_decimation_level.metadata = decimation_level_metadata
+        else:
+            fc_decimation_level = fc_group.add_decimation_level(
+                dec_level_name,
+                decimation_level_metadata=decimation_level_metadata,
+            )
         fc_decimation_level.from_xarray(stft_obj, decimation_level_metadata.sample_rate)
         fc_decimation_level.update_metadata()
         fc_group.update_metadata()
