@@ -68,16 +68,17 @@ class TestZFileReadWrite(unittest.TestCase):
         ).all()
         return tf
 
-    def test_tf_read_and_write(self):
-        """Checks that an ingested z-file is written back out the same"""
-        import filecmp
-
-        tf_z = self._tf_z_obj
-        out_file_name = str(self.zrr_file_base).replace(".zrr", "_rewrite.zrr")
-        out_file_path = pathlib.Path(out_file_name)
-        tf_z.write(out_file_path)
-        assert filecmp.cmp(self.zrr_file_base, out_file_path)
-        print("Add assert statement that the zrr are the same")
+    # An equivalent to this test in in mt_metadata on fix_issue_190
+    # def test_tf_read_and_write(self):
+    #     """Checks that an ingested z-file is written back out the same"""
+    #     import filecmp
+    #
+    #     tf_z = self._tf_z_obj
+    #     out_file_name = str(self.zrr_file_base).replace(".zrr", "_rewrite.zrr")
+    #     out_file_path = pathlib.Path(out_file_name)
+    #     tf_z.write(out_file_path)
+    #     assert filecmp.cmp(self.zrr_file_base, out_file_path)
+    #     print("Add assert statement that the zrr are the same")
 
 
 def main():
