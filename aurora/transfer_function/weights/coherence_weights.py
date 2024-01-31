@@ -267,6 +267,23 @@ def multiple_coherence_weights(
             """<ch1.H ch2> summed along frequnecy"""
             return (ch1.conjugate().transpose() * ch2).sum(dim="frequency")
 
+        def multiply_2x2xN_by_2x1xN(m2x2, m2x1):
+            """
+            This is sort of a sad function.  There are a few places in TF estimation, where we would
+            like to do matrix multiplication, of a 2x1 array on the left by a 2x2.  If we want to do
+            this tens of thousands of times, the options are for-looping (too slow!), reshape the problem
+            to sparse matrix and do all at once (matrix too big when built naively!) or this function.
+
+            An alternative, becuase the multiplication is very straigghtforward
+            [a11 a12] [b1] = [a11*b1 + a12*b2]
+            [a21 a22] [b2] = [a11*b1 + a12*b2]
+            We can just assign the values vectorially.
+
+            :param a2x2:
+            :param b2x1:
+            :return: ab2x1
+            """
+
         # Start by computing relevant cross powers
         if use_remote:
             rx = band["rx"]
@@ -303,8 +320,14 @@ def multiple_coherence_weights(
         print(
             "THE PROBLEM IS RIGHT HERE -- need to multiply the inverse by b=HH@E, NOT E alone"
         )
-        Zxx = inverse_matrices[0, 0, :] * rxex + inverse_matrices[1, 0, :] * ryex
-        Zxy = inverse_matrices[1, 0, :] * rxex + inverse_matrices[0, 1, :] * ryex
+        Zxx = (
+            inverse_matrices[0, 0, :] * rxex.data
+            + inverse_matrices[0, 1, :] * ryex.data
+        )
+        Zxy = (
+            inverse_matrices[1, 0, :] * rxex.data
+            + inverse_matrices[1, 1, :] * ryex.data
+        )
 
         # set up simple system and check Z1, z2 OK
         # ex1 = [hx1 hy1] [z1
@@ -324,7 +347,7 @@ def multiple_coherence_weights(
             np.abs(E) ** 2
         ).sum()
         print("direct", direct)
-        tricky = (np.abs(E - H[:, 0] * Zxx[0] - H[:, 1] * Zxy[1]) ** 2).sum() / (
+        tricky = (np.abs(E - H[:, 0] * Zxx[0] - H[:, 1] * Zxy[0]) ** 2).sum() / (
             np.abs(E) ** 2
         ).sum()
         print("tricky", tricky)
