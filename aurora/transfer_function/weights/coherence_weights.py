@@ -154,20 +154,54 @@ def jackknife_coherence_weights(
 #     pass
 
 
-def estimate_mulitple_coherence(X, Y, Z):
+def estimate_multiple_coherence(
+    X,
+    Y,
+    RR,
+    coh_types=(
+        ("local", "ex"),
+        ("local", "ey"),
+        ("local", "hz"),
+        ("remote", "ex"),
+        ("remote", "ey"),
+        ("remote", "hz"),
+    ),
+):
     """
+
     TODO: add option for how TF is computed from cross-powers ala Sims and ala Vozoff
+    In general, to estimate Z we solve, for example:
+    Ex = Zxx Hx + Zxy Hy
+    The standard OLS single station solution is to set E, H as row vectors
+    Ex 1XN, H a 2xN, , H.H is Nx2 hermitian transpose of H
+    Ex * H.H = [Zxx Zxy] H*H.H  * is matrixmult
+    Ex * H.H *(H*H.H)^[-1] = [Zxx Zxy]
+    Replacing H.H with R.H results in a much more stable estimate of Z, if remote available
+
+
+
+    Z=EH*HH*−1=1DetHH*ExHx* ExHy* HyHy* −HxHy* −HyHx* HxHx*  Eqn7
+
+
     Parameters
     ----------
     X
     Y
-    Z
+    RR
+    coh_types
 
     Returns
     -------
 
+
     """
     pass
+    # Estimate Time Series of Impedance Tensors:
+    # if RR is None:
+    #     HH = X.conj().transpose()
+    # else:
+    #     HH = RR.conj().transpose()
+    # TF = X
     # # Estimate Gxy, Gxx, Gyy (Bendat and Piersol, Eqn 3.46, 3.47) - factors of 2/T drop out when we take ratios
     # xHy = (np.real(X.data.conj() * Y.data)).sum(axis=1)
     # xHx = (np.real(X.data.conj() * X.data)).sum(axis=1)
@@ -177,9 +211,251 @@ def estimate_mulitple_coherence(X, Y, Z):
     # return coherence
 
 
+def multiple_coherence_weights(
+    frequency_band,
+    local_stft_obj,
+    remote_stft_obj,
+    local_or_remote="remote",
+    components=("ex", "ey", "hz"),
+    rule="min3",
+):
+    def multiple_coherence_channel_sets(local_or_remote):
+        """tells what channels to use for H.H in multiple coherence"""
+        if local_or_remote == "local":
+            return (CoherenceChannel("local", "hx"), CoherenceChannel("local", "hy"))
+        elif local_or_remote == "remote":
+            return (CoherenceChannel("remote", "hx"), CoherenceChannel("remote", "hy"))
+
+    def solve_single_time_window(Y, X, R=None):
+        """remember scipy.linalg.solve solves: a @ x == b"""
+        if R is None:
+            xH = X.conjugate().transpose()
+        else:
+            xH = R.conjugate().transpose()
+        a = xH @ X
+        b = xH @ Y
+        z = np.linalg.solve(a, b)
+        return z
+
+    # cutoff_type = "threshold"
+    cutoffs = {}
+    cutoffs["local"] = {}
+    cutoffs["local"]["lower"] = 0.5
+    cutoffs["local"]["upper"] = 1.01
+    cutoffs["remote"] = {}
+    cutoffs["remote"]["lower"] = 0.5
+    cutoffs["remote"]["upper"] = 1.01
+
+    # Widen the band if needed
+    local_stft = Spectrogram(local_stft_obj)
+    remote_stft = Spectrogram(remote_stft_obj)
+    band = adjust_band_for_coherence_sorting(frequency_band, local_stft, rule=rule)
+    # band = frequency_band
+
+    # Extract the FCs for band
+    band_datasets = {}
+    band_datasets["local"] = local_stft.extract_band(band)
+    band_datasets["remote"] = remote_stft.extract_band(band)
+    n_obs = band_datasets["local"].time.shape[0]
+
+    # initialize a dict to hold the weights
+    # in this case there will be only two sets of weights, one set
+    # from the ex equation and another from the ey
+    # and one from hz I guess also if we compute Txy, Tyy
+    weights = {}
+    for component in components:
+        weights[component] = np.ones(n_obs)
+    # cumulative_weights = np.ones(n_obs)
+
+    # Estimate Time Series of Impedance Tensors:
+    H = band_datasets["local"][["hx", "hy"]]
+    HH = band_datasets[local_or_remote]
+    HH = HH[["hx", "hy"]].conj()
+
+    # The notation in the following could be cleaned up, but hopefully should make not too murky what
+    # is happening here.  We wish to estimate the multiple coherence for each time window independently
+    # For each time index in the spectrograms we will solve the following three equations
+    # Ex = Zxx Hx + Zxy Hy
+    # Ey = Zyx Hx + Zyy Hy
+    # Hz = Tzx Hx + Tzy Hy
+    # where (at each time step) we can think of Ex, Hx, Hy, Hz as column vectors having M frequencies
+    # i.e. they are M x 1 matrices.
+
+    # Taking the Ex as an example, we have:
+    # [Ex1 = [ Hx1 Hy1 ] [ Zxx
+    #  Ex2 = [ Hx2 Hy2 ]   Zyx]
+    #   .
+    #   .
+    #   .
+    #  ExM]= [ HxM HyM ]
+    # an Mx1 = Mx2 * 2X1
+    # We can also write this as E = HZ,
+    # The standard solution is to multiply on the left by H.T, (conjugate transpose if complex valued).
+    # To keep the notation from getting unsavoury, the symbol R will be used to denote the conjugate transpose of H.
+    # R is a 2 x M array
+    # Yielding
+    # R E = R H Z     (Equation # XX)
+    # Matrix algebra easily solves this, but these matrices are relatively small, and we need to
+    # solve the equations many times over.
+    # Here it is convenient to work in cross-spectral powers.
+
+    # **ASIDE**: For an OLS solution R is the conjugate transpose of H, BUT any matrix of the same
+    # shape whose columns are independent should work (some fine points in the math should be checked)
+    # but the point is that we can use any combination of available channels as the rows
+    # of R.  It could be Ex & Ey, Hx & Hy, or Remote Hx & Remote Hy, which are the usual, preferred soln,
+    # (hence the selection of the variable R).
+
+    # Note that the left hand side of Equation XX is just a 2x1 array, having entries:
+    # [<rx,ex>
+    #  <ry,ex>]
+    # where <a,b> denotes the cross power a.H,b.  I.e. it is the Inner product of the FCs of ex
+    # with the conjugate transpose vectors hx and hy.
+    # Similarly, the RHS of Equation XX is just a 2x2 matrix times Z (a 2x1)
+    # this 2x2 matrix has entries:
+    # [<rx,hx>, <ry,hx>
+    #  <rx,hy>, <ry,hy>]
+
+    # We could iterate over the time intervals, forming the equation:
+    # R E = R H Z
+    # =
+    # [<rx,ex>]  = [<rx,hx>, <ry,hx>]   [Zxx]
+    # [<ry,ex>]    [<rx,hy>, <ry,hy>]   [Zyx]
+    #
+    # and then simply inverting the 2x2, to get our esimates.
+    # This is OK, but will be slow in python.
+    #
+    # It might be better to form, vectorially:
+    #
+    # [<rx1,ex1>]  = [<rx1,hx1>, <ry1,hx1>]   [Zxx1]
+    # [<ry1,ex1>]    [<rx1,hy1>, <ry1,hy1>]   [Zyx1]
+    #
+    # [<rx2,ex2>]  = [<rx2,hx2>, <ry2,hx2>]   [Zxx2]
+    # [<ry2,ex2>]    [<rx2,hy2>, <ry2,hy2>]   [Zyx2]
+    # ...
+    # ...
+    # [<rxN,exN>]  = [<rxN,hxN>, <ryN,hxN>]   [ZxxN]
+    # [<ryN,exN>]    [<rxN,hyN>, <ryN,hyN>]   [ZyxN]
+    #
+    #
+    #
+    # And then merge the equations
+    # ... combining two of them look like this:
+    #
+    # [<rx1,ex1>, <rx2,ex2>]  = [<rx1,hx1>, <ry1,hx1>, <rx2,hx2>, <ry2,hx2>]   [Zxx1]
+    # [<ry1,ex1>, <ry2,ex2>]    [<rx1,hy1>, <ry1,hy1>, <rx2,hy2>, <ry2,hy2>]   [Zyx1]
+    #                                                                          [Zxx2]
+    #                                                                          [Zxy2]
+    # ... combining N of them look like this:
+
+    # [<rx1,ex1>, <rx2,ex2>, ... <rxN,exN>]  = [<rx1,hx1>, <ry1,hx1>, <rx2,hx2>, <ry2,hx2>, ... <rxN,hxN>, <ryN,hxN>]   [Zxx1]
+    # [<ry1,ex1>, <ry2,ex2>, ... <ryN,exN>]    [<rx1,hy1>, <ry1,hy1>, <rx2,hy2>, <ry2,hy2>, ... <rxN,hyN>, <ryN,hyN>]   [Zyx1]
+    #                                                                                                                   [Zxx2]
+    #                                                                                                                   [Zxy2]
+    #                                                                                                                     ...
+    #                                                                                                                   [ZxxN]
+    #                                                                                                                   [ZxyN]
+    # inverting this would be a mess, but np.solve may do it quite efficiently ... and if not,
+    # then this would be a good use of ctypes or similar.
+
+    # alsinvert the 2x2 using a for-loop in python
+    # so we can use the formula for the inverse of a 2x2
+    # (aside)... probably we could stack all the equations and use a cute version of np.solve though ...
+    #
+    # In any case, for a single time interval we have:
+    # - Compute cross power and sum over all harmonics
+    # - Compute Auto Power
+
+    # So treating this as a linalg .solve is not going to cut it
+
+    # for computing Zxx, Zxy we need:
+    # local Ex, Hx, Hy, and then either local Hx, Hy, for the hermitian conjugate, or remote Hx, Hy
+    # it actually can be any two linear independent channels but normally those are the pairings.
+    import time
+
+    t0 = time.time()
+    for component in components:
+        E = band_datasets["local"][component]
+        H = band_datasets["local"][["hx", "hy"]]
+        # R = band_datasets["remote"][["hx", "hy"]]
+        logger.info(f"Looping {component} over time")
+        # 30000 Looper: 150s (3ch)
+        # for i in range(E.time.shape[0]):
+        #     Y = E.data[i:i+1, :].T  # (1,3)
+        #     X = H[["hx", "hy"]].to_array()[:, i:i+1, :].data.squeeze().T
+        #     XR = R[["hx", "hy"]].to_array()[:, i:i+1, :].data.squeeze().T
+        #     z0 = solve_single_time_window(Y,X,XR)
+        # 15000 Looper (71s 3ch)
+        for i in range(int(E.time.shape[0] / 2)):
+            Y = np.reshape(E.data[2 * i : 2 * i + 2, :], (6, 1))
+            X = np.zeros((6, 4), dtype=np.complex128)
+            X[0:3, 0:2] = (
+                H[["hx", "hy"]].to_array()[:, 2 * i : 2 * i + 1, :].data.squeeze().T
+            )
+            X[3:6, 2:4] = (
+                H[["hx", "hy"]].to_array()[:, 2 * i + 1 : 2 * i + 2, :].data.squeeze().T
+            )
+            # X = H[["hx", "hy"]].to_array()[:, i:i + 1, :].data.squeeze().T
+            # XR = R[["hx", "hy"]].to_array()[:, i:i + 1, :].data.squeeze().T
+            z0 = solve_single_time_window(Y, X, None)
+            print(f"z0 {z0}")
+            # 15000 Looper
+        # for i in range(int(E.time.shape[0] / 2)):
+        #     Y = np.reshape(E.data[2 * i:2 * i + 2, :], (6, 1))
+        #     X = np.zeros((6, 4), dtype=np.complex128)
+        #     X[0:3, 0:2] = H[["hx", "hy"]].to_array()[:, 2 * i:2 * i + 1, :].data.squeeze().T
+        #     X[3:6, 2:4] = H[["hx", "hy"]].to_array()[:, 2 * i + 1:2 * i + 2, :].data.squeeze().T
+        #     # X = H[["hx", "hy"]].to_array()[:, i:i + 1, :].data.squeeze().T
+        #     # XR = R[["hx", "hy"]].to_array()[:, i:i + 1, :].data.squeeze().T
+        #     z0 = solve_single_time_window(Y, X, None)
+        # print(f"z0 {z0}")
+        # print("Now loop over time")
+        # i_time = 0;
+        # Y = E.data[0:1, :].T #(1,3)
+        # X = H[["hx","hy"]].to_array()[:,0:1,:].data.squeeze().T
+        # R = R[["hx", "hy"]].to_array()[:, 0:1, :].data.squeeze().T
+        # xH = X.conjugate().transpose()
+        #
+        # a = xH @ X
+        # b = xH @ Y
+        # z0 = np.linalg.solve(a, b)
+        # print(f"b.shape {b.shape}")
+        # print(f"a.shape {a.shape}")
+        # z0 = np.linalg.solve(a,b)
+        # print(z0)
+    msg = f"{time.time()-t0}"
+    print(msg)
+    print(msg)
+    print(msg)
+    print(msg)
+    print(msg)
+    print(msg)
+    print(msg)
+    # raise(ValueError(msg))
+
+
 def estimate_simple_coherence(X, Y):
+    """
+    X, Y have same time dimension values
+    X,Y, should have same frequency dimension values
+    Frequency dimension should not be of length 1
+    TODO: consider binding X, Y as a single xarray
+
+    Parameters
+    ----------
+    X:xarray.core.dataarray.DataArray
+       Spectrogram: 2D array of Fourier coefficients with dims ('time', 'frequency')
+    Y: xarray.core.dataarray.DataArray
+       Spectrogram: 2D array of Fourier coefficients with dims ('time', 'frequency')
+    X, Y are have same time dimension
+
+    Returns
+    -------
+    coherence: numpy.ndarray
+        univariate time series with one entry per "time" entry in inputs X, Y.
+        Values correspond to simple coherence in the frequency
+    """
     # Estimate Gxy, Gxx, Gyy (Bendat and Piersol, Eqn 3.46, 3.47) - factors of 2/T drop out when we take ratios
-    xHy = (np.real(X.data.conj() * Y.data)).sum(axis=1)
+    xHy = ((X.data.conj() * Y.data)).sum(axis=1)
     xHx = (np.real(X.data.conj() * X.data)).sum(axis=1)
     yHy = (np.real(Y.data.conj() * Y.data)).sum(axis=1)
 
@@ -208,7 +484,7 @@ def estimate_jackknife_coherence(X, Y, ttl=""):
 
     """
     # Estimate Gxy, Gxx, Gyy (Bendat and Piersol, Eqn 3.46, 3.47) - factors of 2/T drop out when we take ratios
-    xHy = (np.real(X.data.conj() * Y.data)).sum(axis=1)
+    xHy = ((X.data.conj() * Y.data)).sum(axis=1)
     xHx = (np.real(X.data.conj() * X.data)).sum(axis=1)
     yHy = (np.real(Y.data.conj() * Y.data)).sum(axis=1)
 
@@ -231,22 +507,27 @@ def estimate_jackknife_coherence(X, Y, ttl=""):
     jackknife_coherence = np.abs(Jxy) / np.sqrt(Jxx * Jyy)
 
     # Sanity check stuffs:
-    print("the largest partial coherence is due to removing the worst segment")
-    worst = np.argmax(jackknife_coherence)
+    largest_partial_coh_ndx = np.argmax(jackknife_coherence)
+    print(
+        f"Largest partial coherence is due to removing segment {largest_partial_coh_ndx}"
+    )
+    worst = largest_partial_coh_ndx
     worst_coh = np.abs(xHy[worst]) / np.sqrt(xHx[worst] * yHy[worst])
-    print(f"Which has value {worst_coh}")
+    print(f"Which has simple coherence value {worst_coh} -- expected to be low")
     print("the smallest partial coherence is due to removing the best segment")
     best = np.argmin(jackknife_coherence)
     best_coh = np.abs(xHy[best]) / np.sqrt(xHx[best] * yHy[best])
     print(f"Which has value {best_coh}")
 
-    # sc = np.abs(xHy) / np.sqrt(xHx * yHy)
-    # import matplotlib.pyplot as plt
-    # plt.hist(sc, 1000);
-    # plt.xlabel("Simple Coherence");
-    # plt.ylabel("# Occurrences")
-    # if ttl:
-    #     plt.title(ttl)
+    sc = np.abs(xHy) / np.sqrt(xHx * yHy)
+    import matplotlib.pyplot as plt
+
+    plt.hist(sc, 1000)
+    plt.xlabel("Simple Coherence")
+    plt.ylabel("# Occurrences")
+    if ttl:
+        plt.title(ttl)
+        plt.show()
     return jackknife_coherence
 
 
@@ -255,9 +536,122 @@ def simple_coherence_weights(
     local_stft_obj,
     remote_stft_obj,
     coh_types=[("local", "ex"), ("local", "ey"), ("remote", "hx"), ("remote", "hy")],
-    widening_rule="min3",
+    cutoffs={},
+    rule="min3",
 ):
-    pass
+    """
+    TODO: consider making ("local", "ex") apply weights only to local ex and it's paired channel,
+    ditto for ("local", "ey"), ("remote", "hx"), ("remote", "hy")
+    - This would require a bit of wrangling and make this a "channel_weights" method
+    as opposed to a global "segment" weights method.
+
+    Also, Note that when solving the "ex" equation, we should apply the weights for:
+    [local ex, local hy], [local hx, remote hx], [local hy, remote hy],
+    When cutoffs correspond to fairly large amounts of data getting ejected,
+    it is possible that keeping say 20% in each of the three cases, may leave us with no observations
+    So the cumulative weights for ex, hx, hy need to be evaluated together,
+    as do the cumulative weights for ey, hx, hy
+
+
+    Parameters
+    ----------
+    frequency_band
+    local_stft_obj
+    remote_stft_obj
+    coh_types
+    cutoffs
+    rule
+
+    Returns
+    -------
+
+    """
+    # Define rejection criteria: these should be params in the config
+    #    cutoff_type = "threshold"
+    cutoffs = {}
+    cutoffs["local"] = {}
+    cutoffs["local"]["lower"] = 0.3
+    cutoffs["local"]["upper"] = 0.999
+    cutoffs["remote"] = {}
+    cutoffs["remote"]["lower"] = 0.3
+    cutoffs["remote"]["upper"] = 0.999
+    max_reject_fraction = 0.8
+
+    # define conjugate channel pairs
+    paired_channels = simple_coherence_channel_pairs()
+
+    # Widen the band if needed
+    local_stft = Spectrogram(local_stft_obj)
+    remote_stft = Spectrogram(remote_stft_obj)
+    band = adjust_band_for_coherence_sorting(frequency_band, local_stft, rule=rule)
+    # band = frequency_band
+
+    # Extract the FCs for band
+    band_datasets = {}
+    band_datasets["local"] = local_stft.extract_band(band)
+    band_datasets["remote"] = remote_stft.extract_band(band)
+    n_obs = band_datasets["local"].time.shape[0]
+
+    # initialize a dict to hold the weights
+    weights = {}
+    for (local_or_remote, component) in coh_types:
+        if local_or_remote not in weights.keys():
+            weights[local_or_remote] = {}
+        weights[local_or_remote][component] = np.ones(n_obs)
+    cumulative_weights = np.ones(n_obs)
+
+    # Define the channel pair
+    for (local_or_remote, component) in coh_types:
+        ch1 = CoherenceChannel(local_or_remote, component)
+        ch2 = paired_channels[local_or_remote][component]
+        msg = (
+            f"ch1: {ch1.local_or_remote} {ch1.component}; "
+            f"ch2: {ch2.local_or_remote} {ch2.component}; "
+            f"{band.center_frequency:.3f}Hz"
+        )
+        logger.info(f"\n{msg}")
+
+        X = band_datasets[ch1.local_or_remote][ch1.component]
+        Y = band_datasets[ch2.local_or_remote][ch2.component]
+        W = weights[local_or_remote][component]
+        simple_coherence = estimate_simple_coherence(X, Y)
+
+        # rank the windows from low to high
+        # worst_to_best = np.argsort(simple_coherence)
+        # sorted_simple_coherence = simple_coherence[worst_to_best]
+
+        # Apply lower weights
+        threshold_lower = cutoffs[local_or_remote]["lower"]
+        zero_weights = simple_coherence < threshold_lower
+        n_reject = zero_weights.sum()
+        reject_fraction = 1.0 * n_reject / n_obs
+        if reject_fraction > max_reject_fraction:
+            msg = f"\nRejection fraction {reject_fraction} greater than max allowed {max_reject_fraction}\n"
+            msg += f" -- corresponding to {n_reject}/{n_obs} observations\n"
+            msg += f" -- using {max_reject_fraction} quantile instead\n"
+            logger.warning(msg)
+            zero_weights = simple_coherence < np.quantile(simple_coherence, 0.8)
+            n_reject = zero_weights.sum()
+
+        msg = f"Rejecting {n_reject} of {n_obs} spectrogram samples based on simple coherence"
+        msg = f"{msg} between {ch1.local_or_remote} {ch1.component} & "
+        msg = f"{msg} {ch1.local_or_remote} {ch1.component},  < threshold={threshold_lower}"
+        logger.info(msg)
+        W[zero_weights] = 0.0
+
+        # Apply upper weights
+        threshold_upper = cutoffs[local_or_remote]["upper"]
+        zero_weights = simple_coherence > threshold_upper
+        W[zero_weights] = 0.0
+        n_reject = zero_weights.sum()
+        msg = f"Rejecting {n_reject} of {n_obs} spectrogram samples based on simple coherence"
+        msg = f"{msg} between {ch1.local_or_remote} {ch1.component} & "
+        msg = f"{msg} {ch1.local_or_remote} {ch1.component},  > threshold={threshold_upper}"
+        logger.info(msg)
+
+        cumulative_weights *= W
+
+    return cumulative_weights
 
 
 def coherence_weights_jj84(
@@ -271,6 +665,21 @@ def coherence_weights_jj84(
          This method loosely follows Jones and Jodicke 1984, at least inasfaras it uses a jackknife process.
     However, the termination criteria for when to stop rejecting is given by a simple fraction of data to keep/reject
     This is not what is done in JJ84. They use an SNR maximizing method, that could be added here.
+
+    Also, the way I have it now, the jackknifes are estimated once and then rejection is done
+    en masse on the jackknifes ... JJ84 actually suggest recomputing the Jackknifes after each
+    rejection of a single pair.
+
+    TODO: Review this somewhat non-intuitive fact that the FFT-time-window whose removal results in the
+    largest partial coherence (the one that hurts the group most) does not appear to correspond in general
+    to the FFT-time-window that has the lowest simple coherence.  This may be due to the fact that
+    said window itself is highly coherent, but the signal polarization is counter to the average.  Mix in
+    a possibly large amplitude and you can have "worst time windows" being highly coherent ...
+
+    How exactly to mix this method into the flow in general is not 100% clear, but the above observation
+     emphasizes the fact that in the presence of coherent noise, simple and multiple coherence can
+     lead the coherence sorting down an incorrect path.
+
 
     The thresholds here are NOT values of coherence, they are quantiles to reject.
 
@@ -335,7 +744,7 @@ def coherence_weights_jj84(
     local_stft = Spectrogram(local_stft_obj)
     remote_stft = Spectrogram(remote_stft_obj)
     band = adjust_band_for_coherence_sorting(frequency_band, local_stft, rule="min3")
-
+    # band = frequency_band
     # Extract the FCs for band
     band_datasets = {}
     band_datasets["local"] = local_stft.extract_band(band)
@@ -359,7 +768,7 @@ def coherence_weights_jj84(
         X = band_datasets[ch1.local_or_remote][ch1.component]
         Y = band_datasets[ch2.local_or_remote][ch2.component]
 
-        jackknife_coherence = estimate_jackknife_coherence(X, Y)  # , ttl=msg)
+        jackknife_coherence = estimate_jackknife_coherence(X, Y, ttl=msg)
 
         # Sanity checking
         # from matplotlib import pyplot as plt
