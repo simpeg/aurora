@@ -45,7 +45,7 @@ def get_band_for_tf_estimate(band, dec_level_config, local_stft_obj, remote_stft
     return X, Y, RR
 
 
-def extract_band(frequency_band, fft_obj, epsilon=1e-7):
+def extract_band(frequency_band, fft_obj, channels=[], epsilon=1e-7):
     """
     This may become a method of fft_obj, or frequency band.
     For now leave as stand alone.
@@ -80,6 +80,8 @@ def extract_band(frequency_band, fft_obj, epsilon=1e-7):
         tmp = fft_obj.to_array()
         band = tmp.where(cond1 & cond2, drop=True)
         band = band.to_dataset("variable")
+    if channels:
+        band = band[channels]
     return band
 
 
@@ -292,8 +294,10 @@ class Spectrogram(object):
         num_harmonics = (cond1 & cond2).data.sum()
         return num_harmonics
 
-    def extract_band(self, frequency_band):
-        return extract_band(frequency_band, self.dataset, epsilon=1e-7)
+    def extract_band(self, frequency_band, channels=[]):
+        return extract_band(
+            frequency_band, self.dataset, channels=channels, epsilon=1e-7
+        )
 
     def cross_powers(self, ch1, ch2, band=None):
         pass
