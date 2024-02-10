@@ -155,7 +155,7 @@ def process_transfer_functions(
     local_stft_obj,
     remote_stft_obj,
     transfer_function_obj,
-    # segment_weights=["jj84_coherence_weights",],
+    # segment_weights=["multiple_coherence",],#["simple_coherence",],#["multiple_coherence",],#jj84_coherence_weights",],
     segment_weights=[],
     channel_weights=None,
 ):
@@ -169,21 +169,30 @@ def process_transfer_functions(
     remote_stft_obj
     transfer_function_obj: aurora.transfer_function.TTFZ.TTFZ
         The transfer function container ready to receive values in this method.
-    segment_weights : numpy array or None
+    segment_weights : numpy array or list of strings
         1D array which should be of the same length as the time axis of the STFT objects
         If these weights are zero anywhere, we drop all that segment across all channels
+        If it is a list of strings, each string corresponds to a weighting
+        algorithm to be applied.
+        ["jackknife_jj84", "multiple_coherence", "simple_coherence"]
     channel_weights : numpy array or None
 
+    Note #1: Although it is advantageous to executing the regression channel-by-channel
+    vs. all-at-once, we need to keep the all-at-once to get residual covariances (see issue #87)
 
-    TODO:
-    1. Review the advantages of executing the regression all at once vs
-    channel-by-channel.  If there is not disadvantage to always
-    using a channel-by-channel approach we can modify this to only support that
-    method.  However, we still need a way to get residual covariances (see issue #87)
-    2. Consider push the nan-handling into the band extraction as a
-    kwarg.
-    3. The reindexing of the band may be done in the extraction as well.  This would
-    result in an "edf-weighting-scheme-ready" format.
+    Note #2:
+    Consider placing the segment weight logic in its own module with the various functions in a dictionary.
+    Possibly can combines (product) all segment weights, like the following pseudocode:
+
+        W = zeros
+        for wt_style in  segment_weights:
+            fcn = wt_fucntions[style]
+            w = fcn(X, Y, RR, )
+            W *= w
+        return W
+
+
+    TODO: Consider push the nan-handling into the band extraction as a kwarg.
 
     Returns
     -------
@@ -197,21 +206,30 @@ def process_transfer_functions(
             band, dec_level_config, local_stft_obj, remote_stft_obj
         )
 
-        # Apply segment weights first
-        # This could be replaced by a method that combines (product) all segment weights in a dict
-        # weights = {}
-        if "jj84_coherence_weights" in segment_weights:
+        # Apply segment weights first -- see Note #2
+
+        if "jackknife_jj84" in segment_weights:
             from aurora.transfer_function.weights.coherence_weights import (
                 coherence_weights_jj84,
             )
 
             Wjj84 = coherence_weights_jj84(band, local_stft_obj, remote_stft_obj)
             apply_weights(X, Y, RR, Wjj84, segment=True, dropna=False)
+        if "simple_coherence" in segment_weights:
+            from aurora.transfer_function.weights.coherence_weights import (
+                simple_coherence_weights,
+            )
 
-        # if multiple_coherence_weights in segment_weights:
-        #     from aurora.transfer_function.weights.coherence_weights import compute_multiple_coherence_weights
-        #     Wmc = compute_multiple_coherence_weights(band, local_stft_obj, remote_stft_obj)
-        #     apply_segment_weights(X, Y, RR, Wmc)
+            W = simple_coherence_weights(band, local_stft_obj, remote_stft_obj)
+            apply_weights(X, Y, RR, W, segment=True, dropna=False)
+
+        if "multiple_coherence" in segment_weights:
+            from aurora.transfer_function.weights.coherence_weights import (
+                multiple_coherence_weights,
+            )
+
+            W = multiple_coherence_weights(band, local_stft_obj, remote_stft_obj)
+            apply_weights(X, Y, RR, W, segment=True, dropna=False)
 
         # if there are channel weights apply them here
 

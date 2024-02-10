@@ -41,20 +41,6 @@ def simple_coherence_channel_pairs():
     return paired_channels
 
 
-def drop_column(x, i_col):
-    """
-    Parameters
-    ----------
-    x: numpy array
-    i_drop: integer index of column to drop
-
-    Returns
-    -------
-    numpy array same as input without i_col
-    """
-    return np.hstack([x[:, 0:i_col], x[:, i_col + 1 : :]])
-
-
 def coherence_from_fc_series(c_xy, c_xx, c_yy):
     # n_obs = len(c_xy)
     num = np.sum(c_xy) ** 2
@@ -196,19 +182,6 @@ def estimate_multiple_coherence(
 
     """
     pass
-    # Estimate Time Series of Impedance Tensors:
-    # if RR is None:
-    #     HH = X.conj().transpose()
-    # else:
-    #     HH = RR.conj().transpose()
-    # TF = X
-    # # Estimate Gxy, Gxx, Gyy (Bendat and Piersol, Eqn 3.46, 3.47) - factors of 2/T drop out when we take ratios
-    # xHy = (np.real(X.data.conj() * Y.data)).sum(axis=1)
-    # xHx = (np.real(X.data.conj() * X.data)).sum(axis=1)
-    # yHy = (np.real(Y.data.conj() * Y.data)).sum(axis=1)
-    #
-    # coherence = np.abs(xHy) / np.sqrt(xHx * yHy)
-    # return coherence
 
 
 def multiple_coherence_weights(
@@ -219,6 +192,120 @@ def multiple_coherence_weights(
     components=("ex", "ey", "hz"),
     rule="min3",
 ):
+    """
+        Estimate the multiple coherence for each time window independently
+        For each time index in the spectrograms we will solve the following three equations
+        Ex = Zxx Hx + Zxy Hy    (Equation 1a)
+        Ey = Zyx Hx + Zyy Hy    (Equation 1b)
+        Hz = Tzx Hx + Tzy Hy    (Equation 1c)
+        where (at each time step) we can think of Ex, Ey, Hx, Hy, Hz as column vectors having M frequencies
+        i.e. they are M x 1 matrices.
+
+        Taking the Equation 1a (Ex = Zxx Hx + Zxy Hy) as an example, we have:
+        [Ex1 = [ Hx1 Hy1 ] [ Zxx
+         Ex2 = [ Hx2 Hy2 ]   Zyx]
+          .
+          .
+          .
+         ExM]= [ HxM HyM ]  (Equation #2)
+        an Mx1 = Mx2 * 2X1
+
+        We can also write this as E = HZ,  (Equation 3)
+        The standard solution is to multiply on the left by H.T, (conjugate transpose if complex valued).
+        Let the symbol R denote the conjugate transpose of H, then R is a 2 x M array
+        Yielding
+        R E = R H Z     (Equation 4)
+        RH is square, 2x2 and almost always invertable.  We can solve this using numpy.linalg.solve,
+        but we need to solve once for every time-window, and that can get very slow, so we want to vectorize
+        the solution over all time windows.
+
+        **ASIDE**: For an OLS solution R is the conjugate transpose of H, BUT any matrix of the same
+        shape whose columns are independent should work (some fine points in the math should be checked)
+        but the point is that we can use any combination of available channels as the rows
+        of R.  It could be Ex & Ey, Hx & Hy, or Remote Hx & Remote Hy, which are the usual, preferred soln,
+        (hence the selection of the variable R).
+
+        Here it is convenient to work in cross-spectral powers -- which can be computed for each
+        at time window individually using vectorial xarray e.g. rxex = (rx*ex).sum(axis=freq)
+
+        Note that the left hand side of Equation 4 is just a 2x1 array, having entries:
+        [<rx,ex>
+         <ry,ex>]
+        where <a,b> denotes the cross power a.H,b.  I.e. it is the Inner product of the FCs of ex
+        with the conjugate transpose vectors hx and hy.
+        Similarly, the RHS of Equation 4 is just a 2x2 matrix times Z (a 2x1)
+        this 2x2 matrix has entries:
+        [<rx,hx>, <ry,hx>
+         <rx,hy>, <ry,hy>]
+
+        We can rewrite Equation 4 as:
+        R E = R H Z
+        =
+        [<rx,ex>]  = [<rx,hx>, <rx,hy]   [Zxx]
+        [<ry,ex>]    [<ry,hx>, <ry,hy>]   [Zyx]   (Equation 5)
+
+        Thus we have N equations:
+
+        [<rx1,ex1>]  = [<rx1,hx1>, <ry1,hx1>]   [Zxx1]   (Equation 6a)
+        [<ry1,ex1>]    [<rx1,hy1>, <ry1,hy1>]   [Zyx1]
+
+        [<rx2,ex2>]  = [<rx2,hx2>, <ry2,hx2>]   [Zxx2]   (Equation 6b)
+        [<ry2,ex2>]    [<rx2,hy2>, <ry2,hy2>]   [Zyx2]
+        ...
+        ...
+        [<rxN,exN>]  = [<rxN,hxN>, <ryN,hxN>]   [ZxxN]   (Equation 6c)
+        [<ryN,exN>]    [<rxN,hyN>, <ryN,hyN>]   [ZyxN]
+
+
+
+        Which can be merged ... combining two of them look like this:
+
+        [<rx1,ex1>]  = [<rx1,hx1>, <ry1,hx1>,     0          0    ]   [Zxx1]
+        [<ry1,ex1>]    [<rx1,hy1>, <ry1,hy1>,     0          0    ]   [Zyx1]
+        [<rx2,ex2>]    [   0     ,    0     , <rx2,hx2>, <ry2,hx2>]   [Zxx2]
+        [<ry2,ex2>]    [   0     ,    0     , <rx2,hy2>, <ry2,hy2>]   [Zxy2]    (Equation 7)
+
+
+        2N X 1   = 2N x 2N  2N x1
+        In general  combining N of them leaves us with a 2N x 2N (relatively sparse) matrix to invert.
+        This matrix can easily have tens of thousands of entries per row/col so inverting (and even forming)
+        the large matrix is impractical.  I have NOT checked if np.solve can do this efficiently, with the
+        sparse matrix library.
+
+        Because each equation is only associated with inverting a 2x2, we can use the formula
+        for the inverse of a 2x2
+
+        For a single matrix we have, for example Equation 5:
+        R E = R H Z
+        =
+        [<rx,ex>]  = [<rx,hx>, <rx,hy]   [Zxx]
+        [<ry,ex>]    [<ry,hx>, <ry,hy>]   [Zyx]
+
+        Now instead of np.solving the 2x2, we can instead use the explicit solution:
+        A= [a b] ^-1 =  # 1/det(A)   [ d -b]   where det(A)  = 1/(ad-bc)
+           [c d]                     [-c  a]
+
+        This requires a bit of bookkeeping but its fast and relatively light on memory especailly as compared
+        to forming the large square matrix problem suggested by (Equation 7) but with N large.
+
+
+
+
+
+    Parameters
+    ----------
+    frequency_band
+    local_stft_obj
+    remote_stft_obj
+    local_or_remote
+    components
+    rule
+
+    Returns
+    -------
+
+    """
+
     def multiple_coherence_channel_sets(local_or_remote):
         """tells what channels to use for H.H in multiple coherence"""
         if local_or_remote == "local":
@@ -267,22 +354,23 @@ def multiple_coherence_weights(
             """<ch1.H ch2> summed along frequnecy"""
             return (ch1.conjugate().transpose() * ch2).sum(dim="frequency")
 
-        def multiply_2x2xN_by_2x1xN(m2x2, m2x1):
-            """
-            This is sort of a sad function.  There are a few places in TF estimation, where we would
-            like to do matrix multiplication, of a 2x1 array on the left by a 2x2.  If we want to do
-            this tens of thousands of times, the options are for-looping (too slow!), reshape the problem
-            to sparse matrix and do all at once (matrix too big when built naively!) or this function.
-
-            An alternative, becuase the multiplication is very straigghtforward
-            [a11 a12] [b1] = [a11*b1 + a12*b2]
-            [a21 a22] [b2] = [a11*b1 + a12*b2]
-            We can just assign the values vectorially.
-
-            :param a2x2:
-            :param b2x1:
-            :return: ab2x1
-            """
+        # def multiply_2x2xN_by_2x1xN(m2x2, m2x1):
+        #     """
+        #     This is sort of a sad function.  There are a few places in TF estimation, where we would
+        #     like to do matrix multiplication, of a 2x1 array on the left by a 2x2.  If we want to do
+        #     this tens of thousands of times, the options are for-looping (too slow!), reshape the problem
+        #     to sparse matrix and do all at once (matrix too big when built naively!) or this function.
+        #
+        #     An alternative, becuase the multiplication is very straigghtforward
+        #     [a11 a12] [b1] = [a11*b1 + a12*b2]
+        #     [a21 a22] [b2] = [a11*b1 + a12*b2]
+        #     We can just assign the values vectorially.
+        #
+        #     :param a2x2:
+        #     :param b2x1:
+        #     :return: ab2x1
+        #     """
+        #     pass
 
         # Start by computing relevant cross powers
         if use_remote:
@@ -317,9 +405,6 @@ def multiple_coherence_weights(
         # bb1 = inverse_matrices[0, 0, :] * rxex + inverse_matrices[1, 0, :] * ryex
         # Zxy = inverse_matrices[1, 0, :] * rxex + inverse_matrices[0, 1, :] * ryex
 
-        print(
-            "THE PROBLEM IS RIGHT HERE -- need to multiply the inverse by b=HH@E, NOT E alone"
-        )
         Zxx = (
             inverse_matrices[0, 0, :] * rxex.data
             + inverse_matrices[0, 1, :] * ryex.data
@@ -329,28 +414,39 @@ def multiple_coherence_weights(
             + inverse_matrices[1, 1, :] * ryex.data
         )
 
-        # set up simple system and check Z1, z2 OK
-        # ex1 = [hx1 hy1] [z1
-        # ex2 = [hx2 hy2]  z2]
-        # ex3 = [hx2 hy2]
-        idx = 0
+        # Below code is a spot check that the caclulation of Zxx and Zxy from the "fast vectorized"
+        # method above is consistent with for-looping on np.solve
+
+        # Set up the problem in terms of linalg.solve()
+        idx = 0  # a time-window index to check
         E = band["ex"][idx, :]
         H = band[["hx", "hy"]].to_array()[:, idx].T
         HH = H.conj().transpose()
         a = HH.data @ H.data
         b = HH.data @ E.data
+
+        # Solve using direct inverse
         inv_a = np.linalg.inv(a)
         zz0 = inv_a @ b
-        print(zz0)
+        # solve using linalg.solve
         zz = solve_single_time_window(b, a, None)
-        direct = (np.abs(E - H[:, 0] * zz[0] - H[:, 1] * zz[1]) ** 2).sum() / (
-            np.abs(E) ** 2
-        ).sum()
-        print("direct", direct)
-        tricky = (np.abs(E - H[:, 0] * Zxx[0] - H[:, 1] * Zxy[0]) ** 2).sum() / (
-            np.abs(E) ** 2
-        ).sum()
-        print("tricky", tricky)
+        # compare the two solutions
+        assert np.isclose(np.abs(zz0 - zz), 0, atol=1e-10)
+
+        # Estimate multiple coherence with linalg.solve soln
+        solved_residual = E - H[:, 0] * zz[0] - H[:, 1] * zz[1]
+        solved_residual_energy = (np.abs(solved_residual) ** 2).sum()
+        output_energy = (np.abs(E) ** 2).sum()
+        multiple_coherence_1 = solved_residual_energy / output_energy
+        print("solve", multiple_coherence_1)
+        # Estimate multiple coherence with Zxx Zxy
+        homebrew_residual = E - H[:, 0] * Zxx[0] - H[:, 1] * Zxy[0]
+        homebrew_residual_energy = (np.abs(homebrew_residual) ** 2).sum()
+        multiple_coherence_2 = homebrew_residual_energy / output_energy
+        print(multiple_coherence_2)
+        assert np.isclose(
+            multiple_coherence_1.data, multiple_coherence_2.data, 0, atol=1e-14
+        )
         return Zxx, Zxy
 
     # cutoff_type = "threshold"
@@ -364,15 +460,19 @@ def multiple_coherence_weights(
 
     # Widen the band if needed
     local_stft = Spectrogram(local_stft_obj)
-    remote_stft = Spectrogram(remote_stft_obj)
     band = adjust_band_for_coherence_sorting(frequency_band, local_stft, rule=rule)
-    # band = frequency_band
+    if remote_stft_obj is not None:
+        remote_stft = Spectrogram(remote_stft_obj)
 
     # Extract the FCs for band
     local_dataset = local_stft.extract_band(band)
-    remote_dataset = remote_stft.extract_band(band, channels=["hx", "hy"])
-    remote_dataset = remote_dataset.rename({"hx": "rx", "hy": "ry"})
-    band_dataset = local_dataset.merge(remote_dataset)
+    if remote_stft_obj is not None:
+        remote_dataset = remote_stft.extract_band(band, channels=["hx", "hy"])
+        remote_dataset = remote_dataset.rename({"hx": "rx", "hy": "ry"})
+        band_dataset = local_dataset.merge(remote_dataset)
+    else:
+        band_dataset = local_dataset
+
     n_obs = band_dataset.time.shape[0]
     import time
 
@@ -381,23 +481,32 @@ def multiple_coherence_weights(
     Zxx, Zxy = estimate_time_series_of_impedances(
         band_dataset, output_ch=component, use_remote=False
     )
-    print(time.time() - t0)
+    print(f"Time elapsed to estimate Z for each time window: {time.time() - t0}")
 
-    predicted = Zxx * band_dataset["hx"] + Zxy * band_dataset["hy"]
-    predicted_energy = np.real(
-        (predicted.conjugate().transpose() * predicted).sum("frequency")
-    )
-    # residual = band_dataset[component] - estimate_output
-    # residual_energy = (residual.conjugate().transpose() * residual).real()
-    component_energy = np.real(
-        (band_dataset[component].conjugate().transpose() * band_dataset[component]).sum(
-            "frequency"
-        )
-    )
-    # component_energy = (band_dataset[component].conjugate().transpose() * band_dataset[component]).real()
-    # estimate_energy = (predicted_energy * estimate_output).real()
-    mulitple_coherence = predicted_energy / component_energy
-    print(mulitple_coherence[0])
+    # From Z estimates obtained above, we will predict the output for each time window.
+    # This means hx,hy (input channels) from each time window must be scaled by Zxx and Zy respectively
+    # (TFs) from that time window.
+    # For looping with matrix multiplication is too slow in python (probably fine in C/Fortran), and
+    # it would be too memory intensive to pack a sparse array (although sparse package may do it!)
+    # We can use numpy multiply() function if the arrays are properly shaped ...
+
+    H = local_dataset[["hx", "hy"]].to_array()
+    hx = H.data[0, :, :].squeeze()
+    hy = H.data[1, :, :].squeeze()
+
+    # OR
+    # hx = band_dataset["hx"].data.T
+    # hy = band_dataset["hy"].data.T
+    E_pred = (
+        hx.T * Zxx + hy.T * Zxy
+    )  # Careful that this is scaling each time window separately!!!
+    # E pred is the predicted Fourier coefficients
+    # residual = band_dataset[component] - E_pred
+    predicted_energy = (np.abs(E_pred) ** 2).sum(axis=0)
+    original_energy = (np.abs(local_dataset[component]) ** 2).sum(dim="frequency")
+    multiple_coh = predicted_energy / original_energy.data
+    assert len(multiple_coh) == n_obs
+
     # initialize a dict to hold the weights
     # in this case there will be only two sets of weights, one set
     # from the ex equation and another from the ey
@@ -405,180 +514,8 @@ def multiple_coherence_weights(
     weights = {}
     for component in components:
         weights[component] = np.ones(n_obs)
-    # cumulative_weights = np.ones(n_obs)
-
-    # The notation in the following could be cleaned up, but hopefully should make not too murky what
-    # is happening here.  We wish to estimate the multiple coherence for each time window independently
-    # For each time index in the spectrograms we will solve the following three equations
-    # Ex = Zxx Hx + Zxy Hy
-    # Ey = Zyx Hx + Zyy Hy
-    # Hz = Tzx Hx + Tzy Hy
-    # where (at each time step) we can think of Ex, Hx, Hy, Hz as column vectors having M frequencies
-    # i.e. they are M x 1 matrices.
-
-    # Taking the Ex as an example, we have:
-    # [Ex1 = [ Hx1 Hy1 ] [ Zxx
-    #  Ex2 = [ Hx2 Hy2 ]   Zyx]
-    #   .
-    #   .
-    #   .
-    #  ExM]= [ HxM HyM ]
-    # an Mx1 = Mx2 * 2X1
-    # We can also write this as E = HZ,
-    # The standard solution is to multiply on the left by H.T, (conjugate transpose if complex valued).
-    # To keep the notation from getting unsavoury, the symbol R will be used to denote the conjugate transpose of H.
-    # R is a 2 x M array
-    # Yielding
-    # R E = R H Z     (Equation # XX)
-    # Matrix algebra easily solves this, but these matrices are relatively small, and we need to
-    # solve the equations many times over.
-    # Here it is convenient to work in cross-spectral powers.
-
-    # **ASIDE**: For an OLS solution R is the conjugate transpose of H, BUT any matrix of the same
-    # shape whose columns are independent should work (some fine points in the math should be checked)
-    # but the point is that we can use any combination of available channels as the rows
-    # of R.  It could be Ex & Ey, Hx & Hy, or Remote Hx & Remote Hy, which are the usual, preferred soln,
-    # (hence the selection of the variable R).
-
-    # Note that the left hand side of Equation XX is just a 2x1 array, having entries:
-    # [<rx,ex>
-    #  <ry,ex>]
-    # where <a,b> denotes the cross power a.H,b.  I.e. it is the Inner product of the FCs of ex
-    # with the conjugate transpose vectors hx and hy.
-    # Similarly, the RHS of Equation XX is just a 2x2 matrix times Z (a 2x1)
-    # this 2x2 matrix has entries:
-    # [<rx,hx>, <ry,hx>
-    #  <rx,hy>, <ry,hy>]
-
-    # We could iterate over the time intervals, forming the equation:
-    # R E = R H Z
-    # =
-    # [<rx,ex>]  = [<rx,hx>, <rx,hy]   [Zxx]
-    # [<ry,ex>]    [<ry,hx>, <ry,hy>]   [Zyx]
-    #
-    # and then simply inverting the 2x2, to get our esimates.
-    # This is OK, but will be slow in python.
-    #
-    # It might be better to form, vectorially:
-    #
-    # [<rx1,ex1>]  = [<rx1,hx1>, <ry1,hx1>]   [Zxx1]
-    # [<ry1,ex1>]    [<rx1,hy1>, <ry1,hy1>]   [Zyx1]
-    #
-    # [<rx2,ex2>]  = [<rx2,hx2>, <ry2,hx2>]   [Zxx2]
-    # [<ry2,ex2>]    [<rx2,hy2>, <ry2,hy2>]   [Zyx2]
-    # ...
-    # ...
-    # [<rxN,exN>]  = [<rxN,hxN>, <ryN,hxN>]   [ZxxN]
-    # [<ryN,exN>]    [<rxN,hyN>, <ryN,hyN>]   [ZyxN]
-    #
-    #
-    #
-    # And then merge the equations
-    # ... combining two of them look like this:
-    #
-    # [<rx1,ex1>, <rx2,ex2>]  = [<rx1,hx1>, <ry1,hx1>, <rx2,hx2>, <ry2,hx2>]   [Zxx1]
-    # [<ry1,ex1>, <ry2,ex2>]    [<rx1,hy1>, <ry1,hy1>, <rx2,hy2>, <ry2,hy2>]   [Zyx1]
-    #                                                                          [Zxx2]
-    #                                                                          [Zxy2]
-    # ... combining N of them look like this:
-
-    # [<rx1,ex1>, <rx2,ex2>, ... <rxN,exN>]  = [<rx1,hx1>, <ry1,hx1>, <rx2,hx2>, <ry2,hx2>, ... <rxN,hxN>, <ryN,hxN>]   [Zxx1]
-    # [<ry1,ex1>, <ry2,ex2>, ... <ryN,exN>]    [<rx1,hy1>, <ry1,hy1>, <rx2,hy2>, <ry2,hy2>, ... <rxN,hyN>, <ryN,hyN>]   [Zyx1]
-    #                                                                                                                   [Zxx2]
-    #                                                                                                                   [Zxy2]
-    #                                                                                                                     ...
-    #                                                                                                                   [ZxxN]
-    #                                                                                                                   [ZxyN]
-    # inverting this would be a mess, but np.solve may do it quite efficiently ... and if not,
-    # then this would be a good use of ctypes or similar.
-
-    # alsinvert the 2x2 using a for-loop in python
-    # so we can use the formula for the inverse of a 2x2
-    # (aside)... probably we could stack all the equations and use a cute version of np.solve though ...
-    #
-    # In any case, for a single time interval we have:
-    # - Compute cross power and sum over all harmonics
-    # - Compute Auto Power
-
-    # So treating this as a linalg .solve is not going to cut it
-    # 20230130: Inverting the large matrix is impractical, it turns out to be a sparse
-    # matrix with little nFC x 2 blocks along its diagonal, and can easily get to be 100k elt's on a side
-    # i.e. simple vctorization is not an option.
-    # one could call C (or maybe even Julia) to speed it up, but another approach would be to use
-    # a cross-power formulation for the Z estimates.
-    #
-    # Above it was noted that we need to solve, many times (onve per time window)
-    # An equation like this: where the rx, ry, are in gereral the two chanels in the
-    # Hermitian transpose matrix used in the classic solution, i.e. its G* in: d = Gm <--> G*d = G*Gm
-    #
-    # R E = R H Z
-    # =
-    # [<rx,ex>]  = [<rx,hx>, <ry,hx>]   [Zxx]
-    # [<ry,ex>]    [<rx,hy>, <ry,hy>]   [Zyx]
-    #
-    # But the crosspowers can be computed by just taking (rx*ex).sum(axis=freq) so we can easily set up
-    # all terms in the cross powers.  Now instead of np.solving the 2x2, we can instead use the explicit solution:
-    # A= [a b] ^-1 =  # 1/det(A)   [ d -b]   where det(A)  = 1/(ad-bc)
-    #    [c d]                     [-c  a]
-    #
-    # it will take a bit of wrangling to get a clean way to compute the dets of the matrices vectorially, but
-    # it should be fast
-    # We know that
-    # for computing Zxx, Zxy we need:
-    # local Ex, Hx, Hy, and then either local Hx, Hy, for the hermitian conjugate, or remote Hx, Hy
-    # it actually can be any two linear independent channels but normally those are the pairings.
-    import time
-
-    t0 = time.time()
-    # for component in components:
-    # E = band_datasets["local"][component]
-    # H = band_datasets["local"][["hx", "hy"]]
-    # R = band_datasets["remote"][["hx", "hy"]]
-    # logger.info(f"Looping {component} over time")
-    # 30000 Looper: 150s (3ch)
-    # for i in range(E.time.shape[0]):
-    #     Y = E.data[i:i+1, :].T  # (1,3)
-    #     X = H[["hx", "hy"]].to_array()[:, i:i+1, :].data.squeeze().T
-    #     XR = R[["hx", "hy"]].to_array()[:, i:i+1, :].data.squeeze().T
-    #     z0 = solve_single_time_window(Y,X,XR)
-    # 15000 Looper (71s 3ch)
-    # for i in range(int(E.time.shape[0] / 2)):
-    #     Y = np.reshape(E.data[2 * i : 2 * i + 2, :], (6, 1))
-    #     X = np.zeros((6, 4), dtype=np.complex128)
-    #     X[0:3, 0:2] = (
-    #         H[["hx", "hy"]].to_array()[:, 2 * i : 2 * i + 1, :].data.squeeze().T
-    #     )
-    #     X[3:6, 2:4] = (
-    #         H[["hx", "hy"]].to_array()[:, 2 * i + 1 : 2 * i + 2, :].data.squeeze().T
-    #     )
-    #     # X = H[["hx", "hy"]].to_array()[:, i:i + 1, :].data.squeeze().T
-    #     # XR = R[["hx", "hy"]].to_array()[:, i:i + 1, :].data.squeeze().T
-    #     z0 = solve_single_time_window(Y, X, None)
-    #     print(f"z0 {z0}")
-    #     # 15000 Looper
-    # for i in range(int(E.time.shape[0] / 2)):
-    #     Y = np.reshape(E.data[2 * i:2 * i + 2, :], (6, 1))
-    #     X = np.zeros((6, 4), dtype=np.complex128)
-    #     X[0:3, 0:2] = H[["hx", "hy"]].to_array()[:, 2 * i:2 * i + 1, :].data.squeeze().T
-    #     X[3:6, 2:4] = H[["hx", "hy"]].to_array()[:, 2 * i + 1:2 * i + 2, :].data.squeeze().T
-    #     # X = H[["hx", "hy"]].to_array()[:, i:i + 1, :].data.squeeze().T
-    #     # XR = R[["hx", "hy"]].to_array()[:, i:i + 1, :].data.squeeze().T
-    #     z0 = solve_single_time_window(Y, X, None)
-    # print(f"z0 {z0}")
-    # print("Now loop over time")
-    # i_time = 0;
-    # Y = E.data[0:1, :].T #(1,3)
-    # X = H[["hx","hy"]].to_array()[:,0:1,:].data.squeeze().T
-    # R = R[["hx", "hy"]].to_array()[:, 0:1, :].data.squeeze().T
-    # xH = X.conjugate().transpose()
-    #
-    # a = xH @ X
-    # b = xH @ Y
-    # z0 = np.linalg.solve(a, b)
-    # print(f"b.shape {b.shape}")
-    # print(f"a.shape {a.shape}")
-    # z0 = np.linalg.solve(a,b)
-    # print(z0)
+    print("Now use the multiple_coh variable to compute weights and return them")
+    return np.ones(n_obs)
 
 
 def estimate_simple_coherence(X, Y):
