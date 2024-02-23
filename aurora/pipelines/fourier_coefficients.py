@@ -80,7 +80,7 @@ def decimation_and_stft_config_creator(
     initial_sample_rate, max_levels=6, decimation_factors=None, time_period=None
 ):
     """
-    Based on the number of samples in the run, we can compute the maximum number of valid decimation levels.
+    Based on the number of samples in the runts, we can compute the maximum number of valid decimation levels.
     This would re-use code in processing summary ... or we could just decimate until we cant anymore?
 
     You can provide something like: decimation_info = {0: 1.0, 1: 4.0, 2: 4.0, 3: 4.0}
@@ -96,9 +96,11 @@ def decimation_and_stft_config_creator(
 
     Returns:
         decimation_and_stft_config: list
-            Each element of the list is a Decimation() object.  The order of the list implies the order of the cascading
-            decimation (thus no decimation levels are omitted).  This could be changed in future by using a dict
-            instead of a list, e.g. decimation_factors = dict(zip(np.arange(max_levels), decimation_factors))
+            Each element of the list is a Decimation() object (a.k.a. FCDecimation).
+            The order of the list corresponds the order of the cascading decimation
+              - No decimation levels are omitted.
+              - This could be changed in future by using a dict instead of a list,
+              - e.g. decimation_factors = dict(zip(np.arange(max_levels), decimation_factors))
 
     """
     if not decimation_factors:
@@ -194,7 +196,7 @@ def add_fcs_to_mth5(m, fc_configs=None):
                 run_obj.metadata.id
             )
 
-            print(" TIMING CORRECTIONS WOULD GO HERE ")
+            # If timing corrections were needed they could go here, right before STFT
 
             for i_dec_level, fc_config in enumerate(fc_configs):
                 if i_dec_level != 0:
