@@ -17,7 +17,9 @@ Run level: 'sample_rate', 1.0
 """
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 from mt_metadata.timeseries.filters.helper_functions import make_coefficient_filter
+from mt_metadata.timeseries import Run
 from mt_metadata.transfer_functions.processing.aurora import ChannelNomenclature
+
 
 synthetic_test_paths = SyntheticTestPaths()
 DATA_PATH = synthetic_test_paths.ascii_data_path
@@ -78,21 +80,28 @@ class SyntheticRun(object):
 
     @property
     def channel_map(self):
+        if self._channel_map is None:
+            channel_nomenclature = ChannelNomenclature(
+                self.channel_nomenclature_keyword
+            )
+            channel_nomenclature.keyword = self.channel_nomenclature_keyword
+            self._channel_map = channel_nomenclature.get_channel_map(
+                self.channel_nomenclature_keyword
+            )
         return self._channel_map
 
     def set_channel_map(self):
-        channel_nomenclature = ChannelNomenclature()
-        channel_nomenclature.keyword = self.channel_nomenclature_keyword
-        channel_map = channel_nomenclature.get_channel_map(
-            self.channel_nomenclature_keyword
+        channel_nomenclature = ChannelNomenclature(
+            keyword=self.channel_nomenclature_keyword
         )
-        self._channel_map = channel_map
+        self._channel_map = channel_nomenclature.get_channel_map()
 
 
 class SyntheticStation(object):
     """
     TODO: could add channel_nomenclature to this obj (instead of run, say) and clean
     things up somewhat. ... i.e. inclde the channel_map() property etc.
+    TODO: This looks like a "dataclass"
 
     """
 
@@ -282,7 +291,9 @@ def make_station_04(channel_nomenclature="default"):
 
 
 # def main():
+#     sr = SyntheticRun("001")
 #     make_station_04()
+#
 #
 # if __name__ == "__main__":
 #     main()
