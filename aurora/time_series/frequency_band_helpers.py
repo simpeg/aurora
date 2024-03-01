@@ -262,7 +262,7 @@ class Spectrogram(object):
 
     """
 
-    def __init__(self, dataset):
+    def __init__(self, dataset=None):
         self._dataset = dataset
         self._df = None
 
@@ -271,7 +271,7 @@ class Spectrogram(object):
         return self._dataset
 
     @property
-    def df(self):
+    def delta_freq(self):
         if self._df is None:
             frequency_axis = self.dataset.frequency
             self._df = frequency_axis.data[1] - frequency_axis.data[0]

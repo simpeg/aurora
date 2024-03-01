@@ -387,23 +387,18 @@ def multiple_coherence_weights(
         ryhy = cross_power_series(ry, band["hy"])
 
         N = len(rxex)
-        # Compute determiniants (one per time window)
+        # Compute determinants (one per time window)
+        # Note that when no remote reference (rx=hx, ry=hy) then det is
+        # the product of the auto powers in h minus the product of the cross powers
         det = rxhx * ryhy - rxhy * ryhx
-        # determinanjt is the sum of the autopowers minus the sum of the cross powers
         det = np.real(det)
-        # det_inv = 1.0 / det  # might get nan here ...
 
-        # Inverse matrix (2 x 2 x nTime)
+        # Construct the Inverse matrices (2 x 2 x N)
         inverse_matrices = np.zeros((2, 2, N), dtype=np.complex128)
         inverse_matrices[0, 0, :] = ryhy / det
         inverse_matrices[1, 1, :] = rxhx / det
         inverse_matrices[0, 1, :] = -rxhy / det
         inverse_matrices[1, 0, :] = -ryhx / det
-
-        # multiply inverse (on the left) against LHS
-        # bb = HH @ E
-        # bb1 = inverse_matrices[0, 0, :] * rxex + inverse_matrices[1, 0, :] * ryex
-        # Zxy = inverse_matrices[1, 0, :] * rxex + inverse_matrices[0, 1, :] * ryex
 
         Zxx = (
             inverse_matrices[0, 0, :] * rxex.data
@@ -414,7 +409,7 @@ def multiple_coherence_weights(
             + inverse_matrices[1, 1, :] * ryex.data
         )
 
-        # Below code is a spot check that the caclulation of Zxx and Zxy from the "fast vectorized"
+        # Below code is a spot check that the calculation of Zxx and Zxy from the "fast vectorized"
         # method above is consistent with for-looping on np.solve
 
         # Set up the problem in terms of linalg.solve()
