@@ -562,6 +562,9 @@ class TransferFunctionKernel(object):
         # Set key as first el't of dict, nor currently supporting mixed surveys in TF
         tf_cls.survey_metadata = self.dataset.local_survey_metadata
         tf_cls.station_metadata.transfer_function.processing_type = self.processing_type
+        # tf_cls.station_metadata.transfer_function.processing_config = (
+        #     self.processing_config
+        # )
         return tf_cls
 
     def memory_warning(self):
