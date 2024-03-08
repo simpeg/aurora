@@ -52,11 +52,11 @@ bibliography: paper.bib
 ---
 # Summary
 
-The Aurora software package robustly estimates single station and remote reference electromagnetic transfer functions (TFs) from magnetotelluric (MT) time series.  Aurora is part of an open-source processsing workflow that leverages the self-describing data container MTH5, which in turn leverages the general mt\_metadata framework to manage metadata.  These pre-existing tools greatly simplify the processing interface, reducing requirements for specialized domain knowledge in time series analysis, or data structures manangement and generating transfer functions with a few lines of code.  The processing depends on two inputs -- a table specifying the data to use for TF estimation, and a JSON file specfiying the processing parameters, both of which are generated automatically, and can be modified if desired.  Output TFs are returned as mt\_metadata objects, and can be exported to a variety of common formats for plotting, modelling and inversion.  
+The Aurora software package robustly estimates single station and remote reference electromagnetic transfer functions (TFs) from magnetotelluric (MT) time series.  Aurora is part of an open-source processsing workflow that leverages the self-describing data container MTH5, which in turn leverages the general mt\_metadata framework to manage metadata.  These pre-existing packages simplify the processing by providing managed data structures, allowing for transfer functions to be generated with only a few lines of code.  The processing depends on two inputs -- a table specifying the data to use for TF estimation, and a JSON file specfiying the processing parameters, both of which are generated automatically, and can be modified if desired.  Output TFs are returned as mt\_metadata objects, and can be exported to a variety of common formats for plotting, modelling and inversion.  
 
 # Introduction
 
-Magnetotellurics (MT) is a geophysical technique for probing the electrical conductivity structure of the subsurface using co-located electric and magnetic field measurements.  After data collection, standard practice is to estimate the time invariant  (frequency domain) transfer function (TF) between electric and magnetic channels before proceeding to interpretation and modelling. If measurements are orthogonal the TF is equivlent to the electrical impedance tensor (Z) [@Vozoff:1991].  
+MT is a geophysical technique for probing subsurface electrical conductivity using co-located electric and magnetic field measurements.  After data collection, standard practice is to estimate the time invariant  (frequency domain) transfer function (TF) between electric and magnetic channels before proceeding to interpretation and modelling. If measurements are orthogonal the TF is equivlent to the electrical impedance tensor (Z) [@Vozoff:1991].  
 
 
 $\begin{bmatrix} E_x \\ E_y \end{bmatrix}
@@ -67,13 +67,15 @@ Z_{yx} & Z_{yy}
 \end{bmatrix}
 \begin{bmatrix} H_x \\ H_y \end{bmatrix}$
  
-where ($E_x$, $E_y$), ($H_x$, $H_y$) denote orthogonal electric and magnetic fields respectively.  TF estimation involves management of metadata (locations, orientations, timestamps,) versatile data containers (for linear algebra, slicing, plotting, etc.) and uses a broad collection of signal processing and statistical techniques (@egbert1997robust and references therein).  MTH5 supplies time series as xarray objects for efficient, lazy access to data and easy application of linear algebra and statistics libraries available in the python.
+where ($E_x$, $E_y$), ($H_x$, $H_y$) denote orthogonal electric and magnetic fields respectively.  TF estimation involves requires the E and H time series _and_ metadata (locations, orientations, timestamps,) and uses a collection of signal processing and statistical techniques (@egbert1997robust and references therein).  MTH5 supplies time series as xarray objects for efficient, lazy access to data and easy application of scientific computing libraries available in the python.
 
 # Statement of Need
 
-Uncompiled FORTRAN processing codes have been available for years (e.g. EMTF @egbert2017mod3dmt, or BIRRP @chave1989birrp) but do not offer the readability of a high-level languge and modifications are seldom attempted [@egbert2017mod3dmt]. Recently several python versions of MT processing codes have been released by the open source community, including @shah2019resistics, @smai2020razorback, @ajithabh2023sigmt, and @mthotel.  Aurora adds to this canon of options but differs by leveraging the MTH5 and mt\_metadata packages elimiating a need for internal development of time series or metadata containers.  By providing an example workflow employing mt\_metadata and MTH5 we hope other developers may benefit from following this model, allowing researchers interested in signal-and-noise separation in MT to spend more time exploring and testing algorithms to improve TF estimates, and less time (re)-developing formats and management tools for data and metadata. As a python representation of Egbert's EMTF Remote Reference processing software, Aurora also provides a sort of continuity in the code space as the languages evolve.  
+Uncompiled FORTRAN processing codes have long been available (e.g. EMTF @egbert2017mod3dmt, or BIRRP @chave1989birrp) but lack the readability of high-level languages and modifications to these programs are seldom attempted [@egbert2017mod3dmt]. Recently several python versions of MT processing codes have been released by the open source community, including @shah2019resistics, @smai2020razorback, @ajithabh2023sigmt, and @mthotel.  Aurora adds to this canon of options but differs by leveraging the MTH5 and mt\_metadata packages elimiating a need for internal development of time series or metadata containers.  As a python representation of Egbert's EMTF Remote Reference processing software, Aurora provides a sort of continuity in the MT code space as the languages evolve.  By providing an example workflow employing MTH5 we hope other developers may benefit from following this model, allowing researchers interested in signal-and-noise separation in MT to spend more time exploring and testing algorithms to improve TF estimates, and less time (re)-developing formats and management tools for data and metadata. 
 
 This manuscript describes the high-level concepts of the software – for information about MT data processing @ajithabh2023sigmt provides a concise summary, and more in-depth details can be found in @Vozoff:1991, @egbert2002processing and references therein.  
+
+
 
 
 # Key Features
@@ -83,17 +85,17 @@ This manuscript describes the high-level concepts of the software – for inform
 - Both allow for programatic or manual editting.
 
 
-A TF instance depends on two key prior decisions: a) The data input to the TF computation algorithm, b) The algorithm itself including the specific values of the processing parameters.  Aurora formalizes these concepts as classes (KernelDataset and Processing, respectively), and a third class TransferFunctionKernel (TFK Figure \ref{TFK}), a compositon of the Processing, and KernelDataset provides a place for logic validating consistency between selected data and processing parameters. TFK specifies all the information needed to make the calculation of a TF reproducible (supporting the R in FAIRly archived TFs).
+A TF instance depends on two key prior decisions: a) The data input to the TF computation algorithm, b) The algorithm itself including the specific values of the processing parameters.  Aurora formalizes these concepts as classes (KernelDataset and Processing, respectively), and a third class TransferFunctionKernel (TFK Figure \ref{TFK}), a compositon of the Processing, and KernelDataset.  TFK provides a place for validating consistency between selected data and processing parameters. and specifies all information needed to make the calculation of a TF reproducible (supporting the R in FAIRly archived TFs).
 
 Generation of robust TFs can be done in only a few lines starting from an MTH5 archive (Figure \ref{minimal_example}).  Simplicity of workflow is due to the MTH5 container already storing comprehensive metadata, including a channel summary table describing all time series stored in the archive including start/end times and sample rates.  Users can easily view a tabular summary of available data and select station pairs to process.  Once a station -- and optionally a remote reference station -- are defined, the simultaneous time intervals of data coverage at both stations are idenitified automatically, providing the Kernel Dataset.  Reasonable starting processing parameters can be automatically generated for a given Kernel Dataset, and editted programatically or via a JSON file. Once the TFK is defined, the processing automatically follows the flow of Figure \ref{FLOW}.
 
 ![TF Kernel concept diagram: A box representing the TF Kernel with two inlay boxes representing the processing config (JSON) and dataset (pandas DataFrame).  \label{TFK}](TFKernelApproach.png)
 
-![The main interfaces of Aurora TF processing. \label{FLOW}  Example time series from mth5 archive in linked notebook (using MTH5 built-in time series plotting), spectrogram from FC data structure, cartoon from @hand2018statistical and TF from [SPUD](https://ds.iris.edu/spud/emtf/18633652).  Input time series are from MTH5, these can initally be drawn from Phoenix, LEMI, FDSN, Metronix, Zonge, systems etc. and the resultant transfer functions can similary export to most common TF formats such as .edi, .zmm, ,j, .avg, .xml etc.](aurora_workflow.png)
+![The main interfaces of Aurora TF processing. \label{FLOW}  Example time series from mth5 archive in linked notebook (using MTH5 built-in time series plotting), spectrogram from FC data structure, cartoon from @hand2018statistical and TF from [SPUD](https://ds.iris.edu/spud/emtf/18633652).  Input time series are from MTH5, these can initally be drawn from Phoenix, LEMI, FDSN, Metronix, Zonge, systems etc. and the resultant transfer functions can similarly export to most common TF formats such as .edi, .zmm, ,j, .avg, .xml etc.](aurora_workflow.png)
 
 # Examples
 
-Here an example of the aurora data processing flow is given, using data from Earthscope.  This section refers to Jupyter notebooks intended as companions to this paper. A relatively general notebook about accessing Earthscope data with MTH5 can be found in the link from row 1 of Table \ref{jupyter}.
+An example of the aurora data processing flow is given using data from Earthscope.  This section refers to Jupyter notebooks intended as companions to this paper. A relatively general notebook about accessing Earthscope data with MTH5 can be found in the link from row 1 of Table \ref{jupyter}.
 
 Table: \label{jupyter} Referenced jupyter notebooks with links.
 
@@ -112,7 +114,9 @@ The MTH5 dataset can be built by executing the example notebook in row 2 of Tabl
 
 
 # Testing
-The Aurora package uses continuous integration [@duvall2007continuous] and implements both unit tests as well as integrated tests with 77% code coverage as measured by CodeCov (core dependencies mt_metadata and MTH5 at 84% and 60% respectively).  Improvement of test coverage is ongoing.  For integrated tests Aurora uses a small synthetic MT dataset.  A few processing configurations with manually validated results are stored in the repository. Deviation from these results causes tests to fail, alerting developers if a code change resulted in an unexpected baseline processing result.  In the summer of 2023, widescale testing on Earthscope data archives was performed and showed that the TF results of auora are similar to those form the EMTF fortran codes, in this case for hundreds of real stations rather than a few synthetic ones.  Before PyPI, and conda forge releases, example Jupyter notebooks are also run via github actions.
+Aurora uses continuous integration [@duvall2007continuous] via unit and integrated tests, with ongoing improvement of test coverage is ongoing.  Currently CodeCov measures 77% code coverage (core dependencies mt_metadata and MTH5 at 84% and 60% respectively).  Aurora uses a small synthetic MT dataset for integrated tests.  On push to github the synthetic data are processed and the results compared against manually validated values that are also stored in the repo.  Deviation from expected results causes test failures, alerting developers a code change resulted in an unexpected baseline processing result.  In the summer of 2023, widescale testing on Earthscope data archives was performed indicating that the aurora TF results are similar to those form the EMTF fortran codes, in this case for hundreds of real stations rather than a few synthetic ones.  Before PyPI, and conda forge releases, example Jupyter notebooks are also run via github actions.
+
+
 
 
 # Future Work
@@ -120,7 +124,7 @@ Aurora uses github issues to track tasks and planned improvments.  In the near f
 
 
 # Conclusion
-Aurora provides an open-source Python implementation of the EMTF package for magnetotelluric data processing.  Aurora is a prototype worked example of how to plug processing into an existing opensource data and metadata ecosystem (MTH5, mt_metadata, & MTpy).  We hope Aurora can be used as an example interface to these packages for the open source MT community, and that these tools will contribute to workflows which can focus more on geoscience analysis, and less on the nuances of data management. 
+Aurora provides an open-source Python implementation of the EMTF package for magnetotelluric data processing.  Processing is relatively simple and requires very limited domain knowledge in time series analysis. Aurora also serves as a prototype worked example of how to plug processing into an existing opensource data and metadata ecosystem (MTH5, mt_metadata, & MTpy).  We hope Aurora can be used as an example interface to these packages for the open source MT community, and that these tools will contribute to workflows which can focus more on geoscience analysis, and less on the nuances of data management.
 
 
 # Appendix
@@ -149,11 +153,12 @@ The authors would like to thank IRIS (now Earthscope) for supporting the develop
 
 TODO:
 
+- [ ] Spellcheck
+
 - [ ] **Update links to ipynb to release branches after mth5/aurora releases**.
 
 - [ ] remove draft watermark
 
-- [ ] Link these issues to discussion in future work? https://github.com/kujaku11/mth5/issues/179, https://github.com/kujaku11/mt_metadata/issues/195
 
 ```python
 
