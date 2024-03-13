@@ -222,15 +222,20 @@ def append_chunk_to_stfts(stfts, chunk, remote):
 #     return station_obj.fourier_coefficients_group.get_fc_group(fc_group_id).get_decimation_level(fc_decimation_id)
 
 
-def load_stft_obj_from_mth5(i_dec_level, row, run_obj):
+def load_stft_obj_from_mth5(i_dec_level, row, run_obj, channels=None):
     """
     Load stft_obj from mth5 (instead of compute)
 
+    Note #1: See note #1 in time_series.frequency_band_helpers.extract_band
+
     Parameters
     ----------
-    i_dec_level: integer
-    row
-    run_obj
+    i_dec_level: int
+        The decimation level where the data are stored within the Fourier Coefficient group
+    row: pandas.core.series.Series
+        A row of the TFK.dataset_df
+    run_obj: mth5.groups.run.RunGroup
+        The original time-domain run associated with the data to load
 
     Returns
     -------
@@ -239,8 +244,17 @@ def load_stft_obj_from_mth5(i_dec_level, row, run_obj):
     station_obj = station_obj_from_row(row)
     fc_group = station_obj.fourier_coefficients_group.get_fc_group(run_obj.metadata.id)
     fc_decimation_level = fc_group.get_decimation_level(f"{i_dec_level}")
-    stft_obj = fc_decimation_level.to_xarray()
-    return stft_obj
+    stft_obj = fc_decimation_level.to_xarray(channels=channels)
+
+    cond1 = stft_obj.time >= row.start.tz_localize(None)
+    cond2 = stft_obj.time <= row.end.tz_localize(None)
+    try:
+        stft_chunk = stft_obj.where(cond1 & cond2, drop=True)
+    except TypeError:  # see Note #1
+        tmp = stft_obj.to_array()
+        tmp = tmp.where(cond1 & cond2, drop=True)
+        stft_chunk = tmp.to_dataset("variable")
+    return stft_chunk
 
 
 def save_fourier_coefficients(dec_level_config, row, run_obj, stft_obj):
