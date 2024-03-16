@@ -22,6 +22,9 @@ import numpy as np
 from aurora.time_series.frequency_band_helpers import adjust_band_for_coherence_sorting
 from aurora.time_series.frequency_band_helpers import Spectrogram
 from aurora.transfer_function.weights.spectral_features import (
+    estimate_multiple_coherence,
+)
+from aurora.transfer_function.weights.spectral_features import (
     estimate_time_series_of_impedances,
 )
 from collections import namedtuple
@@ -141,50 +144,6 @@ def jackknife_coherence_weights(
 #     print(band)
 #     print(band)
 #     pass
-
-
-def estimate_multiple_coherence(
-    X,
-    Y,
-    RR,
-    coh_types=(
-        ("local", "ex"),
-        ("local", "ey"),
-        ("local", "hz"),
-        ("remote", "ex"),
-        ("remote", "ey"),
-        ("remote", "hz"),
-    ),
-):
-    """
-
-    TODO: add option for how TF is computed from cross-powers ala Sims and ala Vozoff
-    In general, to estimate Z we solve, for example:
-    Ex = Zxx Hx + Zxy Hy
-    The standard OLS single station solution is to set E, H as row vectors
-    Ex 1XN, H a 2xN, , H.H is Nx2 hermitian transpose of H
-    Ex * H.H = [Zxx Zxy] H*H.H  * is matrixmult
-    Ex * H.H *(H*H.H)^[-1] = [Zxx Zxy]
-    Replacing H.H with R.H results in a much more stable estimate of Z, if remote available
-
-
-
-    Z=EH*HH*−1=1DetHH*ExHx* ExHy* HyHy* −HxHy* −HyHx* HxHx*  Eqn7
-
-
-    Parameters
-    ----------
-    X
-    Y
-    RR
-    coh_types
-
-    Returns
-    -------
-
-
-    """
-    pass
 
 
 def multiple_coherence_weights(
@@ -349,29 +308,8 @@ def multiple_coherence_weights(
         band_dataset, output_ch=component, use_remote=False
     )
     print(f"Time elapsed to estimate Z for each time window: {time.time() - t0}")
+    multiple_coh = estimate_multiple_coherence(local_dataset, component, Zxx, Zxy)
 
-    # From Z estimates obtained above, we will predict the output for each time window.
-    # This means hx,hy (input channels) from each time window must be scaled by Zxx and Zy respectively
-    # (TFs) from that time window.
-    # For looping with matrix multiplication is too slow in python (probably fine in C/Fortran), and
-    # it would be too memory intensive to pack a sparse array (although sparse package may do it!)
-    # We can use numpy multiply() function if the arrays are properly shaped ...
-
-    H = local_dataset[["hx", "hy"]].to_array()
-    hx = H.data[0, :, :].squeeze()
-    hy = H.data[1, :, :].squeeze()
-
-    # OR
-    # hx = band_dataset["hx"].data.T
-    # hy = band_dataset["hy"].data.T
-    E_pred = (
-        hx.T * Zxx + hy.T * Zxy
-    )  # Careful that this is scaling each time window separately!!!
-    # E pred is the predicted Fourier coefficients
-    # residual = band_dataset[component] - E_pred
-    predicted_energy = (np.abs(E_pred) ** 2).sum(axis=0)
-    original_energy = (np.abs(local_dataset[component]) ** 2).sum(dim="frequency")
-    multiple_coh = predicted_energy / original_energy.data
     assert len(multiple_coh) == n_obs
 
     # initialize a dict to hold the weights

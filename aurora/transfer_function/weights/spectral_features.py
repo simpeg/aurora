@@ -72,14 +72,63 @@ def estimate_time_series_of_impedances(band, output_ch="ex", use_remote=True):
     # Y = X*b
     # E = H z
 
-    # Uncomment for sanity check test
-    idx = np.random.randint(len(Zxx))  # 0  # a time-window index to check
-    E = band["ex"][idx, :]
-    H = band[["hx", "hy"]].to_array()[:, idx].T
-    z_direct = direct_solve_tf(E.data, H.data)
-    z_linalg = simple_solve_tf(E.data, H.data, None)
-    z_tricky = np.array([Zxx[idx], Zxy[idx]])
-    assert np.isclose(np.abs(z_direct - z_linalg), 0, atol=1e-10).all()
-    assert np.isclose(np.abs(z_direct - z_tricky), 0, atol=1e-10).all()
+    # # Uncomment for sanity check test
+    # idx = np.random.randint(len(Zxx))  # 0  # a time-window index to check
+    # E = band["ex"][idx, :]
+    # H = band[["hx", "hy"]].to_array()[:, idx].T
+    # z_linalg = simple_solve_tf(E.data, H.data, None)
+    # z_direct = np.array([Zxx[idx], Zxy[idx]])
+    # assert np.isclose(np.abs(z_direct - z_linalg), 0, atol=1e-10).all()
 
     return Zxx, Zxy
+
+
+def estimate_multiple_coherence(local_dataset, component, Z1, Z2):
+    """
+
+    From Z estimates obtained above, we will predict the output for each time window.
+    This means hx,hy (input channels) from each time window must be scaled by Zxx and Zy respectively
+    (TFs) from that time window.
+    For looping with matrix multiplication is too slow in python (probably fine in C/Fortran), and
+    it would be too memory intensive to pack a sparse array (although sparse package may do it!)
+    We can use numpy multiply() function if the arrays are properly shaped ...
+
+    TODO: add option for how TF is computed from cross-powers ala Sims and ala Vozoff
+    In general, to estimate Z we solve, for example:
+    Ex = Zxx Hx + Zxy Hy
+    The standard OLS single station solution is to set E, H as row vectors
+    Ex 1XN, H a 2xN, , H.H is Nx2 hermitian transpose of H
+    Ex * H.H = [Zxx Zxy] H*H.H  * is matrixmult
+    Ex * H.H *(H*H.H)^[-1] = [Zxx Zxy]
+    Replacing H.H with R.H results in a much more stable estimate of Z, if remote available
+
+        Z=EH*HH*−1=1DetHH*ExHx* ExHy* HyHy* −HxHy* −HyHx* HxHx*  Eqn7
+
+    Parameters
+    ----------
+    local_dataset
+    component
+    Z1
+    Z2
+
+    Returns
+    -------
+    multiple_coh
+
+    """
+
+    H = local_dataset[["hx", "hy"]].to_array()
+    hx = H.data[0, :, :].squeeze()
+    hy = H.data[1, :, :].squeeze()
+
+    # hx = band_dataset["hx"].data.T
+    # hy = band_dataset["hy"].data.T
+    E_pred = hx.T * Z1 + hy.T * Z2
+    # Careful that this is scaling each time window separately!!!
+
+    # E pred is the predicted Fourier coefficients
+    # residual = band_dataset[component] - E_pred
+    predicted_energy = (np.abs(E_pred) ** 2).sum(axis=0)
+    original_energy = (np.abs(local_dataset[component]) ** 2).sum(dim="frequency")
+    multiple_coh = predicted_energy / original_energy.data
+    return multiple_coh
