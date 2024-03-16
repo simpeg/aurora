@@ -4,8 +4,22 @@ from aurora.transfer_function.regression.helper_functions import direct_solve_tf
 from aurora.transfer_function.regression.helper_functions import simple_solve_tf
 
 
-def estimate_time_series_of_impedances(band, output_ch="ex", use_remote=True):
+def estimate_time_series_of_impedances(
+    band_spectrogram, output_ch="ex", use_remote=True
+):
     """
+
+    Parameters
+    ----------
+    band_spectrogram: aurora.time_series.spectrogram.Spectrogram
+        A spectrogram of the frequency band to process
+
+    output_ch
+    use_remote
+
+    Returns
+    -------
+
     solve:
 
     [<rx,ex>]  = [<rx,hx>, <rx,hy>]   [Zxx]
@@ -16,8 +30,6 @@ def estimate_time_series_of_impedances(band, output_ch="ex", use_remote=True):
 
     determinant  where det(A)  = 1/(ad-bc)
 
-    :param band: band dataset: xarray, will be spectrogram in future
-    :return:
 
     Requires some nomenclature setup... for now just hard code:/
 
@@ -26,14 +38,15 @@ def estimate_time_series_of_impedances(band, output_ch="ex", use_remote=True):
         which returns self._ch1_ch2
         which initialized to None and is written when requested
 
-    :param band_dataset:
-    :return:
+
+    :return Zxx, Zxy:
     """
 
     def cross_power_series(ch1, ch2):
         """<ch1.H ch2> summed along frequnecy"""
         return (ch1.conjugate().transpose() * ch2).sum(dim="frequency")
 
+    band = band_spectrogram.dataset
     # Start by computing relevant cross powers
     if use_remote:
         rx = band["rx"]
@@ -83,7 +96,7 @@ def estimate_time_series_of_impedances(band, output_ch="ex", use_remote=True):
     return Zxx, Zxy
 
 
-def estimate_multiple_coherence(local_dataset, component, Z1, Z2):
+def estimate_multiple_coherence(local_spectrogram, component, Z1, Z2):
     """
 
     From Z estimates obtained above, we will predict the output for each time window.
@@ -116,7 +129,7 @@ def estimate_multiple_coherence(local_dataset, component, Z1, Z2):
     multiple_coh
 
     """
-
+    local_dataset = local_spectrogram.dataset
     H = local_dataset[["hx", "hy"]].to_array()
     hx = H.data[0, :, :].squeeze()
     hy = H.data[1, :, :].squeeze()

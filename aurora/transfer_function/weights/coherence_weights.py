@@ -20,7 +20,7 @@ This leads to a coherence score for each observation.  We can boot out all data 
 import numpy as np
 
 from aurora.time_series.frequency_band_helpers import adjust_band_for_coherence_sorting
-from aurora.time_series.frequency_band_helpers import Spectrogram
+from aurora.time_series.spectrogram import Spectrogram
 from aurora.transfer_function.weights.spectral_features import (
     estimate_multiple_coherence,
 )
@@ -299,7 +299,7 @@ def multiple_coherence_weights(
     else:
         band_dataset = local_dataset
 
-    n_obs = band_dataset.time.shape[0]
+    n_obs = band_dataset.time_axis.shape[0]
     import time
 
     t0 = time.time()
