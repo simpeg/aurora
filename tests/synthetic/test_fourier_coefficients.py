@@ -107,10 +107,7 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
             # For code coverage, have a case where fc_decimations is None
             if mth5_path.stem == "test1":
                 fc_decimations = None
-            else:
-                fc_decimations = [
-                    x.to_fc_decimation() for x in processing_config.decimations
-                ]
+
             add_fcs_to_mth5(mth5_path, fc_decimations=fc_decimations)
             read_back_fcs(mth5_path)
 

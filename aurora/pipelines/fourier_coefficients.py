@@ -120,6 +120,7 @@ def fc_decimations_creator(
     for i_dec_level, decimation_factor in enumerate(decimation_factors):
         dd = FCDecimation()
         dd.decimation_level = i_dec_level
+        dd.id = f"{i_dec_level}"
         dd.decimation_factor = decimation_factor
         if i_dec_level == 0:
             current_sample_rate = 1.0 * initial_sample_rate
