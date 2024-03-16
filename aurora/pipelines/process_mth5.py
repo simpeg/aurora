@@ -31,6 +31,7 @@ from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.transfer_function_helpers import process_transfer_functions
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
+from aurora.pipelines.transfer_function_kernel import station_obj_from_row
 from aurora.sandbox.triage_metadata import triage_run_id
 from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
@@ -89,29 +90,6 @@ def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrds, units="
         channel_scale_factors=scale_factors,
     )
     return stft_obj
-
-
-def station_obj_from_row(row):
-    """
-    Access the station object
-    Note if/else could avoidable if replacing text string "none" with a None object in survey column
-
-    Parameters
-    ----------
-    row: pd.Series
-        A row of tfk.dataset_df
-
-    Returns
-    -------
-    station_obj:
-
-    """
-    if row.mth5_obj.file_version == "0.1.0":
-        station_obj = row.mth5_obj.stations_group.get_station(row.station_id)
-    elif row.mth5_obj.file_version == "0.2.0":
-        survey_group = row.mth5_obj.surveys_group.get_survey(row.survey)
-        station_obj = survey_group.stations_group.get_station(row.station_id)
-    return station_obj
 
 
 def process_tf_decimation_level(
