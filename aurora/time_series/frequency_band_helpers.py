@@ -185,8 +185,8 @@ def adjust_band_for_coherence_sorting(frequency_band, spectrogram, rule="min3"):
         logger.warning("Cant evaluate coherence with only 1 harmonic")
         logger.info(f"Widening band according to {rule} rule")
         if rule == "min3":
-            band.frequency_min -= spectrogram.df
-            band.frequency_max += spectrogram.df
+            band.frequency_min -= spectrogram.frequency_increment
+            band.frequency_max += spectrogram.frequency_increment
         else:
             msg = f"Band adjustment rule {rule} not recognized"
             logger.error(msg)
@@ -264,18 +264,18 @@ class Spectrogram(object):
 
     def __init__(self, dataset=None):
         self._dataset = dataset
-        self._df = None
+        self._frequency_increment = None
 
     @property
     def dataset(self):
         return self._dataset
 
     @property
-    def delta_freq(self):
-        if self._df is None:
+    def frequency_increment(self):
+        if self._frequency_increment is None:
             frequency_axis = self.dataset.frequency
-            self._df = frequency_axis.data[1] - frequency_axis.data[0]
-        return self._df
+            self._frequency_increment = frequency_axis.data[1] - frequency_axis.data[0]
+        return self._frequency_increment
 
     def num_harmonics_in_band(self, frequency_band, epsilon=1e-7):
         """

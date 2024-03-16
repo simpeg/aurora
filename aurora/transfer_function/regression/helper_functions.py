@@ -38,3 +38,34 @@ def rme_beta(r0):
     """
     beta = 1.0 - np.exp(-r0)
     return beta
+
+
+def solve_single_time_window(Y, X, R=None):
+    """
+    Cast problem Y = Xb into scipy.linalg.solve form which solves: a @ x = b
+    - This function is used for testing vectorized, direct solver.
+
+
+    Parameters
+    ----------
+    Y: numpy.ndarray
+        The "output" of regression problem.  For testing this often has shape (2,).
+    X: numpy.ndarray
+        The "input" of regression problem.  For testing this often has shape (2,2).
+    R: numpy.ndarray or None
+        Remote reference channels (optional)
+
+    Returns
+    -------
+    z: numpy.ndarray
+        The TF estimate -- Usually two complex numbers, (Zxx, Zxy), or (Zyx, Zyy)
+
+    """
+    if R is None:
+        xH = X.conjugate().transpose()
+    else:
+        xH = R.conjugate().transpose()
+    a = xH @ X
+    b = xH @ Y
+    z = np.linalg.solve(a, b)
+    return z

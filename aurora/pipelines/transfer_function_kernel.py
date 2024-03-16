@@ -411,6 +411,13 @@ class TransferFunctionKernel(object):
             for dec_level_config in self.config.decimations:
                 # if dec_level_config.save_fcs:
                 dec_level_config.save_fcs = False
+
+        # TODO: Add logic here that checks if remote reference station is in processing and save_FCs is True
+        # -- logger.critical() This is not a supported configuration (but it might just work!)
+        # -- basically, you would need to have runs at the local and remote station be simultaneous to work
+        # -- if they overlap in a janky way, then the saved FCs will be janky
+        # -- recommend that you apply single station processing to local and remote station with save FCs =True
+        # -- and then run remote reference processing (with save FCs =True)
         return
 
     def get_mth5_file_open_mode(self):
