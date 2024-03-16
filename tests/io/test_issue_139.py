@@ -60,7 +60,7 @@ class TestZFileReadWrite(unittest.TestCase):
         return self._tf_z_obj
 
     def test_tf_obj_from_zrr(self):
-        tf_z = self._tf_z_obj
+        tf_z = self.tf_z_obj
         tf = self.tf_obj
         # check numeric values
         assert (
