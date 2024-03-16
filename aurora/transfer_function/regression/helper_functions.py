@@ -40,18 +40,25 @@ def rme_beta(r0):
     return beta
 
 
-def solve_single_time_window(Y, X, R=None):
+def simple_solve_tf(Y, X, R=None):
     """
     Cast problem Y = Xb into scipy.linalg.solve form which solves: a @ x = b
+    - Note that the "b" in the two equations is different.
+      - The EMTF regression problem (and many regression problems in general) use Y=Xb
+      - Y, X are known and b is the solution
+      - scipy.linalg.solve form which solves: a @ x = b
+      - Here a, b are known and x is the solution.
     - This function is used for testing vectorized, direct solver.
 
 
     Parameters
     ----------
     Y: numpy.ndarray
-        The "output" of regression problem.  For testing this often has shape (2,).
+        The "output" of regression problem.  For testing this often has shape (N,).
+        Y is normally a vector of Electric field FCs
     X: numpy.ndarray
-        The "input" of regression problem.  For testing this often has shape (2,2).
+        The "input" of regression problem.  For testing this often has shape (N,2).
+        X is normally an array of Magnetic field FCs (two-component)
     R: numpy.ndarray or None
         Remote reference channels (optional)
 
@@ -69,3 +76,49 @@ def solve_single_time_window(Y, X, R=None):
     b = xH @ Y
     z = np.linalg.solve(a, b)
     return z
+
+
+def direct_solve_tf(Y, X, R=None):
+    """
+    Cast problem Y = Xb
+
+    Parameters
+    ----------
+    Y: numpy.ndarray
+        The "output" of regression problem.  For testing this often has shape (N,).
+        Y is normally a vector of Electric field FCs
+    X: numpy.ndarray
+        The "input" of regression problem.  For testing this often has shape (N,2).
+        X is normally an array of Magnetic field FCs (two-component)
+    R: numpy.ndarray or None
+        Remote reference channels (optional)
+
+    Returns
+    -------
+    z: numpy.ndarray
+        The TF estimate -- Usually two complex numbers, (Zxx, Zxy), or (Zyx, Zyy)
+    Parameters
+    ----------
+    Y
+    X
+    R
+
+    Returns
+    -------
+
+    """
+    if R is None:
+        xH = X.conjugate().transpose()
+    else:
+        xH = R.conjugate().transpose()
+
+    # multiply both sides by conjugate transpose
+    xHx = xH @ X
+    xHY = xH @ Y
+
+    # Invert the square matrix
+    inv = np.linalg.inv(xHx)
+
+    # get solution
+    b = inv @ xHY
+    return b

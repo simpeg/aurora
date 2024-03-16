@@ -1,8 +1,7 @@
 import numpy as np
 
-from aurora.transfer_function.regression.helper_functions import (
-    solve_single_time_window,
-)
+from aurora.transfer_function.regression.helper_functions import direct_solve_tf
+from aurora.transfer_function.regression.helper_functions import simple_solve_tf
 
 
 def estimate_time_series_of_impedances(band, output_ch="ex", use_remote=True):
@@ -70,33 +69,17 @@ def estimate_time_series_of_impedances(band, output_ch="ex", use_remote=True):
     # method above is consistent with for-looping on np.solve
 
     # Set up the problem in terms of linalg.solve()
-    idx = 0  # a time-window index to check
+    # Y = X*b
+    # E = H z
+
+    # Uncomment for sanity check test
+    idx = np.random.randint(len(Zxx))  # 0  # a time-window index to check
     E = band["ex"][idx, :]
     H = band[["hx", "hy"]].to_array()[:, idx].T
-    HH = H.conj().transpose()
-    a = HH.data @ H.data
-    b = HH.data @ E.data
+    z_direct = direct_solve_tf(E.data, H.data)
+    z_linalg = simple_solve_tf(E.data, H.data, None)
+    z_tricky = np.array([Zxx[idx], Zxy[idx]])
+    assert np.isclose(np.abs(z_direct - z_linalg), 0, atol=1e-10).all()
+    assert np.isclose(np.abs(z_direct - z_tricky), 0, atol=1e-10).all()
 
-    # Solve using direct inverse
-    inv_a = np.linalg.inv(a)
-    zz0 = inv_a @ b
-    # solve using linalg.solve
-    zz = solve_single_time_window(b, a, None)
-    # compare the two solutions
-    assert np.isclose(np.abs(zz0 - zz), 0, atol=1e-10).all()
-
-    # Estimate multiple coherence with linalg.solve soln
-    solved_residual = E - H[:, 0] * zz[0] - H[:, 1] * zz[1]
-    solved_residual_energy = (np.abs(solved_residual) ** 2).sum()
-    output_energy = (np.abs(E) ** 2).sum()
-    multiple_coherence_1 = solved_residual_energy / output_energy
-    print("solve", multiple_coherence_1)
-    # Estimate multiple coherence with Zxx Zxy
-    homebrew_residual = E - H[:, 0] * Zxx[0] - H[:, 1] * Zxy[0]
-    homebrew_residual_energy = (np.abs(homebrew_residual) ** 2).sum()
-    multiple_coherence_2 = homebrew_residual_energy / output_energy
-    print(multiple_coherence_2)
-    assert np.isclose(
-        multiple_coherence_1.data, multiple_coherence_2.data, 0, atol=1e-14
-    ).all()
     return Zxx, Zxy
