@@ -7,20 +7,8 @@ from mth5.utils.helpers import initialize_mth5
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 from mth5.helpers import close_open_files
 
-
 synthetic_test_paths = SyntheticTestPaths()
 DATA_PATH = synthetic_test_paths.mth5_path
-
-
-def fix_time(tstmp):
-    year = tstmp.year
-    month = tstmp.month
-    day = tstmp.day
-    hour = tstmp.hour
-    minute = tstmp.minute
-    second = tstmp.second
-    out = datetime.datetime(year, month, day, hour, minute, second)
-    return out
 
 
 class TestSlicingRunTS(unittest.TestCase):
@@ -44,11 +32,6 @@ class TestSlicingRunTS(unittest.TestCase):
         run_ts_01 = run_001.to_runts()
         start = df.iloc[0].start
         end = df.iloc[0].end
-        logger.info(
-            " Workaround for mt_metadata issue #86 - remove once that is resolved"
-        )
-        # start = fix_time(start)
-        # end = fix_time(end)
         run_ts_02 = run_001.to_runts(start=start, end=end)
         run_ts_03 = run_001.to_runts(
             start=start, end=end + datetime.timedelta(microseconds=499999)
