@@ -7,7 +7,6 @@ I would expect that I can read-in an emtf_xml and then push the same data struct
 back to an xml, but this does not work as expected.
 
 ToDo: consider adding zss and zmm checks
-        # print(type(tf_cls))
         # zss_file_base = f"synthetic_test1.zss"
         # tf_cls.write(fn=zss_file_base, file_type="zss")
 """
@@ -60,7 +59,7 @@ class TestZFileReadWrite(unittest.TestCase):
         return self._tf_z_obj
 
     def test_tf_obj_from_zrr(self):
-        tf_z = self._tf_z_obj
+        tf_z = self.tf_z_obj
         tf = self.tf_obj
         # check numeric values
         assert (
@@ -78,7 +77,6 @@ class TestZFileReadWrite(unittest.TestCase):
     #     out_file_path = pathlib.Path(out_file_name)
     #     tf_z.write(out_file_path)
     #     assert filecmp.cmp(self.zrr_file_base, out_file_path)
-    #     print("Add assert statement that the zrr are the same")
 
 
 def main():

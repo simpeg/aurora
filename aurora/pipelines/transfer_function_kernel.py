@@ -411,6 +411,17 @@ class TransferFunctionKernel(object):
             for dec_level_config in self.config.decimations:
                 # if dec_level_config.save_fcs:
                 dec_level_config.save_fcs = False
+        if self.config.stations.remote:
+            save_any_fcs = np.array([x.save_fcs for x in self.config.decimations]).any()
+            if save_any_fcs:
+                msg = "\n Saving FCs for remote reference processing is not supported"
+                msg = f"{msg} \n - To save FCs, process as single station, then you can use the FCs for RR processing"
+                msg = f"{msg} \n - See issue #319 for details "
+                msg = f"{msg} \n - forcing processing config save_fcs = False "
+                logger.warning(msg)
+                for dec_level_config in self.config.decimations:
+                    dec_level_config.save_fcs = False
+
         return
 
     def get_mth5_file_open_mode(self):
@@ -658,3 +669,31 @@ def mth5_has_fcs(m, survey_id, station_id, run_id, remote, processing_config):
         processing_config, remote
     )
     return fcs_already_there
+
+
+# =============================================================================
+# Helper Functions
+# =============================================================================
+
+
+def station_obj_from_row(row):
+    """
+    Access the station object
+    Note if/else could avoidable if replacing text string "none" with a None object in survey column
+
+    Parameters
+    ----------
+    row: pd.Series
+        A row of tfk.dataset_df
+
+    Returns
+    -------
+    station_obj:
+
+    """
+    if row.mth5_obj.file_version == "0.1.0":
+        station_obj = row.mth5_obj.stations_group.get_station(row.station_id)
+    elif row.mth5_obj.file_version == "0.2.0":
+        survey_group = row.mth5_obj.surveys_group.get_survey(row.survey)
+        station_obj = survey_group.stations_group.get_station(row.station_id)
+    return station_obj

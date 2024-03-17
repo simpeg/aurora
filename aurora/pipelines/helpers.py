@@ -22,5 +22,5 @@ def initialize_config(processing_config):
     elif isinstance(processing_config, Processing):
         config = processing_config
     else:
-        raise Exception(f"Unrecognized config of type {type(processing_config)}")
+        raise TypeError(f"Unrecognized config of type {type(processing_config)}")
     return config

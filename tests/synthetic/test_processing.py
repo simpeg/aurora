@@ -240,10 +240,14 @@ def process_synthetic_1(
     return tf_result
 
 
-def process_synthetic_2(force_make_mth5=True, z_file_path=None, save_fc=False):
+def process_synthetic_2(
+    force_make_mth5=True, z_file_path=None, save_fc=False, file_version="0.2.0"
+):
     """"""
     station_id = "test2"
-    mth5_path = create_test2_h5(force_make_mth5=force_make_mth5)
+    mth5_path = create_test2_h5(
+        force_make_mth5=force_make_mth5, file_version=file_version
+    )
     mth5_paths = [
         mth5_path,
     ]

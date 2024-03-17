@@ -2,7 +2,7 @@ import unittest
 
 from aurora.config.config_creator import ConfigCreator
 from aurora.pipelines.fourier_coefficients import add_fcs_to_mth5
-from aurora.pipelines.fourier_coefficients import decimation_and_stft_config_creator
+from aurora.pipelines.fourier_coefficients import fc_decimations_creator
 from aurora.pipelines.fourier_coefficients import read_back_fcs
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
@@ -104,7 +104,11 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
             fc_decimations = [
                 x.to_fc_decimation() for x in processing_config.decimations
             ]
-            add_fcs_to_mth5(mth5_path, fc_configs=fc_decimations)
+            # For code coverage, have a case where fc_decimations is None
+            if mth5_path.stem == "test1":
+                fc_decimations = None
+
+            add_fcs_to_mth5(mth5_path, fc_decimations=fc_decimations)
             read_back_fcs(mth5_path)
 
             # Confirm the file still processes fine with the fcs inside
@@ -112,14 +116,14 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
 
         return tfc
 
-    def test_decimation_and_stft_config_creator(self):
+    def test_fc_decimations_creator(self):
         """"""
-        cfgs = decimation_and_stft_config_creator(1.0)
+        cfgs = fc_decimations_creator(1.0)
 
         # test time period must of of type
         with self.assertRaises(NotImplementedError):
             time_period = ["2023-01-01T17:48:59", "2023-01-09T08:54:08"]
-            decimation_and_stft_config_creator(1.0, time_period=time_period)
+            fc_decimations_creator(1.0, time_period=time_period)
         return cfgs
 
     def test_create_then_use_stored_fcs_for_processing(self):
@@ -140,8 +144,7 @@ def main():
     # test_case.setUpClass()
     # test_case.test_create_then_use_stored_fcs_for_processing()
     # test_case.test_123()
-    # test_case.test_decimation_and_stft_config_creator()
-    # print("se funciona!")
+    # test_case.fc_decimations_creator()
     unittest.main()
 
 

@@ -31,6 +31,7 @@ from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.transfer_function_helpers import process_transfer_functions
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
+from aurora.pipelines.transfer_function_kernel import station_obj_from_row
 from aurora.sandbox.triage_metadata import triage_run_id
 from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
@@ -89,29 +90,6 @@ def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrds, units="
         channel_scale_factors=scale_factors,
     )
     return stft_obj
-
-
-def station_obj_from_row(row):
-    """
-    Access the station object
-    Note if/else could avoidable if replacing text string "none" with a None object in survey column
-
-    Parameters
-    ----------
-    row: pd.Series
-        A row of tfk.dataset_df
-
-    Returns
-    -------
-    station_obj:
-
-    """
-    if row.mth5_obj.file_version == "0.1.0":
-        station_obj = row.mth5_obj.stations_group.get_station(row.station_id)
-    elif row.mth5_obj.file_version == "0.2.0":
-        survey_group = row.mth5_obj.surveys_group.get_survey(row.survey)
-        station_obj = survey_group.stations_group.get_station(row.station_id)
-    return station_obj
 
 
 def process_tf_decimation_level(
@@ -222,15 +200,20 @@ def append_chunk_to_stfts(stfts, chunk, remote):
 #     return station_obj.fourier_coefficients_group.get_fc_group(fc_group_id).get_decimation_level(fc_decimation_id)
 
 
-def load_stft_obj_from_mth5(i_dec_level, row, run_obj):
+def load_stft_obj_from_mth5(i_dec_level, row, run_obj, channels=None):
     """
     Load stft_obj from mth5 (instead of compute)
 
+    Note #1: See note #1 in time_series.frequency_band_helpers.extract_band
+
     Parameters
     ----------
-    i_dec_level: integer
-    row
-    run_obj
+    i_dec_level: int
+        The decimation level where the data are stored within the Fourier Coefficient group
+    row: pandas.core.series.Series
+        A row of the TFK.dataset_df
+    run_obj: mth5.groups.run.RunGroup
+        The original time-domain run associated with the data to load
 
     Returns
     -------
@@ -239,8 +222,17 @@ def load_stft_obj_from_mth5(i_dec_level, row, run_obj):
     station_obj = station_obj_from_row(row)
     fc_group = station_obj.fourier_coefficients_group.get_fc_group(run_obj.metadata.id)
     fc_decimation_level = fc_group.get_decimation_level(f"{i_dec_level}")
-    stft_obj = fc_decimation_level.to_xarray()
-    return stft_obj
+    stft_obj = fc_decimation_level.to_xarray(channels=channels)
+
+    cond1 = stft_obj.time >= row.start.tz_localize(None)
+    cond2 = stft_obj.time <= row.end.tz_localize(None)
+    try:
+        stft_chunk = stft_obj.where(cond1 & cond2, drop=True)
+    except TypeError:  # see Note #1
+        tmp = stft_obj.to_array()
+        tmp = tmp.where(cond1 & cond2, drop=True)
+        stft_chunk = tmp.to_dataset("variable")
+    return stft_chunk
 
 
 def save_fourier_coefficients(dec_level_config, row, run_obj, stft_obj):

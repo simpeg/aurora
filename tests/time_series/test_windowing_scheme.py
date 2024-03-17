@@ -4,6 +4,7 @@ import unittest
 
 from aurora.time_series.time_axis_helpers import make_time_axis
 from aurora.time_series.windowing_scheme import WindowingScheme
+from loguru import logger
 
 np.random.seed(0)
 
@@ -32,14 +33,7 @@ def get_xarray_dataset(N=1000, sps=50.0):
     """
     make a few xarrays, then bind them into a dataset
     ToDo: Consider moving this method into test_utils/
-    ToDo: Add a test that confirms we get an AttributeError when we try
-    to overwrite attrs of xarray (
-    try:
-        ds.sample_rate=10
-        print("was not expecting to be able to overwrite attr of xarray")
-        assert(False)
-    except AttributeError:
-        assert(True)
+
     """
     t0 = np.datetime64("1977-03-02 12:34:56")
     time_vector = make_time_axis(t0, N, sps)
@@ -88,7 +82,7 @@ class TestWindowingScheme(unittest.TestCase):
         ds = get_xarray_dataset()
         try:
             ds.sample_rate = 10
-            print("was not expecting to be able to overwrite attr of xarray")
+            logger.info("was not expecting to be able to overwrite attr of xarray")
             assert False
         except AttributeError:
             assert True
