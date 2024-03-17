@@ -8,7 +8,7 @@ tags:
 authors:
   - name: Karl N. Kappler
     orcid: 0000-0002-1877-1255
-    affiliation: 5
+    affiliation: 5,6
   - name: Jared R. Peacock
     orcid: 0000-0002-0439-0224
     affiliation: 1
@@ -45,8 +45,10 @@ affiliations:
    index: 3
  - name: University of British Columbia, USA
    index: 4
- - name: Independent Researcher, USA
+ - name: Space Science Institute, USA
    index: 5
+ - name: DIAS Geophysical, Canada
+   index: 6
 date: 12 January 2023
 bibliography: paper.bib
 ---
