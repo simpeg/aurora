@@ -145,7 +145,6 @@ def main():
     # test_case.test_create_then_use_stored_fcs_for_processing()
     # test_case.test_123()
     # test_case.fc_decimations_creator()
-    # print("se funciona!")
     unittest.main()
 
 
