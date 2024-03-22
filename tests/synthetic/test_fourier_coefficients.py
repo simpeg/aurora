@@ -1,34 +1,8 @@
-"""
-Flow:
-1. We need to start with a list of mth5 files.
-- Assert that synthetic data exist, (and build if they dont)
-- should already know what you expect here ...  test1,2,3.h5 and test12rr.h5
-2. Two ways to prepare the FC-schema (processing configs)
-- a) use the mt_metadata processing fourier_coefficients structures explictly
-- b) use the default processing configs you already use for processing, and
-extract type (a) cfgs from these (the machinery to do this should exist already)
-3. Loop over files and generate FCs
-4. Compare fc values against some archived values
-
-ToDo:
-1. Make one test generate the decimation_and_stft_config with default values from
-the decimation_and_stft_config_creator method here
-2. Make another test take the existing aurora processing config and transform it to
-decimation_and_stft_config
-
-
-Here are the synthetic files for which this is currently passing tests
-    [PosixPath('/home/kkappler/software/irismt/aurora/tests/synthetic/data/test1.h5'),
-     PosixPath('/home/kkappler/software/irismt/aurora/tests/synthetic/data/test2.h5'),
-     PosixPath('/home/kkappler/software/irismt/aurora/tests/synthetic/data/test3.h5'),
-     PosixPath('/home/kkappler/software/irismt/aurora/tests/synthetic/data/test12rr.h5')]
-
-"""
 import unittest
 
 from aurora.config.config_creator import ConfigCreator
 from aurora.pipelines.fourier_coefficients import add_fcs_to_mth5
-from aurora.pipelines.fourier_coefficients import decimation_and_stft_config_creator
+from aurora.pipelines.fourier_coefficients import fc_decimations_creator
 from aurora.pipelines.fourier_coefficients import read_back_fcs
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
@@ -39,6 +13,7 @@ from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
 from aurora.test_utils.synthetic.make_processing_configs import create_test_run_config
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 from aurora.transfer_function.kernel_dataset import KernelDataset
+from loguru import logger
 from mth5.helpers import close_open_files
 
 synthetic_test_paths = SyntheticTestPaths()
@@ -50,11 +25,30 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
     """
     Runs several synthetic processing tests from config creation to tf_cls.
 
+    There are two ways to prepare the FC-schema
+      a) use the mt_metadata.FCDecimation class explictly
+      b) mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel has
+      a to_fc_decimation() method that returns mt_metadata.FCDecimation
+
+    Flow is to make some mth5 files from synthetic data, then loop over those files adding fcs.
+    Finally, process the mth5s to make TFs.
+
+    Synthetic files for which this is currently passing tests:
+    [PosixPath('/home/kkappler/software/irismt/aurora/tests/synthetic/data/test1.h5'),
+     PosixPath('/home/kkappler/software/irismt/aurora/tests/synthetic/data/test2.h5'),
+     PosixPath('/home/kkappler/software/irismt/aurora/tests/synthetic/data/test3.h5'),
+     PosixPath('/home/kkappler/software/irismt/aurora/tests/synthetic/data/test12rr.h5')]
+
+      TODO: review test_123 to see if it can be shortened.
     """
 
     @classmethod
     def setUpClass(self):
-        print("make synthetic data")
+        """
+        Makes some synthetic h5 files for testing.
+
+        """
+        logger.info("Making synthetic data")
         close_open_files()
         self.file_version = "0.1.0"
         mth5_path_1 = create_test1_h5(file_version=self.file_version)
@@ -65,7 +59,13 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
 
     def test_123(self):
         """
-        This test adds FCs to each of the synthetic files that get built in setUpClass method
+        This test adds FCs to each of the synthetic files that get built in setUpClass method.
+        - This could probably be shortened, it isn't clear that all the h5 files need to have fc added
+        and be processed too.
+
+        uses the to_fc_decimation() method of
+        mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel.
+
         Returns
         -------
 
@@ -104,21 +104,26 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
             fc_decimations = [
                 x.to_fc_decimation() for x in processing_config.decimations
             ]
-            add_fcs_to_mth5(mth5_path, decimation_and_stft_configs=fc_decimations)
+            # For code coverage, have a case where fc_decimations is None
+            if mth5_path.stem == "test1":
+                fc_decimations = None
+
+            add_fcs_to_mth5(mth5_path, fc_decimations=fc_decimations)
             read_back_fcs(mth5_path)
 
             # Confirm the file still processes fine with the fcs inside
             tfc = process_mth5(processing_config, tfk_dataset=tfk_dataset)
-            return tfc
-        return
 
-    def test_decimation_and_stft_config_creator(self):
-        cfgs = decimation_and_stft_config_creator(1.0)
+        return tfc
+
+    def test_fc_decimations_creator(self):
+        """"""
+        cfgs = fc_decimations_creator(1.0)
 
         # test time period must of of type
         with self.assertRaises(NotImplementedError):
             time_period = ["2023-01-01T17:48:59", "2023-01-09T08:54:08"]
-            decimation_and_stft_config_creator(1.0, time_period=time_period)
+            fc_decimations_creator(1.0, time_period=time_period)
         return cfgs
 
     def test_create_then_use_stored_fcs_for_processing(self):
@@ -139,8 +144,7 @@ def main():
     # test_case.setUpClass()
     # test_case.test_create_then_use_stored_fcs_for_processing()
     # test_case.test_123()
-    # test_case.test_decimation_and_stft_config_creator()
-    # print("se funciona!")
+    # test_case.fc_decimations_creator()
     unittest.main()
 
 

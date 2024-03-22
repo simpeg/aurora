@@ -16,6 +16,7 @@ from aurora.transfer_function.emtf_z_file_helpers import (
 )
 from aurora.transfer_function.kernel_dataset import KernelDataset
 from plot_helpers_synthetic import plot_rho_phi
+from loguru import logger
 from mth5.helpers import close_open_files
 
 synthetic_test_paths = SyntheticTestPaths()
@@ -137,7 +138,7 @@ def run_test1(emtf_version, ds_df):
     -------
 
     """
-    print(f"Test1 vs {emtf_version}")
+    logger.info(f"Test1 vs {emtf_version}")
     test_case_id = "test1"
     auxilliary_z_file = EMTF_RESULTS_PATH.joinpath("test1.zss")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zss"
@@ -156,7 +157,7 @@ def run_test2r1(tfk_dataset):
     -------
 
     """
-    print("Test2r1")
+    logger.info("Test2r1")
     test_case_id = "test2r1"
     emtf_version = "fortran"
     auxilliary_z_file = EMTF_RESULTS_PATH.joinpath("test2r1.zrr")

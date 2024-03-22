@@ -34,10 +34,22 @@ class TestKernelDataset(unittest.TestCase):
 
     def test_clone_dataframe(self):
         cloned_df = self.kd.clone_dataframe()
+
+        # fc column is None so this wont be true
+        self.assertFalse((cloned_df == self.kd.df).all().all())
+
+        cloned_df["fc"] = False
+        self.kd.df["fc"] = False
         assert (cloned_df == self.kd.df).all().all()
 
     def test_clone(self):
         clone = self.kd.clone()
+
+        # fc column is None so this wont be true
+        self.assertFalse((clone.df == self.kd.df).all().all())
+
+        clone.df["fc"] = False
+        self.kd.df["fc"] = False
         assert (clone.df == self.kd.df).all().all()
         # add more checks
 
