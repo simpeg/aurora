@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pipelines &mdash; aurora 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css?v=7f9a90b1" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=f6245a2f"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="General Helper Functions" href="general_helper_functions.html" />
+    <link rel="prev" title="Transfer Function" href="transfer_function.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="time_series.html">Time Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transfer_function.html">Transfer Function</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Pipelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-aurora.pipelines.process_mth5">Process MTH5</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.process_mth5.append_chunk_to_stfts"><code class="docutils literal notranslate"><span class="pre">append_chunk_to_stfts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.process_mth5.enrich_row"><code class="docutils literal notranslate"><span class="pre">enrich_row()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.process_mth5.get_spectrogams"><code class="docutils literal notranslate"><span class="pre">get_spectrogams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.process_mth5.load_stft_obj_from_mth5"><code class="docutils literal notranslate"><span class="pre">load_stft_obj_from_mth5()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.process_mth5.make_stft_objects"><code class="docutils literal notranslate"><span class="pre">make_stft_objects()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.process_mth5.merge_stfts"><code class="docutils literal notranslate"><span class="pre">merge_stfts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.process_mth5.process_mth5"><code class="docutils literal notranslate"><span class="pre">process_mth5()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.process_mth5.process_tf_decimation_level"><code class="docutils literal notranslate"><span class="pre">process_tf_decimation_level()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.process_mth5.save_fourier_coefficients"><code class="docutils literal notranslate"><span class="pre">save_fourier_coefficients()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.process_mth5.triage_issue_289"><code class="docutils literal notranslate"><span class="pre">triage_issue_289()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-aurora.pipelines.time_series_helpers">Time Series Helpers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.time_series_helpers.apply_prewhitening"><code class="docutils literal notranslate"><span class="pre">apply_prewhitening()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.time_series_helpers.apply_recoloring"><code class="docutils literal notranslate"><span class="pre">apply_recoloring()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.time_series_helpers.calibrate_stft_obj"><code class="docutils literal notranslate"><span class="pre">calibrate_stft_obj()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.time_series_helpers.nan_to_mean"><code class="docutils literal notranslate"><span class="pre">nan_to_mean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.time_series_helpers.prototype_decimate"><code class="docutils literal notranslate"><span class="pre">prototype_decimate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.time_series_helpers.prototype_decimate_2"><code class="docutils literal notranslate"><span class="pre">prototype_decimate_2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.time_series_helpers.prototype_decimate_3"><code class="docutils literal notranslate"><span class="pre">prototype_decimate_3()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.time_series_helpers.run_ts_to_stft"><code class="docutils literal notranslate"><span class="pre">run_ts_to_stft()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.time_series_helpers.run_ts_to_stft_scipy"><code class="docutils literal notranslate"><span class="pre">run_ts_to_stft_scipy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.time_series_helpers.truncate_to_clock_zero"><code class="docutils literal notranslate"><span class="pre">truncate_to_clock_zero()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.time_series_helpers.validate_sample_rate"><code class="docutils literal notranslate"><span class="pre">validate_sample_rate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-aurora.pipelines.transfer_function_helpers">Transfer Function Helpers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.transfer_function_helpers.apply_weights"><code class="docutils literal notranslate"><span class="pre">apply_weights()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.transfer_function_helpers.drop_nans"><code class="docutils literal notranslate"><span class="pre">drop_nans()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.transfer_function_helpers.get_estimator_class"><code class="docutils literal notranslate"><span class="pre">get_estimator_class()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.transfer_function_helpers.process_transfer_functions"><code class="docutils literal notranslate"><span class="pre">process_transfer_functions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.transfer_function_helpers.select_channel"><code class="docutils literal notranslate"><span class="pre">select_channel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.transfer_function_helpers.set_up_iter_control"><code class="docutils literal notranslate"><span class="pre">set_up_iter_control()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.pipelines.transfer_function_helpers.stack_fcs"><code class="docutils literal notranslate"><span class="pre">stack_fcs()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="general_helper_functions.html">General Helper Functions</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">API Reference</a></li>
+      <li class="breadcrumb-item active">Pipelines</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/pipelines.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pipelines">
+<span id="id1"></span><h1>Pipelines<a class="headerlink" href="#pipelines" title="Permalink to this heading">¶</a></h1>
+<section id="module-aurora.pipelines.process_mth5">
+<span id="process-mth5"></span><h2>Process MTH5<a class="headerlink" href="#module-aurora.pipelines.process_mth5" title="Permalink to this heading">¶</a></h2>
+<p>Process an MTH5 using the metdata config object.</p>
+<p>Note 1: process_mth5 assumes application of cascading decimation, and that the
+decimated data will be accessed from the previous decimation level.  This should be
+revisited. It may make more sense to have a get_decimation_level() interface that
+provides an option of applying decimation or loading predecimated data.
+This will be addressed via creation of the FC layer inside mth5.</p>
+<p>Note 2: We can encounter cases where some runs can be decimated and others can not.
+We need a way to handle this. For example, a short run may not yield any data from a
+later decimation level. An attempt to handle this has been made in TF Kernel by
+adding a is_valid_dataset column, associated with each run-decimation level pair.</p>
+<dl class="simple">
+<dt>Note 3: This point in the loop marks the interface between _generation_ of the FCs and</dt><dd><p>their _usage_. In future the code above this comment would be pushed into
+create_fourier_coefficients() and the code below this would access those FCs and
+execute compute_transfer_function()</p>
+</dd>
+</dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.process_mth5.append_chunk_to_stfts">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.process_mth5.</span></span><span class="sig-name descname"><span class="pre">append_chunk_to_stfts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stfts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remote</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/process_mth5.html#append_chunk_to_stfts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.process_mth5.append_chunk_to_stfts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.process_mth5.enrich_row">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.process_mth5.</span></span><span class="sig-name descname"><span class="pre">enrich_row</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/process_mth5.html#enrich_row"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.process_mth5.enrich_row" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.process_mth5.get_spectrogams">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.process_mth5.</span></span><span class="sig-name descname"><span class="pre">get_spectrogams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tfk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_dec_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MT'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/process_mth5.html#get_spectrogams"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.process_mth5.get_spectrogams" title="Permalink to this definition">¶</a></dt>
+<dd><p>Can be make a method of TFK</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tfk</strong> (<em>TransferFunctionKernel</em>) – </p></li>
+<li><p><strong>i_dec_level</strong> (<em>integer</em>) – </p></li>
+<li><p><strong>units</strong> (<em>&quot;MT&quot;</em><em> or </em><em>&quot;SI&quot;</em><em>, </em><em>likely to be deprecated</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)">dict</a> of short time fourier transforms</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.process_mth5.load_stft_obj_from_mth5">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.process_mth5.</span></span><span class="sig-name descname"><span class="pre">load_stft_obj_from_mth5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i_dec_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/process_mth5.html#load_stft_obj_from_mth5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.process_mth5.load_stft_obj_from_mth5" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load stft_obj from mth5 (instead of compute)</p>
+<p>Note #1: See note #1 in time_series.frequency_band_helpers.extract_band</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i_dec_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – The decimation level where the data are stored within the Fourier Coefficient group</p></li>
+<li><p><strong>row</strong> (<em>pandas.core.series.Series</em>) – A row of the TFK.dataset_df</p></li>
+<li><p><strong>run_obj</strong> (<em>mth5.groups.run.RunGroup</em>) – The original time-domain run associated with the data to load</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.process_mth5.make_stft_objects">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.process_mth5.</span></span><span class="sig-name descname"><span class="pre">make_stft_objects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processing_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_dec_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_xrds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MT'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/process_mth5.html#make_stft_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.process_mth5.make_stft_objects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Operates on a “per-run” basis</p>
+<p>This method could be modifed in a multiple station code so that it doesn’t care
+if the station is “local” or “remote” but rather uses scale factors keyed by
+station_id</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>processing_config</strong> (<em>mt_metadata.transfer_functions.processing.aurora.Processing</em>) – Metadata about the processing to be applied</p></li>
+<li><p><strong>i_dec_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – The decimation level to process</p></li>
+<li><p><strong>run_obj</strong> (<em>mth5.groups.master_station_run_channel.RunGroup</em>) – The run to transform to stft</p></li>
+<li><p><strong>run_xrds</strong> (<em>xarray.core.dataset.Dataset</em>) – The data time series from the run to transform</p></li>
+<li><p><strong>units</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – expects “MT”.  May change so that this is the only accepted set of units</p></li>
+<li><p><strong>station_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – To be deprecated, this information is contained in the run_obj as
+run_obj.station_group.metadata.id</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>stft_obj</strong> – Time series of calibrated Fourier coefficients per each channel in the run</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.core.dataset.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.process_mth5.merge_stfts">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.process_mth5.</span></span><span class="sig-name descname"><span class="pre">merge_stfts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stfts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tfk</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/process_mth5.html#merge_stfts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.process_mth5.merge_stfts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.process_mth5.process_mth5">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.process_mth5.</span></span><span class="sig-name descname"><span class="pre">process_mth5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tfk_dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MT'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_file_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_collection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/process_mth5.html#process_mth5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.process_mth5.process_mth5" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the main method used to transform a processing_config,
+and a kernel_dataset into a transfer function estimate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<em>mt_metadata.transfer_functions.processing.aurora.Processing</em><em> or </em><em>path to json</em>) – All processing parameters</p></li>
+<li><p><strong>tfk_dataset</strong> (<em>aurora.tf_kernel.dataset.Dataset</em><em> or </em><em>None</em>) – Specifies what datasets to process according to config</p></li>
+<li><p><strong>units</strong> (<em>string</em>) – “MT” or “SI”.  To be deprecated once data have units embedded</p></li>
+<li><p><strong>show_plot</strong> (<em>boolean</em>) – Only used for dev</p></li>
+<li><p><strong>z_file_path</strong> (<em>string</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><em>pathlib.Path</em></a>) – Target path for a z_file output if desired</p></li>
+<li><p><strong>return_collection</strong> (<em>boolean</em>) – return_collection=False will return an mt_metadata TF object
+return_collection=True will return
+aurora.transfer_function.transfer_function_collection.TransferFunctionCollection</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>tf</strong> (<em>TransferFunctionCollection or mt_metadata TF</em>) – The transfer funtion object</p></li>
+<li><p><strong>tf_cls</strong> (<em>mt_metadata.transfer_functions.TF</em>) – TF object</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.process_mth5.process_tf_decimation_level">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.process_mth5.</span></span><span class="sig-name descname"><span class="pre">process_tf_decimation_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_dec_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_stft_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remote_stft_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MT'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/process_mth5.html#process_tf_decimation_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.process_mth5.process_tf_decimation_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processing pipeline for a single decimation_level</p>
+<p>TODO: Add a check that the processing config sample rates agree with the data
+TODO: Add units to local_stft_obj, remote_stft_obj
+sampling rates otherwise raise Exception
+This method can be single station or remote based on the process cfg</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<em>mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel</em>) – Config for a single decimation level</p></li>
+<li><p><strong>i_dec_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – decimation level_id
+?could we pack this into the decimation level as an attr?</p></li>
+<li><p><strong>local_stft_obj</strong> (<em>xarray.core.dataset.Dataset</em>) – The time series of Fourier coefficients from the local station</p></li>
+<li><p><strong>remote_stft_obj</strong> (<em>xarray.core.dataset.Dataset</em><em> or </em><em>None</em>) – The time series of Fourier coefficients from the remote station</p></li>
+<li><p><strong>units</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – one of [“MT”,”SI”]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>transfer_function_obj</strong> – The transfer function values packed into an object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="transfer_function.html#aurora.transfer_function.TTFZ.TTFZ" title="aurora.transfer_function.TTFZ.TTFZ">aurora.transfer_function.TTFZ.TTFZ</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.process_mth5.save_fourier_coefficients">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.process_mth5.</span></span><span class="sig-name descname"><span class="pre">save_fourier_coefficients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dec_level_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stft_obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/process_mth5.html#save_fourier_coefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.process_mth5.save_fourier_coefficients" title="Permalink to this definition">¶</a></dt>
+<dd><p>Note #1: Logic for building FC layers:
+If the processing config decimation_level.save_fcs_type = “h5” and fc_levels_already_exist is False, then open
+in append mode, else open in read mode.  We should support a flag: force_rebuild_fcs, normally False.  This flag
+is only needed when save_fcs_type==”h5”.  If True, then we open in append mode, regarless of fc_levels_already_exist
+The task of setting mode=”a”, mode=”r” can be handled by tfk (maybe in tfk.validate())</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dec_level_config</strong> – </p></li>
+<li><p><strong>row</strong> – </p></li>
+<li><p><strong>run_obj</strong> – </p></li>
+<li><p><strong>stft_obj</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.process_mth5.triage_issue_289">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.process_mth5.</span></span><span class="sig-name descname"><span class="pre">triage_issue_289</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_stfts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remote_stfts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/process_mth5.html#triage_issue_289"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.process_mth5.triage_issue_289" title="Permalink to this definition">¶</a></dt>
+<dd><p>Timing Error Workaround See Aurora Issue #289: seems associated with getting one fewer sample than expected
+from the edge of a run.</p>
+</dd></dl>
+
+</section>
+<section id="module-aurora.pipelines.time_series_helpers">
+<span id="time-series-helpers"></span><h2>Time Series Helpers<a class="headerlink" href="#module-aurora.pipelines.time_series_helpers" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.time_series_helpers.apply_prewhitening">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.time_series_helpers.</span></span><span class="sig-name descname"><span class="pre">apply_prewhitening</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decimation_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_xrds_input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/time_series_helpers.html#apply_prewhitening"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.time_series_helpers.apply_prewhitening" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies pre-whitening to time series to avoid spectral leakage when FFT is applied.</p>
+<p>If “first difference”, may want to consider clipping first and last sample from
+the differentiated time series.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>decimation_obj</strong> (<em>mt_metadata.transfer_functions.processing.aurora.DecimationLevel</em>) – Information about how the decimation level is to be processed</p></li>
+<li><p><strong>run_xrds_input</strong> (<em>xarray.core.dataset.Dataset</em>) – Time series to be pre-whitened</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>run_xrds</strong> – pre-whitened time series</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.core.dataset.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.time_series_helpers.apply_recoloring">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.time_series_helpers.</span></span><span class="sig-name descname"><span class="pre">apply_recoloring</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decimation_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stft_obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/time_series_helpers.html#apply_recoloring"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.time_series_helpers.apply_recoloring" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>decimation_obj</strong> (<em>mt_metadata.transfer_functions.processing.fourier_coefficients.decimation.Decimation</em>) – Information about how the decimation level is to be processed</p></li>
+<li><p><strong>stft_obj</strong> (<em>xarray.core.dataset.Dataset</em>) – Time series of Fourier coefficients to be recoloured</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>stft_obj</strong> – Recolored time series of Fourier coefficients</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.core.dataset.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.time_series_helpers.calibrate_stft_obj">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.time_series_helpers.</span></span><span class="sig-name descname"><span class="pre">calibrate_stft_obj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stft_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MT'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_scale_factors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/time_series_helpers.html#calibrate_stft_obj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.time_series_helpers.calibrate_stft_obj" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stft_obj</strong> (<em>xarray.core.dataset.Dataset</em>) – Time series of Fourier coefficients to be calibrated</p></li>
+<li><p><strong>run_obj</strong> (<em>mth5.groups.master_station_run_channel.RunGroup</em>) – Provides information about filters for calibration</p></li>
+<li><p><strong>units</strong> (<em>string</em>) – usually “MT”, contemplating supporting “SI”</p></li>
+<li><p><strong>scale_factors</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a><em> or </em><em>None</em>) – keyed by channel, supports a single scalar to apply to that channels data
+Useful for debugging.  Should not be used in production and should throw a
+warning if it is not None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>stft_obj</strong> – Time series of calibrated Fourier coefficients</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.core.dataset.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.time_series_helpers.nan_to_mean">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.time_series_helpers.</span></span><span class="sig-name descname"><span class="pre">nan_to_mean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xrds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/time_series_helpers.html#nan_to_mean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.time_series_helpers.nan_to_mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set Nan values to mean value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>xrds</strong> (<em>TYPE</em>) – DESCRIPTION</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DESCRIPTION</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>TYPE</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.time_series_helpers.prototype_decimate">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.time_series_helpers.</span></span><span class="sig-name descname"><span class="pre">prototype_decimate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_xrds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/time_series_helpers.html#prototype_decimate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.time_series_helpers.prototype_decimate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Consider:
+1. Moving this function into time_series/decimate.py
+2. Replacing the downsampled_time_axis with rolling mean, or somthing that takes
+the average value of the time, not the window start</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<em>mt_metadata.transfer_functions.processing.aurora.Decimation</em>) – </p></li>
+<li><p><strong>run_xrds</strong> (<em>xr.Dataset</em>) – Originally from mth5.timeseries.run_ts.RunTS.dataset, but possibly decimated
+multiple times</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>xr_ds</strong> – Decimated version of the input run_xrds</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xr.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.time_series_helpers.prototype_decimate_2">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.time_series_helpers.</span></span><span class="sig-name descname"><span class="pre">prototype_decimate_2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_xrds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/time_series_helpers.html#prototype_decimate_2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.time_series_helpers.prototype_decimate_2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses the built-in xarray coarsen method.   Not clear what AAF effects are.
+Method is fast.  Might be non-linear.  Seems to give similar performance to
+prototype_decimate for synthetic data.</p>
+<p>N.B. config.factor must be integer valued</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<em>mt_metadata.transfer_functions.processing.aurora.Decimation</em>) – </p></li>
+<li><p><strong>run_xrds</strong> (<em>xr.Dataset</em>) – Originally from mth5.timeseries.run_ts.RunTS.dataset, but possibly decimated
+multiple times</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>xr_ds</strong> – Decimated version of the input run_xrds</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xr.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.time_series_helpers.prototype_decimate_3">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.time_series_helpers.</span></span><span class="sig-name descname"><span class="pre">prototype_decimate_3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_xrds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/time_series_helpers.html#prototype_decimate_3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.time_series_helpers.prototype_decimate_3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses the built-in xarray coarsen method.   Not clear what AAF effects are.
+Method is fast.  Might be non-linear.  Seems to give similar performance to
+prototype_decimate for synthetic data.</p>
+<p>N.B. config.factor must be integer valued</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<em>mt_metadata.transfer_functions.processing.aurora.Decimation</em>) – </p></li>
+<li><p><strong>run_xrds</strong> (<em>xr.Dataset</em>) – Originally from mth5.timeseries.run_ts.RunTS.dataset, but possibly decimated
+multiple times</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>xr_ds</strong> – Decimated version of the input run_xrds</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xr.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.time_series_helpers.run_ts_to_stft">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.time_series_helpers.</span></span><span class="sig-name descname"><span class="pre">run_ts_to_stft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decimation_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_xrds_orig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/time_series_helpers.html#run_ts_to_stft"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.time_series_helpers.run_ts_to_stft" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>decimation_obj</strong> (<em>mt_metadata.transfer_functions.processing.aurora.DecimationLevel</em>) – Information about how the decimation level is to be processed</p></li>
+<li><p><strong>run_ts</strong> (<em>xarray.core.dataset.Dataset</em>) – normally extracted from mth5.RunTS</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>stft_obj</strong> – Note that the STFT object may have inf/nan in the DC harmonic, introduced by
+recoloring. This really doesn’t matter since we don’t use the DC harmonic for
+anything.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.core.dataset.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.time_series_helpers.run_ts_to_stft_scipy">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.time_series_helpers.</span></span><span class="sig-name descname"><span class="pre">run_ts_to_stft_scipy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decimation_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_xrds_orig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/time_series_helpers.html#run_ts_to_stft_scipy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.time_series_helpers.run_ts_to_stft_scipy" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>decimation_obj</strong> (<em>mt_metadata.transfer_functions.processing.aurora.DecimationLevel</em>) – Information about how the decimation level is to be processed</p></li>
+<li><p><strong>run_xrds_orig</strong> (<em>: xarray.core.dataset.Dataset</em>) – Time series to be processed</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>stft_obj</strong> – Time series of Fourier coefficients</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.core.dataset.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.time_series_helpers.truncate_to_clock_zero">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.time_series_helpers.</span></span><span class="sig-name descname"><span class="pre">truncate_to_clock_zero</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decimation_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_xrds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/time_series_helpers.html#truncate_to_clock_zero"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.time_series_helpers.truncate_to_clock_zero" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the time interval between the first data sample and the clock zero
+Identify the first sample in the xarray time series that corresponds to a
+window start sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>decimation_obj</strong> (<em>mt_metadata.transfer_functions.processing.aurora.DecimationLevel</em>) – Information about how the decimation level is to be processed</p></li>
+<li><p><strong>run_xrds</strong> (<em>xarray.core.dataset.Dataset</em>) – normally extracted from mth5.RunTS</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>run_xrds</strong> – same as the input time series, but possibly slightly shortened</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.core.dataset.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.time_series_helpers.validate_sample_rate">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.time_series_helpers.</span></span><span class="sig-name descname"><span class="pre">validate_sample_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">run_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_sample_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/time_series_helpers.html#validate_sample_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.time_series_helpers.validate_sample_rate" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>run_ts</strong> (<em>mth5.timeseries.run_ts.RunTS</em>) – Time series object</p></li>
+<li><p><strong>expected_sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a>) – The sample rate the time series is expected to have. Normally taken from
+the processing config</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-aurora.pipelines.transfer_function_helpers">
+<span id="transfer-function-helpers"></span><h2>Transfer Function Helpers<a class="headerlink" href="#module-aurora.pipelines.transfer_function_helpers" title="Permalink to this heading">¶</a></h2>
+<p>Note #1: repeatedly applying edf_weights seems to have no effect at all.
+tested 20240118 and found that test_compare in synthetic passed whether this was commented
+or not.  TODO confirm this is a one-and-done add doc about why this is so.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_helpers.apply_weights">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.transfer_function_helpers.</span></span><span class="sig-name descname"><span class="pre">apply_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">RR</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">W</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropna</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_helpers.html#apply_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_helpers.apply_weights" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_helpers.drop_nans">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.transfer_function_helpers.</span></span><span class="sig-name descname"><span class="pre">drop_nans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">RR</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_helpers.html#drop_nans"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_helpers.drop_nans" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just a helper intended to enhance readability
+TODO: document the implications of dropna on index of xarray for other weights</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_helpers.get_estimator_class">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.transfer_function_helpers.</span></span><span class="sig-name descname"><span class="pre">get_estimator_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimation_engine</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_helpers.html#get_estimator_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_helpers.get_estimator_class" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>estimation_engine</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – One of the keys in the ESTIMATOR_LIBRARY, designates the method that will be
+used to estimate the transfer function</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>estimator_class</strong> – The class that will do the TF estimation</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>aurora.transfer_function.regression.base.RegressionEstimator</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_helpers.process_transfer_functions">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.transfer_function_helpers.</span></span><span class="sig-name descname"><span class="pre">process_transfer_functions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dec_level_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_stft_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remote_stft_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transfer_function_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_helpers.html#process_transfer_functions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_helpers.process_transfer_functions" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method based on TTFestBand.m</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dec_level_config</strong> – </p></li>
+<li><p><strong>local_stft_obj</strong> – </p></li>
+<li><p><strong>remote_stft_obj</strong> – </p></li>
+<li><p><strong>transfer_function_obj</strong> (<a class="reference internal" href="transfer_function.html#aurora.transfer_function.TTFZ.TTFZ" title="aurora.transfer_function.TTFZ.TTFZ"><em>aurora.transfer_function.TTFZ.TTFZ</em></a>) – The transfer function container ready to receive values in this method.</p></li>
+<li><p><strong>segment_weights</strong> (<em>numpy array</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em> of </em><em>strings</em>) – 1D array which should be of the same length as the time axis of the STFT objects
+If these weights are zero anywhere, we drop all that segment across all channels
+If it is a list of strings, each string corresponds to a weighting
+algorithm to be applied.
+[“jackknife_jj84”, “multiple_coherence”, “simple_coherence”]</p></li>
+<li><p><strong>channel_weights</strong> (<em>numpy array</em><em> or </em><em>None</em>) – </p></li>
+<li><p><strong>#1</strong> (<em>Note</em>) – </p></li>
+<li><p><strong>all-at-once</strong> (<em>vs.</em>) – </p></li>
+<li><p><strong>#87</strong><strong>)</strong> (<em>we need to keep the all-at-once to get residual covariances</em><em> (</em><em>see issue</em>) – </p></li>
+<li><p><strong>#2</strong> (<em>Note</em>) – </p></li>
+<li><p><strong>dictionary.</strong> (<em>Consider placing the segment weight logic in its own module with the various functions in a</em>) – </p></li>
+<li><p><strong>weights</strong> (<em>Possibly can combines</em><em> (</em><em>product</em><em>) </em><em>all segment</em>) – <p>W = zeros
+for wt_style in  segment_weights:</p>
+<blockquote>
+<div><p>fcn = wt_fucntions[style]
+w = fcn(X, Y, RR, )
+W <a href="#id2"><span class="problematic" id="id3">*</span></a>= w</p>
+</div></blockquote>
+<p>return W</p>
+</p></li>
+<li><p><strong>pseudocode</strong> (<em>like the following</em>) – <p>W = zeros
+for wt_style in  segment_weights:</p>
+<blockquote>
+<div><p>fcn = wt_fucntions[style]
+w = fcn(X, Y, RR, )
+W <a href="#id4"><span class="problematic" id="id5">*</span></a>= w</p>
+</div></blockquote>
+<p>return W</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p>TODO: Consider push the nan-handling into the band extraction as a kwarg.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_helpers.select_channel">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.transfer_function_helpers.</span></span><span class="sig-name descname"><span class="pre">select_channel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xrda</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_helpers.html#select_channel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_helpers.select_channel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extra helper function to make process_transfer_functions more readable without
+black forcing multiline
+:param xrda:
+:param channel_label:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_helpers.set_up_iter_control">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.transfer_function_helpers.</span></span><span class="sig-name descname"><span class="pre">set_up_iter_control</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_helpers.html#set_up_iter_control"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_helpers.set_up_iter_control" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO: Review: maybe better to just make this the __init__ method of the
+IterControl object, iter_control = IterControl(config)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel</em>) – </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>iter_control</strong> – Object with parameters about iteration control in regression</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="transfer_function.html#aurora.transfer_function.regression.iter_control.IterControl" title="aurora.transfer_function.regression.iter_control.IterControl">aurora.transfer_function.regression.iter_control.IterControl</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_helpers.stack_fcs">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.transfer_function_helpers.</span></span><span class="sig-name descname"><span class="pre">stack_fcs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">RR</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_helpers.html#stack_fcs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_helpers.stack_fcs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reshape 2D arrays of frequency and time to 1D</p>
+<p>Context:
+When the data for a frequency band are extracted from the Spectrogram, each channel
+is a 2D array, one axis is time (the time of the window that was FFT-ed) and the
+other axis is frequency.  However if we make no distinction between the harmonics
+(bins) within a band in regression, then all the FCs for each channel can be
+put into a 1D array.  This method performs that reshaping (ravelling) operation.
+<a href="#id6"><span class="problematic" id="id7">**</span></a>It is not important how we unravel the FCs but it is important that
+we use the same scheme for X and Y.</p>
+<p>TODO: Make this take a list and return a list rather than X,Y,RR
+TODO: Decorate this with &#64;dataset_or_dataarray</p>
+<blockquote>
+<div><p>if isinstance(X, xr.Dataset):
+tmp = X.to_array(“channel”)
+tmp = tmp.stack()
+or similar</p>
+</div></blockquote>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="transfer_function.html" class="btn btn-neutral float-left" title="Transfer Function" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="general_helper_functions.html" class="btn btn-neutral float-right" title="General Helper Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
