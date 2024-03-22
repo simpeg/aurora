@@ -21,7 +21,7 @@ class RegressionEstimator(object):
     model of solving Y = X*b +epsilon for b.  X is variously called the "input",
     "predictor", "explanatory", "confounding", "independent" "exogenous", variable(s)
     or the "design matrix", "model matrix" or "regressor matrix".
-    Y are variously called the the "output", "predicted", "outcome",
+    Y are variously called the "output", "predicted", "outcome",
     "response", "endogenous", "regressand", or "dependent" variable.  I will try to
     use input and output.
 
@@ -51,11 +51,11 @@ class RegressionEstimator(object):
         X.data is numpy array (normally 2-dimensional)
         These are the input variables.  Like the matlab codes each observation
         corresponds to a row and each parameter (channel) is a column.
-    X :  numpy array (normally 2-dimensional)
+    X : numpy array (normally 2-dimensional)
         This is a "pure array" representation of _X used to emulate Gary
         Egbert's matlab codes. It may or may not be deprecated.
     _Y : xarray.Dataset
-        These are the output variables, aranged same as X above.
+        These are the output variables, arranged same as X above.
     Y : numpy array (normally 2-dimensional)
         This is a "pure array" representation of _X used to emulate Gary
         Egbert's matlab codes. It may or may not be deprecated.
@@ -169,7 +169,9 @@ class RegressionEstimator(object):
         S_inv = np.diag(1.0 / s)
         self.b = (V.T @ S_inv @ U.T) * self.Y
         if self.iter_control.return_covariance:
-            logger.warning("Warning covariances are not xarray, may break things downstream")
+            logger.warning(
+                "Warning covariances are not xarray, may break things downstream"
+            )
             self.cov_nn = np.zeros((self.n_channels_out, self.n_channels_out))
             self.cov_ss_inv = np.zeros((self.n_channels_in, self.n_channels_in))
 
@@ -242,7 +244,7 @@ class RegressionEstimator(object):
             elif self.qr_input == "Z":
                 X = self.Z
             else:
-                logger.error("Matrix to perform QR decompostion not specified")
+                logger.error("Matrix to perform QR decomposition not specified")
                 raise Exception
 
         Q, R = np.linalg.qr(X)
@@ -252,7 +254,7 @@ class RegressionEstimator(object):
             if np.isclose(np.matmul(Q, R) - X, 0).all():
                 pass
             else:
-                logger.error("Failed QR decompostion sanity check")
+                logger.error("Failed QR decomposition sanity check")
                 raise Exception
         return Q, R
 
