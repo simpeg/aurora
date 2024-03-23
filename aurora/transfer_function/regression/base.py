@@ -21,7 +21,7 @@ class RegressionEstimator(object):
     model of solving Y = X*b +epsilon for b.  X is variously called the "input",
     "predictor", "explanatory", "confounding", "independent" "exogenous", variable(s)
     or the "design matrix", "model matrix" or "regressor matrix".
-    Y are variously called the the "output", "predicted", "outcome",
+    Y are variously called the "output", "predicted", "outcome",
     "response", "endogenous", "regressand", or "dependent" variable.  I will try to
     use input and output.
 
@@ -51,11 +51,11 @@ class RegressionEstimator(object):
         X.data is numpy array (normally 2-dimensional)
         These are the input variables.  Like the matlab codes each observation
         corresponds to a row and each parameter (channel) is a column.
-    X :  numpy array (normally 2-dimensional)
+    X : numpy array (normally 2-dimensional)
         This is a "pure array" representation of _X used to emulate Gary
         Egbert's matlab codes. It may or may not be deprecated.
     _Y : xarray.Dataset
-        These are the output variables, aranged same as X above.
+        These are the output variables, arranged same as X above.
     Y : numpy array (normally 2-dimensional)
         This is a "pure array" representation of _X used to emulate Gary
         Egbert's matlab codes. It may or may not be deprecated.
@@ -135,11 +135,21 @@ class RegressionEstimator(object):
         """
         20210806
         This method was originally in TRME.m, but it does not depend in
-        general on using RME method so I am putting it in the base class.
+        general on using RME method so putting it in the base class.
 
-        We basically never get here and when we do we dont trust the results
+        We basically never get here and when we do, we don't trust the results
         https://docs.scipy.org/doc/numpy-1.9.2/reference/generated/numpy.linalg.svd.html
         https://www.mathworks.com/help/matlab/ref/double.svd.html
+
+        Note that the svd outputs are different in matlab and numpy
+        https://stackoverflow.com/questions/50930899/svd-command-in-python-v-s-matlab
+        "The SVD of a matrix can be written as
+
+        A = U S V^H
+
+        Where the ^H signifies the conjugate transpose. Matlab's svd command returns U, S and V,
+        while numpy.linalg.svd returns U, the diagonal of S, and V^H.
+        Thus, to get the same S and V as in Matlab you need to reconstruct the S and also get the V:
 
         <ORIGINAL MATLAB>
             <COMMENT>
@@ -167,9 +177,11 @@ class RegressionEstimator(object):
         """
         U, s, V = np.linalg.svd(self.X, full_matrices=False)
         S_inv = np.diag(1.0 / s)
-        self.b = (V.T @ S_inv @ U.T) * self.Y
+        self.b = (V.T.conj() @ S_inv @ U.T.conj()) * self.Y
         if self.iter_control.return_covariance:
-            logger.warning("Warning covariances are not xarray, may break things downstream")
+            logger.warning(
+                "Warning covariances are not xarray, may break things downstream"
+            )
             self.cov_nn = np.zeros((self.n_channels_out, self.n_channels_out))
             self.cov_ss_inv = np.zeros((self.n_channels_in, self.n_channels_in))
 
@@ -242,7 +254,7 @@ class RegressionEstimator(object):
             elif self.qr_input == "Z":
                 X = self.Z
             else:
-                logger.error("Matrix to perform QR decompostion not specified")
+                logger.error("Matrix to perform QR decomposition not specified")
                 raise Exception
 
         Q, R = np.linalg.qr(X)
@@ -252,7 +264,7 @@ class RegressionEstimator(object):
             if np.isclose(np.matmul(Q, R) - X, 0).all():
                 pass
             else:
-                logger.error("Failed QR decompostion sanity check")
+                logger.error("Failed QR decomposition sanity check")
                 raise Exception
         return Q, R
 
