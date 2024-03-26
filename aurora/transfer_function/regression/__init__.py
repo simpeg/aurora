@@ -6,7 +6,7 @@ from loguru import logger
 ESTIMATOR_LIBRARY = {"OLS": RegressionEstimator, "RME": TRME, "RME_RR": TRME_RR}
 
 
-def get_estimator_class(estimation_engine):
+def get_regression_estimator(estimation_engine):
     """
 
     Parameters

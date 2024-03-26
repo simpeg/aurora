@@ -9,7 +9,7 @@ from aurora.time_series.frequency_band_helpers import adjust_band_for_coherence_
 from aurora.time_series.frequency_band_helpers import get_band_for_tf_estimate
 from aurora.time_series.spectrogram import Spectrogram
 from aurora.time_series.xarray_helpers import handle_nan
-from aurora.transfer_function.regression import get_estimator_class
+from aurora.transfer_function.regression import get_regression_estimator
 from aurora.transfer_function.regression.iter_control import IterControl
 
 # from aurora.transfer_function.weights.coherence_weights import compute_multiple_coherence_weights
@@ -176,7 +176,7 @@ def process_transfer_functions(
 
     # Also consider applying channel nomenlclature map to standard channels for regression, map back when done.
 
-    estimator_class = get_estimator_class(dec_level_config.estimator.engine)
+    estimator_class = get_regression_estimator(dec_level_config.estimator.engine)
     iter_control = set_up_iter_control(dec_level_config)
     for band in transfer_function_obj.frequency_bands.bands():
 
