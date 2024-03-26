@@ -5,46 +5,18 @@ or not.  TODO confirm this is a one-and-done add doc about why this is so.
 """
 import numpy as np
 
+from aurora.time_series.frequency_band_helpers import adjust_band_for_coherence_sorting
 from aurora.time_series.frequency_band_helpers import get_band_for_tf_estimate
+from aurora.time_series.spectrogram import Spectrogram
 from aurora.time_series.xarray_helpers import handle_nan
-from aurora.transfer_function.regression.base import RegressionEstimator
+from aurora.transfer_function.regression import get_estimator_class
 from aurora.transfer_function.regression.iter_control import IterControl
-from aurora.transfer_function.regression.TRME import TRME
-from aurora.transfer_function.regression.TRME_RR import TRME_RR
 
 # from aurora.transfer_function.weights.coherence_weights import compute_multiple_coherence_weights
 from aurora.transfer_function.weights.edf_weights import (
     effective_degrees_of_freedom_weights,
 )
 from loguru import logger
-
-
-ESTIMATOR_LIBRARY = {"OLS": RegressionEstimator, "RME": TRME, "RME_RR": TRME_RR}
-
-
-def get_estimator_class(estimation_engine):
-    """
-
-    Parameters
-    ----------
-    estimation_engine: str
-        One of the keys in the ESTIMATOR_LIBRARY, designates the method that will be
-        used to estimate the transfer function
-
-    Returns
-    -------
-    estimator_class: aurora.transfer_function.regression.base.RegressionEstimator
-        The class that will do the TF estimation
-    """
-    try:
-        estimator_class = ESTIMATOR_LIBRARY[estimation_engine]
-    except KeyError:
-        logger.error(f"processing_scheme {estimation_engine} not supported")
-        logger.error(
-            f"processing_scheme must be one of {list(ESTIMATOR_LIBRARY.keys())}"
-        )
-        raise Exception
-    return estimator_class
 
 
 def set_up_iter_control(config):
@@ -193,15 +165,27 @@ def process_transfer_functions(
 
 
     TODO: Consider push the nan-handling into the band extraction as a kwarg.
-
+    TODO: Since RR officially becomes part of the nomenclature here, we can
     Returns
     -------
 
     """
+    # Experimental nomenclature change for RR case-- If adopted, add mapping rx:hx, ry:hy to processing config
+    local_stft_obj["rx"] = remote_stft_obj["hx"]
+    local_stft_obj["ry"] = remote_stft_obj["hy"]
+
+    # Also consider applying channel nomenlclature map to standard channels for regression, map back when done.
+
     estimator_class = get_estimator_class(dec_level_config.estimator.engine)
     iter_control = set_up_iter_control(dec_level_config)
     for band in transfer_function_obj.frequency_bands.bands():
 
+        # Uncomment for Testing -- this will make a 3xFC-wide spectrogram if there is only 1 FC
+        rule = "min3"  # TODO: Put band-adjustment rule into processing config
+        spectrogram = Spectrogram(dataset=local_stft_obj)
+        adjusted_band = adjust_band_for_coherence_sorting(band, spectrogram, rule=rule)
+
+        band_spectrogram = spectrogram.extract_band(adjusted_band)
         X, Y, RR = get_band_for_tf_estimate(
             band, dec_level_config, local_stft_obj, remote_stft_obj
         )
@@ -219,10 +203,6 @@ def process_transfer_functions(
             # Note that these weights might be better applied within the loop over channel as the weights
             # may be differ depending on the output channel being estimated.
             # We can compute them here, but
-            from aurora.time_series.frequency_band_helpers import (
-                adjust_band_for_coherence_sorting,
-            )
-            from aurora.time_series.spectrogram import Spectrogram
             from aurora.transfer_function.weights.spectral_features import (
                 estimate_simple_coherence,
             )
