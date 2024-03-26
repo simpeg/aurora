@@ -216,12 +216,72 @@ def process_transfer_functions(
             Wjj84 = coherence_weights_jj84(band, local_stft_obj, remote_stft_obj)
             apply_weights(X, Y, RR, Wjj84, segment=True, dropna=False)
         if "simple_coherence" in segment_weights:
+            # Note that these weights might be better applied within the loop over channel as the weights
+            # may be differ depending on the output channel being estimated.
+            # We can compute them here, but
+            from aurora.time_series.frequency_band_helpers import (
+                adjust_band_for_coherence_sorting,
+            )
+            from aurora.time_series.spectrogram import Spectrogram
+            from aurora.transfer_function.weights.spectral_features import (
+                estimate_simple_coherence,
+            )
             from aurora.transfer_function.weights.coherence_weights import (
                 simple_coherence_weights,
             )
 
-            W = simple_coherence_weights(band, local_stft_obj, remote_stft_obj)
-            apply_weights(X, Y, RR, W, segment=True, dropna=False)
+            # def merge_simple_coherence_weights(weights):
+            #     """
+            #
+            #     Parameters
+            #     ----------
+            #     weights dict
+            #
+            #     Returns
+            #     -------
+            #
+            #     """
+            #     keys = list(weights.keys())[0]
+            #     n_obs = len(weights[keys[0]])
+            #     cumulative_weights np.ones(n_obs)
+            #     for k,v in weights.items():
+            #         cumulative_weights *= v
+
+            rule = "min3"  # TODO: Put band-adjustment rule into processing config
+            spectrogram = Spectrogram(dataset=local_stft_obj)
+            adjusted_band = adjust_band_for_coherence_sorting(
+                band, spectrogram, rule=rule
+            )
+            band_spectrogram = spectrogram.extract_band(adjusted_band)
+
+            # Optionally add rx, ry to spectrogram here
+            channel_pairs = (
+                ("ex", "hy"),
+                ("ey", "hx"),
+            )
+            simple_coherences = estimate_simple_coherence(
+                band_spectrogram, channel_pairs=channel_pairs
+            )
+            # TODO: Put cutoffs in the procesing config:
+            cutoffs = {}
+            cutoffs["ex_hy"] = {}
+            cutoffs["ex_hy"]["lower"] = 0.3
+            cutoffs["ex_hy"]["upper"] = 0.999
+            cutoffs["ey_hx"] = {}
+            cutoffs["ey_hx"]["lower"] = 0.3
+            cutoffs["ey_hx"]["upper"] = 0.999
+
+            W = simple_coherence_weights(simple_coherences, channel_pair=("ex", "hy"))
+            # try:
+            #     W = merge_simple_coherence_weights(simple_coh_weights)
+            # except:
+            #     pass
+            #     # # Get cumulative rankings
+            #     # for key in cutoffs.keys():
+            #     #     simple_coherence = simple_coherences[key]
+            #     #     cumulative_rankings += np.argsort(
+            #     #         simple_coherence)  # keep track of lowest and highest values per time window
+            # apply_weights(X, Y, RR, W, segment=True, dropna=False)
 
         if "multiple_coherence" in segment_weights:
             from aurora.transfer_function.weights.coherence_weights import (

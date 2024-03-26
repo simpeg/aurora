@@ -45,7 +45,7 @@ class EffectiveDegreesOfFreedom(object):
         Threshold applied to edf.  All edf below  this value
         are set to weight=0
         """
-        return self.c1 * (self.n_data ** self.alpha)
+        return self.c1 * (self.n_data**self.alpha)
 
     @property
     def p2(self):
@@ -53,7 +53,7 @@ class EffectiveDegreesOfFreedom(object):
         Threshold applied to edf.  All edf above th  this value
         are set to weight=0
         """
-        return self.c2 * (self.n_data ** self.alpha)
+        return self.c2 * (self.n_data**self.alpha)
 
     def compute_weights(self, X, use):
         """
@@ -140,7 +140,7 @@ def effective_degrees_of_freedom_weights(X, R, edf_obj=None, test=True):
     just an oversight in the matlab codes.
     - since we assign zero-weights to Nan, we could probably remove the keep_indices
     methods and simply assign nan or zero weights to those data up front. Since the
-    "use" boolean selects data before computiation are performed on X, R we should
+    "use" boolean selects data before computation are performed on X, R we should
     never get nans in the computed edfs, but should simplify the code somewhat.
 
     Parameters
