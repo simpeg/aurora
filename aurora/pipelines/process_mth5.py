@@ -199,16 +199,33 @@ def merge_stft_remote_channels(local_stft_obj, remote_stft_obj, remote_channels=
 
     if remote_stft_obj is not None:
         check_time_axes_synched(local_stft_obj, remote_stft_obj)
-    # this could be gneralized, but first we need to make sure
+    # this could be generalized, but first we need to make sure
     # that it doesn't need to support other nomenclatures (e1, e2, h1, h2, h3, etc.)
+
+    # some hokey logic for sorting out the "x" remote
+    # TODO: make this use the standards in mt_metadata/processing/aurora
+    ch = "rx"
     if "ex" in remote_channels:
-        local_stft_obj["rx"] = remote_stft_obj["ex"]
+        local_stft_obj[ch] = remote_stft_obj["ex"]
     elif "hx" in remote_channels:
-        local_stft_obj["rx"] = remote_stft_obj["hx"]
+        local_stft_obj[ch] = remote_stft_obj["hx"]
+    elif "bx" in remote_channels:
+        local_stft_obj[ch] = remote_stft_obj["bx"]
+    else:
+        msg = f"Could not identify remote '{ch}' channel in {remote_channels}"
+        logger.error(msg)
+
+    ch = "ry"
     if "ey" in remote_channels:
-        local_stft_obj["ry"] = remote_stft_obj["ey"]
+        local_stft_obj[ch] = remote_stft_obj["ey"]
     elif "hy" in remote_channels:
-        local_stft_obj["ry"] = remote_stft_obj["hy"]
+        local_stft_obj[ch] = remote_stft_obj["hy"]
+    elif "by" in remote_channels:
+        local_stft_obj[ch] = remote_stft_obj["by"]
+    else:
+        msg = f"Could not identify remote '{ch}' channel in {remote_channels}"
+        logger.error(msg)
+
     return local_stft_obj
 
 
