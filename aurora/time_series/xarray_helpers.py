@@ -84,3 +84,31 @@ def handle_nan(X, Y, RR, drop_dim=""):
     RR = RR.rename(data_var_rm_label_mapper)
 
     return X, Y, RR
+
+
+def check_time_axes_synched(X, Y):
+    """
+    Utility function for checking that time axes agree
+
+    Parameters
+    ----------
+    X : xarray
+    Y : xarray
+
+    Returns
+    -------
+
+    """
+    """
+    It is critical that X, Y, RR have the same time axes here
+
+    Returns
+    -------
+
+    """
+    if (X.time == Y.time).all():
+        pass
+    else:
+        logger.warning("WARNING - NAN Handling could fail if X,Y dont share time axes")
+        raise Exception
+    return

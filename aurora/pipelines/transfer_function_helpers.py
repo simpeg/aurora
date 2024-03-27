@@ -6,7 +6,8 @@ or not.  TODO confirm this is a one-and-done add doc about why this is so.
 import numpy as np
 
 from aurora.time_series.frequency_band_helpers import adjust_band_for_coherence_sorting
-from aurora.time_series.frequency_band_helpers import get_band_for_tf_estimate
+
+# from aurora.time_series.frequency_band_helpers import get_band_for_tf_estimate
 from aurora.time_series.spectrogram import Spectrogram
 from aurora.time_series.xarray_helpers import handle_nan
 from aurora.transfer_function.regression import get_regression_estimator
@@ -124,8 +125,7 @@ def apply_weights(X, Y, RR, W, segment=False, dropna=False):
 
 def process_transfer_functions(
     dec_level_config,
-    local_stft_obj,
-    remote_stft_obj,
+    merged_stft_object,
     transfer_function_obj,
     # segment_weights=["multiple_coherence",],#["simple_coherence",],#["multiple_coherence",],#jj84_coherence_weights",],
     segment_weights=[],
@@ -137,8 +137,10 @@ def process_transfer_functions(
     Parameters
     ----------
     dec_level_config
-    local_stft_obj
-    remote_stft_obj
+    merged_stft_object: xarray.core.dataset.Dataset
+        The time series of Fourier coefficients from the local station, with optional
+        keys ["rx", "ry"] for remote reference channels
+
     transfer_function_obj: aurora.transfer_function.TTFZ.TTFZ
         The transfer function container ready to receive values in this method.
     segment_weights : numpy array or list of strings
@@ -170,25 +172,25 @@ def process_transfer_functions(
     -------
 
     """
-    # Experimental nomenclature change for RR case-- If adopted, add mapping rx:hx, ry:hy to processing config
-    local_stft_obj["rx"] = remote_stft_obj["hx"]
-    local_stft_obj["ry"] = remote_stft_obj["hy"]
-
     # Also consider applying channel nomenlclature map to standard channels for regression, map back when done.
 
     estimator_class = get_regression_estimator(dec_level_config.estimator.engine)
     iter_control = set_up_iter_control(dec_level_config)
+    spectrogram = Spectrogram(dataset=merged_stft_object)
     for band in transfer_function_obj.frequency_bands.bands():
 
         # Uncomment for Testing -- this will make a 3xFC-wide spectrogram if there is only 1 FC
         rule = "min3"  # TODO: Put band-adjustment rule into processing config
-        spectrogram = Spectrogram(dataset=local_stft_obj)
-        adjusted_band = adjust_band_for_coherence_sorting(band, spectrogram, rule=rule)
+        # adjusted_band = adjust_band_for_coherence_sorting(band, spectrogram, rule=rule)
+        # band_spectrogram = spectrogram.extract_band(adjusted_band)
 
-        band_spectrogram = spectrogram.extract_band(adjusted_band)
-        X, Y, RR = get_band_for_tf_estimate(
-            band, dec_level_config, local_stft_obj, remote_stft_obj
-        )
+        band_spectrogram = spectrogram.extract_band(band)
+        X = band_spectrogram.dataset[dec_level_config.input_channels]
+        Y = band_spectrogram.dataset[dec_level_config.output_channels]
+        if dec_level_config.reference_channels:
+            RR = band_spectrogram.dataset[["rx", "ry"]]
+        else:
+            RR = None
 
         # Apply segment weights first -- see Note #2
 
@@ -197,7 +199,13 @@ def process_transfer_functions(
                 coherence_weights_jj84,
             )
 
-            Wjj84 = coherence_weights_jj84(band, local_stft_obj, remote_stft_obj)
+            rule = "min3"  # TODO: Put band-adjustment rule into processing config
+            adjusted_band = adjust_band_for_coherence_sorting(
+                band, spectrogram, rule=rule
+            )
+            weight_band_spectrogram = spectrogram.extract_band(adjusted_band)
+
+            Wjj84 = coherence_weights_jj84(weight_band_spectrogram)
             apply_weights(X, Y, RR, Wjj84, segment=True, dropna=False)
         if "simple_coherence" in segment_weights:
             # Note that these weights might be better applied within the loop over channel as the weights
@@ -226,13 +234,11 @@ def process_transfer_functions(
             #     cumulative_weights np.ones(n_obs)
             #     for k,v in weights.items():
             #         cumulative_weights *= v
-
             rule = "min3"  # TODO: Put band-adjustment rule into processing config
-            spectrogram = Spectrogram(dataset=local_stft_obj)
             adjusted_band = adjust_band_for_coherence_sorting(
                 band, spectrogram, rule=rule
             )
-            band_spectrogram = spectrogram.extract_band(adjusted_band)
+            weight_band_spectrogram = spectrogram.extract_band(adjusted_band)
 
             # Optionally add rx, ry to spectrogram here
             channel_pairs = (
@@ -240,7 +246,7 @@ def process_transfer_functions(
                 ("ey", "hx"),
             )
             simple_coherences = estimate_simple_coherence(
-                band_spectrogram, channel_pairs=channel_pairs
+                weight_band_spectrogram, channel_pairs=channel_pairs
             )
             # TODO: Put cutoffs in the procesing config:
             cutoffs = {}
@@ -268,7 +274,14 @@ def process_transfer_functions(
                 multiple_coherence_weights,
             )
 
-            W = multiple_coherence_weights(band, local_stft_obj, remote_stft_obj)
+            rule = "min3"  # TODO: Put band-adjustment rule into processing config
+            adjusted_band = adjust_band_for_coherence_sorting(
+                band, spectrogram, rule=rule
+            )
+            weight_band_spectrogram = spectrogram.extract_band(adjusted_band)
+            W = multiple_coherence_weights(
+                weight_band_spectrogram
+            )  # band, local_stft_obj, remote_stft_obj)
             apply_weights(X, Y, RR, W, segment=True, dropna=False)
 
         # if there are channel weights apply them here

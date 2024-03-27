@@ -92,9 +92,7 @@ def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrds, units="
     return stft_obj
 
 
-def process_tf_decimation_level(
-    config, i_dec_level, local_stft_obj, remote_stft_obj, units="MT"
-):
+def process_tf_decimation_level(config, i_dec_level, merged_stft_object, units="MT"):
     """
     Processing pipeline for a single decimation_level
 
@@ -110,10 +108,9 @@ def process_tf_decimation_level(
     i_dec_level: int
         decimation level_id
         ?could we pack this into the decimation level as an attr?
-    local_stft_obj: xarray.core.dataset.Dataset
-        The time series of Fourier coefficients from the local station
-    remote_stft_obj: xarray.core.dataset.Dataset or None
-        The time series of Fourier coefficients from the remote station
+    merged_stft_object: xarray.core.dataset.Dataset
+        The time series of Fourier coefficients from the local station, with optional
+        keys ["rx", "ry"] for remote reference channels
     units: str
         one of ["MT","SI"]
 
@@ -127,7 +124,7 @@ def process_tf_decimation_level(
     dec_level_config = config.decimations[i_dec_level]
     # segment_weights = coherence_weights(dec_level_config, local_stft_obj, remote_stft_obj)
     transfer_function_obj = process_transfer_functions(
-        dec_level_config, local_stft_obj, remote_stft_obj, transfer_function_obj
+        dec_level_config, merged_stft_object, transfer_function_obj
     )
 
     return transfer_function_obj
@@ -167,7 +164,7 @@ def triage_issue_289(local_stfts, remote_stfts):
     return local_stfts, remote_stfts
 
 
-def merge_stfts(stfts, tfk):
+def merge_stft_runs_in_time(stfts, tfk):
     # Timing Error Workaround See Aurora Issue #289
     local_stfts = stfts["local"]
     remote_stfts = stfts["remote"]
@@ -180,6 +177,39 @@ def merge_stfts(stfts, tfk):
     local_merged_stft_obj = xr.concat(local_stfts, "time")
 
     return local_merged_stft_obj, remote_merged_stft_obj
+
+
+def merge_stft_remote_channels(local_stft_obj, remote_stft_obj, remote_channels=[]):
+    """
+    Temporary function.  Would like to push the merge with remote further upstream in the processing,
+    and use the spectrogram class earlier as well.  For now, this provides a way to merge the classes at the
+    start of process_transfer_functions.
+
+    This provides an interface to merge
+    Parameters
+    ----------
+    local_stft_obj
+    remote_stft_obj
+
+    Returns
+    -------
+
+    """
+    from aurora.time_series.xarray_helpers import check_time_axes_synched
+
+    if remote_stft_obj is not None:
+        check_time_axes_synched(local_stft_obj, remote_stft_obj)
+    # this could be gneralized, but first we need to make sure
+    # that it doesn't need to support other nomenclatures (e1, e2, h1, h2, h3, etc.)
+    if "ex" in remote_channels:
+        local_stft_obj["rx"] = remote_stft_obj["ex"]
+    elif "hx" in remote_channels:
+        local_stft_obj["rx"] = remote_stft_obj["hx"]
+    if "ey" in remote_channels:
+        local_stft_obj["ry"] = remote_stft_obj["ey"]
+    elif "hy" in remote_channels:
+        local_stft_obj["ry"] = remote_stft_obj["hy"]
+    return local_stft_obj
 
 
 def append_chunk_to_stfts(stfts, chunk, remote):
@@ -418,16 +448,22 @@ def process_mth5(
 
         stfts = get_spectrogams(tfk, i_dec_level, units=units)
 
-        local_merged_stft_obj, remote_merged_stft_obj = merge_stfts(stfts, tfk)
+        local_merged_stft_obj, remote_merged_stft_obj = merge_stft_runs_in_time(
+            stfts, tfk
+        )
 
+        merged_stft_obj = merge_stft_remote_channels(
+            local_merged_stft_obj,
+            remote_merged_stft_obj,
+            remote_channels=dec_level_config.reference_channels,
+        )
         # FC TF Interface here (see Note #3)
         # Could downweight bad FCs here
 
         ttfz_obj = process_tf_decimation_level(
             tfk.config,
             i_dec_level,
-            local_merged_stft_obj,
-            remote_merged_stft_obj,
+            merged_stft_obj,
         )
         ttfz_obj.apparent_resistivity(tfk.config.channel_nomenclature, units=units)
         tf_dict[i_dec_level] = ttfz_obj
