@@ -8,7 +8,7 @@ tags:
 authors:
   - name: Karl N. Kappler
     orcid: 0000-0002-1877-1255
-    affiliation: 5,6
+    affiliation: "5,6"
   - name: Jared R. Peacock
     orcid: 0000-0002-0439-0224
     affiliation: 1
