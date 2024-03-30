@@ -141,6 +141,7 @@ Aurora is distributed under the [MIT](https://opensource.org/license/mit/) open-
 
 # Acknowledgments 
 The authors would like to thank IRIS (now EarthScope) for supporting the development of Aurora.  Joe Capriotti at SimPEG helped with online documentation and the initial release.
+Ben Murphy at USGS provided methods for rotating impedance tensors from z-file formatted data.
 
 ```python
 
