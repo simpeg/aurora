@@ -25,7 +25,6 @@ authors:
     orcid: 0000-0003-4395-398X
     affiliation: 1
   - name: Laura Keyson
-    orcid: 0000-0000-0000-0000
     affiliation: 3
   - name: Douglas Oldenburg
     orcid: 0000-0002-4327-2124
