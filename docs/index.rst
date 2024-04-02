@@ -15,7 +15,7 @@
    :maxdepth: 2
    :caption: Examples
 
-   notebooks/operate_aurora.ipynb
+   examples/operate_aurora.ipynb
 
 .. toctree::
    :maxdepth: 2
