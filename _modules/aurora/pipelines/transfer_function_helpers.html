@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.pipelines.transfer_function_helpers &mdash; aurora 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=f6245a2f"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-information-extracted-by-IRIS">1. Build an MTH5 file from information extracted by IRIS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aurora.pipelines.transfer_function_helpers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.pipelines.transfer_function_helpers</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Note #1: repeatedly applying edf_weights seems to have no effect at all.</span>
+<span class="sd">tested 20240118 and found that test_compare in synthetic passed whether this was commented</span>
+<span class="sd">or not.  TODO confirm this is a one-and-done add doc about why this is so.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">aurora.time_series.frequency_band_helpers</span> <span class="kn">import</span> <span class="n">get_band_for_tf_estimate</span>
+<span class="kn">from</span> <span class="nn">aurora.time_series.xarray_helpers</span> <span class="kn">import</span> <span class="n">handle_nan</span>
+<span class="kn">from</span> <span class="nn">aurora.transfer_function.regression.base</span> <span class="kn">import</span> <span class="n">RegressionEstimator</span>
+<span class="kn">from</span> <span class="nn">aurora.transfer_function.regression.iter_control</span> <span class="kn">import</span> <span class="n">IterControl</span>
+<span class="kn">from</span> <span class="nn">aurora.transfer_function.regression.TRME</span> <span class="kn">import</span> <span class="n">TRME</span>
+<span class="kn">from</span> <span class="nn">aurora.transfer_function.regression.TRME_RR</span> <span class="kn">import</span> <span class="n">TRME_RR</span>
+
+<span class="c1"># from aurora.transfer_function.weights.coherence_weights import compute_multiple_coherence_weights</span>
+<span class="kn">from</span> <span class="nn">aurora.transfer_function.weights.edf_weights</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">effective_degrees_of_freedom_weights</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+
+
+<span class="n">ESTIMATOR_LIBRARY</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;OLS&quot;</span><span class="p">:</span> <span class="n">RegressionEstimator</span><span class="p">,</span> <span class="s2">&quot;RME&quot;</span><span class="p">:</span> <span class="n">TRME</span><span class="p">,</span> <span class="s2">&quot;RME_RR&quot;</span><span class="p">:</span> <span class="n">TRME_RR</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="get_estimator_class"><a class="viewcode-back" href="../../../api/pipelines.html#aurora.pipelines.transfer_function_helpers.get_estimator_class">[docs]</a><span class="k">def</span> <span class="nf">get_estimator_class</span><span class="p">(</span><span class="n">estimation_engine</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    estimation_engine: str</span>
+<span class="sd">        One of the keys in the ESTIMATOR_LIBRARY, designates the method that will be</span>
+<span class="sd">        used to estimate the transfer function</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    estimator_class: aurora.transfer_function.regression.base.RegressionEstimator</span>
+<span class="sd">        The class that will do the TF estimation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">estimator_class</span> <span class="o">=</span> <span class="n">ESTIMATOR_LIBRARY</span><span class="p">[</span><span class="n">estimation_engine</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;processing_scheme </span><span class="si">{</span><span class="n">estimation_engine</span><span class="si">}</span><span class="s2"> not supported&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;processing_scheme must be one of </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">ESTIMATOR_LIBRARY</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span>
+    <span class="k">return</span> <span class="n">estimator_class</span></div>
+
+
+<div class="viewcode-block" id="set_up_iter_control"><a class="viewcode-back" href="../../../api/pipelines.html#aurora.pipelines.transfer_function_helpers.set_up_iter_control">[docs]</a><span class="k">def</span> <span class="nf">set_up_iter_control</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    TODO: Review: maybe better to just make this the __init__ method of the</span>
+<span class="sd">    IterControl object, iter_control = IterControl(config)</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    iter_control: aurora.transfer_function.regression.iter_control.IterControl</span>
+<span class="sd">        Object with parameters about iteration control in regression</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">engine</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;RME&quot;</span><span class="p">,</span> <span class="s2">&quot;RME_RR&quot;</span><span class="p">]:</span>
+        <span class="n">iter_control</span> <span class="o">=</span> <span class="n">IterControl</span><span class="p">(</span>
+            <span class="n">max_number_of_iterations</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">regression</span><span class="o">.</span><span class="n">max_iterations</span><span class="p">,</span>
+            <span class="n">max_number_of_redescending_iterations</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">regression</span><span class="o">.</span><span class="n">max_redescending_iterations</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">config</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">engine</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="s2">&quot;OLS&quot;</span><span class="p">,</span>
+    <span class="p">]:</span>
+        <span class="n">iter_control</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">iter_control</span></div>
+
+
+<div class="viewcode-block" id="select_channel"><a class="viewcode-back" href="../../../api/pipelines.html#aurora.pipelines.transfer_function_helpers.select_channel">[docs]</a><span class="k">def</span> <span class="nf">select_channel</span><span class="p">(</span><span class="n">xrda</span><span class="p">,</span> <span class="n">channel_label</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extra helper function to make process_transfer_functions more readable without</span>
+<span class="sd">    black forcing multiline</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    xrda</span>
+<span class="sd">    channel_label</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ch</span> <span class="o">=</span> <span class="n">xrda</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span>
+        <span class="n">channel</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">channel_label</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">ch</span></div>
+
+
+<div class="viewcode-block" id="drop_nans"><a class="viewcode-back" href="../../../api/pipelines.html#aurora.pipelines.transfer_function_helpers.drop_nans">[docs]</a><span class="k">def</span> <span class="nf">drop_nans</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">RR</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Just a helper intended to enhance readability</span>
+<span class="sd">    TODO: document the implications of dropna on index of xarray for other weights</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;observation&quot;</span><span class="p">)</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">Y</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;observation&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">RR</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">RR</span> <span class="o">=</span> <span class="n">RR</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;observation&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">RR</span></div>
+
+
+<div class="viewcode-block" id="stack_fcs"><a class="viewcode-back" href="../../../api/pipelines.html#aurora.pipelines.transfer_function_helpers.stack_fcs">[docs]</a><span class="k">def</span> <span class="nf">stack_fcs</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">RR</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reshape 2D arrays of frequency and time to 1D</span>
+
+<span class="sd">    Context:</span>
+<span class="sd">    When the data for a frequency band are extracted from the Spectrogram, each channel</span>
+<span class="sd">    is a 2D array, one axis is time (the time of the window that was FFT-ed) and the</span>
+<span class="sd">    other axis is frequency.  However if we make no distinction between the harmonics</span>
+<span class="sd">    (bins) within a band in regression, then all the FCs for each channel can be</span>
+<span class="sd">    put into a 1D array.  This method performs that reshaping (ravelling) operation.</span>
+<span class="sd">    **It is not important how we unravel the FCs but it is important that</span>
+<span class="sd">    we use the same scheme for X and Y.</span>
+
+<span class="sd">    TODO: Make this take a list and return a list rather than X,Y,RR</span>
+<span class="sd">    TODO: Decorate this with @dataset_or_dataarray</span>
+<span class="sd">        if isinstance(X, xr.Dataset):</span>
+<span class="sd">        tmp = X.to_array(&quot;channel&quot;)</span>
+<span class="sd">        tmp = tmp.stack()</span>
+<span class="sd">        or similar</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">observation</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;frequency&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">))</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">Y</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">observation</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;frequency&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">RR</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">RR</span> <span class="o">=</span> <span class="n">RR</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">observation</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;frequency&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">RR</span></div>
+
+
+<div class="viewcode-block" id="apply_weights"><a class="viewcode-back" href="../../../api/pipelines.html#aurora.pipelines.transfer_function_helpers.apply_weights">[docs]</a><span class="k">def</span> <span class="nf">apply_weights</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">RR</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">segment</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dropna</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">W</span><span class="p">[</span><span class="n">W</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="k">if</span> <span class="n">segment</span><span class="p">:</span>
+        <span class="n">W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">W</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">X</span> <span class="o">*=</span> <span class="n">W</span>
+    <span class="n">Y</span> <span class="o">*=</span> <span class="n">W</span>
+    <span class="k">if</span> <span class="n">RR</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">RR</span> <span class="o">*=</span> <span class="n">W</span>
+
+    <span class="k">if</span> <span class="n">dropna</span><span class="p">:</span>
+        <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">RR</span> <span class="o">=</span> <span class="n">drop_nans</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">RR</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">RR</span></div>
+
+
+<div class="viewcode-block" id="process_transfer_functions"><a class="viewcode-back" href="../../../api/pipelines.html#aurora.pipelines.transfer_function_helpers.process_transfer_functions">[docs]</a><span class="k">def</span> <span class="nf">process_transfer_functions</span><span class="p">(</span>
+    <span class="n">dec_level_config</span><span class="p">,</span>
+    <span class="n">local_stft_obj</span><span class="p">,</span>
+    <span class="n">remote_stft_obj</span><span class="p">,</span>
+    <span class="n">transfer_function_obj</span><span class="p">,</span>
+    <span class="c1"># segment_weights=[&quot;multiple_coherence&quot;,],#[&quot;simple_coherence&quot;,],#[&quot;multiple_coherence&quot;,],#jj84_coherence_weights&quot;,],</span>
+    <span class="n">segment_weights</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">channel_weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This method based on TTFestBand.m</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dec_level_config</span>
+<span class="sd">    local_stft_obj</span>
+<span class="sd">    remote_stft_obj</span>
+<span class="sd">    transfer_function_obj: aurora.transfer_function.TTFZ.TTFZ</span>
+<span class="sd">        The transfer function container ready to receive values in this method.</span>
+<span class="sd">    segment_weights : numpy array or list of strings</span>
+<span class="sd">        1D array which should be of the same length as the time axis of the STFT objects</span>
+<span class="sd">        If these weights are zero anywhere, we drop all that segment across all channels</span>
+<span class="sd">        If it is a list of strings, each string corresponds to a weighting</span>
+<span class="sd">        algorithm to be applied.</span>
+<span class="sd">        [&quot;jackknife_jj84&quot;, &quot;multiple_coherence&quot;, &quot;simple_coherence&quot;]</span>
+<span class="sd">    channel_weights : numpy array or None</span>
+
+<span class="sd">    Note #1: Although it is advantageous to executing the regression channel-by-channel</span>
+<span class="sd">    vs. all-at-once, we need to keep the all-at-once to get residual covariances (see issue #87)</span>
+
+<span class="sd">    Note #2:</span>
+<span class="sd">    Consider placing the segment weight logic in its own module with the various functions in a dictionary.</span>
+<span class="sd">    Possibly can combines (product) all segment weights, like the following pseudocode:</span>
+
+<span class="sd">        W = zeros</span>
+<span class="sd">        for wt_style in  segment_weights:</span>
+<span class="sd">            fcn = wt_fucntions[style]</span>
+<span class="sd">            w = fcn(X, Y, RR, )</span>
+<span class="sd">            W *= w</span>
+<span class="sd">        return W</span>
+
+
+<span class="sd">    TODO: Consider push the nan-handling into the band extraction as a kwarg.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">estimator_class</span> <span class="o">=</span> <span class="n">get_estimator_class</span><span class="p">(</span><span class="n">dec_level_config</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+    <span class="n">iter_control</span> <span class="o">=</span> <span class="n">set_up_iter_control</span><span class="p">(</span><span class="n">dec_level_config</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">band</span> <span class="ow">in</span> <span class="n">transfer_function_obj</span><span class="o">.</span><span class="n">frequency_bands</span><span class="o">.</span><span class="n">bands</span><span class="p">():</span>
+
+        <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">RR</span> <span class="o">=</span> <span class="n">get_band_for_tf_estimate</span><span class="p">(</span>
+            <span class="n">band</span><span class="p">,</span> <span class="n">dec_level_config</span><span class="p">,</span> <span class="n">local_stft_obj</span><span class="p">,</span> <span class="n">remote_stft_obj</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Apply segment weights first -- see Note #2</span>
+
+        <span class="k">if</span> <span class="s2">&quot;jackknife_jj84&quot;</span> <span class="ow">in</span> <span class="n">segment_weights</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">aurora.transfer_function.weights.coherence_weights</span> <span class="kn">import</span> <span class="p">(</span>
+                <span class="n">coherence_weights_jj84</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">Wjj84</span> <span class="o">=</span> <span class="n">coherence_weights_jj84</span><span class="p">(</span><span class="n">band</span><span class="p">,</span> <span class="n">local_stft_obj</span><span class="p">,</span> <span class="n">remote_stft_obj</span><span class="p">)</span>
+            <span class="n">apply_weights</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">RR</span><span class="p">,</span> <span class="n">Wjj84</span><span class="p">,</span> <span class="n">segment</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dropna</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;simple_coherence&quot;</span> <span class="ow">in</span> <span class="n">segment_weights</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">aurora.transfer_function.weights.coherence_weights</span> <span class="kn">import</span> <span class="p">(</span>
+                <span class="n">simple_coherence_weights</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">W</span> <span class="o">=</span> <span class="n">simple_coherence_weights</span><span class="p">(</span><span class="n">band</span><span class="p">,</span> <span class="n">local_stft_obj</span><span class="p">,</span> <span class="n">remote_stft_obj</span><span class="p">)</span>
+            <span class="n">apply_weights</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">RR</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">segment</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dropna</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;multiple_coherence&quot;</span> <span class="ow">in</span> <span class="n">segment_weights</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">aurora.transfer_function.weights.coherence_weights</span> <span class="kn">import</span> <span class="p">(</span>
+                <span class="n">multiple_coherence_weights</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">W</span> <span class="o">=</span> <span class="n">multiple_coherence_weights</span><span class="p">(</span><span class="n">band</span><span class="p">,</span> <span class="n">local_stft_obj</span><span class="p">,</span> <span class="n">remote_stft_obj</span><span class="p">)</span>
+            <span class="n">apply_weights</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">RR</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">segment</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dropna</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># if there are channel weights apply them here</span>
+
+        <span class="c1"># Reshape to 2d</span>
+        <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">RR</span> <span class="o">=</span> <span class="n">stack_fcs</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">RR</span><span class="p">)</span>
+
+        <span class="c1"># Should only be needed if weights were applied</span>
+        <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">RR</span> <span class="o">=</span> <span class="n">drop_nans</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">RR</span><span class="p">)</span>
+
+        <span class="n">W</span> <span class="o">=</span> <span class="n">effective_degrees_of_freedom_weights</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">RR</span><span class="p">,</span> <span class="n">edf_obj</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">RR</span> <span class="o">=</span> <span class="n">apply_weights</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">RR</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">segment</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dropna</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">dec_level_config</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">estimate_per_channel</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">dec_level_config</span><span class="o">.</span><span class="n">output_channels</span><span class="p">:</span>
+                <span class="n">Y_ch</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">()</span>  <span class="c1"># keep as a dataset, maybe not needed</span>
+
+                <span class="n">X_</span><span class="p">,</span> <span class="n">Y_</span><span class="p">,</span> <span class="n">RR_</span> <span class="o">=</span> <span class="n">handle_nan</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y_ch</span><span class="p">,</span> <span class="n">RR</span><span class="p">,</span> <span class="n">drop_dim</span><span class="o">=</span><span class="s2">&quot;observation&quot;</span><span class="p">)</span>
+
+                <span class="c1"># see note #1</span>
+                <span class="c1"># if RR is not None:</span>
+                <span class="c1">#     W = effective_degrees_of_freedom_weights(X_, RR_, edf_obj=None)</span>
+                <span class="c1">#     X_, Y_, RR_ = apply_weights(X_, Y_, RR_, W, segment=False)</span>
+
+                <span class="n">regression_estimator</span> <span class="o">=</span> <span class="n">estimator_class</span><span class="p">(</span>
+                    <span class="n">X</span><span class="o">=</span><span class="n">X_</span><span class="p">,</span> <span class="n">Y</span><span class="o">=</span><span class="n">Y_</span><span class="p">,</span> <span class="n">Z</span><span class="o">=</span><span class="n">RR_</span><span class="p">,</span> <span class="n">iter_control</span><span class="o">=</span><span class="n">iter_control</span>
+                <span class="p">)</span>
+                <span class="n">regression_estimator</span><span class="o">.</span><span class="n">estimate</span><span class="p">()</span>
+                <span class="n">transfer_function_obj</span><span class="o">.</span><span class="n">set_tf</span><span class="p">(</span><span class="n">regression_estimator</span><span class="p">,</span> <span class="n">band</span><span class="o">.</span><span class="n">center_period</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">RR</span> <span class="o">=</span> <span class="n">handle_nan</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">RR</span><span class="p">,</span> <span class="n">drop_dim</span><span class="o">=</span><span class="s2">&quot;observation&quot;</span><span class="p">)</span>
+            <span class="n">regression_estimator</span> <span class="o">=</span> <span class="n">estimator_class</span><span class="p">(</span>
+                <span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="o">=</span><span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="o">=</span><span class="n">RR</span><span class="p">,</span> <span class="n">iter_control</span><span class="o">=</span><span class="n">iter_control</span>
+            <span class="p">)</span>
+            <span class="n">regression_estimator</span><span class="o">.</span><span class="n">estimate</span><span class="p">()</span>
+            <span class="n">transfer_function_obj</span><span class="o">.</span><span class="n">set_tf</span><span class="p">(</span><span class="n">regression_estimator</span><span class="p">,</span> <span class="n">band</span><span class="o">.</span><span class="n">center_period</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">transfer_function_obj</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

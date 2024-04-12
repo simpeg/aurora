@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Process Synthetic Data with Aurora &mdash; aurora 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css?v=7f9a90b1" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=f6245a2f"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-information-extracted-by-IRIS">1. Build an MTH5 file from information extracted by IRIS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Process Synthetic Data with Aurora</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials/synthetic_data_processing.nbconvert.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Process-Synthetic-Data-with-Aurora">
+<h1>Process Synthetic Data with Aurora<a class="headerlink" href="#Process-Synthetic-Data-with-Aurora" title="Permalink to this heading">¶</a></h1>
+<p>This notebook shows how to process MTH5 data from a synthetic dataset.</p>
+<p>Steps 1. Create the synthetic mth5 2. Get a Run Summary from the mth5 3. Select the station to process and optionally the remote reference station 4. Create a processing config 5. Generate TFs 6. Archive the TFs (in emtf_xml or z-file)</p>
+<section id="Here-are-the-modules-we-will-need-to-import">
+<h2>Here are the modules we will need to import<a class="headerlink" href="#Here-are-the-modules-we-will-need-to-import" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">aurora.config.config_creator</span> <span class="kn">import</span> <span class="n">ConfigCreator</span>
+<span class="kn">from</span> <span class="nn">aurora.pipelines.process_mth5</span> <span class="kn">import</span> <span class="n">process_mth5</span>
+<span class="kn">from</span> <span class="nn">aurora.pipelines.run_summary</span> <span class="kn">import</span> <span class="n">RunSummary</span>
+<span class="kn">from</span> <span class="nn">aurora.test_utils.synthetic.make_mth5_from_asc</span> <span class="kn">import</span> <span class="n">create_test12rr_h5</span>
+<span class="kn">from</span> <span class="nn">aurora.test_utils.synthetic.paths</span> <span class="kn">import</span> <span class="n">DATA_PATH</span>
+<span class="kn">from</span> <span class="nn">aurora.transfer_function.kernel_dataset</span> <span class="kn">import</span> <span class="n">KernelDataset</span>
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="Define-target-folder-and-mth5-path">
+<h1>Define target folder and mth5 path<a class="headerlink" href="#Define-target-folder-and-mth5-path" title="Permalink to this heading">¶</a></h1>
+<p>By default, the synthetic mth5 file is used for testing in <code class="docutils literal notranslate"><span class="pre">aurora/tests/synthetic/</span></code> and probably already exists on your system if you have run the tests. In the code below, we check if the file exists already, and if not we make it.</p>
+<p><strong>NOTE:</strong> If using a read-only HPC installation, you may not be able to write to the directory where aurora is installed. In that case, defining your target path as somewhere you have write permission. In that case, uncommment the READ ONLY INSTALLATION block below.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">target_folder</span> <span class="o">=</span> <span class="n">DATA_PATH</span>
+
+<span class="c1">## READ ONLY INSTALLATION</span>
+<span class="c1"># home = pathlib.Path.home()</span>
+<span class="c1"># target_folder = home.joinpath(&quot;aurora_test_folder&quot;)</span>
+<span class="c1"># target_folder.mkdir(parents=True, exist_ok=True)</span>
+
+<span class="n">mth5_path</span> <span class="o">=</span> <span class="n">target_folder</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;test12rr.h5&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>If the mth5 doesn’t already exist, or you want to re-make it, call <code class="docutils literal notranslate"><span class="pre">create_test12rr_h5()</span></code></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="ow">not</span> <span class="n">mth5_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">create_test12rr_h5</span><span class="p">(</span><span class="n">target_folder</span><span class="o">=</span><span class="n">target_folder</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:21.456639+0000 | INFO | mth5.mth5 | _initialize_file | Initialized MTH5 0.1.0 file /home/runner/work/aurora/aurora/data/test12rr.h5 in mode w</span>
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:23.073610+0000 | INFO | mth5.mth5 | close_mth5 | Flushing and closing /home/runner/work/aurora/aurora/data/test12rr.h5</span>
+</pre></div></div>
+</div>
+</section>
+<section id="Get-a-Run-Summary">
+<h1>Get a Run Summary<a class="headerlink" href="#Get-a-Run-Summary" title="Permalink to this heading">¶</a></h1>
+<p>Note that we didn’t need to explicitly open the mth5 to do that, we can pass the path if we want. Run summary takes a list of mth5 paths as input argument.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mth5_run_summary</span> <span class="o">=</span> <span class="n">RunSummary</span><span class="p">()</span>
+<span class="n">mth5_run_summary</span><span class="o">.</span><span class="n">from_mth5s</span><span class="p">([</span><span class="n">mth5_path</span><span class="p">,])</span>
+<span class="n">run_summary</span> <span class="o">=</span> <span class="n">mth5_run_summary</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+<span class="n">run_summary</span><span class="o">.</span><span class="n">mini_summary</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:23.117168+0000 | INFO | mth5.mth5 | close_mth5 | Flushing and closing /home/runner/work/aurora/aurora/data/test12rr.h5</span>
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survey</th>
+      <th>station_id</th>
+      <th>run_id</th>
+      <th>start</th>
+      <th>end</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>none</td>
+      <td>test1</td>
+      <td>001</td>
+      <td>1980-01-01 00:00:00+00:00</td>
+      <td>1980-01-01 11:06:39+00:00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>none</td>
+      <td>test2</td>
+      <td>001</td>
+      <td>1980-01-01 00:00:00+00:00</td>
+      <td>1980-01-01 11:06:39+00:00</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Define-a-Kernel-Dataset">
+<h1>Define a Kernel Dataset<a class="headerlink" href="#Define-a-Kernel-Dataset" title="Permalink to this heading">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">kernel_dataset</span> <span class="o">=</span> <span class="n">KernelDataset</span><span class="p">()</span>
+<span class="n">kernel_dataset</span><span class="o">.</span><span class="n">from_run_summary</span><span class="p">(</span><span class="n">run_summary</span><span class="p">,</span> <span class="s2">&quot;test1&quot;</span><span class="p">,</span> <span class="s2">&quot;test2&quot;</span><span class="p">)</span>
+<span class="n">kernel_dataset</span><span class="o">.</span><span class="n">mini_summary</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survey</th>
+      <th>station_id</th>
+      <th>run_id</th>
+      <th>start</th>
+      <th>end</th>
+      <th>duration</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>none</td>
+      <td>test1</td>
+      <td>001</td>
+      <td>1980-01-01 00:00:00+00:00</td>
+      <td>1980-01-01 11:06:39+00:00</td>
+      <td>39999.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>none</td>
+      <td>test2</td>
+      <td>001</td>
+      <td>1980-01-01 00:00:00+00:00</td>
+      <td>1980-01-01 11:06:39+00:00</td>
+      <td>39999.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Now-define-the-processing-Configuration">
+<h1>Now define the processing Configuration<a class="headerlink" href="#Now-define-the-processing-Configuration" title="Permalink to this heading">¶</a></h1>
+<p>The only things we need to provide are our band processing scheme, and the data sample rate to generate a default processing configuration.</p>
+<p>The config will get its information about the specific stations to process via the kernel dataset.</p>
+<p><strong>NOTE:</strong> When doing only single station processing you need to specify RME processing (rather than remote reference processing which expects extra time series from another station)</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cc</span> <span class="o">=</span> <span class="n">ConfigCreator</span><span class="p">()</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">cc</span><span class="o">.</span><span class="n">create_from_kernel_dataset</span><span class="p">(</span><span class="n">kernel_dataset</span><span class="p">)</span>
+
+<span class="c1"># you can export the config to a json by uncommenting the following line</span>
+<span class="c1"># cfg_json = config.to_json()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:23.218946+0000 | INFO | aurora.config.config_creator | determine_band_specification_style | Bands not defined; setting to EMTF BANDS_DEFAULT_FILE</span>
+</pre></div></div>
+</div>
+</section>
+<section id="Take-a-look-at-the-processing-configuration">
+<h1>Take a look at the processing configuration<a class="headerlink" href="#Take-a-look-at-the-processing-configuration" title="Permalink to this heading">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">config</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+    &#34;processing&#34;: {
+        &#34;band_setup_file&#34;: &#34;/home/runner/work/aurora/aurora/aurora/config/emtf_band_setup/bs_test.cfg&#34;,
+        &#34;band_specification_style&#34;: &#34;EMTF&#34;,
+        &#34;channel_nomenclature.ex&#34;: &#34;ex&#34;,
+        &#34;channel_nomenclature.ey&#34;: &#34;ey&#34;,
+        &#34;channel_nomenclature.hx&#34;: &#34;hx&#34;,
+        &#34;channel_nomenclature.hy&#34;: &#34;hy&#34;,
+        &#34;channel_nomenclature.hz&#34;: &#34;hz&#34;,
+        &#34;decimations&#34;: [
+            {
+                &#34;decimation_level&#34;: {
+                    &#34;anti_alias_filter&#34;: &#34;default&#34;,
+                    &#34;bands&#34;: [
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.23828125,
+                                &#34;frequency_min&#34;: 0.19140625,
+                                &#34;index_max&#34;: 30,
+                                &#34;index_min&#34;: 25
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.19140625,
+                                &#34;frequency_min&#34;: 0.15234375,
+                                &#34;index_max&#34;: 24,
+                                &#34;index_min&#34;: 20
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.15234375,
+                                &#34;frequency_min&#34;: 0.12109375,
+                                &#34;index_max&#34;: 19,
+                                &#34;index_min&#34;: 16
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.12109375,
+                                &#34;frequency_min&#34;: 0.09765625,
+                                &#34;index_max&#34;: 15,
+                                &#34;index_min&#34;: 13
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.09765625,
+                                &#34;frequency_min&#34;: 0.07421875,
+                                &#34;index_max&#34;: 12,
+                                &#34;index_min&#34;: 10
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.07421875,
+                                &#34;frequency_min&#34;: 0.05859375,
+                                &#34;index_max&#34;: 9,
+                                &#34;index_min&#34;: 8
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.05859375,
+                                &#34;frequency_min&#34;: 0.04296875,
+                                &#34;index_max&#34;: 7,
+                                &#34;index_min&#34;: 6
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.04296875,
+                                &#34;frequency_min&#34;: 0.03515625,
+                                &#34;index_max&#34;: 5,
+                                &#34;index_min&#34;: 5
+                            }
+                        }
+                    ],
+                    &#34;decimation.factor&#34;: 1.0,
+                    &#34;decimation.level&#34;: 0,
+                    &#34;decimation.method&#34;: &#34;default&#34;,
+                    &#34;decimation.sample_rate&#34;: 1.0,
+                    &#34;estimator.engine&#34;: &#34;RME_RR&#34;,
+                    &#34;estimator.estimate_per_channel&#34;: true,
+                    &#34;extra_pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;input_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;method&#34;: &#34;fft&#34;,
+                    &#34;min_num_stft_windows&#34;: 2,
+                    &#34;output_channels&#34;: [
+                        &#34;hz&#34;,
+                        &#34;ex&#34;,
+                        &#34;ey&#34;
+                    ],
+                    &#34;pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;prewhitening_type&#34;: &#34;first difference&#34;,
+                    &#34;recoloring&#34;: true,
+                    &#34;reference_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;regression.max_iterations&#34;: 10,
+                    &#34;regression.max_redescending_iterations&#34;: 2,
+                    &#34;regression.minimum_cycles&#34;: 10,
+                    &#34;save_fcs&#34;: false,
+                    &#34;window.clock_zero_type&#34;: &#34;ignore&#34;,
+                    &#34;window.num_samples&#34;: 128,
+                    &#34;window.overlap&#34;: 32,
+                    &#34;window.type&#34;: &#34;boxcar&#34;
+                }
+            },
+            {
+                &#34;decimation_level&#34;: {
+                    &#34;anti_alias_filter&#34;: &#34;default&#34;,
+                    &#34;bands&#34;: [
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0.0341796875,
+                                &#34;frequency_min&#34;: 0.0263671875,
+                                &#34;index_max&#34;: 17,
+                                &#34;index_min&#34;: 14
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0.0263671875,
+                                &#34;frequency_min&#34;: 0.0205078125,
+                                &#34;index_max&#34;: 13,
+                                &#34;index_min&#34;: 11
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0.0205078125,
+                                &#34;frequency_min&#34;: 0.0166015625,
+                                &#34;index_max&#34;: 10,
+                                &#34;index_min&#34;: 9
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0.0166015625,
+                                &#34;frequency_min&#34;: 0.0126953125,
+                                &#34;index_max&#34;: 8,
+                                &#34;index_min&#34;: 7
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0.0126953125,
+                                &#34;frequency_min&#34;: 0.0107421875,
+                                &#34;index_max&#34;: 6,
+                                &#34;index_min&#34;: 6
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0.0107421875,
+                                &#34;frequency_min&#34;: 0.0087890625,
+                                &#34;index_max&#34;: 5,
+                                &#34;index_min&#34;: 5
+                            }
+                        }
+                    ],
+                    &#34;decimation.factor&#34;: 4.0,
+                    &#34;decimation.level&#34;: 1,
+                    &#34;decimation.method&#34;: &#34;default&#34;,
+                    &#34;decimation.sample_rate&#34;: 0.25,
+                    &#34;estimator.engine&#34;: &#34;RME_RR&#34;,
+                    &#34;estimator.estimate_per_channel&#34;: true,
+                    &#34;extra_pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;input_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;method&#34;: &#34;fft&#34;,
+                    &#34;min_num_stft_windows&#34;: 2,
+                    &#34;output_channels&#34;: [
+                        &#34;hz&#34;,
+                        &#34;ex&#34;,
+                        &#34;ey&#34;
+                    ],
+                    &#34;pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;prewhitening_type&#34;: &#34;first difference&#34;,
+                    &#34;recoloring&#34;: true,
+                    &#34;reference_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;regression.max_iterations&#34;: 10,
+                    &#34;regression.max_redescending_iterations&#34;: 2,
+                    &#34;regression.minimum_cycles&#34;: 10,
+                    &#34;save_fcs&#34;: false,
+                    &#34;window.clock_zero_type&#34;: &#34;ignore&#34;,
+                    &#34;window.num_samples&#34;: 128,
+                    &#34;window.overlap&#34;: 32,
+                    &#34;window.type&#34;: &#34;boxcar&#34;
+                }
+            },
+            {
+                &#34;decimation_level&#34;: {
+                    &#34;anti_alias_filter&#34;: &#34;default&#34;,
+                    &#34;bands&#34;: [
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0.008544921875,
+                                &#34;frequency_min&#34;: 0.006591796875,
+                                &#34;index_max&#34;: 17,
+                                &#34;index_min&#34;: 14
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0.006591796875,
+                                &#34;frequency_min&#34;: 0.005126953125,
+                                &#34;index_max&#34;: 13,
+                                &#34;index_min&#34;: 11
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0.005126953125,
+                                &#34;frequency_min&#34;: 0.004150390625,
+                                &#34;index_max&#34;: 10,
+                                &#34;index_min&#34;: 9
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0.004150390625,
+                                &#34;frequency_min&#34;: 0.003173828125,
+                                &#34;index_max&#34;: 8,
+                                &#34;index_min&#34;: 7
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0.003173828125,
+                                &#34;frequency_min&#34;: 0.002685546875,
+                                &#34;index_max&#34;: 6,
+                                &#34;index_min&#34;: 6
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0.002685546875,
+                                &#34;frequency_min&#34;: 0.002197265625,
+                                &#34;index_max&#34;: 5,
+                                &#34;index_min&#34;: 5
+                            }
+                        }
+                    ],
+                    &#34;decimation.factor&#34;: 4.0,
+                    &#34;decimation.level&#34;: 2,
+                    &#34;decimation.method&#34;: &#34;default&#34;,
+                    &#34;decimation.sample_rate&#34;: 0.0625,
+                    &#34;estimator.engine&#34;: &#34;RME_RR&#34;,
+                    &#34;estimator.estimate_per_channel&#34;: true,
+                    &#34;extra_pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;input_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;method&#34;: &#34;fft&#34;,
+                    &#34;min_num_stft_windows&#34;: 2,
+                    &#34;output_channels&#34;: [
+                        &#34;hz&#34;,
+                        &#34;ex&#34;,
+                        &#34;ey&#34;
+                    ],
+                    &#34;pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;prewhitening_type&#34;: &#34;first difference&#34;,
+                    &#34;recoloring&#34;: true,
+                    &#34;reference_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;regression.max_iterations&#34;: 10,
+                    &#34;regression.max_redescending_iterations&#34;: 2,
+                    &#34;regression.minimum_cycles&#34;: 10,
+                    &#34;save_fcs&#34;: false,
+                    &#34;window.clock_zero_type&#34;: &#34;ignore&#34;,
+                    &#34;window.num_samples&#34;: 128,
+                    &#34;window.overlap&#34;: 32,
+                    &#34;window.type&#34;: &#34;boxcar&#34;
+                }
+            },
+            {
+                &#34;decimation_level&#34;: {
+                    &#34;anti_alias_filter&#34;: &#34;default&#34;,
+                    &#34;bands&#34;: [
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0.00274658203125,
+                                &#34;frequency_min&#34;: 0.00213623046875,
+                                &#34;index_max&#34;: 22,
+                                &#34;index_min&#34;: 18
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0.00213623046875,
+                                &#34;frequency_min&#34;: 0.00164794921875,
+                                &#34;index_max&#34;: 17,
+                                &#34;index_min&#34;: 14
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0.00164794921875,
+                                &#34;frequency_min&#34;: 0.00115966796875,
+                                &#34;index_max&#34;: 13,
+                                &#34;index_min&#34;: 10
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0.00115966796875,
+                                &#34;frequency_min&#34;: 0.00079345703125,
+                                &#34;index_max&#34;: 9,
+                                &#34;index_min&#34;: 7
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0.00079345703125,
+                                &#34;frequency_min&#34;: 0.00054931640625,
+                                &#34;index_max&#34;: 6,
+                                &#34;index_min&#34;: 5
+                            }
+                        }
+                    ],
+                    &#34;decimation.factor&#34;: 4.0,
+                    &#34;decimation.level&#34;: 3,
+                    &#34;decimation.method&#34;: &#34;default&#34;,
+                    &#34;decimation.sample_rate&#34;: 0.015625,
+                    &#34;estimator.engine&#34;: &#34;RME_RR&#34;,
+                    &#34;estimator.estimate_per_channel&#34;: true,
+                    &#34;extra_pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;input_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;method&#34;: &#34;fft&#34;,
+                    &#34;min_num_stft_windows&#34;: 2,
+                    &#34;output_channels&#34;: [
+                        &#34;hz&#34;,
+                        &#34;ex&#34;,
+                        &#34;ey&#34;
+                    ],
+                    &#34;pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;prewhitening_type&#34;: &#34;first difference&#34;,
+                    &#34;recoloring&#34;: true,
+                    &#34;reference_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;regression.max_iterations&#34;: 10,
+                    &#34;regression.max_redescending_iterations&#34;: 2,
+                    &#34;regression.minimum_cycles&#34;: 10,
+                    &#34;save_fcs&#34;: false,
+                    &#34;window.clock_zero_type&#34;: &#34;ignore&#34;,
+                    &#34;window.num_samples&#34;: 128,
+                    &#34;window.overlap&#34;: 32,
+                    &#34;window.type&#34;: &#34;boxcar&#34;
+                }
+            }
+        ],
+        &#34;id&#34;: &#34;test1-test2&#34;,
+        &#34;stations.local.id&#34;: &#34;test1&#34;,
+        &#34;stations.local.mth5_path&#34;: &#34;/home/runner/work/aurora/aurora/data/test12rr.h5&#34;,
+        &#34;stations.local.remote&#34;: false,
+        &#34;stations.local.runs&#34;: [
+            {
+                &#34;run&#34;: {
+                    &#34;id&#34;: &#34;001&#34;,
+                    &#34;input_channels&#34;: [
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hx&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hy&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        }
+                    ],
+                    &#34;output_channels&#34;: [
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;ex&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;ey&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hz&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        }
+                    ],
+                    &#34;sample_rate&#34;: 1.0,
+                    &#34;time_periods&#34;: [
+                        {
+                            &#34;time_period&#34;: {
+                                &#34;end&#34;: &#34;1980-01-01T11:06:39+00:00&#34;,
+                                &#34;start&#34;: &#34;1980-01-01T00:00:00+00:00&#34;
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        &#34;stations.remote&#34;: [
+            {
+                &#34;station&#34;: {
+                    &#34;id&#34;: &#34;test2&#34;,
+                    &#34;mth5_path&#34;: &#34;/home/runner/work/aurora/aurora/data/test12rr.h5&#34;,
+                    &#34;remote&#34;: true,
+                    &#34;runs&#34;: [
+                        {
+                            &#34;run&#34;: {
+                                &#34;id&#34;: &#34;001&#34;,
+                                &#34;input_channels&#34;: [
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hx&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hy&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    }
+                                ],
+                                &#34;output_channels&#34;: [
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;ex&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;ey&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hz&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    }
+                                ],
+                                &#34;sample_rate&#34;: 1.0,
+                                &#34;time_periods&#34;: [
+                                    {
+                                        &#34;time_period&#34;: {
+                                            &#34;end&#34;: &#34;1980-01-01T11:06:39+00:00&#34;,
+                                            &#34;start&#34;: &#34;1980-01-01T00:00:00+00:00&#34;
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
+</pre></div></div>
+</div>
+</section>
+<section id="Call-process_mth5">
+<h1>Call process_mth5<a class="headerlink" href="#Call-process_mth5" title="Permalink to this heading">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show_plot</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">tf_cls</span> <span class="o">=</span> <span class="n">process_mth5</span><span class="p">(</span><span class="n">config</span><span class="p">,</span>
+                    <span class="n">kernel_dataset</span><span class="p">,</span>
+                    <span class="n">units</span><span class="o">=</span><span class="s2">&quot;MT&quot;</span><span class="p">,</span>
+                    <span class="n">show_plot</span><span class="o">=</span><span class="n">show_plot</span><span class="p">,</span>
+                    <span class="n">z_file_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:23.264341+0000 | INFO | aurora.pipelines.transfer_function_kernel | show_processing_summary | Processing Summary Dataframe:</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:23.268884+0000 | INFO | aurora.pipelines.transfer_function_kernel | show_processing_summary |
+  survey station_id run_id  valid  remote  duration    fc dec_level  dec_factor  sample_rate  window_duration  num_samples_window  num_samples  num_stft_windows
+0   none      test1    001   True   False   39999.0  None         0         1.0     1.000000            128.0                 128      39999.0             416.0
+1   none      test1    001   True   False   39999.0  None         1         4.0     0.250000            512.0                 128       9999.0             103.0
+2   none      test1    001   True   False   39999.0  None         2         4.0     0.062500           2048.0                 128       2499.0              25.0
+3   none      test1    001   True   False   39999.0  None         3         4.0     0.015625           8192.0                 128        624.0               6.0
+4   none      test2    001   True    True   39999.0  None         0         1.0     1.000000            128.0                 128      39999.0             416.0
+5   none      test2    001   True    True   39999.0  None         1         4.0     0.250000            512.0                 128       9999.0             103.0
+6   none      test2    001   True    True   39999.0  None         2         4.0     0.062500           2048.0                 128       2499.0              25.0
+7   none      test2    001   True    True   39999.0  None         3         4.0     0.015625           8192.0                 128        624.0               6.0</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:23.270120+0000 | INFO | aurora.pipelines.transfer_function_kernel | memory_warning | Total memory: 15.61 GB</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:23.270721+0000 | INFO | aurora.pipelines.transfer_function_kernel | memory_warning | Total Bytes of Raw Data: 0.001 GB</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:23.271206+0000 | INFO | aurora.pipelines.transfer_function_kernel | memory_warning | Raw Data will use: 0.004 % of memory</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:23.282346+0000 | INFO | aurora.pipelines.transfer_function_kernel | mth5_has_fcs | Fourier coefficients not detected for survey: none, station: test1, run: 001-- Fourier coefficients will be computed</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:23.307231+0000 | INFO | mth5.mth5 | close_mth5 | Flushing and closing /home/runner/work/aurora/aurora/data/test12rr.h5</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:23.317759+0000 | INFO | aurora.pipelines.transfer_function_kernel | mth5_has_fcs | Fourier coefficients not detected for survey: none, station: test2, run: 001-- Fourier coefficients will be computed</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:23.342112+0000 | INFO | mth5.mth5 | close_mth5 | Flushing and closing /home/runner/work/aurora/aurora/data/test12rr.h5</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:23.343546+0000 | INFO | aurora.pipelines.transfer_function_kernel | check_if_fcs_already_exist | FC levels not present</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:23.348755+0000 | INFO | aurora.pipelines.process_mth5 | process_mth5 | Processing config indicates 4 decimation levels</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:23.350081+0000 | INFO | aurora.pipelines.transfer_function_kernel | valid_decimations | After validation there are 4 valid decimation levels</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:24.039363+0000 | INFO | aurora.transfer_function.kernel_dataset | initialize_dataframe_for_processing | Dataset dataframe initialized successfully</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:24.040111+0000 | INFO | aurora.pipelines.transfer_function_kernel | update_dataset_df | Dataset Dataframe Updated for decimation level 0 Successfully</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:24.255037+0000 | INFO | aurora.pipelines.process_mth5 | save_fourier_coefficients | Skip saving FCs. dec_level_config.save_fc =  False</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:24.498812+0000 | INFO | aurora.pipelines.process_mth5 | save_fourier_coefficients | Skip saving FCs. dec_level_config.save_fc =  False</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:24.510626+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 25.728968s  (0.038867Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:24.578872+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 19.929573s  (0.050177Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:24.647707+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 15.164131s  (0.065945Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:24.702954+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 11.746086s  (0.085135Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:24.759541+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 9.195791s  (0.108745Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:24.815502+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 7.362526s  (0.135823Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:24.873055+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 5.856115s  (0.170762Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:24.940663+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 4.682492s  (0.213562Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_synthetic_data_processing.nbconvert_18_24.png" src="../_images/tutorials_synthetic_data_processing.nbconvert_18_24.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:25.622100+0000 | INFO | aurora.pipelines.transfer_function_kernel | update_dataset_df | DECIMATION LEVEL 1</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:25.650763+0000 | INFO | aurora.pipelines.transfer_function_kernel | update_dataset_df | Dataset Dataframe Updated for decimation level 1 Successfully</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:25.848698+0000 | INFO | aurora.pipelines.process_mth5 | save_fourier_coefficients | Skip saving FCs. dec_level_config.save_fc =  False</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:26.084329+0000 | INFO | aurora.pipelines.process_mth5 | save_fourier_coefficients | Skip saving FCs. dec_level_config.save_fc =  False</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:26.095389+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 102.915872s  (0.009717Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:26.149364+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 85.631182s  (0.011678Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:26.204065+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 68.881694s  (0.014518Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:26.258935+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 54.195827s  (0.018452Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:26.313661+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 43.003958s  (0.023254Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:26.368456+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 33.310722s  (0.030020Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_synthetic_data_processing.nbconvert_18_35.png" src="../_images/tutorials_synthetic_data_processing.nbconvert_18_35.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:26.911405+0000 | INFO | aurora.pipelines.transfer_function_kernel | update_dataset_df | DECIMATION LEVEL 2</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:26.935396+0000 | INFO | aurora.pipelines.transfer_function_kernel | update_dataset_df | Dataset Dataframe Updated for decimation level 2 Successfully</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:27.106258+0000 | INFO | aurora.pipelines.process_mth5 | save_fourier_coefficients | Skip saving FCs. dec_level_config.save_fc =  False</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:27.309268+0000 | INFO | aurora.pipelines.process_mth5 | save_fourier_coefficients | Skip saving FCs. dec_level_config.save_fc =  False</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:27.320247+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 411.663489s  (0.002429Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:27.374077+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 342.524727s  (0.002919Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:27.427175+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 275.526776s  (0.003629Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:27.480319+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 216.783308s  (0.004613Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:27.534647+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 172.015831s  (0.005813Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:27.587634+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 133.242890s  (0.007505Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_synthetic_data_processing.nbconvert_18_46.png" src="../_images/tutorials_synthetic_data_processing.nbconvert_18_46.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:28.230221+0000 | INFO | aurora.pipelines.transfer_function_kernel | update_dataset_df | DECIMATION LEVEL 3</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:28.253198+0000 | INFO | aurora.pipelines.transfer_function_kernel | update_dataset_df | Dataset Dataframe Updated for decimation level 3 Successfully</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:28.418471+0000 | INFO | aurora.pipelines.process_mth5 | save_fourier_coefficients | Skip saving FCs. dec_level_config.save_fc =  False</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:28.621287+0000 | INFO | aurora.pipelines.process_mth5 | save_fourier_coefficients | Skip saving FCs. dec_level_config.save_fc =  False</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:28.631933+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 1514.701336s  (0.000660Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:28.687454+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 1042.488956s  (0.000959Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:28.741488+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 723.371271s  (0.001382Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:28.795098+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 532.971560s  (0.001876Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:28.848563+0000 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Processing band 412.837995s  (0.002422Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_synthetic_data_processing.nbconvert_18_56.png" src="../_images/tutorials_synthetic_data_processing.nbconvert_18_56.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:29.501501+0000 | INFO | mth5.mth5 | close_mth5 | Flushing and closing /home/runner/work/aurora/aurora/data/test12rr.h5</span>
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2024-04-12T23:10:29.502294+0000 | INFO | mth5.mth5 | close_mth5 | Flushing and closing /home/runner/work/aurora/aurora/data/test12rr.h5</span>
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">xml_file_base</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;synthetic_test1.xml&quot;</span>
+<span class="n">tf_cls</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fn</span><span class="o">=</span><span class="n">xml_file_base</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="s2">&quot;emtfxml&quot;</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+EMTFXML(station=&#39;test1&#39;, latitude=0.00, longitude=0.00, elevation=0.00)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">edi_file_base</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;synthetic_test1.edi&quot;</span>
+<span class="n">tf_cls</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fn</span><span class="o">=</span><span class="n">edi_file_base</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="s2">&quot;edi&quot;</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Station: test1
+--------------------------------------------------
+        Survey:        0
+        Project:       None
+        Acquired by:   None
+        Acquired date: 1980-01-01
+        Latitude:      0.000
+        Longitude:     0.000
+        Elevation:     0.000
+        Impedance:     True
+        Tipper:        True
+        Number of periods: 25
+                Period Range:   4.68249E+00 -- 1.51470E+03 s
+                Frequency Range 6.60196E-04 -- 2.13561E-01 s
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
