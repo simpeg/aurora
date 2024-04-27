@@ -234,7 +234,7 @@ def add_fcs_to_mth5(m, fc_decimations=None):
 
 
 @path_or_mth5_object
-def read_back_fcs(m):
+def read_back_fcs(m, mode="r"):
     """
     This is mostly a helper function for tests.  It was used as a sanity check while debugging the FC files, and
     also is a good example for how to access the data at each level for each channel.

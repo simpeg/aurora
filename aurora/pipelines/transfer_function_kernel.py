@@ -212,7 +212,13 @@ class TransferFunctionKernel(object):
             remote = run_sub_df.remote.iloc[0]
             mth5_path = run_sub_df.mth5_path.iloc[0]
             fcs_present = mth5_has_fcs(
-                mth5_path, survey_id, station_id, run_id, remote, self.processing_config
+                mth5_path,
+                survey_id,
+                station_id,
+                run_id,
+                remote,
+                self.processing_config,
+                mode="r",
             )
             self.dataset_df.loc[dataset_df_indices, "fc"] = fcs_present
 
@@ -618,13 +624,15 @@ class TransferFunctionKernel(object):
 
 
 @path_or_mth5_object
-def mth5_has_fcs(m, survey_id, station_id, run_id, remote, processing_config):
+def mth5_has_fcs(m, survey_id, station_id, run_id, remote, processing_config, **kwargs):
     """
     Checks if all needed fc-levels for survey-station-run are present under processing_config
 
     Note #1: At this point in the logic, it is established that there are FCs associated with run_id and there are
         at least as many FC decimation levels as we require as per the processing config.  The next step is to
         assert whether it is True that the existing FCs conform to the recipe in the processing config.
+
+    kwargs are here as a pass through to the decorator ... we pass mode="r","a","w"
 
     Parameters
     ----------
