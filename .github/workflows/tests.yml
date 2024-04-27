@@ -75,10 +75,17 @@ jobs:
         # pytest -s -v tests/synthetic/test_fourier_coefficients.py --cov=./ --cov-report=xml --cov=aurora
         pytest -s -v --cov=./ --cov-report=xml --cov=aurora
 
-    - name: "Upload coverage to Codecov"
-      uses: codecov/codecov-action@v1
+  - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4
       with:
+        token: ${{ secrets.CODECOV_TOKEN }}
         fail_ci_if_error: false
+
+# Old codecov upload - can be deleted once new is working
+#    - name: "Upload coverage to Codecov"
+#      uses: codecov/codecov-action@v1
+#      with:
+#        fail_ci_if_error: false
 
     - name: Build Doc
       if: ${{ (github.ref == 'refs/heads/main') && (matrix.python-version == '3.8')}}
