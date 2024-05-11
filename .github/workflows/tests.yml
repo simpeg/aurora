@@ -81,11 +81,6 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         fail_ci_if_error: false
 
-# Old codecov upload - can be deleted once new is working
-#    - name: "Upload coverage to Codecov"
-#      uses: codecov/codecov-action@v1
-#      with:
-#        fail_ci_if_error: false
 
     - name: Build Doc
       if: ${{ (github.ref == 'refs/heads/main') && (matrix.python-version == '3.8')}}

@@ -174,6 +174,17 @@ def triage_issue_289(local_stfts, remote_stfts):
 
 
 def merge_stfts(stfts, tfk):
+    """
+
+    Parameters
+    ----------
+    stfts: ? iterable?
+    tfk
+
+    Returns
+    -------
+
+    """
     # Timing Error Workaround See Aurora Issue #289
     local_stfts = stfts["local"]
     remote_stfts = stfts["remote"]
