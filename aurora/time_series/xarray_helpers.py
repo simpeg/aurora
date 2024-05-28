@@ -64,7 +64,13 @@ def handle_nan(X, Y, RR, drop_dim=""):
     # Workaround for issue #228
     # merged_xr = merged_xr.merge(RR, join="exact")
     try:
-        merged_xr = merged_xr.merge(RR, join="exact")
+        try:
+            merged_xr = merged_xr.merge(RR, join="exact")
+        except ValueError as error:
+            logger.debug(error)
+            logger.debug("Merging with 'outer'")
+            merged_xr = merged_xr.merge(RR, join="outer")
+
     except ValueError:
         logger.error("Coordinate alignment mismatch -- see aurora issue #228 ")
         matches = X.time.values == RR.time.values
