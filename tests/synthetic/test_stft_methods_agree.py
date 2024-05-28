@@ -13,6 +13,7 @@ from aurora.test_utils.synthetic.make_processing_configs import (
     create_test_run_config,
 )
 from aurora.transfer_function.kernel_dataset import KernelDataset
+from loguru import logger
 from mth5.mth5 import MTH5
 from mth5.helpers import close_open_files
 
@@ -79,7 +80,7 @@ def test_stft_methods_agree():
 
         assert np.isclose(stft_difference, 0).all()
 
-        print("stft aurora method agrees with scipy.signal.spectrogram")
+        logger.info("stft aurora method agrees with scipy.signal.spectrogram")
     return
 
 

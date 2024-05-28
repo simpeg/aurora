@@ -329,7 +329,9 @@ def compare_aurora_vs_emtf(local_station_id, remote_station_id, coh=False):
     """
     if remote_station_id is None:
         emtf_file_base = "CAS04bcd_REV06.zrr"
-        logger.warning("Warning: No Single station EMTF results were provided for CAS04 by USGS")
+        logger.warning(
+            "Warning: No Single station EMTF results were provided for CAS04 by USGS"
+        )
         logger.warning(f"Using {emtf_file_base}")
     else:
         emtf_file_base = f"{local_station_id}bcd_{remote_station_id}.zrr"
@@ -379,7 +381,6 @@ def main():
 # h5_paths = [H5_PATH,]
 # RR = None# "REV06"
 # process_with_remote(h5_paths, "CAS04", RR)
-# print("OK")
 # compare_aurora_vs_emtf("CAS04", RR, coh=False)
 
 if __name__ == "__main__":

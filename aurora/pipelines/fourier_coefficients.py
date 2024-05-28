@@ -76,11 +76,11 @@ from mt_metadata.transfer_functions.processing.fourier_coefficients import (
 GROUPBY_COLUMNS = ["survey", "station", "sample_rate"]
 
 
-def decimation_and_stft_config_creator(
-    initial_sample_rate, max_levels=6, decimation_factors=None, time_period=None
+def fc_decimations_creator(
+    initial_sample_rate, decimation_factors=None, max_levels=6, time_period=None
 ):
     """
-    Based on the number of samples in the run, we can compute the maximum number of valid decimation levels.
+    Based on the number of samples in the runts, we can compute the maximum number of valid decimation levels.
     This would re-use code in processing summary ... or we could just decimate until we cant anymore?
 
     You can provide something like: decimation_info = {0: 1.0, 1: 4.0, 2: 4.0, 3: 4.0}
@@ -89,16 +89,23 @@ def decimation_and_stft_config_creator(
     mt_metadata.transfer_functions.processing.Processing.assign_bands() to see how this was done in the past
 
     Args:
-        initial_sample_rate:
-        max_levels:
-        decimation_factors:
+        initial_sample_rate: float
+            Sample rate of the "level0" data -- usually the sample rate during field acquisition.
+        decimation_factors: list (or other iterable)
+            The decimation factors that will be applied at each FC decimation level
+
+        max_levels: int
+            The maximum number of dice
+
         time_period:
 
     Returns:
         decimation_and_stft_config: list
-            Each element of the list is a Decimation() object.  The order of the list implies the order of the cascading
-            decimation (thus no decimation levels are omitted).  This could be changed in future by using a dict
-            instead of a list, e.g. decimation_factors = dict(zip(np.arange(max_levels), decimation_factors))
+            Each element of the list is a Decimation() object (a.k.a. FCDecimation).
+            The order of the list corresponds the order of the cascading decimation
+              - No decimation levels are omitted.
+              - This could be changed in future by using a dict instead of a list,
+              - e.g. decimation_factors = dict(zip(np.arange(max_levels), decimation_factors))
 
     """
     if not decimation_factors:
@@ -109,10 +116,11 @@ def decimation_and_stft_config_creator(
         decimation_factors[0] = 1
 
     # See Note 1
-    decimation_and_stft_config = []
+    fc_decimations = []
     for i_dec_level, decimation_factor in enumerate(decimation_factors):
         dd = FCDecimation()
         dd.decimation_level = i_dec_level
+        dd.id = f"{i_dec_level}"
         dd.decimation_factor = decimation_factor
         if i_dec_level == 0:
             current_sample_rate = 1.0 * initial_sample_rate
@@ -130,13 +138,13 @@ def decimation_and_stft_config_creator(
                 logger.info(msg)
                 raise NotImplementedError(msg)
 
-        decimation_and_stft_config.append(dd)
+        fc_decimations.append(dd)
 
-    return decimation_and_stft_config
+    return fc_decimations
 
 
 @path_or_mth5_object
-def add_fcs_to_mth5(m, decimation_and_stft_configs=None):
+def add_fcs_to_mth5(m, fc_decimations=None):
     """
     usssr_grouper: output of a groupby on unique {survey, station, sample_rate} tuples
 
@@ -161,12 +169,12 @@ def add_fcs_to_mth5(m, decimation_and_stft_configs=None):
         run_summary = station_obj.run_summary
 
         # Get the FC schemes
-        if not decimation_and_stft_configs:
-            msg = "FC config not supplied, using default, creating on the fly"
-            logger.info(f"{msg}")
-            decimation_and_stft_configs = decimation_and_stft_config_creator(
-                sample_rate, time_period=None
+        if not fc_decimations:
+            msg = (
+                "FC Decimation configs not supplied, using default, creating on the fly"
             )
+            logger.info(f"{msg}")
+            fc_decimations = fc_decimations_creator(sample_rate, time_period=None)
 
         # Make this a function that can be done using df.apply()
         # I wonder if daskifiying that will cause issues with multiple threads trying to
@@ -179,12 +187,12 @@ def add_fcs_to_mth5(m, decimation_and_stft_configs=None):
             run_obj = m.from_reference(run_row.hdf5_reference)
 
             # Set the time period:
-            for decimation_and_stft_config in decimation_and_stft_configs:
-                decimation_and_stft_config.time_period = run_obj.metadata.time_period
+            for fc_decimation in fc_decimations:
+                fc_decimation.time_period = run_obj.metadata.time_period
 
             runts = run_obj.to_runts(
-                start=decimation_and_stft_config.time_period.start,
-                end=decimation_and_stft_config.time_period.end,
+                start=fc_decimation.time_period.start,
+                end=fc_decimation.time_period.end,
             )
             # runts = run_obj.to_runts() # skip setting time_period explcitly
 
@@ -194,16 +202,14 @@ def add_fcs_to_mth5(m, decimation_and_stft_configs=None):
                 run_obj.metadata.id
             )
 
-            print(" TIMING CORRECTIONS WOULD GO HERE ")
+            # If timing corrections were needed they could go here, right before STFT
 
-            for i_dec_level, decimation_stft_obj in enumerate(
-                decimation_and_stft_configs
-            ):
+            for i_dec_level, fc_decimation in enumerate(fc_decimations):
                 if i_dec_level != 0:
                     # Apply decimation
-                    run_xrds = prototype_decimate(decimation_stft_obj, run_xrds)
-                logger.debug(f"type decimation_stft_obj = {type(decimation_stft_obj)}")
-                if not decimation_stft_obj.is_valid_for_time_series_length(
+                    run_xrds = prototype_decimate(fc_decimation, run_xrds)
+
+                if not fc_decimation.is_valid_for_time_series_length(
                     run_xrds.time.shape[0]
                 ):
                     logger.info(
@@ -211,12 +217,17 @@ def add_fcs_to_mth5(m, decimation_and_stft_configs=None):
                     )
                     continue
 
-                stft_obj = run_ts_to_stft_scipy(decimation_stft_obj, run_xrds)
+                stft_obj = run_ts_to_stft_scipy(fc_decimation, run_xrds)
                 stft_obj = calibrate_stft_obj(stft_obj, run_obj)
 
                 # Pack FCs into h5 and update metadata
-                decimation_level = fc_group.add_decimation_level(f"{i_dec_level}")
-                decimation_level.from_xarray(stft_obj)
+
+                decimation_level = fc_group.add_decimation_level(
+                    f"{i_dec_level}", decimation_level_metadata=fc_decimation
+                )
+                decimation_level.from_xarray(
+                    stft_obj, decimation_level.metadata.sample_rate_decimation
+                )
                 decimation_level.update_metadata()
                 fc_group.update_metadata()
     return

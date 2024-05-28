@@ -31,6 +31,7 @@ from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.transfer_function_helpers import process_transfer_functions
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
+from aurora.pipelines.transfer_function_kernel import station_obj_from_row
 from aurora.sandbox.triage_metadata import triage_run_id
 from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
@@ -91,30 +92,6 @@ def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrds, units="
     return stft_obj
 
 
-def station_obj_from_row(row):
-    """
-    Access the station object
-    Note if/else could avoidable if replacing text string "none" with a None object in survey column
-
-    Parameters
-    ----------
-    row: pd.Series
-        A row of tfk.dataset_df
-
-    Returns
-    -------
-    station_obj:
-
-    """
-    if row.survey == "none":
-        station_obj = row.mth5_obj.stations_group.get_station(row.station_id)
-    else:
-        station_obj = row.mth5_obj.stations_group.get_station(
-            row.station_id, survey=row.survey
-        )
-    return station_obj
-
-
 def process_tf_decimation_level(
     config, i_dec_level, local_stft_obj, remote_stft_obj, units="MT"
 ):
@@ -148,6 +125,7 @@ def process_tf_decimation_level(
     frequency_bands = config.decimations[i_dec_level].frequency_bands_obj()
     transfer_function_obj = TTFZ(i_dec_level, frequency_bands, processing_config=config)
     dec_level_config = config.decimations[i_dec_level]
+    # segment_weights = coherence_weights(dec_level_config, local_stft_obj, remote_stft_obj)
     transfer_function_obj = process_transfer_functions(
         dec_level_config, local_stft_obj, remote_stft_obj, transfer_function_obj
     )
@@ -212,33 +190,79 @@ def append_chunk_to_stfts(stfts, chunk, remote):
     return stfts
 
 
-def load_stft_obj_from_mth5(i_dec_level, row, run_obj):
+# def load_spectrogram_from_station_object(station_obj, fc_group_id, fc_decimation_id):
+#     """
+#     Placeholder.  This could also be a method in mth5
+#     Returns
+#     -------
+#
+#     """
+#     return station_obj.fourier_coefficients_group.get_fc_group(fc_group_id).get_decimation_level(fc_decimation_id)
+
+
+def load_stft_obj_from_mth5(i_dec_level, row, run_obj, channels=None):
     """
     Load stft_obj from mth5 (instead of compute)
 
+    Note #1: See note #1 in time_series.frequency_band_helpers.extract_band
+
     Parameters
     ----------
-    i_dec_level: integer
-    row
-    run_obj
+    i_dec_level: int
+        The decimation level where the data are stored within the Fourier Coefficient group
+    row: pandas.core.series.Series
+        A row of the TFK.dataset_df
+    run_obj: mth5.groups.run.RunGroup
+        The original time-domain run associated with the data to load
 
     Returns
     -------
 
     """
     station_obj = station_obj_from_row(row)
-    fc_group = station_obj.fourier_coefficients_group.add_fc_group(run_obj.metadata.id)
+    fc_group = station_obj.fourier_coefficients_group.get_fc_group(run_obj.metadata.id)
     fc_decimation_level = fc_group.get_decimation_level(f"{i_dec_level}")
-    stft_obj = fc_decimation_level.to_xarray()
-    return stft_obj
+    stft_obj = fc_decimation_level.to_xarray(channels=channels)
+
+    cond1 = stft_obj.time >= row.start.tz_localize(None)
+    cond2 = stft_obj.time <= row.end.tz_localize(None)
+    try:
+        stft_chunk = stft_obj.where(cond1 & cond2, drop=True)
+    except TypeError:  # see Note #1
+        tmp = stft_obj.to_array()
+        tmp = tmp.where(cond1 & cond2, drop=True)
+        stft_chunk = tmp.to_dataset("variable")
+    return stft_chunk
 
 
-def save_fourier_coefficients(dec_level_config, i_dec_level, row, run_obj, stft_obj):
+def save_fourier_coefficients(dec_level_config, row, run_obj, stft_obj):
+    """
+
+
+    Note #1: Logic for building FC layers:
+    If the processing config decimation_level.save_fcs_type = "h5" and fc_levels_already_exist is False, then open
+    in append mode, else open in read mode.  We should support a flag: force_rebuild_fcs, normally False.  This flag
+    is only needed when save_fcs_type=="h5".  If True, then we open in append mode, regarless of fc_levels_already_exist
+    The task of setting mode="a", mode="r" can be handled by tfk (maybe in tfk.validate())
+
+    Parameters
+    ----------
+    dec_level_config
+    row
+    run_obj
+    stft_obj
+
+    Returns
+    -------
+
+    """
+
     if not dec_level_config.save_fcs:
         msg = "Skip saving FCs. dec_level_config.save_fc = "
         msg = f"{msg} {dec_level_config.save_fcs}"
-        logger.info(f"{msg} {dec_level_config.save_fcs}")
+        logger.info(f"{msg}")
         return
+    i_dec_level = dec_level_config.decimation.level
     if dec_level_config.save_fcs_type == "csv":
         msg = "Unless debugging or testing, saving FCs to csv unexpected"
         logger.warning(msg)
@@ -246,23 +270,93 @@ def save_fourier_coefficients(dec_level_config, i_dec_level, row, run_obj, stft_
         stft_df = stft_obj.to_dataframe()
         stft_df.to_csv(csv_name)
     elif dec_level_config.save_fcs_type == "h5":
+        logger.info(("Saving FC level"))
         station_obj = station_obj_from_row(row)
 
-        # See Note #1 at top this method (not module)
         if not row.mth5_obj.h5_is_write():
-            raise NotImplementedError("See Note #1 at top this method")
-        fc_group = station_obj.fourier_coefficients_group.add_fc_group(
-            run_obj.metadata.id
-        )
+            msg = "See Note #1: Logic for building FC layers"
+            raise NotImplementedError(msg)
+
+        # Get FC group (create if needed)
+        if run_obj.metadata.id in station_obj.fourier_coefficients_group.groups_list:
+            fc_group = station_obj.fourier_coefficients_group.get_fc_group(
+                run_obj.metadata.id
+            )
+        else:
+            fc_group = station_obj.fourier_coefficients_group.add_fc_group(
+                run_obj.metadata.id
+            )
+
         decimation_level_metadata = dec_level_config.to_fc_decimation()
-        fc_decimation_level = fc_group.add_decimation_level(
-            f"{i_dec_level}",
-            decimation_level_metadata=decimation_level_metadata,
-        )
-        fc_decimation_level.from_xarray(stft_obj)
+
+        # Get FC Decimation Level (create if needed)
+        dec_level_name = f"{i_dec_level}"
+        if dec_level_name in fc_group.groups_list:
+            fc_decimation_level = fc_group.get_decimation_level(dec_level_name)
+            fc_decimation_level.metadata = decimation_level_metadata
+        else:
+            fc_decimation_level = fc_group.add_decimation_level(
+                dec_level_name,
+                decimation_level_metadata=decimation_level_metadata,
+            )
+        fc_decimation_level.from_xarray(stft_obj, decimation_level_metadata.sample_rate)
         fc_decimation_level.update_metadata()
         fc_group.update_metadata()
     return
+
+
+def get_spectrogams(tfk, i_dec_level, units="MT"):
+    """
+    Can be make a method of TFK
+
+    Parameters
+    ----------
+    tfk: TransferFunctionKernel
+    i_dec_level: integer
+    units: "MT" or "SI", likely to be deprecated
+
+    Returns
+    -------
+    dict of short time fourier transforms
+    """
+
+    stfts = {}
+    stfts["local"] = []
+    stfts["remote"] = []
+
+    # Check first if TS processing or accessing FC Levels
+    for i, row in tfk.dataset_df.iterrows():
+        # This iterator could be updated to iterate over row-pairs if remote is True,
+        # corresponding to simultaneous data
+
+        if not tfk.is_valid_dataset(row, i_dec_level):
+            continue
+
+        run_obj = row.mth5_obj.from_reference(row.run_reference)
+        if row.fc:
+            stft_obj = load_stft_obj_from_mth5(i_dec_level, row, run_obj)
+            stfts = append_chunk_to_stfts(stfts, stft_obj, row.remote)
+            continue
+
+        run_xrds = row["run_dataarray"].to_dataset("channel")
+
+        # Musgraves workaround for old MT data
+        triage_run_id(row.run_id, run_obj)
+
+        stft_obj = make_stft_objects(
+            tfk.config,
+            i_dec_level,
+            run_obj,
+            run_xrds,
+            units,
+        )
+
+        # Pack FCs into h5
+        dec_level_config = tfk.config.decimations[i_dec_level]
+        save_fourier_coefficients(dec_level_config, row, run_obj, stft_obj)
+        stfts = append_chunk_to_stfts(stfts, stft_obj, row.remote)
+
+    return stfts
 
 
 def process_mth5(
@@ -276,13 +370,6 @@ def process_mth5(
     """
     This is the main method used to transform a processing_config,
     and a kernel_dataset into a transfer function estimate.
-
-    Note 1: Logic for building FC layers:
-    If the processing config decimation_level.save_fcs_type = "h5" and fc_levels_already_exist is False, then open
-    in append mode, else open in read mode.  We should support a flag: force_rebuild_fcs, normally False.  This flag
-    is only needed when save_fcs_type=="h5".  If True, then we open in append mode, regarless of fc_levels_already_exist
-    The task of setting mode="a", mode="r" can be handled by tfk (maybe in tfk.validate())
-
 
     Parameters
     ----------
@@ -314,68 +401,22 @@ def process_mth5(
     tfk.make_processing_summary()
     tfk.show_processing_summary()
     tfk.validate()
-    # See Note #1
-    if tfk.config.decimations[0].save_fcs:
-        mth5_mode = "a"
-    else:
-        mth5_mode = "r"
-    tfk.initialize_mth5s(mode=mth5_mode)
-    try:
-        tfk.check_if_fc_levels_already_exist()  # populate the "fc" column of dataset_df
-        msg = f"fc_levels_already_exist = {tfk.dataset_df['fc'].iloc[0]}"
-        logger.info(msg)
-        msg = (
-            f"Processing config indicates {len(tfk.config.decimations)} "
-            f"decimation levels"
-        )
-        logger.info(msg)
-    except:
-        msg = "WARNING -- Unable to execute check for FC Levels"
-        msg = f"{msg} Possibly FCs not present at all (file from old MTH5 version)?"
-        logger.warning(msg)
 
+    tfk.initialize_mth5s()
+
+    msg = (
+        f"Processing config indicates {len(tfk.config.decimations)} "
+        f"decimation levels"
+    )
+    logger.info(msg)
     tf_dict = {}
 
     for i_dec_level, dec_level_config in enumerate(tfk.valid_decimations()):
+        # if not tfk.all_fcs_already_exist():
         tfk.update_dataset_df(i_dec_level)
-        dec_level_config = tfk.apply_clock_zero(dec_level_config)
+        tfk.apply_clock_zero(dec_level_config)
 
-        stfts = {}
-        stfts["local"] = []
-        stfts["remote"] = []
-
-        # Check first if TS processing or accessing FC Levels
-        for i, row in tfk.dataset_df.iterrows():
-            # This iterator could be updated to iterate over row-pairs if remote is True,
-            # corresponding to simultaneous data
-
-            if not tfk.is_valid_dataset(row, i_dec_level):
-                continue
-
-            run_obj = row.mth5_obj.from_reference(row.run_reference)
-            if row.fc:
-                stft_obj = load_stft_obj_from_mth5(i_dec_level, row, run_obj)
-                stfts = append_chunk_to_stfts(stfts, stft_obj, row.remote)
-                continue
-
-            run_xrds = row["run_dataarray"].to_dataset("channel")
-
-            # Musgraves workaround for old MT data
-            triage_run_id(row.run_id, run_obj)
-
-            stft_obj = make_stft_objects(
-                tfk.config,
-                i_dec_level,
-                run_obj,
-                run_xrds,
-                units,
-            )
-            # Pack FCs into h5
-            save_fourier_coefficients(
-                dec_level_config, i_dec_level, row, run_obj, stft_obj
-            )
-
-            stfts = append_chunk_to_stfts(stfts, stft_obj, row.remote)
+        stfts = get_spectrogams(tfk, i_dec_level, units=units)
 
         local_merged_stft_obj, remote_merged_stft_obj = merge_stfts(stfts, tfk)
 
@@ -405,7 +446,7 @@ def process_mth5(
     if z_file_path:
         tf_cls.write(z_file_path)
 
-    tfk.dataset.close_mths_objs()
+    tfk.dataset.close_mth5s()
     if return_collection:
         # this is now really only to be used for debugging and may be deprecated soon
         return tf_collection

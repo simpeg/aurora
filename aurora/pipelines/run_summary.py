@@ -24,12 +24,15 @@ import copy
 import pandas as pd
 
 
-from mt_metadata.transfer_functions.processing.aurora.channel_nomenclature import ALLOWED_INPUT_CHANNELS
-from mt_metadata.transfer_functions.processing.aurora.channel_nomenclature import ALLOWED_OUTPUT_CHANNELS
+from mt_metadata.transfer_functions.processing.aurora.channel_nomenclature import (
+    ALLOWED_INPUT_CHANNELS,
+)
+from mt_metadata.transfer_functions.processing.aurora.channel_nomenclature import (
+    ALLOWED_OUTPUT_CHANNELS,
+)
 import mth5
 from mth5.utils.helpers import initialize_mth5
 from loguru import logger
-
 
 
 RUN_SUMMARY_COLUMNS = [
@@ -270,7 +273,9 @@ def extract_run_summary_from_mth5(mth5_obj, summary_type="run"):
     channel_summary_df = mth5_obj.channel_summary.to_dataframe()
     # check that the mth5 has been summarized already
     if len(channel_summary_df) < 2:
-        logger.info("Channel summary maybe not initialized yet, 3 or more channels expected.")
+        logger.info(
+            "Channel summary maybe not initialized yet, 3 or more channels expected."
+        )
         mth5_obj.channel_summary.summarize()
         channel_summary_df = mth5_obj.channel_summary.to_dataframe()
     if summary_type == "run":
@@ -317,7 +322,7 @@ def extract_run_summaries_from_mth5s(mth5_list, summary_type="run", deduplicate=
         if isinstance(mth5_elt, mth5.mth5.MTH5):
             mth5_obj = mth5_elt
         else:  # mth5_elt is a path or a string
-            mth5_obj = initialize_mth5(mth5_elt, mode="r")
+            mth5_obj = initialize_mth5(mth5_elt, mode="a")
 
         df = extract_run_summary_from_mth5(mth5_obj, summary_type=summary_type)
 

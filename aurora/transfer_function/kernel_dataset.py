@@ -181,7 +181,7 @@ class KernelDataset:
             raise ValueError(msg)
         else:
             self._add_duration_column()
-        self.df["fc"] = False
+        self.df["fc"] = None
 
     @property
     def mini_summary(self):
@@ -355,6 +355,35 @@ class KernelDataset:
         sample_rate = self.df.sample_rate.unique()[0]
         return sample_rate
 
+    def update_survey_metadata(self, i, row, run_ts):
+        """
+        Wrangle survey_metadata into kernel_dataset.  This needs to be passed to TF before exporting data
+
+        This was factored out of initialize_dataframe_for_processing
+        Parameters
+        ----------
+        i: integer.
+            This would be the index of row, if we were sure that the dataframe was cleanly indexed
+        row: row of kernel_dataset dataframe corresponding to a survey-station-run.
+        run_ts
+
+        Returns
+        -------
+
+        """
+        survey_id = run_ts.survey_metadata.id
+        if i == 0:
+            self.survey_metadata[survey_id] = run_ts.survey_metadata
+        elif i > 0:
+            if row.station_id in self.survey_metadata[survey_id].stations.keys():
+                self.survey_metadata[survey_id].stations[row.station_id].add_run(
+                    run_ts.run_metadata
+                )
+            else:
+                self.survey_metadata[survey_id].add_station(run_ts.station_metadata)
+        if len(self.survey_metadata.keys()) > 1:
+            raise NotImplementedError
+
     def initialize_dataframe_for_processing(self, mth5_objs):
         """
         Adds extra columns needed for processing, populates them with mth5 objects,
@@ -363,12 +392,16 @@ class KernelDataset:
         Note #1: When assigning xarrays to dataframe cells, df dislikes xr.Dataset,
         so we convert to xr.DataArray before packing df
 
-        Note #2: [OPTIMIZATION] By accesssing the run_ts and packing the "run_dataarray" column of the df with it, we
+        Note #2: [OPTIMIZATION] By accessing the run_ts and packing the "run_dataarray" column of the df, we
          perform a non-lazy operation, and essentially forcing the entire decimation_level=0 dataset to be
          loaded into memory.  Seeking a lazy method to handle this maybe worthwhile.  For example, using
-         a df.apply() approach to initialize only ione row at a time would allow us to gernerate the FCs one
+         a df.apply() approach to initialize only one row at a time would allow us to generate the FCs one
          row at a time and never ingest more than one run of data at a time ...
 
+        Note #3: Uncommenting the continue statement here is desireable, will speed things up, but
+        is not yet tested.  A nice test would be to have two stations, some runs having FCs built
+        and others not having FCs built.  What goes wrong is in update_survey_metadata.
+        Need a way to get the survey metadata from a run, not a run_ts if possible
 
         Parameters
         ----------
@@ -384,27 +417,16 @@ class KernelDataset:
             self.df["run_reference"].at[i] = run_obj.hdf5_group.ref
 
             if row.fc:
-                msg = f"row {row} already has fcs prescribed by processing confg "
-                msg += "-- skipping time series initialzation"
+                msg = f"row {row} already has fcs prescribed by processing config"
+                msg += "-- skipping time series initialisation"
                 logger.info(msg)
-            #    continue
+                # see Note #3
+                # continue
             # the line below is not lazy, See Note #2
             run_ts = run_obj.to_runts(start=row.start, end=row.end)
             self.df["run_dataarray"].at[i] = run_ts.dataset.to_array("channel")
 
-            # wrangle survey_metadata into kernel_dataset
-            survey_id = run_ts.survey_metadata.id
-            if i == 0:
-                self.survey_metadata[survey_id] = run_ts.survey_metadata
-            elif i > 0:
-                if row.station_id in self.survey_metadata[survey_id].stations.keys():
-                    self.survey_metadata[survey_id].stations[row.station_id].add_run(
-                        run_ts.run_metadata
-                    )
-                else:
-                    self.survey_metadata[survey_id].add_station(run_ts.station_metadata)
-            if len(self.survey_metadata.keys()) > 1:
-                raise NotImplementedError
+            self.update_survey_metadata(i, row, run_ts)
 
         logger.info("Dataset dataframe initialized successfully")
 
@@ -449,10 +471,9 @@ class KernelDataset:
         run_obj = row.mth5_obj.from_reference(row.run_reference)
         return run_obj
 
-    def close_mths_objs(self):
+    def close_mth5s(self):
         """
-        Loop over all unique mth5_objs in the df and make sure they are closed
-
+        Loop over all unique mth5_objs in dataset df and make sure they are closed.+
         """
         mth5_objs = self.df["mth5_obj"].unique()
         for mth5_obj in mth5_objs:

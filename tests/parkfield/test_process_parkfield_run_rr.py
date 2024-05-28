@@ -8,7 +8,7 @@ from aurora.test_utils.parkfield.make_parkfield_mth5 import ensure_h5_exists
 from aurora.test_utils.parkfield.path_helpers import PARKFIELD_PATHS
 from aurora.transfer_function.kernel_dataset import KernelDataset
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
-
+from loguru import logger
 from mth5.mth5 import MTH5
 from mth5.helpers import close_open_files
 
@@ -104,8 +104,8 @@ def test():
             xlims=[0.05, 500],
         )
     else:
-        print("Z-File not found - Parkfield tests failed to generate output")
-        print("NCEDC probably not returning data")
+        logger.error("Z-File not found - Parkfield tests failed to generate output")
+        logger.warning("NCEDC probably not returning data")
     close_open_files()
 
 

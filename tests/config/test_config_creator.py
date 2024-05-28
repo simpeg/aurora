@@ -30,9 +30,7 @@ class TestConfigCreator(unittest.TestCase):
 
     def test_exception_for_non_unique_band_specification(self):
         """
-        tests that bands shouldn't be defined in two differnt ways
-        Returns
-        -------
+        tests that bands shouldn't be defined in two different ways
 
         """
         from aurora.config.emtf_band_setup import BANDS_DEFAULT_FILE
