@@ -261,7 +261,6 @@ def process_transfer_functions(
                 # if RR is not None:
                 #     W = effective_degrees_of_freedom_weights(X_, RR_, edf_obj=None)
                 #     X_, Y_, RR_ = apply_weights(X_, Y_, RR_, W, segment=False)
-
                 regression_estimator = estimator_class(
                     X=X_, Y=Y_, Z=RR_, iter_control=iter_control
                 )

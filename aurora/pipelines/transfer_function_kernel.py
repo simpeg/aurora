@@ -3,7 +3,10 @@ import pandas as pd
 import psutil
 
 from aurora.pipelines.helpers import initialize_config
-from aurora.pipelines.time_series_helpers import prototype_decimate
+from aurora.pipelines.time_series_helpers import (
+    prototype_decimate,
+    prototype_decimate_4,
+)
 from mth5.utils.exceptions import MTH5Error
 from mth5.utils.helpers import initialize_mth5
 from mth5.utils.helpers import path_or_mth5_object
@@ -132,21 +135,23 @@ class TransferFunctionKernel(object):
                     continue
                 run_xrds = row["run_dataarray"].to_dataset("channel")
                 decimation = self.config.decimations[i_dec_level].decimation
-                decimated_xrds = prototype_decimate(decimation, run_xrds)
-                self.dataset_df["run_dataarray"].at[i] = decimated_xrds.to_array(
+                decimated_xrds = prototype_decimate_4(decimation, run_xrds)
+                self.dataset_df["run_dataarray"].at[
+                    i
+                ] = decimated_xrds.to_array(
                     "channel"
                 )  # See Note 1 above
 
-        msg = (
-            f"Dataset Dataframe Updated for decimation level {i_dec_level} Successfully"
-        )
+        msg = f"Dataset Dataframe Updated for decimation level {i_dec_level} Successfully"
         logger.info(msg)
         return
 
     def apply_clock_zero(self, dec_level_config):
         """get clock-zero from data if needed"""
         if dec_level_config.window.clock_zero_type == "data start":
-            dec_level_config.window.clock_zero = str(self.dataset_df.start.min())
+            dec_level_config.window.clock_zero = str(
+                self.dataset_df.start.min()
+            )
         return dec_level_config
 
     @property
@@ -212,7 +217,12 @@ class TransferFunctionKernel(object):
             remote = run_sub_df.remote.iloc[0]
             mth5_path = run_sub_df.mth5_path.iloc[0]
             fcs_present = mth5_has_fcs(
-                mth5_path, survey_id, station_id, run_id, remote, self.processing_config
+                mth5_path,
+                survey_id,
+                station_id,
+                run_id,
+                remote,
+                self.processing_config,
             )
             self.dataset_df.loc[dataset_df_indices, "fc"] = fcs_present
 
@@ -245,7 +255,9 @@ class TransferFunctionKernel(object):
         columns_to_show = self.processing_summary.columns
         columns_to_show = [x for x in columns_to_show if x not in omit_columns]
         logger.info("Processing Summary Dataframe:")
-        logger.info(f"\n{self.processing_summary[columns_to_show].to_string()}")
+        logger.info(
+            f"\n{self.processing_summary[columns_to_show].to_string()}"
+        )
 
     def make_processing_summary(self):
         """
@@ -265,11 +277,15 @@ class TransferFunctionKernel(object):
         decimation_info = self.config.decimation_info()
         for i_dec, dec_factor in decimation_info.items():
             tmp[i_dec] = dec_factor
-        tmp = tmp.melt(id_vars=id_vars, value_name="dec_factor", var_name="dec_level")
+        tmp = tmp.melt(
+            id_vars=id_vars, value_name="dec_factor", var_name="dec_level"
+        )
         sortby = ["survey", "station_id", "run_id", "start", "dec_level"]
         tmp.sort_values(by=sortby, inplace=True)
         tmp.reset_index(drop=True, inplace=True)
-        tmp.drop("sample_rate", axis=1, inplace=True)  # not valid for decimated data
+        tmp.drop(
+            "sample_rate", axis=1, inplace=True
+        )  # not valid for decimated data
 
         # Add window info
         group_by = [
@@ -305,7 +321,9 @@ class TransferFunctionKernel(object):
                     num_samples_window=row.num_samples_window,
                     num_samples_overlap=row.num_samples_overlap,
                 )
-                num_windows[i] = ws.available_number_of_windows(row.num_samples)
+                num_windows[i] = ws.available_number_of_windows(
+                    row.num_samples
+                )
             df["num_stft_windows"] = num_windows
             groups.append(df)
 
@@ -347,7 +365,8 @@ class TransferFunctionKernel(object):
                 for x in self.processing_config.decimations
             }
             min_stft_window_list = [
-                min_stft_window_info[x] for x in self.processing_summary.dec_level
+                min_stft_window_info[x]
+                for x in self.processing_summary.dec_level
             ]
             min_num_stft_windows = pd.Series(min_stft_window_list)
 
@@ -371,7 +390,9 @@ class TransferFunctionKernel(object):
             self.config.drop_reference_channels()
             for decimation in self.config.decimations:
                 if decimation.estimator.engine == "RME_RR":
-                    logger.info("No RR station specified, switching RME_RR to RME")
+                    logger.info(
+                        "No RR station specified, switching RME_RR to RME"
+                    )
                     decimation.estimator.engine = "RME"
 
         # Make sure that a local station is defined
@@ -399,7 +420,9 @@ class TransferFunctionKernel(object):
         valid_levels = tmp.dec_level.unique()
 
         dec_levels = [x for x in self.config.decimations]
-        dec_levels = [x for x in dec_levels if x.decimation.level in valid_levels]
+        dec_levels = [
+            x for x in dec_levels if x.decimation.level in valid_levels
+        ]
         msg = f"After validation there are {len(dec_levels)} valid decimation levels"
         logger.info(msg)
         return dec_levels
@@ -412,7 +435,9 @@ class TransferFunctionKernel(object):
                 # if dec_level_config.save_fcs:
                 dec_level_config.save_fcs = False
         if self.config.stations.remote:
-            save_any_fcs = np.array([x.save_fcs for x in self.config.decimations]).any()
+            save_any_fcs = np.array(
+                [x.save_fcs for x in self.config.decimations]
+            ).any()
             if save_any_fcs:
                 msg = "\n Saving FCs for remote reference processing is not supported"
                 msg = f"{msg} \n - To save FCs, process as single station, then you can use the FCs for RR processing"
@@ -521,17 +546,27 @@ class TransferFunctionKernel(object):
             -------
 
             """
-            from mt_metadata.transfer_functions.io.zfiles.zmm import PERIOD_FORMAT
+            from mt_metadata.transfer_functions.io.zfiles.zmm import (
+                PERIOD_FORMAT,
+            )
 
             decimation_dict = {}
 
-            for i_dec, dec_level_cfg in enumerate(processing_config.decimations):
+            for i_dec, dec_level_cfg in enumerate(
+                processing_config.decimations
+            ):
                 for i_band, band in enumerate(dec_level_cfg.bands):
                     period_key = f"{band.center_period:{PERIOD_FORMAT}}"
                     period_value = {}
-                    period_value["level"] = i_dec + 1  # +1 to match EMTF standard
-                    period_value["bands"] = tuple(band.harmonic_indices[np.r_[0, -1]])
-                    period_value["sample_rate"] = dec_level_cfg.sample_rate_decimation
+                    period_value["level"] = (
+                        i_dec + 1
+                    )  # +1 to match EMTF standard
+                    period_value["bands"] = tuple(
+                        band.harmonic_indices[np.r_[0, -1]]
+                    )
+                    period_value[
+                        "sample_rate"
+                    ] = dec_level_cfg.sample_rate_decimation
                     try:
                         period_value["npts"] = tf_collection.tf_dict[
                             i_dec
@@ -561,20 +596,30 @@ class TransferFunctionKernel(object):
         tf_cls.transfer_function = tmp
 
         isp = merged_tf_dict["cov_ss_inv"]
-        renamer_dict = {"input_channel_1": "input", "input_channel_2": "output"}
+        renamer_dict = {
+            "input_channel_1": "input",
+            "input_channel_2": "output",
+        }
         isp = isp.rename(renamer_dict)
         tf_cls.inverse_signal_power = isp
 
         res_cov = merged_tf_dict["cov_nn"]
-        renamer_dict = {"output_channel_1": "input", "output_channel_2": "output"}
+        renamer_dict = {
+            "output_channel_1": "input",
+            "output_channel_2": "output",
+        }
         res_cov = res_cov.rename(renamer_dict)
         tf_cls.residual_covariance = res_cov
 
         # Set key as first el't of dict, nor currently supporting mixed surveys in TF
         tf_cls.survey_metadata = self.dataset.local_survey_metadata
-        tf_cls.station_metadata.transfer_function.processing_type = self.processing_type
-        tf_cls.station_metadata.transfer_function.processing_config = self.processing_config
-        
+        tf_cls.station_metadata.transfer_function.processing_type = (
+            self.processing_type
+        )
+        tf_cls.station_metadata.transfer_function.processing_config = (
+            self.processing_config
+        )
+
         return tf_cls
 
     def memory_warning(self):
@@ -599,7 +644,9 @@ class TransferFunctionKernel(object):
         num_samples = self.dataset_df.duration * self.dataset_df.sample_rate
         total_samples = num_samples.sum()
         total_bytes = total_samples * bytes_per_sample
-        logger.info(f"Total Bytes of Raw Data: {total_bytes / (1024 ** 3):.3f} GB")
+        logger.info(
+            f"Total Bytes of Raw Data: {total_bytes / (1024 ** 3):.3f} GB"
+        )
 
         ram_fraction = 1.0 * total_bytes / total_memory
         logger.info(f"Raw Data will use: {100 * ram_fraction:.3f} % of memory")
@@ -655,7 +702,9 @@ def mth5_has_fcs(m, survey_id, station_id, run_id, remote, processing_config):
         return False
 
     if len(fc_group.groups_list) < processing_config.num_decimation_levels:
-        msg = f"Not enough FC Groups found for {row_ssr_str} -- will build them"
+        msg = (
+            f"Not enough FC Groups found for {row_ssr_str} -- will build them"
+        )
         return False
 
     # Can check time periods here if desired, but unique (survey, station, run) should make this unneeded
