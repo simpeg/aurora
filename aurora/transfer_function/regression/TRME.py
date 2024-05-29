@@ -112,19 +112,10 @@ class TRME(MEstimator):
         self._residual_variance *= correction_factor
         return self._residual_variance
 
-    def update_b(self, b0):
+    def update_b(self):
         """matlab was: b = R\QTY;"""
-        try:
-            self.b = solve_triangular(self.R, self.QHYc)
-        except ValueError as error:
-            self.b = b0
-            # print(error)
-            # print(self.R)
-            # print(self.QHYc)
-            # self.b = solve_triangular(
-            #     np.nan_to_num(self.R, nan=), np.nan_to_num(self.QHYc, nan=1)
-            # )
-            # print(self.b)
+
+        self.b = solve_triangular(self.R, self.QHYc)
 
     def compute_inverse_signal_covariance(self):
         """

@@ -191,7 +191,7 @@ class MEstimator(RegressionEstimator):
         Make first estimate of TF (b), Y_hat, and residual_variance
         """
         self.qr_decomposition()
-        self.update_b(1)
+        self.update_b()
         self.update_y_hat()
         self.update_residual_variance()
 
@@ -203,7 +203,7 @@ class MEstimator(RegressionEstimator):
             b0 = self.b.copy()
             self.iter_control.number_of_iterations += 1
             self.update_y_cleaned_via_huber_weights()
-            self.update_b(b0)
+            self.update_b()
             self.update_y_hat()
             self.update_residual_variance(
                 correction_factor=self.correction_factor
@@ -220,7 +220,7 @@ class MEstimator(RegressionEstimator):
             while self.iter_control.continue_redescending:
                 self.iter_control.number_of_redescending_iterations += 1
                 self.update_y_cleaned_via_redescend_weights()
-                self.update_b(self.b.copy())
+                self.update_b()
                 self.update_y_hat()
                 self.update_residual_variance()
             # crude estimate of expectation of psi
