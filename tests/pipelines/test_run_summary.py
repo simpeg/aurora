@@ -147,6 +147,18 @@ class TestRunSummaryValidation(unittest.TestCase):
             True, np.all([True, False, True] == rs.df.valid.values)
         )
 
+    def test_bad_outputs_drop(self):
+        rs = RunSummary(df=self.df_bad_outputs)
+        rs.validate_channels(drop=True)
+
+        self.assertEqual(True, np.all([True, True] == rs.df.valid.values))
+
+    def test_bad_inputs_drop(self):
+        rs = RunSummary(df=self.df_bad_inputs)
+        rs.validate_channels(drop=True)
+
+        self.assertEqual(True, np.all([True, True] == rs.df.valid.values))
+
     def test_duration(self):
         rs = RunSummary(df=self.df_bad_outputs)
         rs.add_duration()
