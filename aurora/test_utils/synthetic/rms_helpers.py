@@ -40,21 +40,42 @@ def get_expected_rms_misfit(test_case_id, emtf_version=None):
     expected_rms_misfit["phi"] = {}
     if test_case_id == "test1":
         if emtf_version == "fortran":
-            expected_rms_misfit["rho"]["xy"] = 4.433905
-            expected_rms_misfit["phi"]["xy"] = 0.910484
-            expected_rms_misfit["rho"]["yx"] = 3.658614
-            expected_rms_misfit["phi"]["yx"] = 0.844645
+            # original decimation method
+            # expected_rms_misfit["rho"]["xy"] = 4.433905
+            # expected_rms_misfit["phi"]["xy"] = 0.910484
+            # expected_rms_misfit["rho"]["yx"] = 3.658614
+            # expected_rms_misfit["phi"]["yx"] = 0.844645
+
+            # resample_poly method
+            expected_rms_misfit["rho"]["xy"] = 4.432282
+            expected_rms_misfit["phi"]["xy"] = 0.915786
+            expected_rms_misfit["rho"]["yx"] = 3.649244
+            expected_rms_misfit["phi"]["yx"] = 0.843633
         elif emtf_version == "matlab":
-            expected_rms_misfit["rho"]["xy"] = 2.706098
-            expected_rms_misfit["phi"]["xy"] = 0.784229
-            expected_rms_misfit["rho"]["yx"] = 3.745280
-            expected_rms_misfit["phi"]["yx"] = 1.374938
+            # original decimation method
+            # expected_rms_misfit["rho"]["xy"] = 2.706098
+            # expected_rms_misfit["phi"]["xy"] = 0.784229
+            # expected_rms_misfit["rho"]["yx"] = 3.745280
+            # expected_rms_misfit["phi"]["yx"] = 1.374938
+
+            # resample_poly method
+            expected_rms_misfit["rho"]["xy"] = 2.711959
+            expected_rms_misfit["phi"]["xy"] = 0.787291
+            expected_rms_misfit["rho"]["yx"] = 3.632992
+            expected_rms_misfit["phi"]["yx"] = 1.365387
 
     elif test_case_id == "test2r1":
-        expected_rms_misfit["rho"]["xy"] = 3.971313
-        expected_rms_misfit["phi"]["xy"] = 0.982613
-        expected_rms_misfit["rho"]["yx"] = 3.967259
-        expected_rms_misfit["phi"]["yx"] = 1.62881
+        # original decimation method
+        # expected_rms_misfit["rho"]["xy"] = 3.971313
+        # expected_rms_misfit["phi"]["xy"] = 0.982613
+        # expected_rms_misfit["rho"]["yx"] = 3.967259
+        # expected_rms_misfit["phi"]["yx"] = 1.62881
+
+        # resample_poly method
+        expected_rms_misfit["rho"]["xy"] = 3.96470
+        expected_rms_misfit["phi"]["xy"] = 0.991345
+        expected_rms_misfit["rho"]["yx"] = 4.01597
+        expected_rms_misfit["phi"]["yx"] = 1.59927
     return expected_rms_misfit
 
 
