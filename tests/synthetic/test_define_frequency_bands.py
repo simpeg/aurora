@@ -2,7 +2,9 @@ import unittest
 
 from aurora.config.config_creator import ConfigCreator
 from aurora.pipelines.process_mth5 import process_mth5
-from aurora.test_utils.synthetic.processing_helpers import get_example_kernel_dataset
+from aurora.test_utils.synthetic.processing_helpers import (
+    get_example_kernel_dataset,
+)
 
 
 class TestDefineBandsFromDict(unittest.TestCase):
@@ -18,7 +20,9 @@ class TestDefineBandsFromDict(unittest.TestCase):
         cfg1 = cc.create_from_kernel_dataset(
             kernel_dataset, estimator={"engine": "RME"}
         )
-        decimation_factors = list(cfg1.decimation_info().values())  # [1, 4, 4, 4]
+        decimation_factors = list(
+            cfg1.decimation_info().values()
+        )  # [1, 4, 4, 4]
         # Default Band edges, corresponds to DEFAULT_BANDS_FILE
         band_edges = cfg1.band_edges_dict
         cfg2 = cc.create_from_kernel_dataset(
@@ -33,6 +37,10 @@ class TestDefineBandsFromDict(unittest.TestCase):
         tf_cls1.write(fn="cfg1.xml", file_type="emtfxml")
         tf_cls2 = process_mth5(cfg2, kernel_dataset)
         tf_cls2.write(fn="cfg2.xml", file_type="emtfxml")
+
+        # the processing parameters are not the same so need to null them
+        tf_cls1.station_metadata.transfer_function.processing_parameters = []
+        tf_cls2.station_metadata.transfer_function.processing_parameters = []
         assert tf_cls2 == tf_cls1
 
 
