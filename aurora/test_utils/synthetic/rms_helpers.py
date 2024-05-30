@@ -81,22 +81,38 @@ def assert_rms_misfit_ok(
     expected_rms_phi = expected_rms_misfit["phi"][xy_or_yx]
     logger.info(f"expected_rms_rho_{xy_or_yx} {expected_rms_rho}")
     logger.info(f"expected_rms_phi_{xy_or_yx} {expected_rms_phi}")
-    if not np.isclose(rho_rms_aurora - expected_rms_rho, 0, atol=rho_tol):
-        logger.error("==== AURORA ====\n")
+
+    rho = True
+    phi = True
+    if not np.isclose(abs(rho_rms_aurora - expected_rms_rho), 0, atol=rho_tol):
+        logger.error(f"==== AURORA (rho_{xy_or_yx}) ====")
         logger.error(rho_rms_aurora)
-        logger.error("==== EXPECTED ====\n")
+        logger.error(f"==== EXPECTED (rho_{xy_or_yx}) ====")
         logger.error(expected_rms_rho)
-        logger.error("==== DIFFERENCE ====\n")
+        logger.error(f"==== DIFFERENCE (rho_{xy_or_yx}) ====")
         logger.error(rho_rms_aurora - expected_rms_rho)
-        raise AssertionError("Expected misfit for resistivity is not correct")
+        rho = False
+        # raise AssertionError("Expected misfit for resistivity is not correct")
 
-    if not np.isclose(phi_rms_aurora - expected_rms_phi, 0, atol=rho_tol):
-        logger.error("==== AURORA ====\n")
+    if not np.isclose(abs(phi_rms_aurora - expected_rms_phi), 0, atol=phi_tol):
+        logger.error(f"==== AURORA (phi_{xy_or_yx}) ====\n")
         logger.error(phi_rms_aurora)
-        logger.error("==== EXPECTED ====\n")
+        logger.error(f"==== EXPECTED (phi_{xy_or_yx}) ====\n")
         logger.error(expected_rms_phi)
-        logger.error("==== DIFFERENCE ====\n")
+        logger.error(f"==== DIFFERENCE (phi_{xy_or_yx}) ====\n")
         logger.error(phi_rms_aurora - expected_rms_phi)
-        raise AssertionError("Expected misfit for phase is not correct")
+        phi = False
+        # raise AssertionError("Expected misfit for phase is not correct")
 
+    if not rho:
+        if not phi:
+            raise AssertionError(
+                "Expected misfit for resistivity and phase is not correct"
+            )
+        else:
+            raise AssertionError(
+                "Expected misfit for resistivity is not correct"
+            )
+    elif not phi:
+        raise AssertionError("Expected misfit for phase is not correct")
     return

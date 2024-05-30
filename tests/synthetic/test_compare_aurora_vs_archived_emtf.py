@@ -85,11 +85,14 @@ def aurora_vs_emtf(
     )
 
     aux_data = read_z_file(auxilliary_z_file)
-    aurora_rho_phi = merge_tf_collection_to_match_z_file(aux_data, tf_collection)
+    aurora_rho_phi = merge_tf_collection_to_match_z_file(
+        aux_data, tf_collection
+    )
     data_dict = {}
     data_dict["period"] = aux_data.periods
     data_dict["emtf_rho_xy"] = aux_data.rxy
     data_dict["emtf_phi_xy"] = aux_data.pxy
+    tf_dict = {"xy": True, "yx": True, "xy_error": None, "yx_error": None}
     for xy_or_yx in ["xy", "yx"]:
         aurora_rho = aurora_rho_phi["rho"][xy_or_yx]
         aurora_phi = aurora_rho_phi["phi"][xy_or_yx]
@@ -102,9 +105,16 @@ def aurora_vs_emtf(
         data_dict["aurora_rho_xy"] = aurora_rho
         data_dict["aurora_phi_xy"] = aurora_phi
         if expected_rms_misfit is not None:
-            assert_rms_misfit_ok(
-                expected_rms_misfit, xy_or_yx, rho_rms_aurora, phi_rms_aurora
-            )
+            try:
+                assert_rms_misfit_ok(
+                    expected_rms_misfit,
+                    xy_or_yx,
+                    rho_rms_aurora,
+                    phi_rms_aurora,
+                )
+            except AssertionError as error:
+                tf_dict[xy_or_yx] = False
+                tf_dict[f"{xy_or_yx}_error"] = error
 
         if make_rho_phi_plot:
             plot_rho_phi(
@@ -120,6 +130,16 @@ def aurora_vs_emtf(
                 show_plot=show_rho_phi_plot,
                 output_path=AURORA_RESULTS_PATH,
             )
+
+    if not tf_dict["xy"]:
+        if not tf_dict["yx"]:
+            raise AssertionError(
+                f"{tf_dict['xy_error']}; {tf_dict['yx_error']}"
+            )
+        else:
+            raise AssertionError(tf_dict["xy_error"])
+    elif not tf_dict["yx"]:
+        raise AssertionError(tf_dict["yx_error"])
 
     return
 
@@ -142,7 +162,9 @@ def run_test1(emtf_version, ds_df):
     test_case_id = "test1"
     auxilliary_z_file = EMTF_RESULTS_PATH.joinpath("test1.zss")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zss"
-    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df)
+    aurora_vs_emtf(
+        test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df
+    )
     return
 
 
