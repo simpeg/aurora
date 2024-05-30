@@ -19,7 +19,11 @@ from aurora.transfer_function.weights.edf_weights import (
 from loguru import logger
 
 
-ESTIMATOR_LIBRARY = {"OLS": RegressionEstimator, "RME": TRME, "RME_RR": TRME_RR}
+ESTIMATOR_LIBRARY = {
+    "OLS": RegressionEstimator,
+    "RME": TRME,
+    "RME_RR": TRME_RR,
+}
 
 
 def get_estimator_class(estimation_engine):
@@ -201,7 +205,6 @@ def process_transfer_functions(
     estimator_class = get_estimator_class(dec_level_config.estimator.engine)
     iter_control = set_up_iter_control(dec_level_config)
     for band in transfer_function_obj.frequency_bands.bands():
-
         X, Y, RR = get_band_for_tf_estimate(
             band, dec_level_config, local_stft_obj, remote_stft_obj
         )
@@ -213,7 +216,9 @@ def process_transfer_functions(
                 coherence_weights_jj84,
             )
 
-            Wjj84 = coherence_weights_jj84(band, local_stft_obj, remote_stft_obj)
+            Wjj84 = coherence_weights_jj84(
+                band, local_stft_obj, remote_stft_obj
+            )
             apply_weights(X, Y, RR, Wjj84, segment=True, dropna=False)
         if "simple_coherence" in segment_weights:
             from aurora.transfer_function.weights.coherence_weights import (
@@ -228,7 +233,9 @@ def process_transfer_functions(
                 multiple_coherence_weights,
             )
 
-            W = multiple_coherence_weights(band, local_stft_obj, remote_stft_obj)
+            W = multiple_coherence_weights(
+                band, local_stft_obj, remote_stft_obj
+            )
             apply_weights(X, Y, RR, W, segment=True, dropna=False)
 
         # if there are channel weights apply them here
@@ -237,14 +244,16 @@ def process_transfer_functions(
         X, Y, RR = stack_fcs(X, Y, RR)
 
         # Should only be needed if weights were applied
-        X, Y, RR = drop_nans(X, Y, RR)
+        # X, Y, RR = drop_nans(X, Y, RR)
 
         W = effective_degrees_of_freedom_weights(X, RR, edf_obj=None)
         X, Y, RR = apply_weights(X, Y, RR, W, segment=False, dropna=True)
 
         if dec_level_config.estimator.estimate_per_channel:
             for ch in dec_level_config.output_channels:
-                Y_ch = Y[ch].to_dataset()  # keep as a dataset, maybe not needed
+                Y_ch = Y[
+                    ch
+                ].to_dataset()  # keep as a dataset, maybe not needed
 
                 X_, Y_, RR_ = handle_nan(X, Y_ch, RR, drop_dim="observation")
 
@@ -252,18 +261,21 @@ def process_transfer_functions(
                 # if RR is not None:
                 #     W = effective_degrees_of_freedom_weights(X_, RR_, edf_obj=None)
                 #     X_, Y_, RR_ = apply_weights(X_, Y_, RR_, W, segment=False)
-
                 regression_estimator = estimator_class(
                     X=X_, Y=Y_, Z=RR_, iter_control=iter_control
                 )
                 regression_estimator.estimate()
-                transfer_function_obj.set_tf(regression_estimator, band.center_period)
+                transfer_function_obj.set_tf(
+                    regression_estimator, band.center_period
+                )
         else:
             X, Y, RR = handle_nan(X, Y, RR, drop_dim="observation")
             regression_estimator = estimator_class(
                 X=X, Y=Y, Z=RR, iter_control=iter_control
             )
             regression_estimator.estimate()
-            transfer_function_obj.set_tf(regression_estimator, band.center_period)
+            transfer_function_obj.set_tf(
+                regression_estimator, band.center_period
+            )
 
     return transfer_function_obj

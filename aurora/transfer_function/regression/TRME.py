@@ -114,6 +114,7 @@ class TRME(MEstimator):
 
     def update_b(self):
         """matlab was: b = R\QTY;"""
+
         self.b = solve_triangular(self.R, self.QHYc)
 
     def compute_inverse_signal_covariance(self):

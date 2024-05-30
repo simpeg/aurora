@@ -40,21 +40,42 @@ def get_expected_rms_misfit(test_case_id, emtf_version=None):
     expected_rms_misfit["phi"] = {}
     if test_case_id == "test1":
         if emtf_version == "fortran":
-            expected_rms_misfit["rho"]["xy"] = 4.433905
-            expected_rms_misfit["phi"]["xy"] = 0.910484
-            expected_rms_misfit["rho"]["yx"] = 3.658614
-            expected_rms_misfit["phi"]["yx"] = 0.844645
+            # original decimation method
+            # expected_rms_misfit["rho"]["xy"] = 4.433905
+            # expected_rms_misfit["phi"]["xy"] = 0.910484
+            # expected_rms_misfit["rho"]["yx"] = 3.658614
+            # expected_rms_misfit["phi"]["yx"] = 0.844645
+
+            # resample_poly method
+            expected_rms_misfit["rho"]["xy"] = 4.432282
+            expected_rms_misfit["phi"]["xy"] = 0.915786
+            expected_rms_misfit["rho"]["yx"] = 3.649244
+            expected_rms_misfit["phi"]["yx"] = 0.843633
         elif emtf_version == "matlab":
-            expected_rms_misfit["rho"]["xy"] = 2.706098
-            expected_rms_misfit["phi"]["xy"] = 0.784229
-            expected_rms_misfit["rho"]["yx"] = 3.745280
-            expected_rms_misfit["phi"]["yx"] = 1.374938
+            # original decimation method
+            # expected_rms_misfit["rho"]["xy"] = 2.706098
+            # expected_rms_misfit["phi"]["xy"] = 0.784229
+            # expected_rms_misfit["rho"]["yx"] = 3.745280
+            # expected_rms_misfit["phi"]["yx"] = 1.374938
+
+            # resample_poly method
+            expected_rms_misfit["rho"]["xy"] = 2.711959
+            expected_rms_misfit["phi"]["xy"] = 0.787291
+            expected_rms_misfit["rho"]["yx"] = 3.632992
+            expected_rms_misfit["phi"]["yx"] = 1.365387
 
     elif test_case_id == "test2r1":
-        expected_rms_misfit["rho"]["xy"] = 3.971313
-        expected_rms_misfit["phi"]["xy"] = 0.982613
-        expected_rms_misfit["rho"]["yx"] = 3.967259
-        expected_rms_misfit["phi"]["yx"] = 1.62881
+        # original decimation method
+        # expected_rms_misfit["rho"]["xy"] = 3.971313
+        # expected_rms_misfit["phi"]["xy"] = 0.982613
+        # expected_rms_misfit["rho"]["yx"] = 3.967259
+        # expected_rms_misfit["phi"]["yx"] = 1.62881
+
+        # resample_poly method
+        expected_rms_misfit["rho"]["xy"] = 3.96470
+        expected_rms_misfit["phi"]["xy"] = 0.991345
+        expected_rms_misfit["rho"]["yx"] = 4.01597
+        expected_rms_misfit["phi"]["yx"] = 1.59927
     return expected_rms_misfit
 
 
@@ -81,22 +102,38 @@ def assert_rms_misfit_ok(
     expected_rms_phi = expected_rms_misfit["phi"][xy_or_yx]
     logger.info(f"expected_rms_rho_{xy_or_yx} {expected_rms_rho}")
     logger.info(f"expected_rms_phi_{xy_or_yx} {expected_rms_phi}")
-    if not np.isclose(rho_rms_aurora - expected_rms_rho, 0, atol=rho_tol):
-        logger.error("==== AURORA ====\n")
+
+    rho = True
+    phi = True
+    if not np.isclose(abs(rho_rms_aurora - expected_rms_rho), 0, atol=rho_tol):
+        logger.error(f"==== AURORA (rho_{xy_or_yx}) ====")
         logger.error(rho_rms_aurora)
-        logger.error("==== EXPECTED ====\n")
+        logger.error(f"==== EXPECTED (rho_{xy_or_yx}) ====")
         logger.error(expected_rms_rho)
-        logger.error("==== DIFFERENCE ====\n")
+        logger.error(f"==== DIFFERENCE (rho_{xy_or_yx}) ====")
         logger.error(rho_rms_aurora - expected_rms_rho)
-        raise AssertionError("Expected misfit for resistivity is not correct")
+        rho = False
+        # raise AssertionError("Expected misfit for resistivity is not correct")
 
-    if not np.isclose(phi_rms_aurora - expected_rms_phi, 0, atol=rho_tol):
-        logger.error("==== AURORA ====\n")
+    if not np.isclose(abs(phi_rms_aurora - expected_rms_phi), 0, atol=phi_tol):
+        logger.error(f"==== AURORA (phi_{xy_or_yx}) ====\n")
         logger.error(phi_rms_aurora)
-        logger.error("==== EXPECTED ====\n")
+        logger.error(f"==== EXPECTED (phi_{xy_or_yx}) ====\n")
         logger.error(expected_rms_phi)
-        logger.error("==== DIFFERENCE ====\n")
+        logger.error(f"==== DIFFERENCE (phi_{xy_or_yx}) ====\n")
         logger.error(phi_rms_aurora - expected_rms_phi)
-        raise AssertionError("Expected misfit for phase is not correct")
+        phi = False
+        # raise AssertionError("Expected misfit for phase is not correct")
 
+    if not rho:
+        if not phi:
+            raise AssertionError(
+                "Expected misfit for resistivity and phase is not correct"
+            )
+        else:
+            raise AssertionError(
+                "Expected misfit for resistivity is not correct"
+            )
+    elif not phi:
+        raise AssertionError("Expected misfit for phase is not correct")
     return

@@ -73,7 +73,13 @@ class RunSummary:
         self.column_dtypes = [str, str, pd.Timestamp, pd.Timestamp]
         self._input_dict = kwargs.get("input_dict", None)
         self.df = kwargs.get("df", None)
-        self._mini_summary_columns = ["survey", "station_id", "run_id", "start", "end"]
+        self._mini_summary_columns = [
+            "survey",
+            "station_id",
+            "run_id",
+            "start",
+            "end",
+        ]
 
     def clone(self):
         """
@@ -120,7 +126,9 @@ class RunSummary:
             run_obj = m.get_run(row.station_id, row.run_id, row.survey)
             runts = run_obj.to_runts()
             if runts.dataset.to_array().data.__abs__().sum() == 0:
-                logger.critical("CRITICAL: Detected a run with all zero values")
+                logger.critical(
+                    "CRITICAL: Detected a run with all zero values"
+                )
                 self.df["valid"].at[i_row] = False
             # load each run, and take the median of the sum of the absolute values
         if drop:
@@ -130,6 +138,60 @@ class RunSummary:
     def drop_invalid_rows(self):
         self.df = self.df[self.df.valid]
         self.df.reset_index(drop=True, inplace=True)
+
+    def validate_channels(self, drop=False):
+        """
+        Check to make sure each run has the same input and output channels
+
+        optional: drop runs that do not have the same number of channels.
+
+
+        """
+
+        if len(self.df) <= 1:
+            return
+        if len(self.df) == 2:
+            if (
+                self.df.iloc[0].input_channels
+                != self.df.iloc[1].input_channels
+            ):
+                logger.warning(
+                    "Input channels are not the same: "
+                    f"row[0]: {self.df.iloc[0].input_channels} != "
+                    f"row[1]: {self.df.iloc[1].input_channels}"
+                )
+            if (
+                self.df.iloc[0].output_channels
+                != self.df.iloc[1].output_channels
+            ):
+                logger.warning(
+                    "Output channels are not the same: "
+                    f"row[0]: {self.df.iloc[0].output_channels} != "
+                    f"row[1]: {self.df.iloc[1].output_channels}"
+                )
+                return
+        else:
+            common_input_channels = self.df.input_channels.mode()[0]
+            common_output_channels = self.df.output_channels.mode()[0]
+            for row in self.df.itertuples():
+                if row.input_channels != common_input_channels:
+                    self.df["valid"].at[row.Index] = False
+                    logger.warning(
+                        "Input channels are not the same: "
+                        f"run {row.run_id} row {row.Index}: {row.input_channels} != "
+                        f"{common_input_channels}"
+                    )
+                if row.output_channels != common_output_channels:
+                    self.df["valid"].at[row.Index] = False
+                    logger.warning(
+                        "output channels are not the same: "
+                        f"run {row.run_id} row {row.Index}: {row.output_channels} != "
+                        f"{common_output_channels}"
+                    )
+
+        if drop:
+            self.drop_invalid_rows()
+        return
 
     # BELOW FUNCTION CAN BE COPIED FROM METHOD IN KernelDataset()
     # def drop_runs_shorter_than(self, duration, units="s"):
@@ -221,7 +283,9 @@ def channel_summary_to_run_summary(
     channel_scale_factors = n_station_runs * [None]
     i = 0
     for group_values, group in grouper:
-        group_info = dict(zip(group_by_columns, group_values))  # handy for debug
+        group_info = dict(
+            zip(group_by_columns, group_values)
+        )  # handy for debug
         # for k, v in group_info.items():
         #     print(f"{k} = {v}")
         survey_ids[i] = group_info["survey"]
@@ -232,9 +296,15 @@ def channel_summary_to_run_summary(
         sample_rates[i] = group.sample_rate.iloc[0]
         channels_list = group.component.to_list()
         num_channels = len(channels_list)
-        input_channels[i] = [x for x in channels_list if x in allowed_input_channels]
-        output_channels[i] = [x for x in channels_list if x in allowed_output_channels]
-        channel_scale_factors[i] = dict(zip(channels_list, num_channels * [1.0]))
+        input_channels[i] = [
+            x for x in channels_list if x in allowed_input_channels
+        ]
+        output_channels[i] = [
+            x for x in channels_list if x in allowed_output_channels
+        ]
+        channel_scale_factors[i] = dict(
+            zip(channels_list, num_channels * [1.0])
+        )
         i += 1
 
     data_dict = {}
@@ -286,7 +356,9 @@ def extract_run_summary_from_mth5(mth5_obj, summary_type="run"):
     return out_df
 
 
-def extract_run_summaries_from_mth5s(mth5_list, summary_type="run", deduplicate=True):
+def extract_run_summaries_from_mth5s(
+    mth5_list, summary_type="run", deduplicate=True
+):
     """
     ToDo: Move this method into mth5? or mth5_helpers?
     ToDo: Make this a class so that the __repr__ is a nice visual representation of the

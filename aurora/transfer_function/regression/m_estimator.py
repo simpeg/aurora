@@ -56,7 +56,9 @@ class MEstimator(RegressionEstimator):
         return self._Y_hat
 
     def update_y_hat(self):
-        logger.error("Y_hat update method is not defined for abstract MEstimator class")
+        logger.error(
+            "Y_hat update method is not defined for abstract MEstimator class"
+        )
         logger.error("Try using RME or RME_RR class instead")
         raise Exception
 
@@ -103,7 +105,9 @@ class MEstimator(RegressionEstimator):
         than the one in TRME, but also has more computational overhead.
         """
         res = self.Yc - self.Y_hat  # intial estimate of error variance
-        residual_variance = np.sum(np.abs(res * np.conj(res)), axis=0) / self.n_data
+        residual_variance = (
+            np.sum(np.abs(res * np.conj(res)), axis=0) / self.n_data
+        )
         return residual_variance
 
     def residual_variance_method2(self):
@@ -142,12 +146,12 @@ class MEstimator(RegressionEstimator):
         try:
             assert (residual_variance > 0).all()
         except AssertionError:
-            logger.warning("WARNING - Negative error variances observed")
-            logger.warning(residual_variance)
-            logger.warning(
+            # logger.warning("WARNING - Negative error variances observed")
+            # logger.warning(residual_variance)
+            logger.debug(
                 "Setting residual_variance to zero - Negative values observed"
             )
-            residual_variance *= 0
+            residual_variance = np.zeros_like(residual_variance)
 
         return residual_variance
 
@@ -196,19 +200,23 @@ class MEstimator(RegressionEstimator):
         converged = self.iter_control.max_number_of_iterations <= 0
         self.iter_control.number_of_iterations = 0
         while not converged:
-            b0 = self.b
+            b0 = self.b.copy()
             self.iter_control.number_of_iterations += 1
             self.update_y_cleaned_via_huber_weights()
             self.update_b()
             self.update_y_hat()
-            self.update_residual_variance(correction_factor=self.correction_factor)
+            self.update_residual_variance(
+                correction_factor=self.correction_factor
+            )
             converged = self.iter_control.converged(self.b, b0)
         return
 
     def apply_redecending_influence_function(self):
         """one or two iterations with redescending influence curve cleaned data"""
         if self.iter_control.max_number_of_redescending_iterations:
-            self.iter_control.number_of_redescending_iterations = 0  # reset per channel
+            self.iter_control.number_of_redescending_iterations = (
+                0  # reset per channel
+            )
             while self.iter_control.continue_redescending:
                 self.iter_control.number_of_redescending_iterations += 1
                 self.update_y_cleaned_via_redescend_weights()

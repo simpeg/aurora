@@ -54,15 +54,29 @@ def handle_nan(X, Y, RR, drop_dim=""):
         data_var_rm_label_mapper[f"remote_{ch}"] = ch
     RR = RR.rename(data_var_add_label_mapper)
 
-    merged_xr = X.merge(Y, join="exact")
+    try:
+        merged_xr = X.merge(Y, join="exact")
+    except ValueError as error:
+        logger.debug(error)
+        logger.debug("Merging with 'outer'")
+        merged_xr = X.merge(Y, join="outer")
+
     # Workaround for issue #228
     # merged_xr = merged_xr.merge(RR, join="exact")
     try:
-        merged_xr = merged_xr.merge(RR, join="exact")
+        try:
+            merged_xr = merged_xr.merge(RR, join="exact")
+        except ValueError as error:
+            logger.debug(error)
+            logger.debug("Merging with 'outer'")
+            merged_xr = merged_xr.merge(RR, join="outer")
+
     except ValueError:
         logger.error("Coordinate alignment mismatch -- see aurora issue #228 ")
         matches = X.time.values == RR.time.values
-        logger.error(f"{matches.sum()}/{len(matches)} timestamps match exactly")
+        logger.error(
+            f"{matches.sum()}/{len(matches)} timestamps match exactly"
+        )
         deltas = X.time.values - RR.time.values
         logger.error(f"Maximum offset is {deltas.__abs__().max()}ns")
         #        print(f"X.time.[0]: {X.time[0].values}")

@@ -132,7 +132,9 @@ class KernelDataset:
     def clone_dataframe(self):
         return copy.deepcopy(self.df)
 
-    def from_run_summary(self, run_summary, local_station_id, remote_station_id=None):
+    def from_run_summary(
+        self, run_summary, local_station_id, remote_station_id=None
+    ):
         """
 
         Parameters
@@ -156,7 +158,9 @@ class KernelDataset:
         ]
         if remote_station_id:
             station_ids.append(remote_station_id)
-        df = restrict_to_station_list(run_summary.df, station_ids, inplace=False)
+        df = restrict_to_station_list(
+            run_summary.df, station_ids, inplace=False
+        )
         # Check df is non-empty
         if len(df) == 0:
             msg = f"Restricting run_summary df to {station_ids} yields an empty set"
@@ -372,17 +376,23 @@ class KernelDataset:
 
         """
         survey_id = run_ts.survey_metadata.id
-        if i == 0:
+        # need to add another survey if it is not in the survey dictionary.
+        if i == 0 or survey_id not in self.survey_metadata.keys():
             self.survey_metadata[survey_id] = run_ts.survey_metadata
         elif i > 0:
-            if row.station_id in self.survey_metadata[survey_id].stations.keys():
-                self.survey_metadata[survey_id].stations[row.station_id].add_run(
-                    run_ts.run_metadata
-                )
+            if (
+                row.station_id
+                in self.survey_metadata[survey_id].stations.keys()
+            ):
+                self.survey_metadata[survey_id].stations[
+                    row.station_id
+                ].add_run(run_ts.run_metadata)
             else:
-                self.survey_metadata[survey_id].add_station(run_ts.station_metadata)
-        if len(self.survey_metadata.keys()) > 1:
-            raise NotImplementedError
+                self.survey_metadata[survey_id].add_station(
+                    run_ts.station_metadata
+                )
+        # if len(self.survey_metadata.keys()) > 1:
+        #     raise NotImplementedError
 
     def initialize_dataframe_for_processing(self, mth5_objs):
         """
