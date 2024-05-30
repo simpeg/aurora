@@ -377,10 +377,7 @@ class KernelDataset:
         """
         survey_id = run_ts.survey_metadata.id
         # need to add another survey if it is not in the survey dictionary.
-        if survey_id not in self.survey_metadata.keys():
-            self.survey_metadata[survey_id] = run_ts.survey_metadata
-
-        elif i == 0:
+        if i == 0 or survey_id not in self.survey_metadata.keys():
             self.survey_metadata[survey_id] = run_ts.survey_metadata
         elif i > 0:
             if (
@@ -394,8 +391,8 @@ class KernelDataset:
                 self.survey_metadata[survey_id].add_station(
                     run_ts.station_metadata
                 )
-        if len(self.survey_metadata.keys()) > 1:
-            raise NotImplementedError
+        # if len(self.survey_metadata.keys()) > 1:
+        #     raise NotImplementedError
 
     def initialize_dataframe_for_processing(self, mth5_objs):
         """
