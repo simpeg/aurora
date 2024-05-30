@@ -1,16 +1,23 @@
+import unittest
+import logging
+
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test2_h5
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
+from aurora.test_utils.synthetic.make_mth5_from_asc import (
+    create_test1_h5,
+    create_test2_h5,
+    create_test12rr_h5,
+)
 from aurora.test_utils.synthetic.make_processing_configs import (
     create_test_run_config,
 )
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
-from aurora.test_utils.synthetic.rms_helpers import assert_rms_misfit_ok
-from aurora.test_utils.synthetic.rms_helpers import compute_rms
-from aurora.test_utils.synthetic.rms_helpers import get_expected_rms_misfit
+from aurora.test_utils.synthetic.rms_helpers import (
+    assert_rms_misfit_ok,
+    compute_rms,
+    get_expected_rms_misfit,
+)
 from aurora.transfer_function.emtf_z_file_helpers import (
     merge_tf_collection_to_match_z_file,
 )
@@ -141,7 +148,7 @@ def aurora_vs_emtf(
     elif not tf_dict["yx"]:
         raise AssertionError(tf_dict["yx_error"])
 
-    return
+    return True
 
 
 def run_test1(emtf_version, ds_df):
@@ -162,10 +169,9 @@ def run_test1(emtf_version, ds_df):
     test_case_id = "test1"
     auxilliary_z_file = EMTF_RESULTS_PATH.joinpath("test1.zss")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zss"
-    aurora_vs_emtf(
+    return aurora_vs_emtf(
         test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df
     )
-    return
 
 
 def run_test2r1(tfk_dataset):
@@ -184,10 +190,9 @@ def run_test2r1(tfk_dataset):
     emtf_version = "fortran"
     auxilliary_z_file = EMTF_RESULTS_PATH.joinpath("test2r1.zrr")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zrr"
-    aurora_vs_emtf(
+    return aurora_vs_emtf(
         test_case_id, emtf_version, auxilliary_z_file, z_file_base, tfk_dataset
     )
-    return
 
 
 def make_mth5s(merged=True):
@@ -208,58 +213,116 @@ def make_mth5s(merged=True):
     return mth5_paths
 
 
-def test_pipeline(merged=True):
-    """
+class TestAuroraVsArchivedMergedTrue(unittest.TestCase):
+    @classmethod
+    def setUpClass(self):
+        logging.getLogger("matplotlib.font_manager").disabled = True
+        logging.getLogger("matplotlib.ticker").disabled = True
 
-    Parameters
-    ----------
-    merged: bool
-        If true, summarise two separate mth5 files and merge their run summaries
-        If False, use an already-merged mth5
+        close_open_files()
 
-    Returns
-    -------
+        mth5_paths = make_mth5s(merged=True)
+        self.run_summary = RunSummary()
+        self.run_summary.from_mth5s(mth5_paths)
+        self.tfk_dataset = KernelDataset()
+        self.tfk_dataset.from_run_summary(self.run_summary, "test1")
 
-    """
-    close_open_files()
+    def test_aurora_vs_fortran(self):
+        self.assertEqual(True, run_test1("fortran", self.tfk_dataset))
 
-    mth5_paths = make_mth5s(merged=merged)
-    run_summary = RunSummary()
-    run_summary.from_mth5s(mth5_paths)
-    tfk_dataset = KernelDataset()
-    tfk_dataset.from_run_summary(run_summary, "test1")
+    def test_aurora_vs_matlab(self):
+        self.assertEqual(True, run_test1("matlab", self.tfk_dataset))
 
-    run_test1("fortran", tfk_dataset)
-    run_test1("matlab", tfk_dataset)
-
-    tfk_dataset = KernelDataset()
-    tfk_dataset.from_run_summary(run_summary, "test2", "test1")
-    # Uncomment to sanity check the problem is linear
-    # scale_factors = {
-    #     "ex": 20.0,
-    #     "ey": 20.0,
-    #     "hx": 20.0,
-    #     "hy": 20.0,
-    #     "hz": 20.0,
-    # }
-    # tfk_dataset.df["channel_scale_factors"].at[0] = scale_factors
-    # tfk_dataset.df["channel_scale_factors"].at[1] = scale_factors
-    run_test2r1(tfk_dataset)
+    def test_aurora_vs_rr(self):
+        tfk_dataset = KernelDataset()
+        tfk_dataset.from_run_summary(self.run_summary, "test2", "test1")
+        self.assertEqual(True, run_test2r1(tfk_dataset))
 
 
-def test():
-    import logging
+class TestAuroraVsArchivedMergedFalse(unittest.TestCase):
+    @classmethod
+    def setUpClass(self):
+        logging.getLogger("matplotlib.font_manager").disabled = True
+        logging.getLogger("matplotlib.ticker").disabled = True
 
-    logging.getLogger("matplotlib.font_manager").disabled = True
-    logging.getLogger("matplotlib.ticker").disabled = True
+        close_open_files()
 
-    test_pipeline(merged=False)
-    test_pipeline(merged=True)
+        mth5_paths = make_mth5s(merged=False)
+        self.run_summary = RunSummary()
+        self.run_summary.from_mth5s(mth5_paths)
+        self.tfk_dataset = KernelDataset()
+        self.tfk_dataset.from_run_summary(self.run_summary, "test1")
+
+    def test_aurora_vs_fortran(self):
+        self.assertEqual(True, run_test1("fortran", self.tfk_dataset))
+
+    def test_aurora_vs_matlab(self):
+        self.assertEqual(True, run_test1("matlab", self.tfk_dataset))
+
+    def test_aurora_vs_rr(self):
+        tfk_dataset = KernelDataset()
+        tfk_dataset.from_run_summary(self.run_summary, "test2", "test1")
+        self.assertEqual(True, run_test2r1(tfk_dataset))
 
 
-def main():
-    test()
-
-
+# =============================================================================
+# run
+# =============================================================================
 if __name__ == "__main__":
-    main()
+    unittest.main()
+
+# def test_pipeline(merged=True):
+#     """
+
+#     Parameters
+#     ----------
+#     merged: bool
+#         If true, summarise two separate mth5 files and merge their run summaries
+#         If False, use an already-merged mth5
+
+#     Returns
+#     -------
+
+#     """
+#     close_open_files()
+
+#     mth5_paths = make_mth5s(merged=merged)
+#     run_summary = RunSummary()
+#     run_summary.from_mth5s(mth5_paths)
+#     tfk_dataset = KernelDataset()
+#     tfk_dataset.from_run_summary(run_summary, "test1")
+
+#     run_test1("fortran", tfk_dataset)
+#     run_test1("matlab", tfk_dataset)
+
+#     tfk_dataset = KernelDataset()
+#     tfk_dataset.from_run_summary(run_summary, "test2", "test1")
+#     # Uncomment to sanity check the problem is linear
+#     # scale_factors = {
+#     #     "ex": 20.0,
+#     #     "ey": 20.0,
+#     #     "hx": 20.0,
+#     #     "hy": 20.0,
+#     #     "hz": 20.0,
+#     # }
+#     # tfk_dataset.df["channel_scale_factors"].at[0] = scale_factors
+#     # tfk_dataset.df["channel_scale_factors"].at[1] = scale_factors
+#     run_test2r1(tfk_dataset)
+
+
+# def test():
+#     import logging
+
+#     logging.getLogger("matplotlib.font_manager").disabled = True
+#     logging.getLogger("matplotlib.ticker").disabled = True
+
+#     test_pipeline(merged=False)
+#     test_pipeline(merged=True)
+
+
+# def main():
+#     test()
+
+
+# if __name__ == "__main__":
+#     main()
