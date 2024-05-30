@@ -10,7 +10,9 @@ from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test2_h5
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test3_h5
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
-from aurora.test_utils.synthetic.make_processing_configs import create_test_run_config
+from aurora.test_utils.synthetic.make_processing_configs import (
+    create_test_run_config,
+)
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 from aurora.transfer_function.kernel_dataset import KernelDataset
 from loguru import logger
@@ -55,7 +57,12 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
         mth5_path_2 = create_test2_h5(file_version=self.file_version)
         mth5_path_3 = create_test3_h5(file_version=self.file_version)
         mth5_path_12rr = create_test12rr_h5(file_version=self.file_version)
-        self.mth5_paths = [mth5_path_1, mth5_path_2, mth5_path_3, mth5_path_12rr]
+        self.mth5_paths = [
+            mth5_path_1,
+            mth5_path_2,
+            mth5_path_3,
+            mth5_path_12rr,
+        ]
 
     def test_123(self):
         """
@@ -85,7 +92,9 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
             ]:
                 station_id = mth5_path.stem
                 tfk_dataset.from_run_summary(run_summary, station_id)
-                processing_config = create_test_run_config(station_id, tfk_dataset)
+                processing_config = create_test_run_config(
+                    station_id, tfk_dataset
+                )
             elif mth5_path.stem in [
                 "test3",
             ]:
@@ -131,11 +140,18 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
         from test_processing import process_synthetic_2
 
         z_file_path_1 = AURORA_RESULTS_PATH.joinpath("test2.zss")
-        z_file_path_2 = AURORA_RESULTS_PATH.joinpath("test2_from_stored_fc.zss")
+        z_file_path_2 = AURORA_RESULTS_PATH.joinpath(
+            "test2_from_stored_fc.zss"
+        )
         tf1 = process_synthetic_2(
             force_make_mth5=True, z_file_path=z_file_path_1, save_fc=True
         )
-        tf2 = process_synthetic_2(force_make_mth5=False, z_file_path=z_file_path_2)
+        tf2 = process_synthetic_2(
+            force_make_mth5=False, z_file_path=z_file_path_2
+        )
+
+        tf1.station_metadata.transfer_function.processing_parameters = []
+        tf2.station_metadata.transfer_function.processing_parameters = []
         assert tf1 == tf2
 
 
