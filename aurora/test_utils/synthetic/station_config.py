@@ -15,14 +15,14 @@ Run level: 'run_id', name of the run
 Run level: 'sample_rate', 1.0
 
 """
+from aurora.general_helper_functions import get_mth5_ascii_data_path
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 from mt_metadata.timeseries.filters.helper_functions import make_coefficient_filter
 from mt_metadata.timeseries import Run
 from mt_metadata.transfer_functions.processing.aurora import ChannelNomenclature
 
-
+ASCII_DATA_PATH = get_mth5_ascii_data_path()
 synthetic_test_paths = SyntheticTestPaths()
-DATA_PATH = synthetic_test_paths.ascii_data_path
 
 
 def make_filters(as_list=False):
@@ -121,7 +121,7 @@ def make_station_01(channel_nomenclature="default"):
 
     run_001 = SyntheticRun(
         "001",
-        raw_data_path=DATA_PATH.joinpath("test1.asc"),
+        raw_data_path=ASCII_DATA_PATH.joinpath("test1.asc"),
         channel_nomenclature=channel_nomenclature,
         start=None,
     )
@@ -156,7 +156,7 @@ def make_station_02(channel_nomenclature="default"):
     test2 = make_station_01(channel_nomenclature=channel_nomenclature)
     test2.id = "test2"
     test2.mth5_name = "test2.h5"
-    test2.runs[0].raw_data_path = DATA_PATH.joinpath("test2.asc")
+    test2.runs[0].raw_data_path = ASCII_DATA_PATH.joinpath("test2.asc")
     nan_indices = {}
     for channel in test2.runs[0].channels:
         nan_indices[channel] = []
@@ -202,7 +202,7 @@ def make_station_03(channel_nomenclature="default"):
 
     run_001 = SyntheticRun(
         "001",
-        raw_data_path=DATA_PATH.joinpath("test1.asc"),
+        raw_data_path=ASCII_DATA_PATH.joinpath("test1.asc"),
         nan_indices=nan_indices,
         filters=filters,
         channel_nomenclature=channel_nomenclature,
@@ -214,7 +214,7 @@ def make_station_03(channel_nomenclature="default"):
         noise_scalars[ch] = 2.0
     run_002 = SyntheticRun(
         "002",
-        raw_data_path=DATA_PATH.joinpath("test1.asc"),
+        raw_data_path=ASCII_DATA_PATH.joinpath("test1.asc"),
         noise_scalars=noise_scalars,
         nan_indices=nan_indices,
         filters=filters,
@@ -226,7 +226,7 @@ def make_station_03(channel_nomenclature="default"):
         noise_scalars[ch] = 5.0
     run_003 = SyntheticRun(
         "003",
-        raw_data_path=DATA_PATH.joinpath("test1.asc"),
+        raw_data_path=ASCII_DATA_PATH.joinpath("test1.asc"),
         noise_scalars=noise_scalars,
         nan_indices=nan_indices,
         filters=filters,
@@ -238,7 +238,7 @@ def make_station_03(channel_nomenclature="default"):
         noise_scalars[ch] = 10.0
     run_004 = SyntheticRun(
         "004",
-        raw_data_path=DATA_PATH.joinpath("test1.asc"),
+        raw_data_path=ASCII_DATA_PATH.joinpath("test1.asc"),
         noise_scalars=noise_scalars,
         nan_indices=nan_indices,
         filters=filters,
@@ -266,7 +266,7 @@ def make_station_04(channel_nomenclature="default"):
 
     run_001 = SyntheticRun(
         "001",
-        raw_data_path=DATA_PATH.joinpath("test1.asc"),
+        raw_data_path=ASCII_DATA_PATH.joinpath("test1.asc"),
         channel_nomenclature=channel_nomenclature,
         start=None,
         sample_rate=8.0,
