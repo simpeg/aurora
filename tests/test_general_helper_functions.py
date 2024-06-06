@@ -1,11 +1,11 @@
 import logging
-import pathlib
 import unittest
 
 from aurora.general_helper_functions import count_lines
 from aurora.general_helper_functions import DotDict
 from aurora.general_helper_functions import get_mth5_ascii_data_path
 from aurora.general_helper_functions import get_test_path
+from loguru import logger
 
 TEST_PATH = get_test_path()
 
@@ -47,6 +47,9 @@ class TestGeneralHelperFunctions(unittest.TestCase):
         mth5_data_path = get_mth5_ascii_data_path()
         ascii_file_paths = list(mth5_data_path.glob("*asc"))
         file_names = [x.name for x in ascii_file_paths]
+        logger.info(f"mth5_data_path = {mth5_data_path}")
+        logger.info(f"file_names = {file_names}")
+
         assert "test1.asc" in file_names
         assert "test2.asc" in file_names
 
