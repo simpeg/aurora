@@ -37,15 +37,11 @@ jobs:
         pip install -r requirements-dev.txt
         pip install git+https://github.com/kujaku11/mt_metadata.git@main
         pip install git+https://github.com/kujaku11/mth5.git@fix_issue_191 #master
-        ls /usr/share/miniconda/envs/aurora-test/lib/python3.10/site-packages/mth5/*
-        ls /usr/share/miniconda/envs/aurora-test/lib/python3.10/site-packages/mth5/data/*
 
     - name: Install Our Package
       run: |
         pip install -e .
         conda list
-        ls /usr/share/miniconda/envs/aurora-test/lib/python3.10/site-packages/mth5/*
-        ls /usr/share/miniconda/envs/aurora-test/lib/python3.10/site-packages/mth5/data/*
         
 #    - name: Install Jupyter and dependencies
 #      run: |
