@@ -15,6 +15,8 @@ Run level: 'run_id', name of the run
 Run level: 'sample_rate', 1.0
 
 """
+from typing import Dict, List, Union
+
 from aurora.general_helper_functions import get_mth5_ascii_data_path
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 from mt_metadata.timeseries.filters.helper_functions import make_coefficient_filter
@@ -29,9 +31,14 @@ def make_filters(as_list=False):
     Because the data from EMTF is already in mV/km and nT these filters are just
     placeholders to show where they would get assigned.
 
+    Parameters
+    ----------
+    as_list: bool
+        True we return a list, False return a dict
+
     Returns
     -------
-    filters_list: list
+    filters_list: Union[List, Dict]
         filters that can be used to populate the filters lists of synthetic data
     """
     unity_coeff_filter = make_coefficient_filter(name="1", gain=1.0)
