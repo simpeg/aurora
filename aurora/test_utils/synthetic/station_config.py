@@ -18,7 +18,6 @@ Run level: 'sample_rate', 1.0
 from aurora.general_helper_functions import get_mth5_ascii_data_path
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 from mt_metadata.timeseries.filters.helper_functions import make_coefficient_filter
-from mt_metadata.timeseries import Run
 from mt_metadata.transfer_functions.processing.aurora import ChannelNomenclature
 
 ASCII_DATA_PATH = get_mth5_ascii_data_path()
@@ -53,7 +52,11 @@ FILTERS = make_filters()
 
 
 class SyntheticRun(object):
-    """ """
+    """
+    Place to store information that will be needed to initialize and MTH5 Run object.
+
+    Initially this class worked only with the synthetic ASCII data from legacy EMTF.
+    """
 
     def __init__(self, id, **kwargs):
         self.id = id
@@ -80,6 +83,14 @@ class SyntheticRun(object):
 
     @property
     def channel_map(self):
+        """
+        Make self._channel_map if it isn't initialize already.
+
+        Returns
+        -------
+        self._channel_map: dict
+            The mappings between the standard channel names and the ones that will be used in the MTH5.
+        """
         if self._channel_map is None:
             channel_nomenclature = ChannelNomenclature(
                 self.channel_nomenclature_keyword
@@ -91,6 +102,10 @@ class SyntheticRun(object):
         return self._channel_map
 
     def set_channel_map(self):
+        """
+        Populates a dictionary relating "actual" channel names to the standard names "hx", "hy", "hz", "ex", "ey"
+
+        """
         channel_nomenclature = ChannelNomenclature(
             keyword=self.channel_nomenclature_keyword
         )
@@ -99,8 +114,10 @@ class SyntheticRun(object):
 
 class SyntheticStation(object):
     """
+    Class used to contain information needed to generate MTH5 file from synthetic data.
+
     TODO: could add channel_nomenclature to this obj (instead of run, say) and clean
-    things up somewhat. ... i.e. inclde the channel_map() property etc.
+    things up somewhat. ... i.e. include the channel_map() property etc.
     TODO: This looks like a "dataclass"
 
     """
@@ -113,9 +130,23 @@ class SyntheticStation(object):
 
 
 def make_station_01(channel_nomenclature="default"):
+    """
+
+    Parameters
+    ----------
+    channel_nomenclature: str
+        Must be one of the nomenclatures defined in "channel_nomenclatures.json"
+
+    Returns
+    -------
+    station: SyntheticStation
+        Object with all info needed to generate MTH5 file from synthetic data.
+    """
+    # define channel nomenclature
     channel_nomenclature_obj = ChannelNomenclature()
     channel_nomenclature_obj.keyword = channel_nomenclature
-    EX, EY, HX, HY, HZ = channel_nomenclature_obj.unpack()
+
+    # initialize SyntheticStation
     station = SyntheticStation("test1")
     station.mth5_name = "test1.h5"
 
@@ -125,23 +156,26 @@ def make_station_01(channel_nomenclature="default"):
         channel_nomenclature=channel_nomenclature,
         start=None,
     )
+
+    # assign indices to set to Nan (not used 2024-06-06)
     nan_indices = {}
     for ch in run_001.channels:
         nan_indices[ch] = []
-        if ch == HX:
+        if ch == channel_nomenclature_obj.hx:
             nan_indices[ch].append([11, 100])
-        if ch == HY:
+        if ch == channel_nomenclature_obj.hy:
             nan_indices[ch].append([11, 100])
             nan_indices[ch].append([20000, 444])
     run_001.nan_indices = nan_indices
 
+    # assign some filters to the channels
     filters = {}
     for ch in run_001.channels:
-        if ch in [EX, EY]:
+        if ch in channel_nomenclature_obj.ex_ey:
             filters[ch] = [
                 FILTERS["1x"].name,
             ]
-        elif ch in [HX, HY, HZ]:
+        elif ch in channel_nomenclature_obj.hx_hy_hz:
             filters[ch] = [FILTERS["10x"].name, FILTERS["0.1x"].name]
     run_001.filters = filters
 
@@ -261,6 +295,7 @@ def make_station_04(channel_nomenclature="default"):
     channel_nomenclature_obj = ChannelNomenclature()
     channel_nomenclature_obj.keyword = channel_nomenclature
     EX, EY, HX, HY, HZ = channel_nomenclature_obj.unpack()
+
     station = SyntheticStation("test1")
     station.mth5_name = "test_04_8Hz.h5"
 
@@ -275,11 +310,11 @@ def make_station_04(channel_nomenclature="default"):
 
     filters = {}
     for ch in run_001.channels:
-        if ch in [EX, EY]:
+        if ch in channel_nomenclature_obj.ex_ey:
             filters[ch] = [
                 FILTERS["1x"].name,
             ]
-        elif ch in [HX, HY, HZ]:
+        elif ch in channel_nomenclature_obj.hx_hy_hz:
             filters[ch] = [FILTERS["10x"].name, FILTERS["0.1x"].name]
     run_001.filters = filters
 
