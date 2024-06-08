@@ -20,6 +20,8 @@ from typing import Dict, List, Union
 from aurora.general_helper_functions import get_mth5_ascii_data_path
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 from mt_metadata.timeseries.filters.helper_functions import make_coefficient_filter
+from mt_metadata.timeseries import Run
+from mt_metadata.timeseries import Station
 from mt_metadata.transfer_functions.processing.aurora import ChannelNomenclature
 
 ASCII_DATA_PATH = get_mth5_ascii_data_path()
@@ -66,8 +68,10 @@ class SyntheticRun(object):
     """
 
     def __init__(self, id, **kwargs):
-        self.id = id
-        self.sample_rate = kwargs.get("sample_rate", 1.0)
+        run_metadata = Run()
+        run_metadata.id = id
+        run_metadata.sample_rate = kwargs.get("sample_rate", 1.0)
+
         self.raw_data_path = kwargs.get("raw_data_path", None)
 
         # set channel names
@@ -87,6 +91,10 @@ class SyntheticRun(object):
             self.noise_scalars = {}
             for channel in self.channels:
                 self.noise_scalars[channel] = 0.0
+        # run_metadata.add_base_attribute("")
+        self.run_metadata = run_metadata
+
+        return
 
     @property
     def channel_map(self):
@@ -146,16 +154,17 @@ def make_station_01(channel_nomenclature="default"):
 
     Returns
     -------
-    station: SyntheticStation
+    station: mt_metadata.timeseries.Station
         Object with all info needed to generate MTH5 file from synthetic data.
     """
-    # define channel nomenclature
+    station_metadata = Station()
+    station_metadata.id = "test1"
     channel_nomenclature_obj = ChannelNomenclature()
     channel_nomenclature_obj.keyword = channel_nomenclature
 
     # initialize SyntheticStation
-    station = SyntheticStation("test1")
-    station.mth5_name = "test1.h5"
+    station = SyntheticStation(station_metadata.id)
+    station.mth5_name = f"{station_metadata.id}.h5"
 
     run_001 = SyntheticRun(
         "001",
@@ -189,7 +198,10 @@ def make_station_01(channel_nomenclature="default"):
     station.runs = [
         run_001,
     ]
-
+    station_metadata.run_list = [
+        run_001,
+    ]
+    station.station_metadata = station_metadata
     return station
 
 
@@ -299,6 +311,8 @@ def make_station_03(channel_nomenclature="default"):
 
 def make_station_04(channel_nomenclature="default"):
     """Just like station 01, but data are resampled to 8Hz"""
+    station_metadata = Station()
+    station_metadata.id = "test1"
     channel_nomenclature_obj = ChannelNomenclature()
     channel_nomenclature_obj.keyword = channel_nomenclature
     EX, EY, HX, HY, HZ = channel_nomenclature_obj.unpack()
@@ -328,14 +342,17 @@ def make_station_04(channel_nomenclature="default"):
     station.runs = [
         run_001,
     ]
-
+    station_metadata.run_list = [
+        run_001,
+    ]
+    station.station_metadata = station_metadata
     return station
 
 
-# def main():
-#     sr = SyntheticRun("001")
-#     make_station_04()
-#
-#
-# if __name__ == "__main__":
-#     main()
+def main():
+    # sr = SyntheticRun("001")
+    make_station_04()
+
+
+if __name__ == "__main__":
+    main()
