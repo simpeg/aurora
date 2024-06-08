@@ -16,12 +16,12 @@ Here are the parameters that are defined via the mt_metadata fourier coefficient
 "window.overlap": 32,
 "window.type": "boxcar"
 
-Key to creating the decimations config is the decision about decimation factors and the number of levels.
-We have been getting this from the EMTF band setup file by default.  It is desireable to continue supporting this,
+Creating the decimations config requires a decision about decimation factors and the number of levels.
+We have been getting this from the EMTF band setup file by default.  It is desirable to continue supporting this,
 however, note that the EMTF band setup is really about processing, and not about making STFTs.
 
-What we really want here is control of the decimation config.
-This was controlled by decset.cfg which looks like this:
+For the record, here is the legacy decimation config from EMTF, a.k.a. decset.cfg:
+```
 4     0      # of decimation level, & decimation offset
 128  32.   1   0   0   7   4   32   1
 1.0
@@ -31,6 +31,7 @@ This was controlled by decset.cfg which looks like this:
 .2154  .1911   .1307   .0705
 128  32.   4   0   0   7   4   32   4
 .2154  .1911   .1307   .0705
+```
 
 This essentially corresponds to a "Decimations Group" which is a list of decimations.
 Related to the generation of FCs is the ARMA prewhitening (Issue #60) which was controlled in
@@ -70,7 +71,7 @@ from mth5.utils.helpers import path_or_mth5_object
 from mt_metadata.transfer_functions.processing.fourier_coefficients import (
     Decimation as FCDecimation,
 )
-
+from typing import List, Union
 
 # =============================================================================
 GROUPBY_COLUMNS = ["survey", "station", "sample_rate"]
@@ -93,15 +94,16 @@ def fc_decimations_creator(
             Sample rate of the "level0" data -- usually the sample rate during field acquisition.
         decimation_factors: list (or other iterable)
             The decimation factors that will be applied at each FC decimation level
-
         max_levels: int
-            The maximum number of dice
-
+            The maximum number of decimation levels to allow
         time_period:
 
     Returns:
         decimation_and_stft_config: list
-            Each element of the list is a Decimation() object (a.k.a. FCDecimation).
+            Each element of the list is an object of type
+            mt_metadata.transfer_functions.processing.fourier_coefficients.Decimation,
+            (a.k.a. FCDecimation).
+
             The order of the list corresponds the order of the cascading decimation
               - No decimation levels are omitted.
               - This could be changed in future by using a dict instead of a list,
@@ -146,14 +148,26 @@ def fc_decimations_creator(
 @path_or_mth5_object
 def add_fcs_to_mth5(m, fc_decimations=None):
     """
-    usssr_grouper: output of a groupby on unique {survey, station, sample_rate} tuples
+    Add Fourier Coefficient Levels ot an existing MTH5.
 
-    Args:
+    Notes:
+        - This module computes the FCs differently than the legacy aurora pipeline.  It uses scipy.signal.spectrogram.
+        There is a test in Aurora to confirm that there are equivalent if we are not using fancy prewhitening.
+        - Nomenclature: "usssr_grouper" is the output of a groupby on unique {survey, station, sample_rate} tuples
+
+    Parameters
+        ----------
         m: str or pathlib.Path, or MTH5 object
             Where the mth5 file is located
-        decimation_and_stft_configs:
-
-    Returns:
+        fc_decimations: Union[str, None, List]
+            This specifies the scheme to use for decimating the time series when building the FC layer.
+            None: Just use default (something like four decimation levels, decimated by 4 each time say.
+            String: Controlled Vocabulary, values are a work in progress, that will allow custom definition of the fc_decimations for some common cases. For example, say you have stored already decimated time
+            series, then you want simply the zeroth decimation for each run, because the decimated time series live
+            under another run container, and that will get its own FCs.  This is experimental.
+            List: (**UNTESTED**) -- This means that the user thought about the decimations that they want to create and is
+            passing them explicitly.  -- probably will need to be a dictionary actually, since this
+            would get redefined at each sample rate.
 
     """
     channel_summary_df = m.channel_summary.to_dataframe()
@@ -175,6 +189,9 @@ def add_fcs_to_mth5(m, fc_decimations=None):
             )
             logger.info(f"{msg}")
             fc_decimations = fc_decimations_creator(sample_rate, time_period=None)
+        elif isinstance(fc_decimations, str):
+            if fc_decimations == "degenerate":
+                fc_decimations = get_degenerate_fc_decimation(sample_rate)
 
         # Make this a function that can be done using df.apply()
         # I wonder if daskifiying that will cause issues with multiple threads trying to
@@ -231,6 +248,23 @@ def add_fcs_to_mth5(m, fc_decimations=None):
                 decimation_level.update_metadata()
                 fc_group.update_metadata()
     return
+
+
+def get_degenerate_fc_decimation(sample_rate):
+    """
+    We need a way to generate FCs on data in the case that we are already storing decimated time series in the
+    MTH5.  This means that the FCDecimation will have only one level.
+    Returns
+    -------
+
+    """
+    return fc_decimations_creator(
+        sample_rate,
+        decimation_factors=[
+            1,
+        ],
+        max_levels=1,
+    )
 
 
 @path_or_mth5_object
