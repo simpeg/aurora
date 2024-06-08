@@ -36,9 +36,7 @@ from aurora.test_utils.synthetic.station_config import make_station_04
 from loguru import logger
 from mth5.mth5 import MTH5
 from mth5.timeseries import ChannelTS, RunTS
-import mt_metadata.timeseries as metadata_ts
 from mt_metadata.transfer_functions.processing.aurora import ChannelNomenclature
-from mt_metadata.timeseries import Channel
 from mt_metadata.timeseries import Electric
 from mt_metadata.timeseries import Magnetic
 from mth5.utils.helpers import add_filters
@@ -71,40 +69,29 @@ def create_run_ts_from_synthetic_run(run, df, channel_nomenclature="default"):
     -------
 
     """
-    #    meta_classes = dict(inspect.getmembers(metadata_ts, inspect.isclass))
 
     channel_nomenclature_obj = ChannelNomenclature()
     channel_nomenclature_obj.keyword = channel_nomenclature
-    EX, EY, HX, HY, HZ = channel_nomenclature_obj.unpack()
     ch_list = []
     for col in df.columns:
 
         data = df[col].values
-        # meta_dict = {
-        #     "component": col,
-        #     "sample_rate": run.run_metadata.sample_rate,
-        #     "filter.name": run.filters[col],
-        #     "filter.applied": len(run.filters[col])
-        #     * [
-        #         True,
-        #     ],
-        #     "time_period.start": run.start,
-        # }
-        if col in [EX, EY]:
+        if col in channel_nomenclature_obj.ex_ey:
             channel_metadata = Electric()
             channel_metadata.component = col
             channel_metadata.units = "millivolts per kilometer"
             chts = ChannelTS(
                 channel_type="electric",
                 data=data,
-                channel_metadata=channel_metadata.to_dict(),  # ["electric"],
+                channel_metadata=channel_metadata.to_dict(),
             )
+
             # add metadata to the channel here
             chts.channel_metadata.dipole_length = 50
-            if col == EY:
+            if col == channel_nomenclature_obj.ey:
                 chts.channel_metadata.measurement_azimuth = 90.0
 
-        elif col in [HX, HY, HZ]:
+        elif col in channel_nomenclature_obj.hx_hy_hz:
             channel_metadata = Magnetic()
             channel_metadata.units = "nanotesla"
             channel_metadata.component = col
@@ -116,11 +103,11 @@ def create_run_ts_from_synthetic_run(run, df, channel_nomenclature="default"):
             chts = ChannelTS(
                 channel_type=channel_metadata.type,
                 data=data,
-                channel_metadata=channel_metadata.to_dict()["magnetic"],
+                channel_metadata=channel_metadata.to_dict(),
             )
             chts.component = col
 
-            if col == HY:
+            if col == channel_nomenclature_obj.ey:
                 chts.channel_metadata.measurement_azimuth = 90.0
 
         chts.channel_metadata.component = col
@@ -271,7 +258,6 @@ def create_mth5_synthetic_file(
         station_group = m.add_station(station_cfg.id, survey=survey_id)
 
         for run in station_cfg.runs:
-            # station_obj = m.get_station(station_cfg.id, survey_id)
             df = get_time_series_dataframe(run, source_folder, add_nan_values)
 
             # cast to run_ts

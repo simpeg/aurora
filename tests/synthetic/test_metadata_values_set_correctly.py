@@ -39,7 +39,9 @@ class TestMetadataValuesSetCorrect(unittest.TestCase):
         run_summary
         station_03 = make_station_03()
         for run in station_03.runs:
-            summary_row = run_summary.df[run_summary.df.run_id == run.id].iloc[0]
+            summary_row = run_summary.df[
+                run_summary.df.run_id == run.run_metadata.id
+            ].iloc[0]
             assert summary_row.start == pd.Timestamp(run.start)
 
 
