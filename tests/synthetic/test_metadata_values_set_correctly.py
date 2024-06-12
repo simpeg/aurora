@@ -1,5 +1,5 @@
 """
-TODO: Dperecate -- This now basically duplicates a test in MTH5 (issue #191)
+TODO: Deprecate -- This now basically duplicates a test in MTH5 (issue #191)
 """
 import logging
 import pandas as pd
