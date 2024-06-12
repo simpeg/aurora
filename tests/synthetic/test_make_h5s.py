@@ -5,7 +5,7 @@ import unittest
 # from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
 # from aurora.test_utils.synthetic.make_mth5_from_asc import create_test2_h5
 # from aurora.test_utils.synthetic.make_mth5_from_asc import create_test3_h5
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test4_h5
+from mth5.data.make_mth5_from_asc import create_test4_h5
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 
 synthetic_test_paths = SyntheticTestPaths()

@@ -117,16 +117,26 @@ def stack_fcs(X, Y, RR):
     other axis is frequency.  However if we make no distinction between the harmonics
     (bins) within a band in regression, then all the FCs for each channel can be
     put into a 1D array.  This method performs that reshaping (ravelling) operation.
-    **It is not important how we unravel the FCs but it is important that
-    we use the same scheme for X and Y.
+    **It is not important how we unravel the FCs but it is important that the same indexing
+    scheme is used for X, Y and RR.
 
-    TODO: Make this take a list and return a list rather than X,Y,RR
-    TODO: Decorate this with @dataset_or_dataarray
+    TODO: Consider this take a list and return a list rather than X,Y,RR
+    TODO: Consider decorate this with @dataset_or_dataarray
+     -- But Note that stack
         if isinstance(X, xr.Dataset):
         tmp = X.to_array("channel")
         tmp = tmp.stack()
         or similar
 
+    Parameters
+    ----------
+    X: xarray.core.dataset.Dataset
+    Y: xarray.core.dataset.Dataset
+    RR: xarray.core.dataset.Dataset or None
+
+    Returns
+    -------
+    X, Y, RR: Same as input but with stacked time and frequency dimensions
     """
     X = X.stack(observation=("frequency", "time"))
     Y = Y.stack(observation=("frequency", "time"))

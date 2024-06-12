@@ -1,16 +1,16 @@
 """
-follows Gary's TRME.m in
+    follows Gary's TRME.m in
 iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
 
-(Complex) regression-M estimate for the model  Y = X*b
-Allows multiple columns of Y, but estimates b for each column separately
+    (Complex) regression-M estimate for the model  Y = X*b
+    Allows multiple columns of Y, but estimates b for each column separately
 
-TODO: Consider making a QR-Estimator class between RegressionEstimator and RMEEstimator
+    TODO: Consider making a QR-Estimator class between RegressionEstimator and RMEEstimator
 
-# <QR-decomposition Notes>
-The QR-decomposition is employed on the matrix of input variables X.
-X = Q R where Q is unitary/orthogonal and R upper triangular.
-Since X is [n_data x n_channels_in] Q is [n_data x n_data].
+    Notes: QR-decomposition
+    The QR-decomposition is employed on the matrix of input variables X.
+    X = Q R where Q is unitary/orthogonal and R upper triangular.
+    Since X is [n_data x n_channels_in] Q is [n_data x n_data].
 
 Wikipedia has a nice description of the QR factorization:
 https://en.wikipedia.org/wiki/QR_decomposition
@@ -19,7 +19,7 @@ into a domain where the inversion is done with a triangular matrix.
 
 The symbol QH will denote the conjugate transpose of the matrix Q.
 
-We employ here the "economical" form of the QR decompostion, so that Q is not square,
+We employ here the "economical" form of the QR decomposition, so that Q is not square,
 and not in fact unitary.  This is because its inverse is not defined (as it isn't
 square). Q does however obey: Q.H @ Q = I.
 
@@ -47,7 +47,7 @@ The norms of QQHY and QHY are the same
     < MATLAB Documentation >
     https://www.mathworks.com/help/matlab/ref/qr.html
 
-Matlab's reference to the "economy" rerpresentation is what Trefethen and Bau
+Matlab's reference to the "economy" representation is what Trefethen and Bau
 call the "reduced QR factorization".  Golub & Van Loan (1996, §5.2) call Q1R1
 the thin QR factorization of A;
     < /MATLAB Documentation >
@@ -95,15 +95,15 @@ class TRME(MEstimator):
             then it increases linearly to 1 (r0)
             Psi' is something like 1 between -r0, and r0
             Psi' is zero outside
-            So the expectiaon value of psi' is the number of points outside
-            its the number of points that didnt get weighted /total number of points
+            So the expectation value of psi' is the number of points outside
+            Its the number of points that didn't get weighted /total number of points
 
         """
         super(TRME, self).__init__(**kwargs)
         self.qr_input = "X"
 
     def update_y_hat(self):
-        """?rename as update_predicted_data?"""
+        """could rename this as update_predicted_data"""
         self._Y_hat = self.Q @ self.QHYc
         return
 
@@ -118,11 +118,10 @@ class TRME(MEstimator):
 
     def compute_inverse_signal_covariance(self):
         """
+
         Note that because X = QR, we have
         X.H @ X = (QR).H @ QR = R.H Q.H Q R = R.H @ R
         i.e. computing R.H @ R below is just computing the signal covariance matrix of X
-        Returns
-        -------
 
         """
         cov_ss_inv = np.linalg.inv(self.R.conj().T @ self.R)

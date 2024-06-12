@@ -6,6 +6,8 @@ from egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF
 import numpy as np
 from loguru import logger
 
+import aurora.transfer_function.weights.edf_weights
+
 
 class EffectiveDegreesOfFreedom(object):
     def __init__(self, **kwargs):
@@ -45,7 +47,7 @@ class EffectiveDegreesOfFreedom(object):
         Threshold applied to edf.  All edf below  this value
         are set to weight=0
         """
-        return self.c1 * (self.n_data ** self.alpha)
+        return self.c1 * (self.n_data**self.alpha)
 
     @property
     def p2(self):
@@ -53,7 +55,7 @@ class EffectiveDegreesOfFreedom(object):
         Threshold applied to edf.  All edf above th  this value
         are set to weight=0
         """
-        return self.c2 * (self.n_data ** self.alpha)
+        return self.c2 * (self.n_data**self.alpha)
 
     def compute_weights(self, X, use):
         """
@@ -116,32 +118,31 @@ def effective_degrees_of_freedom_weights(X, R, edf_obj=None, test=True):
     4 Return the weights vector.  We then broadcast multiply that array against the
     data, to apply the weights.
 
-    This follows the matlab code by using a boolean index vector.  An xarray
-    implementaiton which uses the observation dimension of X, R was started but never
-    finished.  Here are the breadcrumbs for the xarray method:
-    0. Create weights:
-    import xarray as xr
-    X = X.assign(weights=lambda x: X.frequency*0+1.0)
-    weights = X["weights"]
-    X = X[["hx","hy"]]
-    1. Then to drop nan:
-    from aurora.time_series.xarray_helpers import handle_nan
-    X, Y, RR = handle_nan(XX, None, R, drop_dim="observation")
-    2. Same as below
-    3. Overwrite: Not sure, it wasn't clear how to assign them. Possibly the syntax
-    with multi-index was confusing me when trying to assign.
-    Accessing the weights was done by:
-    weights.sel(observation=X.observation)
-    But the assignment syntax I'm not sure about.  Could also be that I need to cast
-    as dataarray for the assignement step.
+    TODO: This follows the matlab code by using a boolean index vector.  An xarray
+     implementation which uses the observation dimension of X, R was started but never
+     finished.  Here are the breadcrumbs for the xarray method:
+     0. Create weights:
+     import xarray as xr
+     X = X.assign(weights=lambda x: X.frequency*0+1.0)
+     weights = X["weights"]
+     X = X[["hx","hy"]]
+     1. Then to drop nan:
+     from aurora.time_series.xarray_helpers import handle_nan
+     X, Y, RR = handle_nan(XX, None, R, drop_dim="observation")
+     2. Same as below
+     3. Overwrite: Not sure, it wasn't clear how to assign them. Possibly the syntax
+     with multi-index was confusing me when trying to assign.
+     Accessing the weights was done by:
+     weights.sel(observation=X.observation)
+     But the assignment syntax I'm not sure about.  Could also be that I need to cast
+     as dataarray for the assignment step.
 
-    Things to review:
-    -Why is the Remote reference weighting not done with a while loop?  This maybe
-    just an oversight in the matlab codes.
-    - since we assign zero-weights to Nan, we could probably remove the keep_indices
-    methods and simply assign nan or zero weights to those data up front. Since the
-    "use" boolean selects data before computiation are performed on X, R we should
-    never get nans in the computed edfs, but should simplify the code somewhat.
+    TODO: Why is the Remote reference weighting not done with a while loop?  Maybe
+     an oversight in the matlab codes.
+    TODO: Since zero-weights assigned to Nan, could probably remove the keep_indices
+     methods and simply assign nan or zero weights to those data up front. Since the
+     "use" boolean selects data before computation are performed on X, R we should
+     never get nans in the computed edfs, but should simplify the code somewhat.
 
     Parameters
     ----------
@@ -150,15 +151,16 @@ def effective_degrees_of_freedom_weights(X, R, edf_obj=None, test=True):
     R : xr.Dataset or None
         The remote reference channels, usually hx, hy.  Can be None if single-station
         processing
-    EDFparam : EffectiveDegreesOfFreedom
+    edf_obj : aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom
         Object with parameters for Gary's adhoc edfwts method.
 
     Returns
-     weights : numpy array
-        Weights for reducing leverage points.
     -------
+    weights : numpy array
+        Weights for reducing leverage points.
 
     """
+
     num_channels = len(X.data_vars)
     if num_channels != 2:
         logger.error("edfwts only works for 2 input channels")
@@ -220,7 +222,6 @@ def effective_degrees_of_freedom_weights(X, R, edf_obj=None, test=True):
     cond = (eff_deg_of_freedom <= edf_obj.p2) & (eff_deg_of_freedom > edf_obj.p1)
     wt[cond] = np.sqrt(edf_obj.p1 / eff_deg_of_freedom[cond])
 
-    # May want to add a loop in the RR
     if R is not None:
         # now find additional segments with crazy remotes
         wtRef = np.ones(n_observations_numeric)
