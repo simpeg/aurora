@@ -14,6 +14,39 @@ class Spectrogram(object):
         self._dataset = dataset
         self._frequency_increment = None
 
+    def _lowest_frequency(self):
+        pass
+
+    def _higest_frequency(self):
+        pass
+
+    def __str__(self):
+        # Description of frequency coverage
+        intro = "Spectrogram:"
+        frequency_coverage = (
+            f"{self.dataset.dims['frequency']} harmonics, {self.frequency_increment}Hz spaced \n"
+            f" from {self.dataset.frequency.data[0]} to {self.dataset.frequency.data[-1]} Hz."
+        )
+        time_coverage = f"\n{self.dataset.dims['time']} Time observations"
+        time_coverage = f"{time_coverage} \nStart: {self.dataset.time.data[0]}"
+        time_coverage = f"{time_coverage} \nEnd:   {self.dataset.time.data[-1]}"
+
+        channel_coverage = list(self.dataset.data_vars.keys())
+        channel_coverage = "\n".join(channel_coverage)
+        channel_coverage = f"\nChannels present: \n{channel_coverage}"
+        return (
+            intro
+            + "\n"
+            + frequency_coverage
+            + "\n"
+            + time_coverage
+            + "\n"
+            + channel_coverage
+        )
+
+    def __repr__(self):
+        return self.__str__()
+
     @property
     def dataset(self):
         return self._dataset
@@ -62,7 +95,10 @@ class Spectrogram(object):
 
         """
         extracted_band_dataset = extract_band(
-            frequency_band, self.dataset, channels=channels, epsilon=1e-7
+            frequency_band,
+            self.dataset,
+            channels=channels,
+            epsilon=self.frequency_increment / 2.0,
         )
         spectrogram = Spectrogram(dataset=extracted_band_dataset)
         return spectrogram

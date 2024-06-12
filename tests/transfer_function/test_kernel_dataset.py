@@ -1,9 +1,10 @@
-import logging
-import pathlib
+import pandas as pd
 import unittest
 
 from aurora.pipelines.run_summary import RunSummary
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
+from aurora.transfer_function.kernel_dataset import intervals_overlap
+from aurora.transfer_function.kernel_dataset import overlap
 from aurora.transfer_function.kernel_dataset import KernelDataset
 
 
@@ -52,6 +53,62 @@ class TestKernelDataset(unittest.TestCase):
         self.kd.df["fc"] = False
         assert (clone.df == self.kd.df).all().all()
         # add more checks
+
+
+class TestOverlapFunctions(unittest.TestCase):
+    @classmethod
+    def setUpClass(self):
+        """
+        Pick some time intervals and test that the overlap logic is correct
+
+        Returns
+        -------
+
+        """
+        # A day long interal
+        self.ti1_start = pd.Timestamp(1980, 1, 1, 12, 30, 0)
+        self.ti1_end = pd.Timestamp(1980, 1, 2, 12, 30, 0)
+        self.shift_1_hours = 5
+        self.shift_2_hours = 25
+        # hours
+
+        # shift the interval forward, leave it overlapping
+        self.ti2_start = self.ti1_start + pd.Timedelta(hours=self.shift_1_hours)
+        self.ti2_end = self.ti1_end + pd.Timedelta(hours=self.shift_1_hours)
+
+        # shift the interval forward, non-verlapping
+        self.ti3_start = self.ti1_start + pd.Timedelta(hours=self.shift_2_hours)
+        self.ti3_end = self.ti1_end + pd.Timedelta(hours=self.shift_2_hours)
+
+    def test_overlaps_boolean(self):
+        self.assertTrue(
+            intervals_overlap(
+                self.ti1_start, self.ti1_end, self.ti2_start, self.ti2_end
+            )
+        )
+
+        self.assertFalse(
+            intervals_overlap(
+                self.ti1_start, self.ti1_end, self.ti3_start, self.ti3_end
+            )
+        )
+
+    def test_overlap_returns_interval(self):
+        """
+        TODO: there are four cases being handled ---
+        add a subtest for each of the four
+        Returns
+        -------
+
+        """
+        # This test corresponds to the second line in the if/elif logic.
+        tmp = overlap(self.ti1_start, self.ti1_end, self.ti2_start, self.ti2_end)
+        self.assertTrue(
+            tmp[0] == self.ti1_start + pd.Timedelta(hours=self.shift_1_hours)
+        )
+        self.assertTrue(tmp[1] == self.ti1_end)
+
+        # TODO To test first line, we need t1 to completely enclose t2
 
 
 def main():

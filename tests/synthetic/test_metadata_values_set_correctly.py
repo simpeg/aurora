@@ -1,10 +1,14 @@
+"""
+TODO: Deprecate -- This now basically duplicates a test in MTH5 (issue #191)
+"""
+from loguru import logger
 import logging
 import pandas as pd
 import unittest
 
 from aurora.pipelines.run_summary import RunSummary
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test3_h5
-from aurora.test_utils.synthetic.station_config import make_station_03
+from mth5.data.make_mth5_from_asc import create_test3_h5
+from mth5.data.station_config import make_station_03
 from mth5.helpers import close_open_files
 
 
@@ -39,7 +43,11 @@ class TestMetadataValuesSetCorrect(unittest.TestCase):
         run_summary
         station_03 = make_station_03()
         for run in station_03.runs:
-            summary_row = run_summary.df[run_summary.df.run_id == run.id].iloc[0]
+            summary_row = run_summary.df[
+                run_summary.df.run_id == run.run_metadata.id
+            ].iloc[0]
+            logger.info(summary_row.start)
+            logger.info(run.start)
             assert summary_row.start == pd.Timestamp(run.start)
 
 

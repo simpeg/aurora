@@ -1,5 +1,6 @@
 import inspect
 import os
+import pathlib
 import scipy.io as sio
 import subprocess
 
@@ -8,6 +9,8 @@ from pathlib import Path
 
 import aurora
 import mt_metadata
+import mth5
+
 
 init_file = inspect.getfile(aurora)
 AURORA_PATH = Path(init_file).parent.parent
@@ -15,6 +18,18 @@ DATA_PATH = AURORA_PATH.joinpath("data")
 TEST_PATH = AURORA_PATH.joinpath("tests")
 CONFIG_PATH = AURORA_PATH.joinpath("aurora", "config")
 BAND_SETUP_PATH = CONFIG_PATH.joinpath("emtf_band_setup")
+
+
+def get_mth5_ascii_data_path():
+    """
+    Get the path to the
+    Returns
+    -------
+    mth5_data_path: pathlib.Path
+        This is the place where the legacy test files (ascii MT data from EMTF) are archived
+    """
+    mth5_data_path = pathlib.Path(mth5.__file__).parent.joinpath("data")
+    return mth5_data_path
 
 
 def get_test_path():
