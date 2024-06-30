@@ -98,9 +98,29 @@ Generation of robust TFs can be done in only a few lines starting from an MTH5 a
 
 # Example
 
-This section refers to a Jupyter notebook companion to this paper (archived on GitHub: [process_cas04_mulitple_station](https://github.com/simpeg/aurora/blob/joss/docs/examples/process_cas04_mulitple_station.ipynb)).  The companion notebook builds an MTH5 dataset from the EMscope dataset (@schultz2010emscope) and executes data processing -- a condensed version of which is shown in Figure \ref{minimal_example}.  Apparent resistivities are plotted in Figure \ref{compareTFs} along with the EMTF-generated results hosted at EarthScope.  
+This section refers to a Jupyter notebook companion to this paper (archived on GitHub: [process_cas04_mulitple_station](https://github.com/simpeg/aurora/blob/joss/docs/examples/process_cas04_mulitple_station.ipynb)).  The companion notebook builds an MTH5 dataset from the EMscope dataset (@schultz2010emscope) and executes data processing -- a condensed version of which is shown in \ref{minimal_example} below.  Apparent resistivities are plotted in Figure \ref{compareTFs} along with the EMTF-generated results hosted at EarthScope.  
 
-![Code snippet with steps to generate a TF from an MTH5. With MTH5 file ("8P_CAS04_NVR08.h5") in present working directory, a table of available contiguous blocks of multichannel time series is generated ("RunSummary").  -- In this example, the file contains data from two stations, "CAS04" and "NVR08" which are accessed from the EarthScope data archives --  Then station(s) to process are selected (by inspection of the RunSummary dataframe) to generate a KernelDataset.  The KernelDataset identifies simultaneous data at the local and reference site, and generates processing parameters, which can be edited before passing them to process_mth5, and finally exporting TF to a standard output format, in this case `edi`. \label{minimal_example}](processing_code_example.png)
+
+```python
+from aurora.config.config_creator import ConfigCreator
+from aurora.pipelines.process_mth5 import process_mth5
+from aurora.pipelines.run_summary import RunSummary
+from aurora.transfer_function.kernel_dataset import KernelDataset
+
+run_summary = RunSummary()
+run_summary.from_mth5s(["8P_CAS04_NVR08.h5",])
+kernel_dataset = KernelDataset()
+kernel_dataset.from_run_summary(run_summary, "CAS04", "NVR08")
+
+cc = ConfigCreator()
+config = cc.create_from_kernel_dataset(kernel_dataset) 
+
+tf = process_mth5(config, kernel_dataset)
+tf.write(fn="CAS04_rrNVR08.edi", file_type="edi")
+
+```
+<p id="minimal_example">Code snippet with steps to generate a TF from an MTH5. With MTH5 file ("8P_CAS04_NVR08.h5") in present working directory, a table of available contiguous blocks of multichannel time series is generated ("RunSummary").  -- In this example, the file contains data from two stations, "CAS04" and "NVR08" which are accessed from the EarthScope data archives --  Then station(s) to process are selected (by inspection of the RunSummary dataframe) to generate a KernelDataset.  The KernelDataset identifies simultaneous data at the local and reference site, and generates processing parameters, which can be edited before passing them to process_mth5, and finally exporting TF to a standard output format, in this case `edi`.</p>
+
 
 ![Comparison of apparent resistivities from Aurora and EMTF for station CAS04.  Both curves exhibit scatter in the low SNR MT "dead band" between 1-10s, but most of estimates are very similar. \label{compareTFs}](tf_comparison.png)
 
