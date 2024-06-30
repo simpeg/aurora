@@ -81,7 +81,7 @@ where ($E_x$, $E_y$), ($H_x$, $H_y$) denote orthogonal electric and magnetic fie
 
 # Statement of Need
 
-FORTRAN processing codes have long been available (e.g. EMTF @egbert2017mod3dmt, or BIRRP @chave1989birrp) but lack the readability of high-level languages and modifications to these programs are seldom attempted [@egbert2017mod3dmt], and have the additional barrier of compiling. Recently several python versions of MT processing codes have been released by the open source community, including @shah2019resistics, @smai2020razorback, @ajithabh2023sigmt, and @mthotel.  Aurora adds to this canon of options but differs by leveraging the MTH5 and mt\_metadata packages eliminating a need for internal development of time series or metadata containers.  As a python representation of Egbert's EMTF Remote Reference processing software, Aurora provides a continuity in the MT code space as the languages evolve.  We note that Aurora is two degrees separated from the FORTRAN EMTF, as we used a Matlab implementation of EMTF from Prof. Gary Egbert as an initial framework.  By providing an example workflow employing MTH5 we hope other developers may benefit from following this model, allowing researchers interested in signal-and-noise separation in MT to spend more time exploring and testing algorithms to improve TF estimates, and less time (re)-developing formats and management tools for data and metadata. 
+FORTRAN processing codes have long been available (e.g. EMTF @egbert2017mod3dmt, or BIRRP @chave1989birrp) but lack the readability of high-level languages and modifications to these programs are seldom attempted [@egbert2017mod3dmt], and have the additional barrier of compiling. Recently several python versions of MT processing codes have been released by the open source community, including @shah2019resistics, @smai2020razorback, @ajithabh2023sigmt, and @mthotel.  Aurora adds to this canon of options but differs by leveraging the MTH5 and mt\_metadata packages eliminating a need for internal development of time series or metadata containers.  As a python representation of Egbert's EMTF Remote Reference processing software, Aurora provides a continuity in the MT code space as the languages evolve.  We note that Aurora is two degrees separated from the FORTRAN EMTF, as we used a Matlab implementation of EMTF from Prof. Gary Egbert as an initial framework.  By providing an example workflow employing MTH5 we hope other developers may benefit from following this model, allowing researchers interested in signal-and-noise separation in MT to spend more time exploring and testing algorithms to improve TF estimates, and less time (re)-developing formats and management tools for data and metadata. Aurora is distributed under the [MIT](https://opensource.org/license/mit/) open-source license.
 
 
 This manuscript describes the high-level concepts of the software – for information about MT data processing @ajithabh2023sigmt provides a concise summary, and more in-depth details can be found in @Vozoff:1991, @egbert2002processing and references therein.  
@@ -119,49 +119,35 @@ tf = process_mth5(config, kernel_dataset)
 tf.write(fn="CAS04_rrNVR08.edi", file_type="edi")
 
 ```
-<p id="minimal_example">Code snippet with steps to generate a TF from an MTH5. With MTH5 file ("8P_CAS04_NVR08.h5") in present working directory, a table of available contiguous blocks of multichannel time series is generated ("RunSummary").  -- In this example, the file contains data from two stations, "CAS04" and "NVR08" which are accessed from the EarthScope data archives --  Then station(s) to process are selected (by inspection of the RunSummary dataframe) to generate a KernelDataset.  The KernelDataset identifies simultaneous data at the local and reference site, and generates processing parameters, which can be edited before passing them to process_mth5, and finally exporting TF to a standard output format, in this case `edi`.</p>
+<p id="minimal_example">Code snippet with steps to generate a TF from an MTH5. With MTH5 file ("8P_CAS04_NVR08.h5") in present working directory, a table of available contiguous blocks of multichannel time series is generated (`RunSummary()`).  In this example, the file contains data from two stations, "CAS04" and "NVR08" which are accessed from the EarthScope data archives.  Then station(s) to process are selected (by inspection of the RunSummary dataframe) to generate a KernelDataset.  The KernelDataset identifies simultaneous data at the local and reference site, and generates processing parameters, which can be edited before passing them to process_mth5, and finally exporting TF to a standard output format, in this case `edi`.</p>
+
+To run the example you must install aurora, which can be done via conda or pip.  Detailed instructions and further documentation can be found on the SimPEG (@cockett2015simpeg) [documentation website](http://simpeg.xyz/aurora/).
 
 
-![Comparison of apparent resistivities from Aurora and EMTF for station CAS04.  Both curves exhibit scatter in the low SNR MT "dead band" between 1-10s, but most of estimates are very similar. \label{compareTFs}](tf_comparison.png)
+![Comparison of apparent resistivities from Aurora and EMTF for station CAS04.  Both curves exhibit scatter in the low SNR MT "dead band" between 1-10s, but most of estimates are very similar.  The aurora results are from executing the example code snippet.  The plotting details are in the Jupyter notebook. \label{compareTFs}](tf_comparison.png)
 
 
 # Testing
-Aurora uses continuous integration [@duvall2007continuous] via unit and integrated tests, with ongoing improvement of test coverage.  Currently CodeCov measures 77% code coverage (core dependencies mt_metadata and MTH5 at 84% and 60% respectively).  Aurora uses a small synthetic MT dataset for integrated tests.  On push to GitHub the synthetic data are processed and the results compared against manually validated values (from aurora and EMTF results) that are also stored in the repository.  Deviation from expected results causes test failures, alerting developers a code change resulted in an unexpected baseline processing result.  In the summer of 2023, wide-scale testing on EarthScope data archives was performed indicating that the aurora TF results are similar to those form the EMTF fortran codes, in this case for hundreds of real stations rather than a few synthetic ones.  Before PyPI, and conda forge releases, example Jupyter notebooks are also run via GitHub actions.
+Aurora uses continuous integration [@duvall2007continuous] via unit and integrated tests, with ongoing improvement of test coverage.  Currently CodeCov measures 77% code coverage (core dependencies mt_metadata and MTH5 at 84% and 60% respectively).  Aurora uses a small synthetic MT dataset for integrated tests.  On push to GitHub the synthetic data are processed and the results compared against manually validated values (from aurora and EMTF results) that are also stored in the repository.  Deviation from expected results causes test failures, alerting developers a code change resulted in an unexpected baseline processing result.  In the summer of 2023, wide-scale testing on EarthScope data archives was performed indicating that the aurora TF results are similar to those form the EMTF fortran codes, in this case for hundreds of real stations rather than a few synthetic ones.  Before PyPI, and conda forge releases, example Jupyter notebooks are also run via GitHub actions to assert functionality.
 
 
 
 
 # Future Work
-Aurora uses GitHub issues to track tasks and planned improvements.  We have recently added utilities for using a "Fourier coefficient" (FC) layer in the MTH5.  This allows for storage of the time series of Fourier coefficients in the MTH5, so the user can initialize TF processing from the FC layer, rather than the time series layer of the MTH5.  Prototype usage of this layer is already in Aurora's tests, but some work is still needed to make the FCs part of the normal workflow.  In the near future we want to add noise suppression techniques, for example coherence and polarization sorting and Mahalanobis distance (e.g. @ajithabh2023sigmt, @platz2019automated).  We would also like to develop, or plug into a graphical data selection/rejection interface with time series plotting. Besides these improvements to TF quality, we also would like to embed the TFKernel information into both the MTH5 and the output EMTF\_XML (@kelbert2020emtf). Unit and integrated tests should be expanded, including a test dataset from audio MT band (most test data is sampled at 1Hz). Aurora will continue to be co-developed with mt\_metadata, MTH5 and MTPy to maintain the ability to provide outputs for inversion and modeling. Ideally the community can participate in a comparative analysis of the open-source codes available to build a recipe book for handling noise from various open-archived datasets.
+Aurora uses GitHub issues to track tasks and planned improvements.  We have recently added utilities for using a "Fourier coefficient" (FC) layer in the MTH5.  This allows for storage of the time series of Fourier coefficients in the MTH5, so the user can initialize TF processing from the FC layer, rather than the time series layer of the MTH5.  Prototype usage of this layer is already in Aurora's tests, but some work is still needed to make the FCs part of the normal workflow.  In the near future we want to add noise suppression techniques, for example coherence and polarization sorting and Mahalanobis distance (e.g. @ajithabh2023sigmt, @platz2019automated).  We would also like to develop, or plug into a graphical data selection/rejection interface with time series plotting. Besides these improvements to TF quality, we also would like to embed the TFKernel information into both the MTH5 and the output EMTF\_XML (@kelbert2020emtf). Unit and integrated tests should be expanded, including a test dataset from audio MT band. Aurora will continue to be co-developed with mt\_metadata, MTH5 and MTPy to maintain the ability to provide outputs for inversion and modeling. Ideally the community can participate in a comparative analysis of the open-source codes available to build a recipe book for handling noise from various open-archived datasets.
 
 
 # Conclusion
 Aurora provides an open-source Python implementation of the EMTF package for magnetotelluric data processing.  Processing is relatively simple and requires very limited domain knowledge in time series analysis. Aurora also serves as a prototype example of how to plug processing into an existing open data and metadata ecosystem (MTH5, mt_metadata, & MTpy).  We hope Aurora can be used as an example interface to these packages for the open source MT community, and that these tools will contribute to workflows which can focus more on geoscience analysis, and less on the nuances of data management.
 
 
-# Appendix
-
-## Installation Instructions
-
-Python Package Index:
-	> pip install aurora
-
-Conda-forge:
-	> conda install aurora
-
-
-## Documentation
-Documentation is hosted by SimPEG (@cockett2015simpeg) and can be found at this [link](http://simpeg.xyz/aurora/)
-
-
-## License
-Aurora is distributed under the [MIT](https://opensource.org/license/mit/) open-source license.
-
 
 # Acknowledgments 
 The authors would like to thank IRIS (now EarthScope) for supporting the development of Aurora.  Joe Capriotti at SimPEG helped with online documentation and the initial release.
 Ben Murphy at USGS provided methods for rotating impedance tensors from z-file formatted data.
 
+
+# References
 ```python
 
 ```
