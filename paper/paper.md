@@ -77,7 +77,7 @@ Z_{yx} & Z_{yy}
 \end{bmatrix}
 \begin{bmatrix} H_x \\ H_y \end{bmatrix}$
  
-where ($E_x$, $E_y$), ($H_x$, $H_y$) denote orthogonal electric and magnetic fields respectively.  TF estimation requires the E and H time series _and_ metadata (locations, orientations, timestamps) and uses a collection of signal processing and statistical techniques (@egbert1997robust and references therein).  MTH5 archives the metadata _with_ the data, and supplies time series as xarray objects for efficient, lazy access to data and easy application of scientific computing libraries available in the python.  
+where ($E_x$, $E_y$), ($H_x$, $H_y$) denote orthogonal electric and magnetic fields respectively.  TF estimation requires the E and H time series _and_ metadata (locations, orientations, timestamps) and uses a collection of signal processing and statistical techniques (@egbert1997robust and references therein).  MTH5 archives the metadata _with_ the data, and supplies time series as xarray (@hoyer2017xarray) objects for efficient, lazy access to data and easy application of scientific computing libraries available in the python.  
 
 # Statement of Need
 
