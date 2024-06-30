@@ -11,4 +11,4 @@ There are many ways to contribute to the aurora, such as:
 * Suggest additional features or functionalities
 * Fix editorial inconsistencies or inaccuracies
 
-Aurora is hosted by simpeg, please refer to their  `contributing guidelines page <https://docs.simpeg.xyz/latest/content/getting_started/contributing/index.html>`_. for ore details.
+Aurora is hosted by simpeg, please refer to their  `contributing guidelines page <https://docs.simpeg.xyz/latest/content/getting_started/contributing/index.html>`_. for more details.
