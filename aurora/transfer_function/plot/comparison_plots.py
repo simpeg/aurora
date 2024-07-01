@@ -9,8 +9,8 @@ from loguru import logger
 def compare_two_z_files(
     z_path1,
     z_path2,
-    angle1 = 0.0,
-    angle2 = 0.0,
+    angle1=0.0,
+    angle2=0.0,
     label1="",
     label2="",
     scale_factor1=1.0,
@@ -19,6 +19,8 @@ def compare_two_z_files(
     show_plot=True,
     use_ylims=True,
     use_xlims=True,
+    rho_ax_label_size=16,
+    phi_ax_label_size=16,
     **kwargs,
 ):
     """
@@ -81,6 +83,7 @@ def compare_two_z_files(
             markersize=markersize,
             marker=markers[xy_or_yx],
             color=file1_colors[xy_or_yx],
+            ax_label_size=rho_ax_label_size,
         )
         plot_rho(
             axs[0],
@@ -90,11 +93,12 @@ def compare_two_z_files(
             markersize=markersize,
             marker=markers[xy_or_yx],
             color=file2_colors[xy_or_yx],
+            ax_label_size=rho_ax_label_size,
         )
 
     axs[0].legend(prop={"size": 6})
     # axs[0].set_ylabel("$\\rho_a$")
-    axs[0].set_ylabel("Apparent Resistivity $\Omega$-m")
+    axs[0].set_ylabel("Apparent Resistivity $\Omega$-m", fontsize=12)
     rho_ylims = kwargs.get("rho_ylims", [1, 1e3])
     if use_ylims:
         axs[0].set_ylim(rho_ylims[0], rho_ylims[1])
@@ -112,6 +116,7 @@ def compare_two_z_files(
             markersize=markersize,
             marker=markers[xy_or_yx],
             color=file1_colors[xy_or_yx],
+            ax_label_size=phi_ax_label_size,
         )
         plot_phi(
             axs[1],
@@ -121,16 +126,23 @@ def compare_two_z_files(
             markersize=markersize,
             marker=markers[xy_or_yx],
             color=file2_colors[xy_or_yx],
+            ax_label_size=phi_ax_label_size,
         )
 
     axs[1].legend(prop={"size": 6})
-    axs[1].set_xlabel("Period (s)")
-    axs[1].set_ylabel("Phase (degrees)")
+    axs[1].set_xlabel("Period (s)", fontsize=12)
+    axs[1].set_ylabel("Phase (degrees)", fontsize=12)
     phi_ylims = kwargs.get("phi_ylims", [0, 90])
     axs[1].set_ylim(phi_ylims[0], phi_ylims[1])
 
-    axs[0].grid(which = 'both', axis = 'both',)
-    axs[1].grid(which='both', axis='both', )
+    axs[0].grid(
+        which="both",
+        axis="both",
+    )
+    axs[1].grid(
+        which="both",
+        axis="both",
+    )
     if out_file:
         # if out_file[-3:] != ".png":
         #     out_file+=".png"
