@@ -58,7 +58,7 @@ The Aurora software package robustly estimates single station and remote referen
 
 ## Key Features
 
-- Tabular ata indexing and management (pandas data frames), 
+- Tabular data indexing and management (Pandas dataframes), 
 - Dictionary-like processing parameters configuration
 - Programmatic or manual editing of inputs
 - Largely automated workflow
@@ -66,7 +66,7 @@ The Aurora software package robustly estimates single station and remote referen
 
 # Introduction
 
-MT is a geophysical technique for probing subsurface electrical conductivity using co-located electric and magnetic field measurements.  After data collection, standard practice is to estimate the time invariant  (frequency domain) transfer function (TF) between electric and magnetic channels before proceeding to interpretation and modeling. If measurements are orthogonal, the TF is equivalent to the electrical impedance tensor (Z) [@Vozoff:1991].  
+MT is a geophysical technique for probing subsurface electrical conductivity using collocated electric and magnetic field measurements.  Field data is collected in the time domain, however the Earth can be approximated as a linear system in the frequency domain.  Therefore, common practice is to estimate the time invariant  (frequency domain) transfer function (TF) between electric and magnetic channels to get information of the Earth's resistivity structure. If measurements are orthogonal, the TF is equivalent to the electrical impedance tensor (Z) [@Vozoff:1991].  
 
 
 $\begin{bmatrix} E_x \\ E_y \end{bmatrix}
@@ -77,11 +77,11 @@ Z_{yx} & Z_{yy}
 \end{bmatrix}
 \begin{bmatrix} H_x \\ H_y \end{bmatrix}$
  
-where ($E_x$, $E_y$), ($H_x$, $H_y$) denote orthogonal electric and magnetic fields respectively.  TF estimation requires the E and H time series _and_ metadata (locations, orientations, timestamps) and uses a collection of signal processing and statistical techniques (@egbert1997robust and references therein).  MTH5 archives the metadata _with_ the data, and supplies time series as xarray (@hoyer2017xarray) objects for efficient, lazy access to data and easy application of scientific computing libraries available in the python.  
+where ($E_x$, $E_y$), ($H_x$, $H_y$) denote orthogonal electric and magnetic fields respectively.  TF estimation requires the E and H time series _and_ metadata (locations, orientations, timestamps) along with a collection of signal processing and statistical techniques (@egbert1997robust and references therein).  MTH5 archives the metadata _with_ the data (@peacock2022mth5), and supplies time series as xarray (@hoyer2017xarray) objects for efficient, lazy access to data and easy application of scientific computing libraries available in the Python.  
 
 # Statement of Need
 
-FORTRAN processing codes have long been available (e.g. EMTF @egbert2017mod3dmt, or BIRRP @chave1989birrp) but lack the readability of high-level languages and modifications to these programs are seldom attempted [@egbert2017mod3dmt], and have the additional barrier of compiling. Recently several python versions of MT processing codes have been released by the open source community, including @shah2019resistics, @smai2020razorback, @ajithabh2023sigmt, and @mthotel.  Aurora adds to this canon of options but differs by leveraging the MTH5 and mt\_metadata packages eliminating a need for development of time series or metadata containers.  As a python representation of Egbert's EMTF Remote Reference processing software, Aurora provides a continuity in the MT code space as the languages evolve.  We note that Aurora is two degrees separated from the FORTRAN EMTF, as we used a Matlab implementation of EMTF from Prof. Gary Egbert as an initial framework.  By providing an example workflow employing MTH5 we hope other developers may benefit from following this model, allowing researchers interested in signal-and-noise separation in MT to spend more time exploring and testing algorithms to improve TF estimates, and less time (re)-developing formats and management tools for data and metadata. Aurora is distributed under the [MIT](https://opensource.org/license/mit/) open-source license.
+FORTRAN processing codes have long been available (e.g. EMTF @egbert2017mod3dmt, or BIRRP @chave1989birrp) but lack the readability of high-level languages and modifications to these programs are seldom attempted [@egbert2017mod3dmt], and have the additional barrier of compiling. Recently several Python versions of MT processing codes have been released by the open source community, including @shah2019resistics, @smai2020razorback, @ajithabh2023sigmt, and @mthotel.  Aurora adds to this canon of options but differs by leveraging the MTH5 and mt\_metadata packages eliminating a need for development of time series or metadata containers (@peacock2022mth5).  As a Python representation of Egbert's EMTF Remote Reference processing software, Aurora provides a continuity in the MT code space as the languages evolve.  We note that Aurora is two degrees separated from the FORTRAN EMTF, as we used a Matlab implementation of EMTF from Prof. Gary Egbert as an initial framework.  By providing an example workflow employing MTH5 we hope other developers may benefit from following this model, allowing researchers interested in signal-and-noise separation in MT to spend more time exploring and testing algorithms to improve TF estimates, and less time (re)-developing formats and management tools for data and metadata. Aurora is distributed under the [MIT](https://opensource.org/license/mit/) open-source license.
 
 
 This manuscript describes the high-level concepts of the software – for information about MT data processing @ajithabh2023sigmt provides a concise summary, and more in-depth details can be found in @Vozoff:1991, @egbert2002processing and references therein.  
@@ -128,7 +128,7 @@ To run the example you must install aurora, which can be done via conda or pip. 
 
 
 # Testing
-Aurora uses continuous integration [@duvall2007continuous] via unit and integrated tests, with ongoing improvement of test coverage.  Currently CodeCov measures 77% code coverage (core dependencies mt_metadata and MTH5 at 84% and 60% respectively).  Aurora uses a small synthetic MT dataset for integrated tests.  On push to GitHub the synthetic data are processed and the results compared against manually validated values (from aurora and EMTF results) that are also stored in the repository.  Deviation from expected results causes test failures, alerting developers a code change resulted in an unexpected baseline processing result.  In the summer of 2023, wide-scale testing on EarthScope data archives was performed indicating that the aurora TF results are similar to those form the EMTF fortran codes, in this case for hundreds of real stations rather than a few synthetic ones.  Before PyPI, and conda forge releases, example Jupyter notebooks are also run via GitHub actions to assert functionality.
+Aurora uses continuous integration [@duvall2007continuous] via unit and integrated tests, with ongoing improvement of test coverage.  Currently CodeCov measures 77% code coverage (core dependencies mt_metadata and MTH5 at 84% and 60% respectively).  Aurora uses a small synthetic MT dataset for integrated tests.  On push to GitHub the synthetic data are processed and the results compared against manually validated values (from Aurora and EMTF results) that are also stored in the repository.  Deviation from expected results causes test failures, alerting developers a code change resulted in an unexpected baseline processing result.  In the summer of 2023, wide-scale testing on EarthScope data archives was performed indicating that the aurora TF results are similar to those form the EMTF fortran codes, in this case for hundreds of real stations rather than a few synthetic ones.  Before PyPI, and conda forge releases, example Jupyter notebooks are also run via GitHub actions to assert functionality.
 
 
 
@@ -138,13 +138,12 @@ Aurora uses GitHub issues to track tasks and planned improvements.  We have rece
 
 
 # Conclusion
-Aurora provides an open-source Python implementation of the EMTF package for magnetotelluric data processing.  Processing is relatively simple and requires very limited domain knowledge in time series analysis. Aurora also serves as a prototype example of how to plug processing into an existing open data and metadata ecosystem (MTH5, mt_metadata, & MTpy).  We hope Aurora can be used as an example interface to these packages for the open source MT community, and that these tools will contribute to workflows which can focus more on geoscience analysis, and less on the nuances of data management.
+Aurora provides an open-source Python implementation of the EMTF package for magnetotelluric data processing.  Processing is relatively simple and requires very limited domain knowledge in time series analysis. Aurora also serves as a prototype example of how to plug processing into an existing open data and metadata ecosystem (MTH5, mt_metadata, & MTpy-v2).  We hope Aurora can be used as an example interface to these packages for the open source MT community, and that these tools will contribute to workflows which can focus more on geoscience analysis, and less on the nuances of data management.
 
 
 
 # Acknowledgments 
-The authors would like to thank IRIS (now EarthScope) for supporting the development of Aurora.  Joe Capriotti at SimPEG helped with online documentation and the initial release.
-Ben Murphy at USGS provided methods for rotating impedance tensors from z-file formatted data.
+The authors would like to thank IRIS (now EarthScope) for supporting the development of Aurora.  Joe Capriotti at SimPEG helped with online documentation and the initial release. Ben Murphy at USGS provided methods for rotating impedance tensors from z-file formatted data. The facilities of the IRIS Consortium are supported by the National Science Foundation’s Seismological Facilities for the Advancement of Geoscience Award under Cooperative Support Agreement EAR-1851048. Any use of trade, firm, or product names is for descriptive purposes only and does not imply endorsement by the U.S. Government.
 
 
 # References
