@@ -32,8 +32,7 @@ class IterControl(object):
             NOT USED: REMOVE
         kwargs
 
-        Class Variables:
-        <Specific to Egbert's Robust Regression>
+        Class Variables Specific to Egbert's Robust Regression:
         r0: float
             Effectively infinty for OLS, this controls the point at which residuals
             transition from being penalized by a squared vs a linear function.  The
@@ -45,7 +44,7 @@ class IterControl(object):
             makes for severe downweighting about u0.  The function is continuous
             "math friendly" (all derivates exist etc) so you can prove theorems about it
             etc.
-        </Specific to Egbert's Robust Regression>
+
         """
         self.number_of_iterations = 0
         self.number_of_redescending_iterations = 0
