@@ -2,6 +2,7 @@
 follows Gary's IterControl.m in
 iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
 """
+from loguru import logger
 import numpy as np
 
 from aurora.transfer_function.regression.helper_functions import rme_beta
@@ -46,8 +47,8 @@ class IterControl(object):
             etc.
 
         """
-        self.number_of_iterations = 0
-        self.number_of_redescending_iterations = 0
+        self._number_of_iterations = 0
+        self._number_of_redescending_iterations = 0
 
         self.tolerance = 0.005
         self.epsilon = 1000
@@ -69,7 +70,36 @@ class IterControl(object):
         self.robust_diagonalize = False
         # </Additional properties>
 
-    def converged(self, b, b0):
+    @property
+    def number_of_iterations(self) -> int:
+        return self._number_of_iterations
+
+    # @number_of_iterations.setter
+    # def number_of_iterations(self, value) -> int:
+    #     self._number_of_iterations = value
+
+    def reset_number_of_iterations(self) -> int:
+        self._number_of_iterations = 0
+
+    def increment_iteration_number(self):
+        self._number_of_iterations += 1
+
+    @property
+    def number_of_redescending_iterations(self) -> int:
+        return self._number_of_redescending_iterations
+
+    @number_of_redescending_iterations.setter
+    def number_of_redescending_iterations(self, value) -> int:
+        self._number_of_redescending_iterations = value
+
+    def increment_redescending_iteration_number(self):
+        self._number_of_redescending_iterations += 1
+
+    @property
+    def max_iterations_reached(self):
+        return self.number_of_iterations >= self.max_number_of_iterations
+
+    def converged(self, b, b0, verbose=False):
         """
         Parameters
         ----------
@@ -77,6 +107,8 @@ class IterControl(object):
             the most recent regression estimate
         b0 : complex-valued numpy array
             The previous regression estimate
+        verbose: bool
+            Set to True for debugging
 
         Returns
         -------
@@ -89,27 +121,25 @@ class IterControl(object):
         1 - abs(b/b0), however, that will be insensitive to phase changes in b,
         which is complex valued.  The way it is coded np.max(np.abs(1 - b / b0)) is
         correct as it stands.
+
         """
 
-        converged = False
         maximum_change = np.max(np.abs(1 - b / b0))
         tolerance_cond = maximum_change <= self.tolerance
-        iteration_cond = self.number_of_iterations >= self.max_number_of_iterations
+        iteration_cond = self.max_iterations_reached
         if tolerance_cond or iteration_cond:
             converged = True
-            # These print statments are not very clear and
-            # Should be reworded.
-            # if tolerance_cond:
-            #    print(
-            #        f"Converged Due to MaxChange < Tolerance after "
-            #        f" {self.number_of_iterations} of "
-            #        f" {self.max_number_of_iterations} iterations"
-            #    )
-            # elif iteration_cond:
-            #    print(
-            #        f"Converged Due to maximum number_of_iterations "
-            #        f" {self.max_number_of_iterations}"
-            #    )
+            if verbose:
+                msg_start = "Converged due to"
+                msg_end = (
+                    f"{self.number_of_iterations} of "
+                    f"{self.max_number_of_iterations} iterations"
+                )
+                if tolerance_cond:
+                    msg = f"{msg_start} MaxChange < Tolerance after {msg_end}"
+                elif iteration_cond:
+                    msg = f"{msg_start} maximum number_of_iterations {msg_end}"
+                logger.info(msg)
         else:
             converged = False
 

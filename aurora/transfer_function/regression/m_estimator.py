@@ -192,12 +192,18 @@ class MEstimator(RegressionEstimator):
         self.update_residual_variance()
 
     def apply_huber_regression(self):
-        """This is the 'convergence loop' from TRME, TRME_RR"""
-        converged = self.iter_control.max_number_of_iterations <= 0
-        self.iter_control.number_of_iterations = 0
+        """
+            This is the 'convergence loop' from TRME, TRME_RR
+
+        TODO: Consider not setting iter_control.number_of_iterations
+         - Instead, Initialize a new iter_control object
+        """
+        converged = self.iter_control.max_iterations_reached
+        if self.iter_control.number_of_iterations:
+            self.iter_control.reset_number_of_iterations()
         while not converged:
             b0 = self.b
-            self.iter_control.number_of_iterations += 1
+            self.iter_control.increment_iteration_number()
             self.update_y_cleaned_via_huber_weights()
             self.update_b()
             self.update_y_hat()
@@ -210,7 +216,7 @@ class MEstimator(RegressionEstimator):
         if self.iter_control.max_number_of_redescending_iterations:
             self.iter_control.number_of_redescending_iterations = 0  # reset per channel
             while self.iter_control.continue_redescending:
-                self.iter_control.number_of_redescending_iterations += 1
+                self.iter_control.increment_redescending_iteration_number()
                 self.update_y_cleaned_via_redescend_weights()
                 self.update_b()
                 self.update_y_hat()
