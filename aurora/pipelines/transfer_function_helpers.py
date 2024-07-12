@@ -22,7 +22,7 @@ from loguru import logger
 ESTIMATOR_LIBRARY = {"OLS": RegressionEstimator, "RME": TRME, "RME_RR": TRME_RR}
 
 
-def get_estimator_class(estimation_engine):
+def get_estimator_class(estimation_engine) -> RegressionEstimator:
     """
 
     Parameters
@@ -172,11 +172,29 @@ def process_transfer_functions(
     """
     This method based on TTFestBand.m
 
+    Note #1: Although it is advantageous to execute the regression channel-by-channel
+    vs. all-at-once, we need to keep the all-at-once to get residual covariances (see issue #87)
+
+    Note #2:
+    Consider placing the segment weight logic in its own module with the various functions in a dictionary.
+    Possibly can combines (product) all segment weights, like the following pseudocode:
+
+        W = ones
+        for wt_style in  segment_weights:
+            fcn = wt_fucntions[style]
+            w = fcn(X, Y, RR, )
+            W *= w
+        return W
+
+
+    TODO: Consider push the nan-handling into the band extraction as a kwarg.
+
+
     Parameters
     ----------
-    dec_level_config
-    local_stft_obj
-    remote_stft_obj
+    dec_level_config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
+    local_stft_obj: xarray.core.dataset.Dataset
+    remote_stft_obj: xarray.core.dataset.Dataset or None
     transfer_function_obj: aurora.transfer_function.TTFZ.TTFZ
         The transfer function container ready to receive values in this method.
     segment_weights : numpy array or list of strings
@@ -187,26 +205,10 @@ def process_transfer_functions(
         ["jackknife_jj84", "multiple_coherence", "simple_coherence"]
     channel_weights : numpy array or None
 
-    Note #1: Although it is advantageous to executing the regression channel-by-channel
-    vs. all-at-once, we need to keep the all-at-once to get residual covariances (see issue #87)
-
-    Note #2:
-    Consider placing the segment weight logic in its own module with the various functions in a dictionary.
-    Possibly can combines (product) all segment weights, like the following pseudocode:
-
-        W = zeros
-        for wt_style in  segment_weights:
-            fcn = wt_fucntions[style]
-            w = fcn(X, Y, RR, )
-            W *= w
-        return W
-
-
-    TODO: Consider push the nan-handling into the band extraction as a kwarg.
 
     Returns
     -------
-
+    transfer_function_obj: aurora.transfer_function.TTFZ.TTFZ
     """
     estimator_class = get_estimator_class(dec_level_config.estimator.engine)
     iter_control = set_up_iter_control(dec_level_config)
