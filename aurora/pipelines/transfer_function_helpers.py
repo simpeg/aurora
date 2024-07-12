@@ -77,7 +77,8 @@ def set_up_iter_control(config):
 def select_channel(xrda, channel_label):
     """
     Extra helper function to make process_transfer_functions more readable without
-    black forcing multiline
+    black (the uncompromising formatter) forcing multilines.
+
     Parameters
     ----------
     xrda

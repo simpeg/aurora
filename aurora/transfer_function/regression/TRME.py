@@ -41,7 +41,7 @@ Y_hat.H @ Y_hat = QQHY.H @ QQHY = QHY.H @ Q.H @ Q @ QHY = QHY.H @ QHY.
 
 The predicted data has to lie in span of the columns in the design matrix X.
 The predicted data has to be a linear combination of the columns of Y.
-Q is an orthoganal basis for the columns of X.
+Q is an orthogonal basis for the columns of X.
 The norms of QQHY and QHY are the same
 
     < MATLAB Documentation >
