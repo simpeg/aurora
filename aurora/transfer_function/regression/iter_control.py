@@ -88,9 +88,8 @@ class IterControl(object):
     def number_of_redescending_iterations(self) -> int:
         return self._number_of_redescending_iterations
 
-    @number_of_redescending_iterations.setter
-    def number_of_redescending_iterations(self, value) -> int:
-        self._number_of_redescending_iterations = value
+    def reset_number_of_redescending_iterations(self):
+        self._number_of_redescending_iterations = 0
 
     def increment_redescending_iteration_number(self):
         self._number_of_redescending_iterations += 1

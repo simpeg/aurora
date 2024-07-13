@@ -214,7 +214,7 @@ class MEstimator(RegressionEstimator):
     def apply_redecending_influence_function(self):
         """one or two iterations with redescending influence curve cleaned data"""
         if self.iter_control.max_number_of_redescending_iterations:
-            self.iter_control.number_of_redescending_iterations = 0  # reset per channel
+            self.iter_control.reset_number_of_redescending_iterations()  # reset per channel
             while self.iter_control.continue_redescending:
                 self.iter_control.increment_redescending_iteration_number()
                 self.update_y_cleaned_via_redescend_weights()
