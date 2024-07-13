@@ -9,12 +9,26 @@ from aurora.transfer_function.regression.helper_functions import rme_beta
 
 
 class IterControl(object):
-    """ """
+    """
+    Notes:
+         Here is a class to hold variables that are used to control the regression
+         - currently this is used for variations on RME (Robust M-Estimator)
+         - TODO: in the original matlab code there was a class property called `epsilon`, but
+         it was unused; There was no documentation about it's purpose, except possibly that
+         the abstract base class solved Y = X*b + epsilon for b, complex-valued.
+         Perhaps this was intended as an intrinsic tolerated noise level.  The value of
+         epsilon was set to 1000.
+         -  TODO The return covariance boolean just initializes arrays of zeros.  Needs to be
+         made functional or removed
+    """
 
     def __init__(
         self,
         max_number_of_iterations=10,
         max_number_of_redescending_iterations=2,
+        r0=1.4,
+        u0=2.8,
+        tolerance=0.0005,
         **kwargs,
     ):
         """
@@ -50,25 +64,22 @@ class IterControl(object):
         self._number_of_iterations = 0
         self._number_of_redescending_iterations = 0
 
-        self.tolerance = 0.005
-        self.epsilon = 1000
+        self.tolerance = tolerance
         self.max_number_of_iterations = max_number_of_iterations
         self.max_number_of_redescending_iterations = (
             max_number_of_redescending_iterations
         )
 
-        # <regression-M estimator params>
-        self.r0 = 1.5
-        self.u0 = 2.8
-        # </regression-M estimator params>
+        # regression-M estimator params
+        self.r0 = r0
+        self.u0 = u0
 
-        # <Additional properties>
+        # Additional properties
         # used sometimes to control one or another of the iterative algorithms
         # These were translated from the matlab code and may be moved in future
-        self.return_covariance = True
-        self.save_cleaned = False
-        self.robust_diagonalize = False
-        # </Additional properties>
+        self.return_covariance = True  # TODO: add functionality
+        self.save_cleaned = False  # TODO: add functionality
+        self.robust_diagonalize = False  # TODO: add functionality
 
     @property
     def number_of_iterations(self) -> int:
@@ -95,7 +106,11 @@ class IterControl(object):
         self._number_of_redescending_iterations += 1
 
     @property
-    def max_iterations_reached(self):
+    def max_iterations_reached(self) -> bool:
+        """
+        Return True of the number of iterations carried out is greater or equal the
+        maximum number of iterations set in the processing config
+        """
         return self.number_of_iterations >= self.max_number_of_iterations
 
     def converged(self, b, b0, verbose=False):
