@@ -49,17 +49,18 @@ class RegressionEstimator(object):
 
     Attributes
     ----------
-    _X : xarray.Dataset
-        X.data is numpy array (normally 2-dimensional)
-        These are the input variables.  Like the matlab codes each observation
+    _X : Union[xr.Dataset, xr.DataArray, np.ndarray]
+        The underlying dataset is assumed to be if shape nCH x nObs (normally 2-dimensional)
+        These are the input variables.  In the matlab codes each observation
         corresponds to a row and each parameter (channel) is a column.
+        These data are transposed before regression
     X : numpy array (normally 2-dimensional)
         This is a "pure array" representation of _X used to emulate Gary
         Egbert's matlab codes. It may or may not be deprecated.
     _Y : xarray.Dataset
         These are the output variables, arranged same as X above.
     Y : numpy array (normally 2-dimensional)
-        This is a "pure array" representation of _X used to emulate Gary
+        This is a "pure array" representation of _Y used to emulate Gary
         Egbert's matlab codes. It may or may not be deprecated.
     b : numpy array (normally 2-dimensional)
         Matrix of regression coefficients, i.e. the solution to the regression
@@ -84,13 +85,12 @@ class RegressionEstimator(object):
         is a structure which controls the robust scheme iteration.
         On return also contains number of iterations.
 
-    TODO: Consider stop allowing None as X, Y ... not sure what we gain by allowing that
     """
 
     def __init__(
         self,
-        X: Union[xr.Dataset, xr.DataArray],
-        Y: Union[xr.Dataset, xr.DataArray],
+        X: Union[xr.Dataset, xr.DataArray, np.ndarray],
+        Y: Union[xr.Dataset, xr.DataArray, np.ndarray],
         iter_control: IterControl = IterControl(),
         **kwargs,
     ):
