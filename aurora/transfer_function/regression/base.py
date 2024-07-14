@@ -81,15 +81,15 @@ class RegressionEstimator(object):
     Yc : numpy array (normally 2-dimensional)
         A "cleaned" version of Y the output variables.
     iter_control : transfer_function.iter_control.IterControl()
-        is a structure which controls the robust scheme
-        Fields: r0, RG.nITmax, tol (rdcndwt ... not coded yet)
-        On return also contains number of iterations
+        is a structure which controls the robust scheme iteration.
+        On return also contains number of iterations.
     """
 
     def __init__(
         self,
         X: Union[xr.Dataset, None] = None,
         Y: Union[xr.Dataset, None] = None,
+        iter_control: IterControl = IterControl(),
         **kwargs,
     ):
         """
@@ -101,11 +101,11 @@ class RegressionEstimator(object):
         """
         self._X = X
         self._Y = Y
+        self.iter_control = iter_control
         self.b = None
         self.cov_nn = None
         self.cov_ss_inv = None
         self.squared_coherence = None
-        self.iter_control = kwargs.get("iter_control", IterControl())
         self._set_up_regression_variables()
         self.R2 = None
         self.qr_input = "X"
