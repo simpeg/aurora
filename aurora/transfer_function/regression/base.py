@@ -116,6 +116,7 @@ class RegressionEstimator(object):
         self._QH = None  # conjugate transpose of Q (Hermitian operator)
         self._QHY = None  #
         self._QHYc = None
+        self._n_channels_out = None
 
     def _set_up_regression_variables(self):
         """
@@ -237,9 +238,13 @@ class RegressionEstimator(object):
         return self.X.shape[1]
 
     @property
-    def n_channels_out(self):
-        """number of output variables"""
-        return self.Y.shape[1]
+    def n_channels_out(self) -> int:
+        """
+        number of output variables (Assumed to be num columns of a 2D array)
+        """
+        if self._n_channels_out is None:
+            self._n_channels_out = self.Y.shape[1]
+        return self._n_channels_out
 
     @property
     def degrees_of_freedom(self):
@@ -398,6 +403,8 @@ def _input_to_numpy_array(X: Union[xr.Dataset, xr.DataArray]) -> np.ndarray:
         output = X.to_array().data.T
     elif isinstance(X, xr.DataArray):
         output = X.data.T
+        if len(output.shape) == 1:
+            output = np.atleast_2d(output).T  # cast to 2D if 1D
     elif isinstance(X, np.ndarray):
         msg = "np.ndarray input is assumed to be nCH x nObs -- transposing"
         logger.info(msg)
