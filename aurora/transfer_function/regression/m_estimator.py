@@ -307,7 +307,7 @@ class MEstimator(RegressionEstimator):
                 "output_channel",
             ],
             coords={
-                "output_channel": list(self._Y.data_vars),
+                "output_channel": self.output_channel_names,
             },
         )
 
@@ -334,8 +334,8 @@ class MEstimator(RegressionEstimator):
             cov_nn,
             dims=["output_channel_1", "output_channel_2"],
             coords={
-                "output_channel_1": list(self._Y.data_vars),
-                "output_channel_2": list(self._Y.data_vars),
+                "output_channel_1": self.output_channel_names,
+                "output_channel_2": self.output_channel_names,
             },
         )
         return

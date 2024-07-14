@@ -85,6 +85,10 @@ class RegressionEstimator(object):
         is a structure which controls the robust scheme iteration.
         On return also contains number of iterations.
 
+    Kwargs:
+    input_channel_names: list
+        List of strings for channel names.
+
     """
 
     def __init__(
@@ -117,6 +121,8 @@ class RegressionEstimator(object):
         self._QHY = None  #
         self._QHYc = None
         self._n_channels_out = None
+        self._input_channel_names = kwargs.get("input_channel_names", None)
+        self._output_channel_names = kwargs.get("output_channel_names", None)
 
     def _set_up_regression_variables(self):
         """
@@ -140,6 +146,18 @@ class RegressionEstimator(object):
         self._check_number_of_observations_xy_consistent()
 
     @property
+    def input_channel_names(self):
+        if self._input_channel_names is None:
+            self._input_channel_names = _get_channel_names(self._X, label="IN")
+        return self._input_channel_names
+
+    @property
+    def output_channel_names(self):
+        if self._output_channel_names is None:
+            self._output_channel_names = _get_channel_names(self._Y, label="OUT")
+        return self._output_channel_names
+
+    @property
     def inverse_signal_covariance(self):
         return self.cov_ss_inv
 
@@ -152,8 +170,8 @@ class RegressionEstimator(object):
             np.transpose(self.b),
             dims=["output_channel", "input_channel"],
             coords={
-                "output_channel": list(self._Y.data_vars),
-                "input_channel": list(self._X.data_vars),
+                "output_channel": self.output_channel_names,
+                "input_channel": self.input_channel_names,
             },
         )
         return xra
@@ -378,7 +396,7 @@ class RegressionEstimator(object):
         return Z
 
 
-def _input_to_numpy_array(X: Union[xr.Dataset, xr.DataArray]) -> np.ndarray:
+def _input_to_numpy_array(X: Union[xr.Dataset, xr.DataArray, np.ndarray]) -> np.ndarray:
     """
     Casts data input to regression as numpy array, with channels as column vectors.
 
@@ -414,3 +432,43 @@ def _input_to_numpy_array(X: Union[xr.Dataset, xr.DataArray]) -> np.ndarray:
         raise NotImplementedError(msg)
 
     return output
+
+
+def _get_channel_names(
+    X: Union[xr.Dataset, xr.DataArray, np.ndarray], label=""
+) -> list:
+    """
+    More fun trying to support xr.dataset and numpy arrays.
+    It turns out that TRME.estimate() needs input_channel_names.
+    If X is a numpy array, then self._X.data_vars results in
+    AttributeError: 'numpy.ndarray' object has no attribute 'data_vars'
+
+    So here is some logic to make channel names if we dont have any
+
+    Parameters
+    ----------
+    X: Union[xr.Dataset, xr.DataArray, np.ndarray]
+        If its an xarray just return the labels
+        If its a numpy array, make the names up
+
+    Returns
+    -------
+
+    """
+    if isinstance(X, xr.Dataset):
+        channel_names = list(X.data_vars)
+    elif isinstance(X, xr.DataArray):
+        # Beware hard coded assumption of "variable"
+        try:
+            channel_names = list(X.coords["variable"].values)
+        except TypeError:  # This happens when xarray has only one channel
+            channel_names = [
+                X.coords["variable"].values.item(),
+            ]
+    else:
+        # numpy array doesn't have input channel_names predefined
+        channel_names = np.arange(
+            X.shape[0]
+        )  # note its 0, not 1 here because we are talking to _X
+        channel_names = [f"{label}{x}" for x in channel_names]
+    return channel_names

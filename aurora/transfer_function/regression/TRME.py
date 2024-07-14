@@ -130,8 +130,8 @@ class TRME(MEstimator):
             cov_ss_inv,
             dims=["input_channel_1", "input_channel_2"],
             coords={
-                "input_channel_1": list(self._X.data_vars),
-                "input_channel_2": list(self._X.data_vars),
+                "input_channel_1": self.input_channel_names,
+                "input_channel_2": self.input_channel_names,
             },
         )
         return
