@@ -83,12 +83,14 @@ class RegressionEstimator(object):
     iter_control : transfer_function.iter_control.IterControl()
         is a structure which controls the robust scheme iteration.
         On return also contains number of iterations.
+
+    TODO: Consider stop allowing None as X, Y ... not sure what we gain by allowing that
     """
 
     def __init__(
         self,
-        X: Union[xr.Dataset, None] = None,
-        Y: Union[xr.Dataset, None] = None,
+        X: Union[xr.Dataset, xr.DataArray],
+        Y: Union[xr.Dataset, xr.DataArray],
         iter_control: IterControl = IterControl(),
         **kwargs,
     ):
@@ -117,17 +119,40 @@ class RegressionEstimator(object):
 
     def _set_up_regression_variables(self):
         """
-        Placeholder for making this method more general. Currently the input arguments X, Y are xr.Dataset
-        Here we could add logic for supporting dataarrays as well
-        Returns
-        -------
+        Placeholder for making this method more general. Currently, the input arguments X, Y are xr.Dataset
+        Here we could add logic for supporting dataarrays as well.
+
+        When xr.Datasets are X, Y we cast to array (num channels x num observations) and then transpose them
+        When xr.DataArrays are X, Y extract the array -- but how do we know whether or not to transpose?
+        - it would be nice to have a helper function that applies the logic of getting the data from the
+         xarray and transposing or not appropriately.
+
+
+        In here are some assumptions about how the data are organized.
+        These assumptions are OK for xr.Dataset where the datavars are the MT components ("hx", "hy", etc)
+
 
         """
-        if self._X is not None:
+        # self.X = _xarray_to_numpy_array(self._X)
+        if isinstance(self._X, xr.Dataset):
             self.X = self._X.to_array().data.T
-        if self._Y is not None:
+        elif isinstance(self._X, xr.DataArray):
+            msg = f"input argument X to {self.__class__} cannot be xr.DataArray"
+            raise NotImplementedError(msg)
+        else:
+            msg = f"input argument X to {self.__class__} cannot be {type(self._X)}"
+            raise NotImplementedError(msg)
+
+        if isinstance(self._Y, xr.Dataset):
             self.Y = self._Y.to_array().data.T
-            self.Yc = np.zeros(self.Y.shape, dtype=np.complex128)
+        elif isinstance(self._Y, xr.DataArray):
+            msg = f"input argument Y to {self.__class__} cannot be xr.DataArray"
+            raise NotImplementedError(msg)
+        else:
+            msg = f"input argument Y to {self.__class__} cannot be {type(self._Y)}"
+            raise NotImplementedError(msg)
+        self.Yc = np.zeros(self.Y.shape, dtype=np.complex128)
+
         self._check_number_of_observations_xy_consistent()
 
     @property
@@ -363,3 +388,31 @@ class RegressionEstimator(object):
     def estimate(self):
         Z = self.estimate_ols(mode="qr")
         return Z
+
+
+#
+# def _xarray_to_numpy_array(X):
+#     """
+#     Casts data input to regression as numpy array, with channels as column vectors.
+#
+#     Currently we store array channels row-wise (as num_channels x num_observations),
+#     but the way regression is set up the variables should be column vectors (num_observations x num_channels)
+#
+#     This is a place where we could distill the logic for which dimension is which.
+#
+#     Returns
+#     -------
+#
+#     """
+#     if isinstance(X, xr.Dataset):
+#         output = X.to_array().data.T
+#     elif isinstance(X, xr.DataArray):
+#         return None
+#         msg = f"input argument X to {self.__class__} cannot be xr.DataArray"
+#         raise NotImplementedError(msg)
+#     else:
+#         msg = f"input argument X to {self.__class__} cannot be {type(X)}"
+#         raise NotImplementedError(msg)
+#
+#     return output
+#     pass
