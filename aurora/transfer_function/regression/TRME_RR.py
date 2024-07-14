@@ -27,10 +27,9 @@ class TRME_RR(MEstimator):
         self.qr_input = "Z"
         self._QHX = None
         self.check_for_nan()
-        self.check_number_of_observations_xy_consistent()
+        self._check_number_of_observations_xy_consistent()
         self.check_for_enough_data_for_rr_estimate()
         self.check_reference_data_shape()
-
 
     def check_for_nan(self):
         cond1 = np.isnan(self.X).any()
@@ -51,7 +50,9 @@ class TRME_RR(MEstimator):
 
     def check_reference_data_shape(self):
         if self.Z.shape != self.X.shape:
-            logger.error("sizes of local and remote do not agree in RR estimation routine")
+            logger.error(
+                "sizes of local and remote do not agree in RR estimation routine"
+            )
             raise Exception
 
     def update_y_hat(self):

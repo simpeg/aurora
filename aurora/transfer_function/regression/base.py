@@ -9,8 +9,10 @@ arrays to follow Gary's codes more easily since his are matlab arrays.
 """
 import numpy as np
 import xarray as xr
+
 from aurora.transfer_function.regression.iter_control import IterControl
 from loguru import logger
+from typing import Union
 
 
 class RegressionEstimator(object):
@@ -84,7 +86,12 @@ class RegressionEstimator(object):
         On return also contains number of iterations
     """
 
-    def __init__(self, **kwargs):
+    def __init__(
+        self,
+        X: Union[xr.Dataset, None] = None,
+        Y: Union[xr.Dataset, None] = None,
+        **kwargs,
+    ):
         """
 
         Parameters
@@ -92,18 +99,15 @@ class RegressionEstimator(object):
         ----------
         kwargs
         """
-        self._X = kwargs.get("X", None)
-        self._Y = kwargs.get("Y", None)
+        self._X = X
+        self._Y = Y
         self.b = None
         self.cov_nn = None
         self.cov_ss_inv = None
         self.squared_coherence = None
         self.iter_control = kwargs.get("iter_control", IterControl())
-
-        self.X = self._X.to_array().data.T
-        self.Y = self._Y.to_array().data.T
-        self.Yc = np.zeros(self.Y.shape, dtype=np.complex128)
-        self.check_number_of_observations_xy_consistent()
+        self._set_up_regression_variables()
+        self._check_number_of_observations_xy_consistent()
         self.R2 = None
         self.qr_input = "X"
         self._Q = None
@@ -111,6 +115,20 @@ class RegressionEstimator(object):
         self._QH = None  # conjugate transpose of Q (Hermitian operator)
         self._QHY = None  #
         self._QHYc = None
+
+    def _set_up_regression_variables(self):
+        """
+        Placeholder for making this method more general. Currently the input arguments X, Y are xr.Dataset
+        Here we could add logic for supporting dataarrays as well
+        Returns
+        -------
+
+        """
+        if self._X is not None:
+            self.X = self._X.to_array().data.T
+        if self._Y is not None:
+            self.Y = self._Y.to_array().data.T
+            self.Yc = np.zeros(self.Y.shape, dtype=np.complex128)
 
     @property
     def inverse_signal_covariance(self):
@@ -187,7 +205,7 @@ class RegressionEstimator(object):
 
         return
 
-    def check_number_of_observations_xy_consistent(self):
+    def _check_number_of_observations_xy_consistent(self):
         if self.Y.shape[0] != self.X.shape[0]:
             logger.info(
                 f"Design matrix (X) has {self.X.shape[0]} rows but data (Y) "
