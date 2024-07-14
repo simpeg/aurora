@@ -133,8 +133,8 @@ class RegressionEstimator(object):
 
 
         """
-        self.X = _xarray_to_numpy_array(self._X)
-        self.Y = _xarray_to_numpy_array(self._Y)
+        self.X = _input_to_numpy_array(self._X)
+        self.Y = _input_to_numpy_array(self._Y)
         self.Yc = np.zeros(self.Y.shape, dtype=np.complex128)
         self._check_number_of_observations_xy_consistent()
 
@@ -373,7 +373,7 @@ class RegressionEstimator(object):
         return Z
 
 
-def _xarray_to_numpy_array(X: Union[xr.Dataset, xr.DataArray]) -> np.ndarray:
+def _input_to_numpy_array(X: Union[xr.Dataset, xr.DataArray]) -> np.ndarray:
     """
     Casts data input to regression as numpy array, with channels as column vectors.
 
@@ -398,6 +398,10 @@ def _xarray_to_numpy_array(X: Union[xr.Dataset, xr.DataArray]) -> np.ndarray:
         output = X.to_array().data.T
     elif isinstance(X, xr.DataArray):
         output = X.data.T
+    elif isinstance(X, np.ndarray):
+        msg = "np.ndarray input is assumed to be nCH x nObs -- transposing"
+        logger.info(msg)
+        output = X.T
     else:
         msg = f"input argument of type {type(X)} not supported -- try an xarray"
         raise NotImplementedError(msg)
