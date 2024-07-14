@@ -27,7 +27,6 @@ class TRME_RR(MEstimator):
         self.qr_input = "Z"
         self._QHX = None
         self.check_for_nan()
-        self._check_number_of_observations_xy_consistent()
         self.check_for_enough_data_for_rr_estimate()
         self.check_reference_data_shape()
 

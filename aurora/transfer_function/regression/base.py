@@ -107,7 +107,6 @@ class RegressionEstimator(object):
         self.squared_coherence = None
         self.iter_control = kwargs.get("iter_control", IterControl())
         self._set_up_regression_variables()
-        self._check_number_of_observations_xy_consistent()
         self.R2 = None
         self.qr_input = "X"
         self._Q = None
@@ -129,6 +128,7 @@ class RegressionEstimator(object):
         if self._Y is not None:
             self.Y = self._Y.to_array().data.T
             self.Yc = np.zeros(self.Y.shape, dtype=np.complex128)
+        self._check_number_of_observations_xy_consistent()
 
     @property
     def inverse_signal_covariance(self):
