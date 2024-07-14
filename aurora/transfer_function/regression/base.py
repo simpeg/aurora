@@ -133,26 +133,9 @@ class RegressionEstimator(object):
 
 
         """
-        # self.X = _xarray_to_numpy_array(self._X)
-        if isinstance(self._X, xr.Dataset):
-            self.X = self._X.to_array().data.T
-        elif isinstance(self._X, xr.DataArray):
-            msg = f"input argument X to {self.__class__} cannot be xr.DataArray"
-            raise NotImplementedError(msg)
-        else:
-            msg = f"input argument X to {self.__class__} cannot be {type(self._X)}"
-            raise NotImplementedError(msg)
-
-        if isinstance(self._Y, xr.Dataset):
-            self.Y = self._Y.to_array().data.T
-        elif isinstance(self._Y, xr.DataArray):
-            msg = f"input argument Y to {self.__class__} cannot be xr.DataArray"
-            raise NotImplementedError(msg)
-        else:
-            msg = f"input argument Y to {self.__class__} cannot be {type(self._Y)}"
-            raise NotImplementedError(msg)
+        self.X = _xarray_to_numpy_array(self._X)
+        self.Y = _xarray_to_numpy_array(self._Y)
         self.Yc = np.zeros(self.Y.shape, dtype=np.complex128)
-
         self._check_number_of_observations_xy_consistent()
 
     @property
@@ -390,29 +373,33 @@ class RegressionEstimator(object):
         return Z
 
 
-#
-# def _xarray_to_numpy_array(X):
-#     """
-#     Casts data input to regression as numpy array, with channels as column vectors.
-#
-#     Currently we store array channels row-wise (as num_channels x num_observations),
-#     but the way regression is set up the variables should be column vectors (num_observations x num_channels)
-#
-#     This is a place where we could distill the logic for which dimension is which.
-#
-#     Returns
-#     -------
-#
-#     """
-#     if isinstance(X, xr.Dataset):
-#         output = X.to_array().data.T
-#     elif isinstance(X, xr.DataArray):
-#         return None
-#         msg = f"input argument X to {self.__class__} cannot be xr.DataArray"
-#         raise NotImplementedError(msg)
-#     else:
-#         msg = f"input argument X to {self.__class__} cannot be {type(X)}"
-#         raise NotImplementedError(msg)
-#
-#     return output
-#     pass
+def _xarray_to_numpy_array(X: Union[xr.Dataset, xr.DataArray]) -> np.ndarray:
+    """
+    Casts data input to regression as numpy array, with channels as column vectors.
+
+    Currently, we store array channels row-wise (as num_channels x num_observations),
+    but the way regression is set up the variables should be column vectors (num_observations x num_channels)
+
+    This is a place where we could distill the logic for which dimension is which.
+
+
+    Parameters
+    ----------
+    X: Union[xr.Dataset, xr.DataArray]
+        Data to be used in regression in xarray form
+
+    Returns
+    -------
+    output: np.ndarray
+        Data to be used in regression as a numpy array
+
+    """
+    if isinstance(X, xr.Dataset):
+        output = X.to_array().data.T
+    elif isinstance(X, xr.DataArray):
+        output = X.data.T
+    else:
+        msg = f"input argument of type {type(X)} not supported -- try an xarray"
+        raise NotImplementedError(msg)
+
+    return output
