@@ -425,7 +425,7 @@ def _input_to_numpy_array(X: Union[xr.Dataset, xr.DataArray, np.ndarray]) -> np.
             output = np.atleast_2d(output).T  # cast to 2D if 1D
     elif isinstance(X, np.ndarray):
         msg = "np.ndarray input is assumed to be nCH x nObs -- transposing"
-        logger.info(msg)
+        logger.debug(msg)
         output = X.T
     else:
         msg = f"input argument of type {type(X)} not supported -- try an xarray"
