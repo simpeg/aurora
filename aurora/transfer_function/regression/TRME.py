@@ -102,18 +102,22 @@ class TRME(MEstimator):
         super(TRME, self).__init__(**kwargs)
         self.qr_input = "X"
 
-    def update_y_hat(self):
-        """could rename this as update_predicted_data"""
+    def update_y_hat(self) -> None:
+        """
+        Update the predicted_data $\hat{Y}$
+        """
         self._Y_hat = self.Q @ self.QHYc
-        return
 
     def update_residual_variance(self, correction_factor=1):
         self._residual_variance = self.residual_variance_method2()
         self._residual_variance *= correction_factor
         return self._residual_variance
 
-    def update_b(self):
-        """matlab was: b = R\QTY;"""
+    def update_b(self) -> None:
+        """
+        Solve the regression problem using the latest cleaned data via QR-decompostion.
+        matlab was: b = R\QTY;
+        """
         self.b = solve_triangular(self.R, self.QHYc)
 
     def compute_inverse_signal_covariance(self):
