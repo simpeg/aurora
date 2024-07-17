@@ -12,7 +12,7 @@ import xarray as xr
 
 from aurora.transfer_function.regression.iter_control import IterControl
 from loguru import logger
-from typing import Union
+from typing import Optional, Union
 
 
 class RegressionEstimator(object):
@@ -435,7 +435,7 @@ def _input_to_numpy_array(X: Union[xr.Dataset, xr.DataArray, np.ndarray]) -> np.
 
 
 def _get_channel_names(
-    X: Union[xr.Dataset, xr.DataArray, np.ndarray], label=""
+    X: Union[xr.Dataset, xr.DataArray, np.ndarray], label: Optional[str] = ""
 ) -> list:
     """
     More fun trying to support xr.dataset and numpy arrays.
@@ -448,12 +448,18 @@ def _get_channel_names(
     Parameters
     ----------
     X: Union[xr.Dataset, xr.DataArray, np.ndarray]
-        If its an xarray just return the labels
-        If its a numpy array, make the names up
+        If X is xarray just return the labels
+        If X is numpy array, make the names up.  numpy array assumed to contain data from each channel
+        in a separate row, i.e. (n_ch x n_observations) shaped array.
+    label: Optional[str]
+        This gets prepended onto incrementing integers for channel labels.
+        For example, this could be "input", "output", or a station name.
+        Used to keep the indexing a 2D xarray unique.
 
     Returns
     -------
-
+    channel_names: list
+        The names of the channels for the input array X
     """
     if isinstance(X, xr.Dataset):
         channel_names = list(X.data_vars)
