@@ -291,14 +291,27 @@ class MEstimator(RegressionEstimator):
         self.update_QHYc()
         return
 
-    def compute_squared_coherence(self):
+    def compute_squared_coherence(self) -> None:
         """
+        Updates the array self.R2
+
+        Here is taken the ratio of the energy in the residuals with the energy in the cleaned data.
+        This metric can be interpreted as how much of the signal (Y) is "explained" by the regression.
+
+        TODO: There seem to be other valid metrics for this sort of quantity.  In particular, we may want to
+         consider SSY (the sum of squares of the observed data) over SSR.
+
+        TODO: consider renaming self.R2.  That name invokes the idea of the squared residuals.  That is not what
+         is being stored in self.R2.  This is more like a CMRR.
+
         res: Residuals, the original data minus the predicted data.
         SSR : Sum of squares of the residuals, per channel
 
         """
         res = self.Y - self.Y_hat
-        SSR = np.einsum("ij,ji->i", res.conj().T, res)
+        SSR = np.einsum(
+            "ij,ji->i", res.conj().T, res
+        )  # takes the diagonal of the matrix product
         SSR = np.real(SSR).T
         Yc2 = np.abs(self.Yc) ** 2
         SSYC = np.sum(Yc2, axis=0)
@@ -315,6 +328,11 @@ class MEstimator(RegressionEstimator):
             },
         )
 
+        # if self.iter_control.verbosity > 1:
+        #     msg = f"squared coherence = {R2}"
+        #     logger.info(msg)
+        #     msg = f"squared coherence = {self.R2}"
+        #     logger.info(msg)
         return
 
     def compute_noise_covariance(self):
