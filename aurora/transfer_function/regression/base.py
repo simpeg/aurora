@@ -133,11 +133,8 @@ class RegressionEstimator(object):
         When xr.DataArrays are X, Y extract the array -- but how do we know whether or not to transpose?
         - it would be nice to have a helper function that applies the logic of getting the data from the
          xarray and transposing or not appropriately.
-
-
-        In here are some assumptions about how the data are organized.
-        These assumptions are OK for xr.Dataset where the datavars are the MT components ("hx", "hy", etc)
-
+        - for now we assume that the input data are organized so that input arrays are (n_ch x n_observations).
+        This assumption is OK for xr.Dataset where the datavars are the MT components ("hx", "hy", etc)
 
         """
         self.X = _input_to_numpy_array(self._X)
