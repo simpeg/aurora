@@ -24,13 +24,14 @@ class IterControl(object):
 
     def __init__(
         self,
-        max_number_of_iterations=10,
-        max_number_of_redescending_iterations=2,
-        r0=1.4,
-        u0=2.8,
-        tolerance=0.0005,
+        max_number_of_iterations: int = 10,
+        max_number_of_redescending_iterations: int = 2,
+        r0: float = 1.4,
+        u0: float = 2.8,
+        tolerance: float = 0.0005,
+        verbosity: int = 0,
         **kwargs,
-    ):
+    ) -> None:
         """
 
         Parameters
@@ -74,6 +75,7 @@ class IterControl(object):
         self.r0 = r0
         self.u0 = u0
 
+        self.verbosity = verbosity
         # Additional properties
         # used sometimes to control one or another of the iterative algorithms
         # These were translated from the matlab code and may be moved in future
@@ -113,7 +115,7 @@ class IterControl(object):
         """
         return self.number_of_iterations >= self.max_number_of_iterations
 
-    def converged(self, b, b0, verbose=False):
+    def converged(self, b, b0):
         """
         Parameters
         ----------
@@ -143,7 +145,7 @@ class IterControl(object):
         iteration_cond = self.max_iterations_reached
         if tolerance_cond or iteration_cond:
             converged = True
-            if verbose:
+            if self.verbosity > 0:
                 msg_start = "Converged due to"
                 msg_end = (
                     f"{self.number_of_iterations} of "
