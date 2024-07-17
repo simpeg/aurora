@@ -253,6 +253,10 @@ class MEstimator(RegressionEstimator):
         """
         Updates estimate for self.Yc as a match-filtered sum of Y and Y_hat.
 
+        Note: It is not unheard of to observe RuntimeWarning: overflow encountered in exp in the calculation of t.
+        This can happen when large residuals are present.  In that case, t goes to -inf, and w goes to zero,
+        -- the desired behaviour.  When this happens an "invalid value" will also occur  in the calculation
+        of t, but this does not propagate into self.expectation_psi_prime.
 
         Parameters
         ----------
