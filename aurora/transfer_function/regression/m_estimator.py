@@ -136,7 +136,9 @@ class MEstimator(RegressionEstimator):
 
         """
         Y2 = np.linalg.norm(self.Yc, axis=0) ** 2  # variance?
-        QHY2 = np.linalg.norm(self.QHYc, axis=0) ** 2
+        QHY2 = (
+            np.linalg.norm(self.QHYc, axis=0) ** 2
+        )  # note this is the same as QQHYc=Y_hat
         residual_variance = (Y2 - QHY2) / self.n_data
 
         try:
@@ -329,9 +331,7 @@ class MEstimator(RegressionEstimator):
         )
 
         # if self.iter_control.verbosity > 1:
-        #     msg = f"squared coherence = {R2}"
-        #     logger.info(msg)
-        #     msg = f"squared coherence = {self.R2}"
+        #     msg = f"squared coherence {list(self.R2.coords['output_channel'].values)}  {R2}"
         #     logger.info(msg)
         return
 
