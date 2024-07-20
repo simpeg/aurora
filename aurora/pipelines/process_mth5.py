@@ -29,6 +29,7 @@ import xarray as xr
 
 from loguru import logger
 
+import aurora.config.metadata.processing
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.transfer_function_helpers import process_transfer_functions
@@ -40,6 +41,7 @@ from aurora.transfer_function.transfer_function_collection import (
 )
 from aurora.transfer_function.TTFZ import TTFZ
 from mth5.helpers import close_open_files
+from typing import Union
 
 SUPPORTED_PROCESSINGS = [
     "legacy",
@@ -99,7 +101,11 @@ def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrds, units="
 
 
 def process_tf_decimation_level(
-    config, i_dec_level, local_stft_obj, remote_stft_obj, units="MT"
+    config: aurora.config.metadata.processing.Processing,
+    i_dec_level: int,
+    local_stft_obj: xr.core.dataset.Dataset,
+    remote_stft_obj: Union[xr.core.dataset.Dataset, None],
+    units="MT",
 ):
     """
     Processing pipeline for a single decimation_level
