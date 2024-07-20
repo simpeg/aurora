@@ -330,9 +330,9 @@ class MEstimator(RegressionEstimator):
             },
         )
 
-        # if self.iter_control.verbosity > 1:
-        #     msg = f"squared coherence {list(self.R2.coords['output_channel'].values)}  {R2}"
-        #     logger.info(msg)
+        if self.iter_control.verbosity > 1:
+            msg = f"squared coherence {list(self.R2.coords['output_channel'].values)}  {R2}"
+            logger.info(msg)
         return
 
     def compute_noise_covariance(self):
