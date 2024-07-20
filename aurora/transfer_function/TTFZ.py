@@ -11,9 +11,11 @@ from aurora.transfer_function.base import TransferFunction
 
 class TTFZ(TransferFunction):
     """
-    subclass to support some more MT impedance specficic functions  --
-    initially just apparent resistivity and pbase for diagonal elements
+    subclass to support some more MT impedance specific functions  --
+    initially just apparent resistivity and phase for diagonal elements.
     + rotation/fixed coordinate system
+
+    TODO: This class should be deprecated and mt_metadata TF object should be used instead.
 
     properties
     rho
