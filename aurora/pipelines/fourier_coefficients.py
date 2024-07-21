@@ -57,11 +57,14 @@ Note 3: This point in the loop marks the interface between _generation_ of the F
 
 
 """
+
 # =============================================================================
 # Imports
 # =============================================================================
 
 import mt_metadata.timeseries.time_period
+import mth5.mth5
+import pathlib
 
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import prototype_decimate
@@ -99,7 +102,7 @@ def fc_decimations_creator(
         time_period:
 
     Returns:
-        decimation_and_stft_config: list
+        fc_decimations: list
             Each element of the list is an object of type
             mt_metadata.transfer_functions.processing.fourier_coefficients.Decimation,
             (a.k.a. FCDecimation).
@@ -252,23 +255,25 @@ def add_fcs_to_mth5(m, fc_decimations=None):
 
 def get_degenerate_fc_decimation(sample_rate):
     """
-    We need a way to generate FCs on data in the case that we are already storing decimated time series in the
-    MTH5.  This means that the FCDecimation will have only one level.
+    Makes a default fc_decimation list. WIP
+
     Returns
     -------
-
+    output: list
+        List has only one element -- an fc_decimation
     """
-    return fc_decimations_creator(
+    output = fc_decimations_creator(
         sample_rate,
         decimation_factors=[
             1,
         ],
         max_levels=1,
     )
+    return output
 
 
 @path_or_mth5_object
-def read_back_fcs(m, mode="r"):
+def read_back_fcs(m: Union[mth5.mth5.MTH5, pathlib.Path, str], mode="r"):
     """
     This is mostly a helper function for tests.  It was used as a sanity check while debugging the FC files, and
     also is a good example for how to access the data at each level for each channel.
@@ -280,7 +285,6 @@ def read_back_fcs(m, mode="r"):
         m: pathlib.Path, str or an MTH5 object
             The path to an h5 file that we will scan the fcs from
 
-    Returns:
 
     """
     channel_summary_df = m.channel_summary.to_dataframe()
@@ -302,4 +306,4 @@ def read_back_fcs(m, mode="r"):
                 msg = f"{msg} \n Freq axis shape {xrds.frequency.data.shape}"
                 logger.debug(msg)
 
-    return True
+    return
