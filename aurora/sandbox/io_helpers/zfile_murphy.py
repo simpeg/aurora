@@ -1,9 +1,20 @@
+"""
+    This module contains a class that was contributed by Ben Murphy for working with EMTF "Z-files"
+"""
+import pathlib
+from typing import Optional, Union
 import re
 import numpy as np
 
 
 class ZFile:
-    def __init__(self, filename):
+    def __init__(self, filename: Union[str, pathlib.Path]):
+        """
+        Constructor
+        Parameters
+        ----------
+        filename:
+        """
         self.filename = filename
         self.station = ""
         self.decimation_levels = None
@@ -11,23 +22,24 @@ class ZFile:
         self.upper_harmonic_indices = None
         self.f = None
 
-    def open_file(self):
-        # attempt to open file
+    def open_file(self) -> None:
+        """attempt to open file"""
         try:
             self.f = open(self.filename, "r")
         except IOError:
             raise IOError("File not found.")
         return
 
-    def skip_header_lines(self):
+    def skip_header_lines(self) -> None:
+        """Skip over the header when reading"""
         f = self.f
         f.readline()
         f.readline()
         f.readline()
         return
 
-    def get_station_id(self):
-        # get station ID
+    def get_station_id(self) -> None:
+        """get station ID from zfile"""
         f = self.f
         line = f.readline()
         if line.lower().startswith("station"):
@@ -35,10 +47,9 @@ class ZFile:
         else:
             station = line.strip()
         self.station = station
-        return
 
-    def read_coordinates_and_declination(self):
-        # read coordinates and declination
+    def read_coordinates_and_declination(self) -> None:
+        """read coordinates and declination"""
         f = self.f
         line = f.readline().strip().lower()
         match = re.match(
@@ -51,6 +62,7 @@ class ZFile:
         return
 
     def read_number_of_channels_and_number_of_frequencies(self):
+        """read_number_of_channels_and_number_of_frequencies"""
         f = self.f
         line = f.readline().strip().lower()
         match = re.match(
@@ -64,6 +76,7 @@ class ZFile:
         self.nfreqs = nfreqs
 
     def read_channel_information(self):
+        """read_channel_information"""
         f = self.f
         self.orientation = np.zeros((self.nchannels, 2))
         self.channels = []
@@ -82,6 +95,7 @@ class ZFile:
         return
 
     def load(self):
+        """load Z-file and populate attributes of class"""
         self.open_file()
         self.skip_header_lines()
         self.get_station_id()
@@ -182,11 +196,20 @@ class ZFile:
 
         f.close()
 
-    def impedance(self, angle=0.0):
+    def impedance(self, angle: float = 0.0):
         """
-        u,v are identity matrices if angle=0
-        :param angle:
-        :return:
+        Compute the Impedance and errors from the transfer function.
+        - note u,v are identity matrices if angle=0
+        Parameters
+
+        ----------
+        angle: float
+            The angle about the vertical axis by which to rotate the Z tensor.
+
+        Returns
+        -------
+        z
+        error
         """
         # check to see if there are actually electric fields in the TFs
         if "Ex" not in self.channels and "Ey" not in self.channels:
@@ -272,6 +295,7 @@ class ZFile:
         return z, error
 
     def tippers(self, angle=0.0):
+        """compute the tipper from transfer function"""
 
         # check to see if there is a vertical magnetic field in the TFs
         if "Hz" not in self.channels:
@@ -331,7 +355,8 @@ class ZFile:
 
         return tipper, error
 
-    def apparent_resistivity(self, angle=0.0):
+    def apparent_resistivity(self, angle: float = 0.0):
+        """compute the apparent resistivity from the impedance."""
         z_tensor, error = self.impedance(angle=angle)
         Zxy = z_tensor[:, 0, 1]
         Zyx = z_tensor[:, 1, 0]
@@ -344,8 +369,11 @@ class ZFile:
 
     def rho(self, mode):
         """
+        Return the apparent resistivity for the given mode.
+
         Convenience function to help with streamlining synthetic tests - to be
         eventually replaced by functionality in mt_metadata.tf
+
         Parameters
         ----------
         mode: str
@@ -353,7 +381,7 @@ class ZFile:
 
         Returns
         -------
-
+        rho
         """
         if mode == "xy":
             return self.rxy
@@ -362,6 +390,8 @@ class ZFile:
 
     def phi(self, mode):
         """
+        Return the phase for the given mode.
+
         Convenience function to help with streamlining synthetic tests - to be
         eventually replaced by functionality in mt_metadata.tf
         Parameters
@@ -371,7 +401,7 @@ class ZFile:
 
         Returns
         -------
-
+        phi
         """
         if mode == "xy":
             return self.pxy
@@ -379,8 +409,9 @@ class ZFile:
             return self.pyx
 
 
-def read_z_file(z_file_path, angle=0.0):
+def read_z_file(z_file_path, angle=0.0) -> ZFile:
     """
+    Reads a zFile and returns a ZFile object.
 
     Parameters
     ----------
@@ -393,13 +424,8 @@ def read_z_file(z_file_path, angle=0.0):
 
     Returns
     -------
-
-        z_file_path: string or pathlib.Path
-            The name of the EMTF-style z-file to operate on
-        angle: float
-            How much rotation to apply
-
-    Returns:
+    z_obj: ZFile
+        The zFile as an object.
 
     """
     z_obj = ZFile(z_file_path)
