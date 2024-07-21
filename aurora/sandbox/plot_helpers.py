@@ -1,19 +1,30 @@
-from matplotlib.gridspec import GridSpec
+"""
+    This module contains some plotting helper functions.
 
+    Most of these were used in initial development and should be replaced by methods in MTpy.
+    TODO: review which of these can be replaced with methods in MTpy-v2
+
+"""
+from matplotlib.gridspec import GridSpec
+from typing import Optional, Union
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.signal as ssig
 
 
-def is_flat_amplitude(array):
+def _is_flat_amplitude(array) -> bool:
     """
-    Check of an amplitude response is basically flat.  If so, it is best to tune the y-axis lims to
-    make numeric noise invisible
+    Check of an amplitude response is basically flat.
+
+    If so, it is best to tune the y-axis lims to make numeric noise invisible.
+
     Parameters
     ----------
-    array
+    array: the response of some stage as a function of frequency.
     Returns
     -------
+    bool:
+        True is response is flat, False otherwise
     """
     differences = np.diff(np.abs(array))
     if np.isclose(differences, 0.0).all():
@@ -23,6 +34,22 @@ def is_flat_amplitude(array):
 
 
 def cast_angular_frequency_to_period_or_hertz(w, units):
+    """
+        Converts angular frequency to period or Hertz
+
+    Parameters
+    ----------
+    w: numpy array
+        Angular frequencies (radians per second)
+    units: str
+        Requested output units ("period" or "frequency")
+
+    Returns
+    -------
+    x_axis: np.ndarray
+        Same as input but units are now the requested ones.
+
+    """
     if units.lower() == "period":
         x_axis = (2.0 * np.pi) / w
     elif units.lower() == "frequency":
@@ -30,22 +57,26 @@ def cast_angular_frequency_to_period_or_hertz(w, units):
     return x_axis
 
 
-def plot_complex_response(frequency, complex_response, **kwargs):
+def plot_complex_response(
+    frequency: np.ndarray,
+    complex_response: np.ndarray,
+    show: Optional[bool] = True,
+    linewidth: Optional[float] = 3,
+    make: Optional[Union[str, None]] = None,
+    model: Optional[Union[str, None]] = None,
+    yamp: Optional[Union[str, None]] = None,
+):
     """
-    ToDo: add methods for suporting instrument object but for now take as kwargs
+    Plots amplitude and phase of a complex response as a function of frequency.
+
+    Development Notes:
+    ToDo: add methods for supporting instrument object but for now take as kwargs
+
     :param frequency: numpy array of frequencies at which complex response is defined
     :param complex_response: numpy array of full complex valued response function
-    :param kwargs:
     :return:
     """
-
-    show = kwargs.get("show", True)
-    linewidth = kwargs.get("linewidth", 3)
-
-    make = kwargs.get("make", None)
-    model = kwargs.get("model", None)
-    y_amp_string = kwargs.get("yamp", None)
-
+    y_amp_string = yamp
     amplitude = np.abs(complex_response)
     phase = np.angle(complex_response)
 
@@ -77,6 +108,8 @@ def plot_response_pz(
     x_units="Period",
 ):
     """
+    Plots the pole zero response.
+
     This function was contributed by Ben Murphy at USGS
     2021-03-17: there are some issues encountered when using this function to plot
     generic resposnes, looks like the x-axis gets out of order when using frequency
@@ -114,7 +147,7 @@ def plot_response_pz(
     if w_obs is not None and resp_obs is not None:
 
         response_amplitude = np.absolute(resp_obs)
-        if is_flat_amplitude(resp_obs):
+        if _is_flat_amplitude(resp_obs):
             response_amplitude[:] = response_amplitude[0]
             ax_amp.set_ylim([0.9 * response_amplitude[0], 1.1 * response_amplitude[0]])
         x_values = cast_angular_frequency_to_period_or_hertz(w_obs, x_units)
@@ -250,7 +283,9 @@ def plot_response_pz(
 
 def plot_tf_obj(tf_obj, out_filename=None, show=True):
     """
-    To Do: Get plotter from MTpy or elsewhere.
+    Plot the transfer function object in terms of apparent resistivity and phase
+
+    TODO: Get plotter from MTpy or elsewhere.
     See Issue #209
     https://github.com/simpeg/aurora/issues/209
     Parameters
