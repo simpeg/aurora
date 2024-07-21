@@ -1,5 +1,10 @@
+"""
+    This module contains helper functions for making mth5 from FDSN clients.
+
+"""
+import pathlib
+
 import obspy
-from obspy.clients.fdsn.header import FDSNException
 from pathlib import Path
 
 from aurora.sandbox.obspy_helpers import align_streams
@@ -12,30 +17,32 @@ from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
 from mth5.utils.helpers import initialize_mth5
 from mth5.timeseries import RunTS
 from loguru import logger
+from typing import Optional, Union
 
 
 def create_from_server_multistation(
     fdsn_dataset,
-    target_folder=Path(),
-    run_id="001",
-    force_align_streams=True,
-    triage_units=[],
-    triage_missing_coil=False,
-    **kwargs,
-):
+    target_folder: Optional[pathlib.Path] = Path(),
+    run_id: Optional[str] = "001",
+    force_align_streams: Optional[bool] = True,
+    triage_units: Optional[Union[list, None]] = None,
+    triage_missing_coil: Optional[bool] = False,
+) -> pathlib.Path:
     """
+    This function builds an MTH5 file from FDSN client. The input dataset is described by fdsn_dataset.
 
     Parameters
     ----------
     fdsn_dataset: aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset
-    target_folder
+    target_folder:
     run_id : string
         This is a temporary workaround. A more robust program that assigns run
         numbers, and/or gets run labels from StationXML is needed
 
     Returns
     -------
-
+    h5_path: pathlib.Path
+        The path to the mth5 that was built.
     """
 
     # Get Experiement
@@ -54,7 +61,7 @@ def create_from_server_multistation(
     experiment = translator.xml_to_mt(inventory_object=inventory)
 
     # TRIAGE ONE-OFF ISSUE WITH UNITS
-    if triage_units:
+    if triage_units is not None:
         if "V/m to mV/km" in triage_units:
             experiment = triage_mt_units_electric_field(experiment)
         if "T to nT" in triage_units:
