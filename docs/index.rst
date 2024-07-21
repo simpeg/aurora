@@ -22,3 +22,5 @@
    :caption: Reference documentation
 
    api/index.rst
+
+.. include:: ../CONTRIBUTING.rst
