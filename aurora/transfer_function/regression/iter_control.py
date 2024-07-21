@@ -2,20 +2,36 @@
 follows Gary's IterControl.m in
 iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
 """
+from loguru import logger
 import numpy as np
 
 from aurora.transfer_function.regression.helper_functions import rme_beta
 
 
 class IterControl(object):
-    """ """
+    """
+    Notes:
+         Here is a class to hold variables that are used to control the regression
+         - currently this is used for variations on RME (Robust M-Estimator)
+         - TODO: in the original matlab code there was a class property called `epsilon`, but
+         it was unused; There was no documentation about it's purpose, except possibly that
+         the abstract base class solved Y = X*b + epsilon for b, complex-valued.
+         Perhaps this was intended as an intrinsic tolerated noise level.  The value of
+         epsilon was set to 1000.
+         -  TODO The return covariance boolean just initializes arrays of zeros.  Needs to be
+         made functional or removed
+    """
 
     def __init__(
         self,
-        max_number_of_iterations=10,
-        max_number_of_redescending_iterations=2,
+        max_number_of_iterations: int = 10,
+        max_number_of_redescending_iterations: int = 2,
+        r0: float = 1.4,
+        u0: float = 2.8,
+        tolerance: float = 0.0005,
+        verbosity: int = 0,
         **kwargs,
-    ):
+    ) -> None:
         """
 
         Parameters
@@ -32,8 +48,7 @@ class IterControl(object):
             NOT USED: REMOVE
         kwargs
 
-        Class Variables:
-        <Specific to Egbert's Robust Regression>
+        Class Variables Specific to Egbert's Robust Regression:
         r0: float
             Effectively infinty for OLS, this controls the point at which residuals
             transition from being penalized by a squared vs a linear function.  The
@@ -45,30 +60,60 @@ class IterControl(object):
             makes for severe downweighting about u0.  The function is continuous
             "math friendly" (all derivates exist etc) so you can prove theorems about it
             etc.
-        </Specific to Egbert's Robust Regression>
-        """
-        self.number_of_iterations = 0
-        self.number_of_redescending_iterations = 0
 
-        self.tolerance = 0.005
-        self.epsilon = 1000
+        """
+        self._number_of_iterations = 0
+        self._number_of_redescending_iterations = 0
+
+        self.tolerance = tolerance
         self.max_number_of_iterations = max_number_of_iterations
         self.max_number_of_redescending_iterations = (
             max_number_of_redescending_iterations
         )
 
-        # <regression-M estimator params>
-        self.r0 = 1.5
-        self.u0 = 2.8
-        # </regression-M estimator params>
+        # regression-M estimator params
+        self.r0 = r0
+        self.u0 = u0
 
-        # <Additional properties>
+        self.verbosity = verbosity
+        # Additional properties
         # used sometimes to control one or another of the iterative algorithms
         # These were translated from the matlab code and may be moved in future
-        self.return_covariance = True
-        self.save_cleaned = False
-        self.robust_diagonalize = False
-        # </Additional properties>
+        self.return_covariance = True  # TODO: add functionality
+        self.save_cleaned = False  # TODO: add functionality
+        self.robust_diagonalize = False  # TODO: add functionality
+
+    @property
+    def number_of_iterations(self) -> int:
+        return self._number_of_iterations
+
+    # @number_of_iterations.setter
+    # def number_of_iterations(self, value) -> int:
+    #     self._number_of_iterations = value
+
+    def reset_number_of_iterations(self) -> int:
+        self._number_of_iterations = 0
+
+    def increment_iteration_number(self):
+        self._number_of_iterations += 1
+
+    @property
+    def number_of_redescending_iterations(self) -> int:
+        return self._number_of_redescending_iterations
+
+    def reset_number_of_redescending_iterations(self):
+        self._number_of_redescending_iterations = 0
+
+    def increment_redescending_iteration_number(self):
+        self._number_of_redescending_iterations += 1
+
+    @property
+    def max_iterations_reached(self) -> bool:
+        """
+        Return True of the number of iterations carried out is greater or equal the
+        maximum number of iterations set in the processing config
+        """
+        return self.number_of_iterations >= self.max_number_of_iterations
 
     def converged(self, b, b0):
         """
@@ -78,6 +123,8 @@ class IterControl(object):
             the most recent regression estimate
         b0 : complex-valued numpy array
             The previous regression estimate
+        verbose: bool
+            Set to True for debugging
 
         Returns
         -------
@@ -90,27 +137,25 @@ class IterControl(object):
         1 - abs(b/b0), however, that will be insensitive to phase changes in b,
         which is complex valued.  The way it is coded np.max(np.abs(1 - b / b0)) is
         correct as it stands.
+
         """
 
-        converged = False
         maximum_change = np.max(np.abs(1 - b / b0))
         tolerance_cond = maximum_change <= self.tolerance
-        iteration_cond = self.number_of_iterations >= self.max_number_of_iterations
+        iteration_cond = self.max_iterations_reached
         if tolerance_cond or iteration_cond:
             converged = True
-            # These print statments are not very clear and
-            # Should be reworded.
-            # if tolerance_cond:
-            #    print(
-            #        f"Converged Due to MaxChange < Tolerance after "
-            #        f" {self.number_of_iterations} of "
-            #        f" {self.max_number_of_iterations} iterations"
-            #    )
-            # elif iteration_cond:
-            #    print(
-            #        f"Converged Due to maximum number_of_iterations "
-            #        f" {self.max_number_of_iterations}"
-            #    )
+            if self.verbosity > 0:
+                msg_start = "Converged due to"
+                msg_end = (
+                    f"{self.number_of_iterations} of "
+                    f"{self.max_number_of_iterations} iterations"
+                )
+                if tolerance_cond:
+                    msg = f"{msg_start} MaxChange < Tolerance after {msg_end}"
+                elif iteration_cond:
+                    msg = f"{msg_start} maximum number_of_iterations {msg_end}"
+                logger.info(msg)
         else:
             converged = False
 

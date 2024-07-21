@@ -21,7 +21,7 @@ data/test1_LEMI12.h5
 so the band between the old and new Nyquist frequencies is bogus.
 
 """
-
+# import inspect
 import numpy as np
 import pandas as pd
 import pathlib
@@ -37,6 +37,8 @@ from loguru import logger
 from mth5.mth5 import MTH5
 from mth5.timeseries import ChannelTS, RunTS
 from mt_metadata.transfer_functions.processing.aurora import ChannelNomenclature
+from mt_metadata.timeseries import Electric
+from mt_metadata.timeseries import Magnetic
 from mth5.utils.helpers import add_filters
 
 np.random.seed(0)
@@ -67,45 +69,51 @@ def create_run_ts_from_synthetic_run(run, df, channel_nomenclature="default"):
     -------
 
     """
+
     channel_nomenclature_obj = ChannelNomenclature()
     channel_nomenclature_obj.keyword = channel_nomenclature
-    EX, EY, HX, HY, HZ = channel_nomenclature_obj.unpack()
     ch_list = []
     for col in df.columns:
+
         data = df[col].values
-        meta_dict = {
-            "component": col,
-            "sample_rate": run.sample_rate,
-            "filter.name": run.filters[col],
-            "filter.applied": len(run.filters[col])
-            * [
-                True,
-            ],
-            "time_period.start": run.start,
-        }
-        if col in [EX, EY]:
-            meta_dict["units"] = "millivolts per kilometer"
-            channel_metadata = {"electric": meta_dict}
+        if col in channel_nomenclature_obj.ex_ey:
+            channel_metadata = Electric()
+            channel_metadata.component = col
+            channel_metadata.units = "millivolts per kilometer"
             chts = ChannelTS(
                 channel_type="electric",
                 data=data,
-                channel_metadata=channel_metadata,
+                channel_metadata=channel_metadata.to_dict(),
             )
+
             # add metadata to the channel here
             chts.channel_metadata.dipole_length = 50
-            if col == EY:
+            if col == channel_nomenclature_obj.ey:
                 chts.channel_metadata.measurement_azimuth = 90.0
 
-        elif col in [HX, HY, HZ]:
-            meta_dict["units"] = "nanotesla"
-            channel_metadata = {"magnetic": meta_dict}
+        elif col in channel_nomenclature_obj.hx_hy_hz:
+            channel_metadata = Magnetic()
+            channel_metadata.units = "nanotesla"
+            channel_metadata.component = col
+            channel_metadata.channel_number = 0
+            channel_metadata.sample_rate = 1.0
             chts = ChannelTS(
-                channel_type="magnetic",
+                channel_type=channel_metadata.type,
                 data=data,
-                channel_metadata=channel_metadata,
+                channel_metadata=channel_metadata.to_dict(),
             )
-            if col == HY:
+            chts.component = col
+
+            if col == channel_nomenclature_obj.ey:
                 chts.channel_metadata.measurement_azimuth = 90.0
+
+        chts.channel_metadata.component = col
+        chts.channel_metadata.sample_rate = run.run_metadata.sample_rate
+        chts.channel_metadata.filter.name = run.filters[col]
+        chts.channel_metadata.filter.applied = len(run.filters[col]) * [
+            True,
+        ]
+        chts.channel_metadata.start = run.run_metadata.time_period.start
 
         ch_list.append(chts)
 
@@ -113,20 +121,8 @@ def create_run_ts_from_synthetic_run(run, df, channel_nomenclature="default"):
     runts = RunTS(array_list=ch_list)
 
     # add in metadata
-    runts.run_metadata.id = run.id
+    runts.run_metadata.id = run.run_metadata.id
     return runts
-
-
-def get_set_survey_id(m):
-    if m.file_version == "0.1.0":
-        survey_id = None
-    elif m.file_version == "0.2.0":
-        survey_id = "EMTF Synthetic"
-        m.add_survey(survey_id)
-    else:
-        msg = f"unexpected MTH5 file_version = {m.file_version}"
-        raise NotImplementedError(msg)
-    return m, survey_id
 
 
 def get_time_series_dataframe(run, source_folder, add_nan_values):
@@ -155,12 +151,14 @@ def get_time_series_dataframe(run, source_folder, add_nan_values):
     df = pd.read_csv(run.raw_data_path, names=run.channels, sep="\s+")
 
     # upsample data if requested,
-    if run.sample_rate != 1.0:
+    if run.run_metadata.sample_rate != 1.0:
         df_orig = df.copy(deep=True)
         new_data_dict = {}
         for i_ch, ch in enumerate(run.channels):
             data = df_orig[ch].to_numpy()
-            new_data_dict[ch] = ssig.resample(data, int(run.sample_rate) * len(df_orig))
+            new_data_dict[ch] = ssig.resample(
+                data, int(run.run_metadata.sample_rate) * len(df_orig)
+            )
         df = pd.DataFrame(data=new_data_dict)
 
     # add noise
@@ -251,10 +249,11 @@ def create_mth5_synthetic_file(
     # open output h5
     m = MTH5(file_version=file_version)
     m.open_mth5(mth5_path, mode="w")
-    m, survey_id = get_set_survey_id(m)
+    m, survey_id = _get_set_survey_id(m)
 
     for station_cfg in station_cfgs:
         station_group = m.add_station(station_cfg.id, survey=survey_id)
+
         for run in station_cfg.runs:
             df = get_time_series_dataframe(run, source_folder, add_nan_values)
 
@@ -268,7 +267,7 @@ def create_mth5_synthetic_file(
             if plot:
                 runts.plot()
 
-            run_group = station_group.add_run(run.id)
+            run_group = station_group.add_run(run.run_metadata.id)
             run_group.from_runts(runts)
 
     # add filters
@@ -414,6 +413,18 @@ def create_test4_h5(
         source_folder=source_folder,
     )
     return mth5_path
+
+
+def _get_set_survey_id(m):
+    if m.file_version == "0.1.0":
+        survey_id = None
+    elif m.file_version == "0.2.0":
+        survey_id = "EMTF Synthetic"
+        m.add_survey(survey_id)
+    else:
+        msg = f"unexpected MTH5 file_version = {m.file_version}"
+        raise NotImplementedError(msg)
+    return m, survey_id
 
 
 def main(file_version="0.1.0"):

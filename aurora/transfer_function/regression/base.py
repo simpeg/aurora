@@ -9,8 +9,10 @@ arrays to follow Gary's codes more easily since his are matlab arrays.
 """
 import numpy as np
 import xarray as xr
+
 from aurora.transfer_function.regression.iter_control import IterControl
 from loguru import logger
+from typing import Optional, Union
 
 
 class RegressionEstimator(object):
@@ -47,17 +49,18 @@ class RegressionEstimator(object):
 
     Attributes
     ----------
-    _X : xarray.Dataset
-        X.data is numpy array (normally 2-dimensional)
-        These are the input variables.  Like the matlab codes each observation
+    _X : Union[xr.Dataset, xr.DataArray, np.ndarray]
+        The underlying dataset is assumed to be if shape nCH x nObs (normally 2-dimensional)
+        These are the input variables.  In the matlab codes each observation
         corresponds to a row and each parameter (channel) is a column.
+        These data are transposed before regression
     X : numpy array (normally 2-dimensional)
         This is a "pure array" representation of _X used to emulate Gary
         Egbert's matlab codes. It may or may not be deprecated.
     _Y : xarray.Dataset
         These are the output variables, arranged same as X above.
     Y : numpy array (normally 2-dimensional)
-        This is a "pure array" representation of _X used to emulate Gary
+        This is a "pure array" representation of _Y used to emulate Gary
         Egbert's matlab codes. It may or may not be deprecated.
     b : numpy array (normally 2-dimensional)
         Matrix of regression coefficients, i.e. the solution to the regression
@@ -79,12 +82,22 @@ class RegressionEstimator(object):
     Yc : numpy array (normally 2-dimensional)
         A "cleaned" version of Y the output variables.
     iter_control : transfer_function.iter_control.IterControl()
-        is a structure which controls the robust scheme
-        Fields: r0, RG.nITmax, tol (rdcndwt ... not coded yet)
-        On return also contains number of iterations
+        is a structure which controls the robust scheme iteration.
+        On return also contains number of iterations.
+
+    Kwargs:
+    input_channel_names: list
+        List of strings for channel names.
+
     """
 
-    def __init__(self, **kwargs):
+    def __init__(
+        self,
+        X: Union[xr.Dataset, xr.DataArray, np.ndarray],
+        Y: Union[xr.Dataset, xr.DataArray, np.ndarray],
+        iter_control: IterControl = IterControl(),
+        **kwargs,
+    ):
         """
 
         Parameters
@@ -92,18 +105,14 @@ class RegressionEstimator(object):
         ----------
         kwargs
         """
-        self._X = kwargs.get("X", None)
-        self._Y = kwargs.get("Y", None)
+        self._X = X
+        self._Y = Y
+        self.iter_control = iter_control
         self.b = None
         self.cov_nn = None
         self.cov_ss_inv = None
         self.squared_coherence = None
-        self.iter_control = kwargs.get("iter_control", IterControl())
-
-        self.X = self._X.to_array().data.T
-        self.Y = self._Y.to_array().data.T
-        self.Yc = np.zeros(self.Y.shape, dtype=np.complex128)
-        self.check_number_of_observations_xy_consistent()
+        self._set_up_regression_variables()
         self.R2 = None
         self.qr_input = "X"
         self._Q = None
@@ -111,6 +120,39 @@ class RegressionEstimator(object):
         self._QH = None  # conjugate transpose of Q (Hermitian operator)
         self._QHY = None  #
         self._QHYc = None
+        self._n_channels_out = None
+        self._input_channel_names = kwargs.get("input_channel_names", None)
+        self._output_channel_names = kwargs.get("output_channel_names", None)
+
+    def _set_up_regression_variables(self):
+        """
+        Placeholder for making this method more general. Currently, the input arguments X, Y are xr.Dataset
+        Here we could add logic for supporting dataarrays as well.
+
+        When xr.Datasets are X, Y we cast to array (num channels x num observations) and then transpose them
+        When xr.DataArrays are X, Y extract the array -- but how do we know whether or not to transpose?
+        - it would be nice to have a helper function that applies the logic of getting the data from the
+         xarray and transposing or not appropriately.
+        - for now we assume that the input data are organized so that input arrays are (n_ch x n_observations).
+        This assumption is OK for xr.Dataset where the datavars are the MT components ("hx", "hy", etc)
+
+        """
+        self.X = _input_to_numpy_array(self._X)
+        self.Y = _input_to_numpy_array(self._Y)
+        self.Yc = np.zeros(self.Y.shape, dtype=np.complex128)
+        self._check_number_of_observations_xy_consistent()
+
+    @property
+    def input_channel_names(self):
+        if self._input_channel_names is None:
+            self._input_channel_names = _get_channel_names(self._X, label="IN")
+        return self._input_channel_names
+
+    @property
+    def output_channel_names(self):
+        if self._output_channel_names is None:
+            self._output_channel_names = _get_channel_names(self._Y, label="OUT")
+        return self._output_channel_names
 
     @property
     def inverse_signal_covariance(self):
@@ -125,8 +167,8 @@ class RegressionEstimator(object):
             np.transpose(self.b),
             dims=["output_channel", "input_channel"],
             coords={
-                "output_channel": list(self._Y.data_vars),
-                "input_channel": list(self._X.data_vars),
+                "output_channel": self.output_channel_names,
+                "input_channel": self.input_channel_names,
             },
         )
         return xra
@@ -187,7 +229,7 @@ class RegressionEstimator(object):
 
         return
 
-    def check_number_of_observations_xy_consistent(self):
+    def _check_number_of_observations_xy_consistent(self):
         if self.Y.shape[0] != self.X.shape[0]:
             logger.info(
                 f"Design matrix (X) has {self.X.shape[0]} rows but data (Y) "
@@ -211,9 +253,13 @@ class RegressionEstimator(object):
         return self.X.shape[1]
 
     @property
-    def n_channels_out(self):
-        """number of output variables"""
-        return self.Y.shape[1]
+    def n_channels_out(self) -> int:
+        """
+        number of output variables (Assumed to be num columns of a 2D array)
+        """
+        if self._n_channels_out is None:
+            self._n_channels_out = self.Y.shape[1]
+        return self._n_channels_out
 
     @property
     def degrees_of_freedom(self):
@@ -345,3 +391,87 @@ class RegressionEstimator(object):
     def estimate(self):
         Z = self.estimate_ols(mode="qr")
         return Z
+
+
+def _input_to_numpy_array(X: Union[xr.Dataset, xr.DataArray, np.ndarray]) -> np.ndarray:
+    """
+    Casts data input to regression as numpy array, with channels as column vectors.
+
+    Currently, we store array channels row-wise (as num_channels x num_observations),
+    but the way regression is set up the variables should be column vectors (num_observations x num_channels)
+
+    This is a place where we could distill the logic for which dimension is which.
+
+
+    Parameters
+    ----------
+    X: Union[xr.Dataset, xr.DataArray]
+        Data to be used in regression in xarray form
+
+    Returns
+    -------
+    output: np.ndarray
+        Data to be used in regression as a numpy array
+
+    """
+    if isinstance(X, xr.Dataset):
+        output = X.to_array().data.T
+    elif isinstance(X, xr.DataArray):
+        output = X.data.T
+        if len(output.shape) == 1:
+            output = np.atleast_2d(output).T  # cast to 2D if 1D
+    elif isinstance(X, np.ndarray):
+        msg = "np.ndarray input is assumed to be nCH x nObs -- transposing"
+        logger.debug(msg)
+        output = X.T
+    else:
+        msg = f"input argument of type {type(X)} not supported -- try an xarray"
+        raise NotImplementedError(msg)
+
+    return output
+
+
+def _get_channel_names(
+    X: Union[xr.Dataset, xr.DataArray, np.ndarray], label: Optional[str] = ""
+) -> list:
+    """
+    More fun trying to support xr.dataset and numpy arrays.
+    It turns out that TRME.estimate() needs input_channel_names.
+    If X is a numpy array, then self._X.data_vars results in
+    AttributeError: 'numpy.ndarray' object has no attribute 'data_vars'
+
+    So here is some logic to make channel names if we dont have any
+
+    Parameters
+    ----------
+    X: Union[xr.Dataset, xr.DataArray, np.ndarray]
+        If X is xarray just return the labels
+        If X is numpy array, make the names up.  numpy array assumed to contain data from each channel
+        in a separate row, i.e. (n_ch x n_observations) shaped array.
+    label: Optional[str]
+        This gets prepended onto incrementing integers for channel labels.
+        For example, this could be "input", "output", or a station name.
+        Used to keep the indexing a 2D xarray unique.
+
+    Returns
+    -------
+    channel_names: list
+        The names of the channels for the input array X
+    """
+    if isinstance(X, xr.Dataset):
+        channel_names = list(X.data_vars)
+    elif isinstance(X, xr.DataArray):
+        # Beware hard coded assumption of "variable"
+        try:
+            channel_names = list(X.coords["variable"].values)
+        except TypeError:  # This happens when xarray has only one channel
+            channel_names = [
+                X.coords["variable"].values.item(),
+            ]
+    else:
+        # numpy array doesn't have input channel_names predefined
+        channel_names = np.arange(
+            X.shape[0]
+        )  # note its 0, not 1 here because we are talking to _X
+        channel_names = [f"{label}{x}" for x in channel_names]
+    return channel_names

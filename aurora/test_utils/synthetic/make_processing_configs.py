@@ -24,11 +24,21 @@ def create_test_run_config(
     test_case_id: string
         Must be in ["test1", "test2", "test1r2", "test2r1", "test1_tfk", "test1r2_tfk"]
     kernel_dataset: aurora.transfer_function.kernel_dataset.KernelDataset
+        Description of the dataset to process
     matlab_or_fortran: str
         "", "matlab", "fortran"
+    save: str
+        if this has the value "json" a copy of the processing config will be written to a json file
+        The json file name is p.json_fn() with p the processing config object.
+    channel_nomenclature: str
+        A label for the channel nomenclature.  This should be one of the values in
+        mt_metadata/transfer_functions/processing/aurora/standards/channel_nomenclatures.json
+        currently ["default", "lemi12", "lemi34", "phoenix123", "musgraves",]
 
     Returns
     -------
+    p: aurora.config.metadata.processing.Processing
+        The processing config object
 
 
     """

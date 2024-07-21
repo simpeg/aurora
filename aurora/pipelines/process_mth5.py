@@ -1,10 +1,10 @@
 """
-Process an MTH5 using the metdata config object.
+Process an MTH5 using the metadata config object.
 
 Note 1: process_mth5 assumes application of cascading decimation, and that the
 decimated data will be accessed from the previous decimation level.  This should be
 revisited. It may make more sense to have a get_decimation_level() interface that
-provides an option of applying decimation or loading predecimated data.
+provides an option of applying decimation or loading pre-decimated data.
 This will be addressed via creation of the FC layer inside mth5.
 
 Note 2: We can encounter cases where some runs can be decimated and others can not.
@@ -16,7 +16,9 @@ adding a is_valid_dataset column, associated with each run-decimation level pair
 Note 3: This point in the loop marks the interface between _generation_ of the FCs and
  their _usage_. In future the code above this comment would be pushed into
  create_fourier_coefficients() and the code below this would access those FCs and
- execute compute_transfer_function()
+ execute compute_transfer_function().
+  This would also be an appropriate place to place a feature extraction layer, and
+  compute weights for the FCs.
 
 """
 # =============================================================================
@@ -27,6 +29,7 @@ import xarray as xr
 
 from loguru import logger
 
+import aurora.config.metadata.processing
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.transfer_function_helpers import process_transfer_functions
@@ -37,7 +40,12 @@ from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
 )
 from aurora.transfer_function.TTFZ import TTFZ
+from mth5.helpers import close_open_files
+from typing import Union
 
+SUPPORTED_PROCESSINGS = [
+    "legacy",
+]
 
 # =============================================================================
 
@@ -93,7 +101,11 @@ def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrds, units="
 
 
 def process_tf_decimation_level(
-    config, i_dec_level, local_stft_obj, remote_stft_obj, units="MT"
+    config: aurora.config.metadata.processing.Processing,
+    i_dec_level: int,
+    local_stft_obj: xr.core.dataset.Dataset,
+    remote_stft_obj: Union[xr.core.dataset.Dataset, None],
+    units="MT",
 ):
     """
     Processing pipeline for a single decimation_level
@@ -168,6 +180,17 @@ def triage_issue_289(local_stfts, remote_stfts):
 
 
 def merge_stfts(stfts, tfk):
+    """
+
+    Parameters
+    ----------
+    stfts: ? iterable?
+    tfk
+
+    Returns
+    -------
+
+    """
     # Timing Error Workaround See Aurora Issue #289
     local_stfts = stfts["local"]
     remote_stfts = stfts["remote"]
@@ -359,7 +382,7 @@ def get_spectrogams(tfk, i_dec_level, units="MT"):
     return stfts
 
 
-def process_mth5(
+def process_mth5_legacy(
     config,
     tfk_dataset=None,
     units="MT",
@@ -390,12 +413,11 @@ def process_mth5(
 
     Returns
     -------
-    tf: TransferFunctionCollection or mt_metadata TF
-        The transfer funtion object
+    tf_collection: TransferFunctionCollection or mt_metadata TF
+        The transfer function object
     tf_cls: mt_metadata.transfer_functions.TF
         TF object
     """
-
     # Initialize config and mth5s
     tfk = TransferFunctionKernel(dataset=tfk_dataset, config=config)
     tfk.make_processing_summary()
@@ -421,7 +443,7 @@ def process_mth5(
         local_merged_stft_obj, remote_merged_stft_obj = merge_stfts(stfts, tfk)
 
         # FC TF Interface here (see Note #3)
-        # Could downweight bad FCs here
+        # Feature Extraction, Selection of weights
 
         ttfz_obj = process_tf_decimation_level(
             tfk.config,
@@ -452,3 +474,64 @@ def process_mth5(
         return tf_collection
     else:
         return tf_cls
+
+
+def process_mth5(
+    config,
+    tfk_dataset=None,
+    units="MT",
+    show_plot=False,
+    z_file_path=None,
+    return_collection=False,
+    processing_type="legacy",
+):
+    """
+    This is a pass-through method that routes the config and tfk_dataset to MT data processing.
+    It currently only supports legacy aurora processing.
+
+    Parameters
+    ----------
+    config: mt_metadata.transfer_functions.processing.aurora.Processing or path to json
+        All processing parameters
+    tfk_dataset: aurora.tf_kernel.dataset.Dataset or None
+        Specifies what datasets to process according to config
+    units: string
+        "MT" or "SI".  To be deprecated once data have units embedded
+    show_plot: boolean
+        Only used for dev
+    z_file_path: string or pathlib.Path
+        Target path for a z_file output if desired
+    return_collection : boolean
+        return_collection=False will return an mt_metadata TF object
+        return_collection=True will return
+        aurora.transfer_function.transfer_function_collection.TransferFunctionCollection
+    processing_type: string
+        Controlled vocabulary, must be one of ["legacy",]
+        This is not really supported now, but the idea is that in future, the config and tfk_dataset can be passed to
+        another processing method if desired.
+
+    Returns
+    -------
+    tf_obj: TransferFunctionCollection or mt_metadata.transfer_functions.TF
+        The transfer function object
+    """
+    if processing_type not in SUPPORTED_PROCESSINGS:
+        raise NotImplementedError(f"Processing type {processing_type} not supported")
+
+    if processing_type == "legacy":
+        try:
+            return process_mth5_legacy(
+                config,
+                tfk_dataset=tfk_dataset,
+                units=units,
+                show_plot=show_plot,
+                z_file_path=z_file_path,
+                return_collection=return_collection,
+            )
+        except Exception as e:
+            close_open_files()
+            msg = "Failed to run legacy processing\n"
+            msg += "closing all open mth5 files and exiting"
+            msg += f"The encountered exception was {e}"
+            logger.error(msg)
+            return

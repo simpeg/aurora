@@ -136,7 +136,9 @@ class MEstimator(RegressionEstimator):
 
         """
         Y2 = np.linalg.norm(self.Yc, axis=0) ** 2  # variance?
-        QHY2 = np.linalg.norm(self.QHYc, axis=0) ** 2
+        QHY2 = (
+            np.linalg.norm(self.QHYc, axis=0) ** 2
+        )  # note this is the same as QQHYc=Y_hat
         residual_variance = (Y2 - QHY2) / self.n_data
 
         try:
@@ -192,12 +194,18 @@ class MEstimator(RegressionEstimator):
         self.update_residual_variance()
 
     def apply_huber_regression(self):
-        """This is the 'convergence loop' from TRME, TRME_RR"""
-        converged = self.iter_control.max_number_of_iterations <= 0
-        self.iter_control.number_of_iterations = 0
+        """
+            This is the 'convergence loop' from TRME, TRME_RR
+
+        TODO: Consider not setting iter_control.number_of_iterations
+         - Instead, Initialize a new iter_control object
+        """
+        converged = self.iter_control.max_iterations_reached
+        if self.iter_control.number_of_iterations:
+            self.iter_control.reset_number_of_iterations()
         while not converged:
             b0 = self.b
-            self.iter_control.number_of_iterations += 1
+            self.iter_control.increment_iteration_number()
             self.update_y_cleaned_via_huber_weights()
             self.update_b()
             self.update_y_hat()
@@ -208,9 +216,9 @@ class MEstimator(RegressionEstimator):
     def apply_redecending_influence_function(self):
         """one or two iterations with redescending influence curve cleaned data"""
         if self.iter_control.max_number_of_redescending_iterations:
-            self.iter_control.number_of_redescending_iterations = 0  # reset per channel
+            self.iter_control.reset_number_of_redescending_iterations()  # reset per channel
             while self.iter_control.continue_redescending:
-                self.iter_control.number_of_redescending_iterations += 1
+                self.iter_control.increment_redescending_iteration_number()
                 self.update_y_cleaned_via_redescend_weights()
                 self.update_b()
                 self.update_y_hat()
@@ -247,6 +255,10 @@ class MEstimator(RegressionEstimator):
         """
         Updates estimate for self.Yc as a match-filtered sum of Y and Y_hat.
 
+        Note: It is not unheard of to observe RuntimeWarning: overflow encountered in exp in the calculation of t.
+        This can happen when large residuals are present.  In that case, t goes to -inf, and w goes to zero,
+        -- the desired behaviour.  When this happens an "invalid value" will also occur  in the calculation
+        of t, but this does not propagate into self.expectation_psi_prime.
 
         Parameters
         ----------
@@ -281,14 +293,27 @@ class MEstimator(RegressionEstimator):
         self.update_QHYc()
         return
 
-    def compute_squared_coherence(self):
+    def compute_squared_coherence(self) -> None:
         """
+        Updates the array self.R2
+
+        Here is taken the ratio of the energy in the residuals with the energy in the cleaned data.
+        This metric can be interpreted as how much of the signal (Y) is "explained" by the regression.
+
+        TODO: There seem to be other valid metrics for this sort of quantity.  In particular, we may want to
+         consider SSY (the sum of squares of the observed data) over SSR.
+
+        TODO: consider renaming self.R2.  That name invokes the idea of the squared residuals.  That is not what
+         is being stored in self.R2.  This is more like a CMRR.
+
         res: Residuals, the original data minus the predicted data.
         SSR : Sum of squares of the residuals, per channel
 
         """
         res = self.Y - self.Y_hat
-        SSR = np.einsum("ij,ji->i", res.conj().T, res)
+        SSR = np.einsum(
+            "ij,ji->i", res.conj().T, res
+        )  # takes the diagonal of the matrix product
         SSR = np.real(SSR).T
         Yc2 = np.abs(self.Yc) ** 2
         SSYC = np.sum(Yc2, axis=0)
@@ -301,10 +326,13 @@ class MEstimator(RegressionEstimator):
                 "output_channel",
             ],
             coords={
-                "output_channel": list(self._Y.data_vars),
+                "output_channel": self.output_channel_names,
             },
         )
 
+        if self.iter_control.verbosity > 1:
+            msg = f"squared coherence {list(self.R2.coords['output_channel'].values)}  {R2}"
+            logger.info(msg)
         return
 
     def compute_noise_covariance(self):
@@ -328,8 +356,8 @@ class MEstimator(RegressionEstimator):
             cov_nn,
             dims=["output_channel_1", "output_channel_2"],
             coords={
-                "output_channel_1": list(self._Y.data_vars),
-                "output_channel_2": list(self._Y.data_vars),
+                "output_channel_1": self.output_channel_names,
+                "output_channel_2": self.output_channel_names,
             },
         )
         return

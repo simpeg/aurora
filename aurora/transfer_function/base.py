@@ -6,13 +6,13 @@ egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/class
 import numpy as np
 import xarray as xr
 
-from mt_metadata.base import Base
+# from mt_metadata.base import Base
 from loguru import logger
 
 
-class TransferFunction(Base):
+class TransferFunction:
     """Class to contain transfer function array.
-    
+
 
     Parameters
     ----------
@@ -42,7 +42,7 @@ class TransferFunction(Base):
     Nin
     """
 
-    def __init__(self, decimation_level_id, frequency_bands, **kwargs):
+    def __init__(self, decimation_level_id: int, frequency_bands, **kwargs):
         """
         change 2021-07-23 to require a frequency_bands object.  We may want
         to just pass the band_edges.  I'm not a fan of forcing dependency of
