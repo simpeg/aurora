@@ -1,9 +1,12 @@
 """
+This module contains helper methods that are used during transfer function processing.
+
+Development Notes:
 Note #1: repeatedly applying edf_weights seems to have no effect at all.
 tested 20240118 and found that test_compare in synthetic passed whether this was commented
 or not.  TODO confirm this is a one-and-done add doc about why this is so.
+
 """
-import numpy as np
 
 from aurora.time_series.frequency_band_helpers import get_band_for_tf_estimate
 from aurora.time_series.xarray_helpers import handle_nan
@@ -17,12 +20,14 @@ from aurora.transfer_function.weights.edf_weights import (
     effective_degrees_of_freedom_weights,
 )
 from loguru import logger
-
+from typing import Union
+import numpy as np
+import xarray as xr
 
 ESTIMATOR_LIBRARY = {"OLS": RegressionEstimator, "RME": TRME, "RME_RR": TRME_RR}
 
 
-def get_estimator_class(estimation_engine) -> RegressionEstimator:
+def get_estimator_class(estimation_engine: str) -> RegressionEstimator:
     """
 
     Parameters
@@ -49,8 +54,11 @@ def get_estimator_class(estimation_engine) -> RegressionEstimator:
 
 def set_up_iter_control(config):
     """
+    Initializes an IterControl object based on values in the processing config.
+
+    Development Notes:
     TODO: Review: maybe better to just make this the __init__ method of the
-    IterControl object, iter_control = IterControl(config)
+     IterControl object, iter_control = IterControl(config)
 
 
     Parameters
@@ -77,32 +85,54 @@ def set_up_iter_control(config):
     return iter_control
 
 
-def select_channel(xrda, channel_label):
+# def select_channel(xrda: xr.DataArray, channel_label):
+#     """
+#     Returns the channel specified by input channel_label as xarray.
+#
+#     - Extra helper function to make process_transfer_functions more readable without
+#     black (the uncompromising formatter) forcing multiple lines.
+#
+#     Parameters
+#     ----------
+#     xrda:
+#     channel_label
+#
+#     Returns
+#     -------
+#     ch: xr.Dataset
+#         The channel specified by input channel_label as an xarray.
+#     """
+#     ch = xrda.sel(
+#         channel=[
+#             channel_label,
+#         ]
+#     )
+#     return ch
+
+
+def drop_nans(X: xr.Dataset, Y: xr.Dataset, RR: Union[xr.Dataset, None]) -> tuple:
     """
-    Extra helper function to make process_transfer_functions more readable without
-    black (the uncompromising formatter) forcing multilines.
+
+    Drops Nan from any input xarrays.
+    - Just a helper intended to enhance readability
+
+    Development Notes:
+        TODO: document the implications of dropna on index of xarray for other weights
 
     Parameters
     ----------
-    xrda
-    channel_label
+    X: xr.Dataset
+        The input data for regression
+    Y: xr.Dataset
+        The output data for regression
+    RR: Union[xr.Dataset, None]
+        The remote refernce data for regression
 
     Returns
     -------
+    X, Y, RR: tuple
+        Returns the input arugments with nan dropped form the xarrays.
 
-    """
-    ch = xrda.sel(
-        channel=[
-            channel_label,
-        ]
-    )
-    return ch
-
-
-def drop_nans(X, Y, RR):
-    """
-    Just a helper intended to enhance readability
-    TODO: document the implications of dropna on index of xarray for other weights
     """
     X = X.dropna(dim="observation")
     Y = Y.dropna(dim="observation")
@@ -150,6 +180,27 @@ def stack_fcs(X, Y, RR):
 
 
 def apply_weights(X, Y, RR, W, segment=False, dropna=False):
+    """
+    Applies data weights (W) to each of X, Y, RR.
+    If weight is zero, we set to nan and optionally dropna.
+
+    Parameters
+    ----------
+    X: xarray.core.dataset.Dataset
+    Y: xarray.core.dataset.Dataset
+    RR: xarray.core.dataset.Dataset or None
+    W: numpy array
+        The Weights to apply to the data
+    segment: bool
+        If True the weights may need to be reshaped.
+    dropna: bool
+        Whether or not to drop zero-weighted data.  If true, we drop the nans.
+
+    Returns
+    -------
+    X, Y, RR: tuple
+        Same as input but with weights applied and (optionally) nan dropped.
+    """
     W[W == 0] = np.nan
     if segment:
         W = np.atleast_2d(W).T
@@ -174,7 +225,7 @@ def process_transfer_functions(
     channel_weights=None,
 ):
     """
-    This method based on TTFestBand.m
+    This is the main tf_processing method.  It is based on TTFestBand.m
 
     Note #1: Although it is advantageous to execute the regression channel-by-channel
     vs. all-at-once, we need to keep the all-at-once to get residual covariances (see issue #87)
