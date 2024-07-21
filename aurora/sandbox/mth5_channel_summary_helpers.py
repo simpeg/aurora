@@ -1,11 +1,17 @@
+"""
+    This module contains methods to help make mth5 files.
+    TODO: Review and move to make_mth5 if relevant
+"""
 import pandas as pd
 from loguru import logger
 
 
 def channel_summary_to_make_mth5(
-    df, network="", channel_nomenclature=None, verbose=False
+    df: pd.DataFrame, network="", channel_nomenclature=None, verbose=False
 ):
     """
+    Makes a dataframe that can be passed to make_mth5.
+
     Context is say you have a station_xml that has come from somewhere and you want
     to make an mth5 from it, with all the relevant data.  Then you should use
     make_mth5.  But make_mth5 wants a df with a particular schema (which should be
