@@ -1,13 +1,20 @@
+"""
+    This module contains methods associated with RMS calculations that are used in testing
+    aurora processing on synthetic data.
+
+"""
 import numpy as np
 from loguru import logger
 
 
 def compute_rms(rho, phi, model_rho_a=100.0, model_phi=45.0, verbose=False):
     """
-    This function being used to make comparative plots for synthetic data.  Could be
-    used in general to compare different processing results.  For example by replacing
-    model_rho_a and model_phi with other processing results, or other (
-    non-uniform) model results.
+    Computes the RMS between processing results (rho, phi) and model (rho, phi).
+
+    It is used to make annotations for comparative plots for synthetic data. Could be
+    used in general to compare different processing results. For example by replacing
+    model_rho_a and model_phi with other processing results, or other (non-uniform)
+    model results.
 
     Parameters
     ----------
@@ -34,7 +41,21 @@ def compute_rms(rho, phi, model_rho_a=100.0, model_phi=45.0, verbose=False):
     return rho_rms, phi_rms
 
 
-def get_expected_rms_misfit(test_case_id, emtf_version=None):
+def get_expected_rms_misfit(test_case_id: str, emtf_version=None) -> dict:
+    """
+    Returns hard-coded expected results from synthetic data processing.
+    These results are a benchmark against which test results are compared on push to
+    github.
+
+    Parameters
+    ----------
+    test_case_id
+    emtf_version
+
+    Returns
+    -------
+
+    """
     expected_rms_misfit = {}
     expected_rms_misfit["rho"] = {}
     expected_rms_misfit["phi"] = {}
@@ -65,8 +86,10 @@ def assert_rms_misfit_ok(
     phi_rms_aurora,
     rho_tol=1e-4,
     phi_tol=1e-4,
-):
+) -> None:
     """
+    Compares actual RMS misfit from processing against expected values.
+    Raises Assertion errors if test processing results different from expected.
 
     Parameters
     ----------
@@ -90,7 +113,7 @@ def assert_rms_misfit_ok(
         logger.error(rho_rms_aurora - expected_rms_rho)
         raise AssertionError("Expected misfit for resistivity is not correct")
 
-    if not np.isclose(phi_rms_aurora - expected_rms_phi, 0, atol=rho_tol):
+    if not np.isclose(phi_rms_aurora - expected_rms_phi, 0, atol=phi_tol):
         logger.error("==== AURORA ====\n")
         logger.error(phi_rms_aurora)
         logger.error("==== EXPECTED ====\n")

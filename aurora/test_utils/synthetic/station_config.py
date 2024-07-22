@@ -1,7 +1,7 @@
 """
-Definitions used in the creation of synthetic mth5 files.
+This module contains helper functions for the creation of synthetic mth5 files.
 
-
+Development Notes:
 Survey level: 'mth5_path', Path to output h5
 Station level: 'station_id', name of the station
 Station level:'latitude':17.996
@@ -15,7 +15,10 @@ Run level: 'run_id', name of the run
 Run level: 'sample_rate', 1.0
 
 """
-from typing import Dict, List, Union
+import pathlib
+from typing import Dict, List, Optional, Union
+
+import mt_metadata.timeseries
 
 from aurora.general_helper_functions import get_mth5_ascii_data_path
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
@@ -28,10 +31,12 @@ ASCII_DATA_PATH = get_mth5_ascii_data_path()
 synthetic_test_paths = SyntheticTestPaths()
 
 
-def make_filters(as_list=False):
+def make_filters(as_list: bool = False) -> Union[Dict, List]:
     """
+    Returns some dummy, placeholder filters.
+
     Because the data from EMTF is already in mV/km and nT these filters are just
-    placeholders to show where they would get assigned.
+    placeholders to show how to add them to the MTH5.
 
     Parameters
     ----------
@@ -40,7 +45,7 @@ def make_filters(as_list=False):
 
     Returns
     -------
-    filters_list: Union[List, Dict]
+    filters: Union[List, Dict]
         filters that can be used to populate the filters lists of synthetic data
     """
     unity_coeff_filter = make_coefficient_filter(name="1", gain=1.0)
@@ -48,13 +53,13 @@ def make_filters(as_list=False):
     divide_by_10_filter = make_coefficient_filter(gain=0.1, name="0.1")
 
     if as_list:
-        return [unity_coeff_filter, multipy_by_10_filter, divide_by_10_filter]
+        filters = [unity_coeff_filter, multipy_by_10_filter, divide_by_10_filter]
     else:
         filters = {}
         filters["1x"] = unity_coeff_filter
         filters["10x"] = multipy_by_10_filter
         filters["0.1x"] = divide_by_10_filter
-        return filters
+    return filters
 
 
 FILTERS = make_filters()
@@ -67,30 +72,51 @@ class SyntheticRun(object):
     Initially this class worked only with the synthetic ASCII data from legacy EMTF.
     """
 
-    def __init__(self, id, **kwargs):
+    def __init__(
+        self,
+        id: str,
+        sample_rate: Optional[float] = 1.0,
+        raw_data_path: Optional[Union[str, pathlib.Path, None]] = None,
+        channel_nomenclature: Optional[str] = "default",
+        channels: Optional[Union[List, None]] = None,
+        noise_scalars: Optional[Union[Dict, None]] = None,
+        nan_indices: Optional[Union[Dict, None]] = None,
+        filters: Optional[Union[Dict, None]] = None,
+        start: Optional[Union[str, None]] = None,
+    ):
+        """
+        Constructor
+
+        Parameters
+        ----------
+        id
+
+        """
         run_metadata = Run()
         run_metadata.id = id
-        run_metadata.sample_rate = kwargs.get("sample_rate", 1.0)
+        run_metadata.sample_rate = sample_rate
 
-        self.raw_data_path = kwargs.get("raw_data_path", None)
+        self.raw_data_path = raw_data_path
 
         # set channel names
         self._channel_map = None
-        self.channel_nomenclature_keyword = kwargs.get(
-            "channel_nomenclature", "default"
-        )
+        self.channel_nomenclature_keyword = channel_nomenclature
         self.set_channel_map()
-        self.channels = kwargs.get("channels", list(self.channel_map.values()))
+        if channels is None:
+            self.channels = list(self.channel_map.values())
+        else:
+            self.channels = channels
 
-        self.noise_scalars = kwargs.get("noise_scalars", None)
-        self.nan_indices = kwargs.get("nan_indices", {})
-        self.filters = kwargs.get("filters", {})
-        self.start = kwargs.get("start", None)
+        self.noise_scalars = noise_scalars
+        self.nan_indices = nan_indices
+        self.filters = filters
+        self.start = start
 
         if self.noise_scalars is None:
             self.noise_scalars = {}
             for channel in self.channels:
                 self.noise_scalars[channel] = 0.0
+
         # run_metadata.add_base_attribute("")
         self.run_metadata = run_metadata
 
@@ -143,8 +169,9 @@ class SyntheticStation(object):
         self.mth5_name = kwargs.get("mth5_name", None)
 
 
-def make_station_01(channel_nomenclature="default"):
+def make_station_01(channel_nomenclature="default") -> mt_metadata.timeseries.Station:
     """
+        Returns mt_metadata.timeseries.Station object for synthetic MTH5 creation.
 
     Parameters
     ----------
@@ -204,9 +231,10 @@ def make_station_01(channel_nomenclature="default"):
     return station
 
 
-def make_station_02(channel_nomenclature="default"):
+def make_station_02(channel_nomenclature="default") -> mt_metadata.timeseries.Station:
     """
-    Just like station 1, but the data are different
+    Returns mt_metadata.timeseries.Station object for synthetic MTH5 creation.
+     - Just like station 1, but the data are different
 
     Parameters
     ----------
@@ -227,9 +255,10 @@ def make_station_02(channel_nomenclature="default"):
     return test2
 
 
-def make_station_03(channel_nomenclature="default"):
+def make_station_03(channel_nomenclature="default") -> mt_metadata.timeseries.Station:
     """
-    Create a synthetic station with multiple runs.  Rather than generate fresh
+    Returns mt_metadata.timeseries.Station object for synthetic MTH5 creation.
+    - Like 01, 02, but in this case the station has multiple runs.  Rather than generate fresh
     synthetic data, we just reuse test1.asc for each run.
 
     Parameters
@@ -319,8 +348,20 @@ def make_station_03(channel_nomenclature="default"):
     return station
 
 
-def make_station_04(channel_nomenclature="default"):
-    """Just like station 01, but data are resampled to 8Hz"""
+def make_station_04(channel_nomenclature="default") -> mt_metadata.timeseries.Station:
+    """
+    Returns mt_metadata.timeseries.Station object for synthetic MTH5 creation.
+     - Just like station 01, but data are resampled to 8Hz
+
+    Parameters
+    ----------
+    channel_nomenclature
+
+    Returns
+    -------
+
+    """
+
     station_metadata = Station()
     station_metadata.id = "test1"
     channel_nomenclature_obj = ChannelNomenclature()
