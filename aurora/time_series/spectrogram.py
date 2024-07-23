@@ -1,3 +1,8 @@
+"""
+ WORK IN PROGRESS (WIP): This module contains a class that represents a spectrogram,
+ i.e. A 2D time series of Fourier coefficients with axes time and frequency.
+
+"""
 from aurora.time_series.frequency_band_helpers import extract_band
 
 
@@ -11,6 +16,7 @@ class Spectrogram(object):
     """
 
     def __init__(self, dataset=None):
+        """Constructor"""
         self._dataset = dataset
         self._frequency_increment = None
 
@@ -20,8 +26,8 @@ class Spectrogram(object):
     def _higest_frequency(self):
         pass
 
-    def __str__(self):
-        # Description of frequency coverage
+    def __str__(self) -> str:
+        """Returns a Description of frequency coverage"""
         intro = "Spectrogram:"
         frequency_coverage = (
             f"{self.dataset.dims['frequency']} harmonics, {self.frequency_increment}Hz spaced \n"
@@ -49,14 +55,20 @@ class Spectrogram(object):
 
     @property
     def dataset(self):
+        """returns the underlying xarray data"""
         return self._dataset
 
     @property
     def time_axis(self):
+        """returns the time axis of the underlying xarray"""
         return self.dataset.time
 
     @property
     def frequency_increment(self):
+        """
+        returns the "delta f" of the frequency axis
+        - assumes uniformly sampled in frequency domain
+        """
         if self._frequency_increment is None:
             frequency_axis = self.dataset.frequency
             self._frequency_increment = frequency_axis.data[1] - frequency_axis.data[0]
@@ -64,6 +76,8 @@ class Spectrogram(object):
 
     def num_harmonics_in_band(self, frequency_band, epsilon=1e-7):
         """
+
+        Returns the number of harmonics within the frequency band in the underlying dataset
 
         Parameters
         ----------
@@ -81,7 +95,9 @@ class Spectrogram(object):
 
     def extract_band(self, frequency_band, channels=[]):
         """
-        TODO: Check if this should be returning a copy of the data...
+        Returns another instance of Spectrogram, with the frequency axis reduced to the input band.
+
+        TODO: Consider returning a copy of the data...
 
         Parameters
         ----------
@@ -103,5 +119,6 @@ class Spectrogram(object):
         spectrogram = Spectrogram(dataset=extracted_band_dataset)
         return spectrogram
 
-    def cross_powers(self, ch1, ch2, band=None):
-        pass
+    # TODO: Add cross power method
+    # def cross_powers(self, ch1, ch2, band=None):
+    #     pass
