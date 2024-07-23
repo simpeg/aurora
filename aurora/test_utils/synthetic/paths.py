@@ -1,8 +1,11 @@
 """
-Sets up paths for synthetic data testing.
+This module contains a class that helps manage data paths for testing aurora on synthetic data.
 
-The DATA_PATH from general_helper_functions has traditionally had the
-synthetic ascii data, but this is now stored in MTH5.
+Development Notes:
+    - The DATA_PATH from general_helper_functions has traditionally had the
+     synthetic ascii data, but this is now stored in MTH5.
+    - This class was built to handle Issue #303 (installation on read-only file system).
+     https://github.com/simpeg/aurora/issues/303
 """
 import pathlib
 
@@ -29,6 +32,7 @@ class SyntheticTestPaths:
 
     def __init__(self, sandbox_path=None, ascii_data_path=None):
         """
+        Constructor
 
         Parameters
         ----------
