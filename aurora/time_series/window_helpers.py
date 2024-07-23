@@ -1,4 +1,9 @@
 """
+
+This module contains some helper functions that are used when working with sliding windows.
+
+TODO: Not all the functions here are needed, some of them are just examples and tests.
+
 Notes in google doc:
 https://docs.google.com/document/d/1CsRhSLXsRG8HQxM4lKNqVj-V9KA9iUQAvCOtouVzFs0/edit?usp=sharing
 
@@ -13,8 +18,13 @@ from numpy.lib.stride_tricks import as_strided
 
 
 # Window-to-timeseries relationship
-def available_number_of_windows_in_array(n_samples_array, n_samples_window, n_advance):
+def available_number_of_windows_in_array(
+    n_samples_array: int, n_samples_window: int, n_advance: int
+) -> int:
     """
+    Returns the number of whole windows that can be extracted from array of length
+     n_samples_array by a window of length n_samples_window, if the window advances
+     by n_advance samples at each step.
 
     Parameters
     ----------
@@ -32,7 +42,9 @@ def available_number_of_windows_in_array(n_samples_array, n_samples_window, n_ad
     """
     stridable_samples = n_samples_array - n_samples_window
     if stridable_samples < 0:
-        logger.critical("CRITICAL Window is longer than the time series")
+        logger.error(
+            "Window is longer than the time series -- no complete windows can be returned"
+        )
         return 0
     available_number_of_strides = int(np.floor(stridable_samples / n_advance))
     available_number_of_strides += 1
