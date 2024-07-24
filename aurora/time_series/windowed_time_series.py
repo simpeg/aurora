@@ -42,20 +42,17 @@ class WindowedTimeSeries(object):
         """Constructor"""
         pass
 
-    # Not used 20240723: Commenting out.
-    # @can_use_xr_dataarray
-    # @staticmethod
-    # def apply_taper(data=None, taper=None):  #, in_place=True):
-    #     """
-    #     Point by point multiplication of taper against time series.
-    #
-    #     Not Currently Used.
-    #
-    #     xarray handles this very cleanly as a direct multiply operation.
-    #     tapered_obj = windowed_obj * windowing_scheme.taper
-    #     """
-    #     data = data * taper
-    #     return data
+    @can_use_xr_dataarray
+    @staticmethod
+    def apply_taper(data=None, taper=None):  # , in_place=True):
+        """
+        Point by point multiplication of taper against time series.
+
+        xarray handles this very cleanly as a direct multiply operation.
+        tapered_obj = windowed_obj * windowing_scheme.taper
+        """
+        data = data * taper
+        return data
 
     @staticmethod
     def detrend(
