@@ -1,6 +1,7 @@
 """
-based on Gary's
-RhoPlot.m in
+    This module contains functions for plotting apparent resistivity and phase.
+
+    This is based on Gary's RhoPlot.m in the matlab EMTF version.
 iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
 """
 import matplotlib.pyplot as plt
@@ -16,49 +17,13 @@ class RhoPlot(object):
     TF plotting object class; some methods are only relevant to
     specific types of TFs (or for derived parameters such as rho/phi)
 
+    Development Notes:
+        This should be deprecated and replaced with MTpy
+
     """
 
     def __init__(self, tf_obj):
         self.tf = tf_obj
-
-    def phase_plot(self, pred=None):
-        """
-        simple driver to plot phase only on a separate figures of fixed size
-
-        hfig = phasePlot(obj, pred)
-        hfig = figure('Position', [100, 100, 325, 200],
-        'PaperPosition',[1, 1, 3.25, 2.], 'Tag', 'Phase Plot');
-        axRect = [0.1446    0.2150    0.7604    0.7100];
-        if nargin == 2
-            phaseSubPlot(obj, hfig, axRect, pred);
-        else
-            phaseSubPlot(obj, hfig, axRect);
-        end
-
-        Returns
-        -------
-
-        """
-        axRect = [0.1446, 0.2150, 0.7604, 0.7100]
-        # plt.figure(22, figsize = (8.5, 11), dpi=300)
-        fig, ax = plt.subplots()
-        if pred is not None:
-            self.phase_sub_plot(ax, axRect, pred=pred)
-        else:
-            self.phase_sub_plot(ax, axRect)
-
-    def rho_plot2(self, pred=None):
-        """
-        one off, use tools in MTpy
-
-        """
-        axRect = [0.1446, 0.2150, 0.7604, 0.7100]
-        # plt.figure(22, figsize = (8.5, 11), dpi=300)
-        fig, ax = plt.subplots()
-        if pred is not None:
-            self.rho_sub_plot(ax, axRect, pred=pred)
-        else:
-            self.rho_sub_plot(ax, axRect)
 
     def rho_phi_plot(self, pred=None):
         """
@@ -85,53 +50,6 @@ class RhoPlot(object):
 
         H = {"fig": fig, "rho": h_rho, "phi": h_phi}
         return H
-
-    # def rho_plot(self, **kwargs):
-    #     """
-    #     simple driver to plot rho only on a separate figures of fixed size
-    #     function[hfig, hax] = rhoPlot(obj, varargin)
-    #     Returns
-    #     -------
-    #
-    #     """
-    #     AddPred = 0
-    #     inds = 1
-    #     # <HANDLE KWARGS>
-    #     # n_kwargs = len(**kwargs)
-    #     # if np.mod(n_kwargs, 2)==1:
-    #     #     print('Optional arguments must occur in pairs')
-    #     #     raise Exception
-    #     #
-    #     # n_kwarg_pairs = n_kwargs/2
-    #     # for k in range(0, n_kwargs, 2):
-    #     #     option = lower(varargin{k});
-    #     #     switch option
-    #     #     case 'pred'
-    #     #     AddPred = varargin{k + 1};
-    #     #     case 'inds'
-    #     #     inds = varargin{k + 1};
-    #     # <HANDLE KWARGS>
-    #     rects = self.set_figure_size()
-    #     yFac = 1 - (rects.phi(1) + rects.phi(3))
-    #     yMarg = (rects.rho(1) - (rects.phi(1) + rects.phi(3))) / yFac
-    #     rectScreen = rects.Screen
-    #     rectScreen[3] = rectScreen[3] * yFac
-    #     rectPaper = rects.Paper
-    #     rectPaper[3] = rectPaper[3] * yFac
-    #     rectRho = rects.Rho
-    #     rectRho[3] = rectRho[3] / yFac
-    #     rectRho[1] = yMarg
-    #     hfig = plt.figure(
-    #         "Position", rectScreen, "PaperPosition", rectPaper, "Tag", "rho Plot"
-    #     )
-    #     if AddPred:
-    #         hax = self.rho_sub_plot(hfig, rectRho, pred)
-    #     else:
-    #         if inds == 1:
-    #             hax = self.rho_sub_plot(hfig, rectRho)
-    #         else:
-    #             hax = self.rho_sub_plots(hfig, inds)
-    #     # grid on
 
     def phase_sub_plot(self, ax, ttl_str="", axRect=None, pred=None):
         """

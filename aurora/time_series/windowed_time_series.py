@@ -48,8 +48,6 @@ class WindowedTimeSeries(object):
         """
         Point by point multiplication of taper against time series.
 
-        Not Currently Used.
-
         xarray handles this very cleanly as a direct multiply operation.
         tapered_obj = windowed_obj * windowing_scheme.taper
         """

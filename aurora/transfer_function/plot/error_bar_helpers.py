@@ -1,3 +1,7 @@
+"""
+    This module contains a method for plotting error bars on a log-scale y-axis
+    The function was adaptaed from matlab EMTF.
+"""
 import numpy as np
 
 
