@@ -257,24 +257,7 @@ class RhoPlot(object):
         """
         xx_min, xx_max = self.set_period_limits()  # get limits for the x-axis
         yy_min, yy_max = self.set_rho_limits()
-        y_min = self.tf.rho.min()
-        y_min = max(y_min, 1e-20)
-        y_max = self.tf.rho.max()
-        y_max = max(y_max, 1e-20)
 
-        yy_min = 10 ** (np.floor(np.log10(y_min)))
-        if (np.log10(y_min) - np.log10(yy_min)) < 0.15:
-            yy_min = 10 ** (np.log10(yy_min) - 0.3)
-
-        yy_max = 10 ** (np.ceil(np.log10(y_max)))
-        if (np.log10(yy_max) - np.log10(y_max)) < 0.15:
-            yy_max = 10 ** (np.log10(yy_max) + 0.3)
-
-        yyy_min, yyy_max = self.set_rho_limits()
-        assert np.isclose(yyy_max, yy_max)
-        assert np.isclose(yyy_min, yy_min)
-        assert yyy_max == yy_max
-        assert yyy_min == yy_min
         if abs(yy_max - yy_min) > 1:
             lims = [xx_min, xx_max, yy_min, yy_max, 0, 90]
         else:
