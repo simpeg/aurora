@@ -1,15 +1,21 @@
 """
-    This module contains a method for plotting error bars on a log-scale y-axis
-    The function was adaptaed from matlab EMTF.
+    This module contains a method for defining error bar plotting scheme.
+    The function was adapted from matlab EMTF.
 """
 import numpy as np
 
 
-def err_log(x, y, yerr, ll, lims):
+def err_log(x: np.ndarray, y: np.ndarray, yerr: np.ndarray, ll: str, lims: list):
     """
     err_log : used for plotting error bars with a y-axis log scale
     takes VECTORS x and y and outputs matrices (one row per data point) for
     plotting error bars ll = 'XLOG' for log X axis
+
+    Development Notes:
+     This function returns 6 numbers per data point.
+     There is no documentation for what it does.
+     A reasonable guess would be that the six numbers define 3 line segments.
+     One line segment for the error bar, and one line segment at the top of the error bar, and one at the bottom.
 
     Parameters
     ----------
@@ -39,6 +45,7 @@ def err_log(x, y, yerr, ll, lims):
     xb[1, :] = xb[2, :] + dx
     xb[4, :] = xb[2, :] - dx
     xb[5, :] = xb[2, :] + dx
+
     if ll.lower() == "xlog":
         xb = np.exp(xb)
 

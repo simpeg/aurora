@@ -187,12 +187,17 @@ class RhoPlot(object):
         ax.set_ylabel("$\Omega$-m")
         return
 
-    def set_period_limits(self):  # function[Tmin, Tmax] = setTlim(obj)
+    def set_period_limits(self):
         """
-        set nicer period limits for logartihmic period scale plots
+        Returns a set of limits for the x-axis of plots based on periods to display.
+
+        Original Matlab Notes:
+            "set nicer period limits for logartihmic period scale plots"
+
         Returns
         -------
-
+        Tmin, Tmax: tuple
+            The minimum and maximum periods for the x-axis
         """
 
         x_min = self.tf.minimum_period
@@ -207,8 +212,35 @@ class RhoPlot(object):
             Tmax = 10 ** (np.log10(Tmax) + 0.3)
         return Tmin, Tmax
 
+    def set_rho_limits(self):
+        """
+        Returns a set of limits for the x-axis of plots based on periods to display.
+
+        Original Matlab Notes:
+            "set nicer period limits for logartihmic period scale plots"
+
+        Returns
+        -------
+        Tmin, Tmax: tuple
+            The minimum and maximum periods for the x-axis
+        """
+        y_min = max(self.tf.rho.min(), 1e-20)
+        y_max = max(self.tf.rho.max(), 1e-20)
+
+        yy_min = 10 ** (np.floor(np.log10(y_min)))
+        if (np.log10(y_min) - np.log10(yy_min)) < 0.15:
+            yy_min = 10 ** (np.log10(yy_min) - 0.3)
+
+        yy_max = 10 ** (np.ceil(np.log10(y_max)))
+        if (np.log10(yy_max) - np.log10(y_max)) < 0.15:
+            yy_max = 10 ** (np.log10(yy_max) + 0.3)
+
+        return yy_min, yy_max
+
     def set_lims(self):
         """
+        Set limits for the plotting axes
+
         set default limits for plotting; QD, derived from ZPLT
          use max/min limits of periods, rho to set limits
 
@@ -223,7 +255,8 @@ class RhoPlot(object):
         -------
 
         """
-        xx_min, xx_max = self.set_period_limits()
+        xx_min, xx_max = self.set_period_limits()  # get limits for the x-axis
+        yy_min, yy_max = self.set_rho_limits()
         y_min = self.tf.rho.min()
         y_min = max(y_min, 1e-20)
         y_max = self.tf.rho.max()
@@ -237,6 +270,11 @@ class RhoPlot(object):
         if (np.log10(yy_max) - np.log10(y_max)) < 0.15:
             yy_max = 10 ** (np.log10(yy_max) + 0.3)
 
+        yyy_min, yyy_max = self.set_rho_limits()
+        assert np.isclose(yyy_max, yy_max)
+        assert np.isclose(yyy_min, yy_min)
+        assert yyy_max == yy_max
+        assert yyy_min == yy_min
         if abs(yy_max - yy_min) > 1:
             lims = [xx_min, xx_max, yy_min, yy_max, 0, 90]
         else:
