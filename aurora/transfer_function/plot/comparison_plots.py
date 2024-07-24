@@ -1,60 +1,90 @@
+"""
+    This module contains a function to for comparing legacy "z-file"
+     transfer function files.
+
+"""
+import pathlib
+
 from matplotlib import pyplot as plt
 
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.transfer_function.plot.rho_phi_helpers import plot_phi
 from aurora.transfer_function.plot.rho_phi_helpers import plot_rho
 from loguru import logger
+from typing import Optional, Union
 
 
 def compare_two_z_files(
-    z_path1,
-    z_path2,
-    angle1=0.0,
-    angle2=0.0,
-    label1="",
-    label2="",
-    scale_factor1=1.0,
-    scale_factor2=1.0,
-    out_file="",
-    show_plot=True,
-    use_ylims=True,
-    use_xlims=True,
-    rho_ax_label_size=16,
-    phi_ax_label_size=16,
-    **kwargs,
+    z_path1: Union[pathlib.Path, str],
+    z_path2: Union[pathlib.Path, str],
+    angle1: Optional[float] = 0.0,
+    angle2: Optional[float] = 0.0,
+    label1: Optional[str] = "",
+    label2: Optional[str] = "",
+    scale_factor1: Optional[float] = 1.0,
+    scale_factor2: Optional[float] = 1.0,
+    out_file: Optional[Union[pathlib.Path, str]] = "",
+    show_plot: Optional[bool] = True,
+    use_ylims: Optional[bool] = True,
+    use_xlims: Optional[bool] = True,
+    rho_ax_label_size: Optional[float] = 16,
+    phi_ax_label_size: Optional[float] = 16,
+    markersize: Optional[float] = 3,
+    rho_ylims: Optional[tuple] = (1, 1e3),
+    phi_ylims: Optional[tuple] = (0, 90),
+    xlims: Optional[tuple] = (1e-3, 1e3),
 ):
     """
-    TODO: Put this in plot_helpers
+    Takes as input two z-files and plots them both on the same axis
+
+    TODO: Replace with a method from MTpy
 
     Parameters
     ----------
-    z_path1: str or pathlib.Path
-    z_path2: str or pathlib.Path
-    angle1: float
-    angle2: float
-    label1: str
-    label2: str
-    scale_factor1
-    scale_factor2
-    out_file
-    show_plot
-    use_ylims
-    use_xlims
-
-    kwargs
-    rho_ylims
-    xlims
-
-
-    Returns
-    -------
+    z_path1: Union[pathlib.Path, str]
+        The first z-file to compare
+    z_path2: Union[pathlib.Path, str]
+        The second z-file to compare
+    angle1: Optional[float] = 0.0
+        The angle to rotate the first TF
+    angle2: Optional[float] = 0.0
+        The angle to rotate the second TF
+    label1: Optional[str] = "",
+        A legend label for the first TF
+    label2: Optional[str] = "",
+        A legend label for the second TF
+    scale_factor1: Optional[float] = 1.0
+        A scale factor to shift rho of TF1
+    scale_factor2: Optional[float] =1.0
+        A scale factor to shift rho of TF2
+    out_file: Optional[Union[pathlib.Path, str]] = ""
+        A file to save the plot
+    show_plot: Optional[bool] = True
+        If True, show an interactive plot
+    use_ylims: Optional[bool] = True
+        If True, explicitly set y-axis limits to rho_ylims
+    use_xlims: Optional[bool] = True
+        If True, explicitly set x-axis limits to xlims
+    rho_ax_label_size: Optional[float] = 16
+        Set the y-axis label size for rho
+    phi_ax_label_size: Optional[float] = 16,
+        Set the y-axis label size for phi
+    markersize: Optional[float] = 3
+        Set the markersize (for both rho and phi)
+    rho_ylims: Optional[tuple] = (1, 1e3)
+        The Y-axis limits to apply on rho (if use_ylims is True)
+    phi_ylims: Optional[tuple] = (0, 90),
+        The Y-axis limits to apply on phi
+    xlims: Optional[tuple] = (1e-3, 1e3)
+        The Z-axis limits to apply (if use_xlims is True)
 
     """
     zfile1 = read_z_file(z_path1, angle=angle1)
     zfile2 = read_z_file(z_path2, angle=angle2)
-    logger.info(f"scale_factor1: {scale_factor1}")
+
+    logger.info(f"Sacling TF scale_factor1: {scale_factor1}")
     fig, axs = plt.subplots(nrows=2, dpi=300, sharex=True)  # figsize=(8, 6.),
-    markersize = kwargs.get("markersize", 3)
+
     # Make LaTeX symbol strings
     rho_phi_strings = {}
     rho_phi_strings["rho"] = {}
@@ -99,10 +129,8 @@ def compare_two_z_files(
     axs[0].legend(prop={"size": 6})
     # axs[0].set_ylabel("$\\rho_a$")
     axs[0].set_ylabel("Apparent Resistivity $\Omega$-m", fontsize=12)
-    rho_ylims = kwargs.get("rho_ylims", [1, 1e3])
     if use_ylims:
         axs[0].set_ylim(rho_ylims[0], rho_ylims[1])
-    xlims = kwargs.get("xlims", [1e-3, 1e3])
     if use_xlims:
         axs[0].set_xlim(xlims[0], xlims[1])
 
@@ -132,7 +160,6 @@ def compare_two_z_files(
     axs[1].legend(prop={"size": 6})
     axs[1].set_xlabel("Period (s)", fontsize=12)
     axs[1].set_ylabel("Phase (degrees)", fontsize=12)
-    phi_ylims = kwargs.get("phi_ylims", [0, 90])
     axs[1].set_ylim(phi_ylims[0], phi_ylims[1])
 
     axs[0].grid(
@@ -144,8 +171,6 @@ def compare_two_z_files(
         axis="both",
     )
     if out_file:
-        # if out_file[-3:] != ".png":
-        #     out_file+=".png"
         plt.savefig(f"{out_file}")
     if show_plot:
         plt.show()
