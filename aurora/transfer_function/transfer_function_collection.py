@@ -263,7 +263,6 @@ class TransferFunctionCollection(object):
             )
 
         if aux_data:
-            #            try:
             decimation_levels = list(set(aux_data.decimation_levels))
             shape_cyc = {0: "s", 1: "v", 2: "*", 3: "^"}
             if xy_or_yx == "xy":
