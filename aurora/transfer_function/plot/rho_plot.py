@@ -138,7 +138,7 @@ class RhoPlot(object):
         -------
 
         """
-        lims, orient = self.set_lims()
+        lims = self.set_lims()
         # lims_rho = lims[0:3];
         axis_limits = lims[0:4]
         # xticks = self.get_xticks()
@@ -187,12 +187,17 @@ class RhoPlot(object):
         ax.set_ylabel("$\Omega$-m")
         return
 
-    def set_period_limits(self):  # function[Tmin, Tmax] = setTlim(obj)
+    def set_period_limits(self):
         """
-        set nicer period limits for logartihmic period scale plots
+        Returns a set of limits for the x-axis of plots based on periods to display.
+
+        Original Matlab Notes:
+            "set nicer period limits for logartihmic period scale plots"
+
         Returns
         -------
-
+        Tmin, Tmax: tuple
+            The minimum and maximum periods for the x-axis
         """
 
         x_min = self.tf.minimum_period
@@ -207,8 +212,38 @@ class RhoPlot(object):
             Tmax = 10 ** (np.log10(Tmax) + 0.3)
         return Tmin, Tmax
 
-    def set_lims(self):
+    def set_rho_limits(self):
         """
+        Returns a set of limits for the x-axis of plots based on periods to display.
+
+        Original Matlab Notes:
+            "set nicer period limits for logartihmic period scale plots"
+
+        Returns
+        -------
+        Tmin, Tmax: tuple
+            The minimum and maximum periods for the x-axis
+        """
+        y_min = max(self.tf.rho.min(), 1e-20)
+        y_max = max(self.tf.rho.max(), 1e-20)
+
+        yy_min = 10 ** (np.floor(np.log10(y_min)))
+        if (np.log10(y_min) - np.log10(yy_min)) < 0.15:
+            yy_min = 10 ** (np.log10(yy_min) - 0.3)
+
+        yy_max = 10 ** (np.ceil(np.log10(y_max)))
+        if (np.log10(yy_max) - np.log10(y_max)) < 0.15:
+            yy_max = 10 ** (np.log10(yy_max) + 0.3)
+
+        return yy_min, yy_max
+
+    def set_lims(self) -> list:
+        """
+        Set limits for the plotting axes
+
+        TODO: Add doc or start using MTpy
+
+        Matlab Notes:
         set default limits for plotting; QD, derived from ZPLT
          use max/min limits of periods, rho to set limits
 
@@ -219,31 +254,23 @@ class RhoPlot(object):
 
             orient: 0
 
-        TODO: maybe set this as a class?
+        Returns
         -------
-
+        lims: list
+            The plotting limits for period, rho and phi.
         """
-        xx_min, xx_max = self.set_period_limits()
-        y_min = self.tf.rho.min()
-        y_min = max(y_min, 1e-20)
-        y_max = self.tf.rho.max()
-        y_max = max(y_max, 1e-20)
+        period_min, period_max = self.set_period_limits()  # get limits for the x-axis
+        rho_min, rho_max = self.set_rho_limits()
+        phi_min = 0
+        phi_max = 90
 
-        yy_min = 10 ** (np.floor(np.log10(y_min)))
-        if (np.log10(y_min) - np.log10(yy_min)) < 0.15:
-            yy_min = 10 ** (np.log10(yy_min) - 0.3)
+        if abs(rho_max - rho_min) <= 1:
+            rho_min = 0.01
+            rho_max = 1e4
+        lims = [period_min, period_max, rho_min, rho_max, phi_min, phi_max]
 
-        yy_max = 10 ** (np.ceil(np.log10(y_max)))
-        if (np.log10(yy_max) - np.log10(y_max)) < 0.15:
-            yy_max = 10 ** (np.log10(yy_max) + 0.3)
-
-        if abs(yy_max - yy_min) > 1:
-            lims = [xx_min, xx_max, yy_min, yy_max, 0, 90]
-        else:
-            lims = [xx_min, xx_max, 0.01, 1e4, 0, 90]
-
-        orient = 0.0
-        return lims, orient
+        # orient = 0.0
+        return lims  # , orient
 
     def set_figure_size(self):
         """
@@ -254,7 +281,7 @@ class RhoPlot(object):
         -------
 
         """
-        lims, _ = self.set_lims()
+        lims = self.set_lims()
         size_fac = 50
         paperSizeFac = 0.65
         one_dec = 1.6
