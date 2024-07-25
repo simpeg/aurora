@@ -3,6 +3,8 @@
 
     This is based on Gary's RhoPlot.m in the matlab EMTF version.
 iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
+
+TODO: replace with calls to mtpy
 """
 import matplotlib.pyplot as plt
 import numpy as np
@@ -19,48 +21,40 @@ class RhoPlot(object):
 
     Development Notes:
         This should be deprecated and replaced with MTpy
+        The only place this class is used is in aurora/sandbox/plot_helpers.py in the
+        plot_tf_obj method.
 
     """
 
     def __init__(self, tf_obj):
+        """
+        Constructor
+
+        TODO: Replace tf_obj with mt_metadata tf if this method not replaced with mtpy.
+
+        Parameters
+        ----------
+        tf_obj: aurora.transfer_function.TTFZ.TTFZ
+            Object with TF information
+
+
+        """
         self.tf = tf_obj
 
-    def rho_phi_plot(self, pred=None):
+    def phase_sub_plot(self, ax, ttl_str="", pred=None, linewidth=2):
         """
+        place a phase subplot on given figure axis
+
+        Development notes:
+         Originally this took an optional input argument `axRect`
+         but it was never used. It looks as it it was intended to be able to set the
+         position of the figure.  There was also some hardcoded control of linewidth
+         and markersize which has been removed for readability.
+
 
         Parameters
         ----------
-        pred
-
-        Returns
-        -------
-
-        """
-        rects = self.set_figure_size()
-        fig, ax = plt.subplots(2, 1, 1)
-        # hfig = figure('Position', rects.Screen, 'PaperPosition',
-        #                rects.Paper, 'Tag', 'rho-phi plot');
-
-        if pred is not None:
-            h_phi = self.phase_sub_plot(ax, rects.phi, pred)
-            h_rho = self.rho_sub_plot(ax, rects.rho, pred)
-        else:
-            h_phi = self.phase_sub_plot(ax, rects.phi)
-            h_rho = self.rho_sub_plot(ax, rects.rho)
-
-        H = {"fig": fig, "rho": h_rho, "phi": h_phi}
-        return H
-
-    def phase_sub_plot(self, ax, ttl_str="", axRect=None, pred=None):
-        """
-        place a phase subplot on a figure, given figure handle and axis
-        postion
-
-        Parameters
-        ----------
-        self
         ax
-        axRect
         pred
 
         Returns
@@ -75,36 +69,31 @@ class RhoPlot(object):
 
         Tmin, Tmax = self.set_period_limits()
         axis_limits = [Tmin, Tmax, 0, 90]
-        # xticks = self.get_xticks()
 
         [xb, yb] = err_log(
             np.transpose(self.tf.periods),
             self.tf.phi[:, 0],
             self.tf.phi_se[:, 0],
-            "XLOG",
             axis_limits,
+            log_x_axis=True,
         )
-        # figure(ax); #need this?
-        # set current axes
-        # hax = plt.axes('Position', axRect);
+
         ax.semilogx(xb, yb, "b-")
         ax.semilogx(self.tf.periods, phi[:, 0], "bo")
-        # print("OK, now set linewidth and markersize")
-        # set(lines, 'LineWidth', 1, 'MarkerSize', 7);
-        # hold on;
+
         xb, yb = err_log(
             np.transpose(self.tf.periods),
             self.tf.phi[:, 1],
             self.tf.phi_se[:, 1],
-            "XLOG",
             axis_limits,
+            log_x_axis=True,
         )
         ax.semilogx(xb, yb, "r-")
         ax.semilogx(self.tf.periods, phi[:, 1], "ro")
         # set(lines, 'LineWidth', 1, 'MarkerSize', 7);
         if pred is not None:
-            plt.plot(pred.tf.periods, pred.tf.phi[:, 0], "b-", "linewidth", 2)
-            plt.plot(pred.tf.periods, pred.tf.phi[:, 1], "r-", "linewidth", 2)
+            plt.plot(pred.tf.periods, pred.tf.phi[:, 0], "b-", "linewidth", linewidth)
+            plt.plot(pred.tf.periods, pred.tf.phi[:, 1], "r-", "linewidth", linewidth)
 
         # (lims_ph);
         ax.set_xlim(axis_limits[0], axis_limits[1])
@@ -121,34 +110,36 @@ class RhoPlot(object):
         ax.set_xlabel("Period (s)")
         ax.set_ylabel("Degrees")
 
-    def rho_sub_plot(self, ax, ttl_str="", axRect=None, pred=None):
+    def rho_sub_plot(self, ax, ttl_str="", pred=None):
         """
+        Makes an apparent resistivity plot on the input axis.
+
+        Matlab Documentation:
         Calls plotrhom, standard plotting routine; uses some other routines in
         EMTF/matlab/Zplt; this version is for putting multiple curves on the
-        same plot
+        same plot ... set plotting limits now that rho is known
 
-        set plotting limits now that rho is known
+
         Parameters
         ----------
-        ax
-        axRect
+        ax: matplotlib.axes._axes.Axes
         pred
 
         Returns
         -------
 
         """
-        lims = self.set_lims()
-        # lims_rho = lims[0:3];
-        axis_limits = lims[0:4]
-        # xticks = self.get_xticks()
-        # plot error bars:
+        lims = self.set_lims()  # get the axes limits
+        x_axis_limits = lims[0:2]
+        y_axis_limits = lims[2:4]
+
+        # get and plot error bars:
         [xb, yb] = err_log(
             self.tf.periods,
             self.tf.rho[:, 0],
             self.tf.rho_se[:, 0],
-            "XLOG",
-            axis_limits,
+            x_axis_limits,
+            log_x_axis=True,
         )
         ax.loglog(xb, yb, "b-")
 
@@ -159,8 +150,8 @@ class RhoPlot(object):
             self.tf.periods,
             self.tf.rho[:, 1],
             self.tf.rho_se[:, 1],
-            "XLOG",
-            axis_limits,
+            x_axis_limits,
+            log_x_axis=True,
         )
         ax.loglog(xb, yb, "r-")
         ax.loglog(self.tf.periods, self.tf.rho[:, 1], "ro")
@@ -170,15 +161,15 @@ class RhoPlot(object):
             plt.plot(pred.tf.periods, pred.tf.rho[:, 1], "r-", "linewidth", 1.5)
 
         # axis(lims_rho);
-        ax.set_xlim(axis_limits[0], axis_limits[1])
-        ax.set_ylim(axis_limits[2], axis_limits[3])
+        ax.set_xlim(x_axis_limits[0], x_axis_limits[1])
+        ax.set_ylim(y_axis_limits[0], y_axis_limits[1])
 
         #
-        title_pos_x = np.log(axis_limits[0]) + 0.1 * (
-            np.log(axis_limits[1] / axis_limits[0])
+        title_pos_x = np.log(x_axis_limits[0]) + 0.1 * (
+            np.log(x_axis_limits[1] / x_axis_limits[0])
         )
         title_pos_x = np.ceil(np.exp(title_pos_x))
-        title_pos_y = axis_limits[2] + 0.8 * (axis_limits[3] - axis_limits[2])
+        title_pos_y = y_axis_limits[0] + 0.8 * (y_axis_limits[1] - y_axis_limits[0])
         ttl_str = "\u03C1_a : " + ttl_str
         # c_title = "$\rho_a$ :" + "PKD"  # obj.tf.Header.LocalSite.SiteID
         ax.text(title_pos_x, title_pos_y, ttl_str, fontsize=14, fontweight="demi")
@@ -272,53 +263,9 @@ class RhoPlot(object):
         # orient = 0.0
         return lims  # , orient
 
-    def set_figure_size(self):
-        """
-        rects is a dict
-        Returns:
-            rects : dict
-            has keys: "Screen", "Paper", "Rho", "Phi"
-        -------
-
-        """
-        lims = self.set_lims()
-        size_fac = 50
-        paperSizeFac = 0.65
-        one_dec = 1.6
-        xdecs = np.log10(lims(1)) - np.log10(lims(0))
-        one_dec = one_dec * 4 / xdecs
-        ydecs = np.log10(lims[3]) - np.log10(lims[2])
-        paper_width = xdecs * one_dec
-        paper_height = (ydecs + 3) * one_dec
-        paper_height = min([paper_height, 9])
-        rectScreen = [0.5, 0.5, paper_width, paper_height] * size_fac
-        rectPaper = [1.0, 1.0, paper_width * paperSizeFac, paper_height * paperSizeFac]
-
-        rectRho = [0.15, 0.15 + 2.3 / (ydecs + 3), 0.8, ydecs / (ydecs + 3) * 0.8]
-        rectPhi = [0.15, 0.15, 0.8, 2 / (ydecs + 3) * 0.8]
-        rects = {
-            "Screen": rectScreen,
-            "Paper": rectPaper,
-            "Rho": rectRho,
-            "Phi": rectPhi,
-        }
-        return rects
-
-    def get_xticks(self):
-        xticks = 10.0 ** np.arange(-5, 6)
-        cond1 = xticks >= self.tf.minimum_period
-        cond2 = xticks <= self.tf.maximum_period
-        xticks = xticks[cond1 & cond2]
-        return xticks
-
-
-def test():
-    pass
-
-
-def main():
-    test()
-
-
-if __name__ == "__main__":
-    main()
+    # def get_xticks(self):
+    #     xticks = 10.0 ** np.arange(-5, 6)
+    #     cond1 = xticks >= self.tf.minimum_period
+    #     cond2 = xticks <= self.tf.maximum_period
+    #     xticks = xticks[cond1 & cond2]
+    #     return xticks

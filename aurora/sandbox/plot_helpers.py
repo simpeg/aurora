@@ -283,7 +283,10 @@ def plot_response_pz(
 
 def plot_tf_obj(tf_obj, out_filename=None, show=True):
     """
-    Plot the transfer function object in terms of apparent resistivity and phase
+    Plot the transfer function object in terms of apparent resistivity and phase.
+
+    Development Notes:
+        This function is only used in the processing pipeline to give some QC plots
 
     TODO: Get plotter from MTpy or elsewhere.
     See Issue #209
