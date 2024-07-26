@@ -8,7 +8,7 @@ API Reference
 
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 4
     :caption: API documentation
 
     time_series
