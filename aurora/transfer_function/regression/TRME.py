@@ -1,4 +1,9 @@
 """
+    This module contains the regression M-estimator for non-remote reference regression.
+
+
+Development Notes:
+
     follows Gary's TRME.m in
 iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
 
@@ -44,13 +49,12 @@ The predicted data has to be a linear combination of the columns of Y.
 Q is an orthogonal basis for the columns of X.
 The norms of QQHY and QHY are the same
 
-    < MATLAB Documentation >
+    MATLAB Documentation:
     https://www.mathworks.com/help/matlab/ref/qr.html
 
 Matlab's reference to the "economy" representation is what Trefethen and Bau
 call the "reduced QR factorization".  Golub & Van Loan (1996, §5.2) call Q1R1
 the thin QR factorization of A;
-    < /MATLAB Documentation >
 
 There are several discussions online about the differences in
 numpy, scipy, sklearn, skcuda etc.
@@ -58,7 +62,7 @@ https://mail.python.org/pipermail/numpy-discussion/2012-November/064485.html
 We will default to using numpy for now.
 Note that numpy's default is to use the "reduced" form of Q, R.  R is
 upper-right triangular.
-# </QR-decomposition Notes>
+
 
 
 This is cute:
@@ -71,15 +75,14 @@ http://matlab.izmiran.ru/help/techdoc/ref/mldivide.html
 """
 import numpy as np
 import xarray as xr
-
-from scipy.linalg import solve_triangular
-
 from aurora.transfer_function.regression.m_estimator import MEstimator
+from scipy.linalg import solve_triangular
 
 
 class TRME(MEstimator):
     def __init__(self, **kwargs):
         """
+        Constructor.
 
         Parameters
         ----------
@@ -109,6 +112,7 @@ class TRME(MEstimator):
         self._Y_hat = self.Q @ self.QHYc
 
     def update_residual_variance(self, correction_factor=1):
+        """updates residual variance from most recent cleaned and predicted data"""
         self._residual_variance = self.residual_variance_method2()
         self._residual_variance *= correction_factor
         return self._residual_variance
@@ -120,9 +124,11 @@ class TRME(MEstimator):
         """
         self.b = solve_triangular(self.R, self.QHYc)
 
-    def compute_inverse_signal_covariance(self):
+    def compute_inverse_signal_covariance(self) -> None:
         """
+        Computes the inverse signal covariance matrix of the input channels.
 
+        Development Notes:
         Note that because X = QR, we have
         X.H @ X = (QR).H @ QR = R.H Q.H Q R = R.H @ R
         i.e. computing R.H @ R below is just computing the signal covariance matrix of X

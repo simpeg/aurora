@@ -1,3 +1,7 @@
+"""
+    This module contains methods for performing regression to solve Y = Xb.
+"""
+
 import numpy as np
 
 
