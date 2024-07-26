@@ -28,11 +28,11 @@ Documentation for the Aurora project can be found at http://simpeg.xyz/aurora/
 Installation
 ---------------
 
-Suggest using PyPi as the default repository to install from
+Suggest using PyPi as the default repository to install from::
 
 `pip install aurora`
 
-Can use Conda but that is not updated as often
+Can use Conda but that is not updated as often::
 
 `conda -c conda-forge install aurora`
 
