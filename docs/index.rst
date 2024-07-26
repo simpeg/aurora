@@ -18,7 +18,7 @@
    examples/operate_aurora.ipynb
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
    :caption: Reference documentation
 
    api/index.rst
