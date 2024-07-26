@@ -1,3 +1,6 @@
+Welcome to Aurora Documentation
+===================================
+
 .. aurora documentation master file, created by
    sphinx-quickstart on Sun Aug 22 14:43:40 2021.
    You can adapt this file completely to your liking, but it should at least
