@@ -4,8 +4,6 @@
 
 |
 
-
-
 .. image:: https://img.shields.io/pypi/v/aurora.svg
     :target: https://pypi.python.org/pypi/aurora
 
