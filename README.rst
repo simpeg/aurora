@@ -39,7 +39,7 @@ conda -c conda-forge install aurora
 General Work Flow
 -------------------
 
-1. Convert raw time series data to MTH5 format, see `MTH5 Examples <https://mth5.readthedocs.io/en/latest/index.html>`_ for documentation and examples.
+1. Convert raw time series data to MTH5 format, see `MTH5 Documentation and Examples <https://mth5.readthedocs.io/en/latest/index.html>`_.
 2. Understand the time series data and which runs to process for local station `RunSummary`.
 3. Choose remote reference station ``KernelDataset``.
 4. Create a recipe for how the data will be processed ``Config``.
