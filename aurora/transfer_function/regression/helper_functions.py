@@ -1,9 +1,16 @@
+"""
+    This module contains methods for performing regression to solve Y = Xb.
+"""
+
 import numpy as np
 
 
 def rme_beta(r0: float) -> float:
     """
-    This is an RME specific property.  It represents a bias in the calculation of
+    Returns a normalization factor to correct for bias in residual variance.
+
+    Details:
+    - This is an RME specific property.  It represents a bias in the calculation of
     residual_variance which we correct for in TRME and TRME_RR. The implemented
     formula is an approximation.  This is approximately equal to 1/beta where beta is
     defined by Equation A3 in Egbert & Booker 1986.
@@ -37,9 +44,10 @@ def rme_beta(r0: float) -> float:
     return beta
 
 
-def simple_solve_tf(Y, X, R=None):
+def simple_solve_tf(Y, X, R=None) -> np.ndarray:
     """
     Cast problem Y = Xb into scipy.linalg.solve form which solves: a @ x = b
+
     - Note that the "b" in the two equations is different.
       - The EMTF regression problem (and many regression problems in general) use Y=Xb
       - Y, X are known and b is the solution
@@ -75,11 +83,12 @@ def simple_solve_tf(Y, X, R=None):
     return z
 
 
-def direct_solve_tf(Y, X, R=None):
+def direct_solve_tf(Y, X, R=None) -> np.ndarray:
     """
-    Solve problem Y = Xb for b.  This function can be used for testing.  It is not as
-    stable as using simple_solve_tf, but it is instructive to have an example of
-    regression using the crudest approach.
+    Solve problem Y = Xb for b.
+
+    This function can be used for testing.  It is not as stable as using simple_solve_tf,
+     but it is instructive to have an example of regression using the crudest approach.
 
     Parameters
     ----------

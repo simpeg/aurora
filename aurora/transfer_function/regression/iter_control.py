@@ -1,5 +1,8 @@
 """
-follows Gary's IterControl.m in
+This module contains a class that holds parameters to control the iterations of
+robust regression including convergence criteria and thresholds.
+
+Based on Gary's IterControl.m in
 iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
 """
 from loguru import logger
@@ -30,9 +33,9 @@ class IterControl(object):
         u0: float = 2.8,
         tolerance: float = 0.0005,
         verbosity: int = 0,
-        **kwargs,
     ) -> None:
         """
+        Constructor
 
         Parameters
         ----------
@@ -41,14 +44,6 @@ class IterControl(object):
             will refine the estimate.
         max_number_of_redescending_iterations : int
             1 or 2 is fine at most.  If set to zero we ignore the redescend code block.
-        tolerance : float
-            minimum fractional change in any term in b.  Any smaller change
-            than this will trigger convergence
-        epsilon : float
-            NOT USED: REMOVE
-        kwargs
-
-        Class Variables Specific to Egbert's Robust Regression:
         r0: float
             Effectively infinty for OLS, this controls the point at which residuals
             transition from being penalized by a squared vs a linear function.  The
@@ -60,6 +55,14 @@ class IterControl(object):
             makes for severe downweighting about u0.  The function is continuous
             "math friendly" (all derivates exist etc) so you can prove theorems about it
             etc.
+        tolerance : float
+            minimum fractional change in any term in b.  Any smaller change
+            than this will trigger convergence
+        verbosity: int
+            Allows setting of custom logging messages in development.
+
+        Development notes:
+        There was originally a parameter called epsilon (float) but it was not used.
 
         """
         self._number_of_iterations = 0
@@ -175,11 +178,13 @@ class IterControl(object):
     @property
     def correction_factor(self):
         """
-        TODO: This is an RME specific property.  Suggest move r0, u0 and this method
-        into an RME-config class.
+        Returns correction factor for residual variances.
 
-        See notes on usage in
+        Detailed notes on usage in
         transfer_function.regression.helper_functions.rme_beta
+
+        TODO: This is an RME specific property.  Suggest move r0, u0 and this method
+         into an RME-config class.
 
         Returns
         -------
