@@ -30,19 +30,19 @@ Installation
 
 Suggest using PyPi as the default repository to install from::
 
-`pip install aurora`
+pip install aurora
 
 Can use Conda but that is not updated as often::
 
-`conda -c conda-forge install aurora`
+conda -c conda-forge install aurora
 
 General Work Flow
 -------------------
 
 1. Convert raw time series data to MTH5 format, see `MTH5 Examples <https://mth5.readthedocs.io/en/latest/index.html>`_ for documentation and examples.
 2. Understand the time series data and which runs to process for local station `RunSummary`.
-3. Choose remote reference station `KernelDataset`.
-4. Create a recipe for how the data will be processed `Config`.
-5. Estimate transfer function `process_mth5` and out put as a `mt_metadata.transfer_function.core.TF` object which can output [ EMTFXML | EDI | ZMM | ZSS | ZRR ] files. 
+3. Choose remote reference station ``KernelDataset``.
+4. Create a recipe for how the data will be processed ``Config``.
+5. Estimate transfer function `process_mth5` and out put as a ``mt_metadata.transfer_function.core.TF`` object which can output [ EMTFXML | EDI | ZMM | ZSS | ZRR ] files. 
 
 
