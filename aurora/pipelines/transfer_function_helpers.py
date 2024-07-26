@@ -273,30 +273,30 @@ def process_transfer_functions(
             band, dec_level_config, local_stft_obj, remote_stft_obj
         )
 
+        # TODO: WORK IN PROGRESS  (see Issue #119)
         # Apply segment weights first -- see Note #2
-
-        if "jackknife_jj84" in segment_weights:
-            from aurora.transfer_function.weights.coherence_weights import (
-                coherence_weights_jj84,
-            )
-
-            Wjj84 = coherence_weights_jj84(band, local_stft_obj, remote_stft_obj)
-            apply_weights(X, Y, RR, Wjj84, segment=True, dropna=False)
-        if "simple_coherence" in segment_weights:
-            from aurora.transfer_function.weights.coherence_weights import (
-                simple_coherence_weights,
-            )
-
-            W = simple_coherence_weights(band, local_stft_obj, remote_stft_obj)
-            apply_weights(X, Y, RR, W, segment=True, dropna=False)
-
-        if "multiple_coherence" in segment_weights:
-            from aurora.transfer_function.weights.coherence_weights import (
-                multiple_coherence_weights,
-            )
-
-            W = multiple_coherence_weights(band, local_stft_obj, remote_stft_obj)
-            apply_weights(X, Y, RR, W, segment=True, dropna=False)
+        # if "jackknife_jj84" in segment_weights:
+        #     from aurora.transfer_function.weights.coherence_weights import (
+        #         coherence_weights_jj84,
+        #     )
+        #
+        #     Wjj84 = coherence_weights_jj84(band, local_stft_obj, remote_stft_obj)
+        #     apply_weights(X, Y, RR, Wjj84, segment=True, dropna=False)
+        # if "simple_coherence" in segment_weights:
+        #     from aurora.transfer_function.weights.coherence_weights import (
+        #         simple_coherence_weights,
+        #     )
+        #
+        #     W = simple_coherence_weights(band, local_stft_obj, remote_stft_obj)
+        #     apply_weights(X, Y, RR, W, segment=True, dropna=False)
+        #
+        # if "multiple_coherence" in segment_weights:
+        #     from aurora.transfer_function.weights.coherence_weights import (
+        #         multiple_coherence_weights,
+        #     )
+        #
+        #     W = multiple_coherence_weights(band, local_stft_obj, remote_stft_obj)
+        #     apply_weights(X, Y, RR, W, segment=True, dropna=False)
 
         # if there are channel weights apply them here
 
