@@ -4,7 +4,7 @@ Supporting codes for building the FC level of the mth5
 
 Here are the parameters that are defined via the mt_metadata fourier coefficients structures
 "anti_alias_filter": "default",
-"bands"
+"bands",
 "decimation.factor": 4.0,
 "decimation.level": 2,
 "decimation.method": "default",
