@@ -107,8 +107,9 @@ class TransferFunction:
         return self.transfer_function
 
     @property
-    def num_bands(self):
-        """_summary_
+    def num_bands(self) -> int:
+        """
+        Get number of bands associated with TF
 
         Returns
         -------
@@ -226,21 +227,43 @@ class TransferFunction:
         return len(self.tf_header.output_channels)
 
     def frequency_index(self, frequency):
-        return self.period_index(1.0 / frequency)
-        # frequency_index = np.isclose(self.num_segments.frequency, frequency)
-        # frequency_index = np.where(frequency_index)[0][0]
-        # return frequency_index
+        """
+        Gets the index of the tf array associated with the input frequency
 
-    def period_index(self, period):
+        Parameters
+        ----------
+        frequency: float
+            The period in seconds
+
+        Returns
+        -------
+        frequency_index: int
+            The index of the tf array corresponding to the frequency
+        """
+        return self.period_index(1.0 / frequency)
+
+    def period_index(self, period: float) -> int:
+        """
+        Gets the index of the tf array associated with the input period.
+
+        Parameters
+        ----------
+        period: float
+            The period in seconds
+
+        Returns
+        -------
+        period_index: int
+            The index of the tf array corresponding to the period
+        """
         period_index = np.isclose(self.num_segments.period, period)
         period_index = np.where(period_index)[0][0]
         return period_index
-        # return self.frequency_index(1.0 / period)
 
     def set_tf(self, regression_estimator, period):
         """
-        This sets TF elements for one band, using contents of regression_estimator
-        object.  This version assumes there are estimates for Nout output channels
+        Sets TF elements for one band, using contents of regression_estimator object.
+
         """
         index = self.period_index(period)
 
