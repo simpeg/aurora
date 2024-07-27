@@ -690,28 +690,46 @@ def intervals_overlap(
     return cond
 
 
-def overlap(t1start, t1end, t2start, t2end):
+def overlap(
+    t1_start: pd.Timestamp,
+    t1_end: pd.Timestamp,
+    t2_start: pd.Timestamp,
+    t2_end: pd.Timestamp,
+) -> tuple:
     """
-    https://stackoverflow.com/questions/3721249/python-date-interval-intersection
+    Get the start and end times of the overlap between two intervals.
+    Interval 1 is (start1, end1), Interval 2 is (start2, end2),
+
+    Development Notes:
+     Possibly some nicer syntax in this discussion:
+     https://stackoverflow.com/questions/3721249/python-date-interval-intersection
+     - Intended to work with pd.Timestamp objects, but should work for many objects
+      that have an ordering associated.
 
     Parameters
     ----------
-    t1start:
-    t1end
-    t2start
-    t2end
+    t1_start: pd.Timestamp
+        The start of interval 1.
+    t1_end: pd.Timestamp
+        The end of interval 1.
+    t2_start: pd.Timestamp
+        The start of interval 2.
+    t2_end: pd.Timestamp
+        The end of interval 2.
+
 
     Returns
     -------
-
+    start, end : tuple
+        start, end are either same type as input, or they are None,None
     """
-    if t1start <= t2start <= t2end <= t1end:
-        return t2start, t2end
-    elif t1start <= t2start <= t1end:
-        return t2start, t1end
-    elif t1start <= t2end <= t1end:
-        return t1start, t2end
-    elif t2start <= t1start <= t1end <= t2end:
-        return t1start, t1end
+    if t1_start <= t2_start <= t2_end <= t1_end:
+        return t2_start, t2_end
+    elif t1_start <= t2_start <= t1_end:
+        return t2_start, t1_end
+    elif t1_start <= t2_end <= t1_end:
+        return t1_start, t2_end
+    elif t2_start <= t1_start <= t1_end <= t2_end:
+        return t1_start, t1_end
     else:
         return None, None
