@@ -12,14 +12,6 @@ aurora.transfer\_function.weights.edf\_weights module
    :undoc-members:
    :show-inheritance:
 
-aurora.transfer\_function.weights.spectral\_features module
------------------------------------------------------------
-
-.. automodule:: aurora.transfer_function.weights.spectral_features
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 
