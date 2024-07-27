@@ -289,6 +289,10 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
     """
     Calibrates frequency domain data into MT units.
 
+    Development Notes:
+     The calibration often raises a runtime warning due to DC term in calibration response = 0.
+     TODO: It would be nice to suppress this, maybe by only calibrating the non-dc terms and
+      directly assigning np.nan to the dc component when DC-response is zero.
     Parameters
     ----------
     stft_obj : xarray.core.dataset.Dataset
@@ -339,6 +343,7 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
             calibration_response /= channel_scale_factor
         if units == "SI":
             logger.warning("Warning: SI Units are not robustly supported issue #36")
+        # TODO: This often raises a runtime warning due to DC term in calibration response=0
         stft_obj[channel_id].data /= calibration_response
     return stft_obj
 
