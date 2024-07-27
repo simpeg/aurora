@@ -1,16 +1,29 @@
 """
-These methods can possibly be moved under mt_metadata, or mth5
 
+This module contains methods associated with legacy EMTF z-file TF format.
+
+Development notes:
 They extract info needed to setup emtf_z files.
+These methods can possibly be moved under mt_metadata, or deprecated.
+
 """
+import pathlib
+
 import numpy as np
+from aurora.transfer_function.transfer_function_collection import (
+    TransferFunctionCollection,
+)
+from aurora.sandbox.io_helpers.zfile_murphy import ZFile
 from loguru import logger
+from typing import Optional, Union
 
 EMTF_CHANNEL_ORDER = ["hx", "hy", "hz", "ex", "ey"]
 
 
-def get_default_orientation_block(n_ch=5):
+def get_default_orientation_block(n_ch: int = 5) -> list:
     """
+    creates a text block like the part of the z-file that holds channel orientations.
+
     Helper function used when working with matlab structs which do not have enough
     info to make headers
 
@@ -34,21 +47,27 @@ def get_default_orientation_block(n_ch=5):
     return orientation_strs
 
 
-def merge_tf_collection_to_match_z_file(aux_data, tf_collection):
+def merge_tf_collection_to_match_z_file(
+    aux_data: ZFile, tf_collection: TransferFunctionCollection
+) -> dict:
     """
-    Currently this is only used for the synthtetic test, but maybe useful for
-    other tests.  Given data from a z_file, and a tf_collection,
-    the tf_collection may have several TF estimates at the same frequency
-    from multiple decimation levels.  This tries to make a single array as a
-    function of period for all rho and phi
+    method to merge tf data from a tf_collection with a Z-file when there are potentially
+    multiple estimates of TF at the same periods for different decimation levels.
+
+    Development Notes:
+    Currently this is only used for the the synthetic test where aurora results
+    are compared against a stored legacy Z-file.  Given data from a z_file, and a
+    tf_collection, the tf_collection may have several TF estimates at the same
+    frequency from multiple decimation levels.  This tries to make a single array as
+    a function of period for all rho and phi.
 
     Parameters
     ----------
-    aux_data: merge_tf_collection_to_match_z_file
+    aux_data: aurora.sandbox.io_helpers.zfile_murphy.ZFile
         Object representing a z-file
     tf_collection: aurora.transfer_function.transfer_function_collection
     .TransferFunctionCollection
-        Object representing the transfer function returnd from the aurora processing
+        Object representing the transfer function returned from the aurora processing
 
 
     Returns
@@ -87,11 +106,17 @@ def merge_tf_collection_to_match_z_file(aux_data, tf_collection):
     return result
 
 
-def clip_bands_from_z_file(z_path, n_bands_clip, output_z_path=None, n_sensors=5):
+def clip_bands_from_z_file(
+    z_path: Union[str, pathlib.Path],
+    n_bands_clip: int,
+    output_z_path: Optional[Union[str, pathlib.Path, None]] = None,
+    n_sensors: Optional[int] = 5,
+):
     """
-    This function takes a z_file and clips periods off the end of it.
-    It can come in handy sometimes -- specifically for manipulating matlab
-    results of synthetic data.
+    This function clips periods off the end of an EMTF legacy z_file.
+
+    Development Notes:
+    It can come in handy for manipulating matlab results of synthetic data.
 
     Parameters
     ----------
@@ -131,4 +156,3 @@ def clip_bands_from_z_file(z_path, n_bands_clip, output_z_path=None, n_sensors=5
     f = open(output_z_path, "w")
     f.writelines(lines)
     f.close()
-    return
