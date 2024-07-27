@@ -152,11 +152,11 @@ def add_fcs_to_mth5(m, fc_decimations=None):
     """
     Add Fourier Coefficient Levels ot an existing MTH5.
 
-    Notes:
-        - This module computes the FCs differently than the legacy aurora pipeline.  It uses scipy.signal.spectrogram.
-        There is a test in Aurora to confirm that there are equivalent if we are not using fancy prewhitening.
-        - Nomenclature: "usssr_grouper" is the output of a groupby on unique {survey, station, sample_rate} tuples
+    **Notes:**
 
+    - This module computes the FCs differently than the legacy aurora pipeline. It uses scipy.signal.spectrogram. There is a test in Aurora to confirm that there are equivalent if we are not using fancy pre-whitening.
+
+    - Nomenclature: "usssr_grouper" is the output of a group-by on unique {survey, station, sample_rate} tuples.
 
     Parameters
     ----------
