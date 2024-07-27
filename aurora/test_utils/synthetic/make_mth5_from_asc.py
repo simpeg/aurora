@@ -18,7 +18,7 @@ data/test12rr_LEMI34.h5
 data/test1_LEMI12.h5
 
 - 20231103: Added an 8Hz up-sampled version of test1.  No spectral content was added
-so the band between the old and new Nyquist frequencies is bogus.
+ so the band between the old and new Nyquist frequencies is bogus.
 
 Notes: Work in progress -- this module is being migrated to MTH5.
 

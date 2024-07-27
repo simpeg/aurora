@@ -24,8 +24,8 @@ Note 3: This point in the loop marks the interface between _generation_ of the F
  their _usage_. In future the code above this comment would be pushed into
  create_fourier_coefficients() and the code below this would access those FCs and
  execute compute_transfer_function().
-  This would also be an appropriate place to place a feature extraction layer, and
-  compute weights for the FCs.
+ This would also be an appropriate place to place a feature extraction layer, and
+ compute weights for the FCs.
 
 """
 import mth5.groups

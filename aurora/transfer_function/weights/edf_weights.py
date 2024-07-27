@@ -78,7 +78,7 @@ class EffectiveDegreesOfFreedom(object):
         The data covariance matrix s and its inverse h are iteratively recomputed using
         fewer and fewer observations. However, the edf is also computed at every
         iteration but doesn't seem to use any fewer observations.
-        Thus the edf weights change as use drops, _even for indices_ that were
+        Thus the edf weights change as use drops, even for indices that were
         previously computed ... TODO: Could that be an error?
 
         Discussing this with Gary:
