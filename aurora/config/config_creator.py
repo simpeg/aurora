@@ -126,58 +126,59 @@ class ConfigCreator:
         num_samples_window: Optional[Union[int, None]] = None,
     ):
         """
-        This creates a processing config from a kernel dataset
+        This creates a processing config from a kernel dataset.
+
         TODO: Make this a method of kernel_dataset.
 
+        **Development Notes:**
 
-        Notes:
-        1.  2022-09-10
-        The reading-in from EMTF band setup file used to be very terse, carried
-        some baked in assumptions about decimation factors, and did not acknowledge
-        specific frequency bands in Hz.  I am adding some complexity to the method
-        that populates bands from EMTF band setup file but am now explict about the
-        assumption of decimation factors, and do provide the frequency bands in Hz.
+         1. 2022-09-10
 
-        The number of decimation levels must be defined either by:
-         1. decimation_factors argument (normally accompanied by a bands_dict)
-         2. number of decimations implied by EMTF band setup file.
-        Theoretically, you could also use the number of decimations implied by
-        bands_dict but this is sloppy, because it would assume the decimation factor.
+         The reading-in from EMTF band setup file used to be very terse, carried
+         some baked in assumptions about decimation factors, and did not acknowledge
+         specific frequency bands in Hz.  I am adding some complexity to the method
+         that populates bands from EMTF band setup file but am now explict about the
+         assumption of decimation factors, and do provide the frequency bands in Hz.
+
+         2. The number of decimation levels must be defined either by:
+
+          - decimation_factors argument (normally accompanied by a bands_dict)
+          - number of decimations implied by EMTF band setup file.
+
+          Theoretically, you could also use the number of decimations implied by bands_dict but this is sloppy, because it would assume the decimation factor.
 
 
         Parameters
         ----------
-        kernel_dataset: aurora.transfer_function.kernel_dataset.KernelDataset'
+        kernel_dataset: aurora.transfer_function.kernel_dataset.KernelDataset
             An object that defines the data to be processed.
         input_channels: list
             List of the input channels that will be used in TF estimation (usually "hx", "hy")
         output_channels: list
             List of the output channels that will be estimated by TF (usually "ex", "ey", "hz")
-        estimator:  Optional[Union[str, None]] = None,
+        estimator:  Optional[Union[str, None]]
             The name of the regression estimator to use for TF estimation.
-        emtf_band_file: Optional[Union[str, pathlib.Path, None]] = None
-            The emtf nad setup file if used.
-        band_edges: Optional[Union[dict, None]] = None
+        emtf_band_file: Optional[Union[str, pathlib.Path, None]]
+            The emtf and setup file if used.
+        band_edges: Optional[Union[dict, None]]
             The band edges if emtf_band_file not used
-        decimation_factors: Optional[Union[list, None]] = None
+        decimation_factors: Optional[Union[list, None]]
             List of decimation factors, normally [1, 4, 4, 4, ... 4]
-        num_samples_window: Optional[Union[int, None]] = None
+        num_samples_window: Optional[Union[int, None]]
             The size of the window (usually for FFT)
 
         Returns
         -------
         processing_obj: aurora.config.metadata.processing.Processing
             Object storing the processing parameters.
-
         """
-
         processing_id = self.processing_id(kernel_dataset)
         processing_obj = Processing(id=processing_id)  # , **kwargs)
 
         # pack station and run info into processing object
         processing_obj.stations.from_dataset_dataframe(kernel_dataset.df)
 
-        # Unpack optioanl arguments
+        # Unpack optional arguments
         self._emtf_band_file = emtf_band_file
         self._band_edges = band_edges
         decimation_factors = decimation_factors
