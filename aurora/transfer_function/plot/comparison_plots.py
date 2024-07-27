@@ -5,12 +5,11 @@
 """
 import pathlib
 
-from matplotlib import pyplot as plt
-
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.transfer_function.plot.rho_phi_helpers import plot_phi
 from aurora.transfer_function.plot.rho_phi_helpers import plot_rho
 from loguru import logger
+from matplotlib import pyplot as plt
 from typing import Optional, Union
 
 
