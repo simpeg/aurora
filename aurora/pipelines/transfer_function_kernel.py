@@ -596,7 +596,7 @@ class TransferFunctionKernel(object):
                             i_dec
                         ].num_segments.data[0, i_band]
                     except KeyError:
-                        logger.error("Possibly invalid decimation level")
+                        logger.warning("Possibly invalid decimation level")
                         period_value["npts"] = 0
                     decimation_dict[period_key] = period_value
 
