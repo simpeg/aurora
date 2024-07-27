@@ -1,8 +1,7 @@
 """
 Supporting codes for building the FC level of the mth5
 
-
-Here are the parameters that are defined via the mt_metadata fourier coefficients structures
+Here are the parameters that are defined via the mt_metadata fourier coefficients structures:
 "anti_alias_filter": "default",
 "bands",
 "decimation.factor": 4.0,
@@ -158,19 +157,20 @@ def add_fcs_to_mth5(m, fc_decimations=None):
         There is a test in Aurora to confirm that there are equivalent if we are not using fancy prewhitening.
         - Nomenclature: "usssr_grouper" is the output of a groupby on unique {survey, station, sample_rate} tuples
 
+
     Parameters
-        ----------
-        m: str or pathlib.Path, or MTH5 object
-            Where the mth5 file is located
-        fc_decimations: Union[str, None, List]
-            This specifies the scheme to use for decimating the time series when building the FC layer.
-            None: Just use default (something like four decimation levels, decimated by 4 each time say.
-            String: Controlled Vocabulary, values are a work in progress, that will allow custom definition of the fc_decimations for some common cases. For example, say you have stored already decimated time
-            series, then you want simply the zeroth decimation for each run, because the decimated time series live
-            under another run container, and that will get its own FCs.  This is experimental.
-            List: (**UNTESTED**) -- This means that the user thought about the decimations that they want to create and is
-            passing them explicitly.  -- probably will need to be a dictionary actually, since this
-            would get redefined at each sample rate.
+    ----------
+    m: str or pathlib.Path, or MTH5 object
+        Where the mth5 file is located
+    fc_decimations: Union[str, None, List]
+        This specifies the scheme to use for decimating the time series when building the FC layer.
+        None: Just use default (something like four decimation levels, decimated by 4 each time say.
+        String: Controlled Vocabulary, values are a work in progress, that will allow custom definition of the fc_decimations for some common cases. For example, say you have stored already decimated time
+        series, then you want simply the zeroth decimation for each run, because the decimated time series live
+        under another run container, and that will get its own FCs.  This is experimental.
+        List: (**UNTESTED**) -- This means that the user thought about the decimations that they want to create and is
+        passing them explicitly.  -- probably will need to be a dictionary actually, since this
+        would get redefined at each sample rate.
 
     """
     channel_summary_df = m.channel_summary.to_dataframe()
