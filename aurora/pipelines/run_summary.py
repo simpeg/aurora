@@ -191,29 +191,19 @@ def channel_summary_to_run_summary(
     Method for compressing an mth5 channel_summary into a "run summary" which
     has one row per run (not one row per channel)
 
-    Devlopment Notes:
-    TODO: replace station_id with station, and run_id with run
-    Note will need to modify: aurora/tests/config$ more test_dataset_dataframe.py
+    Development Notes:
+    TODO: replace station_id with station, and run_id with run. Note will need to modify: aurora/tests/config more test_dataset_dataframe.py
+
     TODO: Add logic for handling input and output channels based on channel
-    summary.  Specifically, consider the case where there is no vertical magnetic
-    field, this information is available via ch_summary, and output channels should
-    then not include hz.
+     summary.  Specifically, consider the case where there is no vertical magnetic
+     field, this information is available via ch_summary, and output channels should
+     then not include hz.
+
     TODO: Just inherit all the run-level and higher el'ts of the channel_summary,
-    including n_samples?
+     including n_samples?
 
     When creating the dataset dataframe, make it have these columns:
-    [
-            "station_id",
-            "run_id",
-            "start",
-            "end",
-            "mth5_path",
-            "sample_rate",
-            "input_channels",
-            "output_channels",
-            "remote",
-            "channel_scale_factors",
-        ]
+    ["station_id", "run_id", "start", "end", "mth5_path", "sample_rate", "input_channels", "output_channels", "remote", "channel_scale_factors",]
 
     Parameters
     ----------
