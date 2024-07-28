@@ -25,10 +25,12 @@ maximize coverage of the local station runs is generated
 
 
 Development Notes:
+
     TODO: consider adding methods:
      "drop_runs_shorter_than": removes short runs from summary
      "fill_gaps_by_time_interval": allows runs to be merged if gaps between are short
      "fill_gaps_by_run_names": allows runs to be merged if gaps between are short
+
     TODO: Consider whether this should return a copy or modify in-place when querying the df.
 
 """
@@ -66,9 +68,8 @@ RUN_SUMMARY_COLUMNS = [
 class RunSummary:
     """
     Class to contain a run-summary table from one or more mth5s.
-            "
-    WIP: For the full MMT case this may need modification to a channel based summary.
 
+    WIP: For the full MMT case this may need modification to a channel based summary.
 
     """
 
