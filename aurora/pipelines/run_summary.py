@@ -37,10 +37,10 @@ import copy
 import pandas as pd
 
 
-from mt_metadata.transfer_functions.processing.aurora.channel_nomenclature import (
+from mt_metadata.transfer_functions import (
     ALLOWED_INPUT_CHANNELS,
 )
-from mt_metadata.transfer_functions.processing.aurora.channel_nomenclature import (
+from mt_metadata.transfer_functions import (
     ALLOWED_OUTPUT_CHANNELS,
 )
 import mth5
@@ -77,7 +77,6 @@ class RunSummary:
         input_dict: Optional[Union[dict, None]] = None,
         df: Optional[Union[pd.DataFrame, None]] = None,
     ):
-
         """
         Constructor
 
@@ -88,7 +87,13 @@ class RunSummary:
         self.column_dtypes = [str, str, pd.Timestamp, pd.Timestamp]
         self._input_dict = input_dict
         self.df = df
-        self._mini_summary_columns = ["survey", "station_id", "run_id", "start", "end"]
+        self._mini_summary_columns = [
+            "survey",
+            "station_id",
+            "run_id",
+            "start",
+            "end",
+        ]
 
     def clone(self):
         """
@@ -113,7 +118,9 @@ class RunSummary:
         """Calls minisummary through logger so it is formatted."""
         logger.info(self.mini_summary)
 
-    def add_duration(self, df: Optional[Union[pd.DataFrame, None]] = None) -> None:
+    def add_duration(
+        self, df: Optional[Union[pd.DataFrame, None]] = None
+    ) -> None:
         """
         Adds a column called "duration" to the dataframe
 
@@ -150,7 +157,9 @@ class RunSummary:
             run_obj = m.get_run(row.station_id, row.run_id, row.survey)
             runts = run_obj.to_runts()
             if runts.dataset.to_array().data.__abs__().sum() == 0:
-                logger.critical("CRITICAL: Detected a run with all zero values")
+                logger.critical(
+                    "CRITICAL: Detected a run with all zero values"
+                )
                 self.df["valid"].at[i_row] = False
             # load each run, and take the median of the sum of the absolute values
         if drop:
@@ -259,7 +268,9 @@ def channel_summary_to_run_summary(
     channel_scale_factors = n_station_runs * [None]
     i = 0
     for group_values, group in grouper:
-        group_info = dict(zip(group_by_columns, group_values))  # handy for debug
+        group_info = dict(
+            zip(group_by_columns, group_values)
+        )  # handy for debug
         # for k, v in group_info.items():
         #     print(f"{k} = {v}")
         survey_ids[i] = group_info["survey"]
@@ -270,9 +281,15 @@ def channel_summary_to_run_summary(
         sample_rates[i] = group.sample_rate.iloc[0]
         channels_list = group.component.to_list()
         num_channels = len(channels_list)
-        input_channels[i] = [x for x in channels_list if x in allowed_input_channels]
-        output_channels[i] = [x for x in channels_list if x in allowed_output_channels]
-        channel_scale_factors[i] = dict(zip(channels_list, num_channels * [1.0]))
+        input_channels[i] = [
+            x for x in channels_list if x in allowed_input_channels
+        ]
+        output_channels[i] = [
+            x for x in channels_list if x in allowed_output_channels
+        ]
+        channel_scale_factors[i] = dict(
+            zip(channels_list, num_channels * [1.0])
+        )
         i += 1
 
     data_dict = {}
@@ -328,7 +345,9 @@ def extract_run_summary_from_mth5(mth5_obj, summary_type="run"):
     return out_df
 
 
-def extract_run_summaries_from_mth5s(mth5_list, summary_type="run", deduplicate=True):
+def extract_run_summaries_from_mth5s(
+    mth5_list, summary_type="run", deduplicate=True
+):
     """
     Given a list of mth5's, iterate over them, extracting run_summaries and merging into one big table.
 
