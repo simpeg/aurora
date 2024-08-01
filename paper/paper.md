@@ -36,7 +36,7 @@ authors:
     orcid: 0000-0001-7323-9758
     affiliation: 3
 affiliations:
- - name: United States Geological Survey, USA
+ - name: U.S. Geological Survey, USA
    index: 1
  - name: Oregon State University, USA
    index: 2
