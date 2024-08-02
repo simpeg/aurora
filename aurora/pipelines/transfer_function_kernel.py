@@ -75,12 +75,12 @@ class TransferFunctionKernel(object):
         """
         returns a dict of open mth5 objects, keyed by station_id
 
-        A future version of this for multiple station processing may need nested dict with [survey_id][station_id]
+        A future version of this for multiple station processing may need nested dict with [survey_id][station]
 
         Returns
         -------
         mth5_objs : dict
-            Keyed by station_ids.
+            Keyed by stations.
             local station id : mth5.mth5.MTH5
             remote station id: mth5.mth5.MTH5
         """
@@ -140,20 +140,18 @@ class TransferFunctionKernel(object):
                 if not self.is_valid_dataset(row, i_dec_level):
                     continue
                 if row.fc:
-                    row_ssr_str = f"survey: {row.survey}, station_id: {row.station_id}, run_id: {row.run_id}"
+                    row_ssr_str = f"survey: {row.survey}, station: {row.station}, run_id: {row.run_id}"
                     msg = f"FC already exists for {row_ssr_str} -- skipping decimation"
                     logger.info(msg)
                     continue
                 run_xrds = row["run_dataarray"].to_dataset("channel")
                 decimation = self.config.decimations[i_dec_level].decimation
                 decimated_xrds = prototype_decimate(decimation, run_xrds)
-                self.dataset_df["run_dataarray"].at[i] = decimated_xrds.to_array(
-                    "channel"
+                self.dataset_df["run_dataarray"].at[i] = (
+                    decimated_xrds.to_array("channel")
                 )  # See Note 1 above
 
-        msg = (
-            f"Dataset Dataframe Updated for decimation level {i_dec_level} Successfully"
-        )
+        msg = f"Dataset Dataframe Updated for decimation level {i_dec_level} Successfully"
         logger.info(msg)
         return
 
@@ -171,7 +169,9 @@ class TransferFunctionKernel(object):
             The modified DecimationLevel with clock-zero information set.
         """
         if dec_level_config.window.clock_zero_type == "data start":
-            dec_level_config.window.clock_zero = str(self.dataset_df.start.min())
+            dec_level_config.window.clock_zero = str(
+                self.dataset_df.start.min()
+            )
         return dec_level_config
 
     @property
@@ -207,9 +207,9 @@ class TransferFunctionKernel(object):
         intersection of the long run with each of the remote runs. We ignore this for now, selecting only the first
         element of the run_sub_df, under the assumption that FCs have been created for the entire run,
         or not at all.  This assumption can be relaxed in future by using the time_period attribute of the FC layer.
-        For now, we proceed with the all-or-none logic.  That is, if a ['survey', 'station_id', 'run_id',] has FCs,
+        For now, we proceed with the all-or-none logic.  That is, if a ['survey', 'station', 'run',] has FCs,
         assume that the FCs are present for the entire run. We assign the "fc" column of dataset_df to have the same
-         boolean value for all rows of same  ['survey', 'station_id', 'run_id',] .
+         boolean value for all rows of same  ['survey', 'station', 'run',] .
 
         Returns: None
             Modifies self.dataset_df inplace, assigning bools to the "fc" column
@@ -217,15 +217,15 @@ class TransferFunctionKernel(object):
         """
         groupby = [
             "survey",
-            "station_id",
-            "run_id",
+            "station",
+            "run",
         ]
         grouper = self.processing_summary.groupby(groupby)
 
         for (survey_id, station_id, run_id), df in grouper:
             cond1 = self.dataset_df.survey == survey_id
-            cond2 = self.dataset_df.station_id == station_id
-            cond3 = self.dataset_df.run_id == run_id
+            cond2 = self.dataset_df.station == station_id
+            cond3 = self.dataset_df.run == run_id
             run_sub_df = self.dataset_df[cond1 & cond2 & cond3]
 
             if len(run_sub_df) > 1:
@@ -307,17 +307,21 @@ class TransferFunctionKernel(object):
         decimation_info = self.config.decimation_info()
         for i_dec, dec_factor in decimation_info.items():
             tmp[i_dec] = dec_factor
-        tmp = tmp.melt(id_vars=id_vars, value_name="dec_factor", var_name="dec_level")
-        sortby = ["survey", "station_id", "run_id", "start", "dec_level"]
+        tmp = tmp.melt(
+            id_vars=id_vars, value_name="dec_factor", var_name="dec_level"
+        )
+        sortby = ["survey", "station", "run", "start", "dec_level"]
         tmp.sort_values(by=sortby, inplace=True)
         tmp.reset_index(drop=True, inplace=True)
-        tmp.drop("sample_rate", axis=1, inplace=True)  # not valid for decimated data
+        tmp.drop(
+            "sample_rate", axis=1, inplace=True
+        )  # not valid for decimated data
 
         # Add window info
         group_by = [
             "survey",
-            "station_id",
-            "run_id",
+            "station",
+            "run",
             "start",
         ]
         groups = []
@@ -328,7 +332,9 @@ class TransferFunctionKernel(object):
                     cond = (df.dec_level.diff()[1:] == 1).all()
                     assert cond  # dec levels increment by 1
                 except AssertionError:
-                    msg = f"Skipping {group} because decimation levels are messy."
+                    msg = (
+                        f"Skipping {group} because decimation levels are messy."
+                    )
                     logger.info(msg)
                     continue
                 assert df.dec_factor.iloc[0] == 1
@@ -393,7 +399,8 @@ class TransferFunctionKernel(object):
                 for x in self.processing_config.decimations
             }
             min_stft_window_list = [
-                min_stft_window_info[x] for x in self.processing_summary.dec_level
+                min_stft_window_info[x]
+                for x in self.processing_summary.dec_level
             ]
             min_num_stft_windows = pd.Series(min_stft_window_list)
 
@@ -419,7 +426,9 @@ class TransferFunctionKernel(object):
             self.config.drop_reference_channels()
             for decimation in self.config.decimations:
                 if decimation.estimator.engine == "RME_RR":
-                    logger.info("No RR station specified, switching RME_RR to RME")
+                    logger.info(
+                        "No RR station specified, switching RME_RR to RME"
+                    )
                     decimation.estimator.engine = "RME"
 
         # Make sure that a local station is defined
@@ -452,7 +461,9 @@ class TransferFunctionKernel(object):
         valid_levels = tmp.dec_level.unique()
 
         dec_levels = [x for x in self.config.decimations]
-        dec_levels = [x for x in dec_levels if x.decimation.level in valid_levels]
+        dec_levels = [
+            x for x in dec_levels if x.decimation.level in valid_levels
+        ]
         msg = f"After validation there are {len(dec_levels)} valid decimation levels"
         logger.info(msg)
         return dec_levels
@@ -470,7 +481,9 @@ class TransferFunctionKernel(object):
                 # if dec_level_config.save_fcs:
                 dec_level_config.save_fcs = False
         if self.config.stations.remote:
-            save_any_fcs = np.array([x.save_fcs for x in self.config.decimations]).any()
+            save_any_fcs = np.array(
+                [x.save_fcs for x in self.config.decimations]
+            ).any()
             if save_any_fcs:
                 msg = "\n Saving FCs for remote reference processing is not supported"
                 msg = f"{msg} \n - To save FCs, process as single station, then you can use the FCs for RR processing"
@@ -511,8 +524,8 @@ class TransferFunctionKernel(object):
         """
         # Query processing on survey, station, run, decimation
         cond1 = self.processing_summary.survey == row.survey
-        cond2 = self.processing_summary.station_id == row.station_id
-        cond3 = self.processing_summary.run_id == row.run_id
+        cond2 = self.processing_summary.station == row.station_id
+        cond3 = self.processing_summary.run == row.run_id
         cond4 = self.processing_summary.dec_level == i_dec
         cond5 = self.processing_summary.start == row.start
 
@@ -580,17 +593,27 @@ class TransferFunctionKernel(object):
             -------
 
             """
-            from mt_metadata.transfer_functions.io.zfiles.zmm import PERIOD_FORMAT
+            from mt_metadata.transfer_functions.io.zfiles.zmm import (
+                PERIOD_FORMAT,
+            )
 
             decimation_dict = {}
 
-            for i_dec, dec_level_cfg in enumerate(processing_config.decimations):
+            for i_dec, dec_level_cfg in enumerate(
+                processing_config.decimations
+            ):
                 for i_band, band in enumerate(dec_level_cfg.bands):
                     period_key = f"{band.center_period:{PERIOD_FORMAT}}"
                     period_value = {}
-                    period_value["level"] = i_dec + 1  # +1 to match EMTF standard
-                    period_value["bands"] = tuple(band.harmonic_indices[np.r_[0, -1]])
-                    period_value["sample_rate"] = dec_level_cfg.sample_rate_decimation
+                    period_value["level"] = (
+                        i_dec + 1
+                    )  # +1 to match EMTF standard
+                    period_value["bands"] = tuple(
+                        band.harmonic_indices[np.r_[0, -1]]
+                    )
+                    period_value["sample_rate"] = (
+                        dec_level_cfg.sample_rate_decimation
+                    )
                     try:
                         period_value["npts"] = tf_collection.tf_dict[
                             i_dec
@@ -625,13 +648,18 @@ class TransferFunctionKernel(object):
         tf_cls.inverse_signal_power = isp
 
         res_cov = merged_tf_dict["cov_nn"]
-        renamer_dict = {"output_channel_1": "input", "output_channel_2": "output"}
+        renamer_dict = {
+            "output_channel_1": "input",
+            "output_channel_2": "output",
+        }
         res_cov = res_cov.rename(renamer_dict)
         tf_cls.residual_covariance = res_cov
 
         # Set key as first el't of dict, nor currently supporting mixed surveys in TF
         tf_cls.survey_metadata = self.dataset.local_survey_metadata
-        tf_cls.station_metadata.transfer_function.processing_type = self.processing_type
+        tf_cls.station_metadata.transfer_function.processing_type = (
+            self.processing_type
+        )
         # tf_cls.station_metadata.transfer_function.processing_config = (
         #     self.processing_config
         # )
@@ -659,7 +687,9 @@ class TransferFunctionKernel(object):
         num_samples = self.dataset_df.duration * self.dataset_df.sample_rate
         total_samples = num_samples.sum()
         total_bytes = total_samples * bytes_per_sample
-        logger.info(f"Total Bytes of Raw Data: {total_bytes / (1024 ** 3):.3f} GB")
+        logger.info(
+            f"Total Bytes of Raw Data: {total_bytes / (1024 ** 3):.3f} GB"
+        )
 
         ram_fraction = 1.0 * total_bytes / total_memory
         logger.info(f"Raw Data will use: {100 * ram_fraction:.3f} % of memory")
@@ -677,7 +707,9 @@ class TransferFunctionKernel(object):
 
 
 @path_or_mth5_object
-def mth5_has_fcs(m, survey_id, station_id, run_id, remote, processing_config, **kwargs):
+def mth5_has_fcs(
+    m, survey_id, station_id, run_id, remote, processing_config, **kwargs
+):
     """
     Checks if all needed fc-levels for survey-station-run are present under processing_config
 
