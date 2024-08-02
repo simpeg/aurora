@@ -98,7 +98,7 @@ Generation of robust TFs can be done in only a few lines starting from an MTH5 a
 
 # Example
 
-This section refers to a Jupyter notebook companion to this paper (archived on GitHub: [process_cas04_mulitple_station](https://github.com/simpeg/aurora/blob/joss/paper/process_cas04_mulitple_station.ipynb)).  The companion notebook builds an MTH5 dataset from the EMscope dataset (@schultz2010emscope) and executes data processing -- a minimal_example is shown below.  Apparent resistivities are plotted in Figure \ref{compareTFs} along with the EMTF-generated results hosted at [EarthScope EMTF Spud](http://www.ds.iris.edu/spud/emtf/18633652).  
+This section refers to a Jupyter notebook companion to this paper (archived on GitHub: [process_cas04_mulitple_station](https://github.com/simpeg/aurora/blob/joss/docs/tutorials/process_cas04_mulitple_station.ipynb)).  The companion notebook builds an MTH5 dataset from the EMscope dataset (@schultz2010emscope) and executes data processing -- a minimal_example is shown below.  Apparent resistivities are plotted in Figure \ref{compareTFs} along with the EMTF-generated results hosted at [EarthScope EMTF Spud](http://www.ds.iris.edu/spud/emtf/18633652).  
 
 
 ```python
@@ -124,7 +124,7 @@ tf.write(fn="CAS04_rrNVR08.edi", file_type="edi")
 To run the example you must install aurora, which can be done via conda or pip.  Detailed instructions and further documentation can be found on the SimPEG (@cockett2015simpeg) [documentation website](http://simpeg.xyz/aurora/).
 
 
-![Comparison of apparent resistivities from Aurora and EMTF for station CAS04.  Both curves exhibit scatter in the low signal-to-noise ratio MT "dead band" between 1-10s, but most of estimates are very similar.  The Aurora results are from executing the example code snippet.  The plotting details are in the [Jupyter notebook](https://github.com/simpeg/aurora/blob/joss/paper/process_cas04_mulitple_station.ipynb)(. \label{compareTFs}](tf_comparison.png)
+![Comparison of apparent resistivities from Aurora and EMTF for station CAS04.  Both curves exhibit scatter in the low signal-to-noise ratio MT "dead band" between 1-10s, but most of estimates are very similar.  The Aurora results are from executing the example code snippet.  The plotting details are in the [Jupyter notebook](https://github.com/simpeg/aurora/blob/joss/docs/tutorials/process_cas04_mulitple_station.ipynb)(. \label{compareTFs}](tf_comparison.png)
 
 
 # Testing
