@@ -8,10 +8,10 @@ TODO: This class and methods could be replaced by methods in MTH5.
 
 Functionality of RunSummary()
 1. User can get a list of local_station options, which correspond to unique pairs
-of values: (survey_id,  station_id)
+of values: (survey,  station)
 
 2. User can see all possible ways of processing the data:
-- one list per (survey_id,  station_id) pair in the run_summary
+- one list per (survey,  station) pair in the run_summary
 
 Some of the following functionalities may end up in KernelDataset:
 3. User can select local_station
@@ -42,20 +42,6 @@ from loguru import logger
 from typing import Optional, Union
 
 
-RUN_SUMMARY_COLUMNS = [
-    "survey",
-    "station_id",
-    "run_id",
-    "start",
-    "end",
-    "sample_rate",
-    "input_channels",
-    "output_channels",
-    "remote",
-    "mth5_path",
-]
-
-
 class RunSummary:
     """
     Class to contain a run-summary table from one or more mth5s.
@@ -82,8 +68,8 @@ class RunSummary:
         self.df = df
         self._mini_summary_columns = [
             "survey",
-            "station_id",
-            "run_id",
+            "station",
+            "run",
             "start",
             "end",
         ]
@@ -147,7 +133,7 @@ class RunSummary:
             logger.info(f"Checking row for zeros {row}")
             m = mth5.mth5.MTH5()
             m.open_mth5(row.mth5_path)
-            run_obj = m.get_run(row.station_id, row.run_id, row.survey)
+            run_obj = m.get_run(row.station, row.run, row.survey)
             runts = run_obj.to_runts()
             if runts.dataset.to_array().data.__abs__().sum() == 0:
                 logger.critical("CRITICAL: Detected a run with all zero values")
