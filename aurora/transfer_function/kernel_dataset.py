@@ -147,8 +147,8 @@ class KernelDataset:
         self.remote_station_id = remote_station_id
         self._mini_summary_columns = [
             "survey",
-            "station_id",
-            "run_id",
+            "station",
+            "run",
             "start",
             "end",
             "duration",
@@ -190,7 +190,9 @@ class KernelDataset:
         ]
         if remote_station_id:
             station_ids.append(remote_station_id)
-        df = restrict_to_station_list(run_summary.df, station_ids, inplace=False)
+        df = restrict_to_station_list(
+            run_summary.df, station_ids, inplace=False
+        )
 
         # Check df is non-empty
         if len(df) == 0:
@@ -259,7 +261,9 @@ class KernelDataset:
         """calls add_duration_column (after possible manual manipulation of start/end"""
         self._add_duration_column()
 
-    def drop_runs_shorter_than(self, minimum_duration: float, units="s") -> None:
+    def drop_runs_shorter_than(
+        self, minimum_duration: float, units="s"
+    ) -> None:
         """
         Drop runs from df that are inconsequentially short
 
@@ -284,7 +288,9 @@ class KernelDataset:
         self.df.reset_index(drop=True, inplace=True)
         return
 
-    def select_station_runs(self, station_runs_dict: dict, keep_or_drop: bool) -> None:
+    def select_station_runs(
+        self, station_runs_dict: dict, keep_or_drop: bool
+    ) -> None:
         """
         Updates dataframe based on input dict
 
@@ -454,12 +460,17 @@ class KernelDataset:
         if i == 0:
             self.survey_metadata[survey_id] = run_ts.survey_metadata
         elif i > 0:
-            if row.station_id in self.survey_metadata[survey_id].stations.keys():
-                self.survey_metadata[survey_id].stations[row.station_id].add_run(
-                    run_ts.run_metadata
-                )
+            if (
+                row.station_id
+                in self.survey_metadata[survey_id].stations.keys()
+            ):
+                self.survey_metadata[survey_id].stations[
+                    row.station_id
+                ].add_run(run_ts.run_metadata)
             else:
-                self.survey_metadata[survey_id].add_station(run_ts.station_metadata)
+                self.survey_metadata[survey_id].add_station(
+                    run_ts.station_metadata
+                )
         if len(self.survey_metadata.keys()) > 1:
             raise NotImplementedError
 
@@ -498,7 +509,9 @@ class KernelDataset:
             self.df["run_reference"].at[i] = run_obj.hdf5_group.ref
 
             if row.fc:
-                msg = f"row {row} already has fcs prescribed by processing config"
+                msg = (
+                    f"row {row} already has fcs prescribed by processing config"
+                )
                 msg += "-- skipping time series initialisation"
                 logger.info(msg)
                 # see Note #3
@@ -602,7 +615,7 @@ def restrict_to_station_list(df, station_ids, inplace=True) -> pd.DataFrame:
         ]
     if not inplace:
         df = copy.deepcopy(df)
-    cond1 = ~df["station_id"].isin(station_ids)
+    cond1 = ~df["station"].isin(station_ids)
     df.drop(df[cond1].index, inplace=True)
     df = df.reset_index(drop=True)
     return df
@@ -642,8 +655,8 @@ def _select_station_runs(
             run_ids = [
                 run_ids,
             ]
-        cond1 = df["station_id"] == station_id
-        cond2 = df["run_id"].isin(run_ids)
+        cond1 = df["station"] == station_id
+        cond2 = df["run"].isin(run_ids)
         if keep_or_drop == "keep":
             drop_df = df[cond1 & ~cond2]
         else:
@@ -655,7 +668,10 @@ def _select_station_runs(
 
 
 def intervals_overlap(
-    start1: pd.Timestamp, end1: pd.Timestamp, start2: pd.Timestamp, end2: pd.Timestamp
+    start1: pd.Timestamp,
+    end1: pd.Timestamp,
+    start2: pd.Timestamp,
+    end2: pd.Timestamp,
 ) -> bool:
     """
     Checks if intervals 1, and 2 overlap.

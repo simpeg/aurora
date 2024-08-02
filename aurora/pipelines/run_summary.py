@@ -41,6 +41,19 @@ from mth5.utils.helpers import initialize_mth5
 from loguru import logger
 from typing import Optional, Union
 
+RUN_SUMMARY_COLUMNS = [
+    "survey",
+    "station",
+    "run",
+    "start",
+    "end",
+    "sample_rate",
+    "input_channels",
+    "output_channels",
+    "remote",
+    "mth5_path",
+]
+
 
 class RunSummary:
     """
