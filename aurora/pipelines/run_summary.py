@@ -36,13 +36,6 @@ Development Notes:
 import copy
 import pandas as pd
 
-
-from mt_metadata.transfer_functions import (
-    ALLOWED_INPUT_CHANNELS,
-)
-from mt_metadata.transfer_functions import (
-    ALLOWED_OUTPUT_CHANNELS,
-)
 import mth5
 from mth5.utils.helpers import initialize_mth5
 from loguru import logger
@@ -157,9 +150,7 @@ class RunSummary:
             run_obj = m.get_run(row.station_id, row.run_id, row.survey)
             runts = run_obj.to_runts()
             if runts.dataset.to_array().data.__abs__().sum() == 0:
-                logger.critical(
-                    "CRITICAL: Detected a run with all zero values"
-                )
+                logger.critical("CRITICAL: Detected a run with all zero values")
                 self.df["valid"].at[i_row] = False
             # load each run, and take the median of the sum of the absolute values
         if drop:
@@ -189,127 +180,6 @@ class RunSummary:
     #     return df
 
 
-def channel_summary_to_run_summary(
-    ch_summary,
-    allowed_input_channels=ALLOWED_INPUT_CHANNELS,
-    allowed_output_channels=ALLOWED_OUTPUT_CHANNELS,
-    sortby=["station_id", "start"],
-):
-    """
-    Method for compressing an mth5 channel_summary into a "run summary" which
-    has one row per run (not one row per channel)
-
-    Devlopment Notes:
-    TODO: replace station_id with station, and run_id with run
-    Note will need to modify: aurora/tests/config$ more test_dataset_dataframe.py
-    TODO: Add logic for handling input and output channels based on channel
-    summary.  Specifically, consider the case where there is no vertical magnetic
-    field, this information is available via ch_summary, and output channels should
-    then not include hz.
-    TODO: Just inherit all the run-level and higher el'ts of the channel_summary,
-    including n_samples?
-
-    When creating the dataset dataframe, make it have these columns:
-    [
-            "station_id",
-            "run_id",
-            "start",
-            "end",
-            "mth5_path",
-            "sample_rate",
-            "input_channels",
-            "output_channels",
-            "remote",
-            "channel_scale_factors",
-        ]
-
-    Parameters
-    ----------
-    ch_summary: mth5.tables.channel_table.ChannelSummaryTable or pandas DataFrame
-       If its a dataframe it is a representation of an mth5 channel_summary.
-        Maybe restricted to only have certain stations and runs before being passed to
-        this method
-    allowed_input_channels: list of strings
-        Normally ["hx", "hy", ]
-        These are the allowable input channel names for the processing.  See further
-        note under allowed_output_channels.
-    allowed_output_channels: list of strings
-        Normally ["ex", "ey", "hz", ]
-        These are the allowable output channel names for the processing.
-        A global list of these is kept at the top of this module.  The purpose of
-        this is to distinguish between runs that have different layouts, for example
-        some runs will have hz and some will not, and we cannot process for hz the
-        runs that do not have it.  By making this a kwarg we sort of prop the door
-        open for more general names (see issue #74).
-    sortby: bool or list
-        Default: ["station_id", "start"]
-
-    Returns
-    -------
-    run_summary_df: pd.Dataframe
-        A table with one row per "acquistion run" that was in the input channel
-        summary table
-    """
-    if isinstance(ch_summary, mth5.tables.channel_table.ChannelSummaryTable):
-        ch_summary_df = ch_summary.to_dataframe()
-    elif isinstance(ch_summary, pd.DataFrame):
-        ch_summary_df = ch_summary
-    group_by_columns = ["survey", "station", "run"]
-    grouper = ch_summary_df.groupby(group_by_columns)
-    n_station_runs = len(grouper)
-    survey_ids = n_station_runs * [None]
-    station_ids = n_station_runs * [None]
-    run_ids = n_station_runs * [None]
-    start_times = n_station_runs * [None]
-    end_times = n_station_runs * [None]
-    sample_rates = n_station_runs * [None]
-    input_channels = n_station_runs * [None]
-    output_channels = n_station_runs * [None]
-    channel_scale_factors = n_station_runs * [None]
-    i = 0
-    for group_values, group in grouper:
-        group_info = dict(
-            zip(group_by_columns, group_values)
-        )  # handy for debug
-        # for k, v in group_info.items():
-        #     print(f"{k} = {v}")
-        survey_ids[i] = group_info["survey"]
-        station_ids[i] = group_info["station"]
-        run_ids[i] = group_info["run"]
-        start_times[i] = group.start.iloc[0]
-        end_times[i] = group.end.iloc[0]
-        sample_rates[i] = group.sample_rate.iloc[0]
-        channels_list = group.component.to_list()
-        num_channels = len(channels_list)
-        input_channels[i] = [
-            x for x in channels_list if x in allowed_input_channels
-        ]
-        output_channels[i] = [
-            x for x in channels_list if x in allowed_output_channels
-        ]
-        channel_scale_factors[i] = dict(
-            zip(channels_list, num_channels * [1.0])
-        )
-        i += 1
-
-    data_dict = {}
-    data_dict["survey"] = survey_ids
-    data_dict["station_id"] = station_ids
-    data_dict["run_id"] = run_ids
-    data_dict["start"] = start_times
-    data_dict["end"] = end_times
-    data_dict["sample_rate"] = sample_rates
-    data_dict["input_channels"] = input_channels
-    data_dict["output_channels"] = output_channels
-    data_dict["channel_scale_factors"] = channel_scale_factors
-    data_dict["valid"] = True
-
-    run_summary_df = pd.DataFrame(data=data_dict)
-    if sortby:
-        run_summary_df.sort_values(by=sortby, inplace=True)
-    return run_summary_df
-
-
 def extract_run_summary_from_mth5(mth5_obj, summary_type="run"):
     """
     Given a single mth5 object, get the channel_summary and compress it to a run_summary.
@@ -329,18 +199,11 @@ def extract_run_summary_from_mth5(mth5_obj, summary_type="run"):
     out_df: pd.Dataframe
         Table summarizing the available runs in the input mth5_obj
     """
-    channel_summary_df = mth5_obj.channel_summary.to_dataframe()
-    # check that the mth5 has been summarized already
-    if len(channel_summary_df) < 2:
-        logger.info(
-            "Channel summary maybe not initialized yet, 3 or more channels expected."
-        )
-        mth5_obj.channel_summary.summarize()
-        channel_summary_df = mth5_obj.channel_summary.to_dataframe()
+
     if summary_type == "run":
-        out_df = channel_summary_to_run_summary(channel_summary_df)
+        out_df = mth5_obj.run_summary
     else:
-        out_df = channel_summary_df
+        out_df = mth5_obj.channel_summary.to_dataframe()
     out_df["mth5_path"] = str(mth5_obj.filename)
     return out_df
 
