@@ -618,4 +618,5 @@ def process_mth5(
             msg += "closing all open mth5 files and exiting"
             msg += f"The encountered exception was {e}"
             logger.error(msg)
+            logger.exception(msg)
             return

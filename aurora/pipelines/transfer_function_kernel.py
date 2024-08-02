@@ -524,8 +524,8 @@ class TransferFunctionKernel(object):
         """
         # Query processing on survey, station, run, decimation
         cond1 = self.processing_summary.survey == row.survey
-        cond2 = self.processing_summary.station == row.station_id
-        cond3 = self.processing_summary.run == row.run_id
+        cond2 = self.processing_summary.station == row.station
+        cond3 = self.processing_summary.run == row.run
         cond4 = self.processing_summary.dec_level == i_dec
         cond5 = self.processing_summary.start == row.start
 
