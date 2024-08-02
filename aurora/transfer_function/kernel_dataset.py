@@ -202,7 +202,7 @@ class KernelDataset:
 
         df["remote"] = False
         if remote_station_id:
-            cond = df.station_id == remote_station_id
+            cond = df.station == remote_station_id
             df.remote = cond
 
         self.df = df
@@ -340,8 +340,8 @@ class KernelDataset:
         -------
 
         """
-        local_df = self.df[self.df.station_id == self.local_station_id]
-        remote_df = self.df[self.df.station_id == self.remote_station_id]
+        local_df = self.df[self.df.station == self.local_station_id]
+        remote_df = self.df[self.df.station == self.remote_station_id]
         output_sub_runs = []
         for i_local, local_row in local_df.iterrows():
             for i_remote, remote_row in remote_df.iterrows():
@@ -396,9 +396,9 @@ class KernelDataset:
 
         """
         # get a list of local runs:
-        cond = self.df["station_id"] == local_station_id
+        cond = self.df["station"] == local_station_id
         sub_df = self.df[cond]
-        sub_df.drop_duplicates(subset="run_id", inplace=True)
+        sub_df.drop_duplicates(subset="run", inplace=True)
 
         # sanity check:
         run_ids = sub_df.run_id.unique()
@@ -460,13 +460,10 @@ class KernelDataset:
         if i == 0:
             self.survey_metadata[survey_id] = run_ts.survey_metadata
         elif i > 0:
-            if (
-                row.station_id
-                in self.survey_metadata[survey_id].stations.keys()
-            ):
-                self.survey_metadata[survey_id].stations[
-                    row.station_id
-                ].add_run(run_ts.run_metadata)
+            if row.station in self.survey_metadata[survey_id].stations.keys():
+                self.survey_metadata[survey_id].stations[row.station].add_run(
+                    run_ts.run_metadata
+                )
             else:
                 self.survey_metadata[survey_id].add_station(
                     run_ts.station_metadata
@@ -504,7 +501,7 @@ class KernelDataset:
 
         for i, row in self.df.iterrows():
             run_obj = row.mth5_obj.get_run(
-                row.station_id, row.run_id, survey=row.survey
+                row.station, row.run, survey=row.survey
             )
             self.df["run_reference"].at[i] = run_obj.hdf5_group.ref
 
@@ -546,7 +543,7 @@ class KernelDataset:
         """
         columns_to_add = ["run_dataarray", "stft", "run_reference"]
         mth5_obj_column = len(self.df) * [None]
-        for i, station_id in enumerate(self.df["station_id"]):
+        for i, station_id in enumerate(self.df["station"]):
             mth5_obj_column[i] = mth5_objs[station_id]
         self.df["mth5_obj"] = mth5_obj_column
         for column_name in columns_to_add:

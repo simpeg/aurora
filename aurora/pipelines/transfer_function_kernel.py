@@ -140,7 +140,7 @@ class TransferFunctionKernel(object):
                 if not self.is_valid_dataset(row, i_dec_level):
                     continue
                 if row.fc:
-                    row_ssr_str = f"survey: {row.survey}, station: {row.station}, run_id: {row.run_id}"
+                    row_ssr_str = f"survey: {row.survey}, station: {row.station}, run: {row.run}"
                     msg = f"FC already exists for {row_ssr_str} -- skipping decimation"
                     logger.info(msg)
                     continue
