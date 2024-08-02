@@ -3,26 +3,28 @@
 Installing
 ----------
 
-We recommend installing Python (>= 3.6) using
+We recommend installing Python (>= 3.8) using
 `Anaconda <https://www.anaconda.com/products/individual>`_ or
 `Miniconda <https://docs.conda.io/en/latest/miniconda.html>`_
 
 
-Conda forge
+PyPi
 ***********
 
-The simplest way to install `aurora` is using
-`conda-forge <https://anaconda.org/conda-forge/aurora>`_::
-
-    conda install -c conda-forge aurora
-
-
-Pypi
-****
+The most up to date way to install `aurora` is using
 
 You can also use `pypi <https://pypi.org/project/aurora/>`_ to install `aurora`::
 
     pip install aurora
+
+
+
+Conda Forge
+************
+
+`conda-forge <https://anaconda.org/conda-forge/aurora>`_::
+
+    conda install -c conda-forge aurora
 
 
 From source
