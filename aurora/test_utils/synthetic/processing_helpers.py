@@ -2,6 +2,7 @@
     This module contains some helper functions that are called during the
     execution of aurora's tests of processing on synthetic data.
 """
+
 import mt_metadata.transfer_functions
 import pathlib
 from aurora.pipelines.process_mth5 import process_mth5
@@ -32,7 +33,7 @@ def get_example_kernel_dataset():
     )
 
     kernel_dataset = KernelDataset()
-    station_id = run_summary.df.station_id.iloc[0]
+    station_id = run_summary.df.station.iloc[0]
     kernel_dataset.from_run_summary(run_summary, station_id)
     return kernel_dataset
 
