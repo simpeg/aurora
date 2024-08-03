@@ -20,6 +20,7 @@ import time
 from loguru import logger
 from numba import jit
 from numpy.lib.stride_tricks import as_strided
+from typing import Optional, Union
 
 
 def available_number_of_windows_in_array(
@@ -122,18 +123,23 @@ def sliding_window_numba(data, num_samples_window, num_samples_advance, num_wind
     return output_array
 
 
-def striding_window(data, num_samples_window, num_samples_advance, num_windows=None):
+def striding_window(
+    data: np.ndarray,
+    num_samples_window: int,
+    num_samples_advance: int,
+    num_windows: Optional[Union[int, None]] = None,
+) -> np.ndarray:
     """
     Reshapes input data with a sliding window.
 
     Not currently used.
 
-    Development notes
+    Development Notes:
     Applies a striding window to an array.  We use 1D arrays here.
     Note that this method is extendable to N-dimensional arrays as was once shown
     at  http://www.johnvinyard.com/blog/?p=268
 
-    Karl has an implementation of this code but chose to resrtict to 1D here.
+    Here the code is restricted to 1D.
     This is because of several warnings encountered, on the notes of stride_tricks.py,
     as well as for example here:
     https://stackoverflow.com/questions/4936620/using-strides-for-an-efficient-moving-average-filter
@@ -143,14 +149,6 @@ def striding_window(data, num_samples_window, num_samples_advance, num_windows=N
     copies.  To avoid this, use 1d implementation only for now.
 
     Another clean example of this method can be found in the razorback codes from brgm.
-
-    result is 2d: result[i] is the i-th window
-
-    > sliding_window(np.arange(15), 4, 3, 2)
-    array([[0, 1, 2],
-           [2, 3, 4],
-           [4, 5, 6],
-           [6, 7, 8]])
 
     Parameters
     ----------
@@ -167,7 +165,7 @@ def striding_window(data, num_samples_window, num_samples_advance, num_windows=N
     Returns
     -------
     strided_window: numpy.ndarray
-        The windowed time series
+        The windowed time series.  result is 2d: result[i] is the i'th window.
 
     """
     if num_windows is None:

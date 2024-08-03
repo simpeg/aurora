@@ -2,10 +2,9 @@
 This module contains a base class for Transfer function information.
 
 Development Notes:
- The class is based on Gary's TTF.m in iris_mt_scratch
-egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
-TODO:
- This class should be updated to use mt_metadata.transfer_function.TF, or replaced by it (issue #203)
+ The class is based on Gary's TTF.m in iris_mt_scratch egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
+
+TODO: This class should be updated to use mt_metadata.transfer_function.TF, or replaced by it (issue #203)
 
 """
 
