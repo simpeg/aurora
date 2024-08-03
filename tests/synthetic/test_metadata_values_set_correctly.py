@@ -1,6 +1,7 @@
 """
 TODO: Deprecate -- This now basically duplicates a test in MTH5 (issue #191)
 """
+
 from loguru import logger
 import logging
 import pandas as pd
@@ -26,7 +27,9 @@ class TestMetadataValuesSetCorrect(unittest.TestCase):
 
     def make_mth5(self):
         close_open_files()
-        mth5_path = create_test3_h5(force_make_mth5=self.remake_mth5_for_each_test)
+        mth5_path = create_test3_h5(
+            force_make_mth5=self.remake_mth5_for_each_test
+        )
         return mth5_path
 
     def make_run_summary(self):
@@ -44,7 +47,7 @@ class TestMetadataValuesSetCorrect(unittest.TestCase):
         station_03 = make_station_03()
         for run in station_03.runs:
             summary_row = run_summary.df[
-                run_summary.df.run_id == run.run_metadata.id
+                run_summary.df.run == run.run_metadata.id
             ].iloc[0]
             logger.info(summary_row.start)
             logger.info(run.start)

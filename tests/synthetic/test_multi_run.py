@@ -35,7 +35,9 @@ class TestMultiRunProcessing(unittest.TestCase):
 
     def make_mth5(self):
         close_open_files()
-        mth5_path = create_test3_h5(force_make_mth5=self.remake_mth5_for_each_test)
+        mth5_path = create_test3_h5(
+            force_make_mth5=self.remake_mth5_for_each_test
+        )
         return mth5_path
 
     def make_run_summary(self):
@@ -50,7 +52,7 @@ class TestMultiRunProcessing(unittest.TestCase):
     def test_each_run_individually(self):
         close_open_files()
         run_summary = self.make_run_summary()
-        for run_id in run_summary.df.run_id.unique():
+        for run_id in run_summary.df.run.unique():
             kernel_dataset = KernelDataset()
             kernel_dataset.from_run_summary(run_summary, "test3")
             station_runs_dict = {}
@@ -129,7 +131,9 @@ class TestMultiRunProcessing(unittest.TestCase):
             show_plot=show_plot,
             z_file_path=z_file_path,
         )
-        xml_file_name = AURORA_RESULTS_PATH.joinpath("syn3_all_truncated_run.xml")
+        xml_file_name = AURORA_RESULTS_PATH.joinpath(
+            "syn3_all_truncated_run.xml"
+        )
         tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
 
