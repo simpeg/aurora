@@ -1,64 +1,76 @@
 """
+
+This module contains a class for representing a dataset that can be processed.
+
+Development Notes:
+The KernelDataset could potentially be moved into mth5 or mtpy and used
+as the dataset description for other processing flows.
+
 Players on the stage:  One or more mth5s.
 
 Each mth5 has a mth5_obj.channel_summary dataframe which tells what data are available.
-Here we use a compressed view of this df with one line per acquisition run. I've been
-calling that a "run_summary".  That object could be moved to mth5, so that each mth5
-has a mth5_obj.run_summary dataframe.  As of Mar 29, 2023 a RunSummary is available at the
-station level in mth5, but the aurora version is still being used.  This should be merged if possible
-so that aurora uses the built-in mth5 method.
+Use a compressed view of this df with one line per acquisition run -- a "run_summary".
 
-The run_summary provides options for the local and possibly remote reference stations.
- Candidates for local station are the unique value in the station column.
- *It maybe that we need to groupby survey & station, for now I am considering station
- names to be unique.
+Run_summary provides options for the local and possibly remote reference stations.
+Candidates for local station are the unique values in the station column.
 
- For any given candidate station, there are some integer n runs available.
- This yields 2**n - 1 possible combinations that can be processed, neglecting any
- flagging of time intervals within any run, or any joining of runs.
- (There are actually 2**n, but we ignore the empty set, so -1)
+For any candidate station, there are some integer n runs available.
+This yields 2^n - 1 possible combinations that can be processed, neglecting any
+flagging of time intervals within any run, or any joining of runs.
+(There are actually 2**n, but we ignore the empty set, so -1)
 
- Intuition suggests default ought to be to process n runs in n+1 configurations:
- {all runs} + each run individually.  This will give a bulk answer, and bad runs can
- be flagged by comparing them.  After an initial processing, the tfs can be reviewed
- and the problematic runs can be addressed.
+Intuition suggests default ought to be to process n runs in n+1 configurations:
+{all runs} + each run individually.  This will give a bulk answer, and bad runs can
+be flagged by comparing them.  After an initial processing, the tfs can be reviewed
+and the problematic runs can be addressed.
 
 The user can interact with the run_summary_df, selecting sub dataframes via querying,
 and in future maybe via some GUI (or a spreadsheet).
 
+The intended usage process is as follows:
+ 0. Start with a list of mth5s
+ 1. Extract channel_summaries from each mth5 and join them vertically
+ 2. Compress to a run_summary
+ 3. Stare at the run_summary_df & Select a station "S" to process
+ 4. Select a non-empty set of runs for station "S"
+ 5. Select a remote reference "RR", (this is allowed to be None)
+ 6. Extract the sub-dataframe corresponding to acquisition_runs from "S" and "RR"
+ 7. If the remote is not None:
+  - Drop the runs (rows) associated with RR that do not intersect with S
+  - Restrict start/end times of RR runs that intersect with S so overlap is complete.
+  - Restrict start/end times of S runs so that they intersect with remote
+ 8. This is now a TFKernel Dataset Definition (ish). Initialize a default processing
+ object and pass it this df.
+ ```
+  >>> cc = ConfigCreator()
+  >>> p = cc.create_from_kernel_dataset(kernel_dataset)
+  - Optionally pass emtf_band_file=emtf_band_setup_file
+ 9. Edit the Processing Config appropriately,
 
-The process looks like this:
-0. Start with a list of mth5s
-1. Extract channel_summaries from each mth5 and join them vertically
-2. Compress to a run_summay
-3. Stare at the run_summary_df & Select a station "S" to process
-4. Given "S"", select a non-empty set of runs for that station
-5. Select a remote reference "RR", (this is allowed to be empty)
-6. Extract the sub-dataframe corresponding to you local_station acquistion_runs,
-and the remote station acquition runs
-7. If the remote is non-empty,
-a) Drop the runs (rows) associated with the remote that DO NOT intersect with local
-b) restrict the start/end times of the remote runs that DO intersect with the
-local so that overlap is complete.
-c) restrict start/end times of the local runs so that they DO intersect with remote
-8. This is now a TFKernel Dataset Definition (ish).  Initialize a default
-processing object and pass it this df:
-cc = ConfigCreator()
-p = cc.create_from_kernel_dataset(kernel_dataset, emtf_band_file=emtf_band_setup_file)
-9. Edit the Processing Config appropriately,
+TODO: Consider supporting a default value for 'channel_scale_factors' that is None,
 
-ToDo: Consider supporting a default value for 'channel_scale_factors' that is None,
+TODO: As of March 2023 a RunSummary is available at the station level in mth5, but
+ the aurora version is still being used.  This should be merged if possible so that
+ aurora uses the built-in mth5 method. -- Run Summary exists atstation level in mth5
+
+TODO: Might need to groupby survey & station, for now consider station_id  unique.
+
 """
 
 import copy
+
+import mt_metadata.timeseries
+import mth5.timeseries.run_ts
 import pandas as pd
 
 from loguru import logger
 
 from aurora.pipelines.run_summary import RUN_SUMMARY_COLUMNS
+from aurora.pipelines.run_summary import RunSummary
 from mt_metadata.utils.list_dict import ListDict
+from typing import Optional, Union
 
-# Add these to a standard, so we track add/subtract columns
+# TODO: Add these to a standard, so we track add/subtract columns
 KERNEL_DATASET_COLUMNS = RUN_SUMMARY_COLUMNS + [
     "channel_scale_factors",
     "duration",
@@ -71,14 +83,14 @@ class KernelDataset:
     This class is intended to work with mth5-derived channel_summary or run_summary
     dataframes, that specify time series intervals.
 
+    Development Notes:
     This class is closely related to (may actually be an extension of) RunSummary
 
     The main idea is to specify one or two stations, and a list of acquisition "runs"
-    that can be merged into a "processing run".
-    Each acquistion run can be further divided into non-overlapping chunks by specifying
-    time-intervals associated with that acquistion run.  An empty iterable of
-    time-intervals associated with a run is interpretted as the interval
-    corresponding to the entire run.
+    that can be merged into a "processing run". Each acquisition run can be further
+    divided into non-overlapping chunks by specifying time-intervals associated with
+    that acquisition run.  An empty iterable of time-intervals associated with a run
+    is interpreted as the interval corresponding to the entire run.
 
     The time intervals can be used for several purposes but primarily:
     To specify contiguous chunks of data for:
@@ -86,7 +98,7 @@ class KernelDataset:
     2. binding together into xarray time series, for eventual gap fill (and then STFT)
     3. managing and analyse the availability of reference time series
 
-    The basic data strucutre can be represented as a table or as a tree:
+    The basic data structure can be represented as a table or as a tree:
     Station <-- run <-- [Intervals],
 
     This is described in issue #118 https://github.com/simpeg/aurora/issues/118
@@ -103,7 +115,6 @@ class KernelDataset:
 
     (b) is really just the case of considering pairs of tables like (a)
 
-
     Question: To return a copy or modify in-place when querying.  Need to decide on
     standards and syntax.  Handling this in general is messy because every function
     needs to be modified.  Maybe better to use a decorator that allows for df kwarg
@@ -112,10 +123,28 @@ class KernelDataset:
 
     """
 
-    def __init__(self, **kwargs):
-        self.df = kwargs.get("df")
-        self.local_station_id = kwargs.get("local_station_id")
-        self.remote_station_id = kwargs.get("remote_station_id")
+    def __init__(
+        self,
+        df: Optional[Union[pd.DataFrame, None]] = None,
+        local_station_id: Optional[str] = "",
+        remote_station_id: Optional[Union[str, None]] = None,
+    ):
+        """
+        Constructor.
+
+        Parameters
+        ----------
+        df: Optional[Union[pd.DataFrame, None]]
+            Option to pass an already formed dataframe.  Normally the df if built from a run_summary.
+        local_station_id: Optional[str]
+            The local station for the dataset.  Normally this is passed via from_run_summary method.
+        remote_station_id: Optional[Union[str, None]]
+            The remote station for the dataset.  Normally this is passed via from_run_summary method.
+
+        """
+        self.df = df
+        self.local_station_id = local_station_id
+        self.remote_station_id = remote_station_id
         self._mini_summary_columns = [
             "survey",
             "station_id",
@@ -127,25 +156,30 @@ class KernelDataset:
         self.survey_metadata = {}
 
     def clone(self):
+        """return a deep copy"""
         return copy.deepcopy(self)
 
-    def clone_dataframe(self):
+    def clone_dataframe(self) -> pd.DataFrame:
+        """return a deep copy of dataframe"""
         return copy.deepcopy(self.df)
 
-    def from_run_summary(self, run_summary, local_station_id, remote_station_id=None):
+    def from_run_summary(
+        self,
+        run_summary: RunSummary,
+        local_station_id: str,
+        remote_station_id: Optional[Union[str, None]] = None,
+    ) -> None:
         """
+        Initialize the dataframe from a run summary
 
         Parameters
         ----------
         run_summary: aurora.pipelines.run_summary.RunSummary
             Summary of available data for processing from one or more stations
-        local_station_id: string
+        local_station_id: str
             Label of the station for which an estimate will be computed
-        remote_station_id: string
+        remote_station_id: Optional[Union[str, None]]
             Label of the remote reference station
-
-        Returns
-        -------
 
         """
         self.local_station_id = local_station_id
@@ -157,6 +191,7 @@ class KernelDataset:
         if remote_station_id:
             station_ids.append(remote_station_id)
         df = restrict_to_station_list(run_summary.df, station_ids, inplace=False)
+
         # Check df is non-empty
         if len(df) == 0:
             msg = f"Restricting run_summary df to {station_ids} yields an empty set"
@@ -171,35 +206,40 @@ class KernelDataset:
         self.df = df
         if remote_station_id:
             self.restrict_run_intervals_to_simultaneous()
+
         # Again check df is non-empty
         if len(self.df) == 0:
             msg = (
                 f"Local {local_station_id} and remote {remote_station_id} do not overlap, "
                 f"Remote reference processing not a valid option"
             )
-            logger.warning(msg)
+            logger.error(msg)
             raise ValueError(msg)
         else:
             self._add_duration_column()
         self.df["fc"] = None
 
     @property
-    def mini_summary(self):
+    def mini_summary(self) -> pd.DataFrame:
+        """return a dataframe that fits in terminal"""
         return self.df[self._mini_summary_columns]
 
     @property
-    def print_mini_summary(self):
+    def print_mini_summary(self) -> None:
+        """prints a dataframe that (hopefully) fits in terminal"""
         logger.info(self.mini_summary)
 
     @property
-    def local_survey_id(self):
+    def local_survey_id(self) -> str:
+        """return string label for local survey id"""
         survey_id = self.df.loc[~self.df.remote].survey.unique()[0]
         if survey_id in ["none"]:
             survey_id = "0"
         return survey_id
 
     @property
-    def local_survey_metadata(self):
+    def local_survey_metadata(self) -> mt_metadata.timeseries.Survey:
+        """return survey metadata for local station"""
         try:
             return self.survey_metadata[self.local_survey_id]
         except KeyError:
@@ -208,41 +248,66 @@ class KernelDataset:
             logger.warning(msg)
             return self.survey_metadata["0"]
 
-    def _add_duration_column(self):
-        """ """
+    def _add_duration_column(self) -> None:
+        """adds a column to self.df with times end-start (in seconds)"""
         timedeltas = self.df.end - self.df.start
         durations = [x.total_seconds() for x in timedeltas]
         self.df["duration"] = durations
         return
 
-    def drop_runs_shorter_than(self, duration, units="s"):
+    def _update_duration_column(self) -> None:
+        """calls add_duration_column (after possible manual manipulation of start/end"""
+        self._add_duration_column()
+
+    def drop_runs_shorter_than(self, minimum_duration: float, units="s") -> None:
         """
+        Drop runs from df that are inconsequentially short
+
+        Development Notes:
         This needs to have duration refreshed before hand
+
         Parameters
         ----------
-        duration
-        units
+        minimum_duration: float
+            The minimum allowed duration for a run (in units of units)
+        units: str
+            placeholder to support units that are not seconds
+
+        """
+        if units != "s":
+            msg = "Expected units are seconds : units='s'"
+            raise NotImplementedError(msg)
+        if "duration" not in self.df.columns:
+            self._add_duration_column()
+        drop_cond = self.df.duration < minimum_duration
+        self.df.drop(self.df[drop_cond].index, inplace=True)
+        self.df.reset_index(drop=True, inplace=True)
+        return
+
+    def select_station_runs(self, station_runs_dict: dict, keep_or_drop: bool) -> None:
+        """
+        Updates dataframe based on input dict
+
+        See doc in _select_station_runs
+
+
+        Parameters
+        ----------
+        station_runs_dict: dict
+            Add doc
+        keep_or_dro: bool
+            Add doc
 
         Returns
         -------
 
         """
-        if units != "s":
-            raise NotImplementedError
-        if "duration" not in self.df.columns:
-            self._add_duration_column()
-        drop_cond = self.df.duration < duration
-        self.df.drop(self.df[drop_cond].index, inplace=True)
-        self.df.reset_index(drop=True, inplace=True)
-        return
-
-    def select_station_runs(self, station_runs_dict, keep_or_drop):
-        df = select_station_runs(self.df, station_runs_dict, keep_or_drop)
+        df = _select_station_runs(self.df, station_runs_dict, keep_or_drop)
         self.df = df
-        return
 
     @property
-    def is_single_station(self):
+    def is_single_station(self) -> bool:
+        """returns True if no RR station"""
         if self.local_station_id:
             if self.remote_station_id:
                 return False
@@ -251,15 +316,15 @@ class KernelDataset:
         else:
             return False
 
-    @property
-    def is_remote_reference(self):
-        raise NotImplementedError
+    # @property
+    # def is_remote_reference(self):
+    #     raise NotImplementedError
 
-    def restrict_run_intervals_to_simultaneous(self):
+    def restrict_run_intervals_to_simultaneous(self) -> None:
         """
-        For each run in local_station_id we check if it has overlap with other runs
+        For each run in local_station_id check if it has overlap with other runs
 
-        There is room for optimiztion here
+        There is room for optimization here
 
         Note that you can wind up splitting runs here.  For example, in that case where
         local is running continuously, but remote is intermittent.  Then the local
@@ -287,10 +352,6 @@ class KernelDataset:
                         remote_row.start,
                         remote_row.end,
                     )
-                    # print(
-                    #     f"{olap_start} -- {olap_end}\n "
-                    #     f"{(olap_end-olap_start).seconds}s\n\n"
-                    # )
 
                     local_sub_run = local_row.copy(deep=True)
                     remote_sub_run = remote_row.copy(deep=True)
@@ -307,11 +368,17 @@ class KernelDataset:
         df = df.reset_index(drop=True)
 
         self.df = df
-        return
 
-    def get_station_metadata(self, local_station_id):
+    def get_station_metadata(self, local_station_id: str):
         """
-        Helper function for archiving the TF
+
+        returns the station metadata.
+
+        Development Notes:
+        TODO: This appears to be unused.  Was probably a precursor to the
+         update_survey_metadata() method. Delete if unused. If used fill out doc:
+        "Helper function for archiving the TF -- returns an object we can use to populate
+        station metadata in the _____"
 
         Parameters
         ----------
@@ -343,11 +410,13 @@ class KernelDataset:
         return station_metadata
 
     @property
-    def num_sample_rates(self):
+    def num_sample_rates(self) -> int:
+        """returns the number of unique sample rates in the dataframe"""
         return len(self.df.sample_rate.unique())
 
     @property
-    def sample_rate(self):
+    def sample_rate(self) -> float:
+        """returns the sample rate that of the data in the dataframer"""
         if self.num_sample_rates != 1:
             msg = "Aurora does not yet process data from mixed sample rates"
             logger.error(f"{msg}")
@@ -355,17 +424,27 @@ class KernelDataset:
         sample_rate = self.df.sample_rate.unique()[0]
         return sample_rate
 
-    def update_survey_metadata(self, i, row, run_ts):
+    def update_survey_metadata(
+        self, i: int, row: pd.Series, run_ts: mth5.timeseries.run_ts.RunTS
+    ) -> None:
         """
-        Wrangle survey_metadata into kernel_dataset.  This needs to be passed to TF before exporting data
+        Wrangle survey_metadata into kernel_dataset.
 
-        This was factored out of initialize_dataframe_for_processing
+        Development Notes:
+        - The survey metadata needs to be passed to TF before exporting data.
+        - This was factored out of initialize_dataframe_for_processing
+        - TODO: It looks like we don't need to pass the whole run_ts, just its metadata
+           There may be some performance implications to passing the whole object.
+           Consider passing run_ts.survey_metadata, run_ts.run_metadata,
+           run_ts.station_metadata only
+
         Parameters
         ----------
         i: integer.
             This would be the index of row, if we were sure that the dataframe was cleanly indexed
         row: row of kernel_dataset dataframe corresponding to a survey-station-run.
-        run_ts
+        run_ts: mth5.timeseries.run_ts.RunTS
+            mth5 object having the survey_metadata
 
         Returns
         -------
@@ -384,11 +463,12 @@ class KernelDataset:
         if len(self.survey_metadata.keys()) > 1:
             raise NotImplementedError
 
-    def initialize_dataframe_for_processing(self, mth5_objs):
+    def initialize_dataframe_for_processing(self, mth5_objs: dict) -> None:
         """
-        Adds extra columns needed for processing, populates them with mth5 objects,
-        run_reference, and xr.Datasets.
+        Adds extra columns needed for processing to the dataframe.
+        Populates them with mth5 objects, run_reference, and xr.Datasets.
 
+        Development Notes:
         Note #1: When assigning xarrays to dataframe cells, df dislikes xr.Dataset,
         so we convert to xr.DataArray before packing df
 
@@ -405,7 +485,8 @@ class KernelDataset:
 
         Parameters
         ----------
-        mth5_objs: dict,  keyed by station_id
+        mth5_objs: dict,
+            Keys are station_id, values are MTH5 objects.
         """
 
         self.add_columns_for_processing(mth5_objs)
@@ -430,19 +511,24 @@ class KernelDataset:
 
         logger.info("Dataset dataframe initialized successfully")
 
-    def add_columns_for_processing(self, mth5_objs):
+    def add_columns_for_processing(self, mth5_objs) -> None:
         """
-        Moving this into kernel_dataset from processing_pipeline
+        Add columns to the dataframe used during processing.
 
-        Q: Should mth5_objs be keyed by survey-station?
-        A: Yes, and ...
-        since the KernelDataset dataframe will be iterated over we should probably
+        Development Notes:
+        - This was originally in pipelines.
+        - Q: Should mth5_objs be keyed by survey-station?
+        - A: Yes, and ...
+        since the KernelDataset dataframe will be iterated over, should probably
         write an iterator method.  This can iterate over survey-station tuples
         for multiple station processing.
+        - Currently the model of keeping all these data objects "live" in the df
+        seems to work OK, but is not well suited to HPC or lazy processing.
 
         Parameters
         ----------
-        mth5_objs: dict,  keyed by station_id
+        mth5_objs: dict,
+            Keys are station_id, values are MTH5 objects.
 
         """
         columns_to_add = ["run_dataarray", "stft", "run_reference"]
@@ -453,8 +539,17 @@ class KernelDataset:
         for column_name in columns_to_add:
             self.df[column_name] = None
 
-    def get_run_object(self, index_or_row):
+    def get_run_object(
+        self, index_or_row: Union[int, pd.Series]
+    ) -> mt_metadata.timeseries.Run:
         """
+        Gets the run object associated with a row of the df
+
+        Development Notes:
+        TODO: This appears to be unused except by get_station_metadata.
+         Delete or integrate if desired.
+         - This has likely been deprecated by direct calls to
+         run_obj = row.mth5_obj.from_reference(row.run_reference) in pipelines.
 
         Parameters
         ----------
@@ -462,7 +557,8 @@ class KernelDataset:
 
         Returns
         -------
-
+        run_obj: mt_metadata.timeseries.Run
+            The run associated with the row of the df.
         """
         if isinstance(index_or_row, int):
             row = self.df.loc[index_or_row]
@@ -471,7 +567,7 @@ class KernelDataset:
         run_obj = row.mth5_obj.from_reference(row.run_reference)
         return run_obj
 
-    def close_mth5s(self):
+    def close_mth5s(self) -> None:
         """
         Loop over all unique mth5_objs in dataset df and make sure they are closed.+
         """
@@ -481,7 +577,7 @@ class KernelDataset:
         return
 
 
-def restrict_to_station_list(df, station_ids, inplace=True):
+def restrict_to_station_list(df, station_ids, inplace=True) -> pd.DataFrame:
     """
     Drops all rows of run_summary dataframe where station_ids are NOT in
     the provided list of station_ids.  Operates on a deepcopy of self.df if a df
@@ -489,9 +585,11 @@ def restrict_to_station_list(df, station_ids, inplace=True):
 
     Parameters
     ----------
+    df: pd.DataFrame
+        a run summary dataframer
     station_ids: str or list of strings
         These are the station ids to keep, normally local and remote
-    overwrite: bool
+    inplace: bool
         If True, self.df is overwritten with the reduced dataframe
 
     Returns
@@ -510,22 +608,15 @@ def restrict_to_station_list(df, station_ids, inplace=True):
     return df
 
 
-def select_station_runs(
+def _select_station_runs(
     df,
     station_runs_dict,
     keep_or_drop,
     overwrite=True,
 ):
     """
-    Drops all rows where station_id==station_id, and run_id is NOT in the provided
-     list of keep_run_ids.  Operates on a deepcopy df if inplace=False
-    Uncommon use case the way this is coded, because it will restrict to a single
-    station processing case.  Better to use drop runs, or a dict-style input
-
-    Note1: Logic of keep/drop
-    keep where cond1 is false
-    keep where cond1 & cond2 both true
-    drop where cond1 is true but cond2 is false
+    Partition the rows of df based on the contents of station_runs_dict and return
+    one of the two partitions (based on value of keep_or_drop).
 
     Parameters
     ----------
@@ -533,14 +624,15 @@ def select_station_runs(
         Keys are string ids of the stations to keep
         Values are lists of string labels for run_ids to keep
     keep_or_drop: str
-        If "keep": returns df with only the station_rus specified in station_runs_dict
+        If "keep": returns df with only the station-runs specified in station_runs_dict
         If "drop": returns df with station_runs_dict excised
     overwrite: bool
         If True, self.df is overwritten with the reduced dataframe
 
     Returns
     -------
-        reduced dataframe with only run_ids provided removed.
+        df: pd.DataFrame
+            reduced dataframe with only run_ids provided removed.
     """
 
     if not overwrite:
@@ -562,8 +654,19 @@ def select_station_runs(
     return df
 
 
-def intervals_overlap(start1, end1, start2, end2):
+def intervals_overlap(
+    start1: pd.Timestamp, end1: pd.Timestamp, start2: pd.Timestamp, end2: pd.Timestamp
+) -> bool:
     """
+    Checks if intervals 1, and 2 overlap.
+
+    Interval 1 is (start1, end1), Interval 2 is (start2, end2),
+
+    Development Notes:
+    This may work vectorized out of the box but has not been tested.
+    Also, it is intended to work with pd.Timestamp objects, but should work
+    for many objects that have an ordering associated.
+    This website was used as a reference when writing the method:
     https://stackoverflow.com/questions/3721249/python-date-interval-intersection
 
     Parameters
@@ -587,36 +690,46 @@ def intervals_overlap(start1, end1, start2, end2):
     return cond
 
 
-def overlap(t1start, t1end, t2start, t2end):
+def overlap(
+    t1_start: pd.Timestamp,
+    t1_end: pd.Timestamp,
+    t2_start: pd.Timestamp,
+    t2_end: pd.Timestamp,
+) -> tuple:
     """
-    https://stackoverflow.com/questions/3721249/python-date-interval-intersection
+    Get the start and end times of the overlap between two intervals.
+    Interval 1 is (start1, end1), Interval 2 is (start2, end2),
+
+    Development Notes:
+     Possibly some nicer syntax in this discussion:
+     https://stackoverflow.com/questions/3721249/python-date-interval-intersection
+     - Intended to work with pd.Timestamp objects, but should work for many objects
+      that have an ordering associated.
 
     Parameters
     ----------
-    t1start
-    t1end
-    t2start
-    t2end
+    t1_start: pd.Timestamp
+        The start of interval 1.
+    t1_end: pd.Timestamp
+        The end of interval 1.
+    t2_start: pd.Timestamp
+        The start of interval 2.
+    t2_end: pd.Timestamp
+        The end of interval 2.
+
 
     Returns
     -------
-
+    start, end : tuple
+        start, end are either same type as input, or they are None,None
     """
-    if t1start <= t2start <= t2end <= t1end:
-        return t2start, t2end
-    elif t1start <= t2start <= t1end:
-        return t2start, t1end
-    elif t1start <= t2end <= t1end:
-        return t1start, t2end
-    elif t2start <= t1start <= t1end <= t2end:
-        return t1start, t1end
+    if t1_start <= t2_start <= t2_end <= t1_end:
+        return t2_start, t2_end
+    elif t1_start <= t2_start <= t1_end:
+        return t2_start, t1_end
+    elif t1_start <= t2_end <= t1_end:
+        return t1_start, t2_end
+    elif t2_start <= t1_start <= t1_end <= t2_end:
+        return t1_start, t1_end
     else:
         return None, None
-
-
-def main():
-    return
-
-
-if __name__ == "__main__":
-    main()

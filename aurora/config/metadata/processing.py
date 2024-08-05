@@ -1,27 +1,46 @@
 # -*- coding: utf-8 -*-
 """
-Extend the Processing class with some aurora-specific methods
+Extend the mt_metadata.transfer_functions.processing.aurora.processing.Processing class
+with some aurora-specific methods.
 """
+import pathlib
+
 # =============================================================================
 # Imports
 # =============================================================================
-import pandas as pd
 
 from aurora.time_series.windowing_scheme import window_scheme_from_decimation
+from loguru import logger
 from mt_metadata.transfer_functions.processing.aurora.processing import Processing
 from mt_metadata.utils.list_dict import ListDict
-from loguru import logger
+from typing import Optional, Union
+import pandas as pd
+
 
 class Processing(Processing):
     def __init__(self, **kwargs):
+        """
+        Constructor
+
+        Parameters
+        ----------
+        kwargs
+        """
         # super().__init__(attr_dict=attr_dict, **kwargs)
         super().__init__(**kwargs)
 
     def window_scheme(self, as_type="df"):
         """
         Make a dataframe of processing parameters one row per decimation level.
+
+        Parameters
+        ----------
+        as_type: Optional[str]
+            if "df" return a dataframe, if "dict" return dict
         Returns
         -------
+        windowing: Union[dict, pd.DataFrame]
+            return type depends on as_type argument.
 
         """
         window_schemes = [window_scheme_from_decimation(x) for x in self.decimations]
@@ -45,20 +64,49 @@ class Processing(Processing):
             raise TypeError
 
     def decimation_info(self):
+        """
+        Zips decimation level ids to the Decimation objects adn returns as a dict
+
+        Returns
+        -------
+        decimation_info: dict
+            The decimation objects keyed by decimation level id.
+        """
         decimation_ids = [x.decimation.level for x in self.decimations]
         decimation_factors = [x.decimation.factor for x in self.decimations]
         decimation_info = dict(zip(decimation_ids, decimation_factors))
         return decimation_info
 
-    def save_as_json(self, filename=None, nested=True, required=False):
+    def save_as_json(
+        self,
+        filename: Optional[Union[str, pathlib.Path, None]] = None,
+        nested: Optional[bool] = True,
+        required: Optional[bool] = False,
+    ) -> None:
+        """
+        Exports self to a JSON
+
+        Parameters
+        ----------
+        filename: Optional[Union[str, pathlib.Path, None]
+            Where to write the json
+        nested: Optional[bool] = True,
+            An mt_metadata argument
+        required: Optional[bool] = False,
+            An mt_metadata argument
+
+        """
         if filename is None:
             filename = self.json_fn()
         json_str = self.to_json(nested=nested, required=required)
         with open(filename, "w") as f:
             f.write(json_str)
 
-    def emtf_tf_header(self, dec_level_id):
+    def emtf_tf_header(self, dec_level_id: int) -> ListDict:
         """
+        Returns a ListDict object that has the information that was in the old EMTF TF
+         Header object.  This may be deprecated in future -- it is an artefact of the
+         old matlab implementation.
 
         Parameters
         ----------
@@ -67,7 +115,9 @@ class Processing(Processing):
 
         Returns
         -------
-        tfh: mt_metadata.transfer_functions.processing.aurora.transfer_function_header.TransferFunctionHeader
+            tfh: ListDict
+            Object with the properties of the old EMTF TransferFunctionHeader class.
+
         """
         tfh = ListDict()
         tfh.processing_scheme = self.decimations[dec_level_id].estimator.engine
@@ -80,7 +130,7 @@ class Processing(Processing):
 
         return tfh
 
-    def make_tf_level(self, dec_level_id):
+    def make_tf_level(self, dec_level_id: int):
         """
         Initialize container for a single decimation level -- "flat" transfer function.
 
@@ -107,7 +157,7 @@ class Processing(Processing):
 
 class EMTFTFHeader(ListDict):
     """
-    Convenince class for storing metadata for a TF estimate.
+    Convenience class for storing metadata for a TF estimate.
     Based on Gary Egbert's TFHeader.m originally in
     iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
 

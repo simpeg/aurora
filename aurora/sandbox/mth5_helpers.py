@@ -1,12 +1,12 @@
 """
-This module was inside of mth5/clients/helper_functions.py
-on branch issue_76_make_mth5_factoring
+This module contains utility functions for working with MTH5 files.
+TODO: Review and move to mth5 if relevant
 
-Some of these functions are handy, and should eventually be merged into mth5.
+Background: This module was inside of mth5/clients/helper_functions.py on branch issue_76_make_mth5_factoring
 
-I would also like to use some of these functions from time-to-time, so I am putting
-them here for now, until we can decide what to move to mth5 and what to keep in
-aurora (and what to throw out).
+Some of these functions are handy, and should eventually be merged into mth5. I would also like to
+use some of these functions from time-to-time, so I am putting them here for now, until we can
+decide what to move to mth5 and what to keep in aurora (and what to throw out).
 """
 import datetime
 import pandas as pd
@@ -19,6 +19,7 @@ from loguru import logger
 
 def enrich_channel_summary(mth5_object, df, keyword):
     """
+    Operates on a channel summary df and adds some information in a new column.
 
     Parameters
     ----------
@@ -59,10 +60,15 @@ def enrich_channel_summary(mth5_object, df, keyword):
     return df
 
 
-def augmented_channel_summary(mth5_object, df=None):  # , **kwargs):
+def augmented_channel_summary(mth5_object, df=None):
     """
-    Consider supportig kwargs, such as a list of keyords that tell what columns to add
-    For now, we only want to add n_filters
+    Adds column "n_filters" to mth5 channel summary.
+
+    This function was used when debugging and wide scale testing at IRIS/Earthscope.
+
+    Development Notes:
+    TODO: Consider supporting a list of keyeords that tell what columns to add
+
     Parameters
     ----------
     df: channel summary dataframe
@@ -70,7 +76,8 @@ def augmented_channel_summary(mth5_object, df=None):  # , **kwargs):
 
     Returns
     -------
-
+    df: pd.Dataframe
+        Same as input but with new column
     """
     if not df:
         df = mth5_object.channel_summary.to_dataframe()
@@ -92,8 +99,10 @@ def build_request_df(
     end=None,
     time_period_dict={},
     mth5_version="0.2.0",
-):
+) -> pd.DataFrame:
     """
+    Given some information about an earthscope dataset, format the dataset description
+     into a request_df dataframe.
 
     Parameters
     ----------
@@ -116,10 +125,7 @@ def build_request_df(
 
     Returns
     -------
-
-
-    Returns:
-        request_df: pd.DataFrame
+    request_df: pd.DataFrame
         A formatted dataframe that can be passed to mth5.clients.FDSN to request metdata or data.
 
     """
@@ -159,6 +165,7 @@ def build_request_df(
 
 
 def get_experiment_from_obspy_inventory(inventory):
+    """Converts an FDSN inventory to an MTH5 Experiment object"""
     translator = XMLInventoryMTExperiment()
     experiment = translator.xml_to_mt(inventory_object=inventory)
     return experiment
@@ -166,6 +173,7 @@ def get_experiment_from_obspy_inventory(inventory):
 
 def mth5_from_experiment(experiment, h5_path=None):
     """
+    Converts an experiment object into an mth5 file.
 
     Parameters
     ----------
@@ -183,6 +191,8 @@ def mth5_from_experiment(experiment, h5_path=None):
 
 def get_channel_summary(h5_path):
     """
+    Gets a channel summary from an mth5;
+    TODO: This can be replaced by methods in mth5.
 
     Parameters
     ----------

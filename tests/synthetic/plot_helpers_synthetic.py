@@ -41,7 +41,7 @@ def make_subtitle(
 
 
 def make_figure_basename(
-    local_station_id, remote_station_id, xy_or_yx, matlab_or_fortran
+    local_station_id: str, remote_station_id: str, xy_or_yx: str, matlab_or_fortran: str
 ):
     """
 
@@ -118,11 +118,11 @@ def plot_rho_phi(
         matlab_or_fortran,
     )
     tf_collection.rho_phi_plot(
-        aux_data=aux_data,
         xy_or_yx=xy_or_yx,
+        aux_data=aux_data,
         ttl_str=ttl_str,
         show=show_plot,
         figure_basename=figure_basename,
-        figure_path=output_path,
+        figures_path=output_path,
     )
     return

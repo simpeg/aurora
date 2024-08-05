@@ -1,6 +1,11 @@
 """
-follows Gary's TTFZ.m in
+This module contains an extension of aurora's TransferFunction base class.
+This class can return estimates of standard error, apparent resistivity and phase.
+
+Development Notes:
+This class follows  Gary's legacy matlab code  TTFZ.m from
 iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
+TODO: This should be replaced by methods in mtpy.
 """
 import numpy as np
 import xarray as xr
@@ -11,22 +16,34 @@ from aurora.transfer_function.base import TransferFunction
 
 class TTFZ(TransferFunction):
     """
-    subclass to support some more MT impedance specficic functions  --
-    initially just apparent resistivity and pbase for diagonal elements
+    subclass to support some more MT impedance specific functions  --
+    initially just apparent resistivity and phase for diagonal elements.
     + rotation/fixed coordinate system
 
-    properties
-    rho
-    rho_se
-    phi
-    phi_se
+    TODO: This class should be deprecated and mt_metadata TF object should be used instead.
+
     """
 
     def __init__(self, *args, **kwargs):
+        """
+        Constructor
+
+        Parameters
+        ----------
+        args: passed through to base class
+        kwargs: passed through to base class
+        """
         super(TTFZ, self).__init__(*args, **kwargs)
 
     def standard_error(self):
         """
+        estimate the standard error, used for error bars and inversion.
+
+        Development Notes:
+        The standard error is normally thought of as the sqrt of the error variance.
+        since the code here sets std_err = np.sqrt(np.abs(cov_ss_inv * cov_nn))
+        that means the inverse signal covariance times the noise covariance is like the error variance.
+
         Returns
         -------
         standard_error: xr.DataArray
@@ -44,15 +61,19 @@ class TTFZ(TransferFunction):
         for out_ch in self.tf_header.output_channels:
             for inp_ch in self.tf_header.input_channels:
                 for T in self.periods:
-                    cov_ss = self.cov_ss_inv.loc[inp_ch, inp_ch, T]
+                    cov_ss_inv = self.cov_ss_inv.loc[inp_ch, inp_ch, T]
                     cov_nn = self.cov_nn.loc[out_ch, out_ch, T]
-                    std_err = np.sqrt(np.abs(cov_ss * cov_nn))
+                    std_err = np.sqrt(np.abs(cov_ss_inv * cov_nn))
                     standard_error.loc[out_ch, inp_ch, T] = std_err
 
         return standard_error
 
     def apparent_resistivity(self, channel_nomenclature, units="SI"):
         """
+        Computes the apparent resistivity and phase.
+
+        Development notes:
+        Original Matlab Documentation:
         ap_res(...) : computes app. res., phase, errors, given imped., cov.
         %USAGE: [rho,rho_se,ph,ph_se] = ap_res(z,sig_s,sig_e,periods) ;
         % Z = array of impedances (from Z_***** file)
@@ -66,7 +87,7 @@ class TTFZ(TransferFunction):
             one of ["MT","SI"]
         channel_nomenclature:
         mt_metadata.transfer_functions.processing.aurora.channel_nomenclature.ChannelNomenclature
-            has a dict that you
+            has a dict that maps the channel names in TF to the standard channel labellings.
 
         """
         ex, ey, hx, hy, hz = channel_nomenclature.unpack()

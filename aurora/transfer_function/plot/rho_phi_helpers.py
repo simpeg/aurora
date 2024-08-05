@@ -1,6 +1,10 @@
 """
-helper functions being factored out of plotter to support mulitple plots on a single
-axis.
+This module contains functions for plotting appararent resistivity and phase.
+
+They are based on the original matlab codes.
+They support multiple plots on a single axis.
+
+TODO: replace these with calls to MTpy
 """
 
 
@@ -16,6 +20,8 @@ def plot_rho(
     ax_label_size=16,
 ):
     """
+
+    Plots apparent resistivity on the given axis
 
     Parameters
     ----------
@@ -58,6 +64,25 @@ def plot_phi(
     markersize=10,
     ax_label_size=16,
 ):
+    """
+    Plots the phase on the given axis.
+
+    Parameters
+    ----------
+    ax
+    periods
+    phi
+    marker
+    color
+    linestyle
+    label
+    markersize
+    ax_label_size
+
+    Returns
+    -------
+
+    """
     ax.semilogx(
         periods,
         phi,

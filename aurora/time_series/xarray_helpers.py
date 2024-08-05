@@ -9,6 +9,7 @@ from loguru import logger
 def handle_nan(X, Y, RR, drop_dim=""):
     """
     Drops Nan from multiple channel series'.
+
     Initial use case is for Fourier coefficients, but could be more general.
 
     Idea is to merge X,Y,RR together, and then call dropna.  We have to be careful

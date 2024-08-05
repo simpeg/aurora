@@ -1,6 +1,11 @@
+"""
+    This module contains a test that should be moved into mt_metadata
+    TODO: Make this a test in mt_metadata
+"""
 from mt_metadata.timeseries.location import Location
 from mth5.mth5 import MTH5
 from loguru import logger
+
 
 def test_can_add_location():
     """

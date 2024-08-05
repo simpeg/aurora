@@ -24,7 +24,7 @@ copyright = "2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Linds
 author = "2021, Karl Kappler, Jared Peacock, Tim Ronan, Andy Frassetto, Lindsey Heagy, Douglas Oldenburg"
 
 # The full version, including alpha/beta/rc tags
-release = "0.0.1"
+release = "0.3.13"
 
 
 # -- General configuration ---------------------------------------------------

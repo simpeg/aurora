@@ -1,3 +1,6 @@
+"""
+    In this module are some helper functions for working with FDSN inventory objects.
+"""
 from loguru import logger
 
 

@@ -1,3 +1,7 @@
+"""
+    This module contains various helper functions that were used to fix errors in metadata.
+"""
+
 from mt_metadata.timeseries.filters.helper_functions import MT2SI_ELECTRIC_FIELD_FILTER
 from mt_metadata.timeseries.filters.helper_functions import MT2SI_MAGNETIC_FIELD_FILTER
 
@@ -6,11 +10,14 @@ from loguru import logger
 
 def triage_mt_units_electric_field(experiment):
     """
+    Updates an mth5 experiment with filter information
+
     One-off example of adding a filter to an mth5 in the case where the electric
     field data are given in V/m, but they were expected in mV/km.  This adds the
     correct filter to the metadata so that the calibrated data have units of
     mV/km.
-     Parameters
+
+    Parameters
     ----------
     experiment ;
 
@@ -37,11 +44,13 @@ def triage_mt_units_electric_field(experiment):
 
 def triage_mt_units_magnetic_field(experiment):
     """
-    One-off example of adding a filter to an mth5 in the case where the electric
-    field data are given in V/m, but they were expected in mV/km.  This adds the
-    correct filter to the metadata so that the calibrated data have units of
-    mV/km.
-     Parameters
+    Updates an mth5 experiment with filter information
+
+    One-off example of adding a filter to an mth5 in the case where the magnetic
+    field data are given in T, but they were expected in nT.  This adds the
+    correct filter to the metadata so that the calibrated data have units of nT.
+
+    Parameters
     ----------
     experiment ;
 
@@ -68,7 +77,10 @@ def triage_mt_units_magnetic_field(experiment):
 
 def triage_missing_coil_hollister(experiment):
     """
+    Fixes missing metadata for Hollister station
+
     One off for hollister missing hy metadata for no reason I can tell
+
     Parameters
     ----------
     experiment
@@ -95,6 +107,8 @@ def triage_missing_coil_hollister(experiment):
 
 def triage_run_id(expected_run_id, run_obj):
     """
+    Fixes metadata from an old version of MTH5.
+
     This situation was encounterd during the Musgraves processing in 2023 HPC workshopl
     The MTH5 files being used were from a previous era, and the run_object metadata did not
     contain the expected value for run_id.

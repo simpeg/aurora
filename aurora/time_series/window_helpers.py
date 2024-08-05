@@ -1,4 +1,14 @@
 """
+
+This module contains some helper functions that are used when working with sliding windows.
+
+Development Notes:
+ - Not all the functions here are needed, some of them are just examples and tests.
+ - for example there are three sliding window functions that were considered.
+   The idea was to compare their performance, but currently we use `sliding_window_crude`.
+
+
+
 Notes in google doc:
 https://docs.google.com/document/d/1CsRhSLXsRG8HQxM4lKNqVj-V9KA9iUQAvCOtouVzFs0/edit?usp=sharing
 
@@ -10,11 +20,16 @@ import time
 from loguru import logger
 from numba import jit
 from numpy.lib.stride_tricks import as_strided
+from typing import Optional, Union
 
 
-# Window-to-timeseries relationship
-def available_number_of_windows_in_array(n_samples_array, n_samples_window, n_advance):
+def available_number_of_windows_in_array(
+    n_samples_array: int, n_samples_window: int, n_advance: int
+) -> int:
     """
+    Returns the number of whole windows that can be extracted from array of length
+     n_samples_array by a window of length n_samples_window, if the window advances
+     by n_advance samples at each step.
 
     Parameters
     ----------
@@ -32,7 +47,9 @@ def available_number_of_windows_in_array(n_samples_array, n_samples_window, n_ad
     """
     stridable_samples = n_samples_array - n_samples_window
     if stridable_samples < 0:
-        logger.critical("CRITICAL Window is longer than the time series")
+        logger.error(
+            "Window is longer than the time series -- no complete windows can be returned"
+        )
         return 0
     available_number_of_strides = int(np.floor(stridable_samples / n_advance))
     available_number_of_strides += 1
@@ -44,6 +61,7 @@ def sliding_window_crude(
     data, num_samples_window, num_samples_advance, num_windows=None
 ):
     """
+    Reshapes input data with a sliding window.
 
     Parameters
     ----------
@@ -78,6 +96,7 @@ def sliding_window_crude(
 @jit(nopython=True)
 def sliding_window_numba(data, num_samples_window, num_samples_advance, num_windows):
     """
+    Reshapes input data with a sliding window.
 
     Parameters
     ----------
@@ -104,30 +123,32 @@ def sliding_window_numba(data, num_samples_window, num_samples_advance, num_wind
     return output_array
 
 
-def striding_window(data, num_samples_window, num_samples_advance, num_windows=None):
+def striding_window(
+    data: np.ndarray,
+    num_samples_window: int,
+    num_samples_advance: int,
+    num_windows: Optional[Union[int, None]] = None,
+) -> np.ndarray:
     """
+    Reshapes input data with a sliding window.
+
+    Not currently used.
+
+    Development Notes:
     Applies a striding window to an array.  We use 1D arrays here.
     Note that this method is extendable to N-dimensional arrays as was once shown
     at  http://www.johnvinyard.com/blog/?p=268
 
-    Karl has an implementation of this code but chose to restict to 1D here.
-    This is becuase of several warnings encountered, on the notes of stride_tricks.py,
+    Here the code is restricted to 1D.
+    This is because of several warnings encountered, on the notes of stride_tricks.py,
     as well as for example here:
     https://stackoverflow.com/questions/4936620/using-strides-for-an-efficient-moving-average-filter
 
-    While we can possibly setup Aurora so that no copies of the strided window are made
+    While we can possibly set up Aurora so that no copies of the strided window are made
     downstream, we cannot guarantee that another user may not add methods that require
-    copies.  For robustness we will use 1d implementation only for now.
+    copies.  To avoid this, use 1d implementation only for now.
 
     Another clean example of this method can be found in the razorback codes from brgm.
-
-    result is 2d: result[i] is the i-th window
-
-    >>> sliding_window(np.arange(15), 4, 3, 2)
-    array([[0, 1, 2],
-           [2, 3, 4],
-           [4, 5, 6],
-           [6, 7, 8]])
 
     Parameters
     ----------
@@ -144,20 +165,17 @@ def striding_window(data, num_samples_window, num_samples_advance, num_windows=N
     Returns
     -------
     strided_window: numpy.ndarray
-        The windowed time series
+        The windowed time series.  result is 2d: result[i] is the i'th window.
 
     """
     if num_windows is None:
         num_windows = available_number_of_windows_in_array(
             len(data), num_samples_window, num_samples_advance
         )
-    # min_ = (num_windows - 1) * num_samples_advance + num_samples_window
     bytes_per_element = data.itemsize
     output_shape = (num_windows, num_samples_window)
-    # print("output_shape", output_shape)
     strides_shape = (num_samples_advance * bytes_per_element, bytes_per_element)
-    # strides_shape = None
-    logger.info("strides_shape", strides_shape)
+    logger.debug("strides_shape", strides_shape)
     strided_window = as_strided(
         data, shape=output_shape, strides=strides_shape
     )  # , writeable=False)
@@ -172,35 +190,23 @@ SLIDING_WINDOW_FUNCTIONS = {
 }
 
 
-# FFT Helpers
-def apply_fft_to_windowed_array(windowed_array):
+def check_all_sliding_window_functions_are_equivalent() -> None:
     """
-    This will operate row-wise as well
-    Parameters
-    ----------
-    windowed_array
+    This is a test to see if the sliding window functions all return the same output.
 
-    Returns
-    -------
+    TODO: Move this into tests.
 
-    """
-    pass
-
-
-def check_all_sliding_window_functions_are_equivalent():
-    """
-    simple sanity check that runs each sliding window function on a small array and
+    Development Notes:
+    - simple sanity check that runs each sliding window function on a small array and
     confirms the results are numerically identical.
-    Note that striding window will return int types where others return float.
-    Returns
-    -------
+    - Note that striding window will return int types where others return float.
 
     """
 
-    N = 15
-    L = 3
-    V = 1
-    A = L - V
+    N = 15  # Num samples data
+    L = 3  # n_samples_window
+    V = 1  # n_overlap
+    A = L - V  # n_advance
     data = np.arange(N)
     n_win = available_number_of_windows_in_array(N, L, A)
     results = {}
@@ -214,37 +220,45 @@ def check_all_sliding_window_functions_are_equivalent():
         else:
             difference = reference_result - results[function_label]
             if np.sum(np.abs(difference)) == 0:
-                logger.info(f"OK {i}")
-                # put an assert here instead of OK
+                assert True
+            else:
+                assert False
 
 
 def do_some_tests():
-    N = 10000000
+    """
+    A placeholder for things that should be moved to tests/
+
+    TODO: Move these into tests
+
+    """
+    # Set parameters for test
+    N = 10000000  # num samples data
     n_samples_window = 128
     n_overlap = 96
     n_advance = n_samples_window - n_overlap
 
+    # Test that striding window executes on a toy dataset
     sw = striding_window(np.arange(15), 3, 2, num_windows=4)
     logger.info(sw)
 
+    # Test speed of striding_window on time series length N
     t0 = time.time()
-    strided_window = striding_window(
-        1.0 * np.arange(N), n_samples_window, n_advance
-    )  # , num_windows=4)
+    strided_window = striding_window(1.0 * np.arange(N), n_samples_window, n_advance)
     strided_window += 1
     logger.info("stride {}".format(time.time() - t0))
-
     logger.info(strided_window)
 
+    # Test speed of sliding_window_crude on time series length N
     t0 = time.time()
     slid_window = sliding_window_crude(
         1.0 * np.arange(N), n_samples_window, n_advance
     )  # , num_windows=4)
     slid_window += 1
     logger.info("crude  {}".format(time.time() - t0))
-
     logger.info(slid_window)
 
+    # Test speed of sliding_window_numba on time series length N
     num_windows = available_number_of_windows_in_array(N, n_samples_window, n_advance)
     logger.info(num_windows)
     t0 = time.time()
@@ -261,7 +275,13 @@ def do_some_tests():
     logger.info("numba  {}".format(time.time() - t0))
 
 
-def test_apply_taper():
+def test_apply_taper() -> None:
+    """
+    Tests that syntax to apply taper is correct.
+
+    Makes a plit showing the first time window with and without taper
+
+    """
     import matplotlib.pyplot as plt
     import scipy.signal as ssig
 
@@ -274,16 +294,17 @@ def test_apply_taper():
     plt.plot(tapered_windowed_data[0], "g", label="tapered data")
     plt.legend()
     plt.show()
-    return
 
 
 def main():
+    """Placeholder for tests"""
     check_all_sliding_window_functions_are_equivalent()
     do_some_tests()
     test_apply_taper()
 
 
 if __name__ == "__main__":
+    """Allow module to be called from terminal window"""
     main()
 
 
