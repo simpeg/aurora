@@ -23,6 +23,13 @@ class TestSpectrogram(unittest.TestCase):
         spectrogram = Spectrogram()
         assert isinstance(spectrogram, Spectrogram)
 
+    def test_slice_band(self):
+        """
+        Place holder
+        TODO: Once FCs are added to an mth5, load a spectrogram and extract a Band
+        """
+        pass
+
 
 if __name__ == "__main__":
     # tmp = TestSpectrogram()

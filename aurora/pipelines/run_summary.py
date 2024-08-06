@@ -1,6 +1,12 @@
 """
 
-Note 1: Functionality of RunSummary()
+This module contains the RunSummary class.
+
+This is a helper class that summarizes the Runs in an mth5.
+
+TODO: This class and methods could be replaced by methods in MTH5.
+
+Functionality of RunSummary()
 1. User can get a list of local_station options, which correspond to unique pairs
 of values: (survey_id,  station_id)
 
@@ -18,6 +24,15 @@ maximize coverage of the local station runs is generated
 7. Time interval endpoints can be changed
 
 
+Development Notes:
+
+    TODO: consider adding methods:
+     "drop_runs_shorter_than": removes short runs from summary
+     "fill_gaps_by_time_interval": allows runs to be merged if gaps between are short
+     "fill_gaps_by_run_names": allows runs to be merged if gaps between are short
+
+    TODO: Consider whether this should return a copy or modify in-place when querying the df.
+
 """
 
 import copy
@@ -33,6 +48,7 @@ from mt_metadata.transfer_functions.processing.aurora.channel_nomenclature impor
 import mth5
 from mth5.utils.helpers import initialize_mth5
 from loguru import logger
+from typing import Optional, Union
 
 
 RUN_SUMMARY_COLUMNS = [
@@ -51,28 +67,28 @@ RUN_SUMMARY_COLUMNS = [
 
 class RunSummary:
     """
-    The dependencies aren't clear yet.
-    Maybe still Dataset:
-        Could have methods
-            "drop_runs_shorter_than"
-            "fill_gaps_by_time_interval"
-            "fill_gaps_by_run_names"
-            "
+    Class to contain a run-summary table from one or more mth5s.
 
-    For the full MMT case this may need modification to a channel based summary.
-
-    Question: To return a copy or modify in-place when querying.  Need to decide on
-    standards and syntax.  Handling this in general could use a decorator that allows
-    df as kwarg, and if it is not passed the modification is done in place.
-    The user who doesn't want to modify in place can work with a clone.
-    Could also try the @staticmethod decorator so that it returns a modified df.
+    WIP: For the full MMT case this may need modification to a channel based summary.
 
     """
 
-    def __init__(self, **kwargs):
+    def __init__(
+        self,
+        input_dict: Optional[Union[dict, None]] = None,
+        df: Optional[Union[pd.DataFrame, None]] = None,
+    ):
+
+        """
+        Constructor
+
+        Parameters
+        ----------
+        kwargs
+        """
         self.column_dtypes = [str, str, pd.Timestamp, pd.Timestamp]
-        self._input_dict = kwargs.get("input_dict", None)
-        self.df = kwargs.get("df", None)
+        self._input_dict = input_dict
+        self.df = df
         self._mini_summary_columns = ["survey", "station_id", "run_id", "start", "end"]
 
     def clone(self):
@@ -84,23 +100,28 @@ class RunSummary:
         return copy.deepcopy(self)
 
     def from_mth5s(self, mth5_list):
+        """Iterates over mth5s in list and creates one big dataframe summarizing the runs"""
         run_summary_df = extract_run_summaries_from_mth5s(mth5_list)
         self.df = run_summary_df
 
     @property
     def mini_summary(self):
+        """shows the dataframe with only a few columns for readbility"""
         return self.df[self._mini_summary_columns]
 
     @property
     def print_mini_summary(self):
+        """Calls minisummary through logger so it is formatted."""
         logger.info(self.mini_summary)
 
-    def add_duration(self, df=None):
+    def add_duration(self, df: Optional[Union[pd.DataFrame, None]] = None) -> None:
         """
+        Adds a column called "duration" to the dataframe
 
         Parameters
         ----------
-        df
+        df: Optional[Union[pd.DataFrame, None]]
+            If not provided use self.df
 
         """
         if df is None:
@@ -110,8 +131,18 @@ class RunSummary:
         df["duration"] = durations
         return
 
-    def check_runs_are_valid(self, drop=False, **kwargs):
-        """kwargs can tell us what sorts of conditions to check, for example all_zero, there are nan, etc."""
+    def check_runs_are_valid(self, drop: bool = False):
+        """
+
+        Checks for runs that are identically zero.
+        TODO: Add optional arguments for other conditions to check, for example there are nan, etc.
+
+        Parameters
+        ----------
+        drop: bool
+            If True, drop invalid rows from dataframe
+
+        """
         # check_for_all_zero_runs
         for i_row, row in self.df.iterrows():
             logger.info(f"Checking row for zeros {row}")
@@ -127,7 +158,11 @@ class RunSummary:
             self.drop_invalid_rows()
         return
 
-    def drop_invalid_rows(self):
+    def drop_invalid_rows(self) -> None:
+        """
+        Drops rows marked invalid (df.valid is False) and resets the index of self.df
+
+        """
         self.df = self.df[self.df.valid]
         self.df.reset_index(drop=True, inplace=True)
 
@@ -153,28 +188,22 @@ def channel_summary_to_run_summary(
     sortby=["station_id", "start"],
 ):
     """
-    TODO: replace station_id with station, and run_id with run
-    Note will need to modify: aurora/tests/config$ more test_dataset_dataframe.py
+    Method for compressing an mth5 channel_summary into a "run summary" which
+    has one row per run (not one row per channel)
+
+    Development Notes:
+    TODO: replace station_id with station, and run_id with run. Note will need to modify: aurora/tests/config more test_dataset_dataframe.py
+
     TODO: Add logic for handling input and output channels based on channel
-    summary.  Specifically, consider the case where there is no vertical magnetic
-    field, this information is available via ch_summary, and output channels should
-    then not include hz.
+     summary.  Specifically, consider the case where there is no vertical magnetic
+     field, this information is available via ch_summary, and output channels should
+     then not include hz.
+
     TODO: Just inherit all the run-level and higher el'ts of the channel_summary,
-    including n_samples?
+     including n_samples?
 
     When creating the dataset dataframe, make it have these columns:
-    [
-            "station_id",
-            "run_id",
-            "start",
-            "end",
-            "mth5_path",
-            "sample_rate",
-            "input_channels",
-            "output_channels",
-            "remote",
-            "channel_scale_factors",
-        ]
+    ["station_id", "run_id", "start", "end", "mth5_path", "sample_rate", "input_channels", "output_channels", "remote", "channel_scale_factors",]
 
     Parameters
     ----------
@@ -257,6 +286,10 @@ def channel_summary_to_run_summary(
 
 def extract_run_summary_from_mth5(mth5_obj, summary_type="run"):
     """
+    Given a single mth5 object, get the channel_summary and compress it to a run_summary.
+
+    Development Notes:
+    TODO: Move this into MTH5 or replace with MTH5 built-in run_summary method.
 
     Parameters
     ----------
@@ -288,14 +321,15 @@ def extract_run_summary_from_mth5(mth5_obj, summary_type="run"):
 
 def extract_run_summaries_from_mth5s(mth5_list, summary_type="run", deduplicate=True):
     """
+    Given a list of mth5's, iterate over them, extracting run_summaries and merging into one big table.
+
+    Development Notes:
     ToDo: Move this method into mth5? or mth5_helpers?
     ToDo: Make this a class so that the __repr__ is a nice visual representation of the
     df, like what channel summary does in mth5
-
-    2022-05-28 Modified to allow this method to accept mth5 objects as well as the
+    - 2022-05-28 Modified to allow this method to accept mth5 objects as well as the
     already supported types of pathlib.Path or str
 
-    Given a list of mth5s, this returns a dataframe of all available runs
 
     In order to drop duplicates I used the solution here:
     https://stackoverflow.com/questions/43855462/pandas-drop-duplicates-method-not-working-on-dataframe-containing-lists
@@ -314,6 +348,7 @@ def extract_run_summaries_from_mth5s(mth5_list, summary_type="run", deduplicate=
     Returns
     -------
     super_summary: pd.DataFrame
+        Given a list of mth5s, a dataframe of all available runs
 
     """
     dfs = len(mth5_list) * [None]

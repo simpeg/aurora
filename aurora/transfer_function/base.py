@@ -1,18 +1,24 @@
 """
-follows Gary's TTF.m in iris_mt_scratch
-egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
+This module contains a base class for Transfer function information.
+
+Development Notes:
+ The class is based on Gary's TTF.m in iris_mt_scratch egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
+
+TODO: This class should be updated to use mt_metadata.transfer_function.TF, or replaced by it (issue #203)
+
 """
 
 import numpy as np
 import xarray as xr
-
-from mt_metadata.base import Base
+from aurora.config.metadata.processing import Processing
 from loguru import logger
+from mt_metadata.transfer_functions.processing.aurora.band import FrequencyBands
+from typing import Optional, Union
 
 
-class TransferFunction(Base):
-    """Class to contain transfer function array.
-    
+class TransferFunction:
+    """
+    Class to contain transfer function array.
 
     Parameters
     ----------
@@ -32,23 +38,21 @@ class TransferFunction(Base):
     FullCov : boolean
         true if full covariance is provided
 
-    Returns
-    -------
-    properties (Dependent)
-    StdErr % standard errors of TF components, same size and order as TF
-    NBands
-    freqs % inverse of period
-    Nout
-    Nin
     """
 
-    def __init__(self, decimation_level_id, frequency_bands, **kwargs):
+    def __init__(
+        self,
+        decimation_level_id: int,
+        frequency_bands: FrequencyBands,
+        processing_config: Optional[Union[Processing, None]] = None,
+        **kwargs
+    ):
         """
+        Constructor.
+
+        Development Notes:
         change 2021-07-23 to require a frequency_bands object.  We may want
-        to just pass the band_edges.  I'm not a fan of forcing dependency of
-        TF on the FrequencyBands class, but it will simplify writting the z_file
-        interfaces.  The old TTF.py class shows an example that just accepted
-        num_bands as an initialation variable.
+        to just pass the band_edges.
 
         Parameters
         ----------
@@ -68,7 +72,7 @@ class TransferFunction(Base):
         self.cov_nn = None
         self.R2 = None
         self.initialized = False
-        self.processing_config = kwargs.get("processing_config", None)
+        self.processing_config = processing_config
 
         if self.emtf_tf_header is not None:
             if self.num_bands is not None:
@@ -76,6 +80,13 @@ class TransferFunction(Base):
 
     @property
     def emtf_tf_header(self):
+        """
+
+        Returns
+        -------
+        emtf_tf_header: None or OrderedDict
+            A legacy construction from the old EMTF codes with some metadata about the TF.
+        """
         if self.processing_config is None:
             logger.info("No header is available without a processing config")
             self._emtf_tf_header = None
@@ -87,6 +98,7 @@ class TransferFunction(Base):
 
     @property
     def tf_header(self):
+        """returns the emtf_header"""
         return self.emtf_tf_header
 
     @property
@@ -94,8 +106,9 @@ class TransferFunction(Base):
         return self.transfer_function
 
     @property
-    def num_bands(self):
-        """_summary_
+    def num_bands(self) -> int:
+        """
+        Get number of bands associated with TF
 
         Returns
         -------
@@ -110,27 +123,20 @@ class TransferFunction(Base):
         periods = np.flipud(periods)
         return periods
 
-    def _initialize_arrays(self):
+    def _initialize_arrays(self) -> None:
         """
-        There are four separate data strucutres, indexed by period here:
+        Initialize the xarray objects that will contain the TF data.
 
-        TF (num_channels_out, num_channels_in)
-        cov_ss_inv (num_channels_in, num_channels_in, num_bands),
-        Cov_NN (num_channels_out, num_channels_out),
-        R2 num_channels_out)
+        Development Notes:
+        There are four separate data strucutres, indexed by period here:
+        - TF (num_channels_out, num_channels_in)
+        - cov_ss_inv (num_channels_in, num_channels_in, num_bands),
+        - Cov_NN (num_channels_out, num_channels_out),
+        - R2 num_channels_out)
 
         We use frequency in Fourier domain and period in TF domain.  Might
         be better to be consistent.  It would be inexpensive to duplicate
         the axis and simply provide both.
-
-        Each of these is indexed by period (or frequency)
-        TODO: These may be better cast as xarrays.  Review after curves up
-        and running
-
-        TODO: also, I prefer np.full(dim_tuple, np.nan) for init
-        Returns
-        -------
-
         """
         if self.tf_header is None:
             logger.error("header needed to allocate transfer function arrays")
@@ -200,44 +206,63 @@ class TransferFunction(Base):
         self.initialized = True
 
     @property
-    def minimum_period(self):
+    def minimum_period(self) -> float:
+        """return the minimum (shortest) period in self.periods"""
         return np.min(self.periods)
 
     @property
     def maximum_period(self):
+        """return the maximum (longest) period in self.periods"""
         return np.max(self.periods)
 
     @property
     def num_channels_in(self):
+        """return the number of input channels in the TF"""
         return len(self.tf_header.input_channels)
 
     @property
     def num_channels_out(self):
+        """return the number of output channels in the TF"""
         return len(self.tf_header.output_channels)
 
     def frequency_index(self, frequency):
-        return self.period_index(1.0 / frequency)
-        # frequency_index = np.isclose(self.num_segments.frequency, frequency)
-        # frequency_index = np.where(frequency_index)[0][0]
-        # return frequency_index
+        """
+        Gets the index of the tf array associated with the input frequency
 
-    def period_index(self, period):
+        Parameters
+        ----------
+        frequency: float
+            The period in seconds
+
+        Returns
+        -------
+        frequency_index: int
+            The index of the tf array corresponding to the frequency
+        """
+        return self.period_index(1.0 / frequency)
+
+    def period_index(self, period: float) -> int:
+        """
+        Gets the index of the tf array associated with the input period.
+
+        Parameters
+        ----------
+        period: float
+            The period in seconds
+
+        Returns
+        -------
+        period_index: int
+            The index of the tf array corresponding to the period
+        """
         period_index = np.isclose(self.num_segments.period, period)
         period_index = np.where(period_index)[0][0]
         return period_index
-        # return self.frequency_index(1.0 / period)
-
-    def tf_to_df(self):
-        pass
-        # import pandas as pd
-        # columns = ["input_channel", "output_channel", "frequency", ]
-        #            #"decimation_level"]
-        # df = pd.DataFrame(columns=columns)
 
     def set_tf(self, regression_estimator, period):
         """
-        This sets TF elements for one band, using contents of regression_estimator
-        object.  This version assumes there are estimates for Nout output channels
+        Sets TF elements for one band, using contents of regression_estimator object.
+
         """
         index = self.period_index(period)
 

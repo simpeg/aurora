@@ -235,7 +235,7 @@ def process_synthetic_1(
                 ttl_str=ttl_str,
                 show=False,
                 figure_basename=out_png_name,
-                figure_path=AURORA_RESULTS_PATH,
+                figures_path=AURORA_RESULTS_PATH,
             )
     return tf_result
 

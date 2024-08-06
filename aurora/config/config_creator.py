@@ -1,29 +1,47 @@
 """
-Helper class to make config files.
+This module contains a Helper class to make config files.
 
-Note: the config is still evolving and this class and its methods are expected to
-change.
-
+The processing config is still evolving and this class and its methods may change.
 
 """
-from loguru import logger
-
 from aurora.config.metadata.processing import Processing
 from aurora.config import BANDS_DEFAULT_FILE
-from mt_metadata.transfer_functions.processing.aurora.window import Window
 from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
+from loguru import logger
+from mt_metadata.transfer_functions.processing.aurora.window import Window
+from typing import Optional, Union
+import pathlib
 
 SUPPORTED_BAND_SPECIFICATION_STYLES = ["EMTF", "band_edges"]
 
 
 class ConfigCreator:
-    def __init__(self, **kwargs):
-        self._emtf_band_file = kwargs.get("emtf_band_file", None)
-        self._band_edges = kwargs.get("band_edges", None)
+    def __init__(
+        self,
+        emtf_band_file: Optional[Union[str, pathlib.Path, None]] = None,
+        band_edges: Optional[Union[dict, None]] = None,
+    ):
+        """
+        Constructor
+
+        Parameters
+        ----------
+        emtf_band_file: Optional[Union[str, pathlib.Path, None]]
+            Allows the specification of an EMTF "band setup file" for defining frequency bands.
+        band_edges: dict
+            Keys are integers corresponding to decimation level.  Values are numpy arrays.
+            Numpy arrays are one-row-per-band.  Array shape n_bands x 2. array[i_band,0] is the
+            lower edge of band, and array[i_band,0] is the upper.
+
+        """
+        self._emtf_band_file = emtf_band_file
+        self._band_edges = band_edges
         self._band_specification_style = None
 
     def processing_id(self, kernel_dataset):
         """
+        Generates a string id label for the processing config: WIP.
+
         In the past, we used f"{local}-{remote}" or  f"{local}-{run_id}"
         Neither of these is sufficiently unique.  In fact, they only describe the
         dataset, and not the processing config.  It is difficult to see how to make a
@@ -37,31 +55,47 @@ class ConfigCreator:
 
         Parameters
         ----------
-        kernel_dataset
+        kernel_dataset: aurora.transfer_function.kernel_dataset.KernelDataset
+            An object that defines the data to be processed.
 
         Returns
         -------
-
+        id: str
+            A label for the processing config.
         """
         id = f"{kernel_dataset.local_station_id}-{kernel_dataset.remote_station_id}"
         return id
 
     @property
     def band_specification_style(self):
+        """return a description of the scheme used to define the bands."""
         return self._band_specification_style
 
     @band_specification_style.setter
-    def band_specification_style(self, value):
+    def band_specification_style(self, value: str) -> None:
+        """
+        Sets the band_specification_style
+
+        Parameters
+        ----------
+        value: str
+            The label for the scheme used to define the bands.
+
+        Returns
+        -------
+
+        """
         if value not in SUPPORTED_BAND_SPECIFICATION_STYLES:
             msg = f"Won't set band specification style to unrecognized value {value}"
             logger.warning(msg)
             raise NotImplementedError(msg)
-            # return
         else:
             self._band_specification_style = value
 
-    def determine_band_specification_style(self):
+    def determine_band_specification_style(self) -> None:
         """
+        Try to identify which scheme was used to define the bands
+
         TODO: Should emtf_band_file path be stored in config to support reproducibility?
 
         """
@@ -85,60 +119,70 @@ class ConfigCreator:
         kernel_dataset,
         input_channels=["hx", "hy"],
         output_channels=["hz", "ex", "ey"],
-        estimator=None,
-        **kwargs,
+        estimator: Optional[Union[str, None]] = None,
+        emtf_band_file: Optional[Union[str, pathlib.Path, None]] = None,
+        band_edges: Optional[Union[dict, None]] = None,
+        decimation_factors: Optional[Union[list, None]] = None,
+        num_samples_window: Optional[Union[int, None]] = None,
     ):
         """
-        Hmmm, why not make this a method of kernel_dataset??
+        This creates a processing config from a kernel dataset.
 
-        Early on we want to know how may decimation levels there will be.
-        This is defined either by:
-         1. decimation_factors argument (normally accompanied by a bands_dict)
-         2. number of decimations implied by EMTF band setup file.
-        Theoretically, you could also use the number of decimations implied by
-        bands_dict but this is sloppy, because it would be bad practice to assume
-        the decimation factor.
+        TODO: Make this a method of kernel_dataset.
 
-        Notes:
-        1.  2022-09-10
-        The reading-in from EMTF band setup file used to be very terse, carried
-        some baked in assumptions about decimation factors, and did not acknowlege
-        specific frequency bands in Hz.  I am adding some complexity to the method
-        that populates bands from EMTF band setup file but am now explict about the
-        assumtion of decimation factors, and do provide the frequency bands in Hz.
+        **Development Notes:**
+
+         1. 2022-09-10
+
+         The reading-in from EMTF band setup file used to be very terse, carried
+         some baked in assumptions about decimation factors, and did not acknowledge
+         specific frequency bands in Hz.  I am adding some complexity to the method
+         that populates bands from EMTF band setup file but am now explict about the
+         assumption of decimation factors, and do provide the frequency bands in Hz.
+
+         2. The number of decimation levels must be defined either by:
+
+          - decimation_factors argument (normally accompanied by a bands_dict)
+          - number of decimations implied by EMTF band setup file.
+
+          Theoretically, you could also use the number of decimations implied by bands_dict but this is sloppy, because it would assume the decimation factor.
 
 
         Parameters
         ----------
-        kernel_dataset
-        emtf_band_file: while the default here is None, it will get assigned the
-        value BANDS_DEFAULT_FILE in the set_frequecy_bands method if band edges is
-        also None.
-        input_channels
-        output_channels
-        estimator
-        band_edges
-        kwargs
+        kernel_dataset: aurora.transfer_function.kernel_dataset.KernelDataset
+            An object that defines the data to be processed.
+        input_channels: list
+            List of the input channels that will be used in TF estimation (usually "hx", "hy")
+        output_channels: list
+            List of the output channels that will be estimated by TF (usually "ex", "ey", "hz")
+        estimator:  Optional[Union[str, None]]
+            The name of the regression estimator to use for TF estimation.
+        emtf_band_file: Optional[Union[str, pathlib.Path, None]]
+            The emtf and setup file if used.
+        band_edges: Optional[Union[dict, None]]
+            The band edges if emtf_band_file not used
+        decimation_factors: Optional[Union[list, None]]
+            List of decimation factors, normally [1, 4, 4, 4, ... 4]
+        num_samples_window: Optional[Union[int, None]]
+            The size of the window (usually for FFT)
 
         Returns
         -------
-
+        processing_obj: aurora.config.metadata.processing.Processing
+            Object storing the processing parameters.
         """
-
         processing_id = self.processing_id(kernel_dataset)
         processing_obj = Processing(id=processing_id)  # , **kwargs)
 
         # pack station and run info into processing object
         processing_obj.stations.from_dataset_dataframe(kernel_dataset.df)
 
-        # Unpack kwargs
-        self._emtf_band_file = kwargs.get("emtf_band_file", None)
-        self._band_edges = kwargs.get("band_edges", None)
-        decimation_factors = kwargs.get("decimation_factors", None)
-        num_samples_window = kwargs.get("num_samples_window", None)
-
-        # determine window parameters:
-        # check if they have been passed as kwargs, otherwise extract default values
+        # Unpack optional arguments
+        self._emtf_band_file = emtf_band_file
+        self._band_edges = band_edges
+        decimation_factors = decimation_factors
+        num_samples_window = num_samples_window
 
         # Determine if band_setup or edges dict is to be used for bands
         self.determine_band_specification_style()
@@ -150,6 +194,7 @@ class ConfigCreator:
                 filepath=self._emtf_band_file, sample_rate=kernel_dataset.sample_rate
             )
             num_decimations = emtf_band_setup_file.num_decimation_levels
+            # Assign optional arguments if they have not been passed
             if decimation_factors is None:
                 # set default values to EMTF default values [1, 4, 4, 4, ..., 4]
                 decimation_factors = num_decimations * [4]

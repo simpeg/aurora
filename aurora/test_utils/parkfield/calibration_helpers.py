@@ -1,3 +1,6 @@
+"""
+    This module contains methods that are used in the Parkfield calibration tests.
+"""
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -8,25 +11,26 @@ from loguru import logger
 plt.ion()
 
 
-def load_bf4_fap_for_parkfield_test_using_mt_metadata(frequencies):
+def load_bf4_fap_for_parkfield_test_using_mt_metadata(frequencies: np.ndarray):
     """
-    The hardware repsonses (AAF and digitizer) are not included in this response,
-    but these do not make any significant difference away from the Nyquist frequecny.
+    Loads a csv format response file for a BF4 coil and return the calibration function.
+    Uses an mt_metadata filter object.
 
-    Near the Nyquist calibration is inadequate anyhow.  Looking at the output plots,
-    which show the "full calibration" vs "response table (EMI)", neither one is
-    realistic at high frequency.  The fap ("response table (EMI)") curve does not
-    compensate for AAF and plunges down at high frequency.  The full calibration
-    from the PZ response on the other hand rises unrealistically.  The PZ rising
-    signal amplitude at high frequency is an artefact of calibrating noise.
+    - Anti-alias filter and digitizer responses are not included in the csv -- it is coil only.
+    - We ignore the AAF, and hard-code a counts-per-volt value for now
+
+    Development Notes:
+    TODO: Add doc showing where counts per volt is accessing in FDSN metadata.
 
     Parameters
     ----------
-    frequencies : numpy array
-        Array of frequencies at which to evaluate the bf response function
+    frequencies: np.ndarray
+        Frequencies at which to evaluate the bf response function
+
     Returns
     -------
-
+    bf4_resp:  np.ndarray
+        Complex response of the filter at the input frequencies
     """
     from aurora.general_helper_functions import DATA_PATH
     from mt_metadata.timeseries.filters.helper_functions import (
@@ -49,6 +53,7 @@ def plot_responses(
     show_response_curves,
 ):
     """
+    Makes a sanity check plot to show the response of the calibration curves
 
     Parameters
     ----------
@@ -99,7 +104,7 @@ def parkfield_sanity_check(
     include_decimation=False,
 ):
     """
-    loop over channels in fft obj and make calibrated spectral plots
+    Loop over channels in fft obj and make calibrated spectral plots
 
     Parameters
     ----------

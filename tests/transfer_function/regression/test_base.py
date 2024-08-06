@@ -105,6 +105,52 @@ class TestRegressionBase(unittest.TestCase):
         re.solve_underdetermined()
         assert re.b is not None
 
+    def test_can_handle_xr_dataarray(self):
+        dataset = make_mini_dataset()
+        X = dataset[["hx", "hy"]]
+        X = X.stack(observation=("frequency", "time"))
+        Y = dataset[
+            [
+                "ex",
+            ]
+        ]
+        Y = Y.stack(observation=("frequency", "time"))
+        X_da = X.to_array()
+        Y_da = Y.to_array()
+        re = RegressionEstimator(X=X_da, Y=Y_da)
+        re.estimate_ols()
+        difference = re.b - np.atleast_2d(self.expected_solution).T
+        assert np.isclose(difference, 0).all()
+        re.estimate()
+        difference = re.b - np.atleast_2d(self.expected_solution).T
+        assert np.isclose(difference, 0).all()
+
+    def test_can_handle_np_ndarray(self):
+        """
+        While we are at it -- handle numpy arrays as well.
+        Returns
+        -------
+
+        """
+        dataset = make_mini_dataset()
+        X = dataset[["hx", "hy"]]
+        X = X.stack(observation=("frequency", "time"))
+        Y = dataset[
+            [
+                "ex",
+            ]
+        ]
+        Y = Y.stack(observation=("frequency", "time"))
+        X_np = X.to_array().data
+        Y_np = Y.to_array().data
+        re = RegressionEstimator(X=X_np, Y=Y_np)
+        re.estimate_ols()
+        difference = re.b - np.atleast_2d(self.expected_solution).T
+        assert np.isclose(difference, 0).all()
+        re.estimate()
+        difference = re.b - np.atleast_2d(self.expected_solution).T
+        assert np.isclose(difference, 0).all()
+
 
 def main():
     unittest.main()

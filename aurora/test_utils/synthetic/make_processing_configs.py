@@ -1,3 +1,7 @@
+"""
+    This module contains methods for generating processing config objects that are
+    used in aurora's tests of processing synthetic data.
+"""
 from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config import BANDS_256_26_FILE
 from aurora.config.config_creator import ConfigCreator
@@ -24,11 +28,21 @@ def create_test_run_config(
     test_case_id: string
         Must be in ["test1", "test2", "test1r2", "test2r1", "test1_tfk", "test1r2_tfk"]
     kernel_dataset: aurora.transfer_function.kernel_dataset.KernelDataset
+        Description of the dataset to process
     matlab_or_fortran: str
         "", "matlab", "fortran"
+    save: str
+        if this has the value "json" a copy of the processing config will be written to a json file
+        The json file name is p.json_fn() with p the processing config object.
+    channel_nomenclature: str
+        A label for the channel nomenclature.  This should be one of the values in
+        mt_metadata/transfer_functions/processing/aurora/standards/channel_nomenclatures.json
+        currently ["default", "lemi12", "lemi34", "phoenix123", "musgraves",]
 
     Returns
     -------
+    p: aurora.config.metadata.processing.Processing
+        The processing config object
 
 
     """
@@ -118,19 +132,29 @@ def create_test_run_config(
 
 def test_to_from_json():
     """
-    Test related to issue #172
-    This is deprecated in its current form, but should be modified to save the json
-    from the processing object (not the config class)
-    Trying to save to json and then read back a Processing object
+    Intended to test that processing config can be stored as a json, then
+    reloaded from json and is equal.
 
-    Start by manually creating the dataset_df for syntehtic test1
+    WORK IN PROGRESS -- see mt_metadata Issue #222
+
+    Development Notes:
+    TODO: This test should be completed and moved into tests.
+    The json does not load into an mt_metadata object.
+    The problem seems to be that at the run-level of the processing config there is an
+    intention to allow for multiple time-periods. This is reasonable, consider a station
+    running for several months, we may want to only process data from certain chunks
+    of the time series.
+    However, the time period reader does not seem to work as expected.
+    A partial fix is on fix_issue_222 branch of mt_metadata
+
+    Related to issue #172
 
 
     Returns
     -------
 
     """
-    import pandas as pd
+    # import pandas as pd
     from mt_metadata.transfer_functions.processing.aurora import Processing
     from aurora.pipelines.run_summary import RunSummary
     from aurora.transfer_function.kernel_dataset import KernelDataset
@@ -154,10 +178,36 @@ def test_to_from_json():
     json_fn = CONFIG_PATH.joinpath(processing_config.json_fn())
     p.from_json(json_fn)
     logger.info("Assert equal needed here")
+    # This fails (July 22, 2024)
+    # assert p == processing_config
+
+    # This should be true, but its false
+    # p.stations.local.runs == processing_config.stations.local.runs
+    # p.stations.local.runs[0] == processing_config.stations.local.runs[0]
+
+    """
+    Debugging Notes:
+    Once the updated parsing from #222 is applied, the next problem is that the object that was
+    read-back from json has two dicts in its time periods:
+    p.stations.local.runs[0].time_periods
+    [{'time_period': {'end': '1980-01-01T11:06:39+00:00', 'start': '1980-01-01T00:00:00+00:00'}},
+     {'time_period': {'end': '1980-01-01T11:06:39+00:00', 'start': '1980-01-01T00:00:00+00:00'}}]
+    processing_config.stations.local.runs[0].time_periods
+    [{
+        "time_period": {
+            "end": "1980-01-01T11:06:39+00:00",
+            "start": "1980-01-01T00:00:00+00:00"
+        }
+    }]
+    """
     return
 
 
 def main():
+    """Allow the module to be called from the command line"""
+    pass
+    # TODO: fix test_to_from_json and put in tests.
+    #  - see issue #222 in mt_metadata.
     test_to_from_json()
     # create_test_run_config("test1", df)
     # create_test_run_config("test2")
