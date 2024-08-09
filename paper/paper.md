@@ -124,7 +124,7 @@ tf.write(fn="CAS04_rrNVR08.edi", file_type="edi")
 To run the example you must install aurora, which can be done via conda or pip.  Detailed instructions and further documentation can be found on the SimPEG (@cockett2015simpeg) [documentation website](http://simpeg.xyz/aurora/).
 
 
-![Comparison of apparent resistivities from Aurora and EMTF for station CAS04.  Both curves exhibit scatter in the low signal-to-noise ratio MT "dead band" between 1-10s, but most of estimates are very similar.  The Aurora results are from executing the example code snippet.  The plotting details are in the [Jupyter notebook](https://github.com/simpeg/aurora/blob/joss/docs/tutorials/process_cas04_mulitple_station.ipynb)(. \label{compareTFs}](tf_comparison.png)
+![Comparison of apparent resistivities from Aurora and EMTF for station CAS04.  Both curves exhibit scatter in the low signal-to-noise ratio MT "dead band" between 1-10s, but most of estimates are very similar.  The Aurora results are from executing the example code snippet.  The plotting details are in the [Jupyter notebook](https://github.com/simpeg/aurora/blob/joss/docs/tutorials/process_cas04_mulitple_station.ipynb) \label{compareTFs}](tf_comparison.png)
 
 
 # Testing
