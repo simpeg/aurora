@@ -11,9 +11,12 @@ class ZFile:
     def __init__(self, filename: Union[str, pathlib.Path]):
         """
         Constructor
+
         Parameters
         ----------
-        filename:
+        filename: Union[str, pathlib.Path]
+            The path to the z-file.
+
         """
         self.filename = filename
         self.station = ""
@@ -196,20 +199,22 @@ class ZFile:
 
         f.close()
 
-    def impedance(self, angle: float = 0.0):
+    def impedance(self, angle: Optional[float] = 0.0):
         """
         Compute the Impedance and errors from the transfer function.
         - note u,v are identity matrices if angle=0
-        Parameters
 
+        Parameters
         ----------
         angle: float
             The angle about the vertical axis by which to rotate the Z tensor.
 
         Returns
         -------
-        z
-        error
+        z: np.ndarray
+            The impedance tensor
+        error: np.ndarray
+            Errors for the impedance tensor
         """
         # check to see if there are actually electric fields in the TFs
         if "Ex" not in self.channels and "Ey" not in self.channels:

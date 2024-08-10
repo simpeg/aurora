@@ -137,15 +137,15 @@ def test_to_from_json():
 
     WORK IN PROGRESS -- see mt_metadata Issue #222
 
-    Development Notes
+    Development Notes:
     TODO: This test should be completed and moved into tests.
-     - The json does not load into an mt_metadata object
-     - The problem seems to be that at the run-level of the processing config
-     there is an intention to allow for multiple time-periods.
-     - This is reasonable, consider a station running for several months,
-     we may want to only process data from certain chunks of the time series.
-     - However, the time period reader does not seem to work as expected.
-     - A partial fix is on fix_issue_222 branch of mt_metadata
+    The json does not load into an mt_metadata object.
+    The problem seems to be that at the run-level of the processing config there is an
+    intention to allow for multiple time-periods. This is reasonable, consider a station
+    running for several months, we may want to only process data from certain chunks
+    of the time series.
+    However, the time period reader does not seem to work as expected.
+    A partial fix is on fix_issue_222 branch of mt_metadata
 
     Related to issue #172
 

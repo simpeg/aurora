@@ -291,8 +291,8 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
 
     Development Notes:
      The calibration often raises a runtime warning due to DC term in calibration response = 0.
-     TODO: It would be nice to suppress this, maybe by only calibrating the non-dc terms and
-      directly assigning np.nan to the dc component when DC-response is zero.
+     TODO: It would be nice to suppress this, maybe by only calibrating the non-dc terms and directly assigning np.nan to the dc component when DC-response is zero.
+
     Parameters
     ----------
     stft_obj : xarray.core.dataset.Dataset
@@ -358,11 +358,9 @@ def prototype_decimate(
      input time series.
 
     TODO: Consider moving this function into time_series/decimate.py
-    TODO: Consider Replacing the downsampled_time_axis with rolling mean, or somthing that takes
-     the average value of the time, not the window start
+    TODO: Consider Replacing the downsampled_time_axis with rolling mean, or somthing that takes the average value of the time, not the window start
     TODO: Compare outputs with scipy resample_poly, which also has an FIR AAF and appears faster
-    TODO: Add handling for case that could occur when sliced time axis has a different length than
-     the decimated data -- see mth5 issue #217 https://github.com/kujaku11/mth5/issues/217
+    TODO: Add handling for case that could occur when sliced time axis has a different length than the decimated data -- see mth5 issue #217 https://github.com/kujaku11/mth5/issues/217
 
     Parameters
     ----------
