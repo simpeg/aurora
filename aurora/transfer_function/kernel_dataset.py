@@ -168,7 +168,8 @@ class KernelDataset:
             if "station" not in self._df.columns:
                 self._df["station"] = self._df["station_id"]
             if "run" not in self._df.columns:
-                self._df["run"] = self._df["run_id"]
+                if "run_id" in self._df.columns:
+                    self._df["run"] = self._df["run_id"]
         return self._df
 
     @df.setter
