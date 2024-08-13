@@ -8,7 +8,6 @@ from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.time_series_helpers import prototype_decimate
 from loguru import logger
 from mth5.utils.exceptions import MTH5Error
-from mth5.utils.helpers import initialize_mth5
 from mth5.utils.helpers import path_or_mth5_object
 from mt_metadata.transfer_functions.core import TF
 
@@ -85,7 +84,7 @@ class TransferFunctionKernel(object):
             remote station id: mth5.mth5.MTH5
         """
         mode = self.get_mth5_file_open_mode()
-        self._mth5_objs = self.kernel_dataset.intialize_mth5s(mode)
+        self._mth5_objs = self.kernel_dataset.initialize_mth5s(mode)
 
     def update_dataset_df(self, i_dec_level):
         """
@@ -117,7 +116,7 @@ class TransferFunctionKernel(object):
             # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
 
             # Assign additional columns to dataset_df, populate with mth5_objs and xr_ts
-            self.dataset.initialize_dataframe_for_processing(self.mth5_objs)
+            self.dataset.initialize_dataframe_for_processing()
 
             # APPLY TIMING CORRECTIONS HERE
         else:
@@ -138,8 +137,9 @@ class TransferFunctionKernel(object):
                     decimated_xrds.to_array("channel")
                 )  # See Note 1 above
 
-        msg = f"Dataset Dataframe Updated for decimation level {i_dec_level} Successfully"
-        logger.info(msg)
+        logger.info(
+            f"Dataset Dataframe Updated for decimation level {i_dec_level} Successfully"
+        )
         return
 
     def apply_clock_zero(self, dec_level_config):

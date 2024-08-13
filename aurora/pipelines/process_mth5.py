@@ -435,7 +435,7 @@ def get_spectrogams(tfk, i_dec_level, units="MT"):
         if not tfk.is_valid_dataset(row, i_dec_level):
             continue
 
-        run_obj = row.mth5_obj.from_reference(row.run_reference)
+        run_obj = row.mth5_obj.from_reference(row.run_hdf5_reference)
         if row.fc:
             stft_obj = load_stft_obj_from_mth5(i_dec_level, row, run_obj)
             stfts = append_chunk_to_stfts(stfts, stft_obj, row.remote)
