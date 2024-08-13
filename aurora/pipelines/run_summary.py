@@ -26,40 +26,39 @@ maximize coverage of the local station runs is generated
 
 Development Notes:
     TODO: consider adding methods:
-     "drop_runs_shorter_than": removes short runs from summary
-     "fill_gaps_by_time_interval": allows runs to be merged if gaps between are short
-     "fill_gaps_by_run_names": allows runs to be merged if gaps between are short
-    TODO: Consider whether this should return a copy or modify in-place when querying the df.
+     - drop_runs_shorter_than": removes short runs from summary
+     - fill_gaps_by_time_interval": allows runs to be merged if gaps between 
+       are short
+     - fill_gaps_by_run_names": allows runs to be merged if gaps between are 
+       short
+    TODO: Consider whether this should return a copy or modify in-place when
+    querying the df.
 
 """
 
+# =============================================================================
+# Imports
+# =============================================================================
 import copy
+from typing import Optional, Union
+
 import pandas as pd
+from loguru import logger
+
+from aurora.pipelines import RUN_SUMMARY_COLUMNS, MINI_SUMMARY_COLUMNS
 
 import mth5
 from mth5.utils.helpers import initialize_mth5
-from loguru import logger
-from typing import Optional, Union
 
-RUN_SUMMARY_COLUMNS = [
-    "survey",
-    "station",
-    "run",
-    "start",
-    "end",
-    "sample_rate",
-    "input_channels",
-    "output_channels",
-    "remote",
-    "mth5_path",
-]
+# =============================================================================
 
 
 class RunSummary:
     """
     Class to contain a run-summary table from one or more mth5s.
-            "
-    WIP: For the full MMT case this may need modification to a channel based summary.
+
+    WIP: For the full MMT case this may need modification to a channel based
+    summary.
 
 
     """
@@ -79,13 +78,48 @@ class RunSummary:
         self.column_dtypes = [str, str, pd.Timestamp, pd.Timestamp]
         self._input_dict = input_dict
         self.df = df
-        self._mini_summary_columns = [
-            "survey",
-            "station",
-            "run",
-            "start",
-            "end",
-        ]
+        self._mini_summary_columns = MINI_SUMMARY_COLUMNS
+
+    def __str__(self):
+        return str(self.mini_summary.head())
+
+    def __repr__(self):
+        return self.__str__()
+
+    @property
+    def df(self):
+        return self._df
+
+    @df.setter
+    def df(self, value):
+        """
+        Make sure the data frame is set properly with proper column names
+
+        :param value: DESCRIPTION
+        :type value: TYPE
+        :return: DESCRIPTION
+        :rtype: TYPE
+
+        """
+        if value is None:
+            self._df = None
+            return
+
+        if not isinstance(value, pd.DataFrame):
+            msg = f"Need to set df with a Pandas.DataFrame not type({type(value)})"
+            logger.error(msg)
+
+            raise TypeError(msg)
+
+        need_columns = []
+        for col in RUN_SUMMARY_COLUMNS:
+            if not col in value.columns:
+                need_columns.append(col)
+        if need_columns:
+            msg = f"DataFrame needs columns {', '.join(need_columns)}"
+            logger.error(msg)
+            raise ValueError(msg)
+        self._df = value
 
     def clone(self):
         """
@@ -96,9 +130,20 @@ class RunSummary:
         return copy.deepcopy(self)
 
     def from_mth5s(self, mth5_list):
-        """Iterates over mth5s in list and creates one big dataframe summarizing the runs"""
+        """Iterates over mth5s in list and creates one big dataframe
+        summarizing the runs
+        """
         run_summary_df = extract_run_summaries_from_mth5s(mth5_list)
         self.df = run_summary_df
+
+    def _warn_no_data_runs(self):
+        if False in self.df.has_data.values:
+            for row in self.df[self.df.has_data == False].itertuples():
+                logger.warning(
+                    f"Found no data run in row {row.Index}: "
+                    f"survey: {row.survey}, station: {row.station}, run: {row.run}"
+                )
+            logger.info("To drop no data runs use `drop_no_data_rows`")
 
     @property
     def mini_summary(self):
@@ -110,78 +155,45 @@ class RunSummary:
         """Calls minisummary through logger so it is formatted."""
         logger.info(self.mini_summary)
 
-    def add_duration(
-        self, df: Optional[Union[pd.DataFrame, None]] = None
-    ) -> None:
+    def drop_no_data_rows(self):
         """
-        Adds a column called "duration" to the dataframe
-
-        Parameters
-        ----------
-        df: Optional[Union[pd.DataFrame, None]]
-            If not provided use self.df
+        Drops rows marked `has_data` = False and resets the index of self.df
 
         """
-        if df is None:
-            df = self.df
-        timedeltas = df.end - df.start
-        durations = [x.total_seconds() for x in timedeltas]
-        df["duration"] = durations
-        return
-
-    def check_runs_are_valid(self, drop: bool = False):
-        """
-
-        Checks for runs that are identically zero.
-        TODO: Add optional arguments for other conditions to check, for example there are nan, etc.
-
-        Parameters
-        ----------
-        drop: bool
-            If True, drop invalid rows from dataframe
-
-        """
-        # check_for_all_zero_runs
-        for i_row, row in self.df.iterrows():
-            logger.info(f"Checking row for zeros {row}")
-            m = mth5.mth5.MTH5()
-            m.open_mth5(row.mth5_path)
-            run_obj = m.get_run(row.station, row.run, row.survey)
-            runts = run_obj.to_runts()
-            if runts.dataset.to_array().data.__abs__().sum() == 0:
-                logger.critical("CRITICAL: Detected a run with all zero values")
-                self.df["valid"].at[i_row] = False
-            # load each run, and take the median of the sum of the absolute values
-        if drop:
-            self.drop_invalid_rows()
-        return
-
-    def drop_invalid_rows(self) -> None:
-        """
-        Drops rows marked invalid (df.valid is False) and resets the index of self.df
-
-        """
-        self.df = self.df[self.df.valid]
+        self.df = self.df[self.df.has_data]
         self.df.reset_index(drop=True, inplace=True)
 
-    # BELOW FUNCTION CAN BE COPIED FROM METHOD IN KernelDataset()
-    # def drop_runs_shorter_than(self, duration, units="s"):
-    #     if units != "s":
-    #         raise NotImplementedError
-    #     if "duration" not in self.df.columns:
-    #         self.add_duration()
-    #     drop_cond = self.df.duration < duration
-    #     # df = self.df[drop_cond]
-    #     self.df.drop(self.df[drop_cond].index, inplace=True)
-    #     df = df.reset_index()
-    #
-    #     self.df = df
-    #     return df
+    def set_sample_rate(self, sample_rate: float, inplace: bool = False):
+        """
+        Set the sample rate so that the run summary represents all runs for
+        a single sample rate.
+
+        :param inplace: DESCRIPTION, defaults to True
+        :type inplace: TYPE, optional
+        :return: DESCRIPTION
+        :rtype: TYPE
+
+        """
+
+        if sample_rate not in self.df.sample_rate.values:
+            msg = (
+                f"Sample rate {sample_rate} is not in RunSummary. Unique "
+                f"values are {self.df.sample_rate.unique()}"
+            )
+            logger.error(msg)
+            raise ValueError(msg)
+        if inplace:
+            self.df = self.df[self.df.sample_rate == sample_rate]
+        else:
+            new_rs = self.clone()
+            new_rs.df = new_rs.df[new_rs.df.sample_rate == sample_rate]
+            return new_rs
 
 
 def extract_run_summary_from_mth5(mth5_obj, summary_type="run"):
     """
-    Given a single mth5 object, get the channel_summary and compress it to a run_summary.
+    Given a single mth5 object, get the channel_summary and compress it to a
+    run_summary.
 
     Development Notes:
     TODO: Move this into MTH5 or replace with MTH5 built-in run_summary method.
@@ -211,13 +223,16 @@ def extract_run_summaries_from_mth5s(
     mth5_list, summary_type="run", deduplicate=True
 ):
     """
-    Given a list of mth5's, iterate over them, extracting run_summaries and merging into one big table.
+    Given a list of mth5's, iterate over them, extracting run_summaries and
+    merging into one big table.
 
     Development Notes:
     ToDo: Move this method into mth5? or mth5_helpers?
-    ToDo: Make this a class so that the __repr__ is a nice visual representation of the
+    ToDo: Make this a class so that the __repr__ is a nice visual representation
+    of the
     df, like what channel summary does in mth5
-    - 2022-05-28 Modified to allow this method to accept mth5 objects as well as the
+    - 2022-05-28 Modified to allow this method to accept mth5 objects as well
+    as the
     already supported types of pathlib.Path or str
 
 
