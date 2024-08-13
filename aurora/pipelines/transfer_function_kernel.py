@@ -85,20 +85,7 @@ class TransferFunctionKernel(object):
             remote station id: mth5.mth5.MTH5
         """
         mode = self.get_mth5_file_open_mode()
-        local_mth5_obj = initialize_mth5(
-            self.config.stations.local.mth5_path, mode=mode
-        )
-        if self.config.stations.remote:
-            remote_path = self.config.stations.remote[0].mth5_path
-            remote_mth5_obj = initialize_mth5(remote_path, mode="r")
-        else:
-            remote_mth5_obj = None
-
-        mth5_objs = {self.config.stations.local.id: local_mth5_obj}
-        if self.config.stations.remote:
-            mth5_objs[self.config.stations.remote[0].id] = remote_mth5_obj
-        self._mth5_objs = mth5_objs
-        return
+        self._mth5_objs = self.kernel_dataset.intialize_mth5s(mode)
 
     def update_dataset_df(self, i_dec_level):
         """
