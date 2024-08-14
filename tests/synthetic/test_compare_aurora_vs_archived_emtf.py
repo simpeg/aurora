@@ -1,9 +1,9 @@
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test2_h5
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
+from mth5.data.make_mth5_from_asc import create_test1_h5
+from mth5.data.make_mth5_from_asc import create_test2_h5
+from mth5.data.make_mth5_from_asc import create_test12rr_h5
 from aurora.test_utils.synthetic.make_processing_configs import (
     create_test_run_config,
 )
@@ -85,7 +85,9 @@ def aurora_vs_emtf(
     )
 
     aux_data = read_z_file(auxilliary_z_file)
-    aurora_rho_phi = merge_tf_collection_to_match_z_file(aux_data, tf_collection)
+    aurora_rho_phi = merge_tf_collection_to_match_z_file(
+        aux_data, tf_collection
+    )
     data_dict = {}
     data_dict["period"] = aux_data.periods
     data_dict["emtf_rho_xy"] = aux_data.rxy
@@ -142,7 +144,9 @@ def run_test1(emtf_version, ds_df):
     test_case_id = "test1"
     auxilliary_z_file = EMTF_RESULTS_PATH.joinpath("test1.zss")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zss"
-    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df)
+    aurora_vs_emtf(
+        test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df
+    )
     return
 
 
