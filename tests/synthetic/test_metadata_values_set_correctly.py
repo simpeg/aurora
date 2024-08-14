@@ -53,13 +53,12 @@ class TestMetadataValuesSetCorrect(unittest.TestCase):
             logger.info(run.start)
             assert summary_row.start == pd.Timestamp(run.start)
 
-
-def main():
-    # tmp = TestMetadataValuesSetCorrect()
-    # tmp.setUp()
-    # tmp.test_start_times_correct()
-    unittest.main()
+    def tearDown(self):
+        close_open_files()
 
 
+# =============================================================================
+# run
+# =============================================================================
 if __name__ == "__main__":
-    main()
+    unittest.main()
