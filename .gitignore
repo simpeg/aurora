@@ -27,6 +27,9 @@ tests/synthetic/data/*h5
 tests/synthetic/test2*csv
 tests/synthetic/out.png
 
+*.h5
+*.xml
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codx]
