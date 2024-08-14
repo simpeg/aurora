@@ -5,15 +5,16 @@ The processing config is still evolving and this class and its methods may chang
 
 """
 
-from aurora.config import BANDS_DEFAULT_FILE
-from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
-from loguru import logger
-from mt_metadata.transfer_functions.processing.aurora.window import Window
-from mt_metadata.transfer_functions.processing.aurora.processing import (
-    Processing,
-)
 from typing import Optional, Union
 import pathlib
+from loguru import logger
+
+from aurora.config import BANDS_DEFAULT_FILE
+from aurora.config.metadata import Processing
+from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
+
+from mt_metadata.transfer_functions.processing.aurora.window import Window
+
 
 SUPPORTED_BAND_SPECIFICATION_STYLES = ["EMTF", "band_edges"]
 
