@@ -73,8 +73,8 @@ from mt_metadata.utils.list_dict import ListDict
 import mth5.timeseries.run_ts
 from mth5.utils.helpers import initialize_mth5
 
-from mtpy.processing.run_summary import RunSummary
-from mtpy.processing import (
+from aurora.processing.run_summary import RunSummary
+from aurora.transfer_function import (
     KERNEL_DATASET_DTYPE,
     MINI_SUMMARY_COLUMNS,
 )

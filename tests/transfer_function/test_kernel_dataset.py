@@ -7,12 +7,12 @@ import unittest
 
 from mth5.data.make_mth5_from_asc import MTH5_PATH, create_test12rr_h5
 
-from mtpy.processing import KERNEL_DATASET_COLUMNS
-from mtpy.processing.run_summary import RunSummary
+from aurora.transfer_function import KERNEL_DATASET_COLUMNS
+from aurora.pipelines.run_summary import RunSummary
 
-from mtpy.processing.kernel_dataset import intervals_overlap
-from mtpy.processing.kernel_dataset import overlap
-from mtpy.processing.kernel_dataset import KernelDataset
+from aurora.transfer_function.kernel_dataset import intervals_overlap
+from aurora.transfer_function.kernel_dataset import overlap
+from aurora.transfer_function.kernel_dataset import KernelDataset
 
 # =============================================================================
 
