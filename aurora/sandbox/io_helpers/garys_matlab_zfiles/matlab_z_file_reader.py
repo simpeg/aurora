@@ -3,6 +3,7 @@ One off method to help read in transfer function dumps provided by Gary from som
 the matlab tests.
 
 """
+
 import numpy as np
 import pandas as pd
 import scipy.io as sio
@@ -96,7 +97,9 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
         ]
         reference_channels = []
         matlab_z_file = test_dir_path.joinpath("IAK34_struct_zss.mat")
-        archived_z_file_path = test_dir_path.joinpath("archived_from_matlab.zss")
+        archived_z_file_path = test_dir_path.joinpath(
+            "archived_from_matlab.zss"
+        )
         z_file_path = test_dir_path.joinpath("from_matlab.zss")
 
     # 2. Create an aurora processing config
@@ -112,7 +115,10 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
         num_samples_window=4 * [num_samples_window],
     )
     p.assign_bands(
-        band_edges, field_data_sample_rate, decimation_factors, num_samples_window
+        band_edges,
+        field_data_sample_rate,
+        decimation_factors,
+        num_samples_window,
     )
 
     # 3. populate decimation levels of processing config
@@ -185,18 +191,13 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
     survey_metadata = Survey()
     kd.survey_metadata["0"] = survey_metadata
     kd_df_dict = {
-        "remote": [
-            False,
-        ],
-        "station_id": [
-            local_station_id,
-        ],
-        "processing_type": [
-            "matlab EMTF",
-        ],
-        "survey": [
-            "0",
-        ],
+        "remote": [False],
+        "station": [local_station_id],
+        "processing_type": ["matlab EMTF"],
+        "survey": ["0"],
+        "run": ["a"],
+        "start": ["1980-01-01T00:00:00"],
+        "end": ["1980-01-02T00:00:00"],
     }
     kd_df = pd.DataFrame(data=kd_df_dict)
     kd.df = kd_df
