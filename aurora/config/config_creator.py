@@ -4,6 +4,7 @@ This module contains a Helper class to make config files.
 The processing config is still evolving and this class and its methods may change.
 
 """
+
 from aurora.config.metadata.processing import Processing
 from aurora.config import BANDS_DEFAULT_FILE
 from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
@@ -105,7 +106,9 @@ class ConfigCreator:
             logger.info(msg)
             self._emtf_band_file = BANDS_DEFAULT_FILE
             self._band_specification_style = "EMTF"
-        elif (self._emtf_band_file is not None) & (self._band_edges is not None):
+        elif (self._emtf_band_file is not None) & (
+            self._band_edges is not None
+        ):
             msg = "Bands defined twice, and possibly inconsistently"
             logger.error(msg)
             raise ValueError(msg)
@@ -117,8 +120,6 @@ class ConfigCreator:
     def create_from_kernel_dataset(
         self,
         kernel_dataset,
-        input_channels=["hx", "hy"],
-        output_channels=["hz", "ex", "ey"],
         estimator: Optional[Union[str, None]] = None,
         emtf_band_file: Optional[Union[str, pathlib.Path, None]] = None,
         band_edges: Optional[Union[dict, None]] = None,
@@ -191,7 +192,8 @@ class ConfigCreator:
         if self.band_specification_style == "EMTF":
             # see note 1
             emtf_band_setup_file = EMTFBandSetupFile(
-                filepath=self._emtf_band_file, sample_rate=kernel_dataset.sample_rate
+                filepath=self._emtf_band_file,
+                sample_rate=kernel_dataset.sample_rate,
             )
             num_decimations = emtf_band_setup_file.num_decimation_levels
             # Assign optional arguments if they have not been passed
@@ -201,7 +203,9 @@ class ConfigCreator:
                 decimation_factors[0] = 1
             if num_samples_window is None:
                 default_window = Window()
-                num_samples_window = num_decimations * [default_window.num_samples]
+                num_samples_window = num_decimations * [
+                    default_window.num_samples
+                ]
             elif isinstance(num_samples_window, int):
                 num_samples_window = num_decimations * [num_samples_window]
             # now you can define the frequency bands
@@ -220,8 +224,8 @@ class ConfigCreator:
         if self.band_specification_style == "EMTF":
             processing_obj.band_setup_file = str(self._emtf_band_file)
         for key, decimation_obj in processing_obj.decimations_dict.items():
-            decimation_obj.input_channels = input_channels
-            decimation_obj.output_channels = output_channels
+            decimation_obj.input_channels = kernel_dataset.input_channels
+            decimation_obj.output_channels = kernel_dataset.output_channels
             if num_samples_window is not None:
                 decimation_obj.window.num_samples = num_samples_window[key]
             # set estimator if provided as kwarg
