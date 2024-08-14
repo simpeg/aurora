@@ -73,8 +73,8 @@ from mt_metadata.utils.list_dict import ListDict
 import mth5.timeseries.run_ts
 from mth5.utils.helpers import initialize_mth5
 
-from aurora.pipelines.run_summary import RunSummary
-from aurora.transfer_function import (
+from mtpy.processing.run_summary import RunSummary
+from mtpy.processing import (
     KERNEL_DATASET_DTYPE,
     MINI_SUMMARY_COLUMNS,
 )
@@ -132,6 +132,7 @@ class KernelDataset:
         df: Optional[Union[pd.DataFrame, None]] = None,
         local_station_id: Optional[str] = "",
         remote_station_id: Optional[Union[str, None]] = None,
+        **kwargs,
     ):
         """
         Constructor.
@@ -154,6 +155,11 @@ class KernelDataset:
         self.initialized = False
         self.local_mth5_obj = None
         self.remote_mth5_obj = None
+        self._local_mth5_path = None
+        self._remote_mth5_path = None
+
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
     def __str__(self):
         return str(self.mini_summary.head())
@@ -313,11 +319,11 @@ class KernelDataset:
                 ].unique()[0]
             )
         else:
-            return None
+            return self._local_mth5_path
 
-    # @local_mth5_path.setter
-    # def local_mth5_path(self, value):
-    #     self._local_mth5_path = self.set_path(value)
+    @local_mth5_path.setter
+    def local_mth5_path(self, value):
+        self._local_mth5_path = self.set_path(value)
 
     def has_local_mth5(self):
         """test if local mth5 exists"""
@@ -365,9 +371,9 @@ class KernelDataset:
         else:
             return None
 
-    # @remote_mth5_path.setter
-    # def remote_mth5_path(self, value):
-    #     self._remote_mth5_path = self.set_path(value)
+    @remote_mth5_path.setter
+    def remote_mth5_path(self, value):
+        self._remote_mth5_path = self.set_path(value)
 
     def has_remote_mth5(self):
         """test if remote mth5 exists"""
@@ -375,6 +381,58 @@ class KernelDataset:
             return False
         else:
             return self.remote_mth5_path.exists()
+
+    @property
+    def input_channels(self):
+        """
+        get input channels from data frame
+
+        :return: Input channels (sources)
+        :rtype: list of strings
+
+        """
+
+        if self._has_df():
+            return self.local_df.input_channels[0]
+
+    @property
+    def output_channels(self):
+        """
+        get input channels from data frame
+
+        :return: Input channels (sources)
+        :rtype: list of strings
+
+        """
+
+        if self._has_df():
+            return self.local_df.output_channels[0]
+
+    @property
+    def local_df(self):
+        """
+        split data frame to just the local station runs
+
+        :return: Local station runs
+        :rtype: pd.DataFrame
+
+        """
+
+        if self._has_df():
+            return self.df[self.df.station == self.local_station_id]
+
+    @property
+    def remote_df(self):
+        """
+        split data frame to just the local station runs
+
+        :return: Local station runs
+        :rtype: pd.DataFrame
+
+        """
+
+        if self._has_df() and self.remote_station_id is not None:
+            return self.df[self.df.station == self.remote_station_id]
 
     @classmethod
     def set_path(self, value):
@@ -392,8 +450,9 @@ class KernelDataset:
     def from_run_summary(
         self,
         run_summary: RunSummary,
-        local_station_id: str,
+        local_station_id: Optional[Union[str, None]] = None,
         remote_station_id: Optional[Union[str, None]] = None,
+        sample_rate: Optional[Union[float, int, None]] = None,
     ) -> None:
         """
         Initialize the dataframe from a run summary
@@ -408,12 +467,17 @@ class KernelDataset:
             Label of the remote reference station
 
         """
-        self.local_station_id = local_station_id
-        self.remote_station_id = remote_station_id
+        if local_station_id is not None:
+            self.local_station_id = local_station_id
+        if remote_station_id is not None:
+            self.remote_station_id = remote_station_id
 
-        station_ids = [local_station_id]
+        if sample_rate is not None:
+            run_summary = run_summary.set_sample_rate(sample_rate)
+
+        station_ids = [self.local_station_id]
         if remote_station_id:
-            station_ids.append(remote_station_id)
+            station_ids.append(self.remote_station_id)
         df = restrict_to_station_list(
             run_summary.df, station_ids, inplace=False
         )
@@ -428,20 +492,21 @@ class KernelDataset:
         df = self._add_columns(df)
 
         # set remote reference
-        if remote_station_id:
-            cond = df.station == remote_station_id
+        if self.remote_station_id:
+            cond = df.station == self.remote_station_id
             df.remote = cond
 
         # be sure to set date time columns and restrict to simultaneous runs
         df = self._set_datetime_columns(df)
-        if remote_station_id:
+        if self.remote_station_id:
             df = self.restrict_run_intervals_to_simultaneous(df)
 
         # Again check df is non-empty
         if len(df) == 0:
             msg = (
-                f"Local: {local_station_id} and remote: {remote_station_id} do "
-                f"not overlap, Remote reference processing not a valid option."
+                f"Local: {self.local_station_id} and remote: "
+                f"{self.remote_station_id} do not overlap. Remote reference "
+                "processing not a valid option."
             )
             logger.error(msg)
             raise ValueError(msg)
@@ -865,9 +930,7 @@ class KernelDataset:
             self.df["run_hdf5_reference"].at[i] = run_obj.hdf5_group.ref
 
             if row.fc:
-                msg = (
-                    f"row {row} already has fcs prescribed by processing config"
-                )
+                msg = f"row {row} already has fcs prescribed by processing config"
                 msg += "-- skipping time series initialisation"
                 logger.info(msg)
                 # see Note #3
