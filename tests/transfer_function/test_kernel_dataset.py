@@ -113,6 +113,8 @@ class TestKernelDataset(unittest.TestCase):
             self.assertListEqual(
                 list(self.kd.remote_df.station.unique()), ["test1"]
             )
+    def test_processing_id(self):
+        self.assertEqual(self.kd.processing_id, "test1-rr_test2")
 
     # @classmethod
     # def tearDownClass(self):
