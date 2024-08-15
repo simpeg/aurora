@@ -4,6 +4,7 @@
 
 import unittest
 from aurora.time_series.xarray_helpers import initialize_xrda_1d
+from aurora.time_series.xarray_helpers import initialize_xrda_2d
 
 
 class TestXarrayHelpers(unittest.TestCase):
@@ -24,6 +25,13 @@ class TestXarrayHelpers(unittest.TestCase):
         dtype = float
         value = -1
         tmp = initialize_xrda_1d(channels, dtype=dtype, value=value)
+        self.assertTrue((tmp.data == value).all())
+
+    def test_initialize_xrda_2d(self):
+        channels = ["ex", "ey", "hx", "hy", "hz"]
+        dtype = float
+        value = -1
+        tmp = initialize_xrda_2d(channels, dtype=dtype, value=value)
         self.assertTrue((tmp.data == value).all())
 
     def test_sometehing_else(self):

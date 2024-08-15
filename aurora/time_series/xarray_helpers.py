@@ -111,7 +111,7 @@ def initialize_xrda_1d(
     Returns
     -------
     xrda: xarray.core.dataarray.DataArray
-        An xarray container for the channel variances, initialized to zeros.
+        An xarray container for the channels, initialized to zeros.
     """
     k = len(channels)
     logger.debug(f"Initializing xarray with values {value}")
@@ -127,4 +127,45 @@ def initialize_xrda_1d(
     if value != 0:
         data = value * np.ones(k, dtype=dtype)
         xrda.data = data
+    return xrda
+
+
+def initialize_xrda_2d(
+    channels, dtype=complex, value: Optional[Union[complex, float, bool]] = 0, dims=None
+):
+
+    """
+     TODO: consider merging with initialize_xrda_1d
+     TODO: consider changing nomenclature from dims=["channel_1", "channel_2"],
+     to dims=["variable_1", "variable_2"], to be consistent with initialize_xrda_1d
+
+    Parameters
+     ----------
+     channels: list
+         The channels in the multivariate array
+     dtype: type
+         The datatype to initialize the array.
+         Common cases are complex, float, and bool
+     value: Union[complex, float, bool]
+         The default value to assign the array
+
+    Returns
+     -------
+     xrda: xarray.core.dataarray.DataArray
+         An xarray container for the channel variances etc., initialized to zeros.
+    """
+    if dims is None:
+        dims = [channels, channels]
+
+    K = len(channels)
+    logger.debug(f"Initializing 2D xarray to {value}")
+    xrda = xr.DataArray(
+        np.zeros((K, K), dtype=dtype),
+        dims=["channel_1", "channel_2"],
+        coords={"channel_1": dims[0], "channel_2": dims[1]},
+    )
+    if value != 0:
+        data = value * np.ones(xrda.shape, dtype=dtype)
+        xrda.data = data
+
     return xrda
