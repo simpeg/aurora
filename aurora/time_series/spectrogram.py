@@ -4,6 +4,8 @@
 
 """
 from aurora.time_series.frequency_band_helpers import extract_band
+from typing import Optional
+import xarray
 
 
 class Spectrogram(object):
@@ -122,3 +124,37 @@ class Spectrogram(object):
     # TODO: Add cross power method
     # def cross_powers(self, ch1, ch2, band=None):
     #     pass
+
+    def flatten(self, chunk_by: Optional[str] = "time") -> xarray.Dataset:
+        """
+
+        Returns the flattened xarray (time-chunked by default).
+
+        Parameters
+        ----------
+        chunk_by: str
+            Controlled vocabulary ["time", "frequency"]. Reshaping the 2D spectrogram can be done two ways
+            (basically "row-major", or column-major). In xarray, but we either keep frequency constant and
+            iterate over time, or keep time constant and iterate over frequency (in the inner loop).
+
+
+        Returns
+        -------
+        xarray.Dataset : The dataset from the band spectrogram, stacked.
+
+        Development Notes:
+        - The flattening used in tf calcuation by default is opposite to here:
+         xrds = band_spcgm.dataset.stack(observation=("frequency", "time"))
+        However, for feature extraction, it may make sense to swap the order:
+        xrds = band_spectrogram.dataset.stack(observation=("time", "frequency"))
+        This is like chunking into time windows and allows individual features to be computed on each time window -- if desired.
+        Still need to split the time series though--Splitting to time would be a reshape by (last_freq_index-first_freq_index).
+        Using pure xarray this may not matter but if we drop down into numpy it could be useful.
+
+
+        """
+        if chunk_by == "time":
+            observation = ("time", "frequency")
+        elif chunk_by == "frequency":
+            observation = ("frequency", "time")
+        return self.dataset.stack(observation=observation)
