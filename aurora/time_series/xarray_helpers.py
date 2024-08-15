@@ -2,8 +2,10 @@
 Placeholder module for methods manipulating xarray time series
 """
 
+import numpy as np
 import xarray as xr
 from loguru import logger
+from typing import Optional, Union
 
 
 def handle_nan(X, Y, RR, drop_dim=""):
@@ -85,3 +87,44 @@ def handle_nan(X, Y, RR, drop_dim=""):
     RR = RR.rename(data_var_rm_label_mapper)
 
     return X, Y, RR
+
+
+def initialize_xrda_1d(
+    channels: list,
+    dtype=Optional[type],
+    value: Optional[Union[complex, float, bool]] = 0,
+) -> xr.DataArray:
+    """
+
+    Returns a 1D xr.DataArray with variable "channel", having values channels named by the input list.
+
+    Parameters
+    ----------
+    channels: list
+        The channels in the multivariate array
+    dtype: type
+        The datatype to initialize the array.
+        Common cases are complex, float, and bool
+    value: Union[complex, float, bool]
+        The default value to assign the array
+
+    Returns
+    -------
+    xrda: xarray.core.dataarray.DataArray
+        An xarray container for the channel variances, initialized to zeros.
+    """
+    k = len(channels)
+    logger.debug(f"Initializing xarray with values {value}")
+    xrda = xr.DataArray(
+        np.zeros(k, dtype=dtype),
+        dims=[
+            "variable",
+        ],
+        coords={
+            "variable": channels,
+        },
+    )
+    if value != 0:
+        data = value * np.ones(k, dtype=dtype)
+        xrda.data = data
+    return xrda
