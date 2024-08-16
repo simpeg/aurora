@@ -1,4 +1,5 @@
 from aurora.time_series.xarray_helpers import initialize_xrda_2d
+from aurora.transfer_function.cross_power import tf_from_cross_powers
 from aurora.transfer_function.cross_power import _channel_names
 from aurora.transfer_function.cross_power import (
     _zxx,
@@ -80,6 +81,13 @@ class TestCrossPower(unittest.TestCase):
         )
         assert _ty(self.sdm, Hz=Hz, Hx=Hx, Hy=Hy, A=A, B=B) == _tf__y(
             self.sdm, Y=Hz, Hx=Hx, Hy=Hy, A=A, B=B
+        )
+
+    def test_tf_from_cross_powers(self):
+        tf_from_cross_powers(
+            self.sdm,
+            station_id=self.station_ids[0],
+            remote=self.station_ids[1],
         )
 
 

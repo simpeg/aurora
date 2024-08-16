@@ -132,7 +132,7 @@ def tf_from_cross_powers(
     -------
 
     """
-    Ex, Ey, Hx, Hy, Hz, A, B = _channel_names(sdm, station_id, remote, join_char)
+    Ex, Ey, Hx, Hy, Hz, A, B = _channel_names(station_id, remote, join_char)
 
     tf = {}
     tf["z_xx"] = _tf__x(sdm, Y=Ex, Hx=Hx, Hy=Hy, A=A, B=B)
