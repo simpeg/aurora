@@ -1,7 +1,7 @@
 """
 This module contains the MEstimator class - an extension of RegressionEstimator.
 
- MEstimator has the class methods that are common to both TRME and TRME_RR.
+ MEstimator has the class methods that are common to both RME and RME_RR.
  See Notes in RME, RME_RR for more details.
 
 """
@@ -33,8 +33,7 @@ class MEstimator(RegressionEstimator):
             then it increases linearly to 1 (r0)
             Psi' is something like 1 between -r0, and r0
             Psi' is zero outside
-            So the expectiaon value of psi' is the number of points outside
-            its the number of points that didnt get weighted /total number of points
+            So the expectation value of psi' is the number of points outside, (that didn't get weighted) divided by the total number of points
 
         """
         super(MEstimator, self).__init__(**kwargs)
@@ -117,8 +116,8 @@ class MEstimator(RegressionEstimator):
         """
         returns the residual variance of the output channels.
 
-        This is the method that was originally in TRME_RR.m.  It seems more correct
-        than the one in TRME, but also has more computational overhead.
+        This is the method that was originally in RME_RR.m.  It seems more correct
+        than the one in RME, but also has more computational overhead.
         """
         res = self.Yc - self.Y_hat  # initial estimate of error variance
         residual_variance = np.sum(np.abs(res * np.conj(res)), axis=0) / self.n_data
@@ -196,7 +195,7 @@ class MEstimator(RegressionEstimator):
             w = np.minimum(r0s / residuals, 1.0)
             self.Yc[:, k] = w * self.Y[:, k] + (1 - w) * self.Y_hat[:, k]
             self.expectation_psi_prime[k] = 1.0 * np.sum(w == 1) / self.n_data
-        self.update_QHYc()  # note the QH is different in TRME_RR vs TRME
+        self.update_QHYc()  # note the QH is different in RME_RR vs RME
         return
 
     def initial_estimate(self) -> None:
@@ -210,7 +209,7 @@ class MEstimator(RegressionEstimator):
 
     def apply_huber_regression(self) -> None:
         """
-            This is the 'convergence loop' from TRME, TRME_RR
+            This is the 'convergence loop' from RME, RME_RR
 
         TODO: Consider not setting iter_control.number_of_iterations
          - Instead, Initialize a new iter_control object

@@ -79,7 +79,7 @@ from aurora.transfer_function.regression.m_estimator import MEstimator
 from scipy.linalg import solve_triangular
 
 
-class TRME(MEstimator):
+class RME(MEstimator):
     def __init__(self, **kwargs):
         """
         Constructor.
@@ -102,7 +102,7 @@ class TRME(MEstimator):
             Its the number of points that didn't get weighted /total number of points
 
         """
-        super(TRME, self).__init__(**kwargs)
+        super(RME, self).__init__(**kwargs)
         self.qr_input = "X"
 
     def update_y_hat(self) -> None:

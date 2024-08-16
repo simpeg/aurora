@@ -10,8 +10,8 @@ def rme_beta(r0: float) -> float:
     Returns a normalization factor to correct for bias in residual variance.
 
     Details:
-    - This is an RME specific property.  It represents a bias in the calculation of
-    residual_variance which we correct for in TRME and TRME_RR. The implemented
+    - This is a Robust M-estimator specific property.  It represents a bias in the calculation of
+    residual_variance which we correct for in RME and RME_RR. The implemented
     formula is an approximation.  This is approximately equal to 1/beta where beta is
     defined by Equation A3 in Egbert & Booker 1986.
 

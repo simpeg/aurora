@@ -14,7 +14,7 @@ from aurora.transfer_function.regression.m_estimator import MEstimator
 from loguru import logger
 
 
-class TRME_RR(MEstimator):
+class RME_RR(MEstimator):
     def __init__(self, **kwargs):
         """
         Constructor.
@@ -22,7 +22,7 @@ class TRME_RR(MEstimator):
         Robust remote reference estimator.  Z is the reference station data,
         and is the same size as X (see regression.base.RegressionEstimator(
         """
-        super(TRME_RR, self).__init__(**kwargs)
+        super(RME_RR, self).__init__(**kwargs)
         self._Z = kwargs.get("Z", None)
         self.Z = self._Z.to_array().data.T
         self.qr_input = "Z"
@@ -38,7 +38,7 @@ class TRME_RR(MEstimator):
         cond3 = np.isnan(self.Z).any()
         nans_present = cond1 or cond2 or cond3
         if nans_present:
-            logger.error("Missing data not allowed for TRME_RR class")
+            logger.error("Missing data not allowed for RME_RR class")
             raise Exception
 
     def check_for_enough_data_for_rr_estimate(self) -> None:
