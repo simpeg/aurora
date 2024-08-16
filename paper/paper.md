@@ -143,7 +143,7 @@ Aurora provides an open-source Python implementation of the EMTF package for mag
 
 
 # Acknowledgments 
-The authors would like to thank IRIS (now EarthScope) for supporting the development of Aurora.  Joe Capriotti at SimPEG helped with online documentation and the initial release. Ben Murphy (Murphy Geo Consulting, LLC) provided methods for rotating impedance tensors from z-file formatted data. The facilities of the IRIS Consortium are supported by the National Science Foundation’s Seismological Facilities for the Advancement of Geoscience Award under Cooperative Support Agreement EAR-1851048. Any use of trade, firm, or product names is for descriptive purposes only and does not imply endorsement by the U.S. Government.
+The authors would like to thank IRIS (now EarthScope) for supporting the development of Aurora.  Joe Capriotti at SimPEG helped with online documentation and the initial release. Ben Murphy (Murphy Geo Consulting, LLC) provided methods for rotating impedance tensors from z-file formatted data. The facilities of the EarthScope Consortium are funded through the National Science Foundation’s Seismological Facility for the Advancement of Geoscience (SAGE) Award under Cooperative Agreement EAR-1724509. Any use of trade, firm, or product names is for descriptive purposes only and does not imply endorsement by the U.S. Government.
 
 
 # References
