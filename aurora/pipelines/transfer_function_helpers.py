@@ -12,8 +12,8 @@ from aurora.time_series.frequency_band_helpers import get_band_for_tf_estimate
 from aurora.time_series.xarray_helpers import handle_nan
 from aurora.transfer_function.regression.base import RegressionEstimator
 from aurora.transfer_function.regression.iter_control import IterControl
-from aurora.transfer_function.regression.TRME import TRME
-from aurora.transfer_function.regression.TRME_RR import TRME_RR
+from aurora.transfer_function.regression.RME import RME
+from aurora.transfer_function.regression.RME_RR import RME_RR
 
 # from aurora.transfer_function.weights.coherence_weights import compute_multiple_coherence_weights
 from aurora.transfer_function.weights.edf_weights import (
@@ -24,7 +24,7 @@ from typing import Union
 import numpy as np
 import xarray as xr
 
-ESTIMATOR_LIBRARY = {"OLS": RegressionEstimator, "RME": TRME, "RME_RR": TRME_RR}
+ESTIMATOR_LIBRARY = {"OLS": RegressionEstimator, "RME": RME, "RME_RR": RME_RR}
 
 
 def get_estimator_class(estimation_engine: str) -> RegressionEstimator:

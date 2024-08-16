@@ -318,7 +318,7 @@ if __name__ == "__main__":
 #     Just like process_synthetic_1, but the window is ridiculously long so that we
 #     encounter the underdetermined problem. We actually pass that test but in testing
 #     I found that at the next band over, which has more data because there are multipe
-#     FCs the sigma in TRME comes out as negative. see issue #4 and issue #55.
+#     FCs the sigma in RME comes out as negative. see issue #4 and issue #55.
 #     Returns
 #     -------
 #

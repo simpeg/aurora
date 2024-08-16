@@ -342,8 +342,8 @@ class RegressionEstimator(object):
         Parameters
         ----------
         X: numpy array
-            In TRME this is the Input channels X
-            In TRME_RR this is the RR channels Z
+            In RME this is the Input channels X
+            In RME_RR this is the RR channels Z
         sanity_check: boolean
             check QR decomposition is working correctly.  Set to True for debugging.
             Can probably be deprecated.
@@ -505,7 +505,7 @@ def _get_channel_names(
     Returns list of channel names.
 
     If X is a numpy array, names will be created.
-    These are needed by TRME.estimate() to return xarrays.
+    These are needed by RME.estimate() to return xarrays.
 
     Parameters
     ----------
