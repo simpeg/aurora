@@ -142,7 +142,7 @@ class KernelDataset:
             The remote station for the dataset.  Normally this is passed via from_run_summary method.
 
         """
-        self.df = df
+        self._df = df
         self.local_station_id = local_station_id
         self.remote_station_id = remote_station_id
         self._mini_summary_columns = [
@@ -154,6 +154,27 @@ class KernelDataset:
             "duration",
         ]
         self.survey_metadata = {}
+
+    @property
+    def df(self):
+        """
+        Adding a temporary workaround for the "station_id" --> "station" column name change.
+
+        Returns
+        -------
+
+        """
+        if self._df is not None:
+            if "station" not in self._df.columns:
+                self._df["station"] = self._df["station_id"]
+            if "run" not in self._df.columns:
+                if "run_id" in self._df.columns:
+                    self._df["run"] = self._df["run_id"]
+        return self._df
+
+    @df.setter
+    def df(self, df):
+        self._df = df
 
     def clone(self):
         """return a deep copy"""
@@ -217,7 +238,7 @@ class KernelDataset:
             raise ValueError(msg)
         else:
             self._add_duration_column()
-        self.df["fc"] = None
+        self._df["fc"] = None
 
     @property
     def mini_summary(self) -> pd.DataFrame:
@@ -280,8 +301,8 @@ class KernelDataset:
         if "duration" not in self.df.columns:
             self._add_duration_column()
         drop_cond = self.df.duration < minimum_duration
-        self.df.drop(self.df[drop_cond].index, inplace=True)
-        self.df.reset_index(drop=True, inplace=True)
+        self._df.drop(self.df[drop_cond].index, inplace=True)
+        self._df.reset_index(drop=True, inplace=True)
         return
 
     def select_station_runs(self, station_runs_dict: dict, keep_or_drop: bool) -> None:

@@ -39,12 +39,8 @@ import copy
 import pandas as pd
 
 
-from mt_metadata.transfer_functions.processing.aurora.channel_nomenclature import (
-    ALLOWED_INPUT_CHANNELS,
-)
-from mt_metadata.transfer_functions.processing.aurora.channel_nomenclature import (
-    ALLOWED_OUTPUT_CHANNELS,
-)
+from mt_metadata.transfer_functions import STANDARD_INPUT_CHANNELS
+from mt_metadata.transfer_functions import STANDARD_OUTPUT_CHANNELS
 import mth5
 from mth5.utils.helpers import initialize_mth5
 from loguru import logger
@@ -183,8 +179,8 @@ class RunSummary:
 
 def channel_summary_to_run_summary(
     ch_summary,
-    allowed_input_channels=ALLOWED_INPUT_CHANNELS,
-    allowed_output_channels=ALLOWED_OUTPUT_CHANNELS,
+    allowed_input_channels=STANDARD_INPUT_CHANNELS,
+    allowed_output_channels=STANDARD_OUTPUT_CHANNELS,
     sortby=["station_id", "start"],
 ):
     """
