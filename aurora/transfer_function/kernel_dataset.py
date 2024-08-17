@@ -39,12 +39,14 @@ The intended usage process is as follows:
   - Drop the runs (rows) associated with RR that do not intersect with S
   - Restrict start/end times of RR runs that intersect with S so overlap is complete.
   - Restrict start/end times of S runs so that they intersect with remote
- 8. This is now a TFKernel Dataset Definition (ish). Initialize a default processing
- object and pass it this df.
+
+ 8. This is now a TFKernel Dataset Definition (ish). Initialize a default processing object and pass it this df.
  ```
   >>> cc = ConfigCreator()
   >>> p = cc.create_from_kernel_dataset(kernel_dataset)
+ ```
   - Optionally pass emtf_band_file=emtf_band_setup_file
+
  9. Edit the Processing Config appropriately,
 
 TODO: Consider supporting a default value for 'channel_scale_factors' that is None,
@@ -396,8 +398,7 @@ class KernelDataset:
         returns the station metadata.
 
         Development Notes:
-        TODO: This appears to be unused.  Was probably a precursor to the
-         update_survey_metadata() method. Delete if unused. If used fill out doc:
+        TODO: This appears to be unused.  Was probably a precursor to the update_survey_metadata() method. Delete if unused. If used fill out doc:
         "Helper function for archiving the TF -- returns an object we can use to populate
         station metadata in the _____"
 
@@ -454,10 +455,7 @@ class KernelDataset:
         Development Notes:
         - The survey metadata needs to be passed to TF before exporting data.
         - This was factored out of initialize_dataframe_for_processing
-        - TODO: It looks like we don't need to pass the whole run_ts, just its metadata
-           There may be some performance implications to passing the whole object.
-           Consider passing run_ts.survey_metadata, run_ts.run_metadata,
-           run_ts.station_metadata only
+        - TODO: It looks like we don't need to pass the whole run_ts, just its metadata. There may be some performance implications to passing the whole object. Consider passing run_ts.survey_metadata, run_ts.run_metadata, run_ts.station_metadata only.
 
         Parameters
         ----------
@@ -567,10 +565,7 @@ class KernelDataset:
         Gets the run object associated with a row of the df
 
         Development Notes:
-        TODO: This appears to be unused except by get_station_metadata.
-         Delete or integrate if desired.
-         - This has likely been deprecated by direct calls to
-         run_obj = row.mth5_obj.from_reference(row.run_reference) in pipelines.
+        TODO: This appears to be unused except by get_station_metadata. Delete or integrate if desired. This has likely been deprecated by direct calls to run_obj = row.mth5_obj.from_reference(row.run_reference) in pipelines.
 
         Parameters
         ----------

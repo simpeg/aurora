@@ -143,8 +143,8 @@ class Spectrogram(object):
         xarray.Dataset : The dataset from the band spectrogram, stacked.
 
         Development Notes:
-        - The flattening used in tf calcuation by default is opposite to here:
-         xrds = band_spcgm.dataset.stack(observation=("frequency", "time"))
+        The flattening used in tf calculation by default is opposite to here
+        dataset.stack(observation=("frequency", "time"))
         However, for feature extraction, it may make sense to swap the order:
         xrds = band_spectrogram.dataset.stack(observation=("time", "frequency"))
         This is like chunking into time windows and allows individual features to be computed on each time window -- if desired.

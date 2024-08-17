@@ -4,8 +4,7 @@
 
 Development Notes:
 
-    follows Gary's TRME.m in
-iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
+follows Gary's TRME.m in iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
 
     (Complex) regression-M estimate for the model  Y = X*b
     Allows multiple columns of Y, but estimates b for each column separately
@@ -17,10 +16,8 @@ iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_1
     X = Q R where Q is unitary/orthogonal and R upper triangular.
     Since X is [n_data x n_channels_in] Q is [n_data x n_data].
 
-Wikipedia has a nice description of the QR factorization:
-https://en.wikipedia.org/wiki/QR_decomposition
-On a high level, the point of the QR decomposition is to transform the data
-into a domain where the inversion is done with a triangular matrix.
+Wikipedia has a nice description of the QR factorization: https://en.wikipedia.org/wiki/QR_decomposition
+The point of the QR decomposition is to transform the data into a domain where the inversion is done with a triangular matrix.
 
 The symbol QH will denote the conjugate transpose of the matrix Q.
 
@@ -60,9 +57,7 @@ There are several discussions online about the differences in
 numpy, scipy, sklearn, skcuda etc.
 https://mail.python.org/pipermail/numpy-discussion/2012-November/064485.html
 We will default to using numpy for now.
-Note that numpy's default is to use the "reduced" form of Q, R.  R is
-upper-right triangular.
-
+Note that numpy's default is to use the "reduced" form of Q, R.  R isupper-right triangular.
 
 
 This is cute:
@@ -72,7 +67,9 @@ The Matlab mldivide flowchart can be found here:
 https://stackoverflow.com/questions/18553210/how-to-implement-matlabs-mldivide-a-k-a-the-backslash-operator
 And the matlab mldivide documentation here
 http://matlab.izmiran.ru/help/techdoc/ref/mldivide.html
+
 """
+
 import numpy as np
 import xarray as xr
 from aurora.transfer_function.regression.m_estimator import MEstimator

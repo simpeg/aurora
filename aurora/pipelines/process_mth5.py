@@ -375,6 +375,10 @@ def save_fourier_coefficients(dec_level_config, row, run_obj, stft_obj) -> None:
         fc_decimation_level.from_xarray(stft_obj, decimation_level_metadata.sample_rate)
         fc_decimation_level.update_metadata()
         fc_group.update_metadata()
+    else:
+        msg = f"dec_level_config.save_fcs_type {dec_level_config.save_fcs_type} not recognized"
+        msg = f"{msg} \n Skipping save fcs"
+        logger.warning(msg)
     return
 
 

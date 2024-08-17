@@ -1,8 +1,7 @@
 """
     This module contains functions for plotting apparent resistivity and phase.
 
-    This is based on Gary's RhoPlot.m in the matlab EMTF version.
-iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
+This is based on Gary's RhoPlot.m in the matlab EMTF version. iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
 
 TODO: replace with calls to mtpy
 """
@@ -235,14 +234,12 @@ class RhoPlot(object):
         TODO: Add doc or start using MTpy
 
         Matlab Notes:
-        set default limits for plotting; QD, derived from ZPLT
-         use max/min limits of periods, rho to set limits
+        set default limits for plotting; QD, derived from ZPLT use max/min limits of periods, rho to set limits
 
         function[lims, orient] = set_lims(obj)
         Returns
             lims : list
             x_max, x_min, y_max, y_min, 0, 90
-
             orient: 0
 
         Returns

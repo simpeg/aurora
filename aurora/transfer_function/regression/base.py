@@ -504,8 +504,7 @@ def _get_channel_names(
     """
     Returns list of channel names.
 
-    If X is a numpy array, names will be created.
-    These are needed by RME.estimate() to return xarrays.
+    If X is a numpy array, names will be created. These are needed by TRME.estimate() to return xarrays.
 
     Parameters
     ----------
