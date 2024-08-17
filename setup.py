@@ -11,7 +11,8 @@ with open("README.rst") as readme_file:
 #    history = history_file.read()
 
 requirements = [
-    "mth5",
+    "mt_metadata==0.3.7",
+    "mth5==0.4.5",
     "numba",
     "psutil",
 ]
