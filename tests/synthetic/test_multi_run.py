@@ -5,10 +5,11 @@ from aurora.pipelines.process_mth5 import process_mth5
 
 from aurora.test_utils.synthetic.make_mth5_from_asc import create_test3_h5
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
-from mtpy.processing.run_summary import RunSummary
-from mtpy.processing.kernel_dataset import KernelDataset
+
 from mth5.helpers import close_open_files
 
+# from mtpy-v2
+from mtpy.processing import RunSummary, KernelDataset
 
 synthetic_test_paths = SyntheticTestPaths()
 synthetic_test_paths.mkdirs()

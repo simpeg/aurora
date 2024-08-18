@@ -13,8 +13,8 @@ from aurora.test_utils.synthetic.make_processing_configs import (
     create_test_run_config,
 )
 
-from mtpy.processing.run_summary import RunSummary
-from mtpy.processing.kernel_dataset import KernelDataset
+# from mtpy-v2
+from mtpy.processing import RunSummary, KernelDataset
 
 from loguru import logger
 from mth5.mth5 import MTH5

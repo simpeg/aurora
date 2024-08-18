@@ -13,8 +13,8 @@ from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 
 from mth5.helpers import close_open_files
 
-from mtpy.processing.run_summary import RunSummary
-from mtpy.processing.kernel_dataset import KernelDataset
+# from mtpy-v2
+from mtpy.processing import RunSummary, KernelDataset
 
 synthetic_test_paths = SyntheticTestPaths()
 synthetic_test_paths.mkdirs()
