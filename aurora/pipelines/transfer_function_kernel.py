@@ -196,7 +196,8 @@ class TransferFunctionKernel(object):
         or not at all.  This assumption can be relaxed in future by using the time_period attribute of the FC layer.
         For now, we proceed with the all-or-none logic.  That is, if a ['survey', 'station', 'run',] has FCs,
         assume that the FCs are present for the entire run. We assign the "fc" column of dataset_df to have the same
-         boolean value for all rows of same  ['survey', 'station', 'run',] .
+        boolean value for all rows of same  ['survey', 'station', 'run'] .
+
 
         Returns: None
             Modifies self.dataset_df inplace, assigning bools to the "fc" column

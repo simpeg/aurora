@@ -12,8 +12,8 @@ from aurora.time_series.frequency_band_helpers import get_band_for_tf_estimate
 from aurora.time_series.xarray_helpers import handle_nan
 from aurora.transfer_function.regression.base import RegressionEstimator
 from aurora.transfer_function.regression.iter_control import IterControl
-from aurora.transfer_function.regression.TRME import TRME
-from aurora.transfer_function.regression.TRME_RR import TRME_RR
+from aurora.transfer_function.regression.RME import RME
+from aurora.transfer_function.regression.RME_RR import RME_RR
 
 # from aurora.transfer_function.weights.coherence_weights import compute_multiple_coherence_weights
 from aurora.transfer_function.weights.edf_weights import (
@@ -24,7 +24,7 @@ from typing import Union
 import numpy as np
 import xarray as xr
 
-ESTIMATOR_LIBRARY = {"OLS": RegressionEstimator, "RME": TRME, "RME_RR": TRME_RR}
+ESTIMATOR_LIBRARY = {"OLS": RegressionEstimator, "RME": RME, "RME_RR": RME_RR}
 
 
 def get_estimator_class(estimation_engine: str) -> RegressionEstimator:
@@ -57,8 +57,7 @@ def set_up_iter_control(config):
     Initializes an IterControl object based on values in the processing config.
 
     Development Notes:
-    TODO: Review: maybe better to just make this the __init__ method of the
-     IterControl object, iter_control = IterControl(config)
+    TODO: Review: maybe better to just make this the __init__ method of the IterControl object, iter_control = IterControl(config)
 
 
     Parameters
@@ -143,24 +142,19 @@ def drop_nans(X: xr.Dataset, Y: xr.Dataset, RR: Union[xr.Dataset, None]) -> tupl
 
 def stack_fcs(X, Y, RR):
     """
-    Reshape 2D arrays of frequency and time to 1D
+    Reshape 2D arrays of frequency and time to 1D.
 
-    Context:
-    When the data for a frequency band are extracted from the Spectrogram, each channel
-    is a 2D array, one axis is time (the time of the window that was FFT-ed) and the
-    other axis is frequency.  However if we make no distinction between the harmonics
+    Notes: When the data for a frequency band are extracted from the Spectrogram, each
+    channel is a 2D array, one axis is time (the time of the window that was FFT-ed) and the
+    other axis is frequency. However if we make no distinction between the harmonics
     (bins) within a band in regression, then all the FCs for each channel can be
     put into a 1D array.  This method performs that reshaping (ravelling) operation.
-    **It is not important how we unravel the FCs but it is important that the same indexing
+    It is not important how we unravel the FCs but it is important that the same indexing
     scheme is used for X, Y and RR.
 
     TODO: Consider this take a list and return a list rather than X,Y,RR
+
     TODO: Consider decorate this with @dataset_or_dataarray
-     -- But Note that stack
-        if isinstance(X, xr.Dataset):
-        tmp = X.to_array("channel")
-        tmp = tmp.stack()
-        or similar
 
     Parameters
     ----------
@@ -234,16 +228,16 @@ def process_transfer_functions(
     Consider placing the segment weight logic in its own module with the various functions in a dictionary.
     Possibly can combines (product) all segment weights, like the following pseudocode:
 
-        W = ones
-        for wt_style in  segment_weights:
-            fcn = wt_fucntions[style]
-            w = fcn(X, Y, RR, )
-            W *= w
-        return W
+    .. code-block:: python
 
+      W = ones
+      for wt_style in segment_weights:
+        fcn = wt_functions[style]
+        w = fcn(X, Y, RR, )
+        W *= w
+      return W
 
     TODO: Consider push the nan-handling into the band extraction as a kwarg.
-
 
     Parameters
     ----------

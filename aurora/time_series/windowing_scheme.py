@@ -125,24 +125,24 @@ class WindowingScheme(ApodizationWindow):
         return info_string
 
     @property
-    def num_samples_advance(self):
+    def num_samples_advance(self) -> int:
         """
         Returns the number of samples the window advances at each step.
 
         Development Note:
-        - num_samples_advance is a derived property.  If it were a fundamental
-         property then overlap would become a derived property.
+        num_samples_advance is a derived property.  If it were a fundamental
+        property then overlap would become a derived property.
         """
         return self.num_samples_window - self.num_samples_overlap
 
-    def available_number_of_windows(self, num_samples_data: int):
+    def available_number_of_windows(self, num_samples_data: int) -> int:
         """
         Returns the number of windows for a dataset with num_samples_data.
 
         Development Note:
-        Only take as many windows as available without
-           wrapping.  Start with one window for free, move forward by
-           num_samples_advance and don't walk over the cliff.
+        Only take as many windows as available without wrapping.  Start with one
+        window for free, move forward by num_samples_advance and don't walk over
+        the cliff.
 
         Parameters
         ----------
