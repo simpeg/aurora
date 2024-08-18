@@ -1,13 +1,15 @@
 from aurora.config.config_creator import ConfigCreator
 from aurora.pipelines.process_mth5 import process_mth5
-from aurora.pipelines.run_summary import RunSummary
 from aurora.sandbox.mth5_channel_summary_helpers import (
     channel_summary_to_make_mth5,
 )
 from aurora.test_utils.parkfield.make_parkfield_mth5 import ensure_h5_exists
 from aurora.test_utils.parkfield.path_helpers import PARKFIELD_PATHS
-from aurora.transfer_function.kernel_dataset import KernelDataset
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
+
+from mtpy.processing.run_summary import RunSummary
+from mtpy.processing.kernel_dataset import KernelDataset
+
 from loguru import logger
 from mth5.mth5 import MTH5
 from mth5.helpers import close_open_files
@@ -90,7 +92,9 @@ def test():
     test_processing(z_file_path=z_file_path)
 
     # COMPARE WITH ARCHIVED Z-FILE
-    auxilliary_z_file = PARKFIELD_PATHS["emtf_results"].joinpath("PKD_272_00.zrr")
+    auxilliary_z_file = PARKFIELD_PATHS["emtf_results"].joinpath(
+        "PKD_272_00.zrr"
+    )
     if z_file_path.exists():
         compare_two_z_files(
             z_file_path,
@@ -104,7 +108,9 @@ def test():
             xlims=[0.05, 500],
         )
     else:
-        logger.error("Z-File not found - Parkfield tests failed to generate output")
+        logger.error(
+            "Z-File not found - Parkfield tests failed to generate output"
+        )
         logger.warning("NCEDC probably not returning data")
     close_open_files()
 
