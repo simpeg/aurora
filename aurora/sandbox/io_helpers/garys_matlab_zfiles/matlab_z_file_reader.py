@@ -14,13 +14,15 @@ from aurora.general_helper_functions import get_test_path
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
 from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
 from aurora.transfer_function.emtf_z_file_helpers import clip_bands_from_z_file
-from aurora.transfer_function.kernel_dataset import KernelDataset
+
 from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
 )
 from mt_metadata.timeseries.survey import Survey
 from mt_metadata.transfer_functions.core import TF
 from loguru import logger
+
+from mtpy.processing import KernelDataset
 
 TEST_PATH = get_test_path()
 

@@ -2,6 +2,7 @@
     This module contains methods for generating processing config objects that are
     used in aurora's tests of processing synthetic data.
 """
+
 from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config import BANDS_256_26_FILE
 from aurora.config.config_creator import ConfigCreator
@@ -156,8 +157,7 @@ def test_to_from_json():
     """
     # import pandas as pd
     from mt_metadata.transfer_functions.processing.aurora import Processing
-    from aurora.pipelines.run_summary import RunSummary
-    from aurora.transfer_function.kernel_dataset import KernelDataset
+    from mtpy.processing import RunSummary, KernelDataset
 
     # Specify path to mth5
     data_path = MTH5_PATH.joinpath("test1.h5")
@@ -173,7 +173,9 @@ def test_to_from_json():
     station_id = "test1"
     tfk_dataset.from_run_summary(run_summary, station_id)
 
-    processing_config = create_test_run_config(station_id, tfk_dataset, save="json")
+    processing_config = create_test_run_config(
+        station_id, tfk_dataset, save="json"
+    )
     p = Processing()
     json_fn = CONFIG_PATH.joinpath(processing_config.json_fn())
     p.from_json(json_fn)

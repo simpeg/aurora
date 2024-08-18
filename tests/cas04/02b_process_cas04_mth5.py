@@ -59,8 +59,7 @@ from aurora.general_helper_functions import get_test_path
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 
-from mtpy.processing.run_summary import RunSummary
-from mtpy.processing.kernel_dataset import KernelDataset
+from mtpy.processing import RunSummary, KernelDataset
 
 from loguru import logger
 
