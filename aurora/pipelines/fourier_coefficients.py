@@ -69,47 +69,51 @@ from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
 from loguru import logger
+from mth5.mth5 import MTH5
 from mth5.utils.helpers import path_or_mth5_object
 from mt_metadata.transfer_functions.processing.fourier_coefficients import (
     Decimation as FCDecimation,
 )
-from typing import List, Union
+from typing import List, Optional, Union
 
 # =============================================================================
 GROUPBY_COLUMNS = ["survey", "station", "sample_rate"]
 
 
 def fc_decimations_creator(
-    initial_sample_rate, decimation_factors=None, max_levels=6, time_period=None
-):
+    initial_sample_rate: float,
+    decimation_factors: Optional[Union[list, None]] = None,
+    max_levels: Optional[int] = 6,
+    time_period: mt_metadata.timeseries.TimePeriod = None,
+) -> list:
     """
-    Based on the number of samples in the runts, we can compute the maximum number of valid decimation levels.
-    This would re-use code in processing summary ... or we could just decimate until we cant anymore?
 
-    You can provide something like: decimation_info = {0: 1.0, 1: 4.0, 2: 4.0, 3: 4.0}
+    Creates mt_metadata FCDecimation objects that parameterize Fourier coefficient decimation levels.
 
     Note 1:  This does not yet work through the assignment of which bands to keep.  Refer to
     mt_metadata.transfer_functions.processing.Processing.assign_bands() to see how this was done in the past
 
-    Args:
-        initial_sample_rate: float
-            Sample rate of the "level0" data -- usually the sample rate during field acquisition.
-        decimation_factors: list (or other iterable)
-            The decimation factors that will be applied at each FC decimation level
-        max_levels: int
-            The maximum number of decimation levels to allow
-        time_period:
+    Parameters
+    ----------
+    initial_sample_rate: float
+        Sample rate of the "level0" data -- usually the sample rate during field acquisition.
+    decimation_factors: list (or other iterable)
+        The decimation factors that will be applied at each FC decimation level
+    max_levels: int
+        The maximum number of decimation levels to allow
+    time_period:
 
-    Returns:
-        fc_decimations: list
-            Each element of the list is an object of type
-            mt_metadata.transfer_functions.processing.fourier_coefficients.Decimation,
-            (a.k.a. FCDecimation).
+    Returns
+    -------
+    fc_decimations: list
+        Each element of the list is an object of type
+        mt_metadata.transfer_functions.processing.fourier_coefficients.Decimation,
+        (a.k.a. FCDecimation).
 
-            The order of the list corresponds the order of the cascading decimation
-              - No decimation levels are omitted.
-              - This could be changed in future by using a dict instead of a list,
-              - e.g. decimation_factors = dict(zip(np.arange(max_levels), decimation_factors))
+        The order of the list corresponds the order of the cascading decimation
+          - No decimation levels are omitted.
+          - This could be changed in future by using a dict instead of a list,
+          - e.g. decimation_factors = dict(zip(np.arange(max_levels), decimation_factors))
 
     """
     if not decimation_factors:
@@ -122,19 +126,19 @@ def fc_decimations_creator(
     # See Note 1
     fc_decimations = []
     for i_dec_level, decimation_factor in enumerate(decimation_factors):
-        dd = FCDecimation()
-        dd.decimation_level = i_dec_level
-        dd.id = f"{i_dec_level}"
-        dd.decimation_factor = decimation_factor
+        fc_dec = FCDecimation()
+        fc_dec.decimation_level = i_dec_level
+        fc_dec.id = f"{i_dec_level}"
+        fc_dec.decimation_factor = decimation_factor
         if i_dec_level == 0:
             current_sample_rate = 1.0 * initial_sample_rate
         else:
             current_sample_rate /= decimation_factor
-        dd.sample_rate_decimation = current_sample_rate
+        fc_dec.sample_rate_decimation = current_sample_rate
 
         if time_period:
             if isinstance(time_period, mt_metadata.timeseries.time_period.TimePeriod):
-                dd.time_period = time_period
+                fc_dec.time_period = time_period
             else:
                 msg = (
                     f"Not sure how to assign time_period with type {type(time_period)}"
@@ -142,13 +146,15 @@ def fc_decimations_creator(
                 logger.info(msg)
                 raise NotImplementedError(msg)
 
-        fc_decimations.append(dd)
+        fc_decimations.append(fc_dec)
 
     return fc_decimations
 
 
 @path_or_mth5_object
-def add_fcs_to_mth5(m, fc_decimations=None):
+def add_fcs_to_mth5(
+    m: MTH5, fc_decimations: Optional[Union[list, None]] = None
+) -> None:
     """
     Add Fourier Coefficient Levels ot an existing MTH5.
 
@@ -160,8 +166,8 @@ def add_fcs_to_mth5(m, fc_decimations=None):
 
     Parameters
     ----------
-    m: str or pathlib.Path, or MTH5 object
-        Where the mth5 file is located
+    m: MTH5 object
+        The mth5 file, open in append mode.
     fc_decimations: Union[str, None, List]
         This specifies the scheme to use for decimating the time series when building the FC layer.
         None: Just use default (something like four decimation levels, decimated by 4 each time say.
@@ -173,32 +179,30 @@ def add_fcs_to_mth5(m, fc_decimations=None):
         would get redefined at each sample rate.
 
     """
+    # Group the channel summary by survey, station, sample_rate
     channel_summary_df = m.channel_summary.to_dataframe()
-
     usssr_grouper = channel_summary_df.groupby(GROUPBY_COLUMNS)
     logger.debug(f"Detected {len(usssr_grouper)} unique station-sample_rate instances")
 
+    # loop over groups
     for (survey, station, sample_rate), usssr_group in usssr_grouper:
-        logger.info(
-            f"\n\n\nsurvey: {survey}, station: {station}, sample_rate {sample_rate}"
-        )
+        msg = f"\n\n\nsurvey: {survey}, station: {station}, sample_rate {sample_rate}"
+        logger.info(msg)
         station_obj = m.get_station(station, survey)
         run_summary = station_obj.run_summary
 
-        # Get the FC schemes
+        # Get the FC decimation schemes if not provided
         if not fc_decimations:
-            msg = (
-                "FC Decimation configs not supplied, using default, creating on the fly"
-            )
+            msg = "FC Decimations not supplied, creating defaults on the fly"
             logger.info(f"{msg}")
-            fc_decimations = fc_decimations_creator(sample_rate, time_period=None)
+            fc_decimations = fc_decimations_creator(
+                initial_sample_rate=sample_rate, time_period=None
+            )
         elif isinstance(fc_decimations, str):
             if fc_decimations == "degenerate":
                 fc_decimations = get_degenerate_fc_decimation(sample_rate)
 
-        # Make this a function that can be done using df.apply()
-        # I wonder if daskifiying that will cause issues with multiple threads trying to
-        # write to the hdf5 file -- will need testing
+        # TODO: Make this a function that can be done using df.apply()
         for i_run_row, run_row in run_summary.iterrows():
             logger.info(
                 f"survey: {survey}, station: {station}, sample_rate {sample_rate}, i_run_row {i_run_row}"
@@ -207,16 +211,17 @@ def add_fcs_to_mth5(m, fc_decimations=None):
             run_obj = m.from_reference(run_row.hdf5_reference)
 
             # Set the time period:
+            # TODO: Should this be over-writing time period if it is already there?
             for fc_decimation in fc_decimations:
                 fc_decimation.time_period = run_obj.metadata.time_period
 
+            # Access the data to Fourier transform
             runts = run_obj.to_runts(
                 start=fc_decimation.time_period.start,
                 end=fc_decimation.time_period.end,
             )
-            # runts = run_obj.to_runts() # skip setting time_period explcitly
-
             run_xrds = runts.dataset
+
             # access container for FCs
             fc_group = station_obj.fourier_coefficients_group.add_fc_group(
                 run_obj.metadata.id
@@ -229,6 +234,7 @@ def add_fcs_to_mth5(m, fc_decimations=None):
                     # Apply decimation
                     run_xrds = prototype_decimate(fc_decimation, run_xrds)
 
+                # check if this decimation level yields a valid spectrogram
                 if not fc_decimation.is_valid_for_time_series_length(
                     run_xrds.time.shape[0]
                 ):
@@ -241,7 +247,6 @@ def add_fcs_to_mth5(m, fc_decimations=None):
                 stft_obj = calibrate_stft_obj(stft_obj, run_obj)
 
                 # Pack FCs into h5 and update metadata
-
                 decimation_level = fc_group.add_decimation_level(
                     f"{i_dec_level}", decimation_level_metadata=fc_decimation
                 )
@@ -253,14 +258,23 @@ def add_fcs_to_mth5(m, fc_decimations=None):
     return
 
 
-def get_degenerate_fc_decimation(sample_rate):
+def get_degenerate_fc_decimation(sample_rate: float) -> list:
     """
+
     Makes a default fc_decimation list. WIP
+    This "degnerate" config will only operate on the first decimation level.
+    This is useful for testing but could be used in future if an MTH5 stored time series in decimation
+    levels already as separate runs.
+
+    Parameters
+    ----------
+    sample_rate: float
+        The sample rate assocaiated with the time-series to convert to Spectrogram
 
     Returns
     -------
     output: list
-        List has only one element -- an fc_decimation
+        List has only one element which is of type mt_metadata.transfer_functions.processing.fourier_coefficients.Decimation.
     """
     output = fc_decimations_creator(
         sample_rate,
@@ -273,7 +287,7 @@ def get_degenerate_fc_decimation(sample_rate):
 
 
 @path_or_mth5_object
-def read_back_fcs(m: Union[mth5.mth5.MTH5, pathlib.Path, str], mode="r"):
+def read_back_fcs(m: Union[MTH5, pathlib.Path, str], mode="r"):
     """
     This is mostly a helper function for tests.  It was used as a sanity check while debugging the FC files, and
     also is a good example for how to access the data at each level for each channel.
