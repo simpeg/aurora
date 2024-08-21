@@ -11,7 +11,7 @@ from obspy import UTCDateTime
 from loguru import logger
 
 
-def trim_streams_to_acquisition_run(streams):
+def trim_streams_to_common_timestamps(streams):
     """
     Slices streams to common time stamps.
 
