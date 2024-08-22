@@ -67,7 +67,7 @@ def test_stft_methods_agree():
         else:
             local_run_xrts = prototype_decimate(dec_config.decimation, local_run_xrts)
 
-        dec_config.extra_pre_fft_detrend_type = ""
+        dec_config.extra_pre_fft_detrend_type = "constant"
         local_stft_obj = run_ts_to_stft(dec_config, local_run_xrts)
         local_stft_obj2 = run_ts_to_stft_scipy(dec_config, local_run_xrts)
         stft_difference = local_stft_obj - local_stft_obj2
