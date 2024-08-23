@@ -76,20 +76,13 @@ jobs:
         # pytest -s -v tests/test_general_helper_functions.py 
         pytest -s -v --cov=./ --cov-report=xml --cov=aurora
 
-# Commenting this old codecov - trying to fix #351
-#    - name: Upload coverage reports to Codecov
-#      uses: codecov/codecov-action@v3
-#      with:
-#        token: ${{ secrets.CODECOV_TOKEN }}
-#        fail_ci_if_error: false
-#        flags: tests
-    - name: Upload coverage reports to Codecov
+    - name: "Upload coverage reports to Codecov"
       uses: codecov/codecov-action@v4
-      env:
+      with:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        token: ${{ secrets.CODECOV_TOKEN }}
         fail_ci_if_error: false
         flags: tests
+        # token: ${{ secrets.CODECOV_TOKEN }}
 
     - name: Build Doc
       if: ${{ (github.ref == 'refs/heads/main') && (matrix.python-version == '3.8')}}
