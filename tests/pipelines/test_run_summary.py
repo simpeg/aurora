@@ -2,8 +2,8 @@
 import unittest
 
 from aurora.pipelines.run_summary import RunSummary
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
 from aurora.test_utils.synthetic.paths import DATA_PATH
+from mth5.data.make_mth5_from_asc import create_test12rr_h5
 
 
 class TestRunSummary(unittest.TestCase):

@@ -1,9 +1,6 @@
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
 from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test2_h5
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
 from aurora.test_utils.synthetic.make_processing_configs import (
     create_test_run_config,
 )
@@ -15,6 +12,9 @@ from aurora.transfer_function.emtf_z_file_helpers import (
     merge_tf_collection_to_match_z_file,
 )
 from aurora.transfer_function.kernel_dataset import KernelDataset
+from mth5.data.make_mth5_from_asc import create_test1_h5
+from mth5.data.make_mth5_from_asc import create_test2_h5
+from mth5.data.make_mth5_from_asc import create_test12rr_h5
 from plot_helpers_synthetic import plot_rho_phi
 from loguru import logger
 from mth5.helpers import close_open_files

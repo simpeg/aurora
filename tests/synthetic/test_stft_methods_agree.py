@@ -8,12 +8,12 @@ from aurora.pipelines.run_summary import RunSummary
 from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
 from aurora.test_utils.synthetic.make_processing_configs import (
     create_test_run_config,
 )
 from aurora.transfer_function.kernel_dataset import KernelDataset
 from loguru import logger
+from mth5.data.make_mth5_from_asc import create_test1_h5
 from mth5.mth5 import MTH5
 from mth5.helpers import close_open_files
 

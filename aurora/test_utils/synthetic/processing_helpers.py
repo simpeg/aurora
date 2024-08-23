@@ -5,7 +5,7 @@
 import mt_metadata.transfer_functions
 import pathlib
 from aurora.pipelines.process_mth5 import process_mth5
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
+from mth5.data.make_mth5_from_asc import create_test1_h5
 
 
 def get_example_kernel_dataset():

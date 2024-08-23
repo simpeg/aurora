@@ -3,9 +3,9 @@ import unittest
 from aurora.config.config_creator import ConfigCreator
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test3_h5
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 from aurora.transfer_function.kernel_dataset import KernelDataset
+from mth5.data.make_mth5_from_asc import create_test3_h5
 from mth5.helpers import close_open_files
 
 

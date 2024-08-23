@@ -3,14 +3,14 @@ import unittest
 
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.pipelines.run_summary import RunSummary
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test2_h5
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
 from aurora.test_utils.synthetic.make_processing_configs import (
     create_test_run_config,
 )
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 from aurora.transfer_function.kernel_dataset import KernelDataset
+from mth5.data.make_mth5_from_asc import create_test1_h5
+from mth5.data.make_mth5_from_asc import create_test2_h5
+from mth5.data.make_mth5_from_asc import create_test12rr_h5
 from mth5.helpers import close_open_files
 
 synthetic_test_paths = SyntheticTestPaths()
