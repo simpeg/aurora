@@ -638,5 +638,5 @@ def process_mth5(
             msg = "Failed to run legacy processing\n"
             msg += "closing all open mth5 files and exiting"
             msg += f"The encountered exception was {e}"
-            logger.error(msg)
+            logger.exception(msg)
             return
