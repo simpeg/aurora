@@ -473,7 +473,7 @@ def get_spectrogams(tfk, i_dec_level, units="MT"):
             units,
         )
         if stft_obj is None:
-            continue
+            break
 
         # Pack FCs into h5
         dec_level_config = tfk.config.decimations[i_dec_level]
