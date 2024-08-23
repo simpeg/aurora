@@ -28,6 +28,7 @@ Note 3: This point in the loop marks the interface between _generation_ of the F
  compute weights for the FCs.
 
 """
+
 import mth5.groups
 
 # =============================================================================
@@ -36,7 +37,9 @@ import mth5.groups
 
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
-from aurora.pipelines.transfer_function_helpers import process_transfer_functions
+from aurora.pipelines.transfer_function_helpers import (
+    process_transfer_functions,
+)
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
 from aurora.pipelines.transfer_function_kernel import station_obj_from_row
 from aurora.sandbox.triage_metadata import triage_run_id
@@ -60,7 +63,9 @@ SUPPORTED_PROCESSINGS = [
 # =============================================================================
 
 
-def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrds, units="MT"):
+def make_stft_objects(
+    processing_config, i_dec_level, run_obj, run_xrds, units="MT"
+):
     """
     Operates on a "per-run" basis.  Applies STFT to all time series in the input run.
 
@@ -90,15 +95,23 @@ def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrds, units="
         Time series of calibrated Fourier coefficients per each channel in the run
     """
     stft_config = processing_config.get_decimation_level(i_dec_level)
-    stft_obj = run_ts_to_stft(stft_config, run_xrds)
+    try:
+        stft_obj = run_ts_to_stft(stft_config, run_xrds)
+    except ValueError:
+        logger.info(f"Could not process decimation level {i_dec_level}")
+        return None
     run_id = run_obj.metadata.id
     if run_obj.station_metadata.id == processing_config.stations.local.id:
         scale_factors = processing_config.stations.local.run_dict[
             run_id
         ].channel_scale_factors
-    elif run_obj.station_metadata.id == processing_config.stations.remote[0].id:
+    elif (
+        run_obj.station_metadata.id == processing_config.stations.remote[0].id
+    ):
         scale_factors = (
-            processing_config.stations.remote[0].run_dict[run_id].channel_scale_factors
+            processing_config.stations.remote[0]
+            .run_dict[run_id]
+            .channel_scale_factors
         )
 
     stft_obj = calibrate_stft_obj(
@@ -145,11 +158,16 @@ def process_tf_decimation_level(
         The transfer function values packed into an object
     """
     frequency_bands = config.decimations[i_dec_level].frequency_bands_obj()
-    transfer_function_obj = TTFZ(i_dec_level, frequency_bands, processing_config=config)
+    transfer_function_obj = TTFZ(
+        i_dec_level, frequency_bands, processing_config=config
+    )
     dec_level_config = config.decimations[i_dec_level]
     # segment_weights = coherence_weights(dec_level_config, local_stft_obj, remote_stft_obj)
     transfer_function_obj = process_transfer_functions(
-        dec_level_config, local_stft_obj, remote_stft_obj, transfer_function_obj
+        dec_level_config,
+        local_stft_obj,
+        remote_stft_obj,
+        transfer_function_obj,
     )
 
     return transfer_function_obj
@@ -172,9 +190,13 @@ def triage_issue_289(local_stfts: list, remote_stfts: list):
     """
     n_chunks = len(local_stfts)
     for i_chunk in range(n_chunks):
-        ok = local_stfts[i_chunk].time.shape == remote_stfts[i_chunk].time.shape
+        ok = (
+            local_stfts[i_chunk].time.shape == remote_stfts[i_chunk].time.shape
+        )
         if not ok:
-            logger.warning("Mismatch in FC array lengths detected -- Issue #289")
+            logger.warning(
+                "Mismatch in FC array lengths detected -- Issue #289"
+            )
             glb = max(
                 local_stfts[i_chunk].time.min(),
                 remote_stfts[i_chunk].time.min(),
@@ -185,13 +207,18 @@ def triage_issue_289(local_stfts: list, remote_stfts: list):
             )
             cond1 = local_stfts[i_chunk].time >= glb
             cond2 = local_stfts[i_chunk].time <= lub
-            local_stfts[i_chunk] = local_stfts[i_chunk].where(cond1 & cond2, drop=True)
+            local_stfts[i_chunk] = local_stfts[i_chunk].where(
+                cond1 & cond2, drop=True
+            )
             cond1 = remote_stfts[i_chunk].time >= glb
             cond2 = remote_stfts[i_chunk].time <= lub
             remote_stfts[i_chunk] = remote_stfts[i_chunk].where(
                 cond1 & cond2, drop=True
             )
-            assert local_stfts[i_chunk].time.shape == remote_stfts[i_chunk].time.shape
+            assert (
+                local_stfts[i_chunk].time.shape
+                == remote_stfts[i_chunk].time.shape
+            )
     return local_stfts, remote_stfts
 
 
@@ -229,7 +256,9 @@ def merge_stfts(stfts: dict, tfk: TransferFunctionKernel):
     return local_merged_stft_obj, remote_merged_stft_obj
 
 
-def append_chunk_to_stfts(stfts: dict, chunk: xr.Dataset, remote: bool) -> dict:
+def append_chunk_to_stfts(
+    stfts: dict, chunk: xr.Dataset, remote: bool
+) -> dict:
     """
     Aggregate one STFT into a larger dictionary that tracks all the STFTs
 
@@ -290,7 +319,9 @@ def load_stft_obj_from_mth5(
         An STFT from mth5.
     """
     station_obj = station_obj_from_row(row)
-    fc_group = station_obj.fourier_coefficients_group.get_fc_group(run_obj.metadata.id)
+    fc_group = station_obj.fourier_coefficients_group.get_fc_group(
+        run_obj.metadata.id
+    )
     fc_decimation_level = fc_group.get_decimation_level(f"{i_dec_level}")
     stft_obj = fc_decimation_level.to_xarray(channels=channels)
 
@@ -305,7 +336,9 @@ def load_stft_obj_from_mth5(
     return stft_chunk
 
 
-def save_fourier_coefficients(dec_level_config, row, run_obj, stft_obj) -> None:
+def save_fourier_coefficients(
+    dec_level_config, row, run_obj, stft_obj
+) -> None:
     """
     Optionally saves the stft object into the MTH5.
     Note that the dec_level_config must have its save_fcs attr set to True to actually save the data.
@@ -351,7 +384,10 @@ def save_fourier_coefficients(dec_level_config, row, run_obj, stft_obj) -> None:
             raise NotImplementedError(msg)
 
         # Get FC group (create if needed)
-        if run_obj.metadata.id in station_obj.fourier_coefficients_group.groups_list:
+        if (
+            run_obj.metadata.id
+            in station_obj.fourier_coefficients_group.groups_list
+        ):
             fc_group = station_obj.fourier_coefficients_group.get_fc_group(
                 run_obj.metadata.id
             )
@@ -372,7 +408,9 @@ def save_fourier_coefficients(dec_level_config, row, run_obj, stft_obj) -> None:
                 dec_level_name,
                 decimation_level_metadata=decimation_level_metadata,
             )
-        fc_decimation_level.from_xarray(stft_obj, decimation_level_metadata.sample_rate)
+        fc_decimation_level.from_xarray(
+            stft_obj, decimation_level_metadata.sample_rate
+        )
         fc_decimation_level.update_metadata()
         fc_group.update_metadata()
     else:
@@ -434,6 +472,8 @@ def get_spectrogams(tfk, i_dec_level, units="MT"):
             run_xrds,
             units,
         )
+        if stft_obj is None:
+            continue
 
         # Pack FCs into h5
         dec_level_config = tfk.config.decimations[i_dec_level]
@@ -512,7 +552,9 @@ def process_mth5_legacy(
             local_merged_stft_obj,
             remote_merged_stft_obj,
         )
-        ttfz_obj.apparent_resistivity(tfk.config.channel_nomenclature, units=units)
+        ttfz_obj.apparent_resistivity(
+            tfk.config.channel_nomenclature, units=units
+        )
         tf_dict[i_dec_level] = ttfz_obj
 
         if show_plot:
@@ -577,7 +619,9 @@ def process_mth5(
         The transfer function object
     """
     if processing_type not in SUPPORTED_PROCESSINGS:
-        raise NotImplementedError(f"Processing type {processing_type} not supported")
+        raise NotImplementedError(
+            f"Processing type {processing_type} not supported"
+        )
 
     if processing_type == "legacy":
         try:

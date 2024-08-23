@@ -1,6 +1,7 @@
 """
     Collection of modules used in processing pipeline that operate on time series
 """
+
 import mt_metadata
 import numpy as np
 import pandas as pd
@@ -66,7 +67,9 @@ def apply_prewhitening(decimation_obj, run_xrds_input):
         run_xrds = run_xrds_input.differentiate("time")
 
     else:
-        msg = f"{decimation_obj.prewhitening_type} pre-whitening not implemented"
+        msg = (
+            f"{decimation_obj.prewhitening_type} pre-whitening not implemented"
+        )
         logger.exception(msg)
         raise NotImplementedError(msg)
     return run_xrds
@@ -204,7 +207,9 @@ def truncate_to_clock_zero(decimation_obj, run_xrds):
             pass  # time series start is already clock zero
         else:
             windowing_scheme = window_scheme_from_decimation(decimation_obj)
-            number_of_steps = delta_t_seconds / windowing_scheme.duration_advance
+            number_of_steps = (
+                delta_t_seconds / windowing_scheme.duration_advance
+            )
             n_partial_steps = number_of_steps - np.floor(number_of_steps)
             n_clip = n_partial_steps * windowing_scheme.num_samples_advance
             n_clip = int(np.round(n_clip))
@@ -273,9 +278,14 @@ def run_ts_to_stft(decimation_obj, run_xrds_orig):
         run_xrds, dt=1.0 / decimation_obj.sample_rate_decimation
     )
     if not np.prod(windowed_obj.to_array().data.shape):
+        logger.error(
+            f"STFT failed because {np.prod(windowed_obj.to_array().data.shape)}"
+        )
         raise ValueError
 
-    windowed_obj = WindowedTimeSeries.detrend(data=windowed_obj, detrend_type="linear")
+    windowed_obj = WindowedTimeSeries.detrend(
+        data=windowed_obj, detrend_type="linear"
+    )
     tapered_obj = windowed_obj * windowing_scheme.taper
     stft_obj = windowing_scheme.apply_fft(
         tapered_obj, detrend_type=decimation_obj.extra_pre_fft_detrend_type
@@ -285,7 +295,9 @@ def run_ts_to_stft(decimation_obj, run_xrds_orig):
     return stft_obj
 
 
-def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None):
+def calibrate_stft_obj(
+    stft_obj, run_obj, units="MT", channel_scale_factors=None
+):
     """
     Calibrates frequency domain data into MT units.
 
@@ -320,7 +332,9 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
             logger.warning(msg)
             if channel_id == "hy":
                 msg = "Channel hy has no filters, try using filters from hx"
-                logger.warning("Channel HY has no filters, try using filters from HX")
+                logger.warning(
+                    "Channel HY has no filters, try using filters from HX"
+                )
                 channel_response = run_obj.get_channel("hx").channel_response
 
         indices_to_flip = channel_response.get_indices_of_filters_to_remove(
@@ -329,7 +343,9 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
         indices_to_flip = [
             i for i in indices_to_flip if channel.metadata.filter.applied[i]
         ]
-        filters_to_remove = [channel_response.filters_list[i] for i in indices_to_flip]
+        filters_to_remove = [
+            channel_response.filters_list[i] for i in indices_to_flip
+        ]
         if not filters_to_remove:
             logger.warning("No filters to remove")
         calibration_response = channel_response.complex_response(
@@ -342,7 +358,9 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
                 channel_scale_factor = 1.0
             calibration_response /= channel_scale_factor
         if units == "SI":
-            logger.warning("Warning: SI Units are not robustly supported issue #36")
+            logger.warning(
+                "Warning: SI Units are not robustly supported issue #36"
+            )
         # TODO: This often raises a runtime warning due to DC term in calibration response=0
         stft_obj[channel_id].data /= calibration_response
     return stft_obj
@@ -384,7 +402,9 @@ def prototype_decimate(
     num_channels = len(channel_labels)
     new_data = np.full((num_observations, num_channels), np.nan)
     for i_ch, ch_label in enumerate(channel_labels):
-        new_data[:, i_ch] = ssig.decimate(run_xrds[ch_label], int(config.factor))
+        new_data[:, i_ch] = ssig.decimate(
+            run_xrds[ch_label], int(config.factor)
+        )
 
     xr_da = xr.DataArray(
         new_data,
