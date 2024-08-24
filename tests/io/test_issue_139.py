@@ -42,7 +42,7 @@ class TestZFileReadWrite(unittest.TestCase):
         self.zrr_file_base = pathlib.Path("synthetic_test1.zrr")
 
         if not self.mth5_path.exists():
-            create_test12rr_h5()
+            create_test12rr_h5(target_folder=self.mth5_path.parent)
 
         self._tf_obj = tf_obj_from_synthetic_data(self.mth5_path)
         write_zrr(self._tf_obj, self.zrr_file_base)
