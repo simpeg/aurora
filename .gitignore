@@ -1,9 +1,17 @@
 .idea
 data/figures
+data/parkfield/*png
 data/parkfield/aurora_results/
 data/parkfield/*h5
 data/synthetic/aurora_results/
 data/synthetic/config/
+data/synthetic/mth5/
+docs/tutorials/*h5
+docs/tutorials/CAS04*edi
+docs/tutorials/CAS04*zrr
+docs/tutorials/CAS04*xml
+docs/tutorials/CAS04*png
+docs/tutorials/config.json
 tests/io/from_matlab.zss
 *ignore*
 *fix_issue*
