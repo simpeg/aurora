@@ -33,6 +33,7 @@ class TestSlicingRunTS(unittest.TestCase):
         try:
             run_001 = mth5_obj.get_run(station_name="test1", run_name="001")
         except ValueError:
+            # this can happen on local machine
             run_001 = mth5_obj.get_run(
                 station_name="test1",
                 run_name="001",
