@@ -44,18 +44,6 @@ def get_test_path() -> pathlib.Path:
     return test_path
 
 
-def get_mth5_ascii_data_path():
-    """
-    Get the path to the
-    Returns
-    -------
-    mth5_data_path: pathlib.Path
-        This is the place where the legacy test files (ascii MT data from EMTF) are archived
-    """
-    mth5_data_path = pathlib.Path(mth5.__file__).parent.joinpath("data")
-    return mth5_data_path
-
-
 try:
     FIGURES_PATH = DATA_PATH.joinpath("figures")
     FIGURES_PATH.mkdir(exist_ok=True, parents=True)
