@@ -342,9 +342,6 @@ class WindowingScheme(ApodizationWindow):
     def apply_taper(self, data):
         """
         modifies the data in place by applying a taper to each window
-
-        TODO: consider adding an option to return a copy of the data without
-         the taper applied
         """
         data = WindowedTimeSeries.apply_taper(data=data, taper=self.taper)
         return data

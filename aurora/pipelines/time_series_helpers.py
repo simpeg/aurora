@@ -276,7 +276,9 @@ def run_ts_to_stft(decimation_obj, run_xrds_orig):
         raise ValueError
 
     windowed_obj = WindowedTimeSeries.detrend(data=windowed_obj, detrend_type="linear")
-    tapered_obj = windowed_obj * windowing_scheme.taper
+    tapered_obj = WindowedTimeSeries.apply_taper(
+        data=windowed_obj, taper=windowing_scheme.taper
+    )
     stft_obj = windowing_scheme.apply_fft(
         tapered_obj, detrend_type=decimation_obj.extra_pre_fft_detrend_type
     )

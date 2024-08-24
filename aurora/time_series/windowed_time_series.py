@@ -44,7 +44,9 @@ class WindowedTimeSeries(object):
 
     @can_use_xr_dataarray
     @staticmethod
-    def apply_taper(data=None, taper=None):  # , in_place=True):
+    def apply_taper(
+        data: Union[xr.DataArray, xr.Dataset], taper: np.ndarray
+    ):  # , in_place=True):
         """
         Point by point multiplication of taper against time series.
 
