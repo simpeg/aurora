@@ -32,6 +32,8 @@ def compare_two_z_files(
     rho_ylims: Optional[tuple] = (1, 1e3),
     phi_ylims: Optional[tuple] = (0, 90),
     xlims: Optional[tuple] = (1e-3, 1e3),
+    title_string: Optional[str] = "",
+    subtitle_string: Optional[str] = "",
 ):
     """
     Takes as input two z-files and plots them both on the same axis
@@ -169,7 +171,12 @@ def compare_two_z_files(
         which="both",
         axis="both",
     )
+    if title_string:
+        plt.suptitle(title_string, fontsize=15)
+    if subtitle_string:
+        axs[0].set_title(subtitle_string, fontsize=8)
     if out_file:
         plt.savefig(f"{out_file}")
+
     if show_plot:
         plt.show()
