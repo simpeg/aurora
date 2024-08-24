@@ -279,9 +279,13 @@ def run_ts_to_stft(decimation_obj, run_xrds_orig):
     tapered_obj = WindowedTimeSeries.apply_taper(
         data=windowed_obj, taper=windowing_scheme.taper
     )
-    stft_obj = windowing_scheme.apply_fft(
-        tapered_obj, detrend_type=decimation_obj.extra_pre_fft_detrend_type
+    stft_obj = WindowedTimeSeries.apply_fft(
+        data=tapered_obj,
+        sample_rate=windowing_scheme.sample_rate,
+        spectral_density_correction=windowing_scheme.linear_spectral_density_calibration_factor,
+        detrend_type=decimation_obj.extra_pre_fft_detrend_type,
     )
+
     stft_obj = apply_recoloring(decimation_obj, stft_obj)
 
     return stft_obj
