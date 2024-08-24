@@ -2,11 +2,14 @@
     This module contains methods that are used in the Parkfield calibration tests.
 """
 import matplotlib.pyplot as plt
+import mth5.groups.run
 import numpy as np
+import pathlib
 
-from pathlib import Path
+import xarray
 from scipy.signal import medfilt
 from loguru import logger
+from typing import Optional, Union
 
 plt.ion()
 
@@ -65,7 +68,7 @@ def plot_responses(
         The complex-values resposne function from the pole-zero response
     bf4_resp : None or numpy.ndarray
         The complex-values resposne function from the BF-4 coil only.
-    figures_path : str or Path
+    figures_path : str or pathlib.Path
         Where the figures will be saved
     show_response_curves : bool
         If True, plots flash to screen - for debugging
@@ -96,12 +99,12 @@ def plot_responses(
 
 
 def parkfield_sanity_check(
-    fft_obj,
-    run_obj,
-    show_response_curves=False,
-    show_spectra=True,
-    figures_path=Path(""),
-    include_decimation=False,
+    fft_obj: xarray.Dataset,
+    run_obj: mth5.groups.run.RunGroup,
+    show_response_curves: Optional[bool] = False,
+    show_spectra: Optional[bool] = False,
+    figures_path: Optional[Union[str, pathlib.Path]] = pathlib.Path(""),
+    include_decimation: Optional[bool] = False,
 ):
     """
     Loop over channels in fft obj and make calibrated spectral plots
@@ -115,7 +118,6 @@ def parkfield_sanity_check(
     -------
 
     """
-
     frequencies = fft_obj.frequency.data[1:]  # drop DC, add flag for dropping DC
     figures_path.mkdir(parents=True, exist_ok=True)
     channel_keys = list(fft_obj.data_vars.keys())
