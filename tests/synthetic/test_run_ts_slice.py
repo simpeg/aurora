@@ -22,7 +22,7 @@ class TestSlicingRunTS(unittest.TestCase):
         close_open_files()
         self.mth5_path = MTH5_PATH.joinpath("test1.h5")
         if not self.mth5_path.exists():
-            create_test1_h5()
+            create_test1_h5(file_version="0.1.0")
 
     def setUp(self):
         pass
@@ -30,7 +30,14 @@ class TestSlicingRunTS(unittest.TestCase):
     def test_can_slice_a_run_ts_using_timestamp(self):
         mth5_obj = initialize_mth5(self.mth5_path, "r")
         df = mth5_obj.channel_summary.to_dataframe()
-        run_001 = mth5_obj.get_run("test1", "001")
+        try:
+            run_001 = mth5_obj.get_run(station_name="test1", run_name="001")
+        except ValueError:
+            run_001 = mth5_obj.get_run(
+                station_name="test1",
+                run_name="001",
+                survey=mth5_obj.surveys_group.groups_list[0],
+            )
         run_ts_01 = run_001.to_runts()
         start = df.iloc[0].start
         end = df.iloc[0].end
