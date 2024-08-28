@@ -9,7 +9,7 @@ from pathlib import Path
 
 from aurora.sandbox.obspy_helpers import align_streams
 from aurora.sandbox.obspy_helpers import make_channel_labels_fdsn_compliant
-from aurora.sandbox.obspy_helpers import trim_streams_to_acquisition_run
+from aurora.sandbox.obspy_helpers import trim_streams_to_common_timestamps
 from aurora.sandbox.triage_metadata import triage_missing_coil_hollister
 from aurora.sandbox.triage_metadata import triage_mt_units_electric_field
 from aurora.sandbox.triage_metadata import triage_mt_units_magnetic_field
@@ -29,11 +29,29 @@ def create_from_server_multistation(
     triage_missing_coil: Optional[bool] = False,
 ) -> pathlib.Path:
     """
+
     This function builds an MTH5 file from FDSN client. The input dataset is described by fdsn_dataset.
 
     Parameters
     ----------
     fdsn_dataset: aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset
+        Description of the dataset to create
+    target_folder: Optional[pathlib.Path]
+        The folder to create the dataset (mth5 file)
+    run_id: str
+        Label for the run
+    force_align_streams: bool
+        If True, the streams will be aligned if they are offset
+    triage_units: list or None
+        elements of the list should be in ["V/m to mV/km", "T to nT" ]
+        These values in the list will result in an additional filter being added to
+        the electric or magnetic field channels.
+    triage_missing_coil: bool
+
+
+    Returns
+    -------
+
     target_folder:
     run_id : string
         This is a temporary workaround. A more robust program that assigns run
@@ -82,7 +100,7 @@ def create_from_server_multistation(
     if force_align_streams:
         logger.warning("WARNING: ALIGN STREAMS NOT ROBUSTLY TESTED")
         streams = align_streams(streams, fdsn_dataset.starttime)
-    streams = trim_streams_to_acquisition_run(streams)
+    streams = trim_streams_to_common_timestamps(streams)
 
     streams_dict = {}
     station_groups = {}

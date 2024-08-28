@@ -2,20 +2,21 @@
 This module contains a class that helps manage data paths for testing aurora on synthetic data.
 
 Development Notes:
- - The DATA_PATH from general_helper_functions has traditionally had the synthetic ascii data, but this is now stored in MTH5.
  - This class was built to handle Issue #303 (installation on read-only file system). https://github.com/simpeg/aurora/issues/303
 
 """
-import pathlib
 
 from aurora.general_helper_functions import DATA_PATH
-from aurora.general_helper_functions import get_mth5_ascii_data_path
 from loguru import logger
+from mth5.data.paths import SyntheticTestPaths as MTH5SyntheticDataPaths
+
+import mth5
+import pathlib
 
 DEFAULT_SANDBOX_PATH = DATA_PATH.joinpath("synthetic")
 
 
-class SyntheticTestPaths:
+class SyntheticTestPaths(MTH5SyntheticDataPaths):
     """
     sandbox path must be a place that has write access.  This class was created because on some
     installations we only have read access.  Originally there was a data/ folder with the synthetic
@@ -29,7 +30,7 @@ class SyntheticTestPaths:
 
     """
 
-    def __init__(self, sandbox_path=None, ascii_data_path=None):
+    def __init__(self, sandbox_path=DEFAULT_SANDBOX_PATH, ascii_data_path=None):
         """
         Constructor
 
@@ -46,9 +47,12 @@ class SyntheticTestPaths:
         - emtf_results_path: stores some legacy results from EMTF processing for tests/comparison.
 
         """
+        super(
+            MTH5SyntheticDataPaths, self
+        ).__init__()  # sandbox_path=sandbox_path,ascii_data_path=ascii_data_path)
         # READ ONLY OK
         if ascii_data_path is None:
-            self.ascii_data_path = get_mth5_ascii_data_path()
+            self.ascii_data_path = _get_mth5_ascii_data_path()
 
         # NEED WRITE ACCESS
         # Consider using an environment variable for sandbox_path
@@ -86,3 +90,16 @@ class SyntheticTestPaths:
         self.config_path.mkdir(parents=True, exist_ok=True)
         self.emtf_results_path.mkdir(parents=True, exist_ok=True)
         self.mth5_path.mkdir(parents=True, exist_ok=True)
+
+
+def _get_mth5_ascii_data_path() -> pathlib.Path:
+    """
+    Get the path to the ascii synthetic data
+
+    Returns
+    -------
+    mth5_data_path: pathlib.Path
+        This is the place where the legacy test files (ascii MT data from EMTF) are archived
+    """
+    mth5_data_path = pathlib.Path(mth5.__file__).parent.joinpath("data")
+    return mth5_data_path

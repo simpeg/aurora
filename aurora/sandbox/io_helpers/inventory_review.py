@@ -1,21 +1,30 @@
 """
     In this module are some helper functions for working with FDSN inventory objects.
 """
+
 from loguru import logger
+from typing import Optional
+import obspy
 
 
-def describe_inventory_stages(inventory, assign_names=False, verbose=False):
+def describe_inventory_stages(
+    inventory: obspy.Inventory,
+    assign_names: Optional[bool] = False,
+    verbose: Optional[bool] = False,
+) -> None:
+
     """
     Scans inventory looking for stages.  Has option to assign names to stages,
     these names are used as keys in MTH5. Modifies inventory in place.
 
     Parameters
     ----------
-    inventory
-    assign_names
-
-    Returns
-    -------
+    inventory: obspy.Inventory
+        obspy representation of station XML
+    assign_names: bool
+        If True, inventory stage names will be assigned
+    verbose: bool
+        If True, some info logs are created.
 
     """
     new_names_were_assigned = False
@@ -54,8 +63,7 @@ def describe_inventory_stages(inventory, assign_names=False, verbose=False):
                         # plt.ylabel("Filter Amplitude")
                         # plt.xlabel("Filter 'Tap'")
                         # plt.title(f"{stage.name}; symmetry: {stage.symmetry}")
-                        # plt.savefig(FIGURES_BUCKET.joinpath(f
-                        # "{stage.name}.png"))
+                        # plt.savefig(f"{stage.name}.png"))
                         # plt.show()
     if new_names_were_assigned:
         inventory.networks = networks

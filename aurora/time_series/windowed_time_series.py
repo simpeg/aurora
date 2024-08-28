@@ -11,6 +11,9 @@
 
 """
 from aurora.time_series.decorators import can_use_xr_dataarray
+from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
+    get_fft_harmonics,
+)
 from typing import Optional, Union
 from loguru import logger
 import numpy as np
@@ -44,7 +47,9 @@ class WindowedTimeSeries(object):
 
     @can_use_xr_dataarray
     @staticmethod
-    def apply_taper(data=None, taper=None):  # , in_place=True):
+    def apply_taper(
+        data: Union[xr.DataArray, xr.Dataset], taper: np.ndarray
+    ):  # , in_place=True):
         """
         Point by point multiplication of taper against time series.
 
@@ -110,6 +115,42 @@ class WindowedTimeSeries(object):
             data[channel].data = ensembles
         return data
 
+    @can_use_xr_dataarray
+    @staticmethod
+    def apply_fft(
+        data: Union[xr.DataArray, xr.Dataset],
+        sample_rate: float,
+        spectral_density_correction: float,
+        detrend_type: Optional[str] = "linear",
+    ) -> xr.Dataset:
+        """
+        Applies the Fourier transform to each window in the windowed time series.
+
+        Assumes sliding window and taper already applied.
+
+        TODO: Make this return a Specrtogram() object.
+
+        Parameters
+        ----------
+        data: xarray.core.dataset.Dataset
+            The windowed data to FFT
+        spectral_density_correction: float
+            Applies window normalization (see Heinzel et al.)
+
+        detrend_type: string
+            Passed through to scipy.signal during detrend operation.
+
+        Returns
+        -------
+        spectral_ds:xr.Dataset
+            Dataset same channels as input but data are now complex values Fourier coefficients.
+
+        """
+        spectral_ds = fft_xr_ds(data, sample_rate, detrend_type=detrend_type)
+        spectral_ds *= spectral_density_correction
+
+        return spectral_ds
+
 
 def _get_time_coordinate_axis(dataset: xr.Dataset) -> int:
     """
@@ -136,37 +177,67 @@ def _get_time_coordinate_axis(dataset: xr.Dataset) -> int:
     return coordinate_labels.index("time")
 
 
-# Not used 20240723: Commenting out.
-#     @staticmethod
-#     def apply_stft(
-#         data,
-#         sample_rate=None,
-#         detrend_type=None,
-#         spectral_density_calibration=1.0,
-# #         fft_axis=None,
-#     ):
-#         """
-#         Applies FFT to Windowed time series
-#
-#         Only supports xr.Dataset at this point
-#
-#         Parameters
-#         ----------
-#         data
-#         sample_rate
-#         detrend_type
-#
-#         Returns
-#         -------
-#
-#         """
-#         from aurora.time_series.windowing_scheme import fft_xr_ds
-#
-#         # if fft_axis is None:
-#         #     fft_axis = _get_time_coordinate_axis(data)
-#         spectral_ds = fft_xr_ds(data, sample_rate, detrend_type=detrend_type)
-#         spectral_ds *= spectral_density_calibration
-#         return spectral_ds
+def fft_xr_ds(
+    dataset: xr.Dataset,
+    sample_rate: float,
+    detrend_type: Optional[str] = "linear",
+    # prewhitening: Optional[Union[str, None]] = None,
+) -> xr.Dataset:
+    """
+    Apply Fourier transform to an xarray Dataset (already windowed) time series.
+
+    Notes:
+    - The returned harmonics do not include the Nyquist frequency. To modify this
+    add +1 to n_fft_harmonics.  Also, only 1-sided ffts are returned.
+    - For each channel within the Dataset, fft is applied along the
+    within-window-time axis of the associated numpy array
+
+    TODO: add support for prewhitening per-window
+
+    Parameters
+    ----------
+    dataset : xr.Dataset
+        Data are 2D (windowed univariate time series).
+    sample_rate: float
+        The sample rate of the time series
+    detrend_type: str
+        Pass-through parameter to scipy.signal.detrend
+    prewhitening: Not used (yet)
+
+    Returns
+    -------
+    output_ds: xr.Dataset
+        The FFT of the input.  Only contains non-negative frequencies
+        i.e. input dataset had coords: (time, within-window time)
+        but output ds has coords (time, frequency)
+    """
+    # TODO: Modify this so that demeaning and detrending is happening before
+    #  application of the tapering window.  Add a second demean right before the FFT
+
+    samples_per_window = len(dataset.coords["within-window time"])
+    n_fft_harmonics = int(samples_per_window / 2)  # no bin at Nyquist,
+    harmonic_frequencies = get_fft_harmonics(samples_per_window, sample_rate)
+
+    output_ds = xr.Dataset()
+    time_coordinate_index = list(dataset.coords.keys()).index("time")
+    dataset = WindowedTimeSeries.detrend(
+        data=dataset, detrend_axis=time_coordinate_index, detrend_type=detrend_type
+    )
+    for channel_id in dataset.keys():
+        data = dataset[channel_id].data
+        # Here is where you would add segment-by-segment prewhitening
+        fspec_array = np.fft.fft(data, axis=time_coordinate_index)
+        fspec_array = fspec_array[:, 0:n_fft_harmonics]  # 1-sided
+
+        xrd = xr.DataArray(
+            fspec_array,
+            dims=["time", "frequency"],
+            coords={"frequency": harmonic_frequencies, "time": dataset.time.data},
+        )
+        output_ds.update({channel_id: xrd})
+
+    return output_ds
+
 
 # Not used 20240723: Commenting out.
 # def delay_correction(self, dataset, run_obj):

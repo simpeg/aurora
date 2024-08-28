@@ -342,9 +342,6 @@ class WindowingScheme(ApodizationWindow):
     def apply_taper(self, data):
         """
         modifies the data in place by applying a taper to each window
-
-        TODO: consider adding an option to return a copy of the data without
-         the taper applied
         """
         data = WindowedTimeSeries.apply_taper(data=data, taper=self.taper)
         return data
@@ -356,7 +353,6 @@ class WindowingScheme(ApodizationWindow):
     def apply_fft(
         self,
         data: Union[xr.DataArray, xr.Dataset],
-        spectral_density_correction: Optional[bool] = True,
         detrend_type: Optional[str] = "linear",
     ) -> xr.Dataset:
         """
@@ -370,8 +366,6 @@ class WindowingScheme(ApodizationWindow):
         ----------
         data: xarray.core.dataset.Dataset
             The windowed data to FFT
-        spectral_density_correction: boolean
-            If true apply window normalization (see Heinzel et al.)
         detrend_type: string
             Passed through to scipy.signal during detrend operation.
 
@@ -381,40 +375,34 @@ class WindowingScheme(ApodizationWindow):
             Dataset same channels as input but data are now complex values Fourier coefficients.
 
         """
-        if isinstance(data, xr.Dataset):
-            spectral_ds = fft_xr_ds(data, self.sample_rate, detrend_type=detrend_type)
-            if spectral_density_correction:
-                spectral_ds = self.apply_spectral_density_calibration(spectral_ds)
-        elif isinstance(data, xr.DataArray):
-            xrds = data.to_dataset("channel")
-            spectral_ds = fft_xr_ds(xrds, self.sample_rate, detrend_type=detrend_type)
-            spectral_ds = spectral_ds.to_array("channel")
-            return spectral_ds
-
-        else:
-            logger.error(f"fft of {type(data)} not yet supported")
-            raise Exception
+        spectral_ds = WindowedTimeSeries.apply_fft(
+            data=data,
+            sample_rate=self.sample_rate,
+            spectral_density_correction=self.linear_spectral_density_calibration_factor,
+            detrend_type=detrend_type,
+        )
 
         return spectral_ds
 
-    def apply_spectral_density_calibration(self, dataset: xr.Dataset) -> xr.Dataset:
-        """
-        Scale the spectral data by spectral density calibration factor
-
-        Parameters
-        ----------
-        dataset: xr.Dataset
-            the spectral data (spectrogram)
-
-        Returns
-        -------
-        dataset: xr.Dataset
-            same as input but scaled for spectral density correction. (See Heinzel et al.)
-
-        """
-        scale_factor = self.linear_spectral_density_calibration_factor
-        dataset *= scale_factor
-        return dataset
+    # 20240824 - comment out as method is unused
+    # def apply_spectral_density_calibration(self, dataset: xr.Dataset) -> xr.Dataset:
+    #     """
+    #     Scale the spectral data by spectral density calibration factor
+    #
+    #     Parameters
+    #     ----------
+    #     dataset: xr.Dataset
+    #         the spectral data (spectrogram)
+    #
+    #     Returns
+    #     -------
+    #     dataset: xr.Dataset
+    #         same as input but scaled for spectral density correction. (See Heinzel et al.)
+    #
+    #     """
+    #     scale_factor = self.linear_spectral_density_calibration_factor
+    #     dataset *= scale_factor
+    #     return dataset
 
     # PROPERTIES THAT NEED SAMPLING RATE
     # these may be moved elsewhere later
@@ -441,7 +429,12 @@ class WindowingScheme(ApodizationWindow):
     @property
     def linear_spectral_density_calibration_factor(self) -> float:
         """
-        Gets the calibration factor for Spctral density.
+        Gets the calibration factor for Spectral density.
+
+        The factor is applied via multiplication.
+
+        scale_factor = self.linear_spectral_density_calibration_factor
+        linear_spectral_data = data * scale_factor
 
         Following Hienzel et al. 2002, Equations 24 and 25 for Linear Spectral Density
          correction for a single-sided spectrum.
@@ -450,72 +443,9 @@ class WindowingScheme(ApodizationWindow):
         -------
         float
             calibration_factor: Following Hienzel et al 2002,
-                Equations 24 and 25 for Linear Spectral Density
-                correction for a single sided spectrum.
+
         """
         return np.sqrt(2 / (self.sample_rate * self.S2))
-
-
-def fft_xr_ds(
-    dataset: xr.Dataset,
-    sample_rate: float,
-    detrend_type: Optional[str] = "linear",
-    # prewhitening: Optional[Union[str, None]] = None,
-) -> xr.Dataset:
-    """
-    Apply Fourier transform to an xarray Dataset (already windowed) time series.
-
-    Notes:
-    - The returned harmonics do not include the Nyquist frequency. To modify this
-    add +1 to n_fft_harmonics.  Also, only 1-sided ffts are returned.
-    - For each channel within the Dataset, fft is applied along the
-    within-window-time axis of the associated numpy array
-
-    TODO: add support for prewhitening per-window
-
-    Parameters
-    ----------
-    dataset : xr.Dataset
-        Data are 2D (windowed univariate time series).
-    sample_rate: float
-        The sample rate of the time series
-    detrend_type: str
-        Pass-through parameter to scipy.signal.detrend
-    prewhitening: Not used (yet)
-
-    Returns
-    -------
-    output_ds: xr.Dataset
-        The FFT of the input.  Only contains non-negative frequencies
-        i.e. input dataset had coords: (time, within-window time)
-        but output ds has coords (time, frequency)
-    """
-    # TODO: Modify this so that demeaning and detrending is happening before
-    #  application of the tapering window.  Add a second demean right before the FFT
-
-    samples_per_window = len(dataset.coords["within-window time"])
-    n_fft_harmonics = int(samples_per_window / 2)  # no bin at Nyquist,
-    harmonic_frequencies = get_fft_harmonics(samples_per_window, sample_rate)
-
-    output_ds = xr.Dataset()
-    time_coordinate_index = list(dataset.coords.keys()).index("time")
-    dataset = WindowedTimeSeries.detrend(
-        data=dataset, detrend_axis=time_coordinate_index, detrend_type=detrend_type
-    )
-    for channel_id in dataset.keys():
-        data = dataset[channel_id].data
-        # Here is where you would add segment-by-segment prewhitening
-        fspec_array = np.fft.fft(data, axis=time_coordinate_index)
-        fspec_array = fspec_array[:, 0:n_fft_harmonics]  # 1-sided
-
-        xrd = xr.DataArray(
-            fspec_array,
-            dims=["time", "frequency"],
-            coords={"frequency": harmonic_frequencies, "time": dataset.time.data},
-        )
-        output_ds.update({channel_id: xrd})
-
-    return output_ds
 
 
 def window_scheme_from_decimation(decimation):

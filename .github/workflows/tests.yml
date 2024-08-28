@@ -22,7 +22,7 @@ jobs:
 #        python-version: ["3.10", ] 
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Setup Miniconda
       uses: conda-incubator/setup-miniconda@v2.1.1
@@ -77,11 +77,13 @@ jobs:
         # pytest -s -v tests/test_general_helper_functions.py 
         pytest -s -v --cov=./ --cov-report=xml --cov=aurora
 
-    - name: Upload coverage reports to Codecov
+    - name: "Upload coverage reports to Codecov"
       uses: codecov/codecov-action@v4
       with:
-        token: ${{ secrets.CODECOV_TOKEN }}
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         fail_ci_if_error: false
+        flags: tests
+        # token: ${{ secrets.CODECOV_TOKEN }}
 
     - name: Build Doc
       if: ${{ (github.ref == 'refs/heads/main') && (matrix.python-version == '3.8')}}
