@@ -2,10 +2,8 @@ import logging
 import unittest
 from aurora.config.config_creator import ConfigCreator
 from aurora.pipelines.process_mth5 import process_mth5
-
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test3_h5
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
-
+from mth5.data.make_mth5_from_asc import create_test3_h5
 from mth5.helpers import close_open_files
 
 # from mtpy-v2
@@ -37,9 +35,7 @@ class TestMultiRunProcessing(unittest.TestCase):
 
     def make_mth5(self):
         close_open_files()
-        mth5_path = create_test3_h5(
-            force_make_mth5=self.remake_mth5_for_each_test
-        )
+        mth5_path = create_test3_h5(force_make_mth5=self.remake_mth5_for_each_test)
         return mth5_path
 
     def make_run_summary(self):
@@ -133,9 +129,7 @@ class TestMultiRunProcessing(unittest.TestCase):
             show_plot=show_plot,
             z_file_path=z_file_path,
         )
-        xml_file_name = AURORA_RESULTS_PATH.joinpath(
-            "syn3_all_truncated_run.xml"
-        )
+        xml_file_name = AURORA_RESULTS_PATH.joinpath("syn3_all_truncated_run.xml")
         tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
 

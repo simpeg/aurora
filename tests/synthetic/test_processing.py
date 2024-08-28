@@ -3,14 +3,13 @@ import unittest
 
 from aurora.pipelines.process_mth5 import process_mth5
 
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test2_h5
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
 from aurora.test_utils.synthetic.make_processing_configs import (
     create_test_run_config,
 )
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
-
+from mth5.data.make_mth5_from_asc import create_test1_h5
+from mth5.data.make_mth5_from_asc import create_test2_h5
+from mth5.data.make_mth5_from_asc import create_test12rr_h5
 from mth5.helpers import close_open_files
 
 # from mtpy-v2
@@ -63,26 +62,20 @@ class TestSyntheticProcessing(unittest.TestCase):
 
     def test_can_use_channel_nomenclature(self):
         channel_nomencalture = "LEMI12"
-        z_file_path = AURORA_RESULTS_PATH.joinpath(
-            f"syn1-{channel_nomencalture}.zss"
-        )
+        z_file_path = AURORA_RESULTS_PATH.joinpath(f"syn1-{channel_nomencalture}.zss")
         tf_cls = process_synthetic_1(
             z_file_path=z_file_path,
             file_version=self.file_version,
             channel_nomenclature=channel_nomencalture,
         )
-        xml_file_base = (
-            f"syn1_mth5-{self.file_version}_{channel_nomencalture}.xml"
-        )
+        xml_file_base = f"syn1_mth5-{self.file_version}_{channel_nomencalture}.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
         tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
     def test_can_use_mth5_file_version_020(self):
         file_version = "0.2.0"
         z_file_path = AURORA_RESULTS_PATH.joinpath(f"syn1-{file_version}.zss")
-        tf_cls = process_synthetic_1(
-            z_file_path=z_file_path, file_version=file_version
-        )
+        tf_cls = process_synthetic_1(z_file_path=z_file_path, file_version=file_version)
         xml_file_base = f"syn1_mth5v{file_version}.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
         tf_cls.write(fn=xml_file_name, file_type="emtfxml")
@@ -115,9 +108,7 @@ class TestSyntheticProcessing(unittest.TestCase):
         )
 
     def test_simultaneous_regression(self):
-        z_file_path = AURORA_RESULTS_PATH.joinpath(
-            "syn1_simultaneous_estimate.zss"
-        )
+        z_file_path = AURORA_RESULTS_PATH.joinpath("syn1_simultaneous_estimate.zss")
         tf_cls = process_synthetic_1(
             z_file_path=z_file_path, simultaneous_regression=True
         )
@@ -239,9 +230,7 @@ def process_synthetic_1(
     if return_collection:
         z_figure_name = z_file_path.name.replace("zss", "png")
         for xy_or_yx in ["xy", "yx"]:
-            ttl_str = (
-                f"{xy_or_yx} component, test_scale_factor = {test_scale_factor}"
-            )
+            ttl_str = f"{xy_or_yx} component, test_scale_factor = {test_scale_factor}"
             out_png_name = f"{xy_or_yx}_{z_figure_name}"
             tf_result.rho_phi_plot(
                 xy_or_yx=xy_or_yx,

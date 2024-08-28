@@ -5,15 +5,14 @@ from aurora.pipelines.fourier_coefficients import add_fcs_to_mth5
 from aurora.pipelines.fourier_coefficients import fc_decimations_creator
 from aurora.pipelines.fourier_coefficients import read_back_fcs
 from aurora.pipelines.process_mth5 import process_mth5
-
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test2_h5
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test3_h5
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
 from aurora.test_utils.synthetic.make_processing_configs import (
     create_test_run_config,
 )
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
+from mth5.data.make_mth5_from_asc import create_test1_h5
+from mth5.data.make_mth5_from_asc import create_test2_h5
+from mth5.data.make_mth5_from_asc import create_test3_h5
+from mth5.data.make_mth5_from_asc import create_test12rr_h5
 
 # from mtpy-v2
 from mtpy.processing import RunSummary, KernelDataset
@@ -95,9 +94,7 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
             ]:
                 station_id = mth5_path.stem
                 tfk_dataset.from_run_summary(run_summary, station_id)
-                processing_config = create_test_run_config(
-                    station_id, tfk_dataset
-                )
+                processing_config = create_test_run_config(station_id, tfk_dataset)
             elif mth5_path.stem in [
                 "test3",
             ]:
@@ -147,9 +144,7 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
         tf1 = process_synthetic_2(
             force_make_mth5=True, z_file_path=z_file_path_1, save_fc=True
         )
-        tf2 = process_synthetic_2(
-            force_make_mth5=False, z_file_path=z_file_path_2
-        )
+        tf2 = process_synthetic_2(force_make_mth5=False, z_file_path=z_file_path_2)
         assert tf1 == tf2
 
 
