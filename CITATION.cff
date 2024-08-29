@@ -1,0 +1,92 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: aurora
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Karl
+    name-particle: N.
+    family-names: Kappler
+    orcid: 'https://orcid.org/0000-0002-1877-1255'
+  - given-names: Jared
+    name-particle: R.
+    family-names: Peacock
+    orcid: 'https://orcid.org/0000-0002-0439-0224'
+  - given-names: Gary
+    name-particle: D.
+    family-names: Egbert
+    orcid: 'https://orcid.org/0000-0003-1276-8538'
+  - orcid: 'https://orcid.org/0000-0002-8818-3731'
+    given-names: Frassetto
+    family-names: Andrew
+  - given-names: Heagy
+    family-names: Lindsey
+    orcid: 'https://orcid.org/0000-0002-1551-5926'
+  - given-names: Kelbert
+    family-names: Anna
+    orcid: 'https://orcid.org/0000-0003-4395-398X'
+  - given-names: Laura
+    family-names: Keyson
+  - given-names: Douglas
+    family-names: Oldenburg
+    orcid: 'https://orcid.org/0000-0002-4327-2124'
+  - given-names: Timothy
+    family-names: Ronan
+    orcid: 'https://orcid.org/0000-0001-8450-9573'
+  - given-names: Justin
+    family-names: Sweet
+    orcid: 'https://orcid.org/0000-0001-7323-9758'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.13334589
+    description: >-
+      Contains the software at time of manuscript
+      acceptance.
+  - type: doi
+    value: 10.21105/joss.06832
+    description: The JOSS manuscript
+repository-code: 'https://github.com/simpeg/aurora'
+url: 'https://simpeg.xyz/aurora/'
+abstract: >-
+  The Aurora software package robustly estimates single
+  station and remote reference electro-
+
+  magnetic transfer functions (TFs) from magnetotelluric
+  (MT) time series. Aurora is part of
+
+  an open-source processing workflow that leverages the
+  self-describing data container MTH5,
+
+  which in turn leverages the general mt_metadata framework
+  to manage metadata. These
+
+  pre-existing packages simplify the processing workflow by
+  providing managed data structures,
+
+  transfer functions to be generated with only a few lines
+  of code. The processing depends on
+
+  two inputs – a table defining the data to use for TF
+  estimation and a JSON file specifying
+
+  the processing parameters, both of which are generated
+  automatically and can be modified if
+
+  desired. Output TFs are returned as mt_metadata objects,
+  and can be exported to a variety
+
+  of common formats for plotting, modeling, and inversion.
+keywords:
+  - open-source
+  - python
+  - 'magnetotelluric '
+  - processing
+  - transfer function
+license: MIT
+commit: abcdefgh
+version: 0.3.14
+date-released: '2024-08-28'

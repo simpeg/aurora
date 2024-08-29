@@ -1,10 +1,10 @@
 import logging
-import pathlib
 import unittest
 
 from aurora.general_helper_functions import count_lines
 from aurora.general_helper_functions import DotDict
 from aurora.general_helper_functions import get_test_path
+from loguru import logger
 
 TEST_PATH = get_test_path()
 

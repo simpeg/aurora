@@ -1,7 +1,10 @@
 """
-Create Parkfield / Hollister mth5 to use as test data
+    This module contains methods for building an MTH5 file from data at Parkfield (PKD) and Hollister
+    (SAO) long term monitoring stations to use as test data.
 
 """
+import pathlib
+
 from aurora.test_utils.dataset_definitions import TEST_DATA_SET_CONFIGS
 from mth5.utils.helpers import read_back_data
 from mth5.helpers import close_open_files
@@ -16,6 +19,16 @@ FDSN_DATASET = TEST_DATA_SET_CONFIGS[DATASET_ID]
 
 
 def select_data_source():
+    """
+    Identifies appropriate web client to use for NCEDC data requests.
+
+    This was used for debugging data access issues in the past -- may no longer be needed.
+
+    Returns
+    -------
+    data_source: str
+        A responsive NCEDC client.
+    """
     from obspy.clients.fdsn import Client
 
     ok = False
@@ -35,7 +48,9 @@ def select_data_source():
 
 
 def make_pkdsao_mth5(fdsn_dataset):
-    """ """
+    """
+    Makes MTH5 file with data from Parkfield and Hollister stations to use for testing.
+    """
     close_open_files()
     fdsn_dataset.data_source = select_data_source()
     fdsn_dataset.initialize_client()
@@ -51,12 +66,14 @@ def make_pkdsao_mth5(fdsn_dataset):
     return h5_path
 
 
-def ensure_h5_exists():
+def ensure_h5_exists() -> pathlib.Path:
     """
+    Make sure that the PKD SAO MTH5 file exists.  If it does not, build it.
 
     Returns
     -------
-
+    h5_path: pathlib.Path
+        The path to the PKD SAO mth5 file to be used for testing.
     """
 
     h5_path = PARKFIELD_PATHS["data"].joinpath(FDSN_DATASET.h5_filebase)
@@ -73,6 +90,7 @@ def ensure_h5_exists():
 
 
 def main():
+    """allows the make to be run by calling this module from the command line"""
     make_pkdsao_mth5(FDSN_DATASET)
 
 

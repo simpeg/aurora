@@ -1,19 +1,25 @@
-import numpy as np
-import pandas as pd
-import psutil
+"""
+    This module contains the TrasnferFunctionKernel class which is the main object that
+    links the KernelDataset to Processing configuration.
+
+"""
 
 from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.time_series_helpers import prototype_decimate
+from loguru import logger
 from mth5.utils.exceptions import MTH5Error
-from mth5.utils.helpers import initialize_mth5
 from mth5.utils.helpers import path_or_mth5_object
 from mt_metadata.transfer_functions.core import TF
-from loguru import logger
+
+import numpy as np
+import pandas as pd
+import psutil
 
 
 class TransferFunctionKernel(object):
     def __init__(self, dataset=None, config=None):
         """
+        Constructor
 
         Parameters
         ----------
@@ -24,35 +30,43 @@ class TransferFunctionKernel(object):
         self._config = processing_config
         self._dataset = dataset
         self._mth5_objs = None
+        self._memory_warning = False
 
     @property
     def dataset(self):
+        """returns the KernelDataset object"""
         return self._dataset
 
     @property
     def kernel_dataset(self):
+        """returns the KernelDataset object"""
         return self._dataset
 
     @property
-    def dataset_df(self):
+    def dataset_df(self) -> pd.DataFrame:
+        """returns the KernelDataset dataframe"""
         return self._dataset.df
 
     @property
     def processing_config(self):
+        """Returns the processing config object"""
         return self._config
 
     @property
     def config(self):
+        """Returns the processing config object"""
         return self._config
 
     @property
     def processing_summary(self):
+        """Returns the processing summary object -- creates if it doesn't yet exist."""
         if self._processing_summary is None:
             self.make_processing_summary()
         return self._processing_summary
 
     @property
-    def mth5_objs(self):
+    def mth5_objs(self) -> dict:
+        """Returns self._mth5_objs"""
         if self._mth5_objs is None:
             self.initialize_mth5s()
         return self._mth5_objs
@@ -61,30 +75,17 @@ class TransferFunctionKernel(object):
         """
         returns a dict of open mth5 objects, keyed by station_id
 
-        A future version of this for multiple station processing may need nested dict with [survey_id][station_id]
+        A future version of this for multiple station processing may need nested dict with [survey_id][station]
 
         Returns
         -------
         mth5_objs : dict
-            Keyed by station_ids.
+            Keyed by stations.
             local station id : mth5.mth5.MTH5
             remote station id: mth5.mth5.MTH5
         """
         mode = self.get_mth5_file_open_mode()
-        local_mth5_obj = initialize_mth5(
-            self.config.stations.local.mth5_path, mode=mode
-        )
-        if self.config.stations.remote:
-            remote_path = self.config.stations.remote[0].mth5_path
-            remote_mth5_obj = initialize_mth5(remote_path, mode="r")
-        else:
-            remote_mth5_obj = None
-
-        mth5_objs = {self.config.stations.local.id: local_mth5_obj}
-        if self.config.stations.remote:
-            mth5_objs[self.config.stations.remote[0].id] = remote_mth5_obj
-        self._mth5_objs = mth5_objs
-        return
+        self._mth5_objs = self.kernel_dataset.initialize_mth5s(mode)
 
     def update_dataset_df(self, i_dec_level):
         """
@@ -116,7 +117,7 @@ class TransferFunctionKernel(object):
             # ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE
 
             # Assign additional columns to dataset_df, populate with mth5_objs and xr_ts
-            self.dataset.initialize_dataframe_for_processing(self.mth5_objs)
+            self.dataset.initialize_dataframe_for_processing()
 
             # APPLY TIMING CORRECTIONS HERE
         else:
@@ -126,7 +127,9 @@ class TransferFunctionKernel(object):
                 if not self.is_valid_dataset(row, i_dec_level):
                     continue
                 if row.fc:
-                    row_ssr_str = f"survey: {row.survey}, station_id: {row.station_id}, run_id: {row.run_id}"
+                    row_ssr_str = (
+                        f"survey: {row.survey}, station: {row.station}, run: {row.run}"
+                    )
                     msg = f"FC already exists for {row_ssr_str} -- skipping decimation"
                     logger.info(msg)
                     continue
@@ -137,20 +140,31 @@ class TransferFunctionKernel(object):
                     "channel"
                 )  # See Note 1 above
 
-        msg = (
+        logger.info(
             f"Dataset Dataframe Updated for decimation level {i_dec_level} Successfully"
         )
-        logger.info(msg)
         return
 
     def apply_clock_zero(self, dec_level_config):
-        """get clock-zero from data if needed"""
+        """
+        get clock-zero from data if needed
+
+        Parameters
+        ----------
+        dec_level_config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
+
+        Returns
+        -------
+        dec_level_config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
+            The modified DecimationLevel with clock-zero information set.
+        """
         if dec_level_config.window.clock_zero_type == "data start":
             dec_level_config.window.clock_zero = str(self.dataset_df.start.min())
         return dec_level_config
 
     @property
-    def all_fcs_already_exist(self):
+    def all_fcs_already_exist(self) -> bool:
+        """Return true of all FCs needed to process data already exist in the mth5s"""
         if self.kernel_dataset.df["fc"].isna().any():
             self.check_if_fcs_already_exist()
 
@@ -181,9 +195,10 @@ class TransferFunctionKernel(object):
         intersection of the long run with each of the remote runs. We ignore this for now, selecting only the first
         element of the run_sub_df, under the assumption that FCs have been created for the entire run,
         or not at all.  This assumption can be relaxed in future by using the time_period attribute of the FC layer.
-        For now, we proceed with the all-or-none logic.  That is, if a ['survey', 'station_id', 'run_id',] has FCs,
+        For now, we proceed with the all-or-none logic.  That is, if a ['survey', 'station', 'run',] has FCs,
         assume that the FCs are present for the entire run. We assign the "fc" column of dataset_df to have the same
-         boolean value for all rows of same  ['survey', 'station_id', 'run_id',] .
+        boolean value for all rows of same  ['survey', 'station', 'run'] .
+
 
         Returns: None
             Modifies self.dataset_df inplace, assigning bools to the "fc" column
@@ -191,15 +206,15 @@ class TransferFunctionKernel(object):
         """
         groupby = [
             "survey",
-            "station_id",
-            "run_id",
+            "station",
+            "run",
         ]
         grouper = self.processing_summary.groupby(groupby)
 
         for (survey_id, station_id, run_id), df in grouper:
             cond1 = self.dataset_df.survey == survey_id
-            cond2 = self.dataset_df.station_id == station_id
-            cond3 = self.dataset_df.run_id == run_id
+            cond2 = self.dataset_df.station == station_id
+            cond3 = self.dataset_df.run == run_id
             run_sub_df = self.dataset_df[cond1 & cond2 & cond3]
 
             if len(run_sub_df) > 1:
@@ -212,7 +227,13 @@ class TransferFunctionKernel(object):
             remote = run_sub_df.remote.iloc[0]
             mth5_path = run_sub_df.mth5_path.iloc[0]
             fcs_present = mth5_has_fcs(
-                mth5_path, survey_id, station_id, run_id, remote, self.processing_config
+                mth5_path,
+                survey_id,
+                station_id,
+                run_id,
+                remote,
+                self.processing_config,
+                mode="r",
             )
             self.dataset_df.loc[dataset_df_indices, "fc"] = fcs_present
 
@@ -242,6 +263,15 @@ class TransferFunctionKernel(object):
             "run_dataarray",
         ),
     ):
+        """
+        Prints the processing summary table via logger.
+
+        Parameters
+        ----------
+        omit_columns: tuple
+            List of columns to omit when showing channel summary (used to keep table small).
+
+        """
         columns_to_show = self.processing_summary.columns
         columns_to_show = [x for x in columns_to_show if x not in omit_columns]
         logger.info("Processing Summary Dataframe:")
@@ -249,8 +279,9 @@ class TransferFunctionKernel(object):
 
     def make_processing_summary(self):
         """
-        Melt the decimation levels over the run summary.  Add columns to estimate
-        the number of FFT windows for each row
+        Create the processing summary table.
+        - Melt the decimation levels over the run summary.
+        - Add columns to estimate the number of FFT windows for each row
 
         Returns
         -------
@@ -266,7 +297,7 @@ class TransferFunctionKernel(object):
         for i_dec, dec_factor in decimation_info.items():
             tmp[i_dec] = dec_factor
         tmp = tmp.melt(id_vars=id_vars, value_name="dec_factor", var_name="dec_level")
-        sortby = ["survey", "station_id", "run_id", "start", "dec_level"]
+        sortby = ["survey", "station", "run", "start", "dec_level"]
         tmp.sort_values(by=sortby, inplace=True)
         tmp.reset_index(drop=True, inplace=True)
         tmp.drop("sample_rate", axis=1, inplace=True)  # not valid for decimated data
@@ -274,8 +305,8 @@ class TransferFunctionKernel(object):
         # Add window info
         group_by = [
             "survey",
-            "station_id",
-            "run_id",
+            "station",
+            "run",
             "start",
         ]
         groups = []
@@ -318,6 +349,10 @@ class TransferFunctionKernel(object):
         self, min_num_stft_windows=None
     ):
         """
+        Checks that the decimation_scheme and dataset are compatable.
+        Marks as invalid any rows that will fail to process based incompatibility.
+
+
         Refers to issue #182 (and #103, and possibly #196 and #233).
         Determine if there exist (one or more) runs that will yield decimated datasets
         that have too few samples to be passed to the STFT algorithm.
@@ -357,6 +392,8 @@ class TransferFunctionKernel(object):
 
     def validate_processing(self):
         """
+        Do some Validation checks. WIP.
+
         Things that are validated:
         1. The default estimation engine from the json file is "RME_RR", which is fine (
         we expect to in general to do more RR processing than SS) but if there is only
@@ -381,18 +418,22 @@ class TransferFunctionKernel(object):
             self.config.stations.from_dataset_dataframe(self.kernel_dataset.df)
 
     def validate(self):
+        """apply all validators"""
         self.validate_processing()
         self.validate_decimation_scheme_and_dataset_compatability()
-        if self.memory_warning():
-            raise Exception("Job requires too much memory")
+        self.memory_check()
         self.validate_save_fc_settings()
 
     def valid_decimations(self):
         """
+        Get the decimation levels that are valid.
+        This is used when iterating over decimation levels in the processing, we do
+        not want to have invalid levels get processed (they will fail).
 
         Returns
         -------
-
+        dec_levels: list
+            Decimations from the config that are valid.
         """
         # identify valid rows of processing summary
         tmp = self.processing_summary[self.processing_summary.valid]
@@ -405,6 +446,11 @@ class TransferFunctionKernel(object):
         return dec_levels
 
     def validate_save_fc_settings(self):
+        """
+        Update save_fc values in the config to be appropriate.
+        - If all FCs exist, set save_fc to False.
+
+        """
         if self.all_fcs_already_exist:
             msg = "FC Layer already exists -- forcing processing config save_fcs=False"
             logger.info(msg)
@@ -424,7 +470,8 @@ class TransferFunctionKernel(object):
 
         return
 
-    def get_mth5_file_open_mode(self):
+    def get_mth5_file_open_mode(self) -> str:
+        """check the mode of an open mth5 (read, write, append)"""
         if self.all_fcs_already_exist:
             return "r"
         elif self.config.decimations[0].save_fcs:
@@ -432,10 +479,10 @@ class TransferFunctionKernel(object):
         else:
             return "r"
 
-    def is_valid_dataset(self, row, i_dec):
+    def is_valid_dataset(self, row, i_dec) -> bool:
         """
-        Given a row from the RunSummary, answers:
-        Will this decimation level yield a valid dataset?
+        Given a row from the RunSummary, answer the question:
+         "Will this decimation level yield a valid dataset?"
 
         Parameters
         ----------
@@ -452,8 +499,8 @@ class TransferFunctionKernel(object):
         """
         # Query processing on survey, station, run, decimation
         cond1 = self.processing_summary.survey == row.survey
-        cond2 = self.processing_summary.station_id == row.station_id
-        cond3 = self.processing_summary.run_id == row.run_id
+        cond2 = self.processing_summary.station == row.station
+        cond3 = self.processing_summary.run == row.run
         cond4 = self.processing_summary.dec_level == i_dec
         cond5 = self.processing_summary.start == row.start
 
@@ -521,7 +568,9 @@ class TransferFunctionKernel(object):
             -------
 
             """
-            from mt_metadata.transfer_functions.io.zfiles.zmm import PERIOD_FORMAT
+            from mt_metadata.transfer_functions.io.zfiles.zmm import (
+                PERIOD_FORMAT,
+            )
 
             decimation_dict = {}
 
@@ -537,7 +586,7 @@ class TransferFunctionKernel(object):
                             i_dec
                         ].num_segments.data[0, i_band]
                     except KeyError:
-                        logger.error("Possibly invalid decimation level")
+                        logger.warning("Possibly invalid decimation level")
                         period_value["npts"] = 0
                     decimation_dict[period_key] = period_value
 
@@ -566,7 +615,10 @@ class TransferFunctionKernel(object):
         tf_cls.inverse_signal_power = isp
 
         res_cov = merged_tf_dict["cov_nn"]
-        renamer_dict = {"output_channel_1": "input", "output_channel_2": "output"}
+        renamer_dict = {
+            "output_channel_1": "input",
+            "output_channel_2": "output",
+        }
         res_cov = res_cov.rename(renamer_dict)
         tf_cls.residual_covariance = res_cov
 
@@ -578,13 +630,16 @@ class TransferFunctionKernel(object):
         # )
         return tf_cls
 
-    def memory_warning(self):
+    def memory_check(self) -> None:
         """
-        Checks if we should be anitcipating a RAM issue
+
+        Checks if a RAM issue should be anticipated.
+
+        Notes:
         Requires an estimate of available RAM, and an estimate of the dataset size
         Available RAM is taken from psutil,
         Dataset size is number of samples, times the number of bytes per sample
-        Bits per sample is estimated to be 64 by default, which is 8-bytes
+        Bits per sample is estimated to be 64 by default, (8-bytes)
         Returns
         -------
 
@@ -607,9 +662,12 @@ class TransferFunctionKernel(object):
 
         # Check a condition
         if total_bytes > memory_threshold * total_memory:
-            return True
+            self._memory_warning = True
         else:
-            return False
+            self._memory_warning = False
+
+        if self._memory_warning:
+            raise Exception("Job requires too much memory")
 
 
 # ###################################################################
@@ -618,13 +676,15 @@ class TransferFunctionKernel(object):
 
 
 @path_or_mth5_object
-def mth5_has_fcs(m, survey_id, station_id, run_id, remote, processing_config):
+def mth5_has_fcs(m, survey_id, station_id, run_id, remote, processing_config, **kwargs):
     """
     Checks if all needed fc-levels for survey-station-run are present under processing_config
 
     Note #1: At this point in the logic, it is established that there are FCs associated with run_id and there are
         at least as many FC decimation levels as we require as per the processing config.  The next step is to
         assert whether it is True that the existing FCs conform to the recipe in the processing config.
+
+    kwargs are here as a pass through to the decorator ... we pass mode="r","a","w"
 
     Parameters
     ----------
@@ -692,8 +752,8 @@ def station_obj_from_row(row):
 
     """
     if row.mth5_obj.file_version == "0.1.0":
-        station_obj = row.mth5_obj.stations_group.get_station(row.station_id)
+        station_obj = row.mth5_obj.stations_group.get_station(row.station)
     elif row.mth5_obj.file_version == "0.2.0":
         survey_group = row.mth5_obj.surveys_group.get_survey(row.survey)
-        station_obj = survey_group.stations_group.get_station(row.station_id)
+        station_obj = survey_group.stations_group.get_station(row.station)
     return station_obj

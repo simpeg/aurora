@@ -11,6 +11,7 @@ with open("README.rst") as readme_file:
 #    history = history_file.read()
 
 requirements = [
+    "mt_metadata",
     "mth5",
     "numba",
     "psutil",
@@ -51,6 +52,6 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/simpeg/aurora",
-    version="0.3.13",
+    version="0.3.14",
     zip_safe=False,
 )

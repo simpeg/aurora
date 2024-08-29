@@ -1,10 +1,11 @@
 from aurora.config.config_creator import ConfigCreator
 from aurora.pipelines.process_mth5 import process_mth5
-from aurora.pipelines.run_summary import RunSummary
 from aurora.test_utils.parkfield.make_parkfield_mth5 import ensure_h5_exists
 from aurora.test_utils.parkfield.path_helpers import PARKFIELD_PATHS
-from aurora.transfer_function.kernel_dataset import KernelDataset
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
+
+from mtpy.processing import RunSummary, KernelDataset
+
 from loguru import logger
 from mth5.helpers import close_open_files
 
@@ -54,42 +55,48 @@ def test_processing(z_file_path=None, test_clock_zero=False):
         show_plot=show_plot,
         z_file_path=z_file_path,
     )
-
-    tf_cls.write(fn="emtfxml_test.xml", file_type="emtfxml")
+    output_xml = PARKFIELD_PATHS["aurora_results"].joinpath("emtfxml_test.xml")
+    tf_cls.write(fn=output_xml, file_type="emtfxml")
     return tf_cls
 
 
 def test():
+    """
+    Process Parkfield dataset thrice.  Tests all configurations of clock_zero parameter.
+    """
     import logging
 
     logging.getLogger("matplotlib.font_manager").disabled = True
     logging.getLogger("matplotlib.ticker").disabled = True
 
     z_file_path = PARKFIELD_PATHS["aurora_results"].joinpath("pkd.zss")
-    tf_cls = test_processing(z_file_path=z_file_path)
-    tf_cls.write("pkd_mt_metadata.zss", file_type="zss")
+    test_processing(z_file_path=z_file_path)
     test_processing(
         z_file_path=z_file_path,
         test_clock_zero="user specified",
     )
     test_processing(z_file_path=z_file_path, test_clock_zero="data start")
 
-    # COMPARE WITH ARCHIVED Z-FILE
-    auxilliary_z_file = PARKFIELD_PATHS["emtf_results"].joinpath("PKD_272_00.zrr")
+    # Compare with archived Z-file
+    auxiliary_z_file = PARKFIELD_PATHS["emtf_results"].joinpath("PKD_272_00.zrr")
+    output_png = PARKFIELD_PATHS["data"].joinpath("SS_processing_comparison.png")
     if z_file_path.exists():
         compare_two_z_files(
             z_file_path,
-            auxilliary_z_file,
+            auxiliary_z_file,
             label1="aurora",
             label2="emtf",
             scale_factor1=1,
-            out_file="SS.png",
+            out_file=output_png,
             markersize=3,
             rho_ylims=[1e0, 1e3],
             xlims=[0.05, 500],
+            title_string="Apparent Resistivity and Phase at Parkfield, CA",
+            subtitle_string="(Aurora Single Station vs EMTF Remote Reference)",
         )
     else:
-        logger.error("Z-File not found - Parkfield tests failed to generate output")
+        msg = "Z-File not found - Parkfield tests failed to generate output"
+        logger.error(msg)
         logger.warning("NCEDC probably not returning data")
 
 

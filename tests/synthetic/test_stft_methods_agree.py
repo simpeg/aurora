@@ -2,18 +2,21 @@
 See aurora issue #3.  This test confirms that the internal aurora stft
 method returns the same array as scipy.signal.spectrogram
 """
+
 import numpy as np
 
-from aurora.pipelines.run_summary import RunSummary
 from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
 from aurora.test_utils.synthetic.make_processing_configs import (
     create_test_run_config,
 )
-from aurora.transfer_function.kernel_dataset import KernelDataset
+
+# from mtpy-v2
+from mtpy.processing import RunSummary, KernelDataset
+
 from loguru import logger
+from mth5.data.make_mth5_from_asc import create_test1_h5
 from mth5.mth5 import MTH5
 from mth5.helpers import close_open_files
 
@@ -65,9 +68,11 @@ def test_stft_methods_agree():
             run_ts = run_obj.to_runts(start=None, end=None)
             local_run_xrts = run_ts.dataset
         else:
-            local_run_xrts = prototype_decimate(dec_config.decimation, local_run_xrts)
+            local_run_xrts = prototype_decimate(
+                dec_config.decimation, local_run_xrts
+            )
 
-        dec_config.extra_pre_fft_detrend_type = ""
+        dec_config.extra_pre_fft_detrend_type = "constant"
         local_stft_obj = run_ts_to_stft(dec_config, local_run_xrts)
         local_stft_obj2 = run_ts_to_stft_scipy(dec_config, local_run_xrts)
         stft_difference = local_stft_obj - local_stft_obj2

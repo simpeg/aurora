@@ -1,13 +1,14 @@
 from aurora.config.config_creator import ConfigCreator
 from aurora.pipelines.process_mth5 import process_mth5
-from aurora.pipelines.run_summary import RunSummary
 from aurora.sandbox.mth5_channel_summary_helpers import (
     channel_summary_to_make_mth5,
 )
 from aurora.test_utils.parkfield.make_parkfield_mth5 import ensure_h5_exists
 from aurora.test_utils.parkfield.path_helpers import PARKFIELD_PATHS
-from aurora.transfer_function.kernel_dataset import KernelDataset
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
+
+from mtpy.processing import RunSummary, KernelDataset
+
 from loguru import logger
 from mth5.mth5 import MTH5
 from mth5.helpers import close_open_files
@@ -89,19 +90,22 @@ def test():
     z_file_path = PARKFIELD_PATHS["aurora_results"].joinpath("pkd.zrr")
     test_processing(z_file_path=z_file_path)
 
-    # COMPARE WITH ARCHIVED Z-FILE
-    auxilliary_z_file = PARKFIELD_PATHS["emtf_results"].joinpath("PKD_272_00.zrr")
+    # Compare with archived Z-file
+    auxiliary_z_file = PARKFIELD_PATHS["emtf_results"].joinpath("PKD_272_00.zrr")
+    output_png = PARKFIELD_PATHS["data"].joinpath("RR_processing_comparison.png")
     if z_file_path.exists():
         compare_two_z_files(
             z_file_path,
-            auxilliary_z_file,
+            auxiliary_z_file,
             label1="aurora",
             label2="emtf",
             scale_factor1=1,
-            out_file="RR.png",
+            out_file=output_png,
             markersize=3,
-            rho_ylims=[1e0, 1e3],
-            xlims=[0.05, 500],
+            rho_ylims=(1e0, 1e3),
+            xlims=(0.05, 500),
+            title_string="Apparent Resistivity and Phase at Parkfield, CA",
+            subtitle_string="(Aurora vs EMTF, both Remote Reference)",
         )
     else:
         logger.error("Z-File not found - Parkfield tests failed to generate output")

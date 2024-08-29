@@ -1,10 +1,16 @@
+"""
+    This module contains methods that are used to define datasets to build from FDSN servers.
+
+    These datasets are in turn used for testing.
+
+"""
 from obspy import UTCDateTime
 from aurora.sandbox.io_helpers.fdsn_dataset import FDSNDataset
 
 
-def make_pkdsao_test_00_config(minitest=False):
+def make_pkdsao_test_00_config(minitest=False) -> FDSNDataset:
     """
-    Populate a FDSNDataset() object for 2h of 40Hz data
+    Return a description of a 2h PKD SAO 40Hz dataset from NCEDC.
 
     Parameters
     ----------
@@ -30,7 +36,14 @@ def make_pkdsao_test_00_config(minitest=False):
     return test_data_set
 
 
-def make_cas04_nvr08_test_00_config():
+def make_cas04_nvr08_test_00_config() -> FDSNDataset:
+    """
+    Return a description of a CAS04,NVR08 dataset from IRIS.
+
+    Returns
+    -------
+
+    """
     test_data_set = FDSNDataset()
     test_data_set.dataset_id = "cas_nvr_test_00"
     test_data_set.network = "ZU"
@@ -52,7 +65,8 @@ def make_cas04_nvr08_test_00_config():
     return test_data_set
 
 
-def make_iak34_test_00_config():
+def make_iak34_test_00_config() -> FDSNDataset:
+    """Return a description of a IAK34 dataset from IRIS."""
     test_data_set = FDSNDataset()
     test_data_set.dataset_id = "iak34_test_00"
     test_data_set.network = "EM"
@@ -70,7 +84,8 @@ def make_iak34_test_00_config():
     return test_data_set
 
 
-def make_iak34_test_01_config():
+def make_iak34_test_01_config() -> FDSNDataset:
+    """Return a description of a IAK34 dataset from IRIS."""
     test_data_set = FDSNDataset()
     test_data_set.dataset_id = "iak34_test_01_long_ss"
     test_data_set.network = "EM"
@@ -87,7 +102,8 @@ def make_iak34_test_01_config():
     return test_data_set
 
 
-def make_iak34_test_02_config():
+def make_iak34_test_02_config() -> FDSNDataset:
+    """Return a description of a IAK34 dataset from IRIS."""
     test_data_set = FDSNDataset()
     test_data_set.dataset_id = "iak34_test_02_long_rr"
     test_data_set.network = "EM"
@@ -104,7 +120,8 @@ def make_iak34_test_02_config():
     return test_data_set
 
 
-def make_iak34_test_03_config():
+def make_iak34_test_03_config() -> FDSNDataset:
+    """Return a description of a IAK34 dataset from IRIS."""
     test_data_set = FDSNDataset()
     test_data_set.dataset_id = "iak34_test_03_long_rr"
     test_data_set.network = "EM"
@@ -121,7 +138,8 @@ def make_iak34_test_03_config():
     return test_data_set
 
 
-def make_iak34_test_04_config():
+def make_iak34_test_04_config() -> FDSNDataset:
+    """Return a description of a IAK34 dataset from IRIS."""
     test_data_set = FDSNDataset()
     test_data_set.dataset_id = "iak34_test_04_rr"
     test_data_set.network = "EM"
@@ -138,29 +156,8 @@ def make_iak34_test_04_config():
     return test_data_set
 
 
-# def make_iak34_nen34_test_00_config():
-#     test_data_set = FDSNDataset()
-#     test_data_set.dataset_id = "iak34_nen34_test_00"
-#     test_data_set.network = "ZU"
-#     test_data_set.station = "IAK34,NEN34"
-#     # <ORIGINAL>
-#     # test_data_set.starttime = UTCDateTime("2020-06-02T18:41:43.000000Z")
-#     # test_data_set.endtime = UTCDateTime("2020-07-13T21:46:12.000000Z")
-#     # </ORIGINAL>
-#     test_data_set.starttime = UTCDateTime("2020-06-04T00:00:00.000000Z")
-#     test_data_set.endtime = UTCDateTime("2020-06-05T00:00:00.000000Z")  # minitest
-#     # test_data_set.endtime = UTCDateTime("2020-06-24T15:55:46.000000Z")
-#
-#     # test_data_set.starttime = UTCDateTime("2004-09-28T00:00:00.000000Z")
-#     # test_data_set.endtime = UTCDateTime("2004-09-28T01:59:59.975000Z")
-#     # test_data_set.endtime = UTCDateTime("2004-09-28T00:01:59.999000Z") #small test
-#     test_data_set.channel_codes = None
-#     test_data_set.description = "earthscope example dataset"
-#     test_data_set.components_list = ["hx", "hy", "ex", "ey"]
-#     return test_data_set
-
-
-def make_test_configs():
+def make_test_configs() -> dict:
+    """Make all the test dataset configs and put them in a dict"""
     test_data_set_configs = {}
 
     # pkd_sao_test_00 Remote Reference

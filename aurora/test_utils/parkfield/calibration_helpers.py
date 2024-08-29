@@ -1,32 +1,39 @@
+"""
+    This module contains methods that are used in the Parkfield calibration tests.
+"""
 import matplotlib.pyplot as plt
+import mth5.groups.run
 import numpy as np
+import pathlib
 
-from pathlib import Path
+import xarray
 from scipy.signal import medfilt
 from loguru import logger
+from typing import Optional, Union
 
 plt.ion()
 
 
-def load_bf4_fap_for_parkfield_test_using_mt_metadata(frequencies):
+def load_bf4_fap_for_parkfield_test_using_mt_metadata(frequencies: np.ndarray):
     """
-    The hardware repsonses (AAF and digitizer) are not included in this response,
-    but these do not make any significant difference away from the Nyquist frequecny.
+    Loads a csv format response file for a BF4 coil and return the calibration function.
+    Uses an mt_metadata filter object.
 
-    Near the Nyquist calibration is inadequate anyhow.  Looking at the output plots,
-    which show the "full calibration" vs "response table (EMI)", neither one is
-    realistic at high frequency.  The fap ("response table (EMI)") curve does not
-    compensate for AAF and plunges down at high frequency.  The full calibration
-    from the PZ response on the other hand rises unrealistically.  The PZ rising
-    signal amplitude at high frequency is an artefact of calibrating noise.
+    - Anti-alias filter and digitizer responses are not included in the csv -- it is coil only.
+    - We ignore the AAF, and hard-code a counts-per-volt value for now
+
+    Development Notes:
+    TODO: Add doc showing where counts per volt is accessing in FDSN metadata.
 
     Parameters
     ----------
-    frequencies : numpy array
-        Array of frequencies at which to evaluate the bf response function
+    frequencies: np.ndarray
+        Frequencies at which to evaluate the bf response function
+
     Returns
     -------
-
+    bf4_resp:  np.ndarray
+        Complex response of the filter at the input frequencies
     """
     from aurora.general_helper_functions import DATA_PATH
     from mt_metadata.timeseries.filters.helper_functions import (
@@ -49,6 +56,7 @@ def plot_responses(
     show_response_curves,
 ):
     """
+    Makes a sanity check plot to show the response of the calibration curves
 
     Parameters
     ----------
@@ -60,7 +68,7 @@ def plot_responses(
         The complex-values resposne function from the pole-zero response
     bf4_resp : None or numpy.ndarray
         The complex-values resposne function from the BF-4 coil only.
-    figures_path : str or Path
+    figures_path : str or pathlib.Path
         Where the figures will be saved
     show_response_curves : bool
         If True, plots flash to screen - for debugging
@@ -91,15 +99,15 @@ def plot_responses(
 
 
 def parkfield_sanity_check(
-    fft_obj,
-    run_obj,
-    show_response_curves=False,
-    show_spectra=True,
-    figures_path=Path(""),
-    include_decimation=False,
+    fft_obj: xarray.Dataset,
+    run_obj: mth5.groups.run.RunGroup,
+    show_response_curves: Optional[bool] = False,
+    show_spectra: Optional[bool] = False,
+    figures_path: Optional[Union[str, pathlib.Path]] = pathlib.Path(""),
+    include_decimation: Optional[bool] = False,
 ):
     """
-    loop over channels in fft obj and make calibrated spectral plots
+    Loop over channels in fft obj and make calibrated spectral plots
 
     Parameters
     ----------
@@ -110,7 +118,6 @@ def parkfield_sanity_check(
     -------
 
     """
-
     frequencies = fft_obj.frequency.data[1:]  # drop DC, add flag for dropping DC
     figures_path.mkdir(parents=True, exist_ok=True)
     channel_keys = list(fft_obj.data_vars.keys())

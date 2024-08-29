@@ -2,16 +2,18 @@ import logging
 import unittest
 
 from aurora.pipelines.process_mth5 import process_mth5
-from aurora.pipelines.run_summary import RunSummary
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test1_h5
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test2_h5
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
+
 from aurora.test_utils.synthetic.make_processing_configs import (
     create_test_run_config,
 )
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
-from aurora.transfer_function.kernel_dataset import KernelDataset
+from mth5.data.make_mth5_from_asc import create_test1_h5
+from mth5.data.make_mth5_from_asc import create_test2_h5
+from mth5.data.make_mth5_from_asc import create_test12rr_h5
 from mth5.helpers import close_open_files
+
+# from mtpy-v2
+from mtpy.processing import RunSummary, KernelDataset
 
 synthetic_test_paths = SyntheticTestPaths()
 synthetic_test_paths.mkdirs()
@@ -235,7 +237,7 @@ def process_synthetic_1(
                 ttl_str=ttl_str,
                 show=False,
                 figure_basename=out_png_name,
-                figure_path=AURORA_RESULTS_PATH,
+                figures_path=AURORA_RESULTS_PATH,
             )
     return tf_result
 
@@ -318,7 +320,7 @@ if __name__ == "__main__":
 #     Just like process_synthetic_1, but the window is ridiculously long so that we
 #     encounter the underdetermined problem. We actually pass that test but in testing
 #     I found that at the next band over, which has more data because there are multipe
-#     FCs the sigma in TRME comes out as negative. see issue #4 and issue #55.
+#     FCs the sigma in RME comes out as negative. see issue #4 and issue #55.
 #     Returns
 #     -------
 #
