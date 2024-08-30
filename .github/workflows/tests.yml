@@ -37,8 +37,9 @@ jobs:
         
         git clone https://github.com/MTgeophysics/mtpy-v2.git # @main
         cd mtpy-v2
+        tail -n+2 environment.yml >> unnamed_environment.yaml
         # conda env create -f environment.yml --name=aurora-test
-        conda env update --file environment.yml # --prune 
+        conda env update --file unnamed_environment.yaml # --prune 
         # source activate aurora-test
         pip install git+https://github.com/simpeg/pydiso.git
         pip install -e . # executes mtpy-v2 setup.py
