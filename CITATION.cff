@@ -87,6 +87,6 @@ keywords:
   - processing
   - transfer function
 license: MIT
-commit: abcdefgh
+commit: d62c784a39c96692a3b1e10d50acb869b83d17c9
 version: 0.3.14
-date-released: '2024-08-28'
+date-released: '2024-08-30'
