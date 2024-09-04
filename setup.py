@@ -11,7 +11,7 @@ with open("README.rst") as readme_file:
 #    history = history_file.read()
 
 requirements = [
-    "rasterio",
+    "rasterio<=1.3.10",
     "mt_metadata",
     "mth5",
     "mtpy-v2",
