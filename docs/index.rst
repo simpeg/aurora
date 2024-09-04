@@ -32,7 +32,7 @@ Welcome to Aurora Documentation
    tutorials/processing_configuration.ipynb
    tutorials/earthscope_magnetic_data_tutorial.ipynb
    tutorials/process_cas04_single_station.ipynb
-   tutorials/process_cas04_mulitple_station.ipynb
+   tutorials/process_cas04_multiple_station.ipynb
    tutorials/synthetic_data_processing.ipynb
 
 .. toctree::
