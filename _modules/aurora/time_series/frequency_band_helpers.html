@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.time_series.frequency_band_helpers &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=d0ab9f1a"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-information-extracted-by-IRIS">1. Build an MTH5 file from information extracted by IRIS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_single_station.html">Make CAS04 – Single Station</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aurora.time_series.frequency_band_helpers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.time_series.frequency_band_helpers</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This module contains functions that are associated with time series of Fourier coefficients</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># import numpy as np</span>
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+
+
+<div class="viewcode-block" id="get_band_for_tf_estimate"><a class="viewcode-back" href="../../../api/aurora.time_series.html#aurora.time_series.frequency_band_helpers.get_band_for_tf_estimate">[docs]</a><span class="k">def</span> <span class="nf">get_band_for_tf_estimate</span><span class="p">(</span><span class="n">band</span><span class="p">,</span> <span class="n">dec_level_config</span><span class="p">,</span> <span class="n">local_stft_obj</span><span class="p">,</span> <span class="n">remote_stft_obj</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns spectrograms X, Y, RR for harmonics within the given band</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    band : mt_metadata.transfer_functions.processing.aurora.FrequencyBands</span>
+<span class="sd">        object with lower_bound and upper_bound to tell stft object which</span>
+<span class="sd">        subarray to return</span>
+<span class="sd">    config : mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel</span>
+<span class="sd">        information about the input and output channels needed for TF</span>
+<span class="sd">        estimation problem setup</span>
+<span class="sd">    local_stft_obj : xarray.core.dataset.Dataset or None</span>
+<span class="sd">        Time series of Fourier coefficients for the station whose TF is to be</span>
+<span class="sd">        estimated</span>
+<span class="sd">    remote_stft_obj : xarray.core.dataset.Dataset or None</span>
+<span class="sd">        Time series of Fourier coefficients for the remote reference station</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    X, Y, RR : xarray.core.dataset.Dataset or None</span>
+<span class="sd">        data structures as local_stft_object and remote_stft_object, but</span>
+<span class="sd">        restricted only to input_channels, output_channels,</span>
+<span class="sd">        reference_channels and also the frequency axes are restricted to</span>
+<span class="sd">        being within the frequency band given as an input argument.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Processing band </span><span class="si">{</span><span class="n">band</span><span class="o">.</span><span class="n">center_period</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">s  (</span><span class="si">{</span><span class="mf">1.</span><span class="o">/</span><span class="n">band</span><span class="o">.</span><span class="n">center_period</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">Hz)&quot;</span>
+    <span class="p">)</span>
+    <span class="n">band_dataset</span> <span class="o">=</span> <span class="n">extract_band</span><span class="p">(</span><span class="n">band</span><span class="p">,</span> <span class="n">local_stft_obj</span><span class="p">)</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">band_dataset</span><span class="p">[</span><span class="n">dec_level_config</span><span class="o">.</span><span class="n">input_channels</span><span class="p">]</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">band_dataset</span><span class="p">[</span><span class="n">dec_level_config</span><span class="o">.</span><span class="n">output_channels</span><span class="p">]</span>
+    <span class="n">check_time_axes_synched</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dec_level_config</span><span class="o">.</span><span class="n">reference_channels</span><span class="p">:</span>
+        <span class="n">band_dataset</span> <span class="o">=</span> <span class="n">extract_band</span><span class="p">(</span><span class="n">band</span><span class="p">,</span> <span class="n">remote_stft_obj</span><span class="p">)</span>
+        <span class="n">RR</span> <span class="o">=</span> <span class="n">band_dataset</span><span class="p">[</span><span class="n">dec_level_config</span><span class="o">.</span><span class="n">reference_channels</span><span class="p">]</span>
+        <span class="n">check_time_axes_synched</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">RR</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">RR</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">RR</span></div>
+
+
+<div class="viewcode-block" id="extract_band"><a class="viewcode-back" href="../../../api/aurora.time_series.html#aurora.time_series.frequency_band_helpers.extract_band">[docs]</a><span class="k">def</span> <span class="nf">extract_band</span><span class="p">(</span><span class="n">frequency_band</span><span class="p">,</span> <span class="n">fft_obj</span><span class="p">,</span> <span class="n">channels</span><span class="o">=</span><span class="p">[],</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts a frequency band from xr.DataArray representing a spectrogram.</span>
+
+<span class="sd">    Stand alone version of the method that is used by WIP Spectrogram class.</span>
+
+<span class="sd">    Development Notes:</span>
+<span class="sd">    #1: 20230902</span>
+<span class="sd">    TODO: Decide if base dataset object should be a xr.DataArray (not xr.Dataset)</span>
+<span class="sd">    - drop=True does not play nice with h5py and Dataset, results in a type error.</span>
+<span class="sd">    File &quot;stringsource&quot;, line 2, in h5py.h5r.Reference.__reduce_cython__</span>
+<span class="sd">    TypeError: no default __reduce__ due to non-trivial __cinit__</span>
+<span class="sd">    However, it works OK with DataArray, so maybe use data array in general</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    frequency_band: mt_metadata.transfer_functions.processing.aurora.band.Band</span>
+<span class="sd">        Specifies interval corresponding to a frequency band</span>
+<span class="sd">    fft_obj: xarray.core.dataset.Dataset</span>
+<span class="sd">        To be replaced with an fft_obj() class in future</span>
+<span class="sd">    epsilon: float</span>
+<span class="sd">        Use this when you are worried about missing a frequency due to</span>
+<span class="sd">        round off error.  This is in general not needed if we use a df/2 pad</span>
+<span class="sd">        around true harmonics.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    band: xr.DataArray</span>
+<span class="sd">        The frequencies within the band passed into this function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cond1</span> <span class="o">=</span> <span class="n">fft_obj</span><span class="o">.</span><span class="n">frequency</span> <span class="o">&gt;=</span> <span class="n">frequency_band</span><span class="o">.</span><span class="n">lower_bound</span> <span class="o">-</span> <span class="n">epsilon</span>
+    <span class="n">cond2</span> <span class="o">=</span> <span class="n">fft_obj</span><span class="o">.</span><span class="n">frequency</span> <span class="o">&lt;=</span> <span class="n">frequency_band</span><span class="o">.</span><span class="n">upper_bound</span> <span class="o">+</span> <span class="n">epsilon</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">band</span> <span class="o">=</span> <span class="n">fft_obj</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cond1</span> <span class="o">&amp;</span> <span class="n">cond2</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>  <span class="c1"># see Note #1</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">fft_obj</span><span class="o">.</span><span class="n">to_array</span><span class="p">()</span>
+        <span class="n">band</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cond1</span> <span class="o">&amp;</span> <span class="n">cond2</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">band</span> <span class="o">=</span> <span class="n">band</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">(</span><span class="s2">&quot;variable&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">channels</span><span class="p">:</span>
+        <span class="n">band</span> <span class="o">=</span> <span class="n">band</span><span class="p">[</span><span class="n">channels</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">band</span></div>
+
+
+<div class="viewcode-block" id="check_time_axes_synched"><a class="viewcode-back" href="../../../api/aurora.time_series.html#aurora.time_series.frequency_band_helpers.check_time_axes_synched">[docs]</a><span class="k">def</span> <span class="nf">check_time_axes_synched</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Utility function for checking that time axes agree.</span>
+<span class="sd">    Raises ValueError if axes do not agree.</span>
+
+<span class="sd">    It is critical that X, Y, RR have the same time axes for aurora processing.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : xarray</span>
+<span class="sd">    Y : xarray</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">time</span> <span class="o">==</span> <span class="n">Y</span><span class="o">.</span><span class="n">time</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Time axes of arrays not identical&quot;</span>
+        <span class="c1">#  &quot;NAN Handling could fail if X,Y dont share time axes&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="adjust_band_for_coherence_sorting"><a class="viewcode-back" href="../../../api/aurora.time_series.html#aurora.time_series.frequency_band_helpers.adjust_band_for_coherence_sorting">[docs]</a><span class="k">def</span> <span class="nf">adjust_band_for_coherence_sorting</span><span class="p">(</span><span class="n">frequency_band</span><span class="p">,</span> <span class="n">spectrogram</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="s2">&quot;min3&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    WIP: Intended to broaden band to allow more FCs for spectral features</span>
+<span class="sd">    - used in coherence sorting and general feature extraction</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    frequency_band</span>
+<span class="sd">    spectrogram: Spectrogram</span>
+<span class="sd">    rule</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">band</span> <span class="o">=</span> <span class="n">frequency_band</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">spectrogram</span><span class="o">.</span><span class="n">num_harmonics_in_band</span><span class="p">(</span><span class="n">band</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Cant evaluate coherence with only 1 harmonic&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Widening band according to </span><span class="si">{</span><span class="n">rule</span><span class="si">}</span><span class="s2"> rule&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rule</span> <span class="o">==</span> <span class="s2">&quot;min3&quot;</span><span class="p">:</span>
+            <span class="n">band</span><span class="o">.</span><span class="n">frequency_min</span> <span class="o">-=</span> <span class="n">spectrogram</span><span class="o">.</span><span class="n">frequency_increment</span>
+            <span class="n">band</span><span class="o">.</span><span class="n">frequency_max</span> <span class="o">+=</span> <span class="n">spectrogram</span><span class="o">.</span><span class="n">frequency_increment</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Band adjustment rule </span><span class="si">{</span><span class="n">rule</span><span class="si">}</span><span class="s2"> not recognized&quot;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">band</span></div>
+
+
+<span class="c1"># def frequency_band_edges(</span>
+<span class="c1">#     f_lower_bound, f_upper_bound, num_bands_per_decade=None, num_bands=None</span>
+<span class="c1"># ):</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     Provides logarithmically spaced fence posts across lowest and highest</span>
+<span class="c1">#     frequencies. This is a lot like calling logspace.  The resultant gates</span>
+<span class="c1">#     have constant Q, i.e. Q = delta_f/f_center = constant.</span>
+<span class="c1">#     where f_center is defined geometrically, i.e. sqrt(f2*f1) is the center freq</span>
+<span class="c1">#     between f1 and f2.</span>
+<span class="c1">#</span>
+<span class="c1">#     TODO: Add a linear spacing option?</span>
+<span class="c1">#</span>
+<span class="c1">#     Parameters</span>
+<span class="c1">#     ----------</span>
+<span class="c1">#     f_lower_bound : float</span>
+<span class="c1">#         lowest frequency under consideration</span>
+<span class="c1">#     f_upper_bound : float</span>
+<span class="c1">#         highest frequency under consideration</span>
+<span class="c1">#     num_bands_per_decade : int (TODO test, float maybe ok also.. need to test)</span>
+<span class="c1">#         number of bands per decade</span>
+<span class="c1">#     num_bands : int</span>
+<span class="c1">#         total number of bands.  This supercedes num_bands_per_decade if supplied</span>
+<span class="c1">#</span>
+<span class="c1">#     Returns</span>
+<span class="c1">#     -------</span>
+<span class="c1">#     fence_posts : array</span>
+<span class="c1">#         logarithmically spaced fence posts acoss lowest and highest</span>
+<span class="c1">#         frequencies.  These partition the frequency domain between</span>
+<span class="c1">#         f_lower_bound and f_upper_bound</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     if (num_bands is None) &amp; (num_bands_per_decade is None):</span>
+<span class="c1">#         logger.error(&quot;Specify either number_of_bands or number of bands_per_decade&quot;)</span>
+<span class="c1">#         raise Exception</span>
+<span class="c1">#</span>
+<span class="c1">#     if num_bands is None:</span>
+<span class="c1">#         number_of_decades = np.log10(f_upper_bound / f_lower_bound)</span>
+<span class="c1">#         # The number of decades spanned (use log8 for octaves)</span>
+<span class="c1">#         num_bands = round(</span>
+<span class="c1">#             number_of_decades * num_bands_per_decade</span>
+<span class="c1">#         )  # floor or ceiling here?</span>
+<span class="c1">#</span>
+<span class="c1">#     base = np.exp((1.0 / num_bands) * np.log(f_upper_bound / f_lower_bound))</span>
+<span class="c1">#     # log - NOT log10!</span>
+<span class="c1">#</span>
+<span class="c1">#     logger.info(f&quot;base = {base}&quot;)</span>
+<span class="c1">#     bases = base * np.ones(num_bands + 1)</span>
+<span class="c1">#     logger.info(f&quot;bases = {bases}&quot;)</span>
+<span class="c1">#     exponents = np.linspace(0, num_bands, num_bands + 1)</span>
+<span class="c1">#     logger.info(f&quot;exponents = {exponents}&quot;)</span>
+<span class="c1">#     fence_posts = f_lower_bound * (bases**exponents)</span>
+<span class="c1">#     logger.info(f&quot;fence posts = {fence_posts}&quot;)</span>
+<span class="c1">#     return fence_posts</span>
+
+
+<span class="c1"># def get_band_for_coherence_sorting(</span>
+<span class="c1">#     frequency_band,</span>
+<span class="c1">#     dec_level_config,</span>
+<span class="c1">#     local_stft_obj,</span>
+<span class="c1">#     remote_stft_obj,</span>
+<span class="c1">#     widening_rule=&quot;min3&quot;,</span>
+<span class="c1"># ):</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     Just like get_band_for_tf_estimate, but here we enforce some rules so that the band is not one FC wide</span>
+<span class="c1">#     - it is possible that this method will get merged with get_band_for_tf_estimate</span>
+<span class="c1">#     - this is a placeholder until the appropriate rules are sorted out.</span>
+<span class="c1">#</span>
+<span class="c1">#     Parameters</span>
+<span class="c1">#     ----------</span>
+<span class="c1">#     band : mt_metadata.transfer_functions.processing.aurora.FrequencyBands</span>
+<span class="c1">#         object with lower_bound and upper_bound to tell stft object which</span>
+<span class="c1">#         subarray to return</span>
+<span class="c1">#     config : mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel</span>
+<span class="c1">#         information about the input and output channels needed for TF</span>
+<span class="c1">#         estimation problem setup</span>
+<span class="c1">#     local_stft_obj : xarray.core.dataset.Dataset or None</span>
+<span class="c1">#         Time series of Fourier coefficients for the station whose TF is to be</span>
+<span class="c1">#         estimated</span>
+<span class="c1">#     remote_stft_obj : xarray.core.dataset.Dataset or None</span>
+<span class="c1">#         Time series of Fourier coefficients for the remote reference station</span>
+<span class="c1">#</span>
+<span class="c1">#     Returns</span>
+<span class="c1">#     -------</span>
+<span class="c1">#     X, Y, RR : xarray.core.dataset.Dataset or None</span>
+<span class="c1">#         data structures as local_stft_object and remote_stft_object, but</span>
+<span class="c1">#         restricted only to input_channels, output_channels,</span>
+<span class="c1">#         reference_channels and also the frequency axes are restricted to</span>
+<span class="c1">#         being within the frequency band given as an input argument.</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     band = frequency_band.copy()</span>
+<span class="c1">#     logger.info(</span>
+<span class="c1">#         f&quot;Processing band {band.center_period:.6f}s  ({1./band.center_period:.6f}Hz)&quot;</span>
+<span class="c1">#     )</span>
+<span class="c1">#     stft = Spectrogram(local_stft_obj)</span>
+<span class="c1">#     if stft.num_harmonics_in_band(band) == 1:</span>
+<span class="c1">#         logger.warning(&quot;Cant evaluate coherence with only 1 harmonic&quot;)</span>
+<span class="c1">#         logger.info(f&quot;Widening band according to {widening_rule} rule&quot;)</span>
+<span class="c1">#         if widening_rule == &quot;min3&quot;:</span>
+<span class="c1">#             band.frequency_min -= stft.df</span>
+<span class="c1">#             band.frequency_max += stft.df</span>
+<span class="c1">#         else:</span>
+<span class="c1">#             msg = f&quot;Widening rule {widening_rule} not recognized&quot;</span>
+<span class="c1">#             logger.error(msg)</span>
+<span class="c1">#             raise NotImplementedError(msg)</span>
+<span class="c1">#     # proceed as in</span>
+<span class="c1">#     return get_band_for_tf_estimate(</span>
+<span class="c1">#         band, dec_level_config, local_stft_obj, remote_stft_obj</span>
+<span class="c1">#     )</span>
+
+
+<div class="viewcode-block" id="cross_spectra"><a class="viewcode-back" href="../../../api/aurora.time_series.html#aurora.time_series.frequency_band_helpers.cross_spectra">[docs]</a><span class="k">def</span> <span class="nf">cross_spectra</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;WIP: Returns the cross power spectra between two arrays&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">X</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span> <span class="o">*</span> <span class="n">Y</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

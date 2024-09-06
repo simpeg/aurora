@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.pipelines.fourier_coefficients &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=d0ab9f1a"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-information-extracted-by-IRIS">1. Build an MTH5 file from information extracted by IRIS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_single_station.html">Make CAS04 – Single Station</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aurora.pipelines.fourier_coefficients</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.pipelines.fourier_coefficients</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Supporting codes for building the FC level of the mth5</span>
+
+<span class="sd">Here are the parameters that are defined via the mt_metadata fourier coefficients structures:</span>
+<span class="sd">&quot;anti_alias_filter&quot;: &quot;default&quot;,</span>
+<span class="sd">&quot;bands&quot;,</span>
+<span class="sd">&quot;decimation.factor&quot;: 4.0,</span>
+<span class="sd">&quot;decimation.level&quot;: 2,</span>
+<span class="sd">&quot;decimation.method&quot;: &quot;default&quot;,</span>
+<span class="sd">&quot;decimation.sample_rate&quot;: 0.0625,</span>
+<span class="sd">&quot;extra_pre_fft_detrend_type&quot;: &quot;linear&quot;,</span>
+<span class="sd">&quot;prewhitening_type&quot;: &quot;first difference&quot;,</span>
+<span class="sd">&quot;window.clock_zero_type&quot;: &quot;ignore&quot;,</span>
+<span class="sd">&quot;window.num_samples&quot;: 128,</span>
+<span class="sd">&quot;window.overlap&quot;: 32,</span>
+<span class="sd">&quot;window.type&quot;: &quot;boxcar&quot;</span>
+
+<span class="sd">Creating the decimations config requires a decision about decimation factors and the number of levels.</span>
+<span class="sd">We have been getting this from the EMTF band setup file by default.  It is desirable to continue supporting this,</span>
+<span class="sd">however, note that the EMTF band setup is really about processing, and not about making STFTs.</span>
+
+<span class="sd">For the record, here is the legacy decimation config from EMTF, a.k.a. decset.cfg:</span>
+<span class="sd">```</span>
+<span class="sd">4     0      # of decimation level, &amp; decimation offset</span>
+<span class="sd">128  32.   1   0   0   7   4   32   1</span>
+<span class="sd">1.0</span>
+<span class="sd">128  32.   4   0   0   7   4   32   4</span>
+<span class="sd">.2154  .1911   .1307   .0705</span>
+<span class="sd">128  32.   4   0   0   7   4   32   4</span>
+<span class="sd">.2154  .1911   .1307   .0705</span>
+<span class="sd">128  32.   4   0   0   7   4   32   4</span>
+<span class="sd">.2154  .1911   .1307   .0705</span>
+<span class="sd">```</span>
+
+<span class="sd">This essentially corresponds to a &quot;Decimations Group&quot; which is a list of decimations.</span>
+<span class="sd">Related to the generation of FCs is the ARMA prewhitening (Issue #60) which was controlled in</span>
+<span class="sd">EMTF with pwset.cfg</span>
+<span class="sd">4    5             # of decimation level, # of channels</span>
+<span class="sd">3 3 3 3 3</span>
+<span class="sd">3 3 3 3 3</span>
+<span class="sd">3 3 3 3 3</span>
+<span class="sd">3 3 3 3 3</span>
+
+<span class="sd">Note 1: Assumes application of cascading decimation, and that the</span>
+<span class="sd">decimated data will be accessed from the previous decimation level.</span>
+
+<span class="sd">Note 2: We can encounter cases where some runs can be decimated and others can not.</span>
+<span class="sd">We need a way to handle this. For example, a short run may not yield any data from a</span>
+<span class="sd">later decimation level. An attempt to handle this has been made in TF Kernel by</span>
+<span class="sd">adding a is_valid_dataset column, associated with each run-decimation level pair.</span>
+
+<span class="sd">Note 3: This point in the loop marks the interface between _generation_ of the FCs and</span>
+<span class="sd"> their _usage_. In future the code above this comment would be pushed into</span>
+<span class="sd"> create_fourier_coefficients() and the code below this would access those FCs and</span>
+<span class="sd"> execute compute_transfer_function()</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># =============================================================================</span>
+<span class="c1"># Imports</span>
+<span class="c1"># =============================================================================</span>
+
+<span class="kn">import</span> <span class="nn">mt_metadata.timeseries.time_period</span>
+<span class="kn">import</span> <span class="nn">mth5.mth5</span>
+<span class="kn">import</span> <span class="nn">pathlib</span>
+
+<span class="kn">from</span> <span class="nn">aurora.pipelines.time_series_helpers</span> <span class="kn">import</span> <span class="n">calibrate_stft_obj</span>
+<span class="kn">from</span> <span class="nn">aurora.pipelines.time_series_helpers</span> <span class="kn">import</span> <span class="n">prototype_decimate</span>
+<span class="kn">from</span> <span class="nn">aurora.pipelines.time_series_helpers</span> <span class="kn">import</span> <span class="n">run_ts_to_stft_scipy</span>
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">mth5.mth5</span> <span class="kn">import</span> <span class="n">MTH5</span>
+<span class="kn">from</span> <span class="nn">mth5.utils.helpers</span> <span class="kn">import</span> <span class="n">path_or_mth5_object</span>
+<span class="kn">from</span> <span class="nn">mt_metadata.transfer_functions.processing.fourier_coefficients</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Decimation</span> <span class="k">as</span> <span class="n">FCDecimation</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="c1"># =============================================================================</span>
+<span class="n">GROUPBY_COLUMNS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;survey&quot;</span><span class="p">,</span> <span class="s2">&quot;station&quot;</span><span class="p">,</span> <span class="s2">&quot;sample_rate&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="fc_decimations_creator"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.fourier_coefficients.fc_decimations_creator">[docs]</a><span class="k">def</span> <span class="nf">fc_decimations_creator</span><span class="p">(</span>
+    <span class="n">initial_sample_rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">decimation_factors</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_levels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
+    <span class="n">time_period</span><span class="p">:</span> <span class="n">mt_metadata</span><span class="o">.</span><span class="n">timeseries</span><span class="o">.</span><span class="n">TimePeriod</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Creates mt_metadata FCDecimation objects that parameterize Fourier coefficient decimation levels.</span>
+
+<span class="sd">    Note 1:  This does not yet work through the assignment of which bands to keep.  Refer to</span>
+<span class="sd">    mt_metadata.transfer_functions.processing.Processing.assign_bands() to see how this was done in the past</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    initial_sample_rate: float</span>
+<span class="sd">        Sample rate of the &quot;level0&quot; data -- usually the sample rate during field acquisition.</span>
+<span class="sd">    decimation_factors: list (or other iterable)</span>
+<span class="sd">        The decimation factors that will be applied at each FC decimation level</span>
+<span class="sd">    max_levels: int</span>
+<span class="sd">        The maximum number of decimation levels to allow</span>
+<span class="sd">    time_period:</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fc_decimations: list</span>
+<span class="sd">        Each element of the list is an object of type</span>
+<span class="sd">        mt_metadata.transfer_functions.processing.fourier_coefficients.Decimation,</span>
+<span class="sd">        (a.k.a. FCDecimation).</span>
+
+<span class="sd">        The order of the list corresponds the order of the cascading decimation</span>
+<span class="sd">          - No decimation levels are omitted.</span>
+<span class="sd">          - This could be changed in future by using a dict instead of a list,</span>
+<span class="sd">          - e.g. decimation_factors = dict(zip(np.arange(max_levels), decimation_factors))</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">decimation_factors</span><span class="p">:</span>
+        <span class="c1"># msg = &quot;No decimation factors given, set default values to EMTF default values [1, 4, 4, 4, ..., 4]&quot;)</span>
+        <span class="c1"># logger.info(msg)</span>
+        <span class="n">default_decimation_factor</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="n">decimation_factors</span> <span class="o">=</span> <span class="n">max_levels</span> <span class="o">*</span> <span class="p">[</span><span class="n">default_decimation_factor</span><span class="p">]</span>
+        <span class="n">decimation_factors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="c1"># See Note 1</span>
+    <span class="n">fc_decimations</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i_dec_level</span><span class="p">,</span> <span class="n">decimation_factor</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">decimation_factors</span><span class="p">):</span>
+        <span class="n">fc_dec</span> <span class="o">=</span> <span class="n">FCDecimation</span><span class="p">()</span>
+        <span class="n">fc_dec</span><span class="o">.</span><span class="n">decimation_level</span> <span class="o">=</span> <span class="n">i_dec_level</span>
+        <span class="n">fc_dec</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i_dec_level</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">fc_dec</span><span class="o">.</span><span class="n">decimation_factor</span> <span class="o">=</span> <span class="n">decimation_factor</span>
+        <span class="k">if</span> <span class="n">i_dec_level</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">current_sample_rate</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">initial_sample_rate</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">current_sample_rate</span> <span class="o">/=</span> <span class="n">decimation_factor</span>
+        <span class="n">fc_dec</span><span class="o">.</span><span class="n">sample_rate_decimation</span> <span class="o">=</span> <span class="n">current_sample_rate</span>
+
+        <span class="k">if</span> <span class="n">time_period</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">time_period</span><span class="p">,</span> <span class="n">mt_metadata</span><span class="o">.</span><span class="n">timeseries</span><span class="o">.</span><span class="n">time_period</span><span class="o">.</span><span class="n">TimePeriod</span><span class="p">):</span>
+                <span class="n">fc_dec</span><span class="o">.</span><span class="n">time_period</span> <span class="o">=</span> <span class="n">time_period</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Not sure how to assign time_period with type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">time_period</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">fc_decimations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fc_dec</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fc_decimations</span></div>
+
+
+<div class="viewcode-block" id="add_fcs_to_mth5"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.fourier_coefficients.add_fcs_to_mth5">[docs]</a><span class="nd">@path_or_mth5_object</span>
+<span class="k">def</span> <span class="nf">add_fcs_to_mth5</span><span class="p">(</span>
+    <span class="n">m</span><span class="p">:</span> <span class="n">MTH5</span><span class="p">,</span> <span class="n">fc_decimations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Add Fourier Coefficient Levels ot an existing MTH5.</span>
+
+<span class="sd">    **Notes:**</span>
+
+<span class="sd">    - This module computes the FCs differently than the legacy aurora pipeline. It uses scipy.signal.spectrogram. There is a test in Aurora to confirm that there are equivalent if we are not using fancy pre-whitening.</span>
+
+<span class="sd">    - Nomenclature: &quot;usssr_grouper&quot; is the output of a group-by on unique {survey, station, sample_rate} tuples.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    m: MTH5 object</span>
+<span class="sd">        The mth5 file, open in append mode.</span>
+<span class="sd">    fc_decimations: Union[str, None, List]</span>
+<span class="sd">        This specifies the scheme to use for decimating the time series when building the FC layer.</span>
+<span class="sd">        None: Just use default (something like four decimation levels, decimated by 4 each time say.</span>
+<span class="sd">        String: Controlled Vocabulary, values are a work in progress, that will allow custom definition of the fc_decimations for some common cases. For example, say you have stored already decimated time</span>
+<span class="sd">        series, then you want simply the zeroth decimation for each run, because the decimated time series live</span>
+<span class="sd">        under another run container, and that will get its own FCs.  This is experimental.</span>
+<span class="sd">        List: (**UNTESTED**) -- This means that the user thought about the decimations that they want to create and is</span>
+<span class="sd">        passing them explicitly.  -- probably will need to be a dictionary actually, since this</span>
+<span class="sd">        would get redefined at each sample rate.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Group the channel summary by survey, station, sample_rate</span>
+    <span class="n">channel_summary_df</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">channel_summary</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+    <span class="n">usssr_grouper</span> <span class="o">=</span> <span class="n">channel_summary_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">GROUPBY_COLUMNS</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Detected </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">usssr_grouper</span><span class="p">)</span><span class="si">}</span><span class="s2"> unique station-sample_rate instances&quot;</span><span class="p">)</span>
+
+    <span class="c1"># loop over groups</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">survey</span><span class="p">,</span> <span class="n">station</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">),</span> <span class="n">usssr_group</span> <span class="ow">in</span> <span class="n">usssr_grouper</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n\n</span><span class="s2">survey: </span><span class="si">{</span><span class="n">survey</span><span class="si">}</span><span class="s2">, station: </span><span class="si">{</span><span class="n">station</span><span class="si">}</span><span class="s2">, sample_rate </span><span class="si">{</span><span class="n">sample_rate</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">station_obj</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">get_station</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="n">survey</span><span class="p">)</span>
+        <span class="n">run_summary</span> <span class="o">=</span> <span class="n">station_obj</span><span class="o">.</span><span class="n">run_summary</span>
+
+        <span class="c1"># Get the FC decimation schemes if not provided</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fc_decimations</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;FC Decimations not supplied, creating defaults on the fly&quot;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">fc_decimations</span> <span class="o">=</span> <span class="n">fc_decimations_creator</span><span class="p">(</span>
+                <span class="n">initial_sample_rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">time_period</span><span class="o">=</span><span class="kc">None</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fc_decimations</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">fc_decimations</span> <span class="o">==</span> <span class="s2">&quot;degenerate&quot;</span><span class="p">:</span>
+                <span class="n">fc_decimations</span> <span class="o">=</span> <span class="n">get_degenerate_fc_decimation</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">)</span>
+
+        <span class="c1"># TODO: Make this a function that can be done using df.apply()</span>
+        <span class="k">for</span> <span class="n">i_run_row</span><span class="p">,</span> <span class="n">run_row</span> <span class="ow">in</span> <span class="n">run_summary</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;survey: </span><span class="si">{</span><span class="n">survey</span><span class="si">}</span><span class="s2">, station: </span><span class="si">{</span><span class="n">station</span><span class="si">}</span><span class="s2">, sample_rate </span><span class="si">{</span><span class="n">sample_rate</span><span class="si">}</span><span class="s2">, i_run_row </span><span class="si">{</span><span class="n">i_run_row</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="c1"># Access Run</span>
+            <span class="n">run_obj</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">from_reference</span><span class="p">(</span><span class="n">run_row</span><span class="o">.</span><span class="n">hdf5_reference</span><span class="p">)</span>
+
+            <span class="c1"># Set the time period:</span>
+            <span class="c1"># TODO: Should this be over-writing time period if it is already there?</span>
+            <span class="k">for</span> <span class="n">fc_decimation</span> <span class="ow">in</span> <span class="n">fc_decimations</span><span class="p">:</span>
+                <span class="n">fc_decimation</span><span class="o">.</span><span class="n">time_period</span> <span class="o">=</span> <span class="n">run_obj</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">time_period</span>
+
+            <span class="c1"># Access the data to Fourier transform</span>
+            <span class="n">runts</span> <span class="o">=</span> <span class="n">run_obj</span><span class="o">.</span><span class="n">to_runts</span><span class="p">(</span>
+                <span class="n">start</span><span class="o">=</span><span class="n">fc_decimation</span><span class="o">.</span><span class="n">time_period</span><span class="o">.</span><span class="n">start</span><span class="p">,</span>
+                <span class="n">end</span><span class="o">=</span><span class="n">fc_decimation</span><span class="o">.</span><span class="n">time_period</span><span class="o">.</span><span class="n">end</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">run_xrds</span> <span class="o">=</span> <span class="n">runts</span><span class="o">.</span><span class="n">dataset</span>
+
+            <span class="c1"># access container for FCs</span>
+            <span class="n">fc_group</span> <span class="o">=</span> <span class="n">station_obj</span><span class="o">.</span><span class="n">fourier_coefficients_group</span><span class="o">.</span><span class="n">add_fc_group</span><span class="p">(</span>
+                <span class="n">run_obj</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">id</span>
+            <span class="p">)</span>
+
+            <span class="c1"># If timing corrections were needed they could go here, right before STFT</span>
+
+            <span class="k">for</span> <span class="n">i_dec_level</span><span class="p">,</span> <span class="n">fc_decimation</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">fc_decimations</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">i_dec_level</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># Apply decimation</span>
+                    <span class="n">run_xrds</span> <span class="o">=</span> <span class="n">prototype_decimate</span><span class="p">(</span><span class="n">fc_decimation</span><span class="p">,</span> <span class="n">run_xrds</span><span class="p">)</span>
+
+                <span class="c1"># check if this decimation level yields a valid spectrogram</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">fc_decimation</span><span class="o">.</span><span class="n">is_valid_for_time_series_length</span><span class="p">(</span>
+                    <span class="n">run_xrds</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Decimation Level </span><span class="si">{</span><span class="n">i_dec_level</span><span class="si">}</span><span class="s2"> invalid, TS of </span><span class="si">{</span><span class="n">run_xrds</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> samples too short&quot;</span>
+                    <span class="p">)</span>
+                    <span class="k">continue</span>
+
+                <span class="n">stft_obj</span> <span class="o">=</span> <span class="n">run_ts_to_stft_scipy</span><span class="p">(</span><span class="n">fc_decimation</span><span class="p">,</span> <span class="n">run_xrds</span><span class="p">)</span>
+                <span class="n">stft_obj</span> <span class="o">=</span> <span class="n">calibrate_stft_obj</span><span class="p">(</span><span class="n">stft_obj</span><span class="p">,</span> <span class="n">run_obj</span><span class="p">)</span>
+
+                <span class="c1"># Pack FCs into h5 and update metadata</span>
+                <span class="n">decimation_level</span> <span class="o">=</span> <span class="n">fc_group</span><span class="o">.</span><span class="n">add_decimation_level</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i_dec_level</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">decimation_level_metadata</span><span class="o">=</span><span class="n">fc_decimation</span>
+                <span class="p">)</span>
+                <span class="n">decimation_level</span><span class="o">.</span><span class="n">from_xarray</span><span class="p">(</span>
+                    <span class="n">stft_obj</span><span class="p">,</span> <span class="n">decimation_level</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">sample_rate_decimation</span>
+                <span class="p">)</span>
+                <span class="n">decimation_level</span><span class="o">.</span><span class="n">update_metadata</span><span class="p">()</span>
+                <span class="n">fc_group</span><span class="o">.</span><span class="n">update_metadata</span><span class="p">()</span>
+    <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="get_degenerate_fc_decimation"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.fourier_coefficients.get_degenerate_fc_decimation">[docs]</a><span class="k">def</span> <span class="nf">get_degenerate_fc_decimation</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Makes a default fc_decimation list. WIP</span>
+<span class="sd">    This &quot;degnerate&quot; config will only operate on the first decimation level.</span>
+<span class="sd">    This is useful for testing but could be used in future if an MTH5 stored time series in decimation</span>
+<span class="sd">    levels already as separate runs.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sample_rate: float</span>
+<span class="sd">        The sample rate assocaiated with the time-series to convert to Spectrogram</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    output: list</span>
+<span class="sd">        List has only one element which is of type mt_metadata.transfer_functions.processing.fourier_coefficients.Decimation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">fc_decimations_creator</span><span class="p">(</span>
+        <span class="n">sample_rate</span><span class="p">,</span>
+        <span class="n">decimation_factors</span><span class="o">=</span><span class="p">[</span>
+            <span class="mi">1</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">max_levels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">output</span></div>
+
+
+<div class="viewcode-block" id="read_back_fcs"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.fourier_coefficients.read_back_fcs">[docs]</a><span class="nd">@path_or_mth5_object</span>
+<span class="k">def</span> <span class="nf">read_back_fcs</span><span class="p">(</span><span class="n">m</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">MTH5</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is mostly a helper function for tests.  It was used as a sanity check while debugging the FC files, and</span>
+<span class="sd">    also is a good example for how to access the data at each level for each channel.</span>
+
+<span class="sd">    The Time axis of the FC array will change from level to level, but the frequency axis will stay the same shape</span>
+<span class="sd">    (for now -- storing all fcs by default)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        m: pathlib.Path, str or an MTH5 object</span>
+<span class="sd">            The path to an h5 file that we will scan the fcs from</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">channel_summary_df</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">channel_summary</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">channel_summary_df</span><span class="p">)</span>
+    <span class="n">usssr_grouper</span> <span class="o">=</span> <span class="n">channel_summary_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">GROUPBY_COLUMNS</span><span class="p">)</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">survey</span><span class="p">,</span> <span class="n">station</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">),</span> <span class="n">usssr_group</span> <span class="ow">in</span> <span class="n">usssr_grouper</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;survey: </span><span class="si">{</span><span class="n">survey</span><span class="si">}</span><span class="s2">, station: </span><span class="si">{</span><span class="n">station</span><span class="si">}</span><span class="s2">, sample_rate </span><span class="si">{</span><span class="n">sample_rate</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">station_obj</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">get_station</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="n">survey</span><span class="p">)</span>
+        <span class="n">fc_groups</span> <span class="o">=</span> <span class="n">station_obj</span><span class="o">.</span><span class="n">fourier_coefficients_group</span><span class="o">.</span><span class="n">groups_list</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FC Groups: </span><span class="si">{</span><span class="n">fc_groups</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">run_id</span> <span class="ow">in</span> <span class="n">fc_groups</span><span class="p">:</span>
+            <span class="n">fc_group</span> <span class="o">=</span> <span class="n">station_obj</span><span class="o">.</span><span class="n">fourier_coefficients_group</span><span class="o">.</span><span class="n">get_fc_group</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
+            <span class="n">dec_level_ids</span> <span class="o">=</span> <span class="n">fc_group</span><span class="o">.</span><span class="n">groups_list</span>
+            <span class="k">for</span> <span class="n">dec_level_id</span> <span class="ow">in</span> <span class="n">dec_level_ids</span><span class="p">:</span>
+                <span class="n">dec_level</span> <span class="o">=</span> <span class="n">fc_group</span><span class="o">.</span><span class="n">get_decimation_level</span><span class="p">(</span><span class="n">dec_level_id</span><span class="p">)</span>
+                <span class="n">xrds</span> <span class="o">=</span> <span class="n">dec_level</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">([</span><span class="s2">&quot;hx&quot;</span><span class="p">,</span> <span class="s2">&quot;hy&quot;</span><span class="p">])</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;dec_level </span><span class="si">{</span><span class="n">dec_level_id</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> Time axis shape </span><span class="si">{</span><span class="n">xrds</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> Freq axis shape </span><span class="si">{</span><span class="n">xrds</span><span class="o">.</span><span class="n">frequency</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">return</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

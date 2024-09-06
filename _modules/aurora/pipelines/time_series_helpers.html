@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.pipelines.time_series_helpers &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=d0ab9f1a"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-information-extracted-by-IRIS">1. Build an MTH5 file from information extracted by IRIS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_single_station.html">Make CAS04 – Single Station</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aurora.pipelines.time_series_helpers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.pipelines.time_series_helpers</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Collection of modules used in processing pipeline that operate on time series</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">mt_metadata</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">scipy.signal</span> <span class="k">as</span> <span class="nn">ssig</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+
+<span class="kn">from</span> <span class="nn">aurora.time_series.windowed_time_series</span> <span class="kn">import</span> <span class="n">WindowedTimeSeries</span>
+<span class="kn">from</span> <span class="nn">aurora.time_series.windowing_scheme</span> <span class="kn">import</span> <span class="n">window_scheme_from_decimation</span>
+
+
+<div class="viewcode-block" id="validate_sample_rate"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.time_series_helpers.validate_sample_rate">[docs]</a><span class="k">def</span> <span class="nf">validate_sample_rate</span><span class="p">(</span><span class="n">run_ts</span><span class="p">,</span> <span class="n">expected_sample_rate</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check that the sample rate of a run_ts is the expected value, and warn if not.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    run_ts: mth5.timeseries.run_ts.RunTS</span>
+<span class="sd">        Time series object with data and metadata.</span>
+<span class="sd">    expected_sample_rate: float</span>
+<span class="sd">        The sample rate the time series is expected to have. Normally taken from</span>
+<span class="sd">        the processing config</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">run_ts</span><span class="o">.</span><span class="n">sample_rate</span> <span class="o">!=</span> <span class="n">expected_sample_rate</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;sample rate in run time series </span><span class="si">{</span><span class="n">run_ts</span><span class="o">.</span><span class="n">sample_rate</span><span class="si">}</span><span class="s2"> and &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;processing decimation_obj </span><span class="si">{</span><span class="n">expected_sample_rate</span><span class="si">}</span><span class="s2"> do not match&quot;</span>
+        <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">run_ts</span><span class="o">.</span><span class="n">sample_rate</span> <span class="o">-</span> <span class="n">expected_sample_rate</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Delta sample rate </span><span class="si">{</span><span class="n">delta</span><span class="si">}</span><span class="s2"> &gt; </span><span class="si">{</span><span class="n">tol</span><span class="si">}</span><span class="s2"> tolerance&quot;</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;TOL should be a percentage&quot;</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="apply_prewhitening"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.time_series_helpers.apply_prewhitening">[docs]</a><span class="k">def</span> <span class="nf">apply_prewhitening</span><span class="p">(</span><span class="n">decimation_obj</span><span class="p">,</span> <span class="n">run_xrds_input</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Applies pre-whitening to time series to avoid spectral leakage when FFT is applied.</span>
+
+<span class="sd">    If &quot;first difference&quot;, may want to consider clipping first and last sample from</span>
+<span class="sd">    the differentiated time series.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    decimation_obj : mt_metadata.transfer_functions.processing.aurora.DecimationLevel</span>
+<span class="sd">        Information about how the decimation level is to be processed</span>
+<span class="sd">    run_xrds_input : xarray.core.dataset.Dataset</span>
+<span class="sd">        Time series to be pre-whitened</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    run_xrds : xarray.core.dataset.Dataset</span>
+<span class="sd">        pre-whitened time series</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">decimation_obj</span><span class="o">.</span><span class="n">prewhitening_type</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">run_xrds_input</span>
+
+    <span class="k">if</span> <span class="n">decimation_obj</span><span class="o">.</span><span class="n">prewhitening_type</span> <span class="o">==</span> <span class="s2">&quot;first difference&quot;</span><span class="p">:</span>
+        <span class="n">run_xrds</span> <span class="o">=</span> <span class="n">run_xrds_input</span><span class="o">.</span><span class="n">differentiate</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">decimation_obj</span><span class="o">.</span><span class="n">prewhitening_type</span><span class="si">}</span><span class="s2"> pre-whitening not implemented&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">run_xrds</span></div>
+
+
+<div class="viewcode-block" id="apply_recoloring"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.time_series_helpers.apply_recoloring">[docs]</a><span class="k">def</span> <span class="nf">apply_recoloring</span><span class="p">(</span><span class="n">decimation_obj</span><span class="p">,</span> <span class="n">stft_obj</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Inverts the pre-whitening operation in frequency domain.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    decimation_obj : mt_metadata.transfer_functions.processing.fourier_coefficients.decimation.Decimation</span>
+<span class="sd">        Information about how the decimation level is to be processed</span>
+<span class="sd">    stft_obj : xarray.core.dataset.Dataset</span>
+<span class="sd">        Time series of Fourier coefficients to be recoloured</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    stft_obj : xarray.core.dataset.Dataset</span>
+<span class="sd">        Recolored time series of Fourier coefficients</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># No recoloring needed if prewhitening not appiled, or recoloring set to False</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">decimation_obj</span><span class="o">.</span><span class="n">prewhitening_type</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">stft_obj</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">decimation_obj</span><span class="o">.</span><span class="n">recoloring</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">stft_obj</span>
+
+    <span class="k">if</span> <span class="n">decimation_obj</span><span class="o">.</span><span class="n">prewhitening_type</span> <span class="o">==</span> <span class="s2">&quot;first difference&quot;</span><span class="p">:</span>
+        <span class="n">freqs</span> <span class="o">=</span> <span class="n">decimation_obj</span><span class="o">.</span><span class="n">fft_frequencies</span>
+        <span class="n">prewhitening_correction</span> <span class="o">=</span> <span class="mf">1.0</span><span class="n">j</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">freqs</span>  <span class="c1"># jw</span>
+
+        <span class="n">stft_obj</span> <span class="o">/=</span> <span class="n">prewhitening_correction</span>
+
+        <span class="c1"># suppress nan and inf to mute later warnings</span>
+        <span class="k">if</span> <span class="n">prewhitening_correction</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">cond</span> <span class="o">=</span> <span class="n">stft_obj</span><span class="o">.</span><span class="n">frequency</span> <span class="o">!=</span> <span class="mf">0.0</span>
+            <span class="n">stft_obj</span> <span class="o">=</span> <span class="n">stft_obj</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="nb">complex</span><span class="p">(</span><span class="mf">0.0</span><span class="p">))</span>
+    <span class="c1"># elif decimation_obj.prewhitening_type == &quot;ARMA&quot;:</span>
+    <span class="c1">#     from statsmodels.tsa.arima.model import ARIMA</span>
+    <span class="c1">#     AR = 3 # add this to processing config</span>
+    <span class="c1">#     MA = 4 # add this to processing config</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">decimation_obj</span><span class="o">.</span><span class="n">prewhitening_type</span><span class="si">}</span><span class="s2"> recoloring not yet implemented&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">stft_obj</span></div>
+
+
+<div class="viewcode-block" id="run_ts_to_stft_scipy"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.time_series_helpers.run_ts_to_stft_scipy">[docs]</a><span class="k">def</span> <span class="nf">run_ts_to_stft_scipy</span><span class="p">(</span><span class="n">decimation_obj</span><span class="p">,</span> <span class="n">run_xrds_orig</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts a runts object into a time series of Fourier coefficients.</span>
+<span class="sd">    This method uses scipy.signal.spectrogram.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    decimation_obj : mt_metadata.transfer_functions.processing.aurora.DecimationLevel</span>
+<span class="sd">        Information about how the decimation level is to be processed</span>
+<span class="sd">    run_xrds_orig : : xarray.core.dataset.Dataset</span>
+<span class="sd">        Time series to be processed</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    stft_obj : xarray.core.dataset.Dataset</span>
+<span class="sd">        Time series of Fourier coefficients</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">run_xrds</span> <span class="o">=</span> <span class="n">apply_prewhitening</span><span class="p">(</span><span class="n">decimation_obj</span><span class="p">,</span> <span class="n">run_xrds_orig</span><span class="p">)</span>
+    <span class="n">windowing_scheme</span> <span class="o">=</span> <span class="n">window_scheme_from_decimation</span><span class="p">(</span><span class="n">decimation_obj</span><span class="p">)</span>
+
+    <span class="n">stft_obj</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">channel_id</span> <span class="ow">in</span> <span class="n">run_xrds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
+        <span class="n">ff</span><span class="p">,</span> <span class="n">tt</span><span class="p">,</span> <span class="n">specgm</span> <span class="o">=</span> <span class="n">ssig</span><span class="o">.</span><span class="n">spectrogram</span><span class="p">(</span>
+            <span class="n">run_xrds</span><span class="p">[</span><span class="n">channel_id</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">fs</span><span class="o">=</span><span class="n">decimation_obj</span><span class="o">.</span><span class="n">sample_rate_decimation</span><span class="p">,</span>
+            <span class="n">window</span><span class="o">=</span><span class="n">windowing_scheme</span><span class="o">.</span><span class="n">taper</span><span class="p">,</span>
+            <span class="n">nperseg</span><span class="o">=</span><span class="n">decimation_obj</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">num_samples</span><span class="p">,</span>
+            <span class="n">noverlap</span><span class="o">=</span><span class="n">decimation_obj</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">overlap</span><span class="p">,</span>
+            <span class="n">detrend</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span>
+            <span class="n">scaling</span><span class="o">=</span><span class="s2">&quot;density&quot;</span><span class="p">,</span>
+            <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;complex&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># drop Nyquist&gt;</span>
+        <span class="n">ff</span> <span class="o">=</span> <span class="n">ff</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">specgm</span> <span class="o">=</span> <span class="n">specgm</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">specgm</span> <span class="o">*=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># make time_axis</span>
+        <span class="n">tt</span> <span class="o">=</span> <span class="n">tt</span> <span class="o">-</span> <span class="n">tt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">tt</span> <span class="o">*=</span> <span class="n">decimation_obj</span><span class="o">.</span><span class="n">sample_rate_decimation</span>
+        <span class="n">time_axis</span> <span class="o">=</span> <span class="n">run_xrds</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">tt</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span>
+
+        <span class="n">xrd</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">specgm</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+            <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;frequency&quot;</span><span class="p">],</span>
+            <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;frequency&quot;</span><span class="p">:</span> <span class="n">ff</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">time_axis</span><span class="p">},</span>
+        <span class="p">)</span>
+        <span class="n">stft_obj</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">channel_id</span><span class="p">:</span> <span class="n">xrd</span><span class="p">})</span>
+
+    <span class="n">stft_obj</span> <span class="o">=</span> <span class="n">apply_recoloring</span><span class="p">(</span><span class="n">decimation_obj</span><span class="p">,</span> <span class="n">stft_obj</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">stft_obj</span></div>
+
+
+<div class="viewcode-block" id="truncate_to_clock_zero"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.time_series_helpers.truncate_to_clock_zero">[docs]</a><span class="k">def</span> <span class="nf">truncate_to_clock_zero</span><span class="p">(</span><span class="n">decimation_obj</span><span class="p">,</span> <span class="n">run_xrds</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the time interval between the first data sample and the clock zero</span>
+<span class="sd">    Identify the first sample in the xarray time series that corresponds to a</span>
+<span class="sd">    window start sample.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    decimation_obj: mt_metadata.transfer_functions.processing.aurora.DecimationLevel</span>
+<span class="sd">        Information about how the decimation level is to be processed</span>
+<span class="sd">    run_xrds : xarray.core.dataset.Dataset</span>
+<span class="sd">        normally extracted from mth5.RunTS</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    run_xrds : xarray.core.dataset.Dataset</span>
+<span class="sd">        same as the input time series, but possibly slightly shortened</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">decimation_obj</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">clock_zero_type</span> <span class="o">==</span> <span class="s2">&quot;ignore&quot;</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">clock_zero</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">decimation_obj</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">clock_zero</span><span class="p">)</span>
+        <span class="n">clock_zero</span> <span class="o">=</span> <span class="n">clock_zero</span><span class="o">.</span><span class="n">to_datetime64</span><span class="p">()</span>
+        <span class="n">delta_t</span> <span class="o">=</span> <span class="n">clock_zero</span> <span class="o">-</span> <span class="n">run_xrds</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">delta_t</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s2">&quot;&lt;m8[ns]&quot;</span>  <span class="c1"># expected in nanoseconds</span>
+        <span class="n">delta_t_seconds</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">delta_t</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1e9</span>
+        <span class="k">if</span> <span class="n">delta_t_seconds</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">pass</span>  <span class="c1"># time series start is already clock zero</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">windowing_scheme</span> <span class="o">=</span> <span class="n">window_scheme_from_decimation</span><span class="p">(</span><span class="n">decimation_obj</span><span class="p">)</span>
+            <span class="n">number_of_steps</span> <span class="o">=</span> <span class="n">delta_t_seconds</span> <span class="o">/</span> <span class="n">windowing_scheme</span><span class="o">.</span><span class="n">duration_advance</span>
+            <span class="n">n_partial_steps</span> <span class="o">=</span> <span class="n">number_of_steps</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">number_of_steps</span><span class="p">)</span>
+            <span class="n">n_clip</span> <span class="o">=</span> <span class="n">n_partial_steps</span> <span class="o">*</span> <span class="n">windowing_scheme</span><span class="o">.</span><span class="n">num_samples_advance</span>
+            <span class="n">n_clip</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">n_clip</span><span class="p">))</span>
+            <span class="n">t_clip</span> <span class="o">=</span> <span class="n">run_xrds</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">n_clip</span><span class="p">]</span>
+            <span class="n">cond1</span> <span class="o">=</span> <span class="n">run_xrds</span><span class="o">.</span><span class="n">time</span> <span class="o">&gt;=</span> <span class="n">t_clip</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;dropping </span><span class="si">{</span><span class="n">n_clip</span><span class="si">}</span><span class="s2"> samples to agree with &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">decimation_obj</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">clock_zero_type</span><span class="si">}</span><span class="s2"> clock zero </span><span class="si">{</span><span class="n">clock_zero</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">run_xrds</span> <span class="o">=</span> <span class="n">run_xrds</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cond1</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">run_xrds</span></div>
+
+
+<div class="viewcode-block" id="nan_to_mean"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.time_series_helpers.nan_to_mean">[docs]</a><span class="k">def</span> <span class="nf">nan_to_mean</span><span class="p">(</span><span class="n">xrds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set Nan values in xr.Dataset to the mean value per channel.</span>
+
+<span class="sd">    xrds: xr.Dataset</span>
+<span class="sd">        Time series data</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    run_xrds : xr.Dataset</span>
+<span class="sd">        The same as the input time series but NaN values are replaced by the mean of the time series (per channel).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">xrds</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">null_values_present</span> <span class="o">=</span> <span class="n">xrds</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">null_values_present</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Unexpected Null values in xrds -- this should be examined&quot;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">xrds</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+            <span class="n">xrds</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span> <span class="o">=</span> <span class="n">xrds</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">xrds</span></div>
+
+
+<div class="viewcode-block" id="run_ts_to_stft"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.time_series_helpers.run_ts_to_stft">[docs]</a><span class="k">def</span> <span class="nf">run_ts_to_stft</span><span class="p">(</span><span class="n">decimation_obj</span><span class="p">,</span> <span class="n">run_xrds_orig</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts a runts object into a time series of Fourier coefficients.</span>
+<span class="sd">    Similar to run_ts_to_stft_scipy, but in this implementation operations on individual</span>
+<span class="sd">    windows are possible (for example pre-whitening per time window via ARMA filtering).</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    decimation_obj : mt_metadata.transfer_functions.processing.aurora.DecimationLevel</span>
+<span class="sd">        Information about how the decimation level is to be processed</span>
+<span class="sd">    run_ts : xarray.core.dataset.Dataset</span>
+<span class="sd">        normally extracted from mth5.RunTS</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    stft_obj: xarray.core.dataset.Dataset</span>
+<span class="sd">        Note that the STFT object may have inf/nan in the DC harmonic, introduced by</span>
+<span class="sd">        recoloring. This really doesn&#39;t matter since we don&#39;t use the DC harmonic for</span>
+<span class="sd">        anything.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># need to remove any nans before windowing, or else if there is a single</span>
+    <span class="c1"># nan then the whole channel becomes nan.</span>
+    <span class="n">run_xrds</span> <span class="o">=</span> <span class="n">nan_to_mean</span><span class="p">(</span><span class="n">run_xrds_orig</span><span class="p">)</span>
+    <span class="n">run_xrds</span> <span class="o">=</span> <span class="n">apply_prewhitening</span><span class="p">(</span><span class="n">decimation_obj</span><span class="p">,</span> <span class="n">run_xrds</span><span class="p">)</span>
+    <span class="n">run_xrds</span> <span class="o">=</span> <span class="n">truncate_to_clock_zero</span><span class="p">(</span><span class="n">decimation_obj</span><span class="p">,</span> <span class="n">run_xrds</span><span class="p">)</span>
+    <span class="n">windowing_scheme</span> <span class="o">=</span> <span class="n">window_scheme_from_decimation</span><span class="p">(</span><span class="n">decimation_obj</span><span class="p">)</span>
+    <span class="n">windowed_obj</span> <span class="o">=</span> <span class="n">windowing_scheme</span><span class="o">.</span><span class="n">apply_sliding_window</span><span class="p">(</span>
+        <span class="n">run_xrds</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">decimation_obj</span><span class="o">.</span><span class="n">sample_rate_decimation</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">windowed_obj</span><span class="o">.</span><span class="n">to_array</span><span class="p">()</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span>
+
+    <span class="n">windowed_obj</span> <span class="o">=</span> <span class="n">WindowedTimeSeries</span><span class="o">.</span><span class="n">detrend</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">windowed_obj</span><span class="p">,</span> <span class="n">detrend_type</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">)</span>
+    <span class="n">tapered_obj</span> <span class="o">=</span> <span class="n">WindowedTimeSeries</span><span class="o">.</span><span class="n">apply_taper</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">windowed_obj</span><span class="p">,</span> <span class="n">taper</span><span class="o">=</span><span class="n">windowing_scheme</span><span class="o">.</span><span class="n">taper</span>
+    <span class="p">)</span>
+    <span class="n">stft_obj</span> <span class="o">=</span> <span class="n">WindowedTimeSeries</span><span class="o">.</span><span class="n">apply_fft</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">tapered_obj</span><span class="p">,</span>
+        <span class="n">sample_rate</span><span class="o">=</span><span class="n">windowing_scheme</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span>
+        <span class="n">spectral_density_correction</span><span class="o">=</span><span class="n">windowing_scheme</span><span class="o">.</span><span class="n">linear_spectral_density_calibration_factor</span><span class="p">,</span>
+        <span class="n">detrend_type</span><span class="o">=</span><span class="n">decimation_obj</span><span class="o">.</span><span class="n">extra_pre_fft_detrend_type</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">stft_obj</span> <span class="o">=</span> <span class="n">apply_recoloring</span><span class="p">(</span><span class="n">decimation_obj</span><span class="p">,</span> <span class="n">stft_obj</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">stft_obj</span></div>
+
+
+<div class="viewcode-block" id="calibrate_stft_obj"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.time_series_helpers.calibrate_stft_obj">[docs]</a><span class="k">def</span> <span class="nf">calibrate_stft_obj</span><span class="p">(</span><span class="n">stft_obj</span><span class="p">,</span> <span class="n">run_obj</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;MT&quot;</span><span class="p">,</span> <span class="n">channel_scale_factors</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calibrates frequency domain data into MT units.</span>
+
+<span class="sd">    Development Notes:</span>
+<span class="sd">     The calibration often raises a runtime warning due to DC term in calibration response = 0.</span>
+<span class="sd">     TODO: It would be nice to suppress this, maybe by only calibrating the non-dc terms and directly assigning np.nan to the dc component when DC-response is zero.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    stft_obj : xarray.core.dataset.Dataset</span>
+<span class="sd">        Time series of Fourier coefficients to be calibrated</span>
+<span class="sd">    run_obj : mth5.groups.master_station_run_channel.RunGroup</span>
+<span class="sd">        Provides information about filters for calibration</span>
+<span class="sd">    units : string</span>
+<span class="sd">        usually &quot;MT&quot;, contemplating supporting &quot;SI&quot;</span>
+<span class="sd">    scale_factors : dict or None</span>
+<span class="sd">        keyed by channel, supports a single scalar to apply to that channels data</span>
+<span class="sd">        Useful for debugging.  Should not be used in production and should throw a</span>
+<span class="sd">        warning if it is not None</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    stft_obj : xarray.core.dataset.Dataset</span>
+<span class="sd">        Time series of calibrated Fourier coefficients</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">channel_id</span> <span class="ow">in</span> <span class="n">stft_obj</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+
+        <span class="n">channel</span> <span class="o">=</span> <span class="n">run_obj</span><span class="o">.</span><span class="n">get_channel</span><span class="p">(</span><span class="n">channel_id</span><span class="p">)</span>
+        <span class="n">channel_response</span> <span class="o">=</span> <span class="n">channel</span><span class="o">.</span><span class="n">channel_response</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">channel_response</span><span class="o">.</span><span class="n">filters_list</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Channel </span><span class="si">{</span><span class="n">channel_id</span><span class="si">}</span><span class="s2"> with empty filters list detected&quot;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">channel_id</span> <span class="o">==</span> <span class="s2">&quot;hy&quot;</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Channel hy has no filters, try using filters from hx&quot;</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Channel HY has no filters, try using filters from HX&quot;</span><span class="p">)</span>
+                <span class="n">channel_response</span> <span class="o">=</span> <span class="n">run_obj</span><span class="o">.</span><span class="n">get_channel</span><span class="p">(</span><span class="s2">&quot;hx&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">channel_response</span>
+
+        <span class="n">indices_to_flip</span> <span class="o">=</span> <span class="n">channel_response</span><span class="o">.</span><span class="n">get_indices_of_filters_to_remove</span><span class="p">(</span>
+            <span class="n">include_decimation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">include_delay</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
+        <span class="n">indices_to_flip</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices_to_flip</span> <span class="k">if</span> <span class="n">channel</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">applied</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="p">]</span>
+        <span class="n">filters_to_remove</span> <span class="o">=</span> <span class="p">[</span><span class="n">channel_response</span><span class="o">.</span><span class="n">filters_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices_to_flip</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">filters_to_remove</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No filters to remove&quot;</span><span class="p">)</span>
+        <span class="n">calibration_response</span> <span class="o">=</span> <span class="n">channel_response</span><span class="o">.</span><span class="n">complex_response</span><span class="p">(</span>
+            <span class="n">stft_obj</span><span class="o">.</span><span class="n">frequency</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">filters_list</span><span class="o">=</span><span class="n">filters_to_remove</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">channel_scale_factors</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">channel_scale_factor</span> <span class="o">=</span> <span class="n">channel_scale_factors</span><span class="p">[</span><span class="n">channel_id</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">channel_scale_factor</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="n">calibration_response</span> <span class="o">/=</span> <span class="n">channel_scale_factor</span>
+        <span class="k">if</span> <span class="n">units</span> <span class="o">==</span> <span class="s2">&quot;SI&quot;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Warning: SI Units are not robustly supported issue #36&quot;</span><span class="p">)</span>
+        <span class="c1"># TODO: This often raises a runtime warning due to DC term in calibration response=0</span>
+        <span class="n">stft_obj</span><span class="p">[</span><span class="n">channel_id</span><span class="p">]</span><span class="o">.</span><span class="n">data</span> <span class="o">/=</span> <span class="n">calibration_response</span>
+    <span class="k">return</span> <span class="n">stft_obj</span></div>
+
+
+<div class="viewcode-block" id="prototype_decimate"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.time_series_helpers.prototype_decimate">[docs]</a><span class="k">def</span> <span class="nf">prototype_decimate</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">mt_metadata</span><span class="o">.</span><span class="n">transfer_functions</span><span class="o">.</span><span class="n">processing</span><span class="o">.</span><span class="n">aurora</span><span class="o">.</span><span class="n">decimation</span><span class="o">.</span><span class="n">Decimation</span><span class="p">,</span>
+    <span class="n">run_xrds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Basically a wrapper for scipy.signal.decimate.  Takes input timeseries (as xarray</span>
+<span class="sd">     Dataset) and a Decimation config object and returns a decimated version of the</span>
+<span class="sd">     input time series.</span>
+
+<span class="sd">    TODO: Consider moving this function into time_series/decimate.py</span>
+<span class="sd">    TODO: Consider Replacing the downsampled_time_axis with rolling mean, or somthing that takes the average value of the time, not the window start</span>
+<span class="sd">    TODO: Compare outputs with scipy resample_poly, which also has an FIR AAF and appears faster</span>
+<span class="sd">    TODO: Add handling for case that could occur when sliced time axis has a different length than the decimated data -- see mth5 issue #217 https://github.com/kujaku11/mth5/issues/217</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config : mt_metadata.transfer_functions.processing.aurora.Decimation</span>
+<span class="sd">    run_xrds: xr.Dataset</span>
+<span class="sd">        Originally from mth5.timeseries.run_ts.RunTS.dataset, but possibly decimated</span>
+<span class="sd">        multiple times</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    xr_ds: xr.Dataset</span>
+<span class="sd">        Decimated version of the input run_xrds</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># downsample the time axis</span>
+    <span class="n">slicer</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">factor</span><span class="p">))</span>  <span class="c1"># decimation.factor</span>
+    <span class="n">downsampled_time_axis</span> <span class="o">=</span> <span class="n">run_xrds</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">slicer</span><span class="p">]</span>
+
+    <span class="c1"># decimate the time series</span>
+    <span class="n">num_observations</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">downsampled_time_axis</span><span class="p">)</span>
+    <span class="n">channel_labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">run_xrds</span><span class="o">.</span><span class="n">data_vars</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>  <span class="c1"># run_ts.channels</span>
+    <span class="n">num_channels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">channel_labels</span><span class="p">)</span>
+    <span class="n">new_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">num_observations</span><span class="p">,</span> <span class="n">num_channels</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i_ch</span><span class="p">,</span> <span class="n">ch_label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">channel_labels</span><span class="p">):</span>
+        <span class="n">new_data</span><span class="p">[:,</span> <span class="n">i_ch</span><span class="p">]</span> <span class="o">=</span> <span class="n">ssig</span><span class="o">.</span><span class="n">decimate</span><span class="p">(</span><span class="n">run_xrds</span><span class="p">[</span><span class="n">ch_label</span><span class="p">],</span> <span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">factor</span><span class="p">))</span>
+
+    <span class="n">xr_da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+        <span class="n">new_data</span><span class="p">,</span>
+        <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;channel&quot;</span><span class="p">],</span>
+        <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">downsampled_time_axis</span><span class="p">,</span> <span class="s2">&quot;channel&quot;</span><span class="p">:</span> <span class="n">channel_labels</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">attr_dict</span> <span class="o">=</span> <span class="n">run_xrds</span><span class="o">.</span><span class="n">attrs</span>
+    <span class="n">attr_dict</span><span class="p">[</span><span class="s2">&quot;sample_rate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">sample_rate</span>
+    <span class="n">xr_da</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">attr_dict</span>
+    <span class="n">xr_ds</span> <span class="o">=</span> <span class="n">xr_da</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">(</span><span class="s2">&quot;channel&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">xr_ds</span></div>
+
+
+<span class="c1"># Here are some other ways to downsample/decimate that were experimented with.</span>
+<span class="c1"># TODO: Jupyter notebook tutorial showing how these differ (cf standard method).</span>
+<span class="c1"># def prototype_decimate_2(config, run_xrds):</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     Uses the built-in xarray coarsen method.   Not clear what AAF effects are.</span>
+<span class="c1">#     Method is fast.  Might be non-linear.  Seems to give similar performance to</span>
+<span class="c1">#     prototype_decimate for synthetic data.</span>
+<span class="c1">#</span>
+<span class="c1">#     N.B. config.factor must be integer valued</span>
+<span class="c1">#</span>
+<span class="c1">#     Parameters</span>
+<span class="c1">#     ----------</span>
+<span class="c1">#     config : mt_metadata.transfer_functions.processing.aurora.Decimation</span>
+<span class="c1">#     run_xrds: xr.Dataset</span>
+<span class="c1">#         Originally from mth5.timeseries.run_ts.RunTS.dataset, but possibly decimated</span>
+<span class="c1">#         multiple times</span>
+<span class="c1">#</span>
+<span class="c1">#     Returns</span>
+<span class="c1">#     -------</span>
+<span class="c1">#     xr_ds: xr.Dataset</span>
+<span class="c1">#         Decimated version of the input run_xrds</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     new_xr_ds = run_xrds.coarsen(time=int(config.factor), boundary=&quot;trim&quot;).mean()</span>
+<span class="c1">#     attr_dict = run_xrds.attrs</span>
+<span class="c1">#     attr_dict[&quot;sample_rate&quot;] = config.sample_rate</span>
+<span class="c1">#     new_xr_ds.attrs = attr_dict</span>
+<span class="c1">#     return new_xr_ds</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># def prototype_decimate_3(config, run_xrds):</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     Uses scipy&#39;s resample method.   Not clear what AAF effects are.</span>
+<span class="c1">#     Method is fast.</span>
+<span class="c1">#</span>
+<span class="c1">#     Parameters</span>
+<span class="c1">#     ----------</span>
+<span class="c1">#     config : mt_metadata.transfer_functions.processing.aurora.Decimation</span>
+<span class="c1">#     run_xrds: xr.Dataset</span>
+<span class="c1">#         Originally from mth5.timeseries.run_ts.RunTS.dataset, but possibly decimated</span>
+<span class="c1">#         multiple times</span>
+<span class="c1">#</span>
+<span class="c1">#     Returns</span>
+<span class="c1">#     -------</span>
+<span class="c1">#     xr_ds: xr.Dataset</span>
+<span class="c1">#         Decimated version of the input run_xrds</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     dt = run_xrds.time.diff(dim=&quot;time&quot;).median().values</span>
+<span class="c1">#     dt_new = config.factor * dt</span>
+<span class="c1">#     dt_new = dt_new.__str__().replace(&quot;nanoseconds&quot;, &quot;ns&quot;)</span>
+<span class="c1">#     new_xr_ds = run_xrds.resample(time=dt_new).mean(dim=&quot;time&quot;)</span>
+<span class="c1">#     attr_dict = run_xrds.attrs</span>
+<span class="c1">#     attr_dict[&quot;sample_rate&quot;] = config.sample_rate</span>
+<span class="c1">#     new_xr_ds.attrs = attr_dict</span>
+<span class="c1">#     return new_xr_ds</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
