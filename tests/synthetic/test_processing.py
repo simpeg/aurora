@@ -5,16 +5,15 @@ import unittest
 from aurora.pipelines.process_mth5 import process_mth5
 
 from aurora.test_utils.synthetic.make_processing_configs import (
-    create_test_run_config,
+    make_processing_config_and_kernel_dataset,
 )
+
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 from mth5.data.make_mth5_from_asc import create_test1_h5
 from mth5.data.make_mth5_from_asc import create_test2_h5
 from mth5.data.make_mth5_from_asc import create_test12rr_h5
 from mth5.helpers import close_open_files
 
-# from mtpy-v2
-from mtpy.processing import RunSummary, KernelDataset
 from typing import Optional, Union
 
 synthetic_test_paths = SyntheticTestPaths()
@@ -185,7 +184,7 @@ def process_synthetic_1(
         mth5_path,
     ]
     station_id = "test1"
-    tfk_dataset, processing_config = _make_processing_config_and_kernel_dataset(
+    tfk_dataset, processing_config = make_processing_config_and_kernel_dataset(
         config_keyword=station_id,
         station_id=station_id,
         remote_id=None,  # TODO: allow empty str instead of None
@@ -257,7 +256,7 @@ def process_synthetic_2(
         mth5_path,
     ]
 
-    tfk_dataset, processing_config = _make_processing_config_and_kernel_dataset(
+    tfk_dataset, processing_config = make_processing_config_and_kernel_dataset(
         config_keyword=station_id,
         station_id=station_id,
         remote_id=None,
@@ -289,7 +288,7 @@ def process_synthetic_1r2(
         mth5_path,
     ]
 
-    tfk_dataset, processing_config = _make_processing_config_and_kernel_dataset(
+    tfk_dataset, processing_config = make_processing_config_and_kernel_dataset(
         config_keyword,
         station_id="test1",
         remote_id="test2",
@@ -303,50 +302,6 @@ def process_synthetic_1r2(
         return_collection=return_collection,
     )
     return tfc
-
-
-def _make_processing_config_and_kernel_dataset(
-    config_keyword: str,
-    station_id: str,
-    remote_id: Optional[
-        Union[str, None]
-    ] = None,  # TODO: allow empty str instead of None
-    mth5s: Optional[Union[list, tuple, None]] = None,
-    channel_nomenclature: Optional[str] = "default",
-):
-    """
-    Gets the processing config and the tfk_dataset
-
-    TODO: Move this to aurora/test_utils/synthetic/
-     - this can then be used by test_fourier_coefficients to validate that the FCs are there before processing
-
-    Parameters
-    ----------
-    station_id
-    remote_id
-    mth5s
-    channel_nomenclature
-
-    Returns
-    -------
-
-    """
-    run_summary = RunSummary()
-    run_summary.from_mth5s(mth5s)
-
-    # next two lines purely for codecov
-    run_summary.print_mini_summary
-    run_summary_clone = run_summary.clone()
-
-    # run_summary.drop_runs_shorter_than(100000)
-    tfk_dataset = KernelDataset()
-    tfk_dataset.from_run_summary(
-        run_summary_clone, local_station_id=station_id, remote_station_id=remote_id
-    )
-    processing_config = create_test_run_config(
-        config_keyword, tfk_dataset, channel_nomenclature=channel_nomenclature
-    )
-    return tfk_dataset, processing_config
 
 
 def main():
