@@ -267,9 +267,8 @@ def process_synthetic_2(
     for decimation_level in processing_config.decimations:
         if save_fc:
             decimation_level.save_fcs = True
-            decimation_level.save_fcs_type = "h5"
-        decimation_level.window.type = "boxcar"
-        # decimation_level.save_fcs_type = "csv"
+            decimation_level.save_fcs_type = "h5"  # h5 instead of "csv"
+
     tfc = process_mth5(
         processing_config,
         tfk_dataset=tfk_dataset,

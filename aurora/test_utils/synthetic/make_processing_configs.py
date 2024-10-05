@@ -15,6 +15,14 @@ from typing import Optional, Union
 synthetic_test_paths = SyntheticTestPaths()
 CONFIG_PATH = synthetic_test_paths.config_path
 MTH5_PATH = synthetic_test_paths.mth5_path
+SUPPORTED_TEST_CASE_IDS = [
+    "test1",
+    "test2",
+    "test1r2",
+    "test2r1",
+    "test1_tfk",
+    "test1r2_tfk",
+]
 
 
 def create_test_run_config(
@@ -30,7 +38,7 @@ def create_test_run_config(
     Parameters
     ----------
     test_case_id: string
-        Must be in ["test1", "test2", "test1r2", "test2r1", "test1_tfk", "test1r2_tfk"]
+        Must be in SUPPORTED_TEST_CASE_IDS
     kernel_dataset: aurora.transfer_function.kernel_dataset.KernelDataset
         Description of the dataset to process
     matlab_or_fortran: str
@@ -126,6 +134,8 @@ def create_test_run_config(
         decimation.window.num_samples = num_samples_window
         decimation.window.overlap = num_samples_overlap
         decimation.regression.max_redescending_iterations = 2
+        if test_case_id == "test2":
+            decimation.window.type = "boxcar"
 
     if save == "json":
         filename = CONFIG_PATH.joinpath(p.json_fn())
@@ -149,10 +159,13 @@ def make_processing_config_and_kernel_dataset(
 
     Parameters
     ----------
-    station_id
-    remote_id
-    mth5s
-    channel_nomenclature
+    config_keyword: str
+        Must be in SUPPORTED_TEST_CASE_IDS
+    station_id: str
+        The name of the station to proces
+    remote_id: str
+    mth5s: Union[list, tuple]
+    channel_nomenclature: Optional[str]
 
     Returns
     -------
