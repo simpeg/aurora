@@ -28,9 +28,7 @@ class TestMetadataValuesSetCorrect(unittest.TestCase):
 
     def make_mth5(self):
         close_open_files()
-        mth5_path = create_test3_h5(
-            force_make_mth5=self.remake_mth5_for_each_test
-        )
+        mth5_path = create_test3_h5(force_make_mth5=self.remake_mth5_for_each_test)
         return mth5_path
 
     def make_run_summary(self):
@@ -51,8 +49,8 @@ class TestMetadataValuesSetCorrect(unittest.TestCase):
                 run_summary.df.run == run.run_metadata.id
             ].iloc[0]
             logger.info(summary_row.start)
-            logger.info(run.start)
-            assert summary_row.start == pd.Timestamp(run.start)
+            logger.info(run.run_metadata.time_period.start)
+            assert summary_row.start == pd.Timestamp(run.run_metadata.time_period.start)
 
     def tearDown(self):
         close_open_files()

@@ -8,10 +8,21 @@ from aurora.config import BANDS_256_26_FILE
 from aurora.config.config_creator import ConfigCreator
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 from loguru import logger
+from mtpy.processing import RunSummary, KernelDataset  # from mtpy-v2
+from typing import Optional, Union
+
 
 synthetic_test_paths = SyntheticTestPaths()
 CONFIG_PATH = synthetic_test_paths.config_path
 MTH5_PATH = synthetic_test_paths.mth5_path
+SUPPORTED_TEST_CASE_IDS = [
+    "test1",
+    "test2",
+    "test1r2",
+    "test2r1",
+    "test1_tfk",
+    "test1r2_tfk",
+]
 
 
 def create_test_run_config(
@@ -27,7 +38,7 @@ def create_test_run_config(
     Parameters
     ----------
     test_case_id: string
-        Must be in ["test1", "test2", "test1r2", "test2r1", "test1_tfk", "test1r2_tfk"]
+        Must be in SUPPORTED_TEST_CASE_IDS
     kernel_dataset: aurora.transfer_function.kernel_dataset.KernelDataset
         Description of the dataset to process
     matlab_or_fortran: str
@@ -123,12 +134,59 @@ def create_test_run_config(
         decimation.window.num_samples = num_samples_window
         decimation.window.overlap = num_samples_overlap
         decimation.regression.max_redescending_iterations = 2
+        if test_case_id == "test2":
+            decimation.window.type = "boxcar"
 
     if save == "json":
         filename = CONFIG_PATH.joinpath(p.json_fn())
         p.save_as_json(filename=filename)
 
     return p
+
+
+def make_processing_config_and_kernel_dataset(
+    config_keyword: str,
+    station_id: str,
+    remote_id: Optional[str] = None,  # TODO: allow empty str instead of None
+    mth5s: Optional[Union[list, tuple]] = None,
+    channel_nomenclature: Optional[str] = "default",
+):
+    """
+    Gets the processing config and the tfk_dataset
+
+    TODO: Move this to aurora/test_utils/synthetic/
+     - this can then be used by test_fourier_coefficients to validate that the FCs are there before processing
+
+    Parameters
+    ----------
+    config_keyword: str
+        Must be in SUPPORTED_TEST_CASE_IDS
+    station_id: str
+        The name of the station to proces
+    remote_id: str
+    mth5s: Union[list, tuple]
+    channel_nomenclature: Optional[str]
+
+    Returns
+    -------
+
+    """
+    run_summary = RunSummary()
+    run_summary.from_mth5s(mth5s)
+
+    # next two lines purely for codecov
+    run_summary.print_mini_summary
+    run_summary_clone = run_summary.clone()
+
+    # run_summary.drop_runs_shorter_than(100000)
+    tfk_dataset = KernelDataset()
+    tfk_dataset.from_run_summary(
+        run_summary_clone, local_station_id=station_id, remote_station_id=remote_id
+    )
+    processing_config = create_test_run_config(
+        config_keyword, tfk_dataset, channel_nomenclature=channel_nomenclature
+    )
+    return tfk_dataset, processing_config
 
 
 def test_to_from_json():
@@ -173,9 +231,7 @@ def test_to_from_json():
     station_id = "test1"
     tfk_dataset.from_run_summary(run_summary, station_id)
 
-    processing_config = create_test_run_config(
-        station_id, tfk_dataset, save="json"
-    )
+    processing_config = create_test_run_config(station_id, tfk_dataset, save="json")
     p = Processing()
     json_fn = CONFIG_PATH.joinpath(processing_config.json_fn())
     p.from_json(json_fn)
