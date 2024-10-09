@@ -11,18 +11,17 @@ ToDo: consider adding zss and zmm checks
         # tf_cls.write(fn=zss_file_base, file_type="zss")
 """
 
-import logging
 import numpy as np
 import pathlib
 import unittest
 import warnings
 
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test12rr_h5
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 from aurora.test_utils.synthetic.processing_helpers import (
     tf_obj_from_synthetic_data,
 )
 from mt_metadata.transfer_functions.core import TF
+from mth5.data.make_mth5_from_asc import create_test12rr_h5
 
 warnings.filterwarnings("ignore")
 
@@ -43,7 +42,7 @@ class TestZFileReadWrite(unittest.TestCase):
         self.zrr_file_base = pathlib.Path("synthetic_test1.zrr")
 
         if not self.mth5_path.exists():
-            create_test12rr_h5()
+            create_test12rr_h5(target_folder=self.mth5_path.parent)
 
         self._tf_obj = tf_obj_from_synthetic_data(self.mth5_path)
         write_zrr(self._tf_obj, self.zrr_file_base)

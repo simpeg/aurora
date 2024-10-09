@@ -1,4 +1,8 @@
-import numpy as np
+"""
+    This module contains functions that are associated with time series of Fourier coefficients
+
+"""
+# import numpy as np
 from loguru import logger
 
 
@@ -47,11 +51,14 @@ def get_band_for_tf_estimate(band, dec_level_config, local_stft_obj, remote_stft
 
 def extract_band(frequency_band, fft_obj, channels=[], epsilon=1e-7):
     """
-    Stand alone method that operates on an xr.DataArray, and is wrapped with Spectrogram
+    Extracts a frequency band from xr.DataArray representing a spectrogram.
 
+    Stand alone version of the method that is used by WIP Spectrogram class.
 
-    Note #1: 20230902
-    drop=True does not play nice with h5py and Dataset, results in a type error.
+    Development Notes:
+    #1: 20230902
+    TODO: Decide if base dataset object should be a xr.DataArray (not xr.Dataset)
+    - drop=True does not play nice with h5py and Dataset, results in a type error.
     File "stringsource", line 2, in h5py.h5r.Reference.__reduce_cython__
     TypeError: no default __reduce__ due to non-trivial __cinit__
     However, it works OK with DataArray, so maybe use data array in general
@@ -87,34 +94,33 @@ def extract_band(frequency_band, fft_obj, channels=[], epsilon=1e-7):
 
 def check_time_axes_synched(X, Y):
     """
-    Utility function for checking that time axes agree
+    Utility function for checking that time axes agree.
+    Raises ValueError if axes do not agree.
+
+    It is critical that X, Y, RR have the same time axes for aurora processing.
 
     Parameters
     ----------
     X : xarray
     Y : xarray
 
-    Returns
-    -------
-
-    """
-    """
-    It is critical that X, Y, RR have the same time axes here
-
-    Returns
-    -------
 
     """
     if (X.time == Y.time).all():
         pass
     else:
-        logger.warning("WARNING - NAN Handling could fail if X,Y dont share time axes")
-        raise Exception
+        msg = "Time axes of arrays not identical"
+        #  "NAN Handling could fail if X,Y dont share time axes"
+        logger.warning(msg)
+        raise ValueError(msg)
     return
 
 
 def adjust_band_for_coherence_sorting(frequency_band, spectrogram, rule="min3"):
     """
+
+    WIP: Intended to broaden band to allow more FCs for spectral features
+    - used in coherence sorting and general feature extraction
 
     Parameters
     ----------
@@ -250,4 +256,5 @@ def adjust_band_for_coherence_sorting(frequency_band, spectrogram, rule="min3"):
 
 
 def cross_spectra(X, Y):
+    """WIP: Returns the cross power spectra between two arrays"""
     return X.conj() * Y

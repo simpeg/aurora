@@ -2,12 +2,12 @@ import logging
 import unittest
 from aurora.config.config_creator import ConfigCreator
 from aurora.pipelines.process_mth5 import process_mth5
-from aurora.pipelines.run_summary import RunSummary
-from aurora.test_utils.synthetic.make_mth5_from_asc import create_test3_h5
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
-from aurora.transfer_function.kernel_dataset import KernelDataset
+from mth5.data.make_mth5_from_asc import create_test3_h5
 from mth5.helpers import close_open_files
 
+# from mtpy-v2
+from mtpy.processing import RunSummary, KernelDataset
 
 synthetic_test_paths = SyntheticTestPaths()
 synthetic_test_paths.mkdirs()
@@ -50,7 +50,7 @@ class TestMultiRunProcessing(unittest.TestCase):
     def test_each_run_individually(self):
         close_open_files()
         run_summary = self.make_run_summary()
-        for run_id in run_summary.df.run_id.unique():
+        for run_id in run_summary.df.run.unique():
             kernel_dataset = KernelDataset()
             kernel_dataset.from_run_summary(run_summary, "test3")
             station_runs_dict = {}
@@ -133,13 +133,8 @@ class TestMultiRunProcessing(unittest.TestCase):
         tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
 
-def main():
-    # tmp = TestMultiRunProcessing()
-    # tmp.setUp()
-    # tmp.test_works_with_truncated_run()
-    # tmp.test_all_runs()
-    unittest.main()
-
-
+# =============================================================================
+# run
+# =============================================================================
 if __name__ == "__main__":
-    main()
+    unittest.main()

@@ -3,6 +3,9 @@ import unittest
 from aurora.config.config_creator import ConfigCreator
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.test_utils.synthetic.processing_helpers import get_example_kernel_dataset
+from aurora.test_utils.synthetic.paths import SyntheticTestPaths
+
+synthetic_test_paths = SyntheticTestPaths()
 
 
 class TestDefineBandsFromDict(unittest.TestCase):
@@ -29,10 +32,13 @@ class TestDefineBandsFromDict(unittest.TestCase):
             num_samples_window=len(band_edges) * [128],
         )
 
+        cfg1_path = synthetic_test_paths.aurora_results_path.joinpath("cfg1.xml")
+        cfg2_path = synthetic_test_paths.aurora_results_path.joinpath("cfg2.xml")
+
         tf_cls1 = process_mth5(cfg1, kernel_dataset)
-        tf_cls1.write(fn="cfg1.xml", file_type="emtfxml")
+        tf_cls1.write(fn=cfg1_path, file_type="emtfxml")
         tf_cls2 = process_mth5(cfg2, kernel_dataset)
-        tf_cls2.write(fn="cfg2.xml", file_type="emtfxml")
+        tf_cls2.write(fn=cfg2_path, file_type="emtfxml")
         assert tf_cls2 == tf_cls1
 
 

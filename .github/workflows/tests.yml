@@ -22,7 +22,7 @@ jobs:
 #        python-version: ["3.10", ] 
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Setup Miniconda
       uses: conda-incubator/setup-miniconda@v2.1.1
@@ -37,11 +37,14 @@ jobs:
         pip install -r requirements-dev.txt
         pip install git+https://github.com/kujaku11/mt_metadata.git@main
         pip install git+https://github.com/kujaku11/mth5.git@master
+        pip install git+https://github.com/MTgeophysics/mtpy-v2.git@main
+        pip uninstall aurora -y
 
     - name: Install Our Package
       run: |
         pip install -e .
         conda list
+        pip freeze
         
     - name: Install Jupyter and dependencies
       run: |
@@ -53,12 +56,14 @@ jobs:
     - name: Execute Jupyter Notebooks
       run: |
         jupyter nbconvert --to notebook --execute docs/examples/dataset_definition.ipynb
-        jupyter nbconvert --to notebook --execute docs/examples/make_cas04_single_station_h5.ipynb
         jupyter nbconvert --to notebook --execute docs/examples/operate_aurora.ipynb
-        jupyter nbconvert --to notebook --execute tests/test_run_on_commit.ipynb
+        jupyter nbconvert --to notebook --execute docs/tutorials/pkd_units_check.ipynb
         jupyter nbconvert --to notebook --execute docs/tutorials/pole_zero_fitting/lemi_pole_zero_fitting_example.ipynb
         jupyter nbconvert --to notebook --execute docs/tutorials/processing_configuration.ipynb
+        jupyter nbconvert --to notebook --execute docs/tutorials/process_cas04_multiple_station.ipynb
+        jupyter nbconvert --to notebook --execute docs/tutorials/process_cas04_single_station.ipynb
         jupyter nbconvert --to notebook --execute docs/tutorials/synthetic_data_processing.ipynb
+        jupyter nbconvert --to notebook --execute tests/test_run_on_commit.ipynb
         # Replace "notebook.ipynb" with your notebook's filename
 
 #    - name: Commit changes (if any)
@@ -72,13 +77,17 @@ jobs:
 
     - name: Run Tests
       run: |
-        # pytest -s -v tests/synthetic/test_fourier_coefficients.py --cov=./ --cov-report=xml --cov=aurora
+        # pytest -s -v tests/synthetic/test_fourier_coefficients.py
+        # pytest -s -v tests/test_general_helper_functions.py 
         pytest -s -v --cov=./ --cov-report=xml --cov=aurora
 
-    - name: "Upload coverage to Codecov"
-      uses: codecov/codecov-action@v1
+    - name: "Upload coverage reports to Codecov"
+      uses: codecov/codecov-action@v4
       with:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         fail_ci_if_error: false
+        flags: tests
+        # token: ${{ secrets.CODECOV_TOKEN }}
 
     - name: Build Doc
       if: ${{ (github.ref == 'refs/heads/main') && (matrix.python-version == '3.8')}}

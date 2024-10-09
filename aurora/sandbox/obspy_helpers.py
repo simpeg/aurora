@@ -1,14 +1,20 @@
+"""
+    This module contains helper functions for working with obspy objects.
+
+    Development Notes
+    - TODO: Most of this could likely be moved into MTH5
+
+"""
 import datetime
 
 from obspy import UTCDateTime
 from loguru import logger
 
 
-def trim_streams_to_acquisition_run(streams):
+def trim_streams_to_common_timestamps(streams):
     """
-    Rename as? TRIM DATA STREAMS TO COMMON TIME STAMPS
-    TODO: add doc here.  It looks like we are slicing from the earliest starttime to
-    the latest endtime
+    Slices streams to common time stamps.
+
     Parameters
     ----------
     streams
@@ -25,6 +31,8 @@ def trim_streams_to_acquisition_run(streams):
 
 def align_streams(streams, clock_start):
     """
+    Shift stream timestamps so that they are aligned.
+
     This is a hack around to handle data that are asynchronously sampled.
     It should not be used in general.  It is only appropriate for datasets that have
     been tested with it.
@@ -38,7 +46,7 @@ def align_streams(streams, clock_start):
 
     Returns
     -------
-
+    streams
     """
     for stream in streams:
         logger.info(
@@ -73,6 +81,8 @@ FDSN_CHANNEL_MAP["LQN"] = "LQ2"
 
 def make_channel_labels_fdsn_compliant(streams):
     """
+    Renames channels to FDSN compliant channel names.
+
     Workaround because NCEDC channel nomenclature is not FDSN Compliant for PKD, SAO
     Specifically, re-assign non-conventional channel labels
     Q2 --> Q1
@@ -85,6 +95,10 @@ def make_channel_labels_fdsn_compliant(streams):
     ----------
     streams : iterable of types obspy.core.stream.Stream
 
+    Returns
+    -------
+    streams : iterable of types obspy.core.stream.Stream
+        Same as input but updated with new channel names.
     """
     for stream in streams:
         stream.stats["channel"] = FDSN_CHANNEL_MAP[stream.stats["channel"]]
