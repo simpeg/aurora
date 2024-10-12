@@ -160,6 +160,8 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
         )
 
         # Intialize a TF kernel to check for FCs
+        original_window = processing_config.decimations[0].window.type
+
         tfk = TransferFunctionKernel(dataset=tfk_dataset, config=processing_config)
         tfk.make_processing_summary()
         tfk.check_if_fcs_already_exist()
@@ -167,7 +169,26 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
             tfk.dataset_df.fc.all()
         )  # assert fcs True in dataframe -- i.e. they were detected.
 
+        # now change the window type and show that FCs are not detected
+        for decimation in processing_config.decimations:
+            decimation.window.type = "hamming"
+        tfk = TransferFunctionKernel(dataset=tfk_dataset, config=processing_config)
+        tfk.make_processing_summary()
+        tfk.check_if_fcs_already_exist()
+        assert not (
+            tfk.dataset_df.fc.all()
+        )  # assert fcs False  in dataframe -- i.e. they were detected.
+
         # Now reprocess with the FCs
+        for decimation in processing_config.decimations:
+            decimation.window.type = original_window
+        tfk = TransferFunctionKernel(dataset=tfk_dataset, config=processing_config)
+        tfk.make_processing_summary()
+        tfk.check_if_fcs_already_exist()
+        assert (
+            tfk.dataset_df.fc.all()
+        )  # assert fcs True in dataframe -- i.e. they were detected.
+
         tf2 = process_synthetic_2(force_make_mth5=False, z_file_path=z_file_path_2)
         assert tf1 == tf2
 
