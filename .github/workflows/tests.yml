@@ -37,7 +37,8 @@ jobs:
         pip install -r requirements-dev.txt
         # pip install git+https://github.com/kujaku11/mt_metadata.git@main
         # pip install git+https://github.com/kujaku11/mth5.git@master
-        pip install git+https://github.com/MTgeophysics/mtpy-v2.git@main
+        # pip install git+https://github.com/MTgeophysics/mtpy-v2.git@main
+        pip install git+https://github.com/MTgeophysics/mtpy-v2.git@pin_numpy
         pip uninstall aurora -y
 
     - name: Install Our Package
