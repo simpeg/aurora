@@ -65,6 +65,7 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
             mth5_path_3,
             mth5_path_12rr,
         ]
+        self.mth5_path_2 = mth5_path_2
 
     def test_123(self):
         """
@@ -138,12 +139,56 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
     def test_create_then_use_stored_fcs_for_processing(self):
         """"""
         from test_processing import process_synthetic_2
+        from aurora.test_utils.synthetic.make_processing_configs import (
+            make_processing_config_and_kernel_dataset,
+        )
+        from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
 
         z_file_path_1 = AURORA_RESULTS_PATH.joinpath("test2.zss")
         z_file_path_2 = AURORA_RESULTS_PATH.joinpath("test2_from_stored_fc.zss")
         tf1 = process_synthetic_2(
             force_make_mth5=True, z_file_path=z_file_path_1, save_fc=True
         )
+        tfk_dataset, processing_config = make_processing_config_and_kernel_dataset(
+            config_keyword="test2",
+            station_id="test2",
+            remote_id=None,
+            mth5s=[
+                self.mth5_path_2,
+            ],
+            channel_nomenclature="default",
+        )
+
+        # Intialize a TF kernel to check for FCs
+        original_window = processing_config.decimations[0].window.type
+
+        tfk = TransferFunctionKernel(dataset=tfk_dataset, config=processing_config)
+        tfk.make_processing_summary()
+        tfk.check_if_fcs_already_exist()
+        assert (
+            tfk.dataset_df.fc.all()
+        )  # assert fcs True in dataframe -- i.e. they were detected.
+
+        # now change the window type and show that FCs are not detected
+        for decimation in processing_config.decimations:
+            decimation.window.type = "hamming"
+        tfk = TransferFunctionKernel(dataset=tfk_dataset, config=processing_config)
+        tfk.make_processing_summary()
+        tfk.check_if_fcs_already_exist()
+        assert not (
+            tfk.dataset_df.fc.all()
+        )  # assert fcs False  in dataframe -- i.e. they were detected.
+
+        # Now reprocess with the FCs
+        for decimation in processing_config.decimations:
+            decimation.window.type = original_window
+        tfk = TransferFunctionKernel(dataset=tfk_dataset, config=processing_config)
+        tfk.make_processing_summary()
+        tfk.check_if_fcs_already_exist()
+        assert (
+            tfk.dataset_df.fc.all()
+        )  # assert fcs True in dataframe -- i.e. they were detected.
+
         tf2 = process_synthetic_2(force_make_mth5=False, z_file_path=z_file_path_2)
         assert tf1 == tf2
 

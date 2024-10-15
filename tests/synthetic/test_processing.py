@@ -1,19 +1,20 @@
 import logging
+import pathlib
 import unittest
 
 from aurora.pipelines.process_mth5 import process_mth5
 
 from aurora.test_utils.synthetic.make_processing_configs import (
-    create_test_run_config,
+    make_processing_config_and_kernel_dataset,
 )
+
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 from mth5.data.make_mth5_from_asc import create_test1_h5
 from mth5.data.make_mth5_from_asc import create_test2_h5
 from mth5.data.make_mth5_from_asc import create_test12rr_h5
 from mth5.helpers import close_open_files
 
-# from mtpy-v2
-from mtpy.processing import RunSummary, KernelDataset
+from typing import Optional, Union
 
 synthetic_test_paths = SyntheticTestPaths()
 synthetic_test_paths.mkdirs()
@@ -145,14 +146,14 @@ class TestSyntheticProcessing(unittest.TestCase):
 
 
 def process_synthetic_1(
-    config_keyword="test1",
-    z_file_path="",
-    test_scale_factor=False,
-    simultaneous_regression=False,
-    file_version="0.1.0",
-    return_collection=False,
-    channel_nomenclature="default",
-    reload_config=False,
+    config_keyword: Optional[str] = "test1",
+    z_file_path: Optional[Union[str, pathlib.Path]] = "",
+    test_scale_factor: Optional[bool] = False,
+    simultaneous_regression: Optional[bool] = False,
+    file_version: Optional[str] = "0.1.0",  # TODO: set to Literal["0.1.0", "0.2.0"]
+    return_collection: Optional[bool] = False,
+    channel_nomenclature: Optional[str] = "default",
+    reload_config: Optional[bool] = False,
 ):
     """
 
@@ -170,6 +171,7 @@ def process_synthetic_1(
         usual, channel-by-channel method
     file_version: str
         one of ["0.1.0", "0.2.0"]
+
     Returns
     -------
     tf_result: TransferFunctionCollection or mt_metadata.transfer_functions.TF
@@ -178,18 +180,17 @@ def process_synthetic_1(
     mth5_path = create_test1_h5(
         file_version=file_version, channel_nomenclature=channel_nomenclature
     )
-    run_summary = RunSummary()
-    run_summary.from_mth5s(
-        [
-            mth5_path,
-        ]
+    mth5_paths = [
+        mth5_path,
+    ]
+    station_id = "test1"
+    tfk_dataset, processing_config = make_processing_config_and_kernel_dataset(
+        config_keyword=station_id,
+        station_id=station_id,
+        remote_id=None,  # TODO: allow empty str instead of None
+        mth5s=mth5_paths,
+        channel_nomenclature=channel_nomenclature,
     )
-    # next two lines purely for codecov
-    run_summary.print_mini_summary
-    run_summary_clone = run_summary.clone()
-    # run_summary.drop_runs_shorter_than(100000)
-    tfk_dataset = KernelDataset()
-    tfk_dataset.from_run_summary(run_summary_clone, "test1")
 
     # Test that channel_scale_factors column is optional
     if test_scale_factor:
@@ -204,9 +205,6 @@ def process_synthetic_1(
     else:
         tfk_dataset.df.drop(columns=["channel_scale_factors"], inplace=True)
 
-    processing_config = create_test_run_config(
-        config_keyword, tfk_dataset, channel_nomenclature=channel_nomenclature
-    )
     # Relates to issue #172
     # reload_config = True
     # if reload_config:
@@ -243,7 +241,11 @@ def process_synthetic_1(
 
 
 def process_synthetic_2(
-    force_make_mth5=True, z_file_path=None, save_fc=False, file_version="0.2.0"
+    force_make_mth5: Optional[bool] = True,
+    z_file_path: Optional[Union[str, pathlib.Path, None]] = None,
+    save_fc: Optional[bool] = False,
+    file_version: Optional[str] = "0.2.0",
+    channel_nomenclature: Optional[str] = "default",
 ):
     """"""
     station_id = "test2"
@@ -253,17 +255,20 @@ def process_synthetic_2(
     mth5_paths = [
         mth5_path,
     ]
-    run_summary = RunSummary()
-    run_summary.from_mth5s(mth5_paths)
-    tfk_dataset = KernelDataset()
-    tfk_dataset.from_run_summary(run_summary, station_id)
-    processing_config = create_test_run_config(station_id, tfk_dataset)
+
+    tfk_dataset, processing_config = make_processing_config_and_kernel_dataset(
+        config_keyword=station_id,
+        station_id=station_id,
+        remote_id=None,
+        mth5s=mth5_paths,
+        channel_nomenclature=channel_nomenclature,
+    )
+
     for decimation_level in processing_config.decimations:
         if save_fc:
             decimation_level.save_fcs = True
-            decimation_level.save_fcs_type = "h5"
-        decimation_level.window.type = "boxcar"
-        # decimation_level.save_fcs_type = "csv"
+            decimation_level.save_fcs_type = "h5"  # h5 instead of "csv"
+
     tfc = process_mth5(
         processing_config,
         tfk_dataset=tfk_dataset,
@@ -281,13 +286,15 @@ def process_synthetic_1r2(
     mth5_paths = [
         mth5_path,
     ]
-    run_summary = RunSummary()
-    run_summary.from_mth5s(mth5_paths)
-    tfk_dataset = KernelDataset()
-    tfk_dataset.from_run_summary(run_summary, "test1", "test2")
-    processing_config = create_test_run_config(
-        config_keyword, tfk_dataset, channel_nomenclature=channel_nomenclature
+
+    tfk_dataset, processing_config = make_processing_config_and_kernel_dataset(
+        config_keyword,
+        station_id="test1",
+        remote_id="test2",
+        mth5s=mth5_paths,
+        channel_nomenclature=channel_nomenclature,
     )
+
     tfc = process_mth5(
         processing_config,
         tfk_dataset=tfk_dataset,

@@ -104,7 +104,7 @@ class EffectiveDegreesOfFreedom(object):
         X: np.ndarray
             The data to for which to determine weights.
         use : np.ndarray
-            popolated with booleans
+            populated with booleans
 
         Returns
         -------
@@ -116,6 +116,8 @@ class EffectiveDegreesOfFreedom(object):
         S /= sum(use)  # normalize by the number of datapoints
         H = np.linalg.inv(S)  # inverse covariance matrix
 
+        # x = X[0, :]
+        # y = X[1, :]
         xx_term = np.real(X[0, :] * np.conj(X[0, :]) * H[0, 0])
         yy_term = np.real(X[1, :] * np.conj(X[1, :]) * H[1, 1])
         xy_term = 2 * np.real(np.conj(X[1, :]) * X[0, :] * H[1, 0])  # real or abs?
