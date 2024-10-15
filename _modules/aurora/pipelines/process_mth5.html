@@ -1,0 +1,772 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.pipelines.process_mth5 &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aurora.pipelines.process_mth5</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.pipelines.process_mth5</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the main methods used in processing mth5 objects to transfer functions.</span>
+
+<span class="sd">The main function is called process_mth5.</span>
+<span class="sd">This function was recently changed to process_mth5_legacy, os that process_mth5</span>
+<span class="sd">can be repurposed for other TF estimation schemes.  The &quot;legacy&quot; version</span>
+<span class="sd">corresponds to aurora default processing.</span>
+
+
+<span class="sd">Notes on process_mth5_legacy:</span>
+<span class="sd">Note 1: process_mth5 assumes application of cascading decimation, and that the</span>
+<span class="sd">decimated data will be accessed from the previous decimation level.  This should be</span>
+<span class="sd">revisited. It may make more sense to have a get_decimation_level() interface that</span>
+<span class="sd">provides an option of applying decimation or loading pre-decimated data.</span>
+<span class="sd">This will be addressed via creation of the FC layer inside mth5.</span>
+
+<span class="sd">Note 2: We can encounter cases where some runs can be decimated and others can not.</span>
+<span class="sd">We need a way to handle this. For example, a short run may not yield any data from a</span>
+<span class="sd">later decimation level. An attempt to handle this has been made in TF Kernel by</span>
+<span class="sd">adding a is_valid_dataset column, associated with each run-decimation level pair.</span>
+
+
+<span class="sd">Note 3: This point in the loop marks the interface between _generation_ of the FCs and</span>
+<span class="sd"> their _usage_. In future the code above this comment would be pushed into</span>
+<span class="sd"> create_fourier_coefficients() and the code below this would access those FCs and</span>
+<span class="sd"> execute compute_transfer_function().</span>
+<span class="sd"> This would also be an appropriate place to place a feature extraction layer, and</span>
+<span class="sd"> compute weights for the FCs.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">mth5.groups</span>
+
+<span class="c1"># =============================================================================</span>
+<span class="c1"># Imports</span>
+<span class="c1"># =============================================================================</span>
+
+<span class="kn">from</span> <span class="nn">aurora.pipelines.time_series_helpers</span> <span class="kn">import</span> <span class="n">calibrate_stft_obj</span>
+<span class="kn">from</span> <span class="nn">aurora.pipelines.time_series_helpers</span> <span class="kn">import</span> <span class="n">run_ts_to_stft</span>
+<span class="kn">from</span> <span class="nn">aurora.pipelines.transfer_function_helpers</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">process_transfer_functions</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">aurora.pipelines.transfer_function_kernel</span> <span class="kn">import</span> <span class="n">TransferFunctionKernel</span>
+<span class="kn">from</span> <span class="nn">aurora.pipelines.transfer_function_kernel</span> <span class="kn">import</span> <span class="n">station_obj_from_row</span>
+<span class="kn">from</span> <span class="nn">aurora.sandbox.triage_metadata</span> <span class="kn">import</span> <span class="n">triage_run_id</span>
+<span class="kn">from</span> <span class="nn">aurora.transfer_function.transfer_function_collection</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">TransferFunctionCollection</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">aurora.transfer_function.TTFZ</span> <span class="kn">import</span> <span class="n">TTFZ</span>
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">mth5.helpers</span> <span class="kn">import</span> <span class="n">close_open_files</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">aurora.config.metadata.processing</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+
+<span class="n">SUPPORTED_PROCESSINGS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;legacy&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="c1"># =============================================================================</span>
+
+
+<div class="viewcode-block" id="make_stft_objects"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.process_mth5.make_stft_objects">[docs]</a><span class="k">def</span> <span class="nf">make_stft_objects</span><span class="p">(</span>
+    <span class="n">processing_config</span><span class="p">,</span> <span class="n">i_dec_level</span><span class="p">,</span> <span class="n">run_obj</span><span class="p">,</span> <span class="n">run_xrds</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;MT&quot;</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Operates on a &quot;per-run&quot; basis.  Applies STFT to all time series in the input run.</span>
+
+<span class="sd">    This method could be modified in a multiple station code so that it doesn&#39;t care</span>
+<span class="sd">    if the station is &quot;local&quot; or &quot;remote&quot; but rather uses scale factors keyed by</span>
+<span class="sd">    station_id (WIP - issue #329)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    processing_config: mt_metadata.transfer_functions.processing.aurora.Processing</span>
+<span class="sd">        Metadata about the processing to be applied</span>
+<span class="sd">    i_dec_level: int</span>
+<span class="sd">        The decimation level to process</span>
+<span class="sd">    run_obj: mth5.groups.master_station_run_channel.RunGroup</span>
+<span class="sd">        The run to transform to stft</span>
+<span class="sd">    run_xrds: xarray.core.dataset.Dataset</span>
+<span class="sd">        The data time series from the run to transform</span>
+<span class="sd">    units: str</span>
+<span class="sd">        expects &quot;MT&quot;.  May change so that this is the only accepted set of units</span>
+<span class="sd">    station_id: str</span>
+<span class="sd">        To be deprecated, this information is contained in the run_obj as</span>
+<span class="sd">        run_obj.station_group.metadata.id</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    stft_obj: xarray.core.dataset.Dataset</span>
+<span class="sd">        Time series of calibrated Fourier coefficients per each channel in the run</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">stft_config</span> <span class="o">=</span> <span class="n">processing_config</span><span class="o">.</span><span class="n">get_decimation_level</span><span class="p">(</span><span class="n">i_dec_level</span><span class="p">)</span>
+    <span class="n">stft_obj</span> <span class="o">=</span> <span class="n">run_ts_to_stft</span><span class="p">(</span><span class="n">stft_config</span><span class="p">,</span> <span class="n">run_xrds</span><span class="p">)</span>
+    <span class="n">run_id</span> <span class="o">=</span> <span class="n">run_obj</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">id</span>
+    <span class="k">if</span> <span class="n">run_obj</span><span class="o">.</span><span class="n">station_metadata</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">processing_config</span><span class="o">.</span><span class="n">stations</span><span class="o">.</span><span class="n">local</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
+        <span class="n">scale_factors</span> <span class="o">=</span> <span class="n">processing_config</span><span class="o">.</span><span class="n">stations</span><span class="o">.</span><span class="n">local</span><span class="o">.</span><span class="n">run_dict</span><span class="p">[</span>
+            <span class="n">run_id</span>
+        <span class="p">]</span><span class="o">.</span><span class="n">channel_scale_factors</span>
+    <span class="k">elif</span> <span class="n">run_obj</span><span class="o">.</span><span class="n">station_metadata</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">processing_config</span><span class="o">.</span><span class="n">stations</span><span class="o">.</span><span class="n">remote</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
+        <span class="n">scale_factors</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">processing_config</span><span class="o">.</span><span class="n">stations</span><span class="o">.</span><span class="n">remote</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="o">.</span><span class="n">run_dict</span><span class="p">[</span><span class="n">run_id</span><span class="p">]</span>
+            <span class="o">.</span><span class="n">channel_scale_factors</span>
+        <span class="p">)</span>
+
+    <span class="n">stft_obj</span> <span class="o">=</span> <span class="n">calibrate_stft_obj</span><span class="p">(</span>
+        <span class="n">stft_obj</span><span class="p">,</span>
+        <span class="n">run_obj</span><span class="p">,</span>
+        <span class="n">units</span><span class="o">=</span><span class="n">units</span><span class="p">,</span>
+        <span class="n">channel_scale_factors</span><span class="o">=</span><span class="n">scale_factors</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">stft_obj</span></div>
+
+
+<div class="viewcode-block" id="process_tf_decimation_level"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.process_mth5.process_tf_decimation_level">[docs]</a><span class="k">def</span> <span class="nf">process_tf_decimation_level</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">aurora</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">processing</span><span class="o">.</span><span class="n">Processing</span><span class="p">,</span>
+    <span class="n">i_dec_level</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">local_stft_obj</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">remote_stft_obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+    <span class="n">units</span><span class="o">=</span><span class="s2">&quot;MT&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Processing pipeline for a single decimation_level</span>
+
+<span class="sd">    TODO: Add a check that the processing config sample rates agree with the data</span>
+<span class="sd">    TODO: Add units to local_stft_obj, remote_stft_obj</span>
+<span class="sd">    sampling rates otherwise raise Exception</span>
+<span class="sd">    This method can be single station or remote based on the process cfg</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel</span>
+<span class="sd">        Config for a single decimation level</span>
+<span class="sd">    i_dec_level: int</span>
+<span class="sd">        decimation level_id</span>
+<span class="sd">        ?could we pack this into the decimation level as an attr?</span>
+<span class="sd">    local_stft_obj: xarray.core.dataset.Dataset</span>
+<span class="sd">        The time series of Fourier coefficients from the local station</span>
+<span class="sd">    remote_stft_obj: xarray.core.dataset.Dataset or None</span>
+<span class="sd">        The time series of Fourier coefficients from the remote station</span>
+<span class="sd">    units: str</span>
+<span class="sd">        one of [&quot;MT&quot;,&quot;SI&quot;]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    transfer_function_obj : aurora.transfer_function.TTFZ.TTFZ</span>
+<span class="sd">        The transfer function values packed into an object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">frequency_bands</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">decimations</span><span class="p">[</span><span class="n">i_dec_level</span><span class="p">]</span><span class="o">.</span><span class="n">frequency_bands_obj</span><span class="p">()</span>
+    <span class="n">transfer_function_obj</span> <span class="o">=</span> <span class="n">TTFZ</span><span class="p">(</span>
+        <span class="n">i_dec_level</span><span class="p">,</span> <span class="n">frequency_bands</span><span class="p">,</span> <span class="n">processing_config</span><span class="o">=</span><span class="n">config</span>
+    <span class="p">)</span>
+    <span class="n">dec_level_config</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">decimations</span><span class="p">[</span><span class="n">i_dec_level</span><span class="p">]</span>
+    <span class="c1"># segment_weights = coherence_weights(dec_level_config, local_stft_obj, remote_stft_obj)</span>
+    <span class="n">transfer_function_obj</span> <span class="o">=</span> <span class="n">process_transfer_functions</span><span class="p">(</span>
+        <span class="n">dec_level_config</span><span class="p">,</span> <span class="n">local_stft_obj</span><span class="p">,</span> <span class="n">remote_stft_obj</span><span class="p">,</span> <span class="n">transfer_function_obj</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">transfer_function_obj</span></div>
+
+
+<span class="c1"># def enrich_row(row):</span>
+<span class="c1">#     pass</span>
+
+
+<div class="viewcode-block" id="triage_issue_289"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.process_mth5.triage_issue_289">[docs]</a><span class="k">def</span> <span class="nf">triage_issue_289</span><span class="p">(</span><span class="n">local_stfts</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">remote_stfts</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Takes STFT objects in and returns them after shape-checking and making sure they are same.</span>
+<span class="sd">    WIP:  Timing Error Workaround See Aurora Issue #289.</span>
+<span class="sd">    Seems associated with getting one fewer sample than expected from the edge of a run.</span>
+
+<span class="sd">    returns: Tuple</span>
+<span class="sd">        (local_stfts, remote_stfts)</span>
+<span class="sd">        The original input arguments, shape-matched</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_chunks</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">local_stfts</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i_chunk</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_chunks</span><span class="p">):</span>
+        <span class="n">ok</span> <span class="o">=</span> <span class="n">local_stfts</span><span class="p">[</span><span class="n">i_chunk</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">remote_stfts</span><span class="p">[</span><span class="n">i_chunk</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ok</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Mismatch in FC array lengths detected -- Issue #289&quot;</span>
+            <span class="p">)</span>
+            <span class="n">glb</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                <span class="n">local_stfts</span><span class="p">[</span><span class="n">i_chunk</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
+                <span class="n">remote_stfts</span><span class="p">[</span><span class="n">i_chunk</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
+            <span class="p">)</span>
+            <span class="n">lub</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+                <span class="n">local_stfts</span><span class="p">[</span><span class="n">i_chunk</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span>
+                <span class="n">remote_stfts</span><span class="p">[</span><span class="n">i_chunk</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span>
+            <span class="p">)</span>
+            <span class="n">cond1</span> <span class="o">=</span> <span class="n">local_stfts</span><span class="p">[</span><span class="n">i_chunk</span><span class="p">]</span><span class="o">.</span><span class="n">time</span> <span class="o">&gt;=</span> <span class="n">glb</span>
+            <span class="n">cond2</span> <span class="o">=</span> <span class="n">local_stfts</span><span class="p">[</span><span class="n">i_chunk</span><span class="p">]</span><span class="o">.</span><span class="n">time</span> <span class="o">&lt;=</span> <span class="n">lub</span>
+            <span class="n">local_stfts</span><span class="p">[</span><span class="n">i_chunk</span><span class="p">]</span> <span class="o">=</span> <span class="n">local_stfts</span><span class="p">[</span><span class="n">i_chunk</span><span class="p">]</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+                <span class="n">cond1</span> <span class="o">&amp;</span> <span class="n">cond2</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="n">cond1</span> <span class="o">=</span> <span class="n">remote_stfts</span><span class="p">[</span><span class="n">i_chunk</span><span class="p">]</span><span class="o">.</span><span class="n">time</span> <span class="o">&gt;=</span> <span class="n">glb</span>
+            <span class="n">cond2</span> <span class="o">=</span> <span class="n">remote_stfts</span><span class="p">[</span><span class="n">i_chunk</span><span class="p">]</span><span class="o">.</span><span class="n">time</span> <span class="o">&lt;=</span> <span class="n">lub</span>
+            <span class="n">remote_stfts</span><span class="p">[</span><span class="n">i_chunk</span><span class="p">]</span> <span class="o">=</span> <span class="n">remote_stfts</span><span class="p">[</span><span class="n">i_chunk</span><span class="p">]</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+                <span class="n">cond1</span> <span class="o">&amp;</span> <span class="n">cond2</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="k">assert</span> <span class="p">(</span>
+                <span class="n">local_stfts</span><span class="p">[</span><span class="n">i_chunk</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">shape</span>
+                <span class="o">==</span> <span class="n">remote_stfts</span><span class="p">[</span><span class="n">i_chunk</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">shape</span>
+            <span class="p">)</span>
+    <span class="k">return</span> <span class="n">local_stfts</span><span class="p">,</span> <span class="n">remote_stfts</span></div>
+
+
+<div class="viewcode-block" id="merge_stfts"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.process_mth5.merge_stfts">[docs]</a><span class="k">def</span> <span class="nf">merge_stfts</span><span class="p">(</span><span class="n">stfts</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">tfk</span><span class="p">:</span> <span class="n">TransferFunctionKernel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Applies concatenation along the time axis to multiple arrays of STFTs from different runs.</span>
+<span class="sd">    At the TF estimation level we treat all the FCs in one array.</span>
+<span class="sd">    This builds the array for both the local and the remote STFTs.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    stfts: dict</span>
+<span class="sd">        The dict is keyed by &quot;local&quot; and &quot;remote&quot;.</span>
+<span class="sd">        Each value is a list of STFTs (one list for local and one for remote)</span>
+<span class="sd">    tfk: TransferFunctionKernel</span>
+<span class="sd">        Just here to let us know if there is a remote reference to merge or not.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    local_merged_stft_obj, remote_merged_stft_obj: Tuple</span>
+<span class="sd">        Both are xr.Datasets</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Timing Error Workaround See Aurora Issue #289</span>
+    <span class="n">local_stfts</span> <span class="o">=</span> <span class="n">stfts</span><span class="p">[</span><span class="s2">&quot;local&quot;</span><span class="p">]</span>
+    <span class="n">remote_stfts</span> <span class="o">=</span> <span class="n">stfts</span><span class="p">[</span><span class="s2">&quot;remote&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">tfk</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stations</span><span class="o">.</span><span class="n">remote</span><span class="p">:</span>
+        <span class="n">local_stfts</span><span class="p">,</span> <span class="n">remote_stfts</span> <span class="o">=</span> <span class="n">triage_issue_289</span><span class="p">(</span><span class="n">local_stfts</span><span class="p">,</span> <span class="n">remote_stfts</span><span class="p">)</span>
+        <span class="n">remote_merged_stft_obj</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">remote_stfts</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">remote_merged_stft_obj</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">local_merged_stft_obj</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">local_stfts</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">local_merged_stft_obj</span><span class="p">,</span> <span class="n">remote_merged_stft_obj</span></div>
+
+
+<div class="viewcode-block" id="append_chunk_to_stfts"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.process_mth5.append_chunk_to_stfts">[docs]</a><span class="k">def</span> <span class="nf">append_chunk_to_stfts</span><span class="p">(</span><span class="n">stfts</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">chunk</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">remote</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Aggregate one STFT into a larger dictionary that tracks all the STFTs</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    stfts: dict</span>
+<span class="sd">        has keys &quot;local&quot; and &quot;remote&quot;.</span>
+<span class="sd">    chunk: xr.Dataset</span>
+<span class="sd">        The data to append to the dictionary</span>
+<span class="sd">    remote: bool</span>
+<span class="sd">        If True, append the chunk to stfts[&quot;remote&quot;], else append to stfts[&quot;local&quot;]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    stfts: dict</span>
+<span class="sd">        Same as input but now has new chunk appended to it.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">remote</span><span class="p">:</span>
+        <span class="n">stfts</span><span class="p">[</span><span class="s2">&quot;remote&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">stfts</span><span class="p">[</span><span class="s2">&quot;local&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">stfts</span></div>
+
+
+<span class="c1"># def load_spectrogram_from_station_object(station_obj, fc_group_id, fc_decimation_id):</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     Placeholder.  This could also be a method in mth5</span>
+<span class="c1">#     Returns</span>
+<span class="c1">#     -------</span>
+<span class="c1">#</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     return station_obj.fourier_coefficients_group.get_fc_group(fc_group_id).get_decimation_level(fc_decimation_id)</span>
+
+
+<div class="viewcode-block" id="load_stft_obj_from_mth5"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.process_mth5.load_stft_obj_from_mth5">[docs]</a><span class="k">def</span> <span class="nf">load_stft_obj_from_mth5</span><span class="p">(</span>
+    <span class="n">i_dec_level</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">row</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">run_obj</span><span class="p">:</span> <span class="n">mth5</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">RunGroup</span><span class="p">,</span>
+    <span class="n">channels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load stft_obj from mth5 (instead of compute)</span>
+
+<span class="sd">    Note #1: See note #1 in time_series.frequency_band_helpers.extract_band</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    i_dec_level: int</span>
+<span class="sd">        The decimation level where the data are stored within the Fourier Coefficient group</span>
+<span class="sd">    row: pandas.core.series.Series</span>
+<span class="sd">        A row of the TFK.dataset_df</span>
+<span class="sd">    run_obj: mth5.groups.run.RunGroup</span>
+<span class="sd">        The original time-domain run associated with the data to load</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    stft_chunk: xr.Dataset</span>
+<span class="sd">        An STFT from mth5.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">station_obj</span> <span class="o">=</span> <span class="n">station_obj_from_row</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+    <span class="n">fc_group</span> <span class="o">=</span> <span class="n">station_obj</span><span class="o">.</span><span class="n">fourier_coefficients_group</span><span class="o">.</span><span class="n">get_fc_group</span><span class="p">(</span>
+        <span class="n">run_obj</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">id</span>
+    <span class="p">)</span>
+    <span class="n">fc_decimation_level</span> <span class="o">=</span> <span class="n">fc_group</span><span class="o">.</span><span class="n">get_decimation_level</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i_dec_level</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">stft_obj</span> <span class="o">=</span> <span class="n">fc_decimation_level</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">(</span><span class="n">channels</span><span class="o">=</span><span class="n">channels</span><span class="p">)</span>
+
+    <span class="n">cond1</span> <span class="o">=</span> <span class="n">stft_obj</span><span class="o">.</span><span class="n">time</span> <span class="o">&gt;=</span> <span class="n">row</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">tz_localize</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">cond2</span> <span class="o">=</span> <span class="n">stft_obj</span><span class="o">.</span><span class="n">time</span> <span class="o">&lt;=</span> <span class="n">row</span><span class="o">.</span><span class="n">end</span><span class="o">.</span><span class="n">tz_localize</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">stft_chunk</span> <span class="o">=</span> <span class="n">stft_obj</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cond1</span> <span class="o">&amp;</span> <span class="n">cond2</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>  <span class="c1"># see Note #1</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">stft_obj</span><span class="o">.</span><span class="n">to_array</span><span class="p">()</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cond1</span> <span class="o">&amp;</span> <span class="n">cond2</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">stft_chunk</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">(</span><span class="s2">&quot;variable&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">stft_chunk</span></div>
+
+
+<div class="viewcode-block" id="save_fourier_coefficients"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.process_mth5.save_fourier_coefficients">[docs]</a><span class="k">def</span> <span class="nf">save_fourier_coefficients</span><span class="p">(</span><span class="n">dec_level_config</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">run_obj</span><span class="p">,</span> <span class="n">stft_obj</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Optionally saves the stft object into the MTH5.</span>
+<span class="sd">    Note that the dec_level_config must have its save_fcs attr set to True to actually save the data.</span>
+<span class="sd">    WIP</span>
+
+<span class="sd">    Note #1: Logic for building FC layers:</span>
+<span class="sd">    If the processing config decimation_level.save_fcs_type = &quot;h5&quot; and fc_levels_already_exist is False, then open</span>
+<span class="sd">    in append mode, else open in read mode.  We should support a flag: force_rebuild_fcs, normally False.  This flag</span>
+<span class="sd">    is only needed when save_fcs_type==&quot;h5&quot;.  If True, then we open in append mode, regarless of fc_levels_already_exist</span>
+<span class="sd">    The task of setting mode=&quot;a&quot;, mode=&quot;r&quot; can be handled by tfk (maybe in tfk.validate())</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dec_level_config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel</span>
+<span class="sd">        The information about decimation level associated with row, run, stft_obj</span>
+<span class="sd">    row: pd.Series</span>
+<span class="sd">         A row of the TFK.dataset_df</span>
+<span class="sd">    run_obj: mth5.groups.run.RunGroup</span>
+<span class="sd">        The run object associated with the STFTs.</span>
+<span class="sd">    stft_obj: xr.Dataset</span>
+<span class="sd">        The data to pack intp the mth5.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">dec_level_config</span><span class="o">.</span><span class="n">save_fcs</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Skip saving FCs. dec_level_config.save_fc = &quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">dec_level_config</span><span class="o">.</span><span class="n">save_fcs</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="n">i_dec_level</span> <span class="o">=</span> <span class="n">dec_level_config</span><span class="o">.</span><span class="n">decimation</span><span class="o">.</span><span class="n">level</span>
+    <span class="k">if</span> <span class="n">dec_level_config</span><span class="o">.</span><span class="n">save_fcs_type</span> <span class="o">==</span> <span class="s2">&quot;csv&quot;</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Unless debugging or testing, saving FCs to csv unexpected&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">csv_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">station</span><span class="si">}</span><span class="s2">_dec_level_</span><span class="si">{</span><span class="n">i_dec_level</span><span class="si">}</span><span class="s2">.csv&quot;</span>
+        <span class="n">stft_df</span> <span class="o">=</span> <span class="n">stft_obj</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+        <span class="n">stft_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">csv_name</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">dec_level_config</span><span class="o">.</span><span class="n">save_fcs_type</span> <span class="o">==</span> <span class="s2">&quot;h5&quot;</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">((</span><span class="s2">&quot;Saving FC level&quot;</span><span class="p">))</span>
+        <span class="n">station_obj</span> <span class="o">=</span> <span class="n">station_obj_from_row</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">row</span><span class="o">.</span><span class="n">mth5_obj</span><span class="o">.</span><span class="n">h5_is_write</span><span class="p">():</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;See Note #1: Logic for building FC layers&quot;</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># Get FC group (create if needed)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">run_obj</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">id</span>
+            <span class="ow">in</span> <span class="n">station_obj</span><span class="o">.</span><span class="n">fourier_coefficients_group</span><span class="o">.</span><span class="n">groups_list</span>
+        <span class="p">):</span>
+            <span class="n">fc_group</span> <span class="o">=</span> <span class="n">station_obj</span><span class="o">.</span><span class="n">fourier_coefficients_group</span><span class="o">.</span><span class="n">get_fc_group</span><span class="p">(</span>
+                <span class="n">run_obj</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">id</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fc_group</span> <span class="o">=</span> <span class="n">station_obj</span><span class="o">.</span><span class="n">fourier_coefficients_group</span><span class="o">.</span><span class="n">add_fc_group</span><span class="p">(</span>
+                <span class="n">run_obj</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">id</span>
+            <span class="p">)</span>
+
+        <span class="n">decimation_level_metadata</span> <span class="o">=</span> <span class="n">dec_level_config</span><span class="o">.</span><span class="n">to_fc_decimation</span><span class="p">()</span>
+
+        <span class="c1"># Get FC Decimation Level (create if needed)</span>
+        <span class="n">dec_level_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i_dec_level</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="n">dec_level_name</span> <span class="ow">in</span> <span class="n">fc_group</span><span class="o">.</span><span class="n">groups_list</span><span class="p">:</span>
+            <span class="n">fc_decimation_level</span> <span class="o">=</span> <span class="n">fc_group</span><span class="o">.</span><span class="n">get_decimation_level</span><span class="p">(</span><span class="n">dec_level_name</span><span class="p">)</span>
+            <span class="n">fc_decimation_level</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">decimation_level_metadata</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fc_decimation_level</span> <span class="o">=</span> <span class="n">fc_group</span><span class="o">.</span><span class="n">add_decimation_level</span><span class="p">(</span>
+                <span class="n">dec_level_name</span><span class="p">,</span>
+                <span class="n">decimation_level_metadata</span><span class="o">=</span><span class="n">decimation_level_metadata</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="n">fc_decimation_level</span><span class="o">.</span><span class="n">from_xarray</span><span class="p">(</span>
+            <span class="n">stft_obj</span><span class="p">,</span> <span class="n">decimation_level_metadata</span><span class="o">.</span><span class="n">sample_rate</span>
+        <span class="p">)</span>
+        <span class="n">fc_decimation_level</span><span class="o">.</span><span class="n">update_metadata</span><span class="p">()</span>
+        <span class="n">fc_group</span><span class="o">.</span><span class="n">update_metadata</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;dec_level_config.save_fcs_type </span><span class="si">{</span><span class="n">dec_level_config</span><span class="o">.</span><span class="n">save_fcs_type</span><span class="si">}</span><span class="s2"> not recognized&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> Skipping save fcs&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="get_spectrogams"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.process_mth5.get_spectrogams">[docs]</a><span class="k">def</span> <span class="nf">get_spectrogams</span><span class="p">(</span><span class="n">tfk</span><span class="p">,</span> <span class="n">i_dec_level</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;MT&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a decimation level id, loads a dictianary of all spectragrams from information in tfk.</span>
+<span class="sd">    TODO: Make this a method of TFK</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    tfk: TransferFunctionKernel</span>
+
+<span class="sd">    i_dec_level: integer</span>
+<span class="sd">        The decimation level of the spectrograms.</span>
+
+<span class="sd">    units: str</span>
+<span class="sd">        &quot;MT&quot; or &quot;SI&quot;, likely to be deprecated</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    stfts: dict</span>
+<span class="sd">        The short time fourier transforms for the decimation level as a dictionary.</span>
+<span class="sd">        Keys are &quot;local&quot; and &quot;remote&quot;.  Values are lists, one (element) xr.Dataset per run</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">stfts</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">stfts</span><span class="p">[</span><span class="s2">&quot;local&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">stfts</span><span class="p">[</span><span class="s2">&quot;remote&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Check first if TS processing or accessing FC Levels</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">tfk</span><span class="o">.</span><span class="n">dataset_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="c1"># This iterator could be updated to iterate over row-pairs if remote is True,</span>
+        <span class="c1"># corresponding to simultaneous data</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">tfk</span><span class="o">.</span><span class="n">is_valid_dataset</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">i_dec_level</span><span class="p">):</span>
+            <span class="k">continue</span>
+
+        <span class="n">run_obj</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">mth5_obj</span><span class="o">.</span><span class="n">from_reference</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">run_hdf5_reference</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">fc</span><span class="p">:</span>
+            <span class="n">stft_obj</span> <span class="o">=</span> <span class="n">load_stft_obj_from_mth5</span><span class="p">(</span><span class="n">i_dec_level</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">run_obj</span><span class="p">)</span>
+            <span class="n">stfts</span> <span class="o">=</span> <span class="n">append_chunk_to_stfts</span><span class="p">(</span><span class="n">stfts</span><span class="p">,</span> <span class="n">stft_obj</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">remote</span><span class="p">)</span>
+            <span class="k">continue</span>
+
+        <span class="n">run_xrds</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;run_dataarray&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">(</span><span class="s2">&quot;channel&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Musgraves workaround for old MT data</span>
+        <span class="n">triage_run_id</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">run_obj</span><span class="p">)</span>
+
+        <span class="n">stft_obj</span> <span class="o">=</span> <span class="n">make_stft_objects</span><span class="p">(</span>
+            <span class="n">tfk</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+            <span class="n">i_dec_level</span><span class="p">,</span>
+            <span class="n">run_obj</span><span class="p">,</span>
+            <span class="n">run_xrds</span><span class="p">,</span>
+            <span class="n">units</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Pack FCs into h5</span>
+        <span class="n">dec_level_config</span> <span class="o">=</span> <span class="n">tfk</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">decimations</span><span class="p">[</span><span class="n">i_dec_level</span><span class="p">]</span>
+        <span class="n">save_fourier_coefficients</span><span class="p">(</span><span class="n">dec_level_config</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">run_obj</span><span class="p">,</span> <span class="n">stft_obj</span><span class="p">)</span>
+        <span class="n">stfts</span> <span class="o">=</span> <span class="n">append_chunk_to_stfts</span><span class="p">(</span><span class="n">stfts</span><span class="p">,</span> <span class="n">stft_obj</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">remote</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">stfts</span></div>
+
+
+<div class="viewcode-block" id="process_mth5_legacy"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.process_mth5.process_mth5_legacy">[docs]</a><span class="k">def</span> <span class="nf">process_mth5_legacy</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">,</span>
+    <span class="n">tfk_dataset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">units</span><span class="o">=</span><span class="s2">&quot;MT&quot;</span><span class="p">,</span>
+    <span class="n">show_plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">z_file_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">return_collection</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the main method used to transform a processing_config,</span>
+<span class="sd">    and a kernel_dataset into a transfer function estimate.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config: mt_metadata.transfer_functions.processing.aurora.Processing or path to json</span>
+<span class="sd">        All processing parameters</span>
+<span class="sd">    tfk_dataset: aurora.tf_kernel.dataset.Dataset or None</span>
+<span class="sd">        Specifies what datasets to process according to config</span>
+<span class="sd">    units: string</span>
+<span class="sd">        &quot;MT&quot; or &quot;SI&quot;.  To be deprecated once data have units embedded</span>
+<span class="sd">    show_plot: boolean</span>
+<span class="sd">        Only used for dev</span>
+<span class="sd">    z_file_path: string or pathlib.Path</span>
+<span class="sd">        Target path for a z_file output if desired</span>
+<span class="sd">    return_collection : boolean</span>
+<span class="sd">        return_collection=False will return an mt_metadata TF object</span>
+<span class="sd">        return_collection=True will return</span>
+<span class="sd">        aurora.transfer_function.transfer_function_collection.TransferFunctionCollection</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tf_collection: TransferFunctionCollection or mt_metadata TF</span>
+<span class="sd">        The transfer function object</span>
+<span class="sd">    tf_cls: mt_metadata.transfer_functions.TF</span>
+<span class="sd">        TF object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Initialize config and mth5s</span>
+    <span class="n">tfk</span> <span class="o">=</span> <span class="n">TransferFunctionKernel</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">tfk_dataset</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">tfk</span><span class="o">.</span><span class="n">make_processing_summary</span><span class="p">()</span>
+    <span class="n">tfk</span><span class="o">.</span><span class="n">show_processing_summary</span><span class="p">()</span>
+    <span class="n">tfk</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+
+    <span class="n">tfk</span><span class="o">.</span><span class="n">initialize_mth5s</span><span class="p">()</span>
+
+    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Processing config indicates </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">tfk</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">decimations</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;decimation levels&quot;</span>
+    <span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="n">tf_dict</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">i_dec_level</span><span class="p">,</span> <span class="n">dec_level_config</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tfk</span><span class="o">.</span><span class="n">valid_decimations</span><span class="p">()):</span>
+        <span class="c1"># if not tfk.all_fcs_already_exist():</span>
+        <span class="n">tfk</span><span class="o">.</span><span class="n">update_dataset_df</span><span class="p">(</span><span class="n">i_dec_level</span><span class="p">)</span>
+        <span class="n">tfk</span><span class="o">.</span><span class="n">apply_clock_zero</span><span class="p">(</span><span class="n">dec_level_config</span><span class="p">)</span>
+
+        <span class="n">stfts</span> <span class="o">=</span> <span class="n">get_spectrogams</span><span class="p">(</span><span class="n">tfk</span><span class="p">,</span> <span class="n">i_dec_level</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="n">units</span><span class="p">)</span>
+
+        <span class="n">local_merged_stft_obj</span><span class="p">,</span> <span class="n">remote_merged_stft_obj</span> <span class="o">=</span> <span class="n">merge_stfts</span><span class="p">(</span><span class="n">stfts</span><span class="p">,</span> <span class="n">tfk</span><span class="p">)</span>
+
+        <span class="c1"># FC TF Interface here (see Note #3)</span>
+        <span class="c1"># Feature Extraction, Selection of weights</span>
+
+        <span class="n">ttfz_obj</span> <span class="o">=</span> <span class="n">process_tf_decimation_level</span><span class="p">(</span>
+            <span class="n">tfk</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+            <span class="n">i_dec_level</span><span class="p">,</span>
+            <span class="n">local_merged_stft_obj</span><span class="p">,</span>
+            <span class="n">remote_merged_stft_obj</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ttfz_obj</span><span class="o">.</span><span class="n">apparent_resistivity</span><span class="p">(</span>
+            <span class="n">tfk</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">channel_nomenclature</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="n">units</span>
+        <span class="p">)</span>
+        <span class="n">tf_dict</span><span class="p">[</span><span class="n">i_dec_level</span><span class="p">]</span> <span class="o">=</span> <span class="n">ttfz_obj</span>
+
+        <span class="k">if</span> <span class="n">show_plot</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">aurora.sandbox.plot_helpers</span> <span class="kn">import</span> <span class="n">plot_tf_obj</span>
+
+            <span class="n">plot_tf_obj</span><span class="p">(</span><span class="n">ttfz_obj</span><span class="p">,</span> <span class="n">out_filename</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="n">tf_collection</span> <span class="o">=</span> <span class="n">TransferFunctionCollection</span><span class="p">(</span>
+        <span class="n">tf_dict</span><span class="o">=</span><span class="n">tf_dict</span><span class="p">,</span> <span class="n">processing_config</span><span class="o">=</span><span class="n">tfk</span><span class="o">.</span><span class="n">config</span>
+    <span class="p">)</span>
+
+    <span class="n">tf_cls</span> <span class="o">=</span> <span class="n">tfk</span><span class="o">.</span><span class="n">export_tf_collection</span><span class="p">(</span><span class="n">tf_collection</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">z_file_path</span><span class="p">:</span>
+        <span class="n">tf_cls</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">z_file_path</span><span class="p">)</span>
+
+    <span class="n">tfk</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">close_mth5s</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">return_collection</span><span class="p">:</span>
+        <span class="c1"># this is now really only to be used for debugging and may be deprecated soon</span>
+        <span class="k">return</span> <span class="n">tf_collection</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">tf_cls</span></div>
+
+
+<div class="viewcode-block" id="process_mth5"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.process_mth5.process_mth5">[docs]</a><span class="k">def</span> <span class="nf">process_mth5</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">,</span>
+    <span class="n">tfk_dataset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">units</span><span class="o">=</span><span class="s2">&quot;MT&quot;</span><span class="p">,</span>
+    <span class="n">show_plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">z_file_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">return_collection</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">processing_type</span><span class="o">=</span><span class="s2">&quot;legacy&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a pass-through method that routes the config and tfk_dataset to MT data processing.</span>
+<span class="sd">    It currently only supports legacy aurora processing.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config: mt_metadata.transfer_functions.processing.aurora.Processing or path to json</span>
+<span class="sd">        All processing parameters</span>
+<span class="sd">    tfk_dataset: aurora.tf_kernel.dataset.Dataset or None</span>
+<span class="sd">        Specifies what datasets to process according to config</span>
+<span class="sd">    units: string</span>
+<span class="sd">        &quot;MT&quot; or &quot;SI&quot;.  To be deprecated once data have units embedded</span>
+<span class="sd">    show_plot: boolean</span>
+<span class="sd">        Only used for dev</span>
+<span class="sd">    z_file_path: string or pathlib.Path</span>
+<span class="sd">        Target path for a z_file output if desired</span>
+<span class="sd">    return_collection : boolean</span>
+<span class="sd">        return_collection=False will return an mt_metadata TF object</span>
+<span class="sd">        return_collection=True will return</span>
+<span class="sd">        aurora.transfer_function.transfer_function_collection.TransferFunctionCollection</span>
+<span class="sd">    processing_type: string</span>
+<span class="sd">        Controlled vocabulary, must be one of [&quot;legacy&quot;,]</span>
+<span class="sd">        This is not really supported now, but the idea is that in future, the config and tfk_dataset can be passed to</span>
+<span class="sd">        another processing method if desired.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tf_obj: TransferFunctionCollection or mt_metadata.transfer_functions.TF</span>
+<span class="sd">        The transfer function object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">processing_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">SUPPORTED_PROCESSINGS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Processing type </span><span class="si">{</span><span class="n">processing_type</span><span class="si">}</span><span class="s2"> not supported&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">processing_type</span> <span class="o">==</span> <span class="s2">&quot;legacy&quot;</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">process_mth5_legacy</span><span class="p">(</span>
+                <span class="n">config</span><span class="p">,</span>
+                <span class="n">tfk_dataset</span><span class="o">=</span><span class="n">tfk_dataset</span><span class="p">,</span>
+                <span class="n">units</span><span class="o">=</span><span class="n">units</span><span class="p">,</span>
+                <span class="n">show_plot</span><span class="o">=</span><span class="n">show_plot</span><span class="p">,</span>
+                <span class="n">z_file_path</span><span class="o">=</span><span class="n">z_file_path</span><span class="p">,</span>
+                <span class="n">return_collection</span><span class="o">=</span><span class="n">return_collection</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">close_open_files</span><span class="p">()</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Failed to run legacy processing</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;closing all open mth5 files and exiting&quot;</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;The encountered exception was </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">return</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

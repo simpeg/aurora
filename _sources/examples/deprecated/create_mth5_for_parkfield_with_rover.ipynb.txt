@@ -1,0 +1,806 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Worked example with Parkfield metadata\n",
+    "\n",
+    "In this example we use obspy to load the stationxml as an Inventory() object and to access data via ROVER.  The inventory provides an iterable view of all the filter stages that are stored in the stationxml.  \n",
+    "\n",
+    "The data are accessed through IRIS ROVER which provides local miniseed files that can also be accessed through obspy.\n",
+    "\n",
+    "Much of the code here is a variant of the example archived in the mth5 repository in the file:\n",
+    "\n",
+    "make_mth5_from_iris_dmc_local.py\n",
+    "\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "2021-09-02 15:58:56,510 [line 106] mth5.setup_logger - INFO: Logging file can be found /home/kkappler/software/irismt/mth5/logs/mth5_debug.log\n"
+     ]
+    }
+   ],
+   "source": [
+    "from obspy import read, UTCDateTime\n",
+    "from pathlib import Path\n",
+    "\n",
+    "from aurora.general_helper_functions import execute_command\n",
+    "from aurora.sandbox.io_helpers.inventory_review import scan_inventory_for_nonconformity\n",
+    "from aurora.sandbox.io_helpers.iris_dataset_config import IRISDatasetConfig\n",
+    "from aurora.sandbox.mth5_helpers import initialize_mth5\n",
+    "from mth5 import mth5\n",
+    "from mth5.timeseries import RunTS\n",
+    "\n",
+    "from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Installing ROVER"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "To install rover go to\n",
+    "https://iris-edu.github.io/rover/\n",
+    "and follow the directions or:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Requirement already satisfied: rover[mseedindex] in /home/kkappler/anaconda2/envs/ulf_geoe/lib/python3.7/site-packages (1.0.5)\n",
+      "Requirement already satisfied: requests in /home/kkappler/anaconda2/envs/ulf_geoe/lib/python3.7/site-packages (from rover[mseedindex]) (2.26.0)\n",
+      "Requirement already satisfied: future in /home/kkappler/anaconda2/envs/ulf_geoe/lib/python3.7/site-packages (from rover[mseedindex]) (0.18.2)\n",
+      "Requirement already satisfied: mseedindex in /home/kkappler/anaconda2/envs/ulf_geoe/lib/python3.7/site-packages (from rover[mseedindex]) (2.7.1)\n",
+      "Requirement already satisfied: certifi>=2017.4.17 in /home/kkappler/anaconda2/envs/ulf_geoe/lib/python3.7/site-packages (from requests->rover[mseedindex]) (2021.5.30)\n",
+      "Requirement already satisfied: urllib3<1.27,>=1.21.1 in /home/kkappler/anaconda2/envs/ulf_geoe/lib/python3.7/site-packages (from requests->rover[mseedindex]) (1.26.6)\n",
+      "Requirement already satisfied: charset-normalizer~=2.0.0 in /home/kkappler/anaconda2/envs/ulf_geoe/lib/python3.7/site-packages (from requests->rover[mseedindex]) (2.0.0)\n",
+      "Requirement already satisfied: idna<4,>=2.5 in /home/kkappler/anaconda2/envs/ulf_geoe/lib/python3.7/site-packages (from requests->rover[mseedindex]) (3.1)\n"
+     ]
+    }
+   ],
+   "source": [
+    "!pip install rover[mseedindex]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Configuring ROVER"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Navigate to a directory where we will execute rover "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "rover path = /home/kkappler/rover\n"
+     ]
+    }
+   ],
+   "source": [
+    "ROVER_DIR = Path().home().joinpath(\"rover\")\n",
+    "ROVER_DIR.mkdir(exist_ok=True)\n",
+    "print(f\"rover path = {ROVER_DIR}\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "rover init-repository /home/kkappler/rover\n"
+     ]
+    }
+   ],
+   "source": [
+    "cmd = f\"rover init-repository {ROVER_DIR}\"\n",
+    "print(cmd)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "executing from /home/kkappler/\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "init-repository  DEFAULT: Writing new config file \"/home/kkappler/rover/rover.config\"\n"
+     ]
+    }
+   ],
+   "source": [
+    "execute_command(cmd)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Defining a request file"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "executing from /home/kkappler/\n",
+      "BK PKD * BQ2 2004-09-28T00:00:00.000000Z 2004-09-28T01:59:59.974999Z\n",
+      "BK PKD * BQ3 2004-09-28T00:00:00.000000Z 2004-09-28T01:59:59.974999Z\n",
+      "BK PKD * BT1 2004-09-28T00:00:00.000000Z 2004-09-28T01:59:59.974999Z\n",
+      "BK PKD * BT2 2004-09-28T00:00:00.000000Z 2004-09-28T01:59:59.974999Z\n",
+      "BK PKD * BT3 2004-09-28T00:00:00.000000Z 2004-09-28T01:59:59.974999Z\n"
+     ]
+    }
+   ],
+   "source": [
+    "request_file = ROVER_DIR.joinpath(\"BK_PKD_B_Request.txt\")\n",
+    "f = open(request_file, 'w')\n",
+    "f.writelines(\"BK PKD * BQ2 2004-09-28T00:00:00.000000Z 2004-09-28T01:59:59.974999Z\\n\")\n",
+    "f.writelines(\"BK PKD * BQ3 2004-09-28T00:00:00.000000Z 2004-09-28T01:59:59.974999Z\\n\")\n",
+    "f.writelines(\"BK PKD * BT1 2004-09-28T00:00:00.000000Z 2004-09-28T01:59:59.974999Z\\n\")\n",
+    "f.writelines(\"BK PKD * BT2 2004-09-28T00:00:00.000000Z 2004-09-28T01:59:59.974999Z\\n\")\n",
+    "#f.writelines(\"BK PKD * BT3 2004-09-28T00:00:00.000000Z 2004-09-28T01:59:59.974999Z\\n\")\n",
+    "f.close()\n",
+    "cmd = f\"cat {request_file}\"\n",
+    "execute_command(cmd)\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Retrieving Data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "executing from /home/kkappler/rover\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "retrieve  DEFAULT: ROVER version 1.0.5 - starting retrieve\n",
+      "retrieve  DEFAULT: Status available at http://127.0.0.1:8000\n",
+      "retrieve  DEFAULT: Trying new retrieval attempt 1 of 3.\n",
+      "retrieve  DEFAULT: Downloading BK_PKD 2004-272 (N_S 1/1; day 1/1)\n",
+      "retrieve  DEFAULT: Successful retrieval, downloaded data so resetting retry count and verify.\n",
+      "retrieve  DEFAULT: Trying new retrieval attempt 1 of 3.\n",
+      "retrieve  DEFAULT: Retrieval attempt 1 of 3 is complete.\n",
+      "retrieve  DEFAULT: The initial retrieval attempt resulted in no errors or data downloaded, will verify.\n",
+      "retrieve  DEFAULT: Trying new retrieval attempt 2 of 3.\n",
+      "retrieve  DEFAULT: Retrieval attempt 2 of 3 is complete.\n",
+      "retrieve  DEFAULT: The final retrieval, attempt 2 of 3, made no downloads and had no errors, we are complete.\n",
+      "retrieve  DEFAULT: \n",
+      "retrieve  DEFAULT: ----- Retrieval Finished -----\n",
+      "retrieve  DEFAULT: \n",
+      "retrieve  DEFAULT: \n",
+      "retrieve  DEFAULT: A ROVER retrieve task on thales4\n",
+      "retrieve  DEFAULT: started 2021-09-02T16:00:43 (2021-09-02T23:00:43 UTC)\n",
+      "retrieve  DEFAULT: has completed in 11.07 seconds\n",
+      "retrieve  DEFAULT: \n",
+      "retrieve  DEFAULT: The download for 1 stations totaled 1.7 MiB,\n",
+      "retrieve  DEFAULT: with data covering 28799 seconds.\n",
+      "retrieve  DEFAULT: \n",
+      "retrieve  DEFAULT: A total of 1 downloads were made, with 0 errors (0 on final pass of 2).\n",
+      "retrieve  DEFAULT: \n"
+     ]
+    }
+   ],
+   "source": [
+    "cmd = f\"rover retrieve {request_file}\"\n",
+    "execute_command(cmd, exec_dir=str(ROVER_DIR))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Using IRISDatasetConfig to get metadata and data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "test_data_set = IRISDatasetConfig()\n",
+    "test_data_set.dataset_id = \"rover_example\"\n",
+    "test_data_set.network = \"BK\"\n",
+    "test_data_set.station = \"PKD\"\n",
+    "test_data_set.starttime = UTCDateTime(\"2004-09-28T00:00:00\")\n",
+    "test_data_set.endtime = UTCDateTime(\"2004-09-28T02:00:00\")\n",
+    "test_data_set.channel_codes = \"BQ2,BQ3,BT1,BT2\"\n",
+    "test_data_set.description = \"Two hours of data at 10Hz from PKD 17h before M6\"\n",
+    "test_data_set.components_list = [\"ex\", \"ey\", \"hx\", \"hy\",]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "['Q2', 'Q3', 'T1', 'T2']\n",
+      "Detected a likely non-FDSN conformant convnetion unless there is a vertical electric dipole\n",
+      "Fixing Electric channel codes\n",
+      "HACK FIX ELECTRIC CHANNEL CODES COMPLETE\n",
+      "Detected a likely non-FDSN conformant convnetion unless there are Tidal data in this study\n",
+      "Fixing Magnetic channel codes\n",
+      "HACK FIX MAGNETIC CHANNEL CODES COMPLETE\n",
+      "BQ1 1 V/M\n",
+      "BQ1 2 V\n",
+      "BQ1 3 V\n",
+      "BQ1 4 COUNTS\n",
+      "BQ1 5 COUNTS\n",
+      "BQ1 6 COUNTS\n",
+      "BQ1 7 COUNTS\n",
+      "BQ2 1 V/M\n",
+      "BQ2 2 V\n",
+      "BQ2 3 V\n",
+      "BQ2 4 COUNTS\n",
+      "BQ2 5 COUNTS\n",
+      "BQ2 6 COUNTS\n",
+      "BQ2 7 COUNTS\n",
+      "BF1 1 T\n",
+      "BF1 2 V\n",
+      "BF1 3 COUNTS\n",
+      "BF1 4 COUNTS\n",
+      "BF1 5 COUNTS\n",
+      "BF1 6 COUNTS\n",
+      "BF2 1 T\n",
+      "BF2 2 V\n",
+      "BF2 3 COUNTS\n",
+      "BF2 4 COUNTS\n",
+      "BF2 5 COUNTS\n",
+      "BF2 6 COUNTS\n",
+      "BK-PKD-BQ1 7-stage response\n",
+      "stagename None\n",
+      "ASSIGNING stage Response type: PolesZerosResponseStage, Stage Sequence Number: 1\n",
+      "\tBQ1_0 \n",
+      "\tFrom V/M (Electric field in Volts per meter) to V (Volts)\n",
+      "\tStage gain: 101.0, defined at 8.00 Hz\n",
+      "\tTransfer function type: LAPLACE (RADIANS/SECOND)\n",
+      "\tNormalization factor: 1.22687e+09, Normalization frequency: 8.00 Hz\n",
+      "\tPoles: 15079.644737231j, 81681.4089933346j\n",
+      "\tZeros: , name BQ1_0\n",
+      "stagename None\n",
+      "ASSIGNING stage Response type: ResponseStage, Stage Sequence Number: 2\n",
+      "\tBQ1_1 \n",
+      "\tFrom V (Volts) to V (Volts)\n",
+      "\tStage gain: 31.37, defined at 8.00 Hz, name BQ1_1\n",
+      "stagename None\n",
+      "ASSIGNING stage Response type: CoefficientsTypeResponseStage, Stage Sequence Number: 3\n",
+      "\tBQ1_2 \n",
+      "\tFrom V (Volts) to COUNTS (Digital Counts)\n",
+      "\tStage gain: 427135.0, defined at 8.00 Hz\n",
+      "\tDecimation:\n",
+      "\t\tInput Sample Rate: 32000.00 Hz\n",
+      "\t\tDecimation Factor: 1\n",
+      "\t\tDecimation Offset: 0\n",
+      "\t\tDecimation Delay: 0.00\n",
+      "\t\tDecimation Correction: 0.00\n",
+      "\tTransfer function type: DIGITAL\n",
+      "\tContains 0 numerators and 0 denominators, name BQ1_2\n",
+      "stagename FIR_AD32M\n",
+      "stagename FIR_FS2D5\n",
+      "stagename FIR_F96C\n",
+      "stagename FIR_FS2D5\n",
+      "BK-PKD-BQ2 7-stage response\n",
+      "stagename None\n",
+      "ASSIGNING stage Response type: PolesZerosResponseStage, Stage Sequence Number: 1\n",
+      "\tBQ2_0 \n",
+      "\tFrom V/M (Electric field in Volts per meter) to V (Volts)\n",
+      "\tStage gain: 99.5, defined at 8.00 Hz\n",
+      "\tTransfer function type: LAPLACE (RADIANS/SECOND)\n",
+      "\tNormalization factor: 1.22687e+09, Normalization frequency: 8.00 Hz\n",
+      "\tPoles: 15079.644737231j, 81681.4089933346j\n",
+      "\tZeros: , name BQ2_0\n",
+      "stagename None\n",
+      "ASSIGNING stage Response type: ResponseStage, Stage Sequence Number: 2\n",
+      "\tBQ2_1 \n",
+      "\tFrom V (Volts) to V (Volts)\n",
+      "\tStage gain: 31.55, defined at 8.00 Hz, name BQ2_1\n",
+      "stagename None\n",
+      "ASSIGNING stage Response type: CoefficientsTypeResponseStage, Stage Sequence Number: 3\n",
+      "\tBQ2_2 \n",
+      "\tFrom V (Volts) to COUNTS (Digital Counts)\n",
+      "\tStage gain: 431027.0, defined at 8.00 Hz\n",
+      "\tDecimation:\n",
+      "\t\tInput Sample Rate: 32000.00 Hz\n",
+      "\t\tDecimation Factor: 1\n",
+      "\t\tDecimation Offset: 0\n",
+      "\t\tDecimation Delay: 0.00\n",
+      "\t\tDecimation Correction: 0.00\n",
+      "\tTransfer function type: DIGITAL\n",
+      "\tContains 0 numerators and 0 denominators, name BQ2_2\n",
+      "stagename FIR_AD32M\n",
+      "stagename FIR_FS2D5\n",
+      "stagename FIR_F96C\n",
+      "stagename FIR_FS2D5\n",
+      "BK-PKD-BF1 6-stage response\n",
+      "stagename None\n",
+      "ASSIGNING stage Response type: PolesZerosResponseStage, Stage Sequence Number: 1\n",
+      "\tBF1_0 \n",
+      "\tFrom T (Magnetic Flux Density in Teslas) to V (Volts)\n",
+      "\tStage gain: 0.30100000000000005, defined at 8.00 Hz\n",
+      "\tTransfer function type: LAPLACE (RADIANS/SECOND)\n",
+      "\tNormalization factor: 7.82e+06, Normalization frequency: 8.00 Hz\n",
+      "\tPoles: (-1.21453971987781+0j), (-1977.06394716448+1977.10186761464j), (-1977.06394716448-1977.10186761464j)\n",
+      "\tZeros: 0j, name BF1_0\n",
+      "stagename None\n",
+      "ASSIGNING stage Response type: CoefficientsTypeResponseStage, Stage Sequence Number: 2\n",
+      "\tBF1_1 \n",
+      "\tFrom V (Volts) to COUNTS (Digital Counts)\n",
+      "\tStage gain: 431659.0, defined at 8.00 Hz\n",
+      "\tDecimation:\n",
+      "\t\tInput Sample Rate: 32000.00 Hz\n",
+      "\t\tDecimation Factor: 1\n",
+      "\t\tDecimation Offset: 0\n",
+      "\t\tDecimation Delay: 0.00\n",
+      "\t\tDecimation Correction: 0.00\n",
+      "\tTransfer function type: DIGITAL\n",
+      "\tContains 0 numerators and 0 denominators, name BF1_1\n",
+      "stagename FIR_AD32M\n",
+      "stagename FIR_FS2D5\n",
+      "stagename FIR_F96C\n",
+      "stagename FIR_FS2D5\n",
+      "BK-PKD-BF2 6-stage response\n",
+      "stagename None\n",
+      "ASSIGNING stage Response type: PolesZerosResponseStage, Stage Sequence Number: 1\n",
+      "\tBF2_0 \n",
+      "\tFrom T (Magnetic Flux Density in Teslas) to V (Volts)\n",
+      "\tStage gain: 0.30100000000000005, defined at 8.00 Hz\n",
+      "\tTransfer function type: LAPLACE (RADIANS/SECOND)\n",
+      "\tNormalization factor: 7.95399e+06, Normalization frequency: 8.00 Hz\n",
+      "\tPoles: (-1.17998220068833+0j), (-1993.94674042116+1993.98498468641j), (-1993.94674042116-1993.98498468641j)\n",
+      "\tZeros: 0j, name BF2_0\n",
+      "stagename None\n",
+      "ASSIGNING stage Response type: CoefficientsTypeResponseStage, Stage Sequence Number: 2\n",
+      "\tBF2_1 \n",
+      "\tFrom V (Volts) to COUNTS (Digital Counts)\n",
+      "\tStage gain: 421721.0, defined at 8.00 Hz\n",
+      "\tDecimation:\n",
+      "\t\tInput Sample Rate: 32000.00 Hz\n",
+      "\t\tDecimation Factor: 1\n",
+      "\t\tDecimation Offset: 0\n",
+      "\t\tDecimation Delay: 0.00\n",
+      "\t\tDecimation Correction: 0.00\n",
+      "\tTransfer function type: DIGITAL\n",
+      "\tContains 0 numerators and 0 denominators, name BF2_1\n",
+      "stagename FIR_AD32M\n",
+      "stagename FIR_FS2D5\n",
+      "stagename FIR_F96C\n",
+      "stagename FIR_FS2D5\n",
+      "Inventory Networks Reassigned\n"
+     ]
+    }
+   ],
+   "source": [
+    "inventory = test_data_set.get_inventory_from_iris(ensure_inventory_stages_are_named=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "tags": []
+   },
+   "source": [
+    "## Handle non-FDSN compliant metadata"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "['Q1', 'Q2', 'F1', 'F2']\n",
+      "BQ1 1 V/M\n",
+      "BQ1 2 V\n",
+      "BQ1 3 V\n",
+      "BQ1 4 COUNTS\n",
+      "BQ1 5 COUNTS\n",
+      "BQ1 6 COUNTS\n",
+      "BQ1 7 COUNTS\n",
+      "BQ2 1 V/M\n",
+      "BQ2 2 V\n",
+      "BQ2 3 V\n",
+      "BQ2 4 COUNTS\n",
+      "BQ2 5 COUNTS\n",
+      "BQ2 6 COUNTS\n",
+      "BQ2 7 COUNTS\n",
+      "BF1 1 T\n",
+      "BF1 2 V\n",
+      "BF1 3 COUNTS\n",
+      "BF1 4 COUNTS\n",
+      "BF1 5 COUNTS\n",
+      "BF1 6 COUNTS\n",
+      "BF2 1 T\n",
+      "BF2 2 V\n",
+      "BF2 3 COUNTS\n",
+      "BF2 4 COUNTS\n",
+      "BF2 5 COUNTS\n",
+      "BF2 6 COUNTS\n"
+     ]
+    }
+   ],
+   "source": [
+    "inventory = scan_inventory_for_nonconformity(inventory)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Inventory created at 2021-09-02T23:08:34.000000Z\n",
+       "\tCreated by: IRIS WEB SERVICE: fdsnws-station | version: 1.1.47\n",
+       "\t\t    http://service.iris.edu/fdsnws/station/1/query?starttime=2004-09-28...\n",
+       "\tSending institution: IRIS-DMC (IRIS-DMC)\n",
+       "\tContains:\n",
+       "\t\tNetworks (1):\n",
+       "\t\t\tBK\n",
+       "\t\tStations (1):\n",
+       "\t\t\tBK.PKD (Bear Valley Ranch, Parkfield, CA, USA)\n",
+       "\t\tChannels (4):\n",
+       "\t\t\tBK.PKD..BF1, BK.PKD..BF2, BK.PKD..BQ1, BK.PKD..BQ2"
+      ]
+     },
+     "execution_count": 19,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "inventory"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "NEWLY ENCOUNTERED 20210514 -- may need some massaging\n",
+      "NEWLY ENCOUNTERED 20210514 -- may need some massaging\n",
+      "Experiment Contents\n",
+      "--------------------\n",
+      "Number of Surveys: 1\n",
+      "\tSurvey ID: None\n",
+      "\tNumber of Stations: 1\n",
+      "\t--------------------\n",
+      "\t\tStation ID: PKD\n",
+      "\t\tNumber of Runs: 1\n",
+      "\t\t--------------------\n",
+      "\t\t\tRun ID: 001\n",
+      "\t\t\tNumber of Channels: 4\n",
+      "\t\t\tRecorded Channels: ex, ey, hx, hy\n",
+      "\t\t\tStart: 2003-09-12T18:54:00+00:00\n",
+      "\t\t\tEnd:   2005-03-15T16:45:00+00:00\n",
+      "\t\t\t--------------------\n"
+     ]
+    }
+   ],
+   "source": [
+    "\n",
+    "translator = XMLInventoryMTExperiment()\n",
+    "experiment = translator.xml_to_mt(inventory_object=inventory)\n",
+    "print(experiment)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "run_metadata = experiment.surveys[0].stations[0].runs[0]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# We have the metadata, now get the data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "ls -lr /home/kkappler/rover/data/BK/2004/272\n"
+     ]
+    }
+   ],
+   "source": [
+    "cmd = f\"ls -lr {ROVER_DIR.joinpath('data','BK','2004','272')}\"\n",
+    "print(cmd)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "executing from /home/kkappler/\n",
+      "total 1700\n",
+      "-rw-rw-r-- 1 kkappler kkappler 1740288 Sep  2 16:00 PKD.BK.2004.272\n"
+     ]
+    }
+   ],
+   "source": [
+    "execute_command(cmd)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "seed_path = ROVER_DIR.joinpath('data','BK','2004','272','PKD.BK.2004.272')\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "streams = read(seed_path.as_posix())"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "0 BQ2\n",
+      "1 BQ3\n",
+      "2 BT1\n",
+      "3 BT2\n"
+     ]
+    }
+   ],
+   "source": [
+    "for i in range(len(streams)):\n",
+    "    print(i,streams[i].stats.channel)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 27,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "streams[0].stats[\"channel\"] = \"BQ1\"\n",
+    "streams[1].stats[\"channel\"] = \"BQ2\"\n",
+    "streams[2].stats[\"channel\"] = \"BF1\"\n",
+    "streams[3].stats[\"channel\"] = \"BF2\""
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "['2004-09-28T00:00:00']\n",
+      "['2004-09-28T01:59:59.950000']\n"
+     ]
+    }
+   ],
+   "source": [
+    "# runs can be split into channels with similar start times and sample rates\n",
+    "start_times = sorted(list(set([tr.stats.starttime.isoformat() for tr in streams])))\n",
+    "end_times = sorted(list(set([tr.stats.endtime.isoformat() for tr in streams])))\n",
+    "print(start_times)\n",
+    "print(end_times)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "2021-09-02 16:09:34,671 [line 526] mth5.mth5.MTH5._initialize_file - INFO: Initialized MTH5 file from_rover.h5 in mode w\n"
+     ]
+    }
+   ],
+   "source": [
+    "# initiate MTH5 file\n",
+    "h5_path = \"from_rover.h5\"\n",
+    "mth5_obj = initialize_mth5(h5_path)\n",
+    "# fill metadata\n",
+    "mth5_obj.from_experiment(experiment)\n",
+    "station_group = mth5_obj.get_station(test_data_set.station)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Below:\n",
+    "We need to add run metadata to each RunTS because in the stationxml the channel metadata is only one entry for all similar channels regardless of their duration so we need to make sure that propagates to the MTH5."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 30,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "/home/kkappler/software/irismt/mth5/mth5/timeseries/channel_ts.py:531: FutureWarning: Timestamp.freq is deprecated and will be removed in a future version\n",
+      "  if self._ts.coords.indexes[\"time\"][0].freq is None:\n",
+      "/home/kkappler/software/irismt/mth5/mth5/timeseries/channel_ts.py:541: FutureWarning: Timestamp.freq is deprecated and will be removed in a future version\n",
+      "  sr = 1e9 / self._ts.coords.indexes[\"time\"][0].freq.nanos\n",
+      "2021-09-02 16:09:40,314 [line 707] mth5.groups.base.Station.add_run - INFO: run 001 already exists, returning existing group.\n",
+      "2021-09-02 16:09:40,570 [line 1165] mth5.groups.base.Run.add_channel - INFO: channel ex already exists, returning existing group.\n",
+      "2021-09-02 16:09:40,586 [line 1169] mth5.groups.base.Run.add_channel - INFO: updating data and metadata\n",
+      "2021-09-02 16:09:43,754 [line 1165] mth5.groups.base.Run.add_channel - INFO: channel ey already exists, returning existing group.\n",
+      "2021-09-02 16:09:43,768 [line 1169] mth5.groups.base.Run.add_channel - INFO: updating data and metadata\n",
+      "2021-09-02 16:09:46,590 [line 1165] mth5.groups.base.Run.add_channel - INFO: channel hx already exists, returning existing group.\n",
+      "2021-09-02 16:09:46,608 [line 1169] mth5.groups.base.Run.add_channel - INFO: updating data and metadata\n",
+      "2021-09-02 16:09:49,552 [line 1165] mth5.groups.base.Run.add_channel - INFO: channel hy already exists, returning existing group.\n",
+      "2021-09-02 16:09:49,565 [line 1169] mth5.groups.base.Run.add_channel - INFO: updating data and metadata\n"
+     ]
+    }
+   ],
+   "source": [
+    "for index, times in enumerate(zip(start_times, end_times), 1):\n",
+    "    run_id = f\"{index:03}\"\n",
+    "    run_stream = streams.slice(UTCDateTime(times[0]), UTCDateTime(times[1]))\n",
+    "    run_ts_obj = RunTS()\n",
+    "    run_ts_obj.from_obspy_stream(run_stream, run_metadata)\n",
+    "    run_ts_obj.run_metadata.id = run_id\n",
+    "    run_group = station_group.add_run(run_id)\n",
+    "    run_group.from_runts(run_ts_obj)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 31,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "2021-09-02 16:10:02,098 [line 569] mth5.mth5.MTH5.close_mth5 - INFO: Flushing and closing from_rover.h5\n"
+     ]
+    }
+   ],
+   "source": [
+    "mth5_obj.close_mth5()"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "ulf_geoe",
+   "language": "python",
+   "name": "ulf_geoe"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.10"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}
