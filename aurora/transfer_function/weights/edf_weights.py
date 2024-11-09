@@ -198,17 +198,19 @@ def effective_degrees_of_freedom_weights(
         Weights for reducing leverage points.
 
     """
+    # Initialize the weights
+    n_observations_initial = len(X.observation)
+    weights = np.ones(n_observations_initial)
 
+    # validate num channels
     num_channels = len(X.data_vars)
     if num_channels != 2:
-        logger.error("edfwts only works for 2 input channels")
-        raise Exception
+        logger.error(f"edfwts only works for 2 input channels, not {num_channels}")
+        return weights
+
     X = X.to_array(dim="channel")
     if R is not None:
         R = R.to_array(dim="channel")
-
-    n_observations_initial = len(X.observation)
-    weights = np.ones(n_observations_initial)
 
     # reduce the data to only valid (non-nan) observations
     if R is not None:
