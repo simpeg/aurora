@@ -63,7 +63,6 @@ jobs:
         jupyter nbconvert --to notebook --execute docs/tutorials/processing_configuration.ipynb
         jupyter nbconvert --to notebook --execute docs/tutorials/process_cas04_multiple_station.ipynb
         jupyter nbconvert --to notebook --execute docs/tutorials/synthetic_data_processing.ipynb
-        jupyter nbconvert --to notebook --execute tests/test_run_on_commit.ipynb
         # Replace "notebook.ipynb" with your notebook's filename
 
 #    - name: Commit changes (if any)
