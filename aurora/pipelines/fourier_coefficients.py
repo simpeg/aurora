@@ -85,7 +85,7 @@ def fc_decimations_creator(
     decimation_factors: Optional[list] = None,
     max_levels: Optional[int] = 6,
     time_period: Optional[TimePeriod] = None,
-) -> list[FCDecimation]:
+) -> List[FCDecimation]:
     """
 
     Creates mt_metadata FCDecimation objects that parameterize Fourier coefficient decimation levels.
