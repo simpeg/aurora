@@ -61,7 +61,6 @@ Note 3: This point in the loop marks the interface between _generation_ of the F
 # Imports
 # =============================================================================
 
-import mt_metadata.timeseries.time_period
 import mth5.mth5
 import pathlib
 
@@ -71,6 +70,7 @@ from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
 from loguru import logger
 from mth5.mth5 import MTH5
 from mth5.utils.helpers import path_or_mth5_object
+from mt_metadata.timeseries.time_period import TimePeriod
 from mt_metadata.transfer_functions.processing.fourier_coefficients import (
     Decimation as FCDecimation,
 )
@@ -82,10 +82,10 @@ GROUPBY_COLUMNS = ["survey", "station", "sample_rate"]
 
 def fc_decimations_creator(
     initial_sample_rate: float,
-    decimation_factors: Optional[Union[list, None]] = None,
+    decimation_factors: Optional[list] = None,
     max_levels: Optional[int] = 6,
-    time_period: mt_metadata.timeseries.TimePeriod = None,
-) -> list:
+    time_period: Optional[TimePeriod] = None,
+) -> list[FCDecimation]:
     """
 
     Creates mt_metadata FCDecimation objects that parameterize Fourier coefficient decimation levels.
@@ -97,11 +97,12 @@ def fc_decimations_creator(
     ----------
     initial_sample_rate: float
         Sample rate of the "level0" data -- usually the sample rate during field acquisition.
-    decimation_factors: list (or other iterable)
+    decimation_factors: Optional[list]
         The decimation factors that will be applied at each FC decimation level
-    max_levels: int
+    max_levels: Optional[int]
         The maximum number of decimation levels to allow
-    time_period:
+    time_period: Optional[TimePeriod]
+        Provides the start and end times
 
     Returns
     -------
@@ -137,7 +138,7 @@ def fc_decimations_creator(
         fc_dec.sample_rate_decimation = current_sample_rate
 
         if time_period:
-            if isinstance(time_period, mt_metadata.timeseries.time_period.TimePeriod):
+            if isinstance(time_period, TimePeriod):
                 fc_dec.time_period = time_period
             else:
                 msg = (
@@ -152,15 +153,14 @@ def fc_decimations_creator(
 
 
 @path_or_mth5_object
-def add_fcs_to_mth5(
-    m: MTH5, fc_decimations: Optional[Union[list, None]] = None
-) -> None:
+def add_fcs_to_mth5(m: MTH5, fc_decimations: Optional[Union[str, list]] = None) -> None:
     """
     Add Fourier Coefficient Levels ot an existing MTH5.
 
     **Notes:**
 
-    - This module computes the FCs differently than the legacy aurora pipeline. It uses scipy.signal.spectrogram. There is a test in Aurora to confirm that there are equivalent if we are not using fancy pre-whitening.
+    - This module computes the FCs differently than the legacy aurora pipeline. It uses scipy.signal.spectrogram.
+     There is a test in Aurora to confirm that there are equivalent if we are not using fancy pre-whitening.
 
     - Nomenclature: "usssr_grouper" is the output of a group-by on unique {survey, station, sample_rate} tuples.
 
@@ -168,10 +168,11 @@ def add_fcs_to_mth5(
     ----------
     m: MTH5 object
         The mth5 file, open in append mode.
-    fc_decimations: Union[str, None, List]
+    fc_decimations: Optional[Union[str, list]]
         This specifies the scheme to use for decimating the time series when building the FC layer.
-        None: Just use default (something like four decimation levels, decimated by 4 each time say.
-        String: Controlled Vocabulary, values are a work in progress, that will allow custom definition of the fc_decimations for some common cases. For example, say you have stored already decimated time
+        None: Just use default (something like four decimation levels, decimated by 4 each time say.)
+        String: Controlled Vocabulary, values are a work in progress, that will allow custom definition of
+        the fc_decimations for some common cases. For example, say you have stored already decimated time
         series, then you want simply the zeroth decimation for each run, because the decimated time series live
         under another run container, and that will get its own FCs.  This is experimental.
         List: (**UNTESTED**) -- This means that the user thought about the decimations that they want to create and is
@@ -287,17 +288,19 @@ def get_degenerate_fc_decimation(sample_rate: float) -> list:
 
 
 @path_or_mth5_object
-def read_back_fcs(m: Union[MTH5, pathlib.Path, str], mode="r"):
+def read_back_fcs(m: Union[MTH5, pathlib.Path, str], mode: str = "r") -> None:
     """
-    This is mostly a helper function for tests.  It was used as a sanity check while debugging the FC files, and
+
+    This is a helper function for tests.  It was used as a sanity check while debugging the FC files, and
     also is a good example for how to access the data at each level for each channel.
 
     The Time axis of the FC array will change from level to level, but the frequency axis will stay the same shape
     (for now -- storing all fcs by default)
 
-    Args:
-        m: pathlib.Path, str or an MTH5 object
-            The path to an h5 file that we will scan the fcs from
+    Parameters
+    ----------
+    m: Union[MTH5, pathlib.Path, str]
+        Either a path to an mth5, or an MTH5 object that the FCs will be read back from.
 
 
     """
