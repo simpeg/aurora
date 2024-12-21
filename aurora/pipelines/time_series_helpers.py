@@ -19,7 +19,7 @@ from mt_metadata.transfer_functions.processing.fourier_coefficients import (
 )
 from mth5.groups import RunGroup
 from mth5.timeseries import RunTS
-from typing import Optional, Union
+from typing import Literal, Optional, Union
 
 
 def validate_sample_rate(
@@ -77,6 +77,8 @@ def apply_prewhitening(
 
     """
     if not decimation_obj.prewhitening_type:
+        msg = "No prewhitening specified - skipping this step"
+        logger.info(msg)
         return run_xrds_input
 
     if decimation_obj.prewhitening_type == "first difference":
@@ -316,7 +318,10 @@ def run_ts_to_stft(
 
 
 def calibrate_stft_obj(
-    stft_obj: xr.Dataset, run_obj, units="MT", channel_scale_factors=None
+    stft_obj: xr.Dataset,
+    run_obj: RunGroup,
+    units: Literal["MT", "SI"] = "MT",
+    channel_scale_factors: Optional[dict] = None,
 ) -> xr.Dataset:
     """
     Calibrates frequency domain data into MT units.
@@ -385,7 +390,7 @@ def calibrate_stft_obj(
 
 
 def prototype_decimate(
-    config: mt_metadata.transfer_functions.processing.aurora.decimation.Decimation,
+    config: AuroraDecimationLevel,
     run_xrds: xr.Dataset,
 ) -> xr.Dataset:
     """
