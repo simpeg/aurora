@@ -113,8 +113,9 @@ def apply_recoloring(
     # No recoloring needed if prewhitening not appiled, or recoloring set to False
     if not decimation_obj.prewhitening_type:
         return stft_obj
-    if not decimation_obj.recoloring:
-        return stft_obj
+    # TODO Delete after tests (20241220) -- this check has been moved above the call to this function
+    # if not decimation_obj.recoloring:
+    #     return stft_obj
 
     if decimation_obj.prewhitening_type == "first difference":
         # first difference prewhitening correction is to divide by jw
@@ -194,8 +195,8 @@ def run_ts_to_stft_scipy(
             coords={"frequency": ff, "time": time_axis},
         )
         stft_obj.update({channel_id: xrd})
-
-    stft_obj = apply_recoloring(decimation_obj, stft_obj)
+    if decimation_obj.recoloring:
+        stft_obj = apply_recoloring(decimation_obj, stft_obj)
 
     return stft_obj
 
@@ -318,7 +319,8 @@ def run_ts_to_stft(
         detrend_type=decimation_obj.extra_pre_fft_detrend_type,
     )
 
-    stft_obj = apply_recoloring(decimation_obj, stft_obj)
+    if decimation_obj.recoloring:
+        stft_obj = apply_recoloring(decimation_obj, stft_obj)
 
     return stft_obj
 
