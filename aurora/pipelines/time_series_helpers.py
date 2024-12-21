@@ -11,11 +11,23 @@ from loguru import logger
 
 from aurora.time_series.windowed_time_series import WindowedTimeSeries
 from aurora.time_series.windowing_scheme import window_scheme_from_decimation
+from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
+    DecimationLevel as AuroraDecimationLevel,
+)
+from mt_metadata.transfer_functions.processing.fourier_coefficients import (
+    Decimation as FCDecimation,
+)
+from mth5.groups import RunGroup
+from mth5.timeseries import RunTS
+from typing import Optional, Union
 
 
-def validate_sample_rate(run_ts, expected_sample_rate, tol=1e-4):
+def validate_sample_rate(
+    run_ts: RunTS, expected_sample_rate: float, tol: Optional[float] = 1e-4
+) -> None:
     """
     Check that the sample rate of a run_ts is the expected value, and warn if not.
+    :raise ValueError if outside tolderance
 
     Parameters
     ----------
@@ -24,6 +36,8 @@ def validate_sample_rate(run_ts, expected_sample_rate, tol=1e-4):
     expected_sample_rate: float
         The sample rate the time series is expected to have. Normally taken from
         the processing config
+    tol: float
+        This is the tolerance for the difference in sample rates allowed before an exception is raised.
 
     """
     if run_ts.sample_rate != expected_sample_rate:
@@ -34,22 +48,25 @@ def validate_sample_rate(run_ts, expected_sample_rate, tol=1e-4):
         logger.warning(msg)
         delta = run_ts.sample_rate - expected_sample_rate
         if np.abs(delta) > tol:
-            msg = f"Delta sample rate {delta} > {tol} tolerance"
-            msg += "TOL should be a percentage"
-            raise Exception(msg)
+            msg = f"Difference between expected sample rate and run_ts sample rate {delta} > {tol} tolerance"
+            raise ValueError(msg)
 
 
-def apply_prewhitening(decimation_obj, run_xrds_input):
+def apply_prewhitening(
+    decimation_obj: Union[AuroraDecimationLevel, FCDecimation],
+    run_xrds_input: xr.Dataset,
+) -> xr.Dataset:
     """
     Applies pre-whitening to time series to avoid spectral leakage when FFT is applied.
 
-    If "first difference", may want to consider clipping first and last sample from
-    the differentiated time series.
+    TODO: If "first difference", consider clipping first and last sample from the
+     differentiated time series.
 
     Parameters
     ----------
-    decimation_obj : mt_metadata.transfer_functions.processing.aurora.DecimationLevel
+    decimation_obj : Union[AuroraDecimationLevel, FCDecimation]
         Information about how the decimation level is to be processed
+
     run_xrds_input : xarray.core.dataset.Dataset
         Time series to be pre-whitened
 
@@ -64,7 +81,6 @@ def apply_prewhitening(decimation_obj, run_xrds_input):
 
     if decimation_obj.prewhitening_type == "first difference":
         run_xrds = run_xrds_input.differentiate("time")
-
     else:
         msg = f"{decimation_obj.prewhitening_type} pre-whitening not implemented"
         logger.exception(msg)
@@ -72,7 +88,10 @@ def apply_prewhitening(decimation_obj, run_xrds_input):
     return run_xrds
 
 
-def apply_recoloring(decimation_obj, stft_obj):
+def apply_recoloring(
+    decimation_obj: Union[AuroraDecimationLevel, FCDecimation],
+    stft_obj: xr.Dataset,
+) -> xr.Dataset:
     """
     Inverts the pre-whitening operation in frequency domain.
 
@@ -118,7 +137,7 @@ def apply_recoloring(decimation_obj, stft_obj):
     return stft_obj
 
 
-def run_ts_to_stft_scipy(decimation_obj, run_xrds_orig):
+def run_ts_to_stft_scipy(decimation_obj: FCDecimation, run_xrds_orig: xr.Dataset):
     """
     Converts a runts object into a time series of Fourier coefficients.
     This method uses scipy.signal.spectrogram.
@@ -173,7 +192,10 @@ def run_ts_to_stft_scipy(decimation_obj, run_xrds_orig):
     return stft_obj
 
 
-def truncate_to_clock_zero(decimation_obj, run_xrds):
+def truncate_to_clock_zero(
+    decimation_obj: Union[AuroraDecimationLevel, FCDecimation],
+    run_xrds: RunGroup,
+):
     """
     Compute the time interval between the first data sample and the clock zero
     Identify the first sample in the xarray time series that corresponds to a
@@ -242,7 +264,9 @@ def nan_to_mean(xrds: xr.Dataset) -> xr.Dataset:
     return xrds
 
 
-def run_ts_to_stft(decimation_obj, run_xrds_orig):
+def run_ts_to_stft(
+    decimation_obj: AuroraDecimationLevel, run_xrds_orig: xr.Dataset
+) -> xr.Dataset:
     """
     Converts a runts object into a time series of Fourier coefficients.
     Similar to run_ts_to_stft_scipy, but in this implementation operations on individual
@@ -291,7 +315,9 @@ def run_ts_to_stft(decimation_obj, run_xrds_orig):
     return stft_obj
 
 
-def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None):
+def calibrate_stft_obj(
+    stft_obj: xr.Dataset, run_obj, units="MT", channel_scale_factors=None
+) -> xr.Dataset:
     """
     Calibrates frequency domain data into MT units.
 
@@ -326,7 +352,7 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
             logger.warning(msg)
             if channel_id == "hy":
                 msg = "Channel hy has no filters, try using filters from hx"
-                logger.warning("Channel HY has no filters, try using filters from HX")
+                logger.warning(msg)
                 channel_response = run_obj.get_channel("hx").channel_response
 
         indices_to_flip = channel_response.get_indices_of_filters_to_remove(
@@ -338,18 +364,22 @@ def calibrate_stft_obj(stft_obj, run_obj, units="MT", channel_scale_factors=None
         filters_to_remove = [channel_response.filters_list[i] for i in indices_to_flip]
         if not filters_to_remove:
             logger.warning("No filters to remove")
+
         calibration_response = channel_response.complex_response(
             stft_obj.frequency.data, filters_list=filters_to_remove
         )
+
         if channel_scale_factors:
             try:
                 channel_scale_factor = channel_scale_factors[channel_id]
             except KeyError:
                 channel_scale_factor = 1.0
             calibration_response /= channel_scale_factor
+
         if units == "SI":
             logger.warning("Warning: SI Units are not robustly supported issue #36")
-        # TODO: This often raises a runtime warning due to DC term in calibration response=0
+
+        # TODO: FIXME Sometimes raises a runtime warning due to DC term in calibration response = 0
         stft_obj[channel_id].data /= calibration_response
     return stft_obj
 

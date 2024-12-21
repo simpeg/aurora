@@ -136,6 +136,15 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
             fc_decimations_creator(1.0, time_period=time_period)
         return cfgs
 
+    def test_spectrogram(self):
+        """
+            Place holder method. TODO: Move this into MTH5
+
+            Development Notes:
+                Currently mth5 does not have any STFT methods.  Once that
+        :return:
+        """
+
     def test_create_then_use_stored_fcs_for_processing(self):
         """"""
         from test_processing import process_synthetic_2
