@@ -117,13 +117,13 @@ def apply_recoloring(
         return stft_obj
 
     if decimation_obj.prewhitening_type == "first difference":
-        freqs = decimation_obj.fft_frequencies
-        prewhitening_correction = 1.0j * 2 * np.pi * freqs  # jw
-
-        stft_obj /= prewhitening_correction
+        # first difference prewhitening correction is to divide by jw
+        freqs = stft_obj.frequency.data  # was freqs = decimation_obj.fft_frequencies
+        jw = 1.0j * 2 * np.pi * freqs
+        stft_obj /= jw
 
         # suppress nan and inf to mute later warnings
-        if prewhitening_correction[0] == 0.0:
+        if jw[0] == 0.0:
             cond = stft_obj.frequency != 0.0
             stft_obj = stft_obj.where(cond, complex(0.0))
     # elif decimation_obj.prewhitening_type == "ARMA":
