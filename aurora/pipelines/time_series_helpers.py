@@ -139,15 +139,21 @@ def apply_recoloring(
     return stft_obj
 
 
-def run_ts_to_stft_scipy(decimation_obj: FCDecimation, run_xrds_orig: xr.Dataset):
+def run_ts_to_stft_scipy(
+    decimation_obj: Union[AuroraDecimationLevel, FCDecimation],
+    run_xrds_orig: xr.Dataset,
+) -> xr.Dataset:
     """
     Converts a runts object into a time series of Fourier coefficients.
     This method uses scipy.signal.spectrogram.
+
 
     Parameters
     ----------
     decimation_obj : mt_metadata.transfer_functions.processing.aurora.DecimationLevel
         Information about how the decimation level is to be processed
+        Note: This works with FCdecimation and AuroraDecimationLevel becuase test_fourier_coefficients
+         and test_stft_methods_agree both use them)
     run_xrds_orig : : xarray.core.dataset.Dataset
         Time series to be processed
 

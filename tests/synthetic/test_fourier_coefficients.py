@@ -115,6 +115,7 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
                 x.to_fc_decimation() for x in processing_config.decimations
             ]
             # For code coverage, have a case where fc_decimations is None
+            # This also (indirectly) tests a different FCDeecimation object.
             if mth5_path.stem == "test1":
                 fc_decimations = None
 
