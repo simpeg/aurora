@@ -11,9 +11,8 @@
 
 """
 from aurora.time_series.decorators import can_use_xr_dataarray
-from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
-    get_fft_harmonics,
-)
+from mt_metadata.transfer_functions.processing.aurora.window import get_fft_harmonics
+
 from typing import Optional, Union
 from loguru import logger
 import numpy as np
