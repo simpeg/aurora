@@ -264,7 +264,7 @@ def get_degenerate_fc_decimation(sample_rate: float) -> list:
 
     Makes a default fc_decimation list. WIP
     This "degnerate" config will only operate on the first decimation level.
-    This is useful for testing but could be used in future if an MTH5 stored time series in decimation
+    This is useful for testing.  It could also be used in future on an MTH5 stored time series in decimation
     levels already as separate runs.
 
     Parameters
@@ -275,7 +275,8 @@ def get_degenerate_fc_decimation(sample_rate: float) -> list:
     Returns
     -------
     output: list
-        List has only one element which is of type mt_metadata.transfer_functions.processing.fourier_coefficients.Decimation.
+        List has only one element which is of type FCDecimation, aka.
+        mt_metadata.transfer_functions.processing.fourier_coefficients.Decimation.
     """
     output = fc_decimations_creator(
         sample_rate,
