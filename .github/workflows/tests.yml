@@ -18,7 +18,8 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu-latest"]
-        python-version: [3.8, 3.9, "3.10", "3.11"]
+        python-version: [3.8, "3.11"]
+#        python-version: [3.8, 3.9, "3.10", "3.11"]
 #        python-version: ["3.10", ] 
 
     steps:
@@ -40,7 +41,7 @@ jobs:
         # pip install git+https://github.com/MTgeophysics/mtpy-v2.git@main
         pip install git+https://github.com/MTgeophysics/mtpy-v2.git@main
         # pip uninstall aurora -y
-        pip install git+https://github.com/kujaku11/mt_metadata.git@main
+        pip install git+https://github.com/kujaku11/mt_metadata.git@fix_issue_235
 
     - name: Install Our Package
       run: |
