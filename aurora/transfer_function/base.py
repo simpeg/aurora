@@ -12,7 +12,7 @@ import numpy as np
 import xarray as xr
 from aurora.config.metadata.processing import Processing
 from loguru import logger
-from mt_metadata.transfer_functions.processing.aurora.band import FrequencyBands
+from mt_metadata.transfer_functions.processing.aurora import FrequencyBands
 from typing import Optional, Union
 
 
