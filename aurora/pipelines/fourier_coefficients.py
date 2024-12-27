@@ -128,14 +128,14 @@ def fc_decimations_creator(
     fc_decimations = []
     for i_dec_level, decimation_factor in enumerate(decimation_factors):
         fc_dec = FCDecimation()
-        fc_dec.decimation_level = i_dec_level
+        fc_dec.time_series_decimation.level = i_dec_level
         fc_dec.id = f"{i_dec_level}"
-        fc_dec.decimation_factor = decimation_factor
+        fc_dec.time_series_decimation.factor = decimation_factor
         if i_dec_level == 0:
             current_sample_rate = 1.0 * initial_sample_rate
         else:
             current_sample_rate /= decimation_factor
-        fc_dec.sample_rate_decimation = current_sample_rate
+        fc_dec.time_series_decimation.sample_rate = current_sample_rate
 
         if time_period:
             if isinstance(time_period, TimePeriod):
