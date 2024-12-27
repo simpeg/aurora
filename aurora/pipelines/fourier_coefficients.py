@@ -70,6 +70,7 @@ from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
 from loguru import logger
 from mth5.mth5 import MTH5
 from mth5.utils.helpers import path_or_mth5_object
+from mth5.groups.fourier_coefficients import FCDecimationGroup
 from mt_metadata.timeseries.time_period import TimePeriod
 from mt_metadata.transfer_functions.processing.fourier_coefficients import (
     Decimation as FCDecimation,
@@ -248,13 +249,13 @@ def add_fcs_to_mth5(m: MTH5, fc_decimations: Optional[Union[str, list]] = None) 
                 stft_obj = calibrate_stft_obj(stft_obj, run_obj)
 
                 # Pack FCs into h5 and update metadata
-                decimation_level = fc_group.add_decimation_level(
+                fc_decimation_group: FCDecimationGroup = fc_group.add_decimation_level(
                     f"{i_dec_level}", decimation_level_metadata=fc_decimation
                 )
-                decimation_level.from_xarray(
-                    stft_obj, decimation_level.metadata.sample_rate_decimation
+                fc_decimation_group.from_xarray(
+                    stft_obj, fc_decimation_group.metadata.sample_rate_decimation
                 )
-                decimation_level.update_metadata()
+                fc_decimation_group.update_metadata()
                 fc_group.update_metadata()
     return
 
