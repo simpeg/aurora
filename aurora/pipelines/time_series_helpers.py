@@ -155,6 +155,7 @@ def run_ts_to_stft_scipy(
         Information about how the decimation level is to be processed
         Note: This works with FCdecimation and AuroraDecimationLevel becuase test_fourier_coefficients
          and test_stft_methods_agree both use them)
+        Note: Both of these objects are basically spectrogram metadata with provenance for decimation levels.
     run_xrds_orig : : xarray.core.dataset.Dataset
         Time series to be processed
 
@@ -182,7 +183,7 @@ def run_ts_to_stft_scipy(
         # drop Nyquist>
         ff = ff[:-1]
         specgm = specgm[:-1, :]
-        specgm *= np.sqrt(2)
+        specgm *= np.sqrt(2)  # compensate energy for keeping only half the spectrum
 
         # make time_axis
         tt = tt - tt[0]
