@@ -282,6 +282,7 @@ def run_ts_to_stft(
     Similar to run_ts_to_stft_scipy, but in this implementation operations on individual
     windows are possible (for example pre-whitening per time window via ARMA filtering).
 
+    TODO: Make the output of this function a Spectrogram object
 
     Parameters
     ----------
