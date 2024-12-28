@@ -4,20 +4,32 @@
 
 """
 
+from aurora.config.metadata.processing import Processing
 from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.time_series_helpers import prototype_decimate
+
+# from aurora.transfer_function.transfer_function_collection import TransferFunctionCollection
 from loguru import logger
 from mth5.utils.exceptions import MTH5Error
 from mth5.utils.helpers import path_or_mth5_object
 from mt_metadata.transfer_functions.core import TF
 
+# from mtpy.processing.kernel_dataset import KernelDataset  # TODO FIXME: causes circular import.
+from typing import Union
+
+# from mt_metadata.transfer_functions.processing.aurora.decimation_level import DecimationLevel as AuroraDecimationLevel
+
+
 import numpy as np
 import pandas as pd
+import pathlib
 import psutil
 
 
 class TransferFunctionKernel(object):
-    def __init__(self, dataset=None, config=None):
+    def __init__(
+        self, dataset, config: Union[Processing, str, pathlib.Path]  # : KernelDataset,
+    ):
         """
         Constructor
 
@@ -33,12 +45,12 @@ class TransferFunctionKernel(object):
         self._memory_warning = False
 
     @property
-    def dataset(self):
+    def dataset(self):  # -> KernelDataset:
         """returns the KernelDataset object"""
         return self._dataset
 
     @property
-    def kernel_dataset(self):
+    def kernel_dataset(self):  # -> KernelDataset:
         """returns the KernelDataset object"""
         return self._dataset
 
@@ -48,12 +60,12 @@ class TransferFunctionKernel(object):
         return self._dataset.df
 
     @property
-    def processing_config(self):
+    def processing_config(self) -> Processing:
         """Returns the processing config object"""
         return self._config
 
     @property
-    def config(self):
+    def config(self) -> Processing:
         """Returns the processing config object"""
         return self._config
 
@@ -546,10 +558,13 @@ class TransferFunctionKernel(object):
             Transfer function container
         """
 
-        def make_decimation_dict_for_tf(tf_collection, processing_config):
+        def make_decimation_dict_for_tf(
+            tf_collection,  # : TransferFunctionCollection,
+            processing_config: Processing,
+        ) -> dict:
             """
-            Decimation dict is used by mt_metadata's TF class when it is writing z-files.
-            If no z-files will be written this is not needed
+            Helper function to create a dictionary used by mt_metadata's TF class when
+            writing z-files.  If no z-files will be written this is not needed
 
             sample element of decimation_dict:
             '1514.70134': {'level': 4, 'bands': (5, 6), 'npts': 386, 'df': 0.015625}}
@@ -562,18 +577,23 @@ class TransferFunctionKernel(object):
 
             Parameters
             ----------
-            tfc
+            tf_collection: TransferFunctionCollection
+                Collection of transfer funtion estimates from aurora.
+            processing_config: Processing
+                Instructions for processing with aurora
 
             Returns
             -------
-
+            decimation_dict: dict
+                Keyed by a string representing the period
+                Values are a custom dictionary.
             """
             from mt_metadata.transfer_functions.io.zfiles.zmm import (
                 PERIOD_FORMAT,
             )
 
             decimation_dict = {}
-
+            # dec_level_cfg is an AuroraDecimationLevel
             for i_dec, dec_level_cfg in enumerate(processing_config.decimations):
                 for i_band, band in enumerate(dec_level_cfg.bands):
                     period_key = f"{band.center_period:{PERIOD_FORMAT}}"

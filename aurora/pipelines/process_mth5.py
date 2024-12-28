@@ -385,7 +385,7 @@ def save_fourier_coefficients(dec_level_config, row, run_obj, stft_obj) -> None:
     return
 
 
-def get_spectrogams(tfk, i_dec_level, units="MT"):
+def get_spectrogams(tfk: TransferFunctionKernel, i_dec_level, units="MT"):
     """
     Given a decimation level id, loads a dictianary of all spectragrams from information in tfk.
     TODO: Make this a method of TFK
