@@ -74,6 +74,9 @@ from aurora.time_series.apodization_window import ApodizationWindow
 from aurora.time_series.windowed_time_series import WindowedTimeSeries
 from aurora.time_series.window_helpers import available_number_of_windows_in_array
 from aurora.time_series.window_helpers import SLIDING_WINDOW_FUNCTIONS
+from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
+    DecimationLevel as AuroraDecimationLevel,
+)
 from mt_metadata.transfer_functions.processing.aurora.window import get_fft_harmonics
 
 from loguru import logger
@@ -446,14 +449,14 @@ class WindowingScheme(ApodizationWindow):
         return np.sqrt(2 / (self.sample_rate * self.S2))
 
 
-def window_scheme_from_decimation(decimation):
+def window_scheme_from_decimation(decimation: AuroraDecimationLevel):
     """
     Helper function to workaround mt_metadata to not import form aurora
 
     Parameters
     ----------
-    decimation: mt_metadata.transfer_function.processing.aurora.decimation_level
-    .DecimationLevel
+    decimation: AuroraDecimationLevel
+     mt_metadata.transfer_function.processing.aurora.decimation_level.DecimationLevel
 
     Returns
     -------
