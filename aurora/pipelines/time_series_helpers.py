@@ -76,15 +76,21 @@ def apply_prewhitening(
         pre-whitened time series
 
     """
-    if not decimation_obj.prewhitening_type:
+    # TODO: remove this try/except once mt_metadata issue 238 PR is merged
+    try:
+        pw_type = decimation_obj.prewhitening_type
+    except AttributeError:
+        pw_type = decimation_obj.stft.prewhitening_type
+
+    if not pw_type:
         msg = "No prewhitening specified - skipping this step"
         logger.info(msg)
         return run_xrds_input
 
-    if decimation_obj.prewhitening_type == "first difference":
+    if pw_type == "first difference":
         run_xrds = run_xrds_input.differentiate("time")
     else:
-        msg = f"{decimation_obj.prewhitening_type} pre-whitening not implemented"
+        msg = f"{pw_type} pre-whitening not implemented"
         logger.exception(msg)
         raise NotImplementedError(msg)
     return run_xrds
@@ -110,14 +116,20 @@ def apply_recoloring(
     stft_obj : xarray.core.dataset.Dataset
         Recolored time series of Fourier coefficients
     """
+    # TODO: remove this try/except once mt_metadata issue 238 PR is merged
+    try:
+        pw_type = decimation_obj.prewhitening_type
+    except AttributeError:
+        pw_type = decimation_obj.stft.prewhitening_type
+
     # No recoloring needed if prewhitening not appiled, or recoloring set to False
-    if not decimation_obj.prewhitening_type:
+    if not pw_type:
         return stft_obj
     # TODO Delete after tests (20241220) -- this check has been moved above the call to this function
     # if not decimation_obj.recoloring:
     #     return stft_obj
 
-    if decimation_obj.prewhitening_type == "first difference":
+    if pw_type == "first difference":
         # first difference prewhitening correction is to divide by jw
         freqs = stft_obj.frequency.data  # was freqs = decimation_obj.fft_frequencies
         jw = 1.0j * 2 * np.pi * freqs
@@ -133,7 +145,7 @@ def apply_recoloring(
     #     MA = 4 # add this to processing config
 
     else:
-        msg = f"{decimation_obj.prewhitening_type} recoloring not yet implemented"
+        msg = f"{pw_type} recoloring not yet implemented"
         logger.error(msg)
         raise NotImplementedError(msg)
 
@@ -196,7 +208,13 @@ def run_ts_to_stft_scipy(
             coords={"frequency": ff, "time": time_axis},
         )
         stft_obj.update({channel_id: xrd})
-    if decimation_obj.recoloring:
+
+    # TODO : remove try/except after mt_metadata issue 238 addressed
+    try:
+        to_recolor_or_not_to_recolor = decimation_obj.recoloring
+    except AttributeError:
+        to_recolor_or_not_to_recolor = decimation_obj.stft.recoloring
+    if to_recolor_or_not_to_recolor:
         stft_obj = apply_recoloring(decimation_obj, stft_obj)
 
     return stft_obj
