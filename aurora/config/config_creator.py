@@ -108,9 +108,7 @@ class ConfigCreator:
             logger.info(msg)
             self._emtf_band_file = BANDS_DEFAULT_FILE
             self._band_specification_style = "EMTF"
-        elif (self._emtf_band_file is not None) & (
-            self._band_edges is not None
-        ):
+        elif (self._emtf_band_file is not None) & (self._band_edges is not None):
             msg = "Bands defined twice, and possibly inconsistently"
             logger.error(msg)
             raise ValueError(msg)
@@ -152,6 +150,8 @@ class ConfigCreator:
 
           Theoretically, you could also use the number of decimations implied by bands_dict but this is sloppy, because it would assume the decimation factor.
 
+         3. 2024-12-29 Added setting of decimation_obj.stft.per_window_detrend_type = "linear"
+          This makes tests pass following a refactoring of mt_metadata.  Could use more testing.
 
         Parameters
         ----------
@@ -178,9 +178,7 @@ class ConfigCreator:
             Object storing the processing parameters.
         """
 
-        processing_obj = Processing(
-            id=kernel_dataset.processing_id
-        )  # , **kwargs)
+        processing_obj = Processing(id=kernel_dataset.processing_id)  # , **kwargs)
 
         # pack station and run info into processing object
         processing_obj.stations.from_dataset_dataframe(kernel_dataset.df)
@@ -209,9 +207,7 @@ class ConfigCreator:
                 decimation_factors[0] = 1
             if num_samples_window is None:
                 default_window = Window()
-                num_samples_window = num_decimations * [
-                    default_window.num_samples
-                ]
+                num_samples_window = num_decimations * [default_window.num_samples]
             elif isinstance(num_samples_window, int):
                 num_samples_window = num_decimations * [num_samples_window]
             # now you can define the frequency bands
@@ -248,4 +244,6 @@ class ConfigCreator:
                     decimation_obj.estimator.engine = estimator["engine"]
                 except KeyError:
                     pass
+            decimation_obj.stft.per_window_detrend_type = "linear"
+
         return processing_obj

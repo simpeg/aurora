@@ -336,7 +336,7 @@ def run_ts_to_stft(
         data=tapered_obj,
         sample_rate=windowing_scheme.sample_rate,
         spectral_density_correction=windowing_scheme.linear_spectral_density_calibration_factor,
-        detrend_type=decimation_obj.extra_pre_fft_detrend_type,
+        detrend_type=decimation_obj.stft.per_window_detrend_type,
     )
 
     if decimation_obj.stft.recoloring:

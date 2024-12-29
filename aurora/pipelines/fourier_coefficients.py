@@ -8,7 +8,7 @@ Here are the parameters that are defined via the mt_metadata fourier coefficient
 "decimation.level": 2,
 "decimation.method": "default",
 "decimation.sample_rate": 0.0625,
-"extra_pre_fft_detrend_type": "linear",
+"per_window_detrend_type": "linear",
 "prewhitening_type": "first difference",
 "window.clock_zero_type": "ignore",
 "window.num_samples": 128,
