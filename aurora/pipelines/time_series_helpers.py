@@ -339,7 +339,7 @@ def run_ts_to_stft(
         detrend_type=decimation_obj.extra_pre_fft_detrend_type,
     )
 
-    if decimation_obj.recoloring:
+    if decimation_obj.stft.recoloring:
         stft_obj = apply_recoloring(decimation_obj, stft_obj)
 
     return stft_obj
