@@ -390,7 +390,7 @@ class TransferFunctionKernel(object):
         """
         if min_num_stft_windows is None:
             min_stft_window_info = {
-                x.decimation.level: x.min_num_stft_windows
+                x.decimation.level: x.stft.min_num_stft_windows
                 for x in self.processing_config.decimations
             }
             min_stft_window_list = [
