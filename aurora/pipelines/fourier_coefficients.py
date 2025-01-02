@@ -89,6 +89,7 @@ def fc_decimations_creator(
     time_period: Optional[TimePeriod] = None,
 ) -> List[FCDecimation]:
     """
+    TODO: move this to mt_metadata / replace with mt_metadata method once moved.
 
     Creates mt_metadata FCDecimation objects that parameterize Fourier coefficient decimation levels.
 
@@ -233,35 +234,28 @@ def add_fcs_to_mth5(m: MTH5, fc_decimations: Optional[Union[str, list]] = None) 
             # If timing corrections were needed they could go here, right before STFT
 
             for i_dec_level, fc_decimation in enumerate(fc_decimations):
+                try:
+                    assert i_dec_level == fc_decimation.time_series_decimation.level
+                except:
+                    msg = "decimation level has unexpected value"
+                    logger.warning(msg)
+
                 if (
                     i_dec_level != 0
                 ):  # TODO: take this number from fc_decimation.time_series_decimation.level
                     # Apply decimation
                     ts_decimation = fc_decimation.time_series_decimation
-                    run_xrds = prototype_decimate(ts_decimation, run_xrds)
+                    run_xrds = prototype_decimate(
+                        ts_decimation, run_xrds
+                    )  # TODO: replace this with mth5 decimation
 
-                # check if this decimation level yields a valid spectrogram
-                if not fc_decimation.is_valid_for_time_series_length(
-                    run_xrds.time.shape[0]
-                ):
-                    logger.info(
-                        f"Decimation Level {i_dec_level} invalid, TS of {run_xrds.time.shape[0]} samples too short"
-                    )
-                    continue
-
-                stft_obj = run_ts_to_stft_scipy(fc_decimation, run_xrds)
-                stft_obj = calibrate_stft_obj(stft_obj, run_obj)
-
-                # Pack FCs into h5 and update metadata
-                fc_decimation_group: FCDecimationGroup = fc_group.add_decimation_level(
-                    f"{i_dec_level}", decimation_level_metadata=fc_decimation
+                _add_spectrogram_to_mth5(
+                    fc_decimation=fc_decimation,
+                    run_obj=run_obj,
+                    run_xrds=run_xrds,
+                    fc_group=fc_group,
                 )
-                fc_decimation_group.from_xarray(
-                    stft_obj,
-                    fc_decimation_group.metadata.time_series_decimation.sample_rate,
-                )
-                fc_decimation_group.update_metadata()
-                fc_group.update_metadata()
+
     return
 
 
