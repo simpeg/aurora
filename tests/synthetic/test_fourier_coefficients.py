@@ -130,8 +130,13 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
         return tfc
 
     def test_fc_decimations_creator(self):
-        """"""
-        cfgs = fc_decimations_creator(1.0)
+        """
+        # TODO: Move this into mt_metadata
+        Returns
+        -------
+
+        """
+        cfgs = fc_decimations_creator(initial_sample_rate=1.0)
 
         # test time period must of of type
         with self.assertRaises(NotImplementedError):
