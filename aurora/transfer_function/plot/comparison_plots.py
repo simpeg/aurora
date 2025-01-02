@@ -83,7 +83,7 @@ def compare_two_z_files(
     zfile1 = read_z_file(z_path1, angle=angle1)
     zfile2 = read_z_file(z_path2, angle=angle2)
 
-    logger.info(f"Sacling TF scale_factor1: {scale_factor1}")
+    logger.info(f"Scaling TF scale_factor1: {scale_factor1}")
     fig, axs = plt.subplots(nrows=2, dpi=300, sharex=True)  # figsize=(8, 6.),
 
     # Make LaTeX symbol strings
