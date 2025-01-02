@@ -63,6 +63,7 @@ Note 3: This point in the loop marks the interface between _generation_ of the F
 
 import mth5.mth5
 import pathlib
+import xarray as xr
 
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import prototype_decimate
@@ -232,9 +233,12 @@ def add_fcs_to_mth5(m: MTH5, fc_decimations: Optional[Union[str, list]] = None) 
             # If timing corrections were needed they could go here, right before STFT
 
             for i_dec_level, fc_decimation in enumerate(fc_decimations):
-                if i_dec_level != 0:
+                if (
+                    i_dec_level != 0
+                ):  # TODO: take this number from fc_decimation.time_series_decimation.level
                     # Apply decimation
-                    run_xrds = prototype_decimate(fc_decimation, run_xrds)
+                    ts_decimation = fc_decimation.time_series_decimation
+                    run_xrds = prototype_decimate(ts_decimation, run_xrds)
 
                 # check if this decimation level yields a valid spectrogram
                 if not fc_decimation.is_valid_for_time_series_length(
@@ -253,11 +257,60 @@ def add_fcs_to_mth5(m: MTH5, fc_decimations: Optional[Union[str, list]] = None) 
                     f"{i_dec_level}", decimation_level_metadata=fc_decimation
                 )
                 fc_decimation_group.from_xarray(
-                    stft_obj, fc_decimation_group.metadata.sample_rate_decimation
+                    stft_obj,
+                    fc_decimation_group.metadata.time_series_decimation.sample_rate,
                 )
                 fc_decimation_group.update_metadata()
                 fc_group.update_metadata()
     return
+
+
+def _add_spectrogram_to_mth5(
+    fc_decimation: FCDecimation,
+    run_obj: mth5.groups.RunGroup,
+    run_xrds: xr.Dataset,
+    fc_group: mth5.groups.FCGroup,
+) -> None:
+    """
+
+    This function has been factored out of add_fcs_to_mth5.
+    This is the most atomic level of adding FCs and will be useful as standalone method.
+
+    Parameters
+    ----------
+    fc_decimation : FCDecimation
+        Metadata about how the decimation level is to be processed
+
+    run_xrds : xarray.core.dataset.Dataset
+        Time series to be converted to a spectrogram and stored in MTH5.
+
+    Returns
+    -------
+    run_xrds : xarray.core.dataset.Dataset
+        pre-whitened time series
+
+    """
+
+    # check if this decimation level yields a valid spectrogram
+    if not fc_decimation.is_valid_for_time_series_length(run_xrds.time.shape[0]):
+        logger.info(
+            f"Decimation Level {fc_decimation.time_series_decimation.level} invalid, TS of {run_xrds.time.shape[0]} samples too short"
+        )
+        return
+
+    stft_obj = run_ts_to_stft_scipy(fc_decimation, run_xrds)
+    stft_obj = calibrate_stft_obj(stft_obj, run_obj)
+
+    # Pack FCs into h5 and update metadata
+    fc_decimation_group: FCDecimationGroup = fc_group.add_decimation_level(
+        f"{fc_decimation.time_series_decimation.level}",
+        decimation_level_metadata=fc_decimation,
+    )
+    fc_decimation_group.from_xarray(
+        stft_obj, fc_decimation_group.metadata.time_series_decimation.sample_rate
+    )
+    fc_decimation_group.update_metadata()
+    fc_group.update_metadata()
 
 
 def get_degenerate_fc_decimation(sample_rate: float) -> list:
@@ -289,6 +342,7 @@ def get_degenerate_fc_decimation(sample_rate: float) -> list:
     return output
 
 
+# TODO: Delete after mth5 issue #271 is closed and merged.
 @path_or_mth5_object
 def read_back_fcs(m: Union[MTH5, pathlib.Path, str], mode: str = "r") -> None:
     """
