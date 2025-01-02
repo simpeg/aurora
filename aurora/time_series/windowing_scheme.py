@@ -77,7 +77,7 @@ from aurora.time_series.window_helpers import SLIDING_WINDOW_FUNCTIONS
 from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
     DecimationLevel as AuroraDecimationLevel,
 )
-from mt_metadata.transfer_functions.processing.aurora.window import get_fft_harmonics
+from mt_metadata.transfer_functions.processing.window import get_fft_harmonics
 
 from loguru import logger
 from typing import Optional, Union
