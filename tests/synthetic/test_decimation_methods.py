@@ -49,16 +49,16 @@ def test_decimation_methods_agree():
         if dec_level_id == 0:
             run_obj = mth5_obj.get_run(station_id, run_id, survey=None)
             run_ts = run_obj.to_runts(start=None, end=None)
-            run_xrts = run_ts.dataset
-            decimated_ts[dec_level_id]["run_xrts"] = run_xrts
+            run_xrds = run_ts.dataset
+            decimated_ts[dec_level_id]["run_xrds"] = run_xrds
             current_sample_rate = run_obj.metadata.sample_rate
 
         if dec_level_id > 0:
-            run_xrts = decimated_ts[dec_level_id - 1]["run_xrts"]
+            run_xrds = decimated_ts[dec_level_id - 1]["run_xrds"]
             target_sample_rate = current_sample_rate / (dec_config.decimation.factor)
 
-            decimated_1 = prototype_decimate(dec_config.decimation, run_xrts)
-            decimated_2 = run_xrts.sps_filters.decimate(
+            decimated_1 = prototype_decimate(dec_config.decimation, run_xrds)
+            decimated_2 = run_xrds.sps_filters.decimate(
                 target_sample_rate=target_sample_rate
             )
 
@@ -67,7 +67,7 @@ def test_decimation_methods_agree():
             assert np.isclose(difference.to_array(), 0).all()
 
             logger.info("prototype decimate aurora method agrees with mth5 decimate")
-            decimated_ts[dec_level_id]["run_xrts"] = decimated_1
+            decimated_ts[dec_level_id]["run_xrds"] = decimated_1
             current_sample_rate = target_sample_rate
     return
 

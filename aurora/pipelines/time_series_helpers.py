@@ -157,6 +157,7 @@ def run_ts_to_stft_scipy(
     run_xrds_orig: xr.Dataset,
 ) -> xr.Dataset:
     """
+    TODO: Replace with mth5 run_ts_to_stft_scipy method
     Converts a runts object into a time series of Fourier coefficients.
     This method uses scipy.signal.spectrogram.
 
@@ -177,7 +178,9 @@ def run_ts_to_stft_scipy(
         Time series of Fourier coefficients
     """
     run_xrds = apply_prewhitening(decimation_obj, run_xrds_orig)
-    windowing_scheme = window_scheme_from_decimation(decimation_obj)
+    windowing_scheme = window_scheme_from_decimation(
+        decimation_obj
+    )  # TODO: deprecate in favor of stft.window.taper
 
     stft_obj = xr.Dataset()
     for channel_id in run_xrds.data_vars:
