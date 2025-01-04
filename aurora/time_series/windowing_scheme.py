@@ -469,6 +469,6 @@ def window_scheme_from_decimation(decimation: AuroraDecimationLevel):
         num_samples_window=decimation.stft.window.num_samples,
         num_samples_overlap=decimation.stft.window.overlap,
         taper_additional_args=decimation.stft.window.additional_args,
-        sample_rate=decimation.sample_rate_decimation,
+        sample_rate=decimation.decimation.sample_rate,
     )
     return windowing_scheme

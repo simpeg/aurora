@@ -156,7 +156,7 @@ def run_ts_to_stft_scipy(
     for channel_id in run_xrds.data_vars:
         ff, tt, specgm = ssig.spectrogram(
             run_xrds[channel_id].data,
-            fs=decimation_obj.sample_rate_decimation,
+            fs=decimation_obj.decimation.sample_rate,
             window=windowing_scheme.taper,
             nperseg=decimation_obj.stft.window.num_samples,
             noverlap=decimation_obj.stft.window.overlap,
@@ -172,7 +172,7 @@ def run_ts_to_stft_scipy(
 
         # make time_axis
         tt = tt - tt[0]
-        tt *= decimation_obj.sample_rate_decimation
+        tt *= decimation_obj.decimation.sample_rate
         time_axis = run_xrds.time.data[tt.astype(int)]
 
         xrd = xr.DataArray(
@@ -296,7 +296,7 @@ def run_ts_to_stft(
     run_xrds = truncate_to_clock_zero(decimation_obj, run_xrds)
     windowing_scheme = window_scheme_from_decimation(decimation_obj)
     windowed_obj = windowing_scheme.apply_sliding_window(
-        run_xrds, dt=1.0 / decimation_obj.sample_rate_decimation
+        run_xrds, dt=1.0 / decimation_obj.decimation.sample_rate
     )
     if not np.prod(windowed_obj.to_array().data.shape):
         raise ValueError
