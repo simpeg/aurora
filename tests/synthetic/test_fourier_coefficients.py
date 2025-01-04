@@ -3,7 +3,8 @@ import unittest
 from aurora.config.config_creator import ConfigCreator
 from aurora.pipelines.fourier_coefficients import add_fcs_to_mth5
 from aurora.pipelines.fourier_coefficients import fc_decimations_creator
-from aurora.pipelines.fourier_coefficients import read_back_fcs
+
+# from aurora.pipelines.fourier_coefficients import read_back_fcs
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.test_utils.synthetic.make_processing_configs import (
     create_test_run_config,
@@ -13,6 +14,7 @@ from mth5.data.make_mth5_from_asc import create_test1_h5
 from mth5.data.make_mth5_from_asc import create_test2_h5
 from mth5.data.make_mth5_from_asc import create_test3_h5
 from mth5.data.make_mth5_from_asc import create_test12rr_h5
+from mth5.timeseries.spectre.helpers import read_back_fcs
 
 # from mtpy-v2
 from mtpy.processing import RunSummary, KernelDataset
@@ -128,8 +130,13 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
         return tfc
 
     def test_fc_decimations_creator(self):
-        """"""
-        cfgs = fc_decimations_creator(1.0)
+        """
+        # TODO: Move this into mt_metadata
+        Returns
+        -------
+
+        """
+        cfgs = fc_decimations_creator(initial_sample_rate=1.0)
 
         # test time period must of of type
         with self.assertRaises(NotImplementedError):

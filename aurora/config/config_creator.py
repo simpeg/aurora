@@ -13,7 +13,7 @@ from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config.metadata import Processing
 from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
 
-from mt_metadata.transfer_functions.processing.aurora.window import Window
+from mt_metadata.transfer_functions.processing.window import Window
 
 
 SUPPORTED_BAND_SPECIFICATION_STYLES = ["EMTF", "band_edges"]
