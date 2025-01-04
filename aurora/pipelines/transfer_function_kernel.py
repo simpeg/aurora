@@ -170,8 +170,8 @@ class TransferFunctionKernel(object):
         dec_level_config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
             The modified DecimationLevel with clock-zero information set.
         """
-        if dec_level_config.window.clock_zero_type == "data start":
-            dec_level_config.window.clock_zero = str(self.dataset_df.start.min())
+        if dec_level_config.stft.window.clock_zero_type == "data start":
+            dec_level_config.stft.window.clock_zero = str(self.dataset_df.start.min())
         return dec_level_config
 
     @property

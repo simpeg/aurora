@@ -465,10 +465,10 @@ def window_scheme_from_decimation(decimation: AuroraDecimationLevel):
     from aurora.time_series.windowing_scheme import WindowingScheme
 
     windowing_scheme = WindowingScheme(
-        taper_family=decimation.window.type,
-        num_samples_window=decimation.window.num_samples,
-        num_samples_overlap=decimation.window.overlap,
-        taper_additional_args=decimation.window.additional_args,
+        taper_family=decimation.stft.window.type,
+        num_samples_window=decimation.stft.window.num_samples,
+        num_samples_overlap=decimation.stft.window.overlap,
+        taper_additional_args=decimation.stft.window.additional_args,
         sample_rate=decimation.sample_rate_decimation,
     )
     return windowing_scheme

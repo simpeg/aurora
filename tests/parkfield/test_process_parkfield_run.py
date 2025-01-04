@@ -43,9 +43,9 @@ def test_processing(z_file_path=None, test_clock_zero=False):
 
     if test_clock_zero:
         for dec_lvl_cfg in config.decimations:
-            dec_lvl_cfg.window.clock_zero_type = test_clock_zero
+            dec_lvl_cfg.stft.window.clock_zero_type = test_clock_zero
             if test_clock_zero == "user specified":
-                dec_lvl_cfg.window.clock_zero = "2004-09-28 00:00:10+00:00"
+                dec_lvl_cfg.stft.window.clock_zero = "2004-09-28 00:00:10+00:00"
 
     show_plot = False
     tf_cls = process_mth5(

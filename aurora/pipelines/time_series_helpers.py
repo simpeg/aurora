@@ -158,8 +158,8 @@ def run_ts_to_stft_scipy(
             run_xrds[channel_id].data,
             fs=decimation_obj.sample_rate_decimation,
             window=windowing_scheme.taper,
-            nperseg=decimation_obj.window.num_samples,
-            noverlap=decimation_obj.window.overlap,
+            nperseg=decimation_obj.stft.window.num_samples,
+            noverlap=decimation_obj.stft.window.overlap,
             detrend="linear",
             scaling="density",
             mode="complex",
@@ -215,10 +215,10 @@ def truncate_to_clock_zero(
     run_xrds : xarray.core.dataset.Dataset
         same as the input time series, but possibly slightly shortened
     """
-    if decimation_obj.window.clock_zero_type == "ignore":
+    if decimation_obj.stft.window.clock_zero_type == "ignore":
         pass
     else:
-        clock_zero = pd.Timestamp(decimation_obj.window.clock_zero)
+        clock_zero = pd.Timestamp(decimation_obj.stft.window.clock_zero)
         clock_zero = clock_zero.to_datetime64()
         delta_t = clock_zero - run_xrds.time[0]
         assert delta_t.dtype == "<m8[ns]"  # expected in nanoseconds
@@ -235,7 +235,7 @@ def truncate_to_clock_zero(
             cond1 = run_xrds.time >= t_clip
             msg = (
                 f"dropping {n_clip} samples to agree with "
-                f"{decimation_obj.window.clock_zero_type} clock zero {clock_zero}"
+                f"{decimation_obj.stft.window.clock_zero_type} clock zero {clock_zero}"
             )
             logger.info(msg)
             run_xrds = run_xrds.where(cond1, drop=True)

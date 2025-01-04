@@ -177,7 +177,7 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
         )
 
         # Intialize a TF kernel to check for FCs
-        original_window = processing_config.decimations[0].window.type
+        original_window = processing_config.decimations[0].stft.window.type
 
         tfk = TransferFunctionKernel(dataset=tfk_dataset, config=processing_config)
         tfk.make_processing_summary()
@@ -188,7 +188,7 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
 
         # now change the window type and show that FCs are not detected
         for decimation in processing_config.decimations:
-            decimation.window.type = "hamming"
+            decimation.stft.window.type = "hamming"
         tfk = TransferFunctionKernel(dataset=tfk_dataset, config=processing_config)
         tfk.make_processing_summary()
         tfk.check_if_fcs_already_exist()
@@ -198,7 +198,7 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
 
         # Now reprocess with the FCs
         for decimation in processing_config.decimations:
-            decimation.window.type = original_window
+            decimation.stft.window.type = original_window
         tfk = TransferFunctionKernel(dataset=tfk_dataset, config=processing_config)
         tfk.make_processing_summary()
         tfk.check_if_fcs_already_exist()

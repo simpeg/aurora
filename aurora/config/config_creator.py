@@ -237,7 +237,7 @@ class ConfigCreator:
                 decimation_obj.output_channels = output_channels
 
             if num_samples_window is not None:
-                decimation_obj.window.num_samples = num_samples_window[key]
+                decimation_obj.stft.window.num_samples = num_samples_window[key]
             # set estimator if provided as kwarg
             if estimator:
                 try:
