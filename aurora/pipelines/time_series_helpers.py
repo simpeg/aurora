@@ -22,36 +22,6 @@ from mth5.timeseries import RunTS
 from typing import Literal, Optional, Union
 
 
-def validate_sample_rate(
-    run_ts: RunTS, expected_sample_rate: float, tol: Optional[float] = 1e-4
-) -> None:
-    """
-    Check that the sample rate of a run_ts is the expected value, and warn if not.
-    :raise ValueError if outside tolderance
-
-    Parameters
-    ----------
-    run_ts: mth5.timeseries.run_ts.RunTS
-        Time series object with data and metadata.
-    expected_sample_rate: float
-        The sample rate the time series is expected to have. Normally taken from
-        the processing config
-    tol: float
-        This is the tolerance for the difference in sample rates allowed before an exception is raised.
-
-    """
-    if run_ts.sample_rate != expected_sample_rate:
-        msg = (
-            f"sample rate in run time series {run_ts.sample_rate} and "
-            f"processing decimation_obj {expected_sample_rate} do not match"
-        )
-        logger.warning(msg)
-        delta = run_ts.sample_rate - expected_sample_rate
-        if np.abs(delta) > tol:
-            msg = f"Difference between expected sample rate and run_ts sample rate {delta} > {tol} tolerance"
-            raise ValueError(msg)
-
-
 def apply_prewhitening(
     decimation_obj: Union[AuroraDecimationLevel, FCDecimation],
     run_xrds_input: xr.Dataset,
