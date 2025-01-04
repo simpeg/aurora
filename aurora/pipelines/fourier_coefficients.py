@@ -2,22 +2,23 @@
 Supporting codes for building the FC level of the mth5
 
 Here are the parameters that are defined via the mt_metadata fourier coefficients structures:
-"anti_alias_filter": "default",
+
 "bands",
+"decimation.anti_alias_filter": "default",
 "decimation.factor": 4.0,
 "decimation.level": 2,
 "decimation.method": "default",
 "decimation.sample_rate": 0.0625,
-"per_window_detrend_type": "linear",
-"prewhitening_type": "first difference",
-"window.clock_zero_type": "ignore",
-"window.num_samples": 128,
-"window.overlap": 32,
-"window.type": "boxcar"
+"stft.per_window_detrend_type": "linear",
+"stft.prewhitening_type": "first difference",
+"stft.window.clock_zero_type": "ignore",
+"stft.window.num_samples": 128,
+"stft.window.overlap": 32,
+"stft.window.type": "boxcar"
 
 Creating the decimations config requires a decision about decimation factors and the number of levels.
 We have been getting this from the EMTF band setup file by default.  It is desirable to continue supporting this,
-however, note that the EMTF band setup is really about processing, and not about making STFTs.
+however, note that the EMTF band setup is really about a time series operation, and not about making STFTs.
 
 For the record, here is the legacy decimation config from EMTF, a.k.a. decset.cfg:
 ```

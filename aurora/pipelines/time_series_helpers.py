@@ -456,6 +456,7 @@ def prototype_decimate(
     num_channels = len(channel_labels)
     new_data = np.full((num_observations, num_channels), np.nan)
     for i_ch, ch_label in enumerate(channel_labels):
+        # TODO: add check here for config.anti_alias_filter
         new_data[:, i_ch] = ssig.decimate(run_xrds[ch_label], int(config.factor))
 
     xr_da = xr.DataArray(
