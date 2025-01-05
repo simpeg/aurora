@@ -32,9 +32,8 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
     Runs several synthetic processing tests from config creation to tf_cls.
 
     There are two ways to prepare the FC-schema
-      a) use the mt_metadata.FCDecimation class explictly
-      b) mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel has
-      a to_fc_decimation() method that returns mt_metadata.FCDecimation
+      a) use the mt_metadata.FCDecimation class
+      b) use AuroraDecimationLevel's to_fc_decimation() method that returns mt_metadata.FCDecimation
 
     Flow is to make some mth5 files from synthetic data, then loop over those files adding fcs.
     Finally, process the mth5s to make TFs.
@@ -75,8 +74,7 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
         - This could probably be shortened, it isn't clear that all the h5 files need to have fc added
         and be processed too.
 
-        uses the to_fc_decimation() method of
-        mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel.
+        uses the to_fc_decimation() method of AuroraDecimationLevel.
 
         Returns
         -------

@@ -456,7 +456,7 @@ def window_scheme_from_decimation(decimation: AuroraDecimationLevel):
     Parameters
     ----------
     decimation: AuroraDecimationLevel
-     mt_metadata.transfer_function.processing.aurora.decimation_level.DecimationLevel
+        Decimation level metadata object
 
     Returns
     -------

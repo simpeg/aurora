@@ -19,6 +19,9 @@ from aurora.transfer_function.regression.RME_RR import RME_RR
 from aurora.transfer_function.weights.edf_weights import (
     effective_degrees_of_freedom_weights,
 )
+from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
+    DecimationLevel as AuroraDecimationLevel,
+)
 from loguru import logger
 from typing import Union
 import numpy as np
@@ -52,7 +55,7 @@ def get_estimator_class(estimation_engine: str) -> RegressionEstimator:
     return estimator_class
 
 
-def set_up_iter_control(config):
+def set_up_iter_control(config: AuroraDecimationLevel):
     """
     Initializes an IterControl object based on values in the processing config.
 
@@ -62,7 +65,8 @@ def set_up_iter_control(config):
 
     Parameters
     ----------
-    config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
+    config: AuroraDecimationLevel
+        metadata about the decimation level processing.
 
     Returns
     -------
@@ -210,7 +214,7 @@ def apply_weights(X, Y, RR, W, segment=False, dropna=False):
 
 
 def process_transfer_functions(
-    dec_level_config,
+    dec_level_config: AuroraDecimationLevel,
     local_stft_obj,
     remote_stft_obj,
     transfer_function_obj,
@@ -241,7 +245,8 @@ def process_transfer_functions(
 
     Parameters
     ----------
-    dec_level_config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
+    dec_level_config: AuroraDecimationLevel
+        Metadata about the decimation level processing.
     local_stft_obj: xarray.core.dataset.Dataset
     remote_stft_obj: xarray.core.dataset.Dataset or None
     transfer_function_obj: aurora.transfer_function.TTFZ.TTFZ

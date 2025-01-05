@@ -34,7 +34,6 @@ import mth5.groups
 # =============================================================================
 # Imports
 # =============================================================================
-
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.transfer_function_helpers import (
@@ -47,6 +46,9 @@ from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
 )
 from aurora.transfer_function.TTFZ import TTFZ
+from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
+    DecimationLevel as AuroraDecimationLevel,
+)
 from loguru import logger
 from mth5.helpers import close_open_files
 from typing import Optional, Union
@@ -130,7 +132,7 @@ def process_tf_decimation_level(
 
     Parameters
     ----------
-    config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
+    config: aurora.config.metadata.processing.Processing,
         Config for a single decimation level
     i_dec_level: int
         decimation level_id
@@ -308,7 +310,9 @@ def load_stft_obj_from_mth5(
     return stft_chunk
 
 
-def save_fourier_coefficients(dec_level_config, row, run_obj, stft_obj) -> None:
+def save_fourier_coefficients(
+    dec_level_config: AuroraDecimationLevel, row: pd.Series, run_obj, stft_obj
+) -> None:
     """
     Optionally saves the stft object into the MTH5.
     Note that the dec_level_config must have its save_fcs attr set to True to actually save the data.

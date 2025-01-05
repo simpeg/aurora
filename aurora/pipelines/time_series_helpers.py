@@ -11,6 +11,7 @@ from loguru import logger
 
 from aurora.time_series.windowed_time_series import WindowedTimeSeries
 from aurora.time_series.windowing_scheme import window_scheme_from_decimation
+from mt_metadata.transfer_functions.processing import TimeSeriesDecimation
 from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
     DecimationLevel as AuroraDecimationLevel,
 )
@@ -18,7 +19,6 @@ from mt_metadata.transfer_functions.processing.fourier_coefficients import (
     Decimation as FCDecimation,
 )
 from mth5.groups import RunGroup
-from mth5.timeseries import RunTS
 from typing import Literal, Optional, Union
 
 
@@ -391,12 +391,12 @@ def calibrate_stft_obj(
 
 
 def prototype_decimate(
-    config: AuroraDecimationLevel,
+    ts_decimation: TimeSeriesDecimation,
     run_xrds: xr.Dataset,
 ) -> xr.Dataset:
     """
     Basically a wrapper for scipy.signal.decimate.  Takes input timeseries (as xarray
-     Dataset) and a Decimation config object and returns a decimated version of the
+     Dataset) and a TimeSeriesDecimation object and returns a decimated version of the
      input time series.
 
     TODO: Consider moving this function into time_series/decimate.py
@@ -406,7 +406,7 @@ def prototype_decimate(
 
     Parameters
     ----------
-    config : mt_metadata.transfer_functions.processing.aurora.Decimation
+    ts_decimation : AuroraDecimationLevel
     run_xrds: xr.Dataset
         Originally from mth5.timeseries.run_ts.RunTS.dataset, but possibly decimated
         multiple times
@@ -417,7 +417,7 @@ def prototype_decimate(
         Decimated version of the input run_xrds
     """
     # downsample the time axis
-    slicer = slice(None, None, int(config.factor))  # decimation.factor
+    slicer = slice(None, None, int(ts_decimation.factor))  # decimation.factor
     downsampled_time_axis = run_xrds.time.data[slicer]
 
     # decimate the time series
@@ -426,8 +426,8 @@ def prototype_decimate(
     num_channels = len(channel_labels)
     new_data = np.full((num_observations, num_channels), np.nan)
     for i_ch, ch_label in enumerate(channel_labels):
-        # TODO: add check here for config.anti_alias_filter
-        new_data[:, i_ch] = ssig.decimate(run_xrds[ch_label], int(config.factor))
+        # TODO: add check here for ts_decimation.anti_alias_filter
+        new_data[:, i_ch] = ssig.decimate(run_xrds[ch_label], int(ts_decimation.factor))
 
     xr_da = xr.DataArray(
         new_data,
@@ -435,7 +435,7 @@ def prototype_decimate(
         coords={"time": downsampled_time_axis, "channel": channel_labels},
     )
     attr_dict = run_xrds.attrs
-    attr_dict["sample_rate"] = config.sample_rate
+    attr_dict["sample_rate"] = ts_decimation.sample_rate
     xr_da.attrs = attr_dict
     xr_ds = xr_da.to_dataset("channel")
     return xr_ds
@@ -449,7 +449,7 @@ def prototype_decimate(
 #     Method is fast.  Might be non-linear.  Seems to give similar performance to
 #     prototype_decimate for synthetic data.
 #
-#     N.B. config.factor must be integer valued
+#     N.B. config.decimation.factor must be integer valued
 #
 #     Parameters
 #     ----------
@@ -463,7 +463,7 @@ def prototype_decimate(
 #     xr_ds: xr.Dataset
 #         Decimated version of the input run_xrds
 #     """
-#     new_xr_ds = run_xrds.coarsen(time=int(config.factor), boundary="trim").mean()
+#     new_xr_ds = run_xrds.coarsen(time=int(config.decimation.factor), boundary="trim").mean()
 #     attr_dict = run_xrds.attrs
 #     attr_dict["sample_rate"] = config.sample_rate
 #     new_xr_ds.attrs = attr_dict
@@ -488,7 +488,7 @@ def prototype_decimate(
 #         Decimated version of the input run_xrds
 #     """
 #     dt = run_xrds.time.diff(dim="time").median().values
-#     dt_new = config.factor * dt
+#     dt_new = config.decimation.factor * dt
 #     dt_new = dt_new.__str__().replace("nanoseconds", "ns")
 #     new_xr_ds = run_xrds.resample(time=dt_new).mean(dim="time")
 #     attr_dict = run_xrds.attrs

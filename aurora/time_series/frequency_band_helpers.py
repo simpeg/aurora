@@ -2,11 +2,15 @@
     This module contains functions that are associated with time series of Fourier coefficients
 
 """
-# import numpy as np
 from loguru import logger
+from mt_metadata.transfer_functions.processing.aurora import (
+    DecimationLevel as AuroraDecimationLevel,
+)
 
 
-def get_band_for_tf_estimate(band, dec_level_config, local_stft_obj, remote_stft_obj):
+def get_band_for_tf_estimate(
+    band, dec_level_config: AuroraDecimationLevel, local_stft_obj, remote_stft_obj
+):
     """
     Returns spectrograms X, Y, RR for harmonics within the given band
 
@@ -15,7 +19,7 @@ def get_band_for_tf_estimate(band, dec_level_config, local_stft_obj, remote_stft
     band : mt_metadata.transfer_functions.processing.aurora.FrequencyBands
         object with lower_bound and upper_bound to tell stft object which
         subarray to return
-    config : mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
+    config : AuroraDecimationLevel
         information about the input and output channels needed for TF
         estimation problem setup
     local_stft_obj : xarray.core.dataset.Dataset or None
@@ -202,7 +206,7 @@ def adjust_band_for_coherence_sorting(frequency_band, spectrogram, rule="min3"):
 
 # def get_band_for_coherence_sorting(
 #     frequency_band,
-#     dec_level_config,
+#     dec_level_config: AuroraDecimationLevel,
 #     local_stft_obj,
 #     remote_stft_obj,
 #     widening_rule="min3",
@@ -217,7 +221,7 @@ def adjust_band_for_coherence_sorting(frequency_band, spectrogram, rule="min3"):
 #     band : mt_metadata.transfer_functions.processing.aurora.FrequencyBands
 #         object with lower_bound and upper_bound to tell stft object which
 #         subarray to return
-#     config : mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
+#     config : AuroraDecimationLevel
 #         information about the input and output channels needed for TF
 #         estimation problem setup
 #     local_stft_obj : xarray.core.dataset.Dataset or None

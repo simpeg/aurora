@@ -13,12 +13,12 @@ from loguru import logger
 from mth5.utils.exceptions import MTH5Error
 from mth5.utils.helpers import path_or_mth5_object
 from mt_metadata.transfer_functions.core import TF
+from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
+    DecimationLevel as AuroraDecimationLevel,
+)
 
 # from mtpy.processing.kernel_dataset import KernelDataset  # TODO FIXME: causes circular import.
 from typing import Union
-
-# from mt_metadata.transfer_functions.processing.aurora.decimation_level import DecimationLevel as AuroraDecimationLevel
-
 
 import numpy as np
 import pandas as pd
@@ -115,8 +115,6 @@ class TransferFunctionKernel(object):
         ----------
         i_dec_level: int
             decimation level id, indexed from zero
-        config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
-            decimation level config
 
         Returns
         -------
@@ -157,17 +155,17 @@ class TransferFunctionKernel(object):
         )
         return
 
-    def apply_clock_zero(self, dec_level_config):
+    def apply_clock_zero(self, dec_level_config: AuroraDecimationLevel):
         """
         get clock-zero from data if needed
 
         Parameters
         ----------
-        dec_level_config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
-
+        dec_level_config: AuroraDecimationLevel
+            metadata about the decimation level processing.
         Returns
         -------
-        dec_level_config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
+        dec_level_config: AuroraDecimationLevel
             The modified DecimationLevel with clock-zero information set.
         """
         if dec_level_config.stft.window.clock_zero_type == "data start":

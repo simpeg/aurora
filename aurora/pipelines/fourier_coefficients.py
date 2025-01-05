@@ -134,12 +134,12 @@ def fc_decimations_creator(
         fc_dec = FCDecimation()
         fc_dec.time_series_decimation.level = i_dec_level
         fc_dec.id = f"{i_dec_level}"
-        fc_dec.time_series_decimation.factor = decimation_factor
+        fc_dec.decimation.factor = decimation_factor
         if i_dec_level == 0:
             current_sample_rate = 1.0 * initial_sample_rate
         else:
             current_sample_rate /= decimation_factor
-        fc_dec.time_series_decimation.sample_rate = current_sample_rate
+        fc_dec.decimation.sample_rate = current_sample_rate
 
         if time_period:
             if isinstance(time_period, TimePeriod):
@@ -302,7 +302,7 @@ def _add_spectrogram_to_mth5(
         decimation_level_metadata=fc_decimation,
     )
     fc_decimation_group.from_xarray(
-        stft_obj, fc_decimation_group.metadata.time_series_decimation.sample_rate
+        stft_obj, fc_decimation_group.metadata.decimation.sample_rate
     )
     fc_decimation_group.update_metadata()
     fc_group.update_metadata()
