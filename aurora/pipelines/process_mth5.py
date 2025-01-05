@@ -379,7 +379,9 @@ def save_fourier_coefficients(
                 dec_level_name,
                 decimation_level_metadata=decimation_level_metadata,
             )
-        fc_decimation_level.from_xarray(stft_obj, decimation_level_metadata.sample_rate)
+        fc_decimation_level.from_xarray(
+            stft_obj, decimation_level_metadata.decimation.sample_rate
+        )
         fc_decimation_level.update_metadata()
         fc_group.update_metadata()
     else:
