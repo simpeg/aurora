@@ -278,7 +278,7 @@ def load_stft_obj_from_mth5(
     """
     Load stft_obj from mth5 (instead of compute)
 
-    Note #1: See note #1 in time_series.frequency_band_helpers.extract_band
+    Note #1: See note #1 in mth5.timeseries.spectre.spectrogram.py in extract_band function.
 
     Parameters
     ----------
