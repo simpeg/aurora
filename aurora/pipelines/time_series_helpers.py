@@ -20,63 +20,8 @@ from mt_metadata.transfer_functions.processing.fourier_coefficients import (
 )
 from mth5.groups import RunGroup
 from mth5.timeseries.spectre.prewhitening import apply_prewhitening
+from mth5.timeseries.spectre.prewhitening import apply_recoloring
 from typing import Literal, Optional, Union
-
-
-def apply_recoloring(
-    decimation_obj: Union[AuroraDecimationLevel, FCDecimation],
-    stft_obj: xr.Dataset,
-) -> xr.Dataset:
-    """
-    Inverts the pre-whitening operation in frequency domain.
-
-    Parameters
-    ----------
-    decimation_obj : mt_metadata.transfer_functions.processing.fourier_coefficients.decimation.Decimation
-        Information about how the decimation level is to be processed
-    stft_obj : xarray.core.dataset.Dataset
-        Time series of Fourier coefficients to be recoloured
-
-
-    Returns
-    -------
-    stft_obj : xarray.core.dataset.Dataset
-        Recolored time series of Fourier coefficients
-    """
-    # TODO: remove this try/except once mt_metadata issue 238 PR is merged
-    try:
-        pw_type = decimation_obj.prewhitening_type
-    except AttributeError:
-        pw_type = decimation_obj.stft.prewhitening_type
-
-    # No recoloring needed if prewhitening not appiled, or recoloring set to False
-    if not pw_type:
-        return stft_obj
-    # TODO Delete after tests (20241220) -- this check has been moved above the call to this function
-    # if not decimation_obj.recoloring:
-    #     return stft_obj
-
-    if pw_type == "first difference":
-        # first difference prewhitening correction is to divide by jw
-        freqs = stft_obj.frequency.data  # was freqs = decimation_obj.fft_frequencies
-        jw = 1.0j * 2 * np.pi * freqs
-        stft_obj /= jw
-
-        # suppress nan and inf to mute later warnings
-        if jw[0] == 0.0:
-            cond = stft_obj.frequency != 0.0
-            stft_obj = stft_obj.where(cond, complex(0.0))
-    # elif decimation_obj.prewhitening_type == "ARMA":
-    #     from statsmodels.tsa.arima.model import ARIMA
-    #     AR = 3 # add this to processing config
-    #     MA = 4 # add this to processing config
-
-    else:
-        msg = f"{pw_type} recoloring not yet implemented"
-        logger.error(msg)
-        raise NotImplementedError(msg)
-
-    return stft_obj
 
 
 def run_ts_to_stft_scipy(
@@ -139,13 +84,8 @@ def run_ts_to_stft_scipy(
         )
         stft_obj.update({channel_id: xrd})
 
-    # TODO : remove try/except after mt_metadata issue 238 addressed
-    try:
-        to_recolor_or_not_to_recolor = decimation_obj.recoloring
-    except AttributeError:
-        to_recolor_or_not_to_recolor = decimation_obj.stft.recoloring
-    if to_recolor_or_not_to_recolor:
-        stft_obj = apply_recoloring(decimation_obj, stft_obj)
+    if decimation_obj.stft.recoloring:
+        stft_obj = apply_recoloring(decimation_obj.stft.prewhitening_type, stft_obj)
 
     return stft_obj
 
@@ -270,7 +210,7 @@ def run_ts_to_stft(
     )
 
     if decimation_obj.stft.recoloring:
-        stft_obj = apply_recoloring(decimation_obj, stft_obj)
+        stft_obj = apply_recoloring(decimation_obj.stft.prewhitening_type, stft_obj)
 
     return stft_obj
 
