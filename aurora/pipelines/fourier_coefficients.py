@@ -79,83 +79,11 @@ from mt_metadata.timeseries.time_period import TimePeriod
 from mt_metadata.transfer_functions.processing.fourier_coefficients import (
     Decimation as FCDecimation,
 )
+from mt_metadata.transfer_functions.processing.fourier_coefficients.decimation import fc_decimations_creator
 from typing import List, Optional, Union
 
 # =============================================================================
 GROUPBY_COLUMNS = ["survey", "station", "sample_rate"]
-
-
-def fc_decimations_creator(
-    initial_sample_rate: float,
-    decimation_factors: Optional[list] = None,
-    max_levels: Optional[int] = 6,
-    time_period: Optional[TimePeriod] = None,
-) -> List[FCDecimation]:
-    """
-    TODO: move this to mt_metadata / replace with mt_metadata method once moved.
-
-    Creates mt_metadata FCDecimation objects that parameterize Fourier coefficient decimation levels.
-
-    Note 1:  This does not yet work through the assignment of which bands to keep.  Refer to
-    mt_metadata.transfer_functions.processing.Processing.assign_bands() to see how this was done in the past
-
-    Parameters
-    ----------
-    initial_sample_rate: float
-        Sample rate of the "level0" data -- usually the sample rate during field acquisition.
-    decimation_factors: Optional[list]
-        The decimation factors that will be applied at each FC decimation level
-    max_levels: Optional[int]
-        The maximum number of decimation levels to allow
-    time_period: Optional[TimePeriod]
-        Provides the start and end times
-
-    Returns
-    -------
-    fc_decimations: list
-        Each element of the list is an object of type
-        mt_metadata.transfer_functions.processing.fourier_coefficients.Decimation,
-        (a.k.a. FCDecimation).
-
-        The order of the list corresponds the order of the cascading decimation
-          - No decimation levels are omitted.
-          - This could be changed in future by using a dict instead of a list,
-          - e.g. decimation_factors = dict(zip(np.arange(max_levels), decimation_factors))
-
-    """
-    if not decimation_factors:
-        # msg = "No decimation factors given, set default values to EMTF default values [1, 4, 4, 4, ..., 4]")
-        # logger.info(msg)
-        default_decimation_factor = 4
-        decimation_factors = max_levels * [default_decimation_factor]
-        decimation_factors[0] = 1
-
-    # See Note 1
-    fc_decimations = []
-    for i_dec_level, decimation_factor in enumerate(decimation_factors):
-        fc_dec = FCDecimation()
-        fc_dec.time_series_decimation.level = i_dec_level
-        fc_dec.id = f"{i_dec_level}"
-        fc_dec.decimation.factor = decimation_factor
-        if i_dec_level == 0:
-            current_sample_rate = 1.0 * initial_sample_rate
-        else:
-            current_sample_rate /= decimation_factor
-        fc_dec.decimation.sample_rate = current_sample_rate
-
-        if time_period:
-            if isinstance(time_period, TimePeriod):
-                fc_dec.time_period = time_period
-            else:
-                msg = (
-                    f"Not sure how to assign time_period with type {type(time_period)}"
-                )
-                logger.info(msg)
-                raise NotImplementedError(msg)
-
-        fc_decimations.append(fc_dec)
-
-    return fc_decimations
 
 
 @path_or_mth5_object
