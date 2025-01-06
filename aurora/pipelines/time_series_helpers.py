@@ -19,51 +19,8 @@ from mt_metadata.transfer_functions.processing.fourier_coefficients import (
     Decimation as FCDecimation,
 )
 from mth5.groups import RunGroup
+from mth5.timeseries.spectre.prewhitening import apply_prewhitening
 from typing import Literal, Optional, Union
-
-
-def apply_prewhitening(
-    decimation_obj: Union[AuroraDecimationLevel, FCDecimation],
-    run_xrds_input: xr.Dataset,
-) -> xr.Dataset:
-    """
-    Applies pre-whitening to time series to avoid spectral leakage when FFT is applied.
-
-    TODO: If "first difference", consider clipping first and last sample from the
-     differentiated time series.
-
-    Parameters
-    ----------
-    decimation_obj : Union[AuroraDecimationLevel, FCDecimation]
-        Information about how the decimation level is to be processed
-
-    run_xrds_input : xarray.core.dataset.Dataset
-        Time series to be pre-whitened
-
-    Returns
-    -------
-    run_xrds : xarray.core.dataset.Dataset
-        pre-whitened time series
-
-    """
-    # TODO: remove this try/except once mt_metadata issue 238 PR is merged
-    try:
-        pw_type = decimation_obj.prewhitening_type
-    except AttributeError:
-        pw_type = decimation_obj.stft.prewhitening_type
-
-    if not pw_type:
-        msg = "No prewhitening specified - skipping this step"
-        logger.info(msg)
-        return run_xrds_input
-
-    if pw_type == "first difference":
-        run_xrds = run_xrds_input.differentiate("time")
-    else:
-        msg = f"{pw_type} pre-whitening not implemented"
-        logger.exception(msg)
-        raise NotImplementedError(msg)
-    return run_xrds
 
 
 def apply_recoloring(
@@ -147,7 +104,7 @@ def run_ts_to_stft_scipy(
     stft_obj : xarray.core.dataset.Dataset
         Time series of Fourier coefficients
     """
-    run_xrds = apply_prewhitening(decimation_obj, run_xrds_orig)
+    run_xrds = apply_prewhitening(decimation_obj.stft.prewhitening_type, run_xrds_orig)
     windowing_scheme = window_scheme_from_decimation(
         decimation_obj
     )  # TODO: deprecate in favor of stft.window.taper
@@ -292,7 +249,7 @@ def run_ts_to_stft(
     # need to remove any nans before windowing, or else if there is a single
     # nan then the whole channel becomes nan.
     run_xrds = nan_to_mean(run_xrds_orig)
-    run_xrds = apply_prewhitening(decimation_obj, run_xrds)
+    run_xrds = apply_prewhitening(decimation_obj.stft.prewhitening_type, run_xrds)
     run_xrds = truncate_to_clock_zero(decimation_obj, run_xrds)
     windowing_scheme = window_scheme_from_decimation(decimation_obj)
     windowed_obj = windowing_scheme.apply_sliding_window(
