@@ -71,6 +71,7 @@ from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
 from loguru import logger
 from mth5.mth5 import MTH5
+from mth5.timeseries.spectre.helpers import _add_spectrogram_to_mth5
 from mth5.utils.helpers import path_or_mth5_object
 from mth5.groups.fourier_coefficients import FCDecimationGroup
 from mt_metadata.timeseries.time_period import TimePeriod
@@ -258,54 +259,6 @@ def add_fcs_to_mth5(m: MTH5, fc_decimations: Optional[Union[str, list]] = None) 
                 )
 
     return
-
-
-def _add_spectrogram_to_mth5(
-    fc_decimation: FCDecimation,
-    run_obj: mth5.groups.RunGroup,
-    run_xrds: xr.Dataset,
-    fc_group: mth5.groups.FCGroup,
-) -> None:
-    """
-
-    This function has been factored out of add_fcs_to_mth5.
-    This is the most atomic level of adding FCs and will be useful as standalone method.
-
-    Parameters
-    ----------
-    fc_decimation : FCDecimation
-        Metadata about how the decimation level is to be processed
-
-    run_xrds : xarray.core.dataset.Dataset
-        Time series to be converted to a spectrogram and stored in MTH5.
-
-    Returns
-    -------
-    run_xrds : xarray.core.dataset.Dataset
-        pre-whitened time series
-
-    """
-
-    # check if this decimation level yields a valid spectrogram
-    if not fc_decimation.is_valid_for_time_series_length(run_xrds.time.shape[0]):
-        logger.info(
-            f"Decimation Level {fc_decimation.time_series_decimation.level} invalid, TS of {run_xrds.time.shape[0]} samples too short"
-        )
-        return
-
-    stft_obj = run_ts_to_stft_scipy(fc_decimation, run_xrds)
-    stft_obj = calibrate_stft_obj(stft_obj, run_obj)
-
-    # Pack FCs into h5 and update metadata
-    fc_decimation_group: FCDecimationGroup = fc_group.add_decimation_level(
-        f"{fc_decimation.time_series_decimation.level}",
-        decimation_level_metadata=fc_decimation,
-    )
-    fc_decimation_group.from_xarray(
-        stft_obj, fc_decimation_group.metadata.decimation.sample_rate
-    )
-    fc_decimation_group.update_metadata()
-    fc_group.update_metadata()
 
 
 def get_degenerate_fc_decimation(sample_rate: float) -> list:
