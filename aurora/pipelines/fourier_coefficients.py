@@ -72,6 +72,7 @@ from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
 from loguru import logger
 from mth5.mth5 import MTH5
 from mth5.timeseries.spectre.helpers import _add_spectrogram_to_mth5
+from mth5.timeseries.spectre.helpers import read_back_fcs
 from mth5.utils.helpers import path_or_mth5_object
 from mth5.groups.fourier_coefficients import FCDecimationGroup
 from mt_metadata.timeseries.time_period import TimePeriod
@@ -288,43 +289,3 @@ def get_degenerate_fc_decimation(sample_rate: float) -> list:
         max_levels=1,
     )
     return output
-
-
-# TODO: Delete after mth5 issue #271 is closed and merged.
-@path_or_mth5_object
-def read_back_fcs(m: Union[MTH5, pathlib.Path, str], mode: str = "r") -> None:
-    """
-
-    This is a helper function for tests.  It was used as a sanity check while debugging the FC files, and
-    also is a good example for how to access the data at each level for each channel.
-
-    The Time axis of the FC array will change from level to level, but the frequency axis will stay the same shape
-    (for now -- storing all fcs by default)
-
-    Parameters
-    ----------
-    m: Union[MTH5, pathlib.Path, str]
-        Either a path to an mth5, or an MTH5 object that the FCs will be read back from.
-
-
-    """
-    channel_summary_df = m.channel_summary.to_dataframe()
-    logger.debug(channel_summary_df)
-    usssr_grouper = channel_summary_df.groupby(GROUPBY_COLUMNS)
-    for (survey, station, sample_rate), usssr_group in usssr_grouper:
-        logger.info(f"survey: {survey}, station: {station}, sample_rate {sample_rate}")
-        station_obj = m.get_station(station, survey)
-        fc_groups = station_obj.fourier_coefficients_group.groups_list
-        logger.info(f"FC Groups: {fc_groups}")
-        for run_id in fc_groups:
-            fc_group = station_obj.fourier_coefficients_group.get_fc_group(run_id)
-            dec_level_ids = fc_group.groups_list
-            for dec_level_id in dec_level_ids:
-                dec_level = fc_group.get_decimation_level(dec_level_id)
-                xrds = dec_level.to_xarray(["hx", "hy"])
-                msg = f"dec_level {dec_level_id}"
-                msg = f"{msg} \n Time axis shape {xrds.time.data.shape}"
-                msg = f"{msg} \n Freq axis shape {xrds.frequency.data.shape}"
-                logger.debug(msg)
-
-    return
