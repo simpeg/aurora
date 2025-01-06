@@ -312,20 +312,20 @@ def get_degenerate_fc_decimation(sample_rate: float) -> list:
     """
 
     Makes a default fc_decimation list. WIP
-    This "degnerate" config will only operate on the first decimation level.
+    This "degenerate" config will only operate on the first decimation level.
     This is useful for testing.  It could also be used in future on an MTH5 stored time series in decimation
     levels already as separate runs.
 
     Parameters
     ----------
     sample_rate: float
-        The sample rate assocaiated with the time-series to convert to Spectrogram
+        The sample rate associated with the time-series to convert to spectrogram
 
     Returns
     -------
     output: list
         List has only one element which is of type FCDecimation, aka.
-        mt_metadata.transfer_functions.processing.fourier_coefficients.Decimation.
+
     """
     output = fc_decimations_creator(
         sample_rate,

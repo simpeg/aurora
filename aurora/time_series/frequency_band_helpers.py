@@ -120,7 +120,11 @@ def check_time_axes_synched(X, Y):
     return
 
 
-def adjust_band_for_coherence_sorting(frequency_band, spectrogram, rule="min3"):
+def adjust_band_for_coherence_sorting(
+        frequency_band,
+        spectrogram,
+        rule="min3"
+):
     """
 
     WIP: Intended to broaden band to allow more FCs for spectral features

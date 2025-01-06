@@ -277,7 +277,7 @@ def run_ts_to_stft(
 
     Parameters
     ----------
-    decimation_obj : mt_metadata.transfer_functions.processing.aurora.DecimationLevel
+    decimation_obj : AuroraDecimationLevel
         Information about how the decimation level is to be processed
     run_ts : xarray.core.dataset.Dataset
         normally extracted from mth5.RunTS
