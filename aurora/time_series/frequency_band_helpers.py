@@ -6,18 +6,24 @@ from loguru import logger
 from mt_metadata.transfer_functions.processing.aurora import (
     DecimationLevel as AuroraDecimationLevel,
 )
+from mt_metadata.transfer_functions.processing.aurora import Band
 from mth5.timeseries.spectre.spectrogram import extract_band
+from typing import Optional, Tuple
+import xarray as xr
 
 
 def get_band_for_tf_estimate(
-    band, dec_level_config: AuroraDecimationLevel, local_stft_obj, remote_stft_obj
-):
+    band: Band,
+    dec_level_config: AuroraDecimationLevel,
+    local_stft_obj: xr.Dataset,
+    remote_stft_obj: Optional[xr.Dataset],
+) -> Tuple[xr.Dataset, xr.Dataset, Optional[xr.Dataset]]:
     """
     Returns spectrograms X, Y, RR for harmonics within the given band
 
     Parameters
     ----------
-    band : mt_metadata.transfer_functions.processing.aurora.FrequencyBands
+    band : mt_metadata.transfer_functions.processing.aurora.Band
         object with lower_bound and upper_bound to tell stft object which
         subarray to return
     config : AuroraDecimationLevel
@@ -53,6 +59,7 @@ def get_band_for_tf_estimate(
 
     return X, Y, RR
 
+
 def check_time_axes_synched(X, Y):
     """
     Utility function for checking that time axes agree.
@@ -77,11 +84,7 @@ def check_time_axes_synched(X, Y):
     return
 
 
-def adjust_band_for_coherence_sorting(
-        frequency_band,
-        spectrogram,
-        rule="min3"
-):
+def adjust_band_for_coherence_sorting(frequency_band, spectrogram, rule="min3"):
     """
 
     WIP: Intended to broaden band to allow more FCs for spectral features
