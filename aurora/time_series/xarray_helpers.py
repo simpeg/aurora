@@ -8,7 +8,6 @@ from loguru import logger
 from typing import Optional, Union
 
 from mth5.timeseries.xarray_helpers import covariance_xr
-from mth5.timeseries.xarray_helpers import initialize_xrda_1d
 
 
 def handle_nan(X, Y, RR, drop_dim=""):
@@ -97,7 +96,6 @@ def initialize_xrda_2d_cov(
 ):
 
     """
-     TODO: consider merging with initialize_xrda_1d
      TODO: consider changing nomenclature from dims=["channel_1", "channel_2"],
      to dims=["variable_1", "variable_2"], to be consistent with initialize_xrda_1d
 
