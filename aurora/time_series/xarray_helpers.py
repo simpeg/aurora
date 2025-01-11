@@ -7,6 +7,9 @@ import xarray as xr
 from loguru import logger
 from typing import Optional, Union
 
+from mth5.timeseries.xarray_helpers import covariance_xr
+from mth5.timeseries.xarray_helpers import initialize_xrda_1d
+
 
 def handle_nan(X, Y, RR, drop_dim=""):
     """
@@ -89,81 +92,7 @@ def handle_nan(X, Y, RR, drop_dim=""):
     return X, Y, RR
 
 
-def covariance_xr(
-    X: xr.DataArray, aweights: Optional[Union[np.ndarray, None]] = None
-) -> xr.DataArray:
-    """
-    Compute the covariance matrix with numpy.cov.
-
-    Parameters
-    ----------
-    X: xarray.core.dataarray.DataArray
-        Multivariate time series as an xarray
-    aweights: array_like, optional
-        Doc taken from numpy cov follows:
-        1-D array of observation vector weights. These relative weights are
-        typically large for observations considered "important" and smaller for
-        observations considered less "important". If ``ddof=0`` the array of
-        weights can be used to assign probabilities to observation vectors.
-
-    Returns
-    -------
-    S: xarray.DataArray
-        The covariance matrix of the data in xarray form.
-    """
-
-    channels = list(X.coords["variable"].values)
-
-    S = xr.DataArray(
-        np.cov(X, aweights=aweights),
-        dims=["channel_1", "channel_2"],
-        coords={"channel_1": channels, "channel_2": channels},
-    )
-    return S
-
-
-def initialize_xrda_1d(
-    channels: list,
-    dtype=Optional[type],
-    value: Optional[Union[complex, float, bool]] = 0,
-) -> xr.DataArray:
-    """
-
-    Returns a 1D xr.DataArray with variable "channel", having values channels named by the input list.
-
-    Parameters
-    ----------
-    channels: list
-        The channels in the multivariate array
-    dtype: type
-        The datatype to initialize the array.
-        Common cases are complex, float, and bool
-    value: Union[complex, float, bool]
-        The default value to assign the array
-
-    Returns
-    -------
-    xrda: xarray.core.dataarray.DataArray
-        An xarray container for the channels, initialized to zeros.
-    """
-    k = len(channels)
-    logger.debug(f"Initializing xarray with values {value}")
-    xrda = xr.DataArray(
-        np.zeros(k, dtype=dtype),
-        dims=[
-            "variable",
-        ],
-        coords={
-            "variable": channels,
-        },
-    )
-    if value != 0:
-        data = value * np.ones(k, dtype=dtype)
-        xrda.data = data
-    return xrda
-
-
-def initialize_xrda_2d(
+def initialize_xrda_2d_cov(
     channels, dtype=complex, value: Optional[Union[complex, float, bool]] = 0, dims=None
 ):
 

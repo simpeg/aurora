@@ -10,7 +10,7 @@ import xarray as xr
 
 from aurora.time_series.xarray_helpers import covariance_xr
 from aurora.time_series.xarray_helpers import initialize_xrda_1d
-from aurora.time_series.xarray_helpers import initialize_xrda_2d
+from aurora.time_series.xarray_helpers import initialize_xrda_2d_cov
 
 
 class TestXarrayHelpers(unittest.TestCase):
@@ -32,10 +32,12 @@ class TestXarrayHelpers(unittest.TestCase):
         tmp = initialize_xrda_1d(self.standard_channel_names, dtype=dtype, value=value)
         self.assertTrue((tmp.data == value).all())
 
-    def test_initialize_xrda_2d(self):
+    def test_initialize_xrda_2d_cov(self):
         dtype = float
         value = -1
-        tmp = initialize_xrda_2d(self.standard_channel_names, dtype=dtype, value=value)
+        tmp = initialize_xrda_2d_cov(
+            self.standard_channel_names, dtype=dtype, value=value
+        )
         self.assertTrue((tmp.data == value).all())
 
     def test_covariance_xr(self):
