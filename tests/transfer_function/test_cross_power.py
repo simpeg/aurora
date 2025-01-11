@@ -1,4 +1,4 @@
-from aurora.timeseries.xarray_helpers import initialize_xrda_2d_cov
+from mth5.timeseries.xarray_helpers import initialize_xrda_2d_cov
 from aurora.transfer_function.cross_power import tf_from_cross_powers
 from aurora.transfer_function.cross_power import _channel_names
 from aurora.transfer_function.cross_power import (
