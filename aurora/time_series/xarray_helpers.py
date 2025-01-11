@@ -2,15 +2,17 @@
 Placeholder module for methods manipulating xarray time series
 """
 
-import numpy as np
 import xarray as xr
 from loguru import logger
-from typing import Optional, Union
-
-from mth5.timeseries.xarray_helpers import covariance_xr
+from typing import Optional
 
 
-def handle_nan(X, Y, RR, drop_dim=""):
+def handle_nan(
+    X: xr.Dataset,
+    Y: Optional[xr.Dataset],
+    RR: Optional[xr.Dataset],
+    drop_dim: Optional[str] = "",
+) -> tuple:
     """
     Drops Nan from multiple channel series'.
 
@@ -89,43 +91,3 @@ def handle_nan(X, Y, RR, drop_dim=""):
     RR = RR.rename(data_var_rm_label_mapper)
 
     return X, Y, RR
-
-
-def initialize_xrda_2d_cov(
-    channels, dtype=complex, value: Optional[Union[complex, float, bool]] = 0, dims=None
-):
-
-    """
-     TODO: consider changing nomenclature from dims=["channel_1", "channel_2"],
-     to dims=["variable_1", "variable_2"], to be consistent with initialize_xrda_1d
-
-    Parameters
-     ----------
-     channels: list
-         The channels in the multivariate array
-     dtype: type
-         The datatype to initialize the array.
-         Common cases are complex, float, and bool
-     value: Union[complex, float, bool]
-         The default value to assign the array
-
-    Returns
-     -------
-     xrda: xarray.core.dataarray.DataArray
-         An xarray container for the channel variances etc., initialized to zeros.
-    """
-    if dims is None:
-        dims = [channels, channels]
-
-    K = len(channels)
-    logger.debug(f"Initializing 2D xarray to {value}")
-    xrda = xr.DataArray(
-        np.zeros((K, K), dtype=dtype),
-        dims=["channel_1", "channel_2"],
-        coords={"channel_1": dims[0], "channel_2": dims[1]},
-    )
-    if value != 0:
-        data = value * np.ones(xrda.shape, dtype=dtype)
-        xrda.data = data
-
-    return xrda
