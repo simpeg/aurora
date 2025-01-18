@@ -6,7 +6,6 @@ This function was recently changed to process_mth5_legacy, os that process_mth5
 can be repurposed for other TF estimation schemes.  The "legacy" version
 corresponds to aurora default processing.
 
-
 Notes on process_mth5_legacy:
 Note 1: process_mth5 assumes application of cascading decimation, and that the
 decimated data will be accessed from the previous decimation level.  This should be
@@ -22,7 +21,7 @@ adding a is_valid_dataset column, associated with each run-decimation level pair
 
 Note 3: This point in the loop marks the interface between _generation_ of the FCs and
  their _usage_. In future the code above this comment would be pushed into
- create_fourier_coefficients() and the code below this would access those FCs and
+ the creation of the spectrograms and the code below this would access those FCs and
  execute compute_transfer_function().
  This would also be an appropriate place to place a feature extraction layer, and
  compute weights for the FCs.
@@ -93,6 +92,49 @@ def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrds, units="
     -------
     stft_obj: xarray.core.dataset.Dataset
         Time series of calibrated Fourier coefficients per each channel in the run
+
+    Development Notes:
+    Here are the parameters that are defined via the mt_metadata fourier coefficients structures:
+
+    "bands",
+    "decimation.anti_alias_filter": "default",
+    "decimation.factor": 4.0,
+    "decimation.level": 2,
+    "decimation.method": "default",
+    "decimation.sample_rate": 0.0625,
+    "stft.per_window_detrend_type": "linear",
+    "stft.prewhitening_type": "first difference",
+    "stft.window.clock_zero_type": "ignore",
+    "stft.window.num_samples": 128,
+    "stft.window.overlap": 32,
+    "stft.window.type": "boxcar"
+
+    Creating the decimations config requires a decision about decimation factors and the number of levels.
+    We have been getting this from the EMTF band setup file by default.  It is desirable to continue supporting this,
+    however, note that the EMTF band setup is really about a time series operation, and not about making STFTs.
+
+    For the record, here is the legacy decimation config from EMTF, a.k.a. decset.cfg:
+    ```
+    4     0      # of decimation level, & decimation offset
+    128  32.   1   0   0   7   4   32   1
+    1.0
+    128  32.   4   0   0   7   4   32   4
+    .2154  .1911   .1307   .0705
+    128  32.   4   0   0   7   4   32   4
+    .2154  .1911   .1307   .0705
+    128  32.   4   0   0   7   4   32   4
+    .2154  .1911   .1307   .0705
+    ```
+
+    This essentially corresponds to a "Decimations Group" which is a list of decimations.
+    Related to the generation of FCs is the ARMA prewhitening (Issue #60) which was controlled in
+    EMTF with pwset.cfg
+    4    5             # of decimation level, # of channels
+    3 3 3 3 3
+    3 3 3 3 3
+    3 3 3 3 3
+    3 3 3 3 3
+
     """
     stft_config = processing_config.get_decimation_level(i_dec_level)
     stft_obj = run_ts_to_stft(stft_config, run_xrds)
@@ -278,7 +320,7 @@ def load_stft_obj_from_mth5(
     """
     Load stft_obj from mth5 (instead of compute)
 
-    Note #1: See note #1 in time_series.frequency_band_helpers.extract_band
+    Note #1: See note #1 in mth5.timeseries.spectre.spectrogram.py in extract_band function.
 
     Parameters
     ----------

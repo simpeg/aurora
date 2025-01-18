@@ -19,178 +19,9 @@ from mt_metadata.transfer_functions.processing.fourier_coefficients import (
     Decimation as FCDecimation,
 )
 from mth5.groups import RunGroup
+from mth5.timeseries.spectre.prewhitening import apply_prewhitening
+from mth5.timeseries.spectre.prewhitening import apply_recoloring
 from typing import Literal, Optional, Union
-
-
-def apply_prewhitening(
-    decimation_obj: Union[AuroraDecimationLevel, FCDecimation],
-    run_xrds_input: xr.Dataset,
-) -> xr.Dataset:
-    """
-    Applies pre-whitening to time series to avoid spectral leakage when FFT is applied.
-
-    TODO: If "first difference", consider clipping first and last sample from the
-     differentiated time series.
-
-    Parameters
-    ----------
-    decimation_obj : Union[AuroraDecimationLevel, FCDecimation]
-        Information about how the decimation level is to be processed
-
-    run_xrds_input : xarray.core.dataset.Dataset
-        Time series to be pre-whitened
-
-    Returns
-    -------
-    run_xrds : xarray.core.dataset.Dataset
-        pre-whitened time series
-
-    """
-    # TODO: remove this try/except once mt_metadata issue 238 PR is merged
-    try:
-        pw_type = decimation_obj.prewhitening_type
-    except AttributeError:
-        pw_type = decimation_obj.stft.prewhitening_type
-
-    if not pw_type:
-        msg = "No prewhitening specified - skipping this step"
-        logger.info(msg)
-        return run_xrds_input
-
-    if pw_type == "first difference":
-        run_xrds = run_xrds_input.differentiate("time")
-    else:
-        msg = f"{pw_type} pre-whitening not implemented"
-        logger.exception(msg)
-        raise NotImplementedError(msg)
-    return run_xrds
-
-
-def apply_recoloring(
-    decimation_obj: Union[AuroraDecimationLevel, FCDecimation],
-    stft_obj: xr.Dataset,
-) -> xr.Dataset:
-    """
-    Inverts the pre-whitening operation in frequency domain.
-
-    Parameters
-    ----------
-    decimation_obj : mt_metadata.transfer_functions.processing.fourier_coefficients.decimation.Decimation
-        Information about how the decimation level is to be processed
-    stft_obj : xarray.core.dataset.Dataset
-        Time series of Fourier coefficients to be recoloured
-
-
-    Returns
-    -------
-    stft_obj : xarray.core.dataset.Dataset
-        Recolored time series of Fourier coefficients
-    """
-    # TODO: remove this try/except once mt_metadata issue 238 PR is merged
-    try:
-        pw_type = decimation_obj.prewhitening_type
-    except AttributeError:
-        pw_type = decimation_obj.stft.prewhitening_type
-
-    # No recoloring needed if prewhitening not appiled, or recoloring set to False
-    if not pw_type:
-        return stft_obj
-    # TODO Delete after tests (20241220) -- this check has been moved above the call to this function
-    # if not decimation_obj.recoloring:
-    #     return stft_obj
-
-    if pw_type == "first difference":
-        # first difference prewhitening correction is to divide by jw
-        freqs = stft_obj.frequency.data  # was freqs = decimation_obj.fft_frequencies
-        jw = 1.0j * 2 * np.pi * freqs
-        stft_obj /= jw
-
-        # suppress nan and inf to mute later warnings
-        if jw[0] == 0.0:
-            cond = stft_obj.frequency != 0.0
-            stft_obj = stft_obj.where(cond, complex(0.0))
-    # elif decimation_obj.prewhitening_type == "ARMA":
-    #     from statsmodels.tsa.arima.model import ARIMA
-    #     AR = 3 # add this to processing config
-    #     MA = 4 # add this to processing config
-
-    else:
-        msg = f"{pw_type} recoloring not yet implemented"
-        logger.error(msg)
-        raise NotImplementedError(msg)
-
-    return stft_obj
-
-
-def run_ts_to_stft_scipy(
-    decimation_obj: Union[AuroraDecimationLevel, FCDecimation],
-    run_xrds_orig: xr.Dataset,
-) -> xr.Dataset:
-    """
-    TODO: Replace with mth5 run_ts_to_stft_scipy method
-    Converts a runts object into a time series of Fourier coefficients.
-    This method uses scipy.signal.spectrogram.
-
-
-    Parameters
-    ----------
-    decimation_obj : mt_metadata.transfer_functions.processing.aurora.DecimationLevel
-        Information about how the decimation level is to be processed
-        Note: This works with FCdecimation and AuroraDecimationLevel becuase test_fourier_coefficients
-         and test_stft_methods_agree both use them)
-        Note: Both of these objects are basically spectrogram metadata with provenance for decimation levels.
-    run_xrds_orig : : xarray.core.dataset.Dataset
-        Time series to be processed
-
-    Returns
-    -------
-    stft_obj : xarray.core.dataset.Dataset
-        Time series of Fourier coefficients
-    """
-    run_xrds = apply_prewhitening(decimation_obj, run_xrds_orig)
-    windowing_scheme = window_scheme_from_decimation(
-        decimation_obj
-    )  # TODO: deprecate in favor of stft.window.taper
-
-    stft_obj = xr.Dataset()
-    for channel_id in run_xrds.data_vars:
-        ff, tt, specgm = ssig.spectrogram(
-            run_xrds[channel_id].data,
-            fs=decimation_obj.decimation.sample_rate,
-            window=windowing_scheme.taper,
-            nperseg=decimation_obj.stft.window.num_samples,
-            noverlap=decimation_obj.stft.window.overlap,
-            detrend="linear",
-            scaling="density",
-            mode="complex",
-        )
-
-        # drop Nyquist>
-        ff = ff[:-1]
-        specgm = specgm[:-1, :]
-        specgm *= np.sqrt(2)  # compensate energy for keeping only half the spectrum
-
-        # make time_axis
-        tt = tt - tt[0]
-        tt *= decimation_obj.decimation.sample_rate
-        time_axis = run_xrds.time.data[tt.astype(int)]
-
-        xrd = xr.DataArray(
-            specgm.T,
-            dims=["time", "frequency"],
-            coords={"frequency": ff, "time": time_axis},
-        )
-        stft_obj.update({channel_id: xrd})
-
-    # TODO : remove try/except after mt_metadata issue 238 addressed
-    try:
-        to_recolor_or_not_to_recolor = decimation_obj.recoloring
-    except AttributeError:
-        to_recolor_or_not_to_recolor = decimation_obj.stft.recoloring
-    if to_recolor_or_not_to_recolor:
-        stft_obj = apply_recoloring(decimation_obj, stft_obj)
-
-    return stft_obj
 
 
 def truncate_to_clock_zero(
@@ -204,7 +35,7 @@ def truncate_to_clock_zero(
 
     Parameters
     ----------
-    decimation_obj: mt_metadata.transfer_functions.processing.aurora.DecimationLevel
+    decimation_obj: Union[AuroraDecimationLevel, FCDecimation]
         Information about how the decimation level is to be processed
     run_xrds : xarray.core.dataset.Dataset
         normally extracted from mth5.RunTS
@@ -277,7 +108,7 @@ def run_ts_to_stft(
 
     Parameters
     ----------
-    decimation_obj : mt_metadata.transfer_functions.processing.aurora.DecimationLevel
+    decimation_obj : AuroraDecimationLevel
         Information about how the decimation level is to be processed
     run_ts : xarray.core.dataset.Dataset
         normally extracted from mth5.RunTS
@@ -292,7 +123,7 @@ def run_ts_to_stft(
     # need to remove any nans before windowing, or else if there is a single
     # nan then the whole channel becomes nan.
     run_xrds = nan_to_mean(run_xrds_orig)
-    run_xrds = apply_prewhitening(decimation_obj, run_xrds)
+    run_xrds = apply_prewhitening(decimation_obj.stft.prewhitening_type, run_xrds)
     run_xrds = truncate_to_clock_zero(decimation_obj, run_xrds)
     windowing_scheme = window_scheme_from_decimation(decimation_obj)
     windowed_obj = windowing_scheme.apply_sliding_window(
@@ -313,7 +144,7 @@ def run_ts_to_stft(
     )
 
     if decimation_obj.stft.recoloring:
-        stft_obj = apply_recoloring(decimation_obj, stft_obj)
+        stft_obj = apply_recoloring(decimation_obj.stft.prewhitening_type, stft_obj)
 
     return stft_obj
 

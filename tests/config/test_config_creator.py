@@ -1,4 +1,5 @@
 # import logging
+import pandas as pd
 import unittest
 
 from aurora.config.config_creator import ConfigCreator
@@ -68,8 +69,13 @@ class TestConfigCreator(unittest.TestCase):
         delta_f = dec_level_0.frequency_sample_interval
         lower_edges = (dec_level_0.lower_bounds * delta_f) - delta_f / 2.0
         upper_edges = (dec_level_0.upper_bounds * delta_f) + delta_f / 2.0
-        band_edges_b = np.vstack((lower_edges, upper_edges)).T
-        assert (band_edges_b - band_edges_a == 0).all()
+        band_edges_b = pd.DataFrame(
+            data={
+                "lower_bound": lower_edges,
+                "upper_bound": upper_edges,
+            }
+        )
+        assert (band_edges_b - band_edges_a == 0).all().all()
 
 
 def main():

@@ -7,18 +7,15 @@ import numpy as np
 
 from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
-from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
 from aurora.test_utils.synthetic.make_processing_configs import (
     create_test_run_config,
 )
-
-# from mtpy-v2
-from mtpy.processing import RunSummary, KernelDataset
-
 from loguru import logger
 from mth5.data.make_mth5_from_asc import create_test1_h5
 from mth5.mth5 import MTH5
 from mth5.helpers import close_open_files
+from mth5.timeseries.spectre.stft import run_ts_to_stft_scipy
+from mtpy.processing import RunSummary, KernelDataset  # from mtpy-v2
 
 
 def test_stft_methods_agree():

@@ -6,17 +6,24 @@ from loguru import logger
 from mt_metadata.transfer_functions.processing.aurora import (
     DecimationLevel as AuroraDecimationLevel,
 )
+from mt_metadata.transfer_functions.processing.aurora import Band
+from mth5.timeseries.spectre.spectrogram import extract_band
+from typing import Optional, Tuple
+import xarray as xr
 
 
 def get_band_for_tf_estimate(
-    band, dec_level_config: AuroraDecimationLevel, local_stft_obj, remote_stft_obj
-):
+    band: Band,
+    dec_level_config: AuroraDecimationLevel,
+    local_stft_obj: xr.Dataset,
+    remote_stft_obj: Optional[xr.Dataset],
+) -> Tuple[xr.Dataset, xr.Dataset, Optional[xr.Dataset]]:
     """
     Returns spectrograms X, Y, RR for harmonics within the given band
 
     Parameters
     ----------
-    band : mt_metadata.transfer_functions.processing.aurora.FrequencyBands
+    band : mt_metadata.transfer_functions.processing.aurora.Band
         object with lower_bound and upper_bound to tell stft object which
         subarray to return
     config : AuroraDecimationLevel
@@ -51,49 +58,6 @@ def get_band_for_tf_estimate(
         RR = None
 
     return X, Y, RR
-
-
-def extract_band(frequency_band, fft_obj, channels=[], epsilon=1e-7):
-    """
-    Extracts a frequency band from xr.DataArray representing a spectrogram.
-
-    Stand alone version of the method that is used by WIP Spectrogram class.
-
-    Development Notes:
-    #1: 20230902
-    TODO: Decide if base dataset object should be a xr.DataArray (not xr.Dataset)
-    - drop=True does not play nice with h5py and Dataset, results in a type error.
-    File "stringsource", line 2, in h5py.h5r.Reference.__reduce_cython__
-    TypeError: no default __reduce__ due to non-trivial __cinit__
-    However, it works OK with DataArray, so maybe use data array in general
-
-    Parameters
-    ----------
-    frequency_band: mt_metadata.transfer_functions.processing.aurora.band.Band
-        Specifies interval corresponding to a frequency band
-    fft_obj: xarray.core.dataset.Dataset
-        To be replaced with an fft_obj() class in future
-    epsilon: float
-        Use this when you are worried about missing a frequency due to
-        round off error.  This is in general not needed if we use a df/2 pad
-        around true harmonics.
-
-    Returns
-    -------
-    band: xr.DataArray
-        The frequencies within the band passed into this function
-    """
-    cond1 = fft_obj.frequency >= frequency_band.lower_bound - epsilon
-    cond2 = fft_obj.frequency <= frequency_band.upper_bound + epsilon
-    try:
-        band = fft_obj.where(cond1 & cond2, drop=True)
-    except TypeError:  # see Note #1
-        tmp = fft_obj.to_array()
-        band = tmp.where(cond1 & cond2, drop=True)
-        band = band.to_dataset("variable")
-    if channels:
-        band = band[channels]
-    return band
 
 
 def check_time_axes_synched(X, Y):

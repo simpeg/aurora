@@ -1,4 +1,4 @@
-from aurora.time_series.xarray_helpers import initialize_xrda_2d
+from mth5.timeseries.xarray_helpers import initialize_xrda_2d_cov
 from aurora.transfer_function.cross_power import tf_from_cross_powers
 from aurora.transfer_function.cross_power import _channel_names
 from aurora.transfer_function.cross_power import (
@@ -32,7 +32,7 @@ class TestCrossPower(unittest.TestCase):
         station_1_channels = [f"{self.station_ids[0]}_{x}" for x in components]
         station_2_channels = [f"{self.station_ids[1]}_{x}" for x in components]
         channels = station_1_channels + station_2_channels
-        sdm = initialize_xrda_2d(
+        sdm = initialize_xrda_2d_cov(
             channels=channels,
             dtype=complex,
         )
