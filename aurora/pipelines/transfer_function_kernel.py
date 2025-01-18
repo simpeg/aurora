@@ -166,10 +166,13 @@ class TransferFunctionKernel(object):
     def all_fcs_already_exist(self) -> bool:
         """Return true of all FCs needed to process data already exist in the mth5s"""
         if self.kernel_dataset.df["fc"].isna().any():
-            self.check_if_fcs_already_exist()
+            has_fcs = self.check_if_fcs_already_exist()
+            if not has_fcs:
+                self.kernel_dataset.df["fc"] = self.kernel_dataset.df[
+                    "fc"
+                ].fillna(False)
 
         # these should all be booleans now
-        print(self.kernel_dataset.df["fc"])
         assert not self.kernel_dataset.df["fc"].isna().any()
 
         return self.kernel_dataset.df.fc.all()
@@ -242,10 +245,12 @@ class TransferFunctionKernel(object):
             if self.dataset_df["fc"].all():
                 msg = "All fc_levels already exist"
                 msg += "Skip time series processing is OK"
+                logger.info(msg)
+                return True
             else:
                 msg = f"Some, but not all fc_levels already exist = {self.dataset_df['fc']}"
-            logger.info(msg)
-            return True
+                logger.info(msg)
+                return False
         else:
             msg = "FC levels not present"
             logger.info(msg)
