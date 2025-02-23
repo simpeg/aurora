@@ -21,6 +21,7 @@ from mt_metadata.transfer_functions.processing.fourier_coefficients import (
 from mth5.groups import RunGroup
 from mth5.timeseries.spectre.prewhitening import apply_prewhitening
 from mth5.timeseries.spectre.prewhitening import apply_recoloring
+import mth5.timeseries.spectre as spectre
 from typing import Literal, Optional, Union
 
 
@@ -98,7 +99,7 @@ def nan_to_mean(xrds: xr.Dataset) -> xr.Dataset:
 
 def run_ts_to_stft(
     decimation_obj: AuroraDecimationLevel, run_xrds_orig: xr.Dataset
-) -> xr.Dataset:
+) -> spectre.Spectrogram:
     """
     Converts a runts object into a time series of Fourier coefficients.
     Similar to run_ts_to_stft_scipy, but in this implementation operations on individual
@@ -110,7 +111,7 @@ def run_ts_to_stft(
     ----------
     decimation_obj : AuroraDecimationLevel
         Information about how the decimation level is to be processed
-    run_ts : xarray.core.dataset.Dataset
+    run_xrds_orig: xarray.core.dataset.Dataset
         normally extracted from mth5.RunTS
 
     Returns
@@ -146,7 +147,8 @@ def run_ts_to_stft(
     if decimation_obj.stft.recoloring:
         stft_obj = apply_recoloring(decimation_obj.stft.prewhitening_type, stft_obj)
 
-    return stft_obj
+    spectrogram = spectre.Spectrogram(dataset=stft_obj)
+    return spectrogram
 
 
 def calibrate_stft_obj(

@@ -50,6 +50,7 @@ from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
 )
 from loguru import logger
 from mth5.helpers import close_open_files
+from mth5.timeseries.spectre import Spectrogram
 from typing import Optional, Union
 
 import aurora.config.metadata.processing
@@ -137,7 +138,7 @@ def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrds, units="
 
     """
     stft_config = processing_config.get_decimation_level(i_dec_level)
-    stft_obj = run_ts_to_stft(stft_config, run_xrds)
+    spectrogram = run_ts_to_stft(stft_config, run_xrds)
     run_id = run_obj.metadata.id
     if run_obj.station_metadata.id == processing_config.stations.local.id:
         scale_factors = processing_config.stations.local.run_dict[
@@ -149,11 +150,12 @@ def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrds, units="
         )
 
     stft_obj = calibrate_stft_obj(
-        stft_obj,
+        spectrogram.dataset,
         run_obj,
         units=units,
         channel_scale_factors=scale_factors,
     )
+
     return stft_obj
 
 
@@ -433,10 +435,11 @@ def save_fourier_coefficients(
     return
 
 
-def get_spectrogams(tfk: TransferFunctionKernel, i_dec_level, units="MT"):
+def get_spectrograms(tfk: TransferFunctionKernel, i_dec_level, units="MT"):
     """
     Given a decimation level id, loads a dictianary of all spectragrams from information in tfk.
     TODO: Make this a method of TFK
+    TODO: Modify this to be able to yield Spectrogram objects.
 
     Parameters
     ----------
@@ -470,6 +473,7 @@ def get_spectrogams(tfk: TransferFunctionKernel, i_dec_level, units="MT"):
         run_obj = row.mth5_obj.from_reference(row.run_hdf5_reference)
         if row.fc:
             stft_obj = load_stft_obj_from_mth5(i_dec_level, row, run_obj)
+            # TODO: Cast stft_obj to a Spectrogram here
             stfts = append_chunk_to_stfts(stfts, stft_obj, row.remote)
             continue
 
@@ -485,10 +489,13 @@ def get_spectrogams(tfk: TransferFunctionKernel, i_dec_level, units="MT"):
             run_xrds,
             units,
         )
+        # TODO: Cast stft_obj to a Spectrogram here or in make_stft_objects
 
         # Pack FCs into h5
         dec_level_config = tfk.config.decimations[i_dec_level]
         save_fourier_coefficients(dec_level_config, row, run_obj, stft_obj)
+        # TODO: 1st pass, cast stft_obj to a Spectrogram here
+
         stfts = append_chunk_to_stfts(stfts, stft_obj, row.remote)
 
     return stfts
@@ -550,7 +557,7 @@ def process_mth5_legacy(
         tfk.update_dataset_df(i_dec_level)
         tfk.apply_clock_zero(dec_level_config)
 
-        stfts = get_spectrogams(tfk, i_dec_level, units=units)
+        stfts = get_spectrograms(tfk, i_dec_level, units=units)
 
         local_merged_stft_obj, remote_merged_stft_obj = merge_stfts(stfts, tfk)
 
