@@ -18,6 +18,13 @@ from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
 )
 
 # from mtpy.processing.kernel_dataset import KernelDataset  # TODO FIXME: causes circular import.
+# The circular import is because mtpy.processing.kernel_dataset needs to import KERNEL_DATASET_DTYPE, and
+# MINI_SUMMARY_COLUMNS, from mtpy.processing.__init__.py, but that same __init__ also imports
+# from .aurora.process_aurora import AuroraProcessing which imports process_mth5 from aurora.pipelines.process_mth5
+# Finally, this TFK here, is also imported by aurora.pipelines.process_mth5, hence the circular import.
+# One solution maybe to create mtpy.processing.dtypes.py, and put KERNEL_DATASET_DTYPE, and
+# # MINI_SUMMARY_COLUMNS into there.
+
 from typing import Union
 
 import numpy as np
@@ -99,7 +106,7 @@ class TransferFunctionKernel(object):
         mode = self.get_mth5_file_open_mode()
         self._mth5_objs = self.kernel_dataset.initialize_mth5s(mode)
 
-    def update_dataset_df(self, i_dec_level):
+    def update_dataset_df(self, i_dec_level: int) -> None:
         """
         This function has two different modes.  The first mode initializes values in the
         array, and could be placed into TFKDataset.initialize_time_series_data()
