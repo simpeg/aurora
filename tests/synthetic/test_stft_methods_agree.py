@@ -68,9 +68,11 @@ def test_stft_methods_agree():
             local_run_xrts = prototype_decimate(dec_config.decimation, local_run_xrts)
 
         dec_config.stft.per_window_detrend_type = "constant"
-        local_stft_obj = run_ts_to_stft(dec_config, local_run_xrts)
-        local_stft_obj2 = run_ts_to_stft_scipy(dec_config, local_run_xrts)
-        stft_difference = local_stft_obj - local_stft_obj2
+        local_spectrogram = run_ts_to_stft(dec_config, local_run_xrts)
+        local_spectrogram2 = run_ts_to_stft_scipy(dec_config, local_run_xrts)
+        stft_difference = (
+            local_spectrogram.dataset - local_spectrogram2.dataset
+        )  # TODO: add a "-" method to spectrogram that subtracts the datasets
         stft_difference = stft_difference.to_array()
 
         # drop dc term
