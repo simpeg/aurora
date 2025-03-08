@@ -13,20 +13,10 @@ from loguru import logger
 from mth5.utils.exceptions import MTH5Error
 from mth5.utils.helpers import path_or_mth5_object
 from mt_metadata.transfer_functions.core import TF
-from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
+from mt_metadata.transfer_functions.processing.aurora import (
     DecimationLevel as AuroraDecimationLevel,
 )
-
-from mtpy.processing.kernel_dataset import (
-    KernelDataset,
-)  # TODO FIXME: causes circular import.
-
-# The circular import is because mtpy.processing.kernel_dataset needs to import KERNEL_DATASET_DTYPE, and
-# MINI_SUMMARY_COLUMNS, from mtpy.processing.__init__.py, but that same __init__ also imports
-# from .aurora.process_aurora import AuroraProcessing which imports process_mth5 from aurora.pipelines.process_mth5
-# Finally, this TFK here, is also imported by aurora.pipelines.process_mth5, hence the circular import.
-# One solution maybe to create mtpy.processing.dtypes.py, and put KERNEL_DATASET_DTYPE, and
-# # MINI_SUMMARY_COLUMNS into there.
+from mtpy.processing.kernel_dataset import KernelDataset
 
 from typing import Union
 
@@ -43,14 +33,14 @@ class TransferFunctionKernel(object):
         config: Union[Processing, str, pathlib.Path],
     ):
         """
-        Constructor
+        Constructor.
 
         Parameters
         ----------
         dataset: mtpy.processing.kernel_dataset.KernelDataset
          Specification of the dataset that will be processed to yield a transfer function.
         config: aurora.config.metadata.processing.Processing
-         Specfication of the processing parameters to be applied to the dataset.
+         Specification of the processing parameters to be applied to the dataset.
         """
         processing_config = initialize_config(config)
         self._config = processing_config
