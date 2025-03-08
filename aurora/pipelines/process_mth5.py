@@ -539,7 +539,7 @@ def process_mth5_legacy(
     """
     # Initialize config and mth5s
     tfk = TransferFunctionKernel(dataset=tfk_dataset, config=config)
-    tfk.make_processing_summary()
+    tfk.update_processing_summary()
     tfk.show_processing_summary()
     tfk.validate()
 

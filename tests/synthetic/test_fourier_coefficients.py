@@ -173,7 +173,7 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
         original_window = processing_config.decimations[0].stft.window.type
 
         tfk = TransferFunctionKernel(dataset=tfk_dataset, config=processing_config)
-        tfk.make_processing_summary()
+        tfk.update_processing_summary()
         tfk.check_if_fcs_already_exist()
         assert (
             tfk.dataset_df.fc.all()
@@ -183,7 +183,7 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
         for decimation in processing_config.decimations:
             decimation.stft.window.type = "hamming"
         tfk = TransferFunctionKernel(dataset=tfk_dataset, config=processing_config)
-        tfk.make_processing_summary()
+        tfk.update_processing_summary()
         tfk.check_if_fcs_already_exist()
         assert not (
             tfk.dataset_df.fc.all()
@@ -193,7 +193,7 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
         for decimation in processing_config.decimations:
             decimation.stft.window.type = original_window
         tfk = TransferFunctionKernel(dataset=tfk_dataset, config=processing_config)
-        tfk.make_processing_summary()
+        tfk.update_processing_summary()
         tfk.check_if_fcs_already_exist()
         assert (
             tfk.dataset_df.fc.all()

@@ -17,7 +17,10 @@ from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
     DecimationLevel as AuroraDecimationLevel,
 )
 
-# from mtpy.processing.kernel_dataset import KernelDataset  # TODO FIXME: causes circular import.
+from mtpy.processing.kernel_dataset import (
+    KernelDataset,
+)  # TODO FIXME: causes circular import.
+
 # The circular import is because mtpy.processing.kernel_dataset needs to import KERNEL_DATASET_DTYPE, and
 # MINI_SUMMARY_COLUMNS, from mtpy.processing.__init__.py, but that same __init__ also imports
 # from .aurora.process_aurora import AuroraProcessing which imports process_mth5 from aurora.pipelines.process_mth5
@@ -35,15 +38,19 @@ import psutil
 
 class TransferFunctionKernel(object):
     def __init__(
-        self, dataset, config: Union[Processing, str, pathlib.Path]  # : KernelDataset,
+        self,
+        dataset: KernelDataset,
+        config: Union[Processing, str, pathlib.Path],
     ):
         """
         Constructor
 
         Parameters
         ----------
-        dataset: aurora.transfer_function.kernel_dataset.KernelDataset
+        dataset: mtpy.processing.kernel_dataset.KernelDataset
+         Specification of the dataset that will be processed to yield a transfer function.
         config: aurora.config.metadata.processing.Processing
+         Specfication of the processing parameters to be applied to the dataset.
         """
         processing_config = initialize_config(config)
         self._config = processing_config
@@ -52,12 +59,12 @@ class TransferFunctionKernel(object):
         self._memory_warning = False
 
     @property
-    def dataset(self):  # -> KernelDataset:
+    def dataset(self) -> KernelDataset:
         """returns the KernelDataset object"""
         return self._dataset
 
     @property
-    def kernel_dataset(self):  # -> KernelDataset:
+    def kernel_dataset(self) -> KernelDataset:
         """returns the KernelDataset object"""
         return self._dataset
 
@@ -77,10 +84,10 @@ class TransferFunctionKernel(object):
         return self._config
 
     @property
-    def processing_summary(self):
+    def processing_summary(self) -> pd.DataFrame:
         """Returns the processing summary object -- creates if it doesn't yet exist."""
         if self._processing_summary is None:
-            self.make_processing_summary()
+            self.update_processing_summary()
         return self._processing_summary
 
     @property
@@ -294,9 +301,10 @@ class TransferFunctionKernel(object):
         logger.info("Processing Summary Dataframe:")
         logger.info(f"\n{self.processing_summary[columns_to_show].to_string()}")
 
-    def make_processing_summary(self):
+    def update_processing_summary(self):
         """
-        Create the processing summary table.
+        Creates or updates the processing summary table based on processing parameters
+        and kernel dataset.
         - Melt the decimation levels over the run summary.
         - Add columns to estimate the number of FFT windows for each row
 
