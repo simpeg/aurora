@@ -8,7 +8,7 @@ from aurora.config.metadata.processing import Processing
 from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.time_series_helpers import prototype_decimate
 
-# from aurora.transfer_function.transfer_function_collection import TransferFunctionCollection
+from aurora.transfer_function import TransferFunctionCollection
 from loguru import logger
 from mth5.utils.exceptions import MTH5Error
 from mth5.utils.helpers import path_or_mth5_object
@@ -546,13 +546,13 @@ class TransferFunctionKernel(object):
 
         return processing_type
 
-    def export_tf_collection(self, tf_collection):
+    def export_tf_collection(self, tf_collection: TransferFunctionCollection):
         """
         Assign transfer_function, residual_covariance, inverse_signal_power, station, survey
 
         Parameters
         ----------
-        tf_collection: aurora.transfer_function.transfer_function_collection.TransferFunctionCollection
+        tf_collection: aurora.transfer_function.TransferFunctionCollection
             Contains TF estimates, covariance, and signal power values
 
         Returns
@@ -562,7 +562,7 @@ class TransferFunctionKernel(object):
         """
 
         def make_decimation_dict_for_tf(
-            tf_collection,  # : TransferFunctionCollection,
+            tf_collection: TransferFunctionCollection,
             processing_config: Processing,
         ) -> dict:
             """
@@ -581,7 +581,7 @@ class TransferFunctionKernel(object):
             Parameters
             ----------
             tf_collection: TransferFunctionCollection
-                Collection of transfer funtion estimates from aurora.
+                Collection of transfer function estimates from aurora.
             processing_config: Processing
                 Instructions for processing with aurora
 
