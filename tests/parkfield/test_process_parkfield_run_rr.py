@@ -7,11 +7,10 @@ from aurora.test_utils.parkfield.make_parkfield_mth5 import ensure_h5_exists
 from aurora.test_utils.parkfield.path_helpers import PARKFIELD_PATHS
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 
-from mtpy.processing import RunSummary, KernelDataset
-
 from loguru import logger
 from mth5.mth5 import MTH5
 from mth5.helpers import close_open_files
+from mth5.processing import RunSummary, KernelDataset
 
 
 def test_stuff_that_belongs_elsewhere():

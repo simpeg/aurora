@@ -59,7 +59,7 @@ from aurora.general_helper_functions import get_test_path
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 
-from mtpy.processing import RunSummary, KernelDataset
+from mth5.processing import RunSummary, KernelDataset
 
 from loguru import logger
 
@@ -125,9 +125,7 @@ class StationRuns(UserDict):
         return out_file
 
 
-def process_station_runs(
-    local_station_id, remote_station_id="", station_runs={}
-):
+def process_station_runs(local_station_id, remote_station_id="", station_runs={}):
     """
 
     Parameters
@@ -154,9 +152,7 @@ def process_station_runs(
 
     # Pass the run_summary to a Dataset class
     kernel_dataset = KernelDataset()
-    kernel_dataset.from_run_summary(
-        run_summary, local_station_id, remote_station_id
-    )
+    kernel_dataset.from_run_summary(run_summary, local_station_id, remote_station_id)
 
     # reduce station_runs_dict to only relevant stations
 
