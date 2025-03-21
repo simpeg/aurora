@@ -22,7 +22,7 @@ from mt_metadata.timeseries.survey import Survey
 from mt_metadata.transfer_functions.core import TF
 from loguru import logger
 
-from mtpy.processing import KernelDataset
+from mth5.processing import KernelDataset
 
 TEST_PATH = get_test_path()
 
@@ -99,9 +99,7 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
         ]
         reference_channels = []
         matlab_z_file = test_dir_path.joinpath("IAK34_struct_zss.mat")
-        archived_z_file_path = test_dir_path.joinpath(
-            "archived_from_matlab.zss"
-        )
+        archived_z_file_path = test_dir_path.joinpath("archived_from_matlab.zss")
         z_file_path = test_dir_path.joinpath("from_matlab.zss")
 
     # 2. Create an aurora processing config

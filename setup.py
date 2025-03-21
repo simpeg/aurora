@@ -13,7 +13,7 @@ with open("README.rst") as readme_file:
 requirements = [
     # "mt_metadata",
     # "mth5",
-    "mtpy-v2",
+    # "mtpy-v2",
     "numba",
     "psutil",
 ]

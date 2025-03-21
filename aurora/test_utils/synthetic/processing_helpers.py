@@ -1,6 +1,6 @@
 """
-    This module contains some helper functions that are called during the
-    execution of aurora's tests of processing on synthetic data.
+This module contains some helper functions that are called during the
+execution of aurora's tests of processing on synthetic data.
 """
 
 import mt_metadata.transfer_functions
@@ -20,7 +20,7 @@ def get_example_kernel_dataset():
         The kernel dataset from a synthetic, single station mth5
     """
 
-    from mtpy.processing import RunSummary, KernelDataset
+    from mth5.processing import RunSummary, KernelDataset
 
     mth5_path = create_test1_h5(force_make_mth5=False)
 
@@ -46,7 +46,7 @@ def tf_obj_from_synthetic_data(
 
     """
     from aurora.config.config_creator import ConfigCreator
-    from mtpy.processing import RunSummary, KernelDataset
+    from mth5.processing import RunSummary, KernelDataset
 
     run_summary = RunSummary()
     run_summary.from_mth5s(list((mth5_path,)))

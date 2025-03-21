@@ -1,4 +1,5 @@
 import unittest
+from loguru import logger
 
 from aurora.config.config_creator import ConfigCreator
 from aurora.pipelines.fourier_coefficients import add_fcs_to_mth5
@@ -9,16 +10,14 @@ from aurora.test_utils.synthetic.make_processing_configs import (
     create_test_run_config,
 )
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
+
 from mth5.data.make_mth5_from_asc import create_test1_h5
 from mth5.data.make_mth5_from_asc import create_test2_h5
 from mth5.data.make_mth5_from_asc import create_test3_h5
 from mth5.data.make_mth5_from_asc import create_test12rr_h5
-
-# from mtpy-v2
-from mtpy.processing import RunSummary, KernelDataset
-
-from loguru import logger
+from mth5.processing import RunSummary, KernelDataset
 from mth5.helpers import close_open_files
+
 
 synthetic_test_paths = SyntheticTestPaths()
 synthetic_test_paths.mkdirs()
