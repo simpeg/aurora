@@ -130,12 +130,12 @@ def create_test_run_config(
 
     for decimation in p.decimations:
         decimation.estimator.engine = estimation_engine
-        decimation.window.type = "hamming"
-        decimation.window.num_samples = num_samples_window
-        decimation.window.overlap = num_samples_overlap
+        decimation.stft.window.type = "hamming"
+        decimation.stft.window.num_samples = num_samples_window
+        decimation.stft.window.overlap = num_samples_overlap
         decimation.regression.max_redescending_iterations = 2
         if test_case_id == "test2":
-            decimation.window.type = "boxcar"
+            decimation.stft.window.type = "boxcar"
 
     if save == "json":
         filename = CONFIG_PATH.joinpath(p.json_fn())

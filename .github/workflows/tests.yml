@@ -18,7 +18,8 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu-latest"]
-        python-version: [3.8, 3.9, "3.10", "3.11"]
+        python-version: [3.8, "3.11"]
+#        python-version: [3.8, 3.9, "3.10", "3.11"]
 #        python-version: ["3.10", ] 
 
     steps:
@@ -33,6 +34,7 @@ jobs:
     - name: Install Env
       run: |
         python --version
+        echo $CONDA_PREFIX
         conda install -c conda-forge pytest pytest-cov certifi">=2017.4.17" pandoc
         pip install -r requirements-dev.txt
         pip install "mt_metadata[obspy] @ git+https://github.com/kujaku11/mt_metadata.git@main"
@@ -42,7 +44,9 @@ jobs:
 
     - name: Install Our Package
       run: |
+        echo $CONDA_PREFIX
         pip install -e .
+        echo "Install complete"
         conda list
         pip freeze
         

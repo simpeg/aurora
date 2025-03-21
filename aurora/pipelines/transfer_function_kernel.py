@@ -4,27 +4,43 @@
 
 """
 
+from aurora.config.metadata.processing import Processing
 from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.time_series_helpers import prototype_decimate
+
+from aurora.transfer_function import TransferFunctionCollection
 from loguru import logger
 from mth5.utils.exceptions import MTH5Error
 from mth5.utils.helpers import path_or_mth5_object
 from mt_metadata.transfer_functions.core import TF
+from mt_metadata.transfer_functions.processing.aurora import (
+    DecimationLevel as AuroraDecimationLevel,
+)
+from mtpy.processing.kernel_dataset import KernelDataset
+
+from typing import Union
 
 import numpy as np
 import pandas as pd
+import pathlib
 import psutil
 
 
 class TransferFunctionKernel(object):
-    def __init__(self, dataset=None, config=None):
+    def __init__(
+        self,
+        dataset: KernelDataset,
+        config: Union[Processing, str, pathlib.Path],
+    ):
         """
-        Constructor
+        Constructor.
 
         Parameters
         ----------
-        dataset: aurora.transfer_function.kernel_dataset.KernelDataset
+        dataset: mtpy.processing.kernel_dataset.KernelDataset
+         Specification of the dataset that will be processed to yield a transfer function.
         config: aurora.config.metadata.processing.Processing
+         Specification of the processing parameters to be applied to the dataset.
         """
         processing_config = initialize_config(config)
         self._config = processing_config
@@ -33,12 +49,12 @@ class TransferFunctionKernel(object):
         self._memory_warning = False
 
     @property
-    def dataset(self):
+    def dataset(self) -> KernelDataset:
         """returns the KernelDataset object"""
         return self._dataset
 
     @property
-    def kernel_dataset(self):
+    def kernel_dataset(self) -> KernelDataset:
         """returns the KernelDataset object"""
         return self._dataset
 
@@ -48,20 +64,20 @@ class TransferFunctionKernel(object):
         return self._dataset.df
 
     @property
-    def processing_config(self):
+    def processing_config(self) -> Processing:
         """Returns the processing config object"""
         return self._config
 
     @property
-    def config(self):
+    def config(self) -> Processing:
         """Returns the processing config object"""
         return self._config
 
     @property
-    def processing_summary(self):
+    def processing_summary(self) -> pd.DataFrame:
         """Returns the processing summary object -- creates if it doesn't yet exist."""
         if self._processing_summary is None:
-            self.make_processing_summary()
+            self.update_processing_summary()
         return self._processing_summary
 
     @property
@@ -87,7 +103,7 @@ class TransferFunctionKernel(object):
         mode = self.get_mth5_file_open_mode()
         self._mth5_objs = self.kernel_dataset.initialize_mth5s(mode)
 
-    def update_dataset_df(self, i_dec_level):
+    def update_dataset_df(self, i_dec_level: int) -> None:
         """
         This function has two different modes.  The first mode initializes values in the
         array, and could be placed into TFKDataset.initialize_time_series_data()
@@ -103,8 +119,6 @@ class TransferFunctionKernel(object):
         ----------
         i_dec_level: int
             decimation level id, indexed from zero
-        config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
-            decimation level config
 
         Returns
         -------
@@ -145,21 +159,21 @@ class TransferFunctionKernel(object):
         )
         return
 
-    def apply_clock_zero(self, dec_level_config):
+    def apply_clock_zero(self, dec_level_config: AuroraDecimationLevel):
         """
         get clock-zero from data if needed
 
         Parameters
         ----------
-        dec_level_config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
-
+        dec_level_config: AuroraDecimationLevel
+            metadata about the decimation level processing.
         Returns
         -------
-        dec_level_config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
+        dec_level_config: AuroraDecimationLevel
             The modified DecimationLevel with clock-zero information set.
         """
-        if dec_level_config.window.clock_zero_type == "data start":
-            dec_level_config.window.clock_zero = str(self.dataset_df.start.min())
+        if dec_level_config.stft.window.clock_zero_type == "data start":
+            dec_level_config.stft.window.clock_zero = str(self.dataset_df.start.min())
         return dec_level_config
 
     @property
@@ -277,9 +291,10 @@ class TransferFunctionKernel(object):
         logger.info("Processing Summary Dataframe:")
         logger.info(f"\n{self.processing_summary[columns_to_show].to_string()}")
 
-    def make_processing_summary(self):
+    def update_processing_summary(self):
         """
-        Create the processing summary table.
+        Creates or updates the processing summary table based on processing parameters
+        and kernel dataset.
         - Melt the decimation levels over the run summary.
         - Add columns to estimate the number of FFT windows for each row
 
@@ -378,7 +393,7 @@ class TransferFunctionKernel(object):
         """
         if min_num_stft_windows is None:
             min_stft_window_info = {
-                x.decimation.level: x.min_num_stft_windows
+                x.decimation.level: x.stft.min_num_stft_windows
                 for x in self.processing_config.decimations
             }
             min_stft_window_list = [
@@ -531,13 +546,13 @@ class TransferFunctionKernel(object):
 
         return processing_type
 
-    def export_tf_collection(self, tf_collection):
+    def export_tf_collection(self, tf_collection: TransferFunctionCollection):
         """
         Assign transfer_function, residual_covariance, inverse_signal_power, station, survey
 
         Parameters
         ----------
-        tf_collection: aurora.transfer_function.transfer_function_collection.TransferFunctionCollection
+        tf_collection: aurora.transfer_function.TransferFunctionCollection
             Contains TF estimates, covariance, and signal power values
 
         Returns
@@ -546,10 +561,13 @@ class TransferFunctionKernel(object):
             Transfer function container
         """
 
-        def make_decimation_dict_for_tf(tf_collection, processing_config):
+        def make_decimation_dict_for_tf(
+            tf_collection: TransferFunctionCollection,
+            processing_config: Processing,
+        ) -> dict:
             """
-            Decimation dict is used by mt_metadata's TF class when it is writing z-files.
-            If no z-files will be written this is not needed
+            Helper function to create a dictionary used by mt_metadata's TF class when
+            writing z-files.  If no z-files will be written this is not needed
 
             sample element of decimation_dict:
             '1514.70134': {'level': 4, 'bands': (5, 6), 'npts': 386, 'df': 0.015625}}
@@ -562,25 +580,30 @@ class TransferFunctionKernel(object):
 
             Parameters
             ----------
-            tfc
+            tf_collection: TransferFunctionCollection
+                Collection of transfer function estimates from aurora.
+            processing_config: Processing
+                Instructions for processing with aurora
 
             Returns
             -------
-
+            decimation_dict: dict
+                Keyed by a string representing the period
+                Values are a custom dictionary.
             """
             from mt_metadata.transfer_functions.io.zfiles.zmm import (
                 PERIOD_FORMAT,
             )
 
             decimation_dict = {}
-
+            # dec_level_cfg is an AuroraDecimationLevel
             for i_dec, dec_level_cfg in enumerate(processing_config.decimations):
                 for i_band, band in enumerate(dec_level_cfg.bands):
                     period_key = f"{band.center_period:{PERIOD_FORMAT}}"
                     period_value = {}
                     period_value["level"] = i_dec + 1  # +1 to match EMTF standard
                     period_value["bands"] = tuple(band.harmonic_indices[np.r_[0, -1]])
-                    period_value["sample_rate"] = dec_level_cfg.sample_rate_decimation
+                    period_value["sample_rate"] = dec_level_cfg.decimation.sample_rate
                     try:
                         period_value["npts"] = tf_collection.tf_dict[
                             i_dec

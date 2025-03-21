@@ -8,7 +8,6 @@ import numpy as np
 
 from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
-from aurora.pipelines.time_series_helpers import run_ts_to_stft_scipy
 from aurora.test_utils.synthetic.make_processing_configs import (
     create_test_run_config,
 )
@@ -17,6 +16,7 @@ from mth5.processing import RunSummary, KernelDataset
 from mth5.data.make_mth5_from_asc import create_test1_h5
 from mth5.mth5 import MTH5
 from mth5.helpers import close_open_files
+from mth5.timeseries.spectre.stft import run_ts_to_stft_scipy
 
 
 def test_stft_methods_agree():
@@ -68,10 +68,12 @@ def test_stft_methods_agree():
         else:
             local_run_xrts = prototype_decimate(dec_config.decimation, local_run_xrts)
 
-        dec_config.extra_pre_fft_detrend_type = "constant"
-        local_stft_obj = run_ts_to_stft(dec_config, local_run_xrts)
-        local_stft_obj2 = run_ts_to_stft_scipy(dec_config, local_run_xrts)
-        stft_difference = local_stft_obj - local_stft_obj2
+        dec_config.stft.per_window_detrend_type = "constant"
+        local_spectrogram = run_ts_to_stft(dec_config, local_run_xrts)
+        local_spectrogram2 = run_ts_to_stft_scipy(dec_config, local_run_xrts)
+        stft_difference = (
+            local_spectrogram.dataset - local_spectrogram2.dataset
+        )  # TODO: add a "-" method to spectrogram that subtracts the datasets
         stft_difference = stft_difference.to_array()
 
         # drop dc term

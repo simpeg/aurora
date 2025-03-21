@@ -11,6 +11,7 @@ from loguru import logger
 
 from aurora.time_series.windowed_time_series import WindowedTimeSeries
 from aurora.time_series.windowing_scheme import window_scheme_from_decimation
+from mt_metadata.transfer_functions.processing import TimeSeriesDecimation
 from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
     DecimationLevel as AuroraDecimationLevel,
 )
@@ -18,187 +19,10 @@ from mt_metadata.transfer_functions.processing.fourier_coefficients import (
     Decimation as FCDecimation,
 )
 from mth5.groups import RunGroup
-from mth5.timeseries import RunTS
+from mth5.timeseries.spectre.prewhitening import apply_prewhitening
+from mth5.timeseries.spectre.prewhitening import apply_recoloring
+import mth5.timeseries.spectre as spectre
 from typing import Literal, Optional, Union
-
-
-def validate_sample_rate(
-    run_ts: RunTS, expected_sample_rate: float, tol: Optional[float] = 1e-4
-) -> None:
-    """
-    Check that the sample rate of a run_ts is the expected value, and warn if not.
-    :raise ValueError if outside tolderance
-
-    Parameters
-    ----------
-    run_ts: mth5.timeseries.run_ts.RunTS
-        Time series object with data and metadata.
-    expected_sample_rate: float
-        The sample rate the time series is expected to have. Normally taken from
-        the processing config
-    tol: float
-        This is the tolerance for the difference in sample rates allowed before an exception is raised.
-
-    """
-    if run_ts.sample_rate != expected_sample_rate:
-        msg = (
-            f"sample rate in run time series {run_ts.sample_rate} and "
-            f"processing decimation_obj {expected_sample_rate} do not match"
-        )
-        logger.warning(msg)
-        delta = run_ts.sample_rate - expected_sample_rate
-        if np.abs(delta) > tol:
-            msg = f"Difference between expected sample rate and run_ts sample rate {delta} > {tol} tolerance"
-            raise ValueError(msg)
-
-
-def apply_prewhitening(
-    decimation_obj: Union[AuroraDecimationLevel, FCDecimation],
-    run_xrds_input: xr.Dataset,
-) -> xr.Dataset:
-    """
-    Applies pre-whitening to time series to avoid spectral leakage when FFT is applied.
-
-    TODO: If "first difference", consider clipping first and last sample from the
-     differentiated time series.
-
-    Parameters
-    ----------
-    decimation_obj : Union[AuroraDecimationLevel, FCDecimation]
-        Information about how the decimation level is to be processed
-
-    run_xrds_input : xarray.core.dataset.Dataset
-        Time series to be pre-whitened
-
-    Returns
-    -------
-    run_xrds : xarray.core.dataset.Dataset
-        pre-whitened time series
-
-    """
-    if not decimation_obj.prewhitening_type:
-        msg = "No prewhitening specified - skipping this step"
-        logger.info(msg)
-        return run_xrds_input
-
-    if decimation_obj.prewhitening_type == "first difference":
-        run_xrds = run_xrds_input.differentiate("time")
-    else:
-        msg = f"{decimation_obj.prewhitening_type} pre-whitening not implemented"
-        logger.exception(msg)
-        raise NotImplementedError(msg)
-    return run_xrds
-
-
-def apply_recoloring(
-    decimation_obj: Union[AuroraDecimationLevel, FCDecimation],
-    stft_obj: xr.Dataset,
-) -> xr.Dataset:
-    """
-    Inverts the pre-whitening operation in frequency domain.
-
-    Parameters
-    ----------
-    decimation_obj : mt_metadata.transfer_functions.processing.fourier_coefficients.decimation.Decimation
-        Information about how the decimation level is to be processed
-    stft_obj : xarray.core.dataset.Dataset
-        Time series of Fourier coefficients to be recoloured
-
-
-    Returns
-    -------
-    stft_obj : xarray.core.dataset.Dataset
-        Recolored time series of Fourier coefficients
-    """
-    # No recoloring needed if prewhitening not appiled, or recoloring set to False
-    if not decimation_obj.prewhitening_type:
-        return stft_obj
-    # TODO Delete after tests (20241220) -- this check has been moved above the call to this function
-    # if not decimation_obj.recoloring:
-    #     return stft_obj
-
-    if decimation_obj.prewhitening_type == "first difference":
-        # first difference prewhitening correction is to divide by jw
-        freqs = stft_obj.frequency.data  # was freqs = decimation_obj.fft_frequencies
-        jw = 1.0j * 2 * np.pi * freqs
-        stft_obj /= jw
-
-        # suppress nan and inf to mute later warnings
-        if jw[0] == 0.0:
-            cond = stft_obj.frequency != 0.0
-            stft_obj = stft_obj.where(cond, complex(0.0))
-    # elif decimation_obj.prewhitening_type == "ARMA":
-    #     from statsmodels.tsa.arima.model import ARIMA
-    #     AR = 3 # add this to processing config
-    #     MA = 4 # add this to processing config
-
-    else:
-        msg = f"{decimation_obj.prewhitening_type} recoloring not yet implemented"
-        logger.error(msg)
-        raise NotImplementedError(msg)
-
-    return stft_obj
-
-
-def run_ts_to_stft_scipy(
-    decimation_obj: Union[AuroraDecimationLevel, FCDecimation],
-    run_xrds_orig: xr.Dataset,
-) -> xr.Dataset:
-    """
-    Converts a runts object into a time series of Fourier coefficients.
-    This method uses scipy.signal.spectrogram.
-
-
-    Parameters
-    ----------
-    decimation_obj : mt_metadata.transfer_functions.processing.aurora.DecimationLevel
-        Information about how the decimation level is to be processed
-        Note: This works with FCdecimation and AuroraDecimationLevel becuase test_fourier_coefficients
-         and test_stft_methods_agree both use them)
-    run_xrds_orig : : xarray.core.dataset.Dataset
-        Time series to be processed
-
-    Returns
-    -------
-    stft_obj : xarray.core.dataset.Dataset
-        Time series of Fourier coefficients
-    """
-    run_xrds = apply_prewhitening(decimation_obj, run_xrds_orig)
-    windowing_scheme = window_scheme_from_decimation(decimation_obj)
-
-    stft_obj = xr.Dataset()
-    for channel_id in run_xrds.data_vars:
-        ff, tt, specgm = ssig.spectrogram(
-            run_xrds[channel_id].data,
-            fs=decimation_obj.sample_rate_decimation,
-            window=windowing_scheme.taper,
-            nperseg=decimation_obj.window.num_samples,
-            noverlap=decimation_obj.window.overlap,
-            detrend="linear",
-            scaling="density",
-            mode="complex",
-        )
-
-        # drop Nyquist>
-        ff = ff[:-1]
-        specgm = specgm[:-1, :]
-        specgm *= np.sqrt(2)
-
-        # make time_axis
-        tt = tt - tt[0]
-        tt *= decimation_obj.sample_rate_decimation
-        time_axis = run_xrds.time.data[tt.astype(int)]
-
-        xrd = xr.DataArray(
-            specgm.T,
-            dims=["time", "frequency"],
-            coords={"frequency": ff, "time": time_axis},
-        )
-        stft_obj.update({channel_id: xrd})
-    if decimation_obj.recoloring:
-        stft_obj = apply_recoloring(decimation_obj, stft_obj)
-
-    return stft_obj
 
 
 def truncate_to_clock_zero(
@@ -212,7 +36,7 @@ def truncate_to_clock_zero(
 
     Parameters
     ----------
-    decimation_obj: mt_metadata.transfer_functions.processing.aurora.DecimationLevel
+    decimation_obj: Union[AuroraDecimationLevel, FCDecimation]
         Information about how the decimation level is to be processed
     run_xrds : xarray.core.dataset.Dataset
         normally extracted from mth5.RunTS
@@ -223,10 +47,10 @@ def truncate_to_clock_zero(
     run_xrds : xarray.core.dataset.Dataset
         same as the input time series, but possibly slightly shortened
     """
-    if decimation_obj.window.clock_zero_type == "ignore":
+    if decimation_obj.stft.window.clock_zero_type == "ignore":
         pass
     else:
-        clock_zero = pd.Timestamp(decimation_obj.window.clock_zero)
+        clock_zero = pd.Timestamp(decimation_obj.stft.window.clock_zero)
         clock_zero = clock_zero.to_datetime64()
         delta_t = clock_zero - run_xrds.time[0]
         assert delta_t.dtype == "<m8[ns]"  # expected in nanoseconds
@@ -243,7 +67,7 @@ def truncate_to_clock_zero(
             cond1 = run_xrds.time >= t_clip
             msg = (
                 f"dropping {n_clip} samples to agree with "
-                f"{decimation_obj.window.clock_zero_type} clock zero {clock_zero}"
+                f"{decimation_obj.stft.window.clock_zero_type} clock zero {clock_zero}"
             )
             logger.info(msg)
             run_xrds = run_xrds.where(cond1, drop=True)
@@ -275,18 +99,19 @@ def nan_to_mean(xrds: xr.Dataset) -> xr.Dataset:
 
 def run_ts_to_stft(
     decimation_obj: AuroraDecimationLevel, run_xrds_orig: xr.Dataset
-) -> xr.Dataset:
+) -> spectre.Spectrogram:
     """
     Converts a runts object into a time series of Fourier coefficients.
     Similar to run_ts_to_stft_scipy, but in this implementation operations on individual
     windows are possible (for example pre-whitening per time window via ARMA filtering).
 
+    TODO: Make the output of this function a Spectrogram object
 
     Parameters
     ----------
-    decimation_obj : mt_metadata.transfer_functions.processing.aurora.DecimationLevel
+    decimation_obj : AuroraDecimationLevel
         Information about how the decimation level is to be processed
-    run_ts : xarray.core.dataset.Dataset
+    run_xrds_orig: xarray.core.dataset.Dataset
         normally extracted from mth5.RunTS
 
     Returns
@@ -299,11 +124,11 @@ def run_ts_to_stft(
     # need to remove any nans before windowing, or else if there is a single
     # nan then the whole channel becomes nan.
     run_xrds = nan_to_mean(run_xrds_orig)
-    run_xrds = apply_prewhitening(decimation_obj, run_xrds)
+    run_xrds = apply_prewhitening(decimation_obj.stft.prewhitening_type, run_xrds)
     run_xrds = truncate_to_clock_zero(decimation_obj, run_xrds)
     windowing_scheme = window_scheme_from_decimation(decimation_obj)
     windowed_obj = windowing_scheme.apply_sliding_window(
-        run_xrds, dt=1.0 / decimation_obj.sample_rate_decimation
+        run_xrds, dt=1.0 / decimation_obj.decimation.sample_rate
     )
     if not np.prod(windowed_obj.to_array().data.shape):
         raise ValueError
@@ -316,13 +141,14 @@ def run_ts_to_stft(
         data=tapered_obj,
         sample_rate=windowing_scheme.sample_rate,
         spectral_density_correction=windowing_scheme.linear_spectral_density_calibration_factor,
-        detrend_type=decimation_obj.extra_pre_fft_detrend_type,
+        detrend_type=decimation_obj.stft.per_window_detrend_type,
     )
 
-    if decimation_obj.recoloring:
-        stft_obj = apply_recoloring(decimation_obj, stft_obj)
+    if decimation_obj.stft.recoloring:
+        stft_obj = apply_recoloring(decimation_obj.stft.prewhitening_type, stft_obj)
 
-    return stft_obj
+    spectrogram = spectre.Spectrogram(dataset=stft_obj)
+    return spectrogram
 
 
 def calibrate_stft_obj(
@@ -398,12 +224,12 @@ def calibrate_stft_obj(
 
 
 def prototype_decimate(
-    config: AuroraDecimationLevel,
+    ts_decimation: TimeSeriesDecimation,
     run_xrds: xr.Dataset,
 ) -> xr.Dataset:
     """
     Basically a wrapper for scipy.signal.decimate.  Takes input timeseries (as xarray
-     Dataset) and a Decimation config object and returns a decimated version of the
+     Dataset) and a TimeSeriesDecimation object and returns a decimated version of the
      input time series.
 
     TODO: Consider moving this function into time_series/decimate.py
@@ -413,7 +239,7 @@ def prototype_decimate(
 
     Parameters
     ----------
-    config : mt_metadata.transfer_functions.processing.aurora.Decimation
+    ts_decimation : AuroraDecimationLevel
     run_xrds: xr.Dataset
         Originally from mth5.timeseries.run_ts.RunTS.dataset, but possibly decimated
         multiple times
@@ -424,7 +250,7 @@ def prototype_decimate(
         Decimated version of the input run_xrds
     """
     # downsample the time axis
-    slicer = slice(None, None, int(config.factor))  # decimation.factor
+    slicer = slice(None, None, int(ts_decimation.factor))  # decimation.factor
     downsampled_time_axis = run_xrds.time.data[slicer]
 
     # decimate the time series
@@ -433,7 +259,8 @@ def prototype_decimate(
     num_channels = len(channel_labels)
     new_data = np.full((num_observations, num_channels), np.nan)
     for i_ch, ch_label in enumerate(channel_labels):
-        new_data[:, i_ch] = ssig.decimate(run_xrds[ch_label], int(config.factor))
+        # TODO: add check here for ts_decimation.anti_alias_filter
+        new_data[:, i_ch] = ssig.decimate(run_xrds[ch_label], int(ts_decimation.factor))
 
     xr_da = xr.DataArray(
         new_data,
@@ -441,7 +268,7 @@ def prototype_decimate(
         coords={"time": downsampled_time_axis, "channel": channel_labels},
     )
     attr_dict = run_xrds.attrs
-    attr_dict["sample_rate"] = config.sample_rate
+    attr_dict["sample_rate"] = ts_decimation.sample_rate
     xr_da.attrs = attr_dict
     xr_ds = xr_da.to_dataset("channel")
     return xr_ds
@@ -455,7 +282,7 @@ def prototype_decimate(
 #     Method is fast.  Might be non-linear.  Seems to give similar performance to
 #     prototype_decimate for synthetic data.
 #
-#     N.B. config.factor must be integer valued
+#     N.B. config.decimation.factor must be integer valued
 #
 #     Parameters
 #     ----------
@@ -469,7 +296,7 @@ def prototype_decimate(
 #     xr_ds: xr.Dataset
 #         Decimated version of the input run_xrds
 #     """
-#     new_xr_ds = run_xrds.coarsen(time=int(config.factor), boundary="trim").mean()
+#     new_xr_ds = run_xrds.coarsen(time=int(config.decimation.factor), boundary="trim").mean()
 #     attr_dict = run_xrds.attrs
 #     attr_dict["sample_rate"] = config.sample_rate
 #     new_xr_ds.attrs = attr_dict
@@ -494,7 +321,7 @@ def prototype_decimate(
 #         Decimated version of the input run_xrds
 #     """
 #     dt = run_xrds.time.diff(dim="time").median().values
-#     dt_new = config.factor * dt
+#     dt_new = config.decimation.factor * dt
 #     dt_new = dt_new.__str__().replace("nanoseconds", "ns")
 #     new_xr_ds = run_xrds.resample(time=dt_new).mean(dim="time")
 #     attr_dict = run_xrds.attrs

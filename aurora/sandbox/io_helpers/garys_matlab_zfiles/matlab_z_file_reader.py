@@ -126,7 +126,7 @@ def test_matlab_zfile_reader(case_id="IAK34ss", make_plot=False):
     sample_rate = field_data_sample_rate
     for i_dec in range(4):
         p.decimations[i_dec].decimation.sample_rate = sample_rate
-        p.decimations[i_dec].window.num_samples = num_samples_window
+        p.decimations[i_dec].stft.window.num_samples = num_samples_window
         p.decimations[i_dec].estimator.engine = estimator_engine
         p.decimations[i_dec].input_channels = input_channels
         p.decimations[i_dec].output_channels = output_channels

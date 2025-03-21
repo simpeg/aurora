@@ -74,10 +74,11 @@ from aurora.time_series.apodization_window import ApodizationWindow
 from aurora.time_series.windowed_time_series import WindowedTimeSeries
 from aurora.time_series.window_helpers import available_number_of_windows_in_array
 from aurora.time_series.window_helpers import SLIDING_WINDOW_FUNCTIONS
-
 from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
-    get_fft_harmonics,
+    DecimationLevel as AuroraDecimationLevel,
 )
+from mt_metadata.transfer_functions.processing.window import get_fft_harmonics
+
 from loguru import logger
 from typing import Optional, Union
 
@@ -448,14 +449,14 @@ class WindowingScheme(ApodizationWindow):
         return np.sqrt(2 / (self.sample_rate * self.S2))
 
 
-def window_scheme_from_decimation(decimation):
+def window_scheme_from_decimation(decimation: AuroraDecimationLevel):
     """
     Helper function to workaround mt_metadata to not import form aurora
 
     Parameters
     ----------
-    decimation: mt_metadata.transfer_function.processing.aurora.decimation_level
-    .DecimationLevel
+    decimation: AuroraDecimationLevel
+        Decimation level metadata object
 
     Returns
     -------
@@ -464,10 +465,10 @@ def window_scheme_from_decimation(decimation):
     from aurora.time_series.windowing_scheme import WindowingScheme
 
     windowing_scheme = WindowingScheme(
-        taper_family=decimation.window.type,
-        num_samples_window=decimation.window.num_samples,
-        num_samples_overlap=decimation.window.overlap,
-        taper_additional_args=decimation.window.additional_args,
-        sample_rate=decimation.sample_rate_decimation,
+        taper_family=decimation.stft.window.type,
+        num_samples_window=decimation.stft.window.num_samples,
+        num_samples_overlap=decimation.stft.window.overlap,
+        taper_additional_args=decimation.stft.window.additional_args,
+        sample_rate=decimation.decimation.sample_rate,
     )
     return windowing_scheme

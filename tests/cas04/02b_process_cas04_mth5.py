@@ -293,7 +293,7 @@ def process_with_remote(
         kernel_dataset, emtf_band_file=band_setup_file
     )
     for decimation in config.decimations:
-        decimation.window.type = "hamming"
+        decimation.stft.window.type = "hamming"
     show_plot = False
     if remote:
         z_file_base = f"{local}_RR{remote}.zrr"

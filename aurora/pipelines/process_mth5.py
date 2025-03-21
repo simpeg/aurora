@@ -6,7 +6,6 @@ This function was recently changed to process_mth5_legacy, os that process_mth5
 can be repurposed for other TF estimation schemes.  The "legacy" version
 corresponds to aurora default processing.
 
-
 Notes on process_mth5_legacy:
 Note 1: process_mth5 assumes application of cascading decimation, and that the
 decimated data will be accessed from the previous decimation level.  This should be
@@ -22,7 +21,7 @@ adding a is_valid_dataset column, associated with each run-decimation level pair
 
 Note 3: This point in the loop marks the interface between _generation_ of the FCs and
  their _usage_. In future the code above this comment would be pushed into
- create_fourier_coefficients() and the code below this would access those FCs and
+ the creation of the spectrograms and the code below this would access those FCs and
  execute compute_transfer_function().
  This would also be an appropriate place to place a feature extraction layer, and
  compute weights for the FCs.
@@ -34,7 +33,6 @@ import mth5.groups
 # =============================================================================
 # Imports
 # =============================================================================
-
 from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.transfer_function_helpers import (
@@ -47,8 +45,12 @@ from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
 )
 from aurora.transfer_function.TTFZ import TTFZ
+from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
+    DecimationLevel as AuroraDecimationLevel,
+)
 from loguru import logger
 from mth5.helpers import close_open_files
+from mth5.timeseries.spectre import Spectrogram
 from typing import Optional, Union
 
 import aurora.config.metadata.processing
@@ -91,9 +93,52 @@ def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrds, units="
     -------
     stft_obj: xarray.core.dataset.Dataset
         Time series of calibrated Fourier coefficients per each channel in the run
+
+    Development Notes:
+    Here are the parameters that are defined via the mt_metadata fourier coefficients structures:
+
+    "bands",
+    "decimation.anti_alias_filter": "default",
+    "decimation.factor": 4.0,
+    "decimation.level": 2,
+    "decimation.method": "default",
+    "decimation.sample_rate": 0.0625,
+    "stft.per_window_detrend_type": "linear",
+    "stft.prewhitening_type": "first difference",
+    "stft.window.clock_zero_type": "ignore",
+    "stft.window.num_samples": 128,
+    "stft.window.overlap": 32,
+    "stft.window.type": "boxcar"
+
+    Creating the decimations config requires a decision about decimation factors and the number of levels.
+    We have been getting this from the EMTF band setup file by default.  It is desirable to continue supporting this,
+    however, note that the EMTF band setup is really about a time series operation, and not about making STFTs.
+
+    For the record, here is the legacy decimation config from EMTF, a.k.a. decset.cfg:
+    ```
+    4     0      # of decimation level, & decimation offset
+    128  32.   1   0   0   7   4   32   1
+    1.0
+    128  32.   4   0   0   7   4   32   4
+    .2154  .1911   .1307   .0705
+    128  32.   4   0   0   7   4   32   4
+    .2154  .1911   .1307   .0705
+    128  32.   4   0   0   7   4   32   4
+    .2154  .1911   .1307   .0705
+    ```
+
+    This essentially corresponds to a "Decimations Group" which is a list of decimations.
+    Related to the generation of FCs is the ARMA prewhitening (Issue #60) which was controlled in
+    EMTF with pwset.cfg
+    4    5             # of decimation level, # of channels
+    3 3 3 3 3
+    3 3 3 3 3
+    3 3 3 3 3
+    3 3 3 3 3
+
     """
     stft_config = processing_config.get_decimation_level(i_dec_level)
-    stft_obj = run_ts_to_stft(stft_config, run_xrds)
+    spectrogram = run_ts_to_stft(stft_config, run_xrds)
     run_id = run_obj.metadata.id
     if run_obj.station_metadata.id == processing_config.stations.local.id:
         scale_factors = processing_config.stations.local.run_dict[
@@ -105,11 +150,12 @@ def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrds, units="
         )
 
     stft_obj = calibrate_stft_obj(
-        stft_obj,
+        spectrogram.dataset,
         run_obj,
         units=units,
         channel_scale_factors=scale_factors,
     )
+
     return stft_obj
 
 
@@ -130,7 +176,7 @@ def process_tf_decimation_level(
 
     Parameters
     ----------
-    config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
+    config: aurora.config.metadata.processing.Processing,
         Config for a single decimation level
     i_dec_level: int
         decimation level_id
@@ -276,7 +322,7 @@ def load_stft_obj_from_mth5(
     """
     Load stft_obj from mth5 (instead of compute)
 
-    Note #1: See note #1 in time_series.frequency_band_helpers.extract_band
+    Note #1: See note #1 in mth5.timeseries.spectre.spectrogram.py in extract_band function.
 
     Parameters
     ----------
@@ -308,7 +354,9 @@ def load_stft_obj_from_mth5(
     return stft_chunk
 
 
-def save_fourier_coefficients(dec_level_config, row, run_obj, stft_obj) -> None:
+def save_fourier_coefficients(
+    dec_level_config: AuroraDecimationLevel, row: pd.Series, run_obj, stft_obj
+) -> None:
     """
     Optionally saves the stft object into the MTH5.
     Note that the dec_level_config must have its save_fcs attr set to True to actually save the data.
@@ -375,7 +423,9 @@ def save_fourier_coefficients(dec_level_config, row, run_obj, stft_obj) -> None:
                 dec_level_name,
                 decimation_level_metadata=decimation_level_metadata,
             )
-        fc_decimation_level.from_xarray(stft_obj, decimation_level_metadata.sample_rate)
+        fc_decimation_level.from_xarray(
+            stft_obj, decimation_level_metadata.decimation.sample_rate
+        )
         fc_decimation_level.update_metadata()
         fc_group.update_metadata()
     else:
@@ -385,10 +435,11 @@ def save_fourier_coefficients(dec_level_config, row, run_obj, stft_obj) -> None:
     return
 
 
-def get_spectrogams(tfk, i_dec_level, units="MT"):
+def get_spectrograms(tfk: TransferFunctionKernel, i_dec_level, units="MT"):
     """
     Given a decimation level id, loads a dictianary of all spectragrams from information in tfk.
     TODO: Make this a method of TFK
+    TODO: Modify this to be able to yield Spectrogram objects.
 
     Parameters
     ----------
@@ -422,6 +473,7 @@ def get_spectrogams(tfk, i_dec_level, units="MT"):
         run_obj = row.mth5_obj.from_reference(row.run_hdf5_reference)
         if row.fc:
             stft_obj = load_stft_obj_from_mth5(i_dec_level, row, run_obj)
+            # TODO: Cast stft_obj to a Spectrogram here
             stfts = append_chunk_to_stfts(stfts, stft_obj, row.remote)
             continue
 
@@ -437,10 +489,13 @@ def get_spectrogams(tfk, i_dec_level, units="MT"):
             run_xrds,
             units,
         )
+        # TODO: Cast stft_obj to a Spectrogram here or in make_stft_objects
 
         # Pack FCs into h5
         dec_level_config = tfk.config.decimations[i_dec_level]
         save_fourier_coefficients(dec_level_config, row, run_obj, stft_obj)
+        # TODO: 1st pass, cast stft_obj to a Spectrogram here
+
         stfts = append_chunk_to_stfts(stfts, stft_obj, row.remote)
 
     return stfts
@@ -484,7 +539,7 @@ def process_mth5_legacy(
     """
     # Initialize config and mth5s
     tfk = TransferFunctionKernel(dataset=tfk_dataset, config=config)
-    tfk.make_processing_summary()
+    tfk.update_processing_summary()
     tfk.show_processing_summary()
     tfk.validate()
 
@@ -502,7 +557,7 @@ def process_mth5_legacy(
         tfk.update_dataset_df(i_dec_level)
         tfk.apply_clock_zero(dec_level_config)
 
-        stfts = get_spectrogams(tfk, i_dec_level, units=units)
+        stfts = get_spectrograms(tfk, i_dec_level, units=units)
 
         local_merged_stft_obj, remote_merged_stft_obj = merge_stfts(stfts, tfk)
 

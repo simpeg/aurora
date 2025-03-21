@@ -12,7 +12,7 @@ import numpy as np
 import xarray as xr
 from aurora.config.metadata.processing import Processing
 from loguru import logger
-from mt_metadata.transfer_functions.processing.aurora.band import FrequencyBands
+from mt_metadata.transfer_functions.processing.aurora import FrequencyBands
 from typing import Optional, Union
 
 
@@ -50,10 +50,6 @@ class TransferFunction:
         """
         Constructor.
 
-        Development Notes:
-        change 2021-07-23 to require a frequency_bands object.  We may want
-        to just pass the band_edges.
-
         Parameters
         ----------
         _emtf_header : legacy header information used by Egbert's matlab class.  Header contains
@@ -61,8 +57,8 @@ class TransferFunction:
         decimation_level_id: int
             Identifies the relevant decimation level.  Used for accessing the
             appropriate info in self.processing config.
-        frequency_bands: aurora.time_series.frequency_band.FrequencyBands
-            frequency bands object
+        frequency_bands: FrequencyBands
+            frequency bands object defining the tf estimation bands.
         """
         self._emtf_tf_header = None
         self.decimation_level_id = decimation_level_id

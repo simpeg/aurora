@@ -2,9 +2,9 @@
 This module contains helper methods that are used during transfer function processing.
 
 Development Notes:
-Note #1: repeatedly applying edf_weights seems to have no effect at all.
-tested 20240118 and found that test_compare in synthetic passed whether this was commented
-or not.  TODO confirm this is a one-and-done add doc about why this is so.
+ Note #1: repeatedly applying edf_weights seems to have no effect at all.
+ tested 20240118 and found that test_compare in synthetic passed whether this was commented
+ or not.  TODO confirm this is a one-and-done add doc about why this is so.
 
 """
 
@@ -19,20 +19,25 @@ from aurora.transfer_function.regression.RME_RR import RME_RR
 from aurora.transfer_function.weights.edf_weights import (
     effective_degrees_of_freedom_weights,
 )
+from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
+    DecimationLevel as AuroraDecimationLevel,
+)
 from loguru import logger
-from typing import Union
+from typing import Literal, Union
 import numpy as np
 import xarray as xr
 
 ESTIMATOR_LIBRARY = {"OLS": RegressionEstimator, "RME": RME, "RME_RR": RME_RR}
 
 
-def get_estimator_class(estimation_engine: str) -> RegressionEstimator:
+def get_estimator_class(
+    estimation_engine: Literal["OLS", "RME", "RME_RR"]
+) -> RegressionEstimator:
     """
 
     Parameters
     ----------
-    estimation_engine: str
+    estimation_engine: Literal["OLS", "RME", "RME_RR"]
         One of the keys in the ESTIMATOR_LIBRARY, designates the method that will be
         used to estimate the transfer function
 
@@ -52,7 +57,7 @@ def get_estimator_class(estimation_engine: str) -> RegressionEstimator:
     return estimator_class
 
 
-def set_up_iter_control(config):
+def set_up_iter_control(config: AuroraDecimationLevel):
     """
     Initializes an IterControl object based on values in the processing config.
 
@@ -62,7 +67,8 @@ def set_up_iter_control(config):
 
     Parameters
     ----------
-    config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
+    config: AuroraDecimationLevel
+        metadata about the decimation level processing.
 
     Returns
     -------
@@ -81,32 +87,8 @@ def set_up_iter_control(config):
         "OLS",
     ]:
         iter_control = None
+
     return iter_control
-
-
-# def select_channel(xrda: xr.DataArray, channel_label):
-#     """
-#     Returns the channel specified by input channel_label as xarray.
-#
-#     - Extra helper function to make process_transfer_functions more readable without
-#     black (the uncompromising formatter) forcing multiple lines.
-#
-#     Parameters
-#     ----------
-#     xrda:
-#     channel_label
-#
-#     Returns
-#     -------
-#     ch: xr.Dataset
-#         The channel specified by input channel_label as an xarray.
-#     """
-#     ch = xrda.sel(
-#         channel=[
-#             channel_label,
-#         ]
-#     )
-#     return ch
 
 
 def drop_nans(X: xr.Dataset, Y: xr.Dataset, RR: Union[xr.Dataset, None]) -> tuple:
@@ -173,7 +155,14 @@ def stack_fcs(X, Y, RR):
     return X, Y, RR
 
 
-def apply_weights(X, Y, RR, W, segment=False, dropna=False):
+def apply_weights(
+    X: xr.Dataset,
+    Y: xr.Dataset,
+    RR: xr.Dataset,
+    W,
+    segment: bool = False,
+    dropna: bool = False,
+) -> tuple:
     """
     Applies data weights (W) to each of X, Y, RR.
     If weight is zero, we set to nan and optionally dropna.
@@ -210,7 +199,7 @@ def apply_weights(X, Y, RR, W, segment=False, dropna=False):
 
 
 def process_transfer_functions(
-    dec_level_config,
+    dec_level_config: AuroraDecimationLevel,
     local_stft_obj,
     remote_stft_obj,
     transfer_function_obj,
@@ -219,10 +208,10 @@ def process_transfer_functions(
     channel_weights=None,
 ):
     """
-    This is the main tf_processing method.  It is based on TTFestBand.m
+    This is the main tf_processing method.  It is based on the Matlab legacy code TTFestBand.m.
 
     Note #1: Although it is advantageous to execute the regression channel-by-channel
-    vs. all-at-once, we need to keep the all-at-once to get residual covariances (see issue #87)
+    vs. all-at-once, we need to keep the all-at-once to get residual covariances (see aurora issue #87)
 
     Note #2:
     Consider placing the segment weight logic in its own module with the various functions in a dictionary.
@@ -241,7 +230,8 @@ def process_transfer_functions(
 
     Parameters
     ----------
-    dec_level_config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
+    dec_level_config: AuroraDecimationLevel
+        Metadata about the decimation level processing.
     local_stft_obj: xarray.core.dataset.Dataset
     remote_stft_obj: xarray.core.dataset.Dataset or None
     transfer_function_obj: aurora.transfer_function.TTFZ.TTFZ
@@ -259,7 +249,9 @@ def process_transfer_functions(
     -------
     transfer_function_obj: aurora.transfer_function.TTFZ.TTFZ
     """
-    estimator_class = get_estimator_class(dec_level_config.estimator.engine)
+    estimator_class: RegressionEstimator = get_estimator_class(
+        dec_level_config.estimator.engine
+    )
     iter_control = set_up_iter_control(dec_level_config)
     for band in transfer_function_obj.frequency_bands.bands():
 
@@ -328,3 +320,28 @@ def process_transfer_functions(
             transfer_function_obj.set_tf(regression_estimator, band.center_period)
 
     return transfer_function_obj
+
+
+# def select_channel(xrda: xr.DataArray, channel_label):
+#     """
+#     Returns the channel specified by input channel_label as xarray.
+#
+#     - Extra helper function to make process_transfer_functions more readable without
+#     black (the uncompromising formatter) forcing multiple lines.
+#
+#     Parameters
+#     ----------
+#     xrda:
+#     channel_label
+#
+#     Returns
+#     -------
+#     ch: xr.Dataset
+#         The channel specified by input channel_label as an xarray.
+#     """
+#     ch = xrda.sel(
+#         channel=[
+#             channel_label,
+#         ]
+#     )
+#     return ch
