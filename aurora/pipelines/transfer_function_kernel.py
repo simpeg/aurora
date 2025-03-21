@@ -16,7 +16,7 @@ from mt_metadata.transfer_functions.core import TF
 from mt_metadata.transfer_functions.processing.aurora import (
     DecimationLevel as AuroraDecimationLevel,
 )
-from mtpy.processing.kernel_dataset import KernelDataset
+from mth5.processing.kernel_dataset import KernelDataset
 
 from typing import Union
 
