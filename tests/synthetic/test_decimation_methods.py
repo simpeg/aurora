@@ -12,7 +12,7 @@ from loguru import logger
 from mth5.data.make_mth5_from_asc import create_test1_h5
 from mth5.mth5 import MTH5
 from mth5.helpers import close_open_files
-from mtpy.processing import RunSummary, KernelDataset  # mtpy-v2
+from mth5.processing import RunSummary, KernelDataset
 
 import numpy as np
 

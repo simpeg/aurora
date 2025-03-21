@@ -17,7 +17,6 @@ from mth5.helpers import close_open_files
 from mth5.timeseries.spectre.helpers import add_fcs_to_mth5
 from mth5.timeseries.spectre.helpers import fc_decimations_creator
 from mth5.timeseries.spectre.helpers import read_back_fcs
-from mtpy.processing import RunSummary, KernelDataset  # from mtpy-v2
 
 
 synthetic_test_paths = SyntheticTestPaths()

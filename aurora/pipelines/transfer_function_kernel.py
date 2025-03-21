@@ -37,7 +37,7 @@ class TransferFunctionKernel(object):
 
         Parameters
         ----------
-        dataset: mtpy.processing.kernel_dataset.KernelDataset
+        dataset: mth5.processing.kernel_dataset.KernelDataset
          Specification of the dataset that will be processed to yield a transfer function.
         config: aurora.config.metadata.processing.Processing
          Specification of the processing parameters to be applied to the dataset.
