@@ -3,6 +3,7 @@ See aurora issue #3.  This test confirms that the internal aurora stft
 method returns the same array as scipy.signal.spectrogram
 """
 
+from loguru import logger
 import numpy as np
 
 from aurora.pipelines.time_series_helpers import prototype_decimate
@@ -10,12 +11,12 @@ from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.test_utils.synthetic.make_processing_configs import (
     create_test_run_config,
 )
-from loguru import logger
+
+from mth5.processing import RunSummary, KernelDataset
 from mth5.data.make_mth5_from_asc import create_test1_h5
 from mth5.mth5 import MTH5
 from mth5.helpers import close_open_files
 from mth5.timeseries.spectre.stft import run_ts_to_stft_scipy
-from mtpy.processing import RunSummary, KernelDataset  # from mtpy-v2
 
 
 def test_stft_methods_agree():

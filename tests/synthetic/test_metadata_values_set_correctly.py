@@ -7,8 +7,7 @@ import logging
 import pandas as pd
 import unittest
 
-# from mtpy-v2
-from mtpy.processing import RunSummary
+from mth5.processing import RunSummary
 from mth5.data.make_mth5_from_asc import create_test3_h5
 from mth5.data.station_config import make_station_03
 from mth5.helpers import close_open_files

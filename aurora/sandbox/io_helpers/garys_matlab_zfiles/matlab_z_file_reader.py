@@ -22,7 +22,7 @@ from mt_metadata.timeseries.survey import Survey
 from mt_metadata.transfer_functions.core import TF
 from loguru import logger
 
-from mtpy.processing import KernelDataset
+from mth5.processing import KernelDataset
 
 TEST_PATH = get_test_path()
 
