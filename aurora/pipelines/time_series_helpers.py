@@ -172,8 +172,8 @@ def calibrate_stft_obj(
         Provides information about filters for calibration
     units : string
         usually "MT", contemplating supporting "SI"
-    scale_factors : dict or None
-        keyed by channel, supports a single scalar to apply to that channels data
+    channel_scale_factors : Optional[dict]
+        Keyed by channel, supports a single scalar to apply to that channels data
         Useful for debugging.  Should not be used in production and should throw a
         warning if it is not None
 
@@ -213,7 +213,8 @@ def calibrate_stft_obj(
                 channel_scale_factor = channel_scale_factors[channel_id]
             except KeyError:
                 channel_scale_factor = 1.0
-            calibration_response /= channel_scale_factor
+            if channel_scale_factor != 1.0:
+                calibration_response /= channel_scale_factor
 
         if units == "SI":
             logger.warning("Warning: SI Units are not robustly supported issue #36")

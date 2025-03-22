@@ -3,6 +3,10 @@ This module contains a Helper class to make config files.
 
 The processing config is still evolving and this class and its methods may change.
 
+Development Notes:
+ - Initially, we only supported EMTF style band specification, but this should be updated
+ to allow logarithmically spaced bands of constant Q.
+
 """
 
 from typing import Optional, Union
@@ -97,7 +101,7 @@ class ConfigCreator:
 
     def determine_band_specification_style(self) -> None:
         """
-        Try to identify which scheme was used to define the bands
+            Tries to identify which scheme was used to define the bands
 
         TODO: Should emtf_band_file path be stored in config to support reproducibility?
 

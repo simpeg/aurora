@@ -49,14 +49,14 @@ from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
     DecimationLevel as AuroraDecimationLevel,
 )
 from loguru import logger
+from mth5.groups import RunGroup
 from mth5.helpers import close_open_files
 from mth5.timeseries.spectre import Spectrogram
-from typing import Optional, Union
+from typing import Literal, Optional, Tuple, Union
 
 import aurora.config.metadata.processing
 import pandas as pd
 import xarray as xr
-
 
 SUPPORTED_PROCESSINGS = [
     "legacy",
@@ -65,9 +65,16 @@ SUPPORTED_PROCESSINGS = [
 # =============================================================================
 
 
-def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrds, units="MT"):
+def make_stft_objects(
+    processing_config: aurora.config.metadata.processing.Processing,
+    i_dec_level: int,
+    run_obj: RunGroup,
+    run_xrds: xr.Dataset,
+    units: Literal["MT", "SI"] = "MT",
+) -> xr.Dataset:
+
     """
-    Operates on a "per-run" basis.  Applies STFT to all time series in the input run.
+    Applies STFT to all channel time series in the input run.
 
     This method could be modified in a multiple station code so that it doesn't care
     if the station is "local" or "remote" but rather uses scale factors keyed by
@@ -83,7 +90,7 @@ def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrds, units="
         The run to transform to stft
     run_xrds: xarray.core.dataset.Dataset
         The data time series from the run to transform
-    units: str
+    units: Literal["MT", "SI"] = "MT",
         expects "MT".  May change so that this is the only accepted set of units
     station_id: str
         To be deprecated, this information is contained in the run_obj as
@@ -130,7 +137,7 @@ def make_stft_objects(processing_config, i_dec_level, run_obj, run_xrds, units="
     This essentially corresponds to a "Decimations Group" which is a list of decimations.
     Related to the generation of FCs is the ARMA prewhitening (Issue #60) which was controlled in
     EMTF with pwset.cfg
-    4    5             # of decimation level, # of channels
+    4    5             # of decimation levels, # of channels
     3 3 3 3 3
     3 3 3 3 3
     3 3 3 3 3
@@ -164,14 +171,18 @@ def process_tf_decimation_level(
     i_dec_level: int,
     local_stft_obj: xr.core.dataset.Dataset,
     remote_stft_obj: Union[xr.core.dataset.Dataset, None],
+    weights: Optional[
+        Tuple[str]
+    ] = None,  # TODO: Make this a Literal of SupportedWeights
     units="MT",
 ):
     """
     Processing pipeline for a single decimation_level
 
     TODO: Add a check that the processing config sample rates agree with the data
+     sampling rates otherwise raise Exception
     TODO: Add units to local_stft_obj, remote_stft_obj
-    sampling rates otherwise raise Exception
+    TODO: This is the method that should be accessing weights
     This method can be single station or remote based on the process cfg
 
     Parameters
@@ -196,16 +207,26 @@ def process_tf_decimation_level(
     frequency_bands = config.decimations[i_dec_level].frequency_bands_obj()
     transfer_function_obj = TTFZ(i_dec_level, frequency_bands, processing_config=config)
     dec_level_config = config.decimations[i_dec_level]
-    # segment_weights = coherence_weights(dec_level_config, local_stft_obj, remote_stft_obj)
+
+    # Get weights if requested
+    if weights:
+        from aurora.transfer_function.weights.segment_weights import _get_weights
+
+        segment_weights_obj = _get_weights(
+            dec_level_config, local_stft_obj, remote_stft_obj
+        )
+    else:
+        segment_weights_obj = None
+
     transfer_function_obj = process_transfer_functions(
-        dec_level_config, local_stft_obj, remote_stft_obj, transfer_function_obj
+        dec_level_config=dec_level_config,
+        local_stft_obj=local_stft_obj,
+        remote_stft_obj=remote_stft_obj,
+        transfer_function_obj=transfer_function_obj,
+        segment_weights_obj=segment_weights_obj,
     )
 
     return transfer_function_obj
-
-
-# def enrich_row(row):
-#     pass
 
 
 def triage_issue_289(local_stfts: list, remote_stfts: list):

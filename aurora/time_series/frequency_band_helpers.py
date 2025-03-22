@@ -44,7 +44,7 @@ def get_band_for_tf_estimate(
         being within the frequency band given as an input argument.
     """
     logger.info(
-        f"Processing band {band.center_period:.6f}s  ({1./band.center_period:.6f}Hz)"
+        f"Accessing band {band.center_period:.6f}s  ({1./band.center_period:.6f}Hz)"
     )
     band_dataset = extract_band(band, local_stft_obj)
     X = band_dataset[dec_level_config.input_channels]
@@ -114,6 +114,7 @@ def adjust_band_for_coherence_sorting(frequency_band, spectrogram, rule="min3"):
     return band
 
 
+# TODO: Delete once this tool is moved to MTH5 (in progress, March 2025).
 # def frequency_band_edges(
 #     f_lower_bound, f_upper_bound, num_bands_per_decade=None, num_bands=None
 # ):
@@ -168,59 +169,64 @@ def adjust_band_for_coherence_sorting(frequency_band, spectrogram, rule="min3"):
 #     return fence_posts
 
 
-# def get_band_for_coherence_sorting(
-#     frequency_band,
-#     dec_level_config: AuroraDecimationLevel,
-#     local_stft_obj,
-#     remote_stft_obj,
-#     widening_rule="min3",
-# ):
-#     """
-#     Just like get_band_for_tf_estimate, but here we enforce some rules so that the band is not one FC wide
-#     - it is possible that this method will get merged with get_band_for_tf_estimate
-#     - this is a placeholder until the appropriate rules are sorted out.
-#
-#     Parameters
-#     ----------
-#     band : mt_metadata.transfer_functions.processing.aurora.FrequencyBands
-#         object with lower_bound and upper_bound to tell stft object which
-#         subarray to return
-#     config : AuroraDecimationLevel
-#         information about the input and output channels needed for TF
-#         estimation problem setup
-#     local_stft_obj : xarray.core.dataset.Dataset or None
-#         Time series of Fourier coefficients for the station whose TF is to be
-#         estimated
-#     remote_stft_obj : xarray.core.dataset.Dataset or None
-#         Time series of Fourier coefficients for the remote reference station
-#
-#     Returns
-#     -------
-#     X, Y, RR : xarray.core.dataset.Dataset or None
-#         data structures as local_stft_object and remote_stft_object, but
-#         restricted only to input_channels, output_channels,
-#         reference_channels and also the frequency axes are restricted to
-#         being within the frequency band given as an input argument.
-#     """
-#     band = frequency_band.copy()
-#     logger.info(
-#         f"Processing band {band.center_period:.6f}s  ({1./band.center_period:.6f}Hz)"
-#     )
-#     stft = Spectrogram(local_stft_obj)
-#     if stft.num_harmonics_in_band(band) == 1:
-#         logger.warning("Cant evaluate coherence with only 1 harmonic")
-#         logger.info(f"Widening band according to {widening_rule} rule")
-#         if widening_rule == "min3":
-#             band.frequency_min -= stft.df
-#             band.frequency_max += stft.df
-#         else:
-#             msg = f"Widening rule {widening_rule} not recognized"
-#             logger.error(msg)
-#             raise NotImplementedError(msg)
-#     # proceed as in
-#     return get_band_for_tf_estimate(
-#         band, dec_level_config, local_stft_obj, remote_stft_obj
-#     )
+# TODO: move this to mth5.processing.spectre
+def get_band_for_coherence_sorting(
+    frequency_band,
+    dec_level_config: AuroraDecimationLevel,
+    local_stft_obj,
+    remote_stft_obj,
+    widening_rule="min3",
+):
+    """
+    Just like get_band_for_tf_estimate, but here we enforce some rules so that the band is not one FC wide
+    - it is possible that this method will get merged with get_band_for_tf_estimate
+    - this is a placeholder until the appropriate rules are sorted out.
+
+    Parameters
+    ----------
+    band : mt_metadata.transfer_functions.processing.aurora.FrequencyBands
+        object with lower_bound and upper_bound to tell stft object which
+        subarray to return
+    config : AuroraDecimationLevel
+        information about the input and output channels needed for TF
+        estimation problem setup
+    local_stft_obj : xarray.core.dataset.Dataset or None
+        Time series of Fourier coefficients for the station whose TF is to be
+        estimated
+    remote_stft_obj : xarray.core.dataset.Dataset or None
+        Time series of Fourier coefficients for the remote reference station
+
+    Returns
+    -------
+    X, Y, RR : xarray.core.dataset.Dataset or None
+        data structures as local_stft_object and remote_stft_object, but
+        restricted only to input_channels, output_channels,
+        reference_channels and also the frequency axes are restricted to
+        being within the frequency band given as an input argument.
+    """
+    from mth5.timeseries.spectre import Spectrogram
+
+    band = frequency_band.copy()
+    logger.info(
+        f"Processing band {band.center_period:.6f}s  ({1./band.center_period:.6f}Hz)"
+    )
+    stft = Spectrogram(local_stft_obj)
+    if stft.num_harmonics_in_band(band) == 1:
+        logger.warning("Cant evaluate coherence with only 1 harmonic")
+        logger.info(f"Widening band according to {widening_rule} rule")
+        if widening_rule == "min3":
+            band.frequency_min -= stft.frequency_increment
+            band.frequency_max += stft.frequency_increment
+        else:
+            msg = f"Widening rule {widening_rule} not recognized"
+            logger.error(msg)
+            raise NotImplementedError(msg)
+    # return band TODO: Make this return the band only, then get later
+    # proceed as in
+    x, y, rr = get_band_for_tf_estimate(
+        band, dec_level_config, local_stft_obj, remote_stft_obj
+    )
+    return x, y, rr, band
 
 
 def cross_spectra(X, Y):

@@ -15,7 +15,6 @@ from aurora.transfer_function.regression.iter_control import IterControl
 from aurora.transfer_function.regression.RME import RME
 from aurora.transfer_function.regression.RME_RR import RME_RR
 
-# from aurora.transfer_function.weights.coherence_weights import compute_multiple_coherence_weights
 from aurora.transfer_function.weights.edf_weights import (
     effective_degrees_of_freedom_weights,
 )
@@ -23,7 +22,8 @@ from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
     DecimationLevel as AuroraDecimationLevel,
 )
 from loguru import logger
-from typing import Literal, Union
+from typing import Literal, Optional, Union
+
 import numpy as np
 import xarray as xr
 
@@ -159,7 +159,7 @@ def apply_weights(
     X: xr.Dataset,
     Y: xr.Dataset,
     RR: xr.Dataset,
-    W,
+    W: np.ndarray,
     segment: bool = False,
     dropna: bool = False,
 ) -> tuple:
@@ -200,12 +200,11 @@ def apply_weights(
 
 def process_transfer_functions(
     dec_level_config: AuroraDecimationLevel,
-    local_stft_obj,
-    remote_stft_obj,
+    local_stft_obj: xr.Dataset,
+    remote_stft_obj: xr.Dataset,
     transfer_function_obj,
-    # segment_weights=["multiple_coherence",],#["simple_coherence",],#["multiple_coherence",],#jj84_coherence_weights",],
-    segment_weights=[],
-    channel_weights=None,
+    segment_weights_obj: Optional[dict] = None,
+    channel_weights_obj: Optional[dict] = None,
 ):
     """
     This is the main tf_processing method.  It is based on the Matlab legacy code TTFestBand.m.
@@ -213,25 +212,12 @@ def process_transfer_functions(
     Note #1: Although it is advantageous to execute the regression channel-by-channel
     vs. all-at-once, we need to keep the all-at-once to get residual covariances (see aurora issue #87)
 
-    Note #2:
-    Consider placing the segment weight logic in its own module with the various functions in a dictionary.
-    Possibly can combines (product) all segment weights, like the following pseudocode:
-
-    .. code-block:: python
-
-      W = ones
-      for wt_style in segment_weights:
-        fcn = wt_functions[style]
-        w = fcn(X, Y, RR, )
-        W *= w
-      return W
-
     TODO: Consider push the nan-handling into the band extraction as a kwarg.
 
     Parameters
     ----------
     dec_level_config: AuroraDecimationLevel
-        Metadata about the decimation level processing.
+        Processing parameters for the active decimation level.
     local_stft_obj: xarray.core.dataset.Dataset
     remote_stft_obj: xarray.core.dataset.Dataset or None
     transfer_function_obj: aurora.transfer_function.TTFZ.TTFZ
@@ -242,7 +228,7 @@ def process_transfer_functions(
         If it is a list of strings, each string corresponds to a weighting
         algorithm to be applied.
         ["jackknife_jj84", "multiple_coherence", "simple_coherence"]
-    channel_weights : numpy array or None
+    channel_weights : dict of numpy arrays or None
 
 
     Returns
@@ -260,29 +246,10 @@ def process_transfer_functions(
         )
 
         # TODO: WORK IN PROGRESS  (see Issue #119)
-        # Apply segment weights first -- see Note #2
-        # if "jackknife_jj84" in segment_weights:
-        #     from aurora.transfer_function.weights.coherence_weights import (
-        #         coherence_weights_jj84,
-        #     )
-        #
-        #     Wjj84 = coherence_weights_jj84(band, local_stft_obj, remote_stft_obj)
-        #     apply_weights(X, Y, RR, Wjj84, segment=True, dropna=False)
-        # if "simple_coherence" in segment_weights:
-        #     from aurora.transfer_function.weights.coherence_weights import (
-        #         simple_coherence_weights,
-        #     )
-        #
-        #     W = simple_coherence_weights(band, local_stft_obj, remote_stft_obj)
-        #     apply_weights(X, Y, RR, W, segment=True, dropna=False)
-        #
-        # if "multiple_coherence" in segment_weights:
-        #     from aurora.transfer_function.weights.coherence_weights import (
-        #         multiple_coherence_weights,
-        #     )
-        #
-        #     W = multiple_coherence_weights(band, local_stft_obj, remote_stft_obj)
-        #     apply_weights(X, Y, RR, W, segment=True, dropna=False)
+        # Apply segment weights first if provided.
+        if segment_weights_obj:
+            weights = segment_weights_obj.get_weights_for_band(band)
+            apply_weights(X, Y, RR, weights, segment=True, dropna=False)
 
         # if there are channel weights apply them here
 
@@ -297,7 +264,12 @@ def process_transfer_functions(
 
         if dec_level_config.estimator.estimate_per_channel:
             for ch in dec_level_config.output_channels:
+
                 Y_ch = Y[ch].to_dataset()  # keep as a dataset, maybe not needed
+
+                if channel_weights_obj:
+                    weights = channel_weights_obj.get_weights_for_band(band)
+                    apply_weights(X, Y_ch, RR, weights, segment=True, dropna=False)
 
                 X_, Y_, RR_ = handle_nan(X, Y_ch, RR, drop_dim="observation")
 

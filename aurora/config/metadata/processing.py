@@ -11,13 +11,15 @@ import pathlib
 
 from aurora.time_series.windowing_scheme import window_scheme_from_decimation
 from loguru import logger
-from mt_metadata.transfer_functions.processing.aurora.processing import Processing
+from mt_metadata.transfer_functions.processing.aurora.processing import (
+    Processing as AuroraProcessing,
+)
 from mt_metadata.utils.list_dict import ListDict
 from typing import Optional, Union
 import pandas as pd
 
 
-class Processing(Processing):
+class Processing(AuroraProcessing):
     def __init__(self, **kwargs):
         """
         Constructor
