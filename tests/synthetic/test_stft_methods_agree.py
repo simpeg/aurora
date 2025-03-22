@@ -12,11 +12,11 @@ from aurora.test_utils.synthetic.make_processing_configs import (
     create_test_run_config,
 )
 
-from mth5.processing import RunSummary, KernelDataset
 from mth5.data.make_mth5_from_asc import create_test1_h5
-from mth5.mth5 import MTH5
 from mth5.helpers import close_open_files
-from mth5.timeseries.spectre.stft import run_ts_to_stft_scipy
+from mth5.mth5 import MTH5
+from mth5.processing import RunSummary, KernelDataset
+from mth5.processing.spectre.stft import run_ts_to_stft_scipy
 
 
 def test_stft_methods_agree():

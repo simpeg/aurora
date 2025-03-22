@@ -19,8 +19,8 @@ from mt_metadata.transfer_functions.processing.fourier_coefficients import (
     Decimation as FCDecimation,
 )
 from mth5.groups import RunGroup
-from mth5.timeseries.spectre.prewhitening import apply_prewhitening
-from mth5.timeseries.spectre.prewhitening import apply_recoloring
+from mth5.processing.spectre.prewhitening import apply_prewhitening
+from mth5.processing.spectre.prewhitening import apply_recoloring
 import mth5.timeseries.spectre as spectre
 from typing import Literal, Optional, Union
 
