@@ -7,7 +7,7 @@
 from aurora.config.metadata.processing import Processing
 from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.time_series_helpers import prototype_decimate
-
+from aurora.time_series.windowing_scheme import WindowingScheme
 from aurora.transfer_function import TransferFunctionCollection
 from loguru import logger
 from mth5.utils.exceptions import MTH5Error
@@ -303,113 +303,16 @@ class TransferFunctionKernel(object):
         processing_summary: pd.DataFrame
             One row per each run-deciamtion pair
         """
-        # TODO: Factor this into processing_summary.py
-        # def make_processing_summary(
-        # kernel_dataset.df,
-        # config.decimation_info,
-        # config.window_scheme
-        # )
-        def _decimation_level_info_valid(
-            df: pd.DataFrame,
-            group: tuple,
-        ) -> bool:
-            """
-                Applies some sanity checks to a processing summary dataframe chunk.
-
-                Development Notes:
-                This was previously a fairly janky block of code in `update_processing_summary`.
-                It is being factored to label and contain the jank, and could still be improved.
-                In particular, just because the conditions being checked are expected, it
-                may be that they do not make the processing invalid if they are not True.
-                i.e. The conditions being checked are likely overly conservative and can be relaxed.
-
-
-            Parameters
-            ----------
-            df: pd.DataFrame
-                Input has already been grouped by ["survey", "station", "run", "start",]
-                This is like a "run chunk".
-                This run chunk can have several decimation levels, often these are
-                [1, 4, 4, 4]
-            group: tuple
-                Information about the ["survey", "station", "run", "start",]
-                This is used only for logging messages, and technically we could
-                get this data from the df if needed.
-
-            Returns
-            -------
-
-            """
-            # assert that decimation levels are incrementing (usually 0,1,2,3...)
-            cond = (df.dec_level.diff()[1:] == 1).all()
-            if cond:  # dec levels increment by 1
-                pass
-            else:
-                msg = f"Skipping {group} because decimation levels are messy."
-                logger.info(msg)
-                return False
-
-            # check that first decimation level is zero
-            cond1 = df.dec_factor.iloc[0] == 1
-            cond2 = df.dec_level.iloc[0] == 0
-            cond = cond1 & cond2
-            if cond:
-                pass
-            else:
-                msg = "Was expecting first decimation level 0 and deciumation factor 1"
-                msg += f"Skipping {group} because  not structured as expected."
-                logger.info(msg)
-                return False
-
-            return True
-
-        from aurora.time_series.windowing_scheme import WindowingScheme
-
-        # Create correctly shaped dataframe
-        tmp = self.kernel_dataset.df.copy(deep=True)
-        id_vars = list(tmp.columns)
-        decimation_info = self.config.decimation_info()
-        for i_dec, dec_factor in decimation_info.items():
-            tmp[i_dec] = dec_factor
-        tmp = tmp.melt(id_vars=id_vars, value_name="dec_factor", var_name="dec_level")
-        sortby = ["survey", "station", "run", "start", "dec_level"]
-        tmp.sort_values(by=sortby, inplace=True)
-        tmp.reset_index(drop=True, inplace=True)
-        tmp.drop("sample_rate", axis=1, inplace=True)  # not valid for decimated data
-
-        # Add window info
-        group_by = [
-            "survey",
-            "station",
-            "run",
-            "start",
-        ]
-        groups = []
-        grouper = tmp.groupby(group_by)
-
-        for group, df in grouper:
-            if not _decimation_level_info_valid(df, group):
-                msg = "Decimation levels not structured as expected"
-                raise AssertionError(msg)
-            # df.sample_rate /= np.cumprod(df.dec_factor)  # better to take from config, maybe add as a test though?
-            window_params_df = self.config.window_scheme(as_type="df")
-            df.reset_index(inplace=True, drop=True)
-            df = df.join(window_params_df)
-            df["num_samples"] = np.floor(df.duration * df.sample_rate)
-            num_windows = np.zeros(len(df))
-            for i, row in df.iterrows():
-                ws = WindowingScheme(
-                    num_samples_window=row.num_samples_window,
-                    num_samples_overlap=row.num_samples_overlap,
-                )
-                num_windows[i] = ws.available_number_of_windows(row.num_samples)
-            df["num_stft_windows"] = num_windows
-            groups.append(df)
-
-        processing_summary = pd.concat(groups)
-        processing_summary.reset_index(drop=True, inplace=True)
-        self._processing_summary = processing_summary
-        return processing_summary
+        processing_summary = _make_processing_summary(
+            self.kernel_dataset.df,
+            self.config.decimation_info,
+            self.config.window_scheme(as_type="df"),
+        )
+        if processing_summary:
+            self._processing_summary = processing_summary
+        else:
+            msg = "Failed to update processing_summary"
+            raise ValueError(msg)
 
     def validate_decimation_scheme_and_dataset_compatability(
         self, min_num_stft_windows=None
@@ -747,6 +650,117 @@ class TransferFunctionKernel(object):
 # ###################################################################
 # ######## Helper Functions #########################################
 # ###################################################################
+
+
+def _decimation_level_info_valid(
+    df: pd.DataFrame,
+) -> bool:
+    """
+        Applies some sanity checks to a processing summary dataframe chunk.
+
+        Development Notes:
+        This was previously a fairly janky block of code in `update_processing_summary`.
+        It is being factored to label and contain the jank, and could still be improved.
+        In particular, just because the conditions being checked are expected, it
+        may be that they do not make the processing invalid if they are not True.
+        i.e. The conditions being checked are likely overly conservative and can be relaxed.
+
+
+        Parameters
+        ----------
+        df: pd.DataFrame
+            Input has already been grouped by ["survey", "station", "run", "start",]
+            This is like a "run chunk".
+            This run chunk can have several decimation levels, often these are
+            [1, 4, 4, 4]
+
+    Returns
+    -------
+
+    """
+    # assert that decimation levels are incrementing (usually 0,1,2,3...)
+    cond = (df.dec_level.diff()[1:] == 1).all()
+    if cond:  # dec levels increment by 1
+        pass
+    else:
+        msg = "Processing summary chunk decimation levels are not incrementing by 1."
+        logger.error(msg)
+        return False
+
+    # check that first decimation level is zero
+    cond1 = df.dec_factor.iloc[0] == 1
+    cond2 = df.dec_level.iloc[0] == 0
+    cond = cond1 & cond2
+    if cond:
+        pass
+    else:
+        msg = "Processing summary chunk was expecting first decimation level 0 and decimation factor 1"
+        logger.error(msg)
+        return False
+
+    return True
+
+
+def _make_processing_summary(
+    kernel_dataset_df: pd.DataFrame,
+    decimation_info: dict,
+    window_params_df: pd.DataFrame,
+):
+    """
+    Creates or updates the processing summary table based on processing parameters
+    and kernel dataset.
+    - Melt the decimation levels over the run summary.
+    - Add columns to estimate the number of FFT windows for each row
+
+    Returns
+    -------
+    processing_summary: pd.DataFrame
+        One row per each run-decimation pair
+    """
+
+    # Create correctly shaped dataframe
+    tmp = kernel_dataset_df.copy(deep=True)
+    id_vars = list(tmp.columns)
+    for i_dec, dec_factor in decimation_info.items():
+        tmp[i_dec] = dec_factor
+    tmp = tmp.melt(id_vars=id_vars, value_name="dec_factor", var_name="dec_level")
+    sortby = ["survey", "station", "run", "start", "dec_level"]
+    tmp.sort_values(by=sortby, inplace=True)
+    tmp.reset_index(drop=True, inplace=True)
+    tmp.drop("sample_rate", axis=1, inplace=True)  # not valid for decimated data
+
+    # Add window info
+    group_by = [
+        "survey",
+        "station",
+        "run",
+        "start",
+    ]
+    chunks = []
+    grouper = tmp.groupby(group_by)
+
+    for group, chunk_df in grouper:
+        if not _decimation_level_info_valid(chunk_df, group):
+            msg = f"Failed to update processing summary -- {group} had invalid decimation level info"
+            logger.error(msg)
+            return
+        # df.sample_rate /= np.cumprod(df.dec_factor)  # better to take from config, maybe add as a test though?
+        chunk_df.reset_index(inplace=True, drop=True)
+        chunk_df = chunk_df.join(window_params_df)
+        chunk_df["num_samples"] = np.floor(chunk_df.duration * chunk_df.sample_rate)
+        num_windows = np.zeros(len(chunk_df))
+        for i, row in chunk_df.iterrows():
+            ws = WindowingScheme(
+                num_samples_window=row.num_samples_window,
+                num_samples_overlap=row.num_samples_overlap,
+            )
+            num_windows[i] = ws.available_number_of_windows(row.num_samples)
+        chunk_df["num_stft_windows"] = num_windows
+        chunks.append(chunk_df)
+
+    processing_summary = pd.concat(chunks)
+    processing_summary.reset_index(drop=True, inplace=True)
+    return processing_summary
 
 
 @path_or_mth5_object

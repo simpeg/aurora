@@ -65,6 +65,7 @@ class Processing(AuroraProcessing):
             logger.error(f"unexpected rtype for window_scheme {as_type}")
             raise TypeError
 
+    @property
     def decimation_info(self):
         """
         Zips decimation level ids to the Decimation objects adn returns as a dict

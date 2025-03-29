@@ -21,7 +21,7 @@ class TestDefineBandsFromDict(unittest.TestCase):
         cfg1 = cc.create_from_kernel_dataset(
             kernel_dataset, estimator={"engine": "RME"}
         )
-        decimation_factors = list(cfg1.decimation_info().values())  # [1, 4, 4, 4]
+        decimation_factors = list(cfg1.decimation_info.values())  # [1, 4, 4, 4]
         # Default Band edges, corresponds to DEFAULT_BANDS_FILE
         band_edges = cfg1.band_edges_dict
         cfg2 = cc.create_from_kernel_dataset(
