@@ -100,8 +100,9 @@ class TestConfigCreator(unittest.TestCase):
             "aurora", "config", "processing_configuration_template.json"
         )
         assert reference_file.exists()
-        processing_config.save_as_json(target_file)
 
+        processing_config.save_as_json(target_file)
+        assert target_file.exists()
         assert filecmp.cmp(target_file, reference_file)
         target_file.unlink()
 
