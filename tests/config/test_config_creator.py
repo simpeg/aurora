@@ -93,12 +93,15 @@ class TestConfigCreator(unittest.TestCase):
             kernel_dataset,
             estimator={"engine": "RME_RR"},
         )
-        target_file = pathlib.Path("tmp_processing_config.json")
+        target_file = AURORA_PATH.joinpath(
+            "aurora", "config", "tmp_processing_config.json"
+        )
         reference_file = AURORA_PATH.joinpath(
             "aurora", "config", "processing_configuration_template.json"
         )
         assert reference_file.exists()
         processing_config.save_as_json(target_file)
+
         assert filecmp.cmp(target_file, reference_file)
         target_file.unlink()
 
