@@ -308,7 +308,7 @@ class TransferFunctionKernel(object):
             self.config.decimation_info,
             self.config.window_scheme(as_type="df"),
         )
-        if processing_summary:
+        if processing_summary is not None:
             self._processing_summary = processing_summary
         else:
             msg = "Failed to update processing_summary"
@@ -705,7 +705,7 @@ def _make_processing_summary(
     kernel_dataset_df: pd.DataFrame,
     decimation_info: dict,
     window_params_df: pd.DataFrame,
-):
+) -> pd.DataFrame:
     """
     Creates or updates the processing summary table based on processing parameters
     and kernel dataset.
@@ -740,7 +740,7 @@ def _make_processing_summary(
     grouper = tmp.groupby(group_by)
 
     for group, chunk_df in grouper:
-        if not _decimation_level_info_valid(chunk_df, group):
+        if not _decimation_level_info_valid(chunk_df):
             msg = f"Failed to update processing summary -- {group} had invalid decimation level info"
             logger.error(msg)
             return
