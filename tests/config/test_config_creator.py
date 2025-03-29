@@ -104,8 +104,12 @@ class TestConfigCreator(unittest.TestCase):
 
         processing_config.save_as_json(target_file)
         assert target_file.exists()
-        p2j = json.load(reference_file)
-        assert p2j == processing_config.to_json()
+        # p2j = json.load(reference_file)
+        with open(reference_file, "r") as f_ref:
+            ref_json_str = f_ref.read()
+        p2j = json.loads(ref_json_str)
+
+        assert p2j == processing_config
         # p = Processing()
         # p.from_json(processing_config.from_json())
         # with open(reference_file, "r") as f:
