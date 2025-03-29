@@ -28,10 +28,11 @@ import numpy as np
 import xarray as xr
 
 ESTIMATOR_LIBRARY = {"OLS": RegressionEstimator, "RME": RME, "RME_RR": RME_RR}
+SUPPORTED_REGRESSION_ESTIMATOR = Literal["OLS", "RME", "RME_RR"]
 
 
 def get_estimator_class(
-    estimation_engine: Literal["OLS", "RME", "RME_RR"]
+    estimation_engine: SUPPORTED_REGRESSION_ESTIMATOR,
 ) -> RegressionEstimator:
     """
 

@@ -1,6 +1,6 @@
 """
     This module contains functions that are associated with time series of Fourier coefficients
-
+    TODO: Move these methods to mth5.processing.spectre.frequency_band_helpers
 """
 from loguru import logger
 from mt_metadata.transfer_functions.processing.aurora import (

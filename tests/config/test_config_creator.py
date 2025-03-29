@@ -1,9 +1,13 @@
 # import logging
+
+import filecmp
 import pandas as pd
+import pathlib
 import unittest
 
 from aurora.config.config_creator import ConfigCreator
 from aurora.config.config_creator import SUPPORTED_BAND_SPECIFICATION_STYLES
+from aurora.general_helper_functions import AURORA_PATH
 from aurora.test_utils.synthetic.processing_helpers import get_example_kernel_dataset
 
 
@@ -55,9 +59,8 @@ class TestConfigCreator(unittest.TestCase):
          - Requires a test in mt_metadata that creates a fully populated AuroraDecimationLevel
 
         """
-        import numpy as np
 
-        kernel_dataset = get_example_kernel_dataset()
+        kernel_dataset = get_example_kernel_dataset(num_stations=1)
         cc = ConfigCreator()
         cfg1 = cc.create_from_kernel_dataset(
             kernel_dataset, estimator={"engine": "RME"}
@@ -76,6 +79,27 @@ class TestConfigCreator(unittest.TestCase):
             }
         )
         assert (band_edges_b - band_edges_a == 0).all().all()
+
+    def test_default_synthetic_processing_parameters(self):
+        """
+            Test that the config can be
+        Returns
+        -------
+
+        """
+        kernel_dataset = get_example_kernel_dataset(num_stations=2)
+        cc = ConfigCreator()
+        processing_config = cc.create_from_kernel_dataset(
+            kernel_dataset,
+            estimator={"engine": "RME_RR"},
+        )
+        target_file = pathlib.Path("tmp_processing_config.json")
+        reference_file = AURORA_PATH.joinpath(
+            "aurora", "config", "processing_configuration_template.json"
+        )
+        processing_config.save_as_json(target_file)
+        assert filecmp.cmp(target_file, reference_file)
+        target_file.unlink()
 
 
 def main():

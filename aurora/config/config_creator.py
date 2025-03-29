@@ -131,7 +131,7 @@ class ConfigCreator:
         band_edges: Optional[Union[dict, None]] = None,
         decimation_factors: Optional[Union[list, None]] = None,
         num_samples_window: Optional[Union[int, None]] = None,
-    ):
+    ) -> Processing:
         """
         This creates a processing config from a kernel dataset.
 
