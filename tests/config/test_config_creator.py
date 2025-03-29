@@ -2,11 +2,11 @@
 
 import filecmp
 import pandas as pd
-import pathlib
 import unittest
 
 from aurora.config.config_creator import ConfigCreator
 from aurora.config.config_creator import SUPPORTED_BAND_SPECIFICATION_STYLES
+from aurora.config.metadata import Processing
 from aurora.general_helper_functions import AURORA_PATH
 from aurora.test_utils.synthetic.processing_helpers import get_example_kernel_dataset
 
@@ -100,11 +100,22 @@ class TestConfigCreator(unittest.TestCase):
             "aurora", "config", "processing_configuration_template.json"
         )
         assert reference_file.exists()
+        import json
 
         processing_config.save_as_json(target_file)
         assert target_file.exists()
-        assert filecmp.cmp(target_file, reference_file)
-        target_file.unlink()
+        p2j = json.load(reference_file)
+        assert p2j == processing_config.to_json()
+        # p = Processing()
+        # p.from_json(processing_config.from_json())
+        # with open(reference_file, "r") as f:
+        #     p2 = f.read()
+        #     import json
+        #     p2j = json.load(reference_file)
+        # refjson =
+        # p2_json =
+        # assert filecmp.cmp(target_file, reference_file)
+        # target_file.unlink()
 
 
 def main():
