@@ -8,7 +8,7 @@ import unittest
 from aurora.config.config_creator import ConfigCreator
 from aurora.config.config_creator import SUPPORTED_BAND_SPECIFICATION_STYLES
 
-# from aurora.config.metadata import Processing
+from aurora.config.metadata import Processing
 from aurora.general_helper_functions import AURORA_PATH
 from aurora.test_utils.synthetic.processing_helpers import get_example_kernel_dataset
 
@@ -98,27 +98,27 @@ class TestConfigCreator(unittest.TestCase):
         target_file = AURORA_PATH.joinpath(
             "aurora", "config", "tmp_processing_config.json"
         )
+        processing_config.save_as_json(target_file)
+        assert target_file.exists()
+
+        # get mt_processing_parameters template
         reference_file = AURORA_PATH.joinpath(
             "aurora", "config", "processing_configuration_template.json"
         )
         assert reference_file.exists()
-
-        processing_config.save_as_json(target_file)
-        assert target_file.exists()
-
         with open(reference_file, "r") as f_ref:
             ref_json_str = f_ref.read()
         p2j = json.loads(ref_json_str)
-
-        assert p2j == processing_config
+        reference_processing_obj = Processing()
+        reference_processing_obj.from_dict(p2j)
+        # Now we want to assert that the config creators output is same as reference.
+        # This may fail on github since the mth5_paths will be /runner/some_github_stuff whereas locally /home/kkappler
+        # in that case, may need to create something to check only non-system specfic things , like:
+        reference_processing_obj.id == processing_config.id
+        # etc.
+        # for local testing we can:
+        assert reference_processing_obj == processing_config
         # TODO: mt_metadata #222 is still live and this nearly addresses it!
-        # p = Processing()
-        # p.from_json(processing_config.from_json())
-        # with open(reference_file, "r") as f:
-        #     p2 = f.read()
-        #     p2j = json.load(reference_file)
-        # assert filecmp.cmp(target_file, reference_file)
-        # target_file.unlink()
 
 
 def main():
