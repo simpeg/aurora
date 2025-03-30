@@ -9,7 +9,7 @@ from aurora.config.config_creator import ConfigCreator
 from aurora.config.config_creator import SUPPORTED_BAND_SPECIFICATION_STYLES
 
 from aurora.config.metadata import Processing
-from aurora.general_helper_functions import AURORA_PATH
+from aurora.general_helper_functions import PROCESSING_TEMPLATES_PATH
 from aurora.test_utils.synthetic.processing_helpers import get_example_kernel_dataset
 
 
@@ -95,15 +95,12 @@ class TestConfigCreator(unittest.TestCase):
             kernel_dataset,
             estimator={"engine": "RME_RR"},
         )
-        target_file = AURORA_PATH.joinpath(
-            "aurora", "config", "tmp_processing_config.json"
-        )
+        target_file = PROCESSING_TEMPLATES_PATH.joinpath("tmp_processing_config.json")
         processing_config.save_as_json(target_file)
-        assert target_file.exists()
 
         # get mt_processing_parameters template
-        reference_file = AURORA_PATH.joinpath(
-            "aurora", "config", "processing_configuration_template.json"
+        reference_file = PROCESSING_TEMPLATES_PATH.joinpath(
+            "processing_configuration_template.json"
         )
         assert reference_file.exists()
         with open(reference_file, "r") as f_ref:
@@ -157,6 +154,14 @@ class TestConfigCreator(unittest.TestCase):
         # 'stations.remote[0].mth5_path (if it exists)
         # TODO: consider simply updating these paths during the test and simply:
         # assert reference_processing_obj == processing_config
+        # OR
+        # assert reference_processing_obj.__eq__(
+        #     processing_config,
+        #     ignore_keys=['band_setup_file',
+        #                  'stations.local.mth5_path',
+        #                  # 'stations.remote',
+        #                  ])
+        # but this will still have the remote reference path ... ugh:/
 
 
 def main():

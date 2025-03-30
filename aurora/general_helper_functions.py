@@ -22,6 +22,7 @@ DATA_PATH = AURORA_PATH.joinpath("data")
 TEST_PATH = AURORA_PATH.joinpath("tests")
 CONFIG_PATH = AURORA_PATH.joinpath("aurora", "config")
 BAND_SETUP_PATH = CONFIG_PATH.joinpath("emtf_band_setup")
+PROCESSING_TEMPLATES_PATH = CONFIG_PATH.joinpath("templates")
 
 
 def get_test_path() -> pathlib.Path:
