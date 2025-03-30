@@ -108,17 +108,55 @@ class TestConfigCreator(unittest.TestCase):
         assert reference_file.exists()
         with open(reference_file, "r") as f_ref:
             ref_json_str = f_ref.read()
-        p2j = json.loads(ref_json_str)
+        p_ref = json.loads(ref_json_str)
         reference_processing_obj = Processing()
-        reference_processing_obj.from_dict(p2j)
-        # Now we want to assert that the config creators output is same as reference.
-        # This may fail on github since the mth5_paths will be /runner/some_github_stuff whereas locally /home/kkappler
-        # in that case, may need to create something to check only non-system specfic things , like:
-        reference_processing_obj.id == processing_config.id
-        # etc.
-        # for local testing we can:
-        assert reference_processing_obj == processing_config
-        # TODO: mt_metadata #222 is still live and this nearly addresses it!
+        reference_processing_obj.from_dict(p_ref)
+
+        # Now we want to assert that the config creator output matches the reference file.
+        # This may fail on github since the mth5_paths will be /home/runner/some_git_path whereas locally /home/kkappler
+        # in that case, may need to create something to check only non-system specific things , like:
+        assert reference_processing_obj.id == processing_config.id
+        assert (
+            reference_processing_obj.band_specification_style
+            == processing_config.band_specification_style
+        )
+        assert (
+            reference_processing_obj.channel_nomenclature
+            == processing_config.channel_nomenclature
+        )
+        assert reference_processing_obj.decimations == processing_config.decimations
+        assert reference_processing_obj.decimations == processing_config.decimations
+        assert (
+            reference_processing_obj.stations.local.id
+            == processing_config.stations.local.id
+        )
+        assert (
+            reference_processing_obj.stations.local.remote
+            == processing_config.stations.local.remote
+        )
+        assert (
+            reference_processing_obj.stations.local.runs
+            == processing_config.stations.local.runs
+        )
+        assert (
+            reference_processing_obj.stations.remote[0].id
+            == processing_config.stations.remote[0].id
+        )
+        assert (
+            reference_processing_obj.stations.remote[0].remote
+            == processing_config.stations.remote[0].remote
+        )
+        assert (
+            reference_processing_obj.stations.remote[0].runs
+            == processing_config.stations.remote[0].runs
+        )
+
+        # keys to ignore, because they have paths from local machine:..
+        # 'band_setup_file',
+        # 'stations.local.mth5_path',
+        # 'stations.remote[0].mth5_path (if it exists)
+        # TODO: consider simply updating these paths during the test and simply:
+        # assert reference_processing_obj == processing_config
 
 
 def main():
