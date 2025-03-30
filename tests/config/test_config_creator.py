@@ -162,6 +162,7 @@ class TestConfigCreator(unittest.TestCase):
         #                  # 'stations.remote',
         #                  ])
         # but this will still have the remote reference path ... ugh:/
+        target_file.unlink()
 
 
 def main():
