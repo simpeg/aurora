@@ -250,6 +250,7 @@ def effective_degrees_of_freedom_weights(
         ref_use = np.ones(n_observations_numeric, dtype=bool)
         edf_ref = edf_obj.compute_weights(RR, ref_use)
 
+        # TODO: FIXME - when this gets set to zero below, then line ~260 will encounter RuntimeWarning div by 0
         wtRef[edf_ref > edf_obj.p2] = 0
         cond = (edf_ref <= edf_obj.p2) & (edf_ref > edf_obj.p1)
         wtRef[cond] = np.sqrt(edf_obj.p1 / edf_ref[cond])
