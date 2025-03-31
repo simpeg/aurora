@@ -219,8 +219,14 @@ def calibrate_stft_obj(
         if units == "SI":
             logger.warning("Warning: SI Units are not robustly supported issue #36")
 
-        # TODO: FIXME Sometimes raises a runtime warning due to DC term in calibration response = 0
+        # Handle case where DC term in calibration response = 0 (Sometimes raises a runtime warning)
+        zero_dc_term = calibration_response[0] == 0
+        if zero_dc_term:
+            calibration_response[0] = 1.0
         stft_obj[channel_id].data /= calibration_response
+        if zero_dc_term:
+            stft_obj[channel_id].data[:, 0] = np.nan + 1j * np.nan
+
     return stft_obj
 
 
