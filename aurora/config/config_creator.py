@@ -10,15 +10,15 @@ Development Notes:
 """
 
 from typing import Optional, Union
-import pathlib
 from loguru import logger
 
 from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config.metadata import Processing
 from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
-
+from mth5.processing.kernel_dataset import KernelDataset
 from mt_metadata.transfer_functions.processing.window import Window
 
+import pathlib
 
 SUPPORTED_BAND_SPECIFICATION_STYLES = ["EMTF", "band_edges"]
 
@@ -46,6 +46,7 @@ class ConfigCreator:
         self._band_edges = band_edges
         self._band_specification_style = None
 
+    # TODO: Delete or update with config info ... currently kernel_dataset.processing_id is used.
     # def processing_id(self, kernel_dataset):
     #     """
     #     Generates a string id label for the processing config: WIP.
@@ -123,14 +124,14 @@ class ConfigCreator:
 
     def create_from_kernel_dataset(
         self,
-        kernel_dataset,
-        input_channels=None,
-        output_channels=None,
-        estimator: Optional[Union[str, None]] = None,
-        emtf_band_file: Optional[Union[str, pathlib.Path, None]] = None,
-        band_edges: Optional[Union[dict, None]] = None,
-        decimation_factors: Optional[Union[list, None]] = None,
-        num_samples_window: Optional[Union[int, None]] = None,
+        kernel_dataset: KernelDataset,
+        input_channels: Optional[list] = None,
+        output_channels: Optional[list] = None,
+        estimator: Optional[str] = None,
+        emtf_band_file: Optional[Union[str, pathlib.Path]] = None,
+        band_edges: Optional[dict] = None,
+        decimation_factors: Optional[list] = None,
+        num_samples_window: Optional[int] = None,
     ) -> Processing:
         """
         This creates a processing config from a kernel dataset.
