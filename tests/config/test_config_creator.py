@@ -9,6 +9,7 @@ from aurora.config.config_creator import ConfigCreator
 from aurora.config.config_creator import SUPPORTED_BAND_SPECIFICATION_STYLES
 
 from aurora.config.metadata import Processing
+from aurora.config.metadata.processing import _processing_obj_from_json_file
 from aurora.general_helper_functions import PROCESSING_TEMPLATES_PATH
 from aurora.test_utils.synthetic.processing_helpers import get_example_kernel_dataset
 
@@ -103,11 +104,7 @@ class TestConfigCreator(unittest.TestCase):
             "processing_configuration_template.json"
         )
         assert reference_file.exists()
-        with open(reference_file, "r") as f_ref:
-            ref_json_str = f_ref.read()
-        p_ref = json.loads(ref_json_str)
-        reference_processing_obj = Processing()
-        reference_processing_obj.from_dict(p_ref)
+        reference_processing_obj = _processing_obj_from_json_file(reference_file)
 
         # Now we want to assert that the config creator output matches the reference file.
         # This may fail on github since the mth5_paths will be /home/runner/some_git_path whereas locally /home/kkappler

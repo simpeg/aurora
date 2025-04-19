@@ -3,7 +3,6 @@
 Extend the mt_metadata.transfer_functions.processing.aurora.processing.Processing class
 with some aurora-specific methods.
 """
-import pathlib
 
 # =============================================================================
 # Imports
@@ -16,7 +15,10 @@ from mt_metadata.transfer_functions.processing.aurora.processing import (
 )
 from mt_metadata.utils.list_dict import ListDict
 from typing import Optional, Union
+
+import json
 import pandas as pd
+import pathlib
 
 
 class Processing(AuroraProcessing):
@@ -156,6 +158,21 @@ class Processing(AuroraProcessing):
         )
 
         return tf_obj
+
+
+def _processing_obj_from_json_file(json_path: pathlib.Path) -> Processing:
+    """
+    Read in a processing parameters json file and return a Processing object.
+    :param json_path: Path to a json file processing parameters
+    :return: Processing object.s
+    """
+    assert json_path.exists()
+    with open(json_path, "r") as f:
+        json_str = f.read()
+    p_dict = json.loads(json_str)
+    processing_obj = Processing()
+    processing_obj.from_dict(p_dict)
+    return processing_obj
 
 
 class EMTFTFHeader(ListDict):
