@@ -5,6 +5,7 @@ Integrated test of the functionality of feature weights.
 """
 
 from aurora.config.metadata import Processing
+from aurora.config.metadata.processing import _processing_obj_from_json_file
 from aurora.general_helper_functions import PROCESSING_TEMPLATES_PATH
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
@@ -71,9 +72,13 @@ def tst_feature_weights(
     return tf_cls
 
 
-def main():
-    synthetic_test_paths = SyntheticTestPaths()
-    mth5_path = synthetic_test_paths.mth5_path.joinpath("test12rr.h5")
+def load_processing_objects_from_file():
+    """
+    Plaace to test reading in the processing jsons and check that their structures are as exoected
+    Returns
+    -------
+
+    """
     processing_params_jsons = {}
     processing_params_jsons["default"] = PROCESSING_TEMPLATES_PATH.joinpath(
         "processing_configuration_template.json"
@@ -82,7 +87,6 @@ def main():
         "test_processing_config_with_weights_block.json"
     )
     processing_objects = {}
-    from aurora.config.metadata.processing import _processing_obj_from_json_file
 
     processing_objects["default"] = _processing_obj_from_json_file(
         processing_params_jsons["default"]
@@ -90,6 +94,13 @@ def main():
     processing_objects["new"] = _processing_obj_from_json_file(
         processing_params_jsons["new"]
     )
+    return processing_objects
+
+
+def main():
+    synthetic_test_paths = SyntheticTestPaths()
+    mth5_path = synthetic_test_paths.mth5_path.joinpath("test12rr.h5")
+    processing_objects = load_processing_objects_from_file()
 
     # tst_feature_weights(mth5_path,  processing_objects["default"])
     tst_feature_weights(mth5_path, processing_objects["new"])
