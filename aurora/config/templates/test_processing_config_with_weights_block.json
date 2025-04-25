@@ -156,93 +156,108 @@
                             "normalized": true
                         }
                     },
-                    "weights": {
-                        "ex": {
-                          "combination_style": "multiplication",
-                          "features":[
-                            {
-                              "feature_name": "coherence",
-                              "feature_params": {
-                                "ch1": "ex",
-                                "ch2": "hy"
-                              },
-                              "window_style": "threshold",
-                              "window_params": {
-                                "min": 0.8,
-                                "max": "+inf"
-                              }
-                          },
-                          {
-                            "feature_name": "multiple_coherence",
-                            "feature_params": {
-                              "output_channel": "ex"
-                            },
-                            "window_style": "threshold",
-                            "window_params": {
-                              "min": 0.9,
-                              "max": 1.1
+                    "channel_weight_specs": [
+                        {
+                            "channel_weight_spec": {
+                                "output_channels": [
+                                    "ex"
+                                ],
+                                "combination_style": "multiplication",
+                                "features": [
+                                    {
+                                        "feature_name": "coherence",
+                                        "feature_params": {
+                                            "ch1": "ex",
+                                            "ch2": "hy"
+                                        },
+                                        "window_style": "threshold",
+                                        "window_params": {
+                                            "min": 0.8,
+                                            "max": "+inf"
+                                        }
+                                    },
+                                    {
+                                        "feature_name": "multiple_coherence",
+                                        "feature_params": {
+                                            "output_channel": "ex"
+                                        },
+                                        "window_style": "threshold",
+                                        "window_params": {
+                                            "min": 0.9,
+                                            "max": 1.1
+                                        }
+                                    }
+                                ]
                             }
-                          }
-                        ]
                         },
-                        "ey": {
-                          "combination_style": "multiplication",
-                          "features":[
-                            {
-                              "feature_name": "coherence",
-                              "feature_params": {
-                                "ch1": "ey",
-                                "ch2": "hx"
-                              },
-                              "window_style": "threshold",
-                              "window_params": {
-                                "min": 0.8,
-                                "max": "+inf"
-                              }
-                          },
-                          {
-                            "feature_name": "multiple_coherence",
-                            "feature_params": {
-                              "output_channel": "ey"
-                            },
-                            "window_style": "threshold",
-                            "window_params": {
-                              "min": 0.9,
-                              "max": 1.1
+                        {
+                            "channel_weight_spec": {
+                                "output_channels": [
+                                    "ey"
+                                ],
+                                "combination_style": "multiplication",
+                                "features": [
+                                    {
+                                        "feature_name": "coherence",
+                                        "feature_params": {
+                                            "ch1": "ey",
+                                            "ch2": "hx"
+                                        },
+                                        "window_style": "threshold",
+                                        "window_params": {
+                                            "min": 0.8,
+                                            "max": "+inf"
+                                        }
+                                    },
+                                    {
+                                        "feature_name": "multiple_coherence",
+                                        "feature_params": {
+                                            "output_channel": "ey"
+                                        },
+                                        "window_style": "threshold",
+                                        "window_params": {
+                                            "min": 0.9,
+                                            "max": 1.1
+                                        }
+                                    }
+                                ]
                             }
-                          }
-                        ]
                         },
-                        "hz": {
-                          "combination_style": "multiplication",
-                          "features":[
-                            {
-                              "feature_name": "coherence",
-                              "feature_params": {
-                                "ch1": "hx",
-                                "ch2": "rx"
-                              },
-                              "window_style": "threshold",
-                              "window_params": {
-                                "min": 0.8,
-                                "max": "+inf"
-                              }
-                          },
-      {
-        "feature_name": "coherence",
-        "feature_params": {
-          "ch1": "hy",
-          "ch2": "ry"
-        },
-        "window_style": "threshold",
-        "window_params": {
-          "min": 0.7,
-          "max": 0.999
-        }
-      }
-    ]
-  }
-                    }
+                        {
+                            "channel_weight_spec": {
+                                "output_channels": [
+                                    "hz"
+                                ],
+                                "combination_style": "multiplication",
+                                "features": [
+                                    {
+                                        "feature_name": "coherence",
+                                        "feature_params": {
+                                            "ch1": "hx",
+                                            "ch2": "rx"
+                                        },
+                                        "window_style": "threshold",
+                                        "window_params": {
+                                            "min": 0.8,
+                                            "max": "+inf"
+                                        }
+                                    },
+                                    {
+                                        "feature_name": "coherence",
+                                        "feature_params": {
+                                            "ch1": "hy",
+                                            "ch2": "ry"
+                                        },
+                                        "window_style": "threshold",
+                                        "window_params": {
+                                            "min": 0.7,
+                                            "max": 0.999
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
                 }
             },
             {
