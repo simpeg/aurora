@@ -174,9 +174,18 @@
                                             "weight_kernels": [
                                                 {
                                                     "weight_kernel": {
-                                                        "weight_type": "monotonic",
-                                                        "min": 0.8,
-                                                        "max": "+inf"
+                                                        "half_window_style": "hann",
+                                                        "transition_lower_bound": 0.8,
+                                                        "transition_upper_bound": 0.9,
+                                                        "threshold": "low cut"
+                                                    }
+                                                },
+                                                {
+                                                    "weight_kernel": {
+                                                        "half_window_style": "hann",
+                                                        "transition_lower_bound": 0.995,
+                                                        "transition_upper_bound": 1.01,
+                                                        "threshold": "high cut"
                                                     }
                                                 }
                                             ]
@@ -191,9 +200,10 @@
                                             "weight_kernels": [
                                                 {
                                                     "weight_kernel": {
-                                                        "weight_type": "taper",
-                                                        "min": 0.9,
-                                                        "max": 1.1
+                                                        "activation_style": "sigmoid",
+                                                        "transition_lower_bound": 0.8,
+                                                        "transition_upper_bound": 1.2,
+                                                        "threshold": "low cut"
                                                     }
                                                 }
                                             ]
@@ -219,9 +229,10 @@
                                             "weight_kernels": [
                                                 {
                                                     "weight_kernel": {
-                                                        "weight_type": "monotonic",
-                                                        "min": 0.8,
-                                                        "max": "+inf"
+                                                        "half_window_style": "hann",
+                                                        "transition_lower_bound": 0.4,
+                                                        "transition_upper_bound": 0.77,
+                                                        "threshold": "low cut"
                                                     }
                                                 }
                                             ]
@@ -236,9 +247,10 @@
                                             "weight_kernels": [
                                                 {
                                                     "weight_kernel": {
-                                                        "weight_type": "taper",
-                                                        "min": 0.8,
-                                                        "max": 1.2
+                                                        "half_window_style": "hann",
+                                                        "transition_lower_bound": 0.4,
+                                                        "transition_upper_bound": 0.8,
+                                                        "threshold": "low cut"
                                                     }
                                                 }
                                             ]
@@ -264,9 +276,11 @@
                                             "weight_kernels": [
                                                 {
                                                     "weight_kernel": {
-                                                        "weight_type": "threshold",
-                                                        "min": 0.7,
-                                                        "max": "+inf"
+                                                        "style": "taper",
+                                                        "half_window_style": "hann",
+                                                        "transition_lower_bound": 0.6,
+                                                        "transition_upper_bound": 0.9,
+                                                        "threshold": "low cut"
                                                     }
                                                 }
                                             ]
@@ -282,9 +296,11 @@
                                             "weight_kernels": [
                                                 {
                                                     "weight_kernel": {
-                                                        "weight_type": "threshold",
-                                                        "min": 0.7,
-                                                        "max": "+inf"
+                                                        "style": "taper",
+                                                        "half_window_style": "hann",
+                                                        "transition_lower_bound": 0.5,
+                                                        "transition_upper_bound": 0.9,
+                                                        "threshold": "low cut"
                                                     }
                                                 }
                                             ]

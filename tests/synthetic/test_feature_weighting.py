@@ -3,6 +3,7 @@
 Integrated test of the functionality of feature weights.
 
 """
+import numpy as np
 
 from aurora.config.metadata import Processing
 from aurora.config.metadata.processing import _processing_obj_from_json_file
@@ -72,9 +73,10 @@ def tst_feature_weights(
     return tf_cls
 
 
-def load_processing_objects_from_file():
+def load_processing_objects_from_file() -> dict:
     """
-    Plaace to test reading in the processing jsons and check that their structures are as exoected
+    Place to test reading in the processing jsons and check that their structures are as expected.
+
     Returns
     -------
 
@@ -88,12 +90,20 @@ def load_processing_objects_from_file():
     )
     processing_objects = {}
 
-    processing_objects["default"] = _processing_obj_from_json_file(
-        processing_params_jsons["default"]
-    )
+    # processing_objects["default"] = _processing_obj_from_json_file(
+    #     processing_params_jsons["default"]
+    # )
     processing_objects["new"] = _processing_obj_from_json_file(
         processing_params_jsons["new"]
     )
+
+    # Walk the weights and confirm they can all be evaluated
+    po_dec0 = processing_objects["new"].decimations[0]
+    for chws in po_dec0.channel_weight_specs:
+        for fws in chws.feature_weight_specs:
+            for wk in fws.weight_kernels:
+                qq = wk.evaluate(np.arange(10) / 10.0)
+                print(qq)
     return processing_objects
 
 
@@ -103,10 +113,11 @@ def main():
     processing_objects = load_processing_objects_from_file()
 
     # tst_feature_weights(mth5_path,  processing_objects["default"])
+    # print("OK-1")
     tst_feature_weights(mth5_path, processing_objects["new"])
-    print("OK-1")
+    print("OK-2")
 
 
 if __name__ == "__main__":
     main()
-    print("OK-2")
+    print("OK-OK")
