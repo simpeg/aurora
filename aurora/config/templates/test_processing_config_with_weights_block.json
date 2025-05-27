@@ -224,9 +224,7 @@
                                             "feature": {
                                                 "name": "striding_window_coherence",
                                                 "ch1": "ey",
-                                                "ch2": "hx",
-                                                "station1": "test1",
-                                                "station2": "test1"
+                                                "ch2": "hx"
                                             },
                                             "weight_kernels": [
                                                 {
