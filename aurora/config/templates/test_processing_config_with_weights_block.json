@@ -166,8 +166,8 @@
                                 "feature_weight_specs": [
                                     {
                                         "feature_weight_spec": {
-                                            "feature":{
-                                                "name": "coherence",
+                                            "feature": {
+                                                "name": "striding_window_coherence",
                                                 "ch1": "ex",
                                                 "ch2": "hy"
                                             },
@@ -193,7 +193,7 @@
                                     },
                                     {
                                         "feature_weight_spec": {
-                                            "feature":{
+                                            "feature": {
                                                 "name": "multiple_coherence",
                                                 "output_channel": "ex"
                                             },
@@ -222,9 +222,11 @@
                                     {
                                         "feature_weight_spec": {
                                             "feature": {
-                                                "name": "coherence",
+                                                "name": "striding_window_coherence",
                                                 "ch1": "ey",
-                                                "ch2": "hx"
+                                                "ch2": "hx",
+                                                "station1": "test1",
+                                                "station2": "test1"
                                             },
                                             "weight_kernels": [
                                                 {
@@ -268,8 +270,8 @@
                                 "feature_weight_specs": [
                                     {
                                         "feature_weight_spec": {
-                                            "feature":{
-                                                "name": "coherence",
+                                            "feature": {
+                                                "name": "striding_window_coherence",
                                                 "ch1": "hx",
                                                 "ch2": "rx"
                                             },
@@ -288,8 +290,8 @@
                                     },
                                     {
                                         "feature_weight_spec": {
-                                            "feature":{
-                                                "name": "coherence",
+                                            "feature": {
+                                                "name": "striding_window_coherence",
                                                 "ch1": "hy",
                                                 "ch2": "ry"
                                             },
