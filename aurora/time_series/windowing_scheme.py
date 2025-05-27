@@ -95,6 +95,8 @@ class WindowingScheme(ApodizationWindow):
     window ... but once the window is applied to data, the sample rate is defined.
     Sample rate is defined here because this window will operate on time series
     with a defined time axis.
+
+    TODO: Add dtypes and docstrings.  Is it possible to replace kwargs with Optional arguments?
     """
 
     def __init__(self, **kwargs):
@@ -107,8 +109,9 @@ class WindowingScheme(ApodizationWindow):
         """
         super(WindowingScheme, self).__init__(**kwargs)
         self.num_samples_overlap = kwargs.get(
-            "num_samples_overlap", None
-        )  # make this 75% of num_samples_window by default
+            "num_samples_overlap",
+            None,  # TODO: make this 75% of num_samples_window by default
+        )
         self.striding_function_label = kwargs.get("striding_function_label", "crude")
         self._left_hand_window_edge_indices = None
         self.sample_rate = kwargs.get("sample_rate", None)
@@ -124,6 +127,9 @@ class WindowingScheme(ApodizationWindow):
             f"overlap {self.num_samples_overlap}"
         )
         return info_string
+
+    def __repr__(self):
+        return self.__str__()
 
     @property
     def num_samples_advance(self) -> int:
@@ -361,7 +367,7 @@ class WindowingScheme(ApodizationWindow):
 
         Assumes sliding window and taper already applied.
 
-        TODO: Make this return a Specrtogram() object.
+        TODO: Make this return a Spectrogram() object.
 
         Parameters
         ----------

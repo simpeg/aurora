@@ -18,7 +18,7 @@ from mt_metadata.transfer_functions.processing.aurora import (
 )
 from mth5.processing.kernel_dataset import KernelDataset
 
-from typing import Union
+from typing import List, Union
 
 import numpy as np
 import pandas as pd
@@ -393,11 +393,11 @@ class TransferFunctionKernel(object):
         self.memory_check()
         self.validate_save_fc_settings()
 
-    def valid_decimations(self):
+    def valid_decimations(self) -> List[AuroraDecimationLevel]:
         """
         Get the decimation levels that are valid.
-        This is used when iterating over decimation levels in the processing, we do
-        not want to have invalid levels get processed (they will fail).
+        This is used when iterating over decimation levels in the processing.
+        We do not want to try processing invalid levels (they will fail).
 
         Returns
         -------

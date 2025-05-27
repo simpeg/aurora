@@ -101,6 +101,7 @@ def load_processing_objects_from_file() -> dict:
     po_dec0 = processing_objects["new"].decimations[0]
     for chws in po_dec0.channel_weight_specs:
         for fws in chws.feature_weight_specs:
+            print(fws.feature.name)
             for wk in fws.weight_kernels:
                 qq = wk.evaluate(np.arange(10) / 10.0)
                 print(qq)
