@@ -866,4 +866,36 @@ def calculate_weights(
     """
     msg = "Weights calculation Not implemented"
     logger.error(msg)
+
+    # loop the channel weight specs
+    for chws in dec_level_config.channel_weight_specs:
+
+        msg = f"{chws}"
+        logger.info(msg)
+        if chws.combination_style == "multiplication":
+            print(f"chws.combination_style {chws.combination_style}")
+            # loop the feature weight specs
+            for fws in chws.feature_weight_specs:
+                msg = f"feature weight spec: {fws}"
+                logger.info(msg)
+                feature = fws.feature
+                msg = f"feature: {feature}"
+                logger.info(msg)
+                # TODO: confirm that the feature object has its data
+                print(len(feature.data))
+
+                # TODO: Now apply the fws weighting to the feature data
+                #  Hopefully this is independent of the feature.
+
+                for wk in fws.weight_kernels:
+                    print(wk)
+                    msg = "TODO -- finish weighting here"
+                    msg += "\napply weights to data"
+
+                    raise NotImplementedError(msg)
+                print("now Take product of weighted data")
+        else:
+            msg = f"chws.combination_style {chws.combination_style} not implemented"
+            raise ValueError(msg)
+
     return
