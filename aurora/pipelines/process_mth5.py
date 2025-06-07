@@ -726,9 +726,11 @@ def extract_features(
         msg += "Calculating features on the fly (development only)"
         logger.warning(msg)
 
-    for chws in dec_level_config.channel_weight_specs:
+    for (
+        chws
+    ) in dec_level_config.channel_weight_specs:  # This refers to solving a TF equation
         # Loop over features and compute them
-        msg = f"{chws}"
+        msg = f"channel weight spec:\n {chws}"
         logger.info(msg)
         for fws in chws.feature_weight_specs:
             msg = f"feature weight spec: {fws}"
@@ -740,9 +742,10 @@ def extract_features(
             if feature.name == "coherence":
                 msg = f"{feature.name} is not supported as a data weighting feature"
                 logger.warning(msg)
-            elif feature.name == "mulitple_coherence":
+            elif feature.name == "multiple_coherence":
                 msg = f"{feature.name} is not supported as a data weighting feature"
-                raise NotImplementedError(msg)
+                logger.warning(msg)
+                # raise NotImplementedError(msg)
             elif feature.name == "striding_window_coherence":
                 # TODO: review logic in time_series_helpers.run_ts_to_stft.  This logic could be
                 #  modified to work similarly.  Importantly, we need to map the time axis of stft
@@ -762,7 +765,7 @@ def extract_features(
                 #  Desirable to have some "processing_run" iterator supplied by KernelDataset.
                 from aurora.pipelines.time_series_helpers import (
                     truncate_to_clock_zero,
-                )  # TODO: consider storing truncated data
+                )  # TODO: consider storing clock-zero-truncated data
 
                 tmp = tfk_dataset.df.copy(deep=True)
                 group_by = [
@@ -773,7 +776,7 @@ def extract_features(
                 )  # these should have 1 or two rows per group
                 for start, df in grouper:
                     end = df.end.unique()[0]  # nice to have this for info log
-                    logger.info("Access ch1 and ch2 ")
+                    logger.debug("Access ch1 and ch2 ")
                     ch1_row = df[df.station == feature.station1].iloc[0]
                     ch1_data = ch1_row.run_dataarray.to_dataset("channel")[feature.ch1]
                     ch1_data = truncate_to_clock_zero(
