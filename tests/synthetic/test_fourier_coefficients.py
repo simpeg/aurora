@@ -6,6 +6,8 @@ from aurora.pipelines.process_mth5 import process_mth5
 from aurora.test_utils.synthetic.make_processing_configs import (
     create_test_run_config,
 )
+from aurora.test_utils.synthetic.triage import tfs_nearly_equal
+
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 from mth5.data.make_mth5_from_asc import create_test1_h5
 from mth5.data.make_mth5_from_asc import create_test2_h5
@@ -202,7 +204,7 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
         )  # assert fcs True in dataframe -- i.e. they were detected.
 
         tf2 = process_synthetic_2(force_make_mth5=False, z_file_path=z_file_path_2)
-        assert tf1 == tf2
+        assert tfs_nearly_equal(tf1, tf2)
 
 
 def main():

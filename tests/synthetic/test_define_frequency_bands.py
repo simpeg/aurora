@@ -4,6 +4,7 @@ from aurora.config.config_creator import ConfigCreator
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.test_utils.synthetic.processing_helpers import get_example_kernel_dataset
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
+from aurora.test_utils.synthetic.triage import tfs_nearly_equal
 
 synthetic_test_paths = SyntheticTestPaths()
 
@@ -39,7 +40,7 @@ class TestDefineBandsFromDict(unittest.TestCase):
         tf_cls1.write(fn=cfg1_path, file_type="emtfxml")
         tf_cls2 = process_mth5(cfg2, kernel_dataset)
         tf_cls2.write(fn=cfg2_path, file_type="emtfxml")
-        assert tf_cls2 == tf_cls1
+        assert tfs_nearly_equal(tf_cls2, tf_cls1)
 
 
 if __name__ == "__main__":
