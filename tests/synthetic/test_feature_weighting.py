@@ -160,8 +160,8 @@ def load_processing_objects_from_file() -> dict:
     processing_params_jsons["new"] = PROCESSING_TEMPLATES_PATH.joinpath(
         "processing_configuration_with_weights_block.json"
     )
-    processing_objects = {}
 
+    processing_objects = {}
     processing_objects["default"] = _processing_obj_from_json_file(
         processing_params_jsons["default"]
     )
@@ -194,10 +194,10 @@ def load_processing_objects_from_file() -> dict:
     po_dec0 = processing_objects["new"].decimations[0]
     for chws in po_dec0.channel_weight_specs:
         for fws in chws.feature_weight_specs:
-            print(fws.feature.name)
+            # print(fws.feature.name)
             for wk in fws.weight_kernels:
-                qq = wk.evaluate(np.arange(10) / 10.0)
-                print(qq)
+                weight_values = wk.evaluate(np.arange(10) / 10.0)
+                assert (weight_values > 0).all()  # print(weight_values)
     return processing_objects
 
 
