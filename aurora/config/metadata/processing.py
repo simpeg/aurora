@@ -163,8 +163,13 @@ class Processing(AuroraProcessing):
 def _processing_obj_from_json_file(json_path: pathlib.Path) -> Processing:
     """
     Read in a processing parameters json file and return a Processing object.
-    :param json_path: Path to a json file processing parameters
-    :return: Processing object.s
+    Parameters
+    ----------
+    json_path: pathlib.Path
+        Path to a json file containing processing parameters
+
+    Returns
+         processing_obj: Processing
     """
     assert json_path.exists()
     with open(json_path, "r") as f:

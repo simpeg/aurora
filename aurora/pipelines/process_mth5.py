@@ -572,7 +572,7 @@ def process_mth5_legacy(
 
     for i_dec_level, dec_level_config in enumerate(tfk.valid_decimations()):
         # if not tfk.all_fcs_already_exist():
-        tfk.update_dataset_df(i_dec_level)
+        tfk.update_dataset_df(i_dec_level)  # TODO: could add noise here
         tfk.apply_clock_zero(dec_level_config)
 
         stfts = get_spectrograms(tfk, i_dec_level, units=units)
@@ -816,6 +816,8 @@ def extract_features(
                     feature_chunks.append(coherence_spectrogram_xr)
                 feature_data = xr.concat(feature_chunks, "time")
                 feature.data = feature_data  # bind feature data to feature instance (maybe temporal workaround)
+                print("OK")
+
     return
 
 
