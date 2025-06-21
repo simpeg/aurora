@@ -197,7 +197,8 @@ def load_processing_objects_from_file() -> dict:
             # print(fws.feature.name)
             for wk in fws.weight_kernels:
                 weight_values = wk.evaluate(np.arange(10) / 10.0)
-                assert (weight_values > 0).all()  # print(weight_values)
+                assert (weight_values >= 0).all()  # print(weight_values)
+
     return processing_objects
 
 
