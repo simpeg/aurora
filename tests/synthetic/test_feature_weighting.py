@@ -65,22 +65,25 @@ def _load_example_channel_weight_specs(
 
     with open(feature_weight_json, "r") as f:
         data = json.load(f)
-    # If the file is a list or dict, adapt as needed
+
     output = []
     channel_weight_specs = data.get("channel_weight_specs", data)
     for cws_dict in channel_weight_specs:
         cws = ChannelWeightSpec()
         cws.from_dict(cws_dict)
+
         # Modify the feature_weight_specs to only include striding_window_coherence
         if keep_only:
             cws.feature_weight_specs = [
                 fws for fws in cws.feature_weight_specs if fws.feature.name in keep_only
             ]
-            # Ensure that the feature_weight_specs is not empty
+
+        # Ensure that the feature_weight_specs is not empty
         if not cws.feature_weight_specs:
             raise ValueError(
                 "No valid feature_weight_specs found in channel weight spec."
             )
+
         output.append(cws)
 
     return output
@@ -155,7 +158,7 @@ def load_processing_objects_from_file() -> dict:
         "processing_configuration_template.json"
     )
     processing_params_jsons["new"] = PROCESSING_TEMPLATES_PATH.joinpath(
-        "test_processing_config_with_weights_block.json"
+        "processing_configuration_with_weights_block.json"
     )
     processing_objects = {}
 
