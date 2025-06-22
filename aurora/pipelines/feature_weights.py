@@ -194,6 +194,8 @@ def calculate_weights(
         logger.info(msg)
         if chws.combination_style == "multiplication":
             print(f"chws.combination_style {chws.combination_style}")
+
+            weights = None
             # loop the feature weight specs
             for fws in chws.feature_weight_specs:
                 msg = f"feature weight spec: {fws}"
@@ -213,7 +215,7 @@ def calculate_weights(
                     else:
                         weights *= wk.evaluate(feature.data)
                 # chws.weights[fws.feature.name] = weights
-                chws.weights = weights
+            chws.weights = weights
 
         else:
             msg = f"chws.combination_style {chws.combination_style} not implemented"
