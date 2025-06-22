@@ -14,16 +14,20 @@ to do this, start by plotting the striding_window_cohernece in aurora
 to make sure that we have a baseline coherence to compare against when
 we provide degraded data.
 
+2. For this test, the results will be more dramatic if we use single
+station processing -- so modify the processing config to set RME (not RME_RR)
 """
 
 from aurora.config.metadata import Processing
 from aurora.config.metadata.processing import _processing_obj_from_json_file
+from aurora.general_helper_functions import TEST_PATH
 from aurora.general_helper_functions import PROCESSING_TEMPLATES_PATH
 from aurora.general_helper_functions import MT_METADATA_FEATURES_TEST_HELPERS_PATH
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 from mth5.data.make_mth5_from_asc import create_test1_h5
 from mth5.data.make_mth5_from_asc import create_test12rr_h5
+from mth5.mth5 import MTH5
 from mt_metadata.features.weights.channel_weight_spec import ChannelWeightSpec
 
 import json
@@ -32,6 +36,71 @@ import pathlib
 import unittest
 
 import mt_metadata.transfer_functions
+
+from loguru import logger
+from mth5.timeseries import ChannelTS, RunTS
+from typing import Optional
+
+
+def create_synthetic_mth5_with_noise(
+    source_file: Optional[pathlib.Path] = None,
+    target_file: Optional[pathlib.Path] = None,
+    noise_channels=("ex", "hy"),
+    frac=0.75,
+    noise_level=1000.0,
+    seed=None,
+):
+    """
+    Copy a synthetic MTH5, injecting noise into specified channels for a fraction of the data.
+    """
+    if source_file is None:
+        source_file = create_test1_h5(
+            file_version="0.1.0",
+            channel_nomenclature="default",
+            force_make_mth5=True,
+            target_folder=TEST_PATH.joinpath("synthetic"),
+        )
+    if target_file is None:
+        target_file = TEST_PATH.joinpath("synthetic", "test1_noisy.h5")
+        if target_file.exists():
+            target_file.unlink()
+    if seed is None:
+        seed = 42  # Default seed for reproducibility
+
+    rng = np.random.default_rng(seed)
+    m_source = MTH5(source_file)
+    m_source.open_mth5(mode="r")
+    m_target = MTH5(target_file, file_version=m_source.file_version)
+    m_target.open_mth5(mode="w")
+
+    for station_id in m_source.station_list:
+        station = m_source.get_station(station_id)
+        if station_id not in m_target.station_list:
+            m_target.add_station(station_id, station_metadata=station.metadata)
+        for run_id in station.run_summary["id"].unique():
+            run = station.get_run(run_id)
+            ch_list = []
+            for ch in run.channel_summary.component.to_list():
+                ch_obj = run.get_channel(ch)
+                ch_ts = ch_obj.to_channel_ts()
+                data = ch_ts.data_array.data.copy()
+                n = len(data)
+                if ch in noise_channels:
+                    noisy_idx = slice(0, int(frac * n))
+                    noise = rng.normal(0, noise_level, size=data[noisy_idx].shape)
+                    noise = noise.astype(
+                        data.dtype
+                    )  # Ensure noise is the same dtype as data
+                    data[noisy_idx] += noise
+                ch_ts.data_array.data = data
+                ch_list.append(ch_ts)
+            runts = RunTS(array_list=ch_list, run_metadata=run.metadata)
+            runts.run_metadata.id = run_id
+            target_station = m_target.get_station(station_id)
+            target_station.add_run(run_id).from_runts(runts)
+    m_source.close_mth5()
+    m_target.close_mth5()
+    return target_file
 
 
 def _load_example_channel_weight_specs(
@@ -77,14 +146,20 @@ def _load_example_channel_weight_specs(
             cws.feature_weight_specs = [
                 fws for fws in cws.feature_weight_specs if fws.feature.name in keep_only
             ]
+            # get rid of Remote reference channels (work in progress)
+            cws.feature_weight_specs = [
+                fws for fws in cws.feature_weight_specs if fws.feature.ch2 != "rx"
+            ]
+            cws.feature_weight_specs = [
+                fws for fws in cws.feature_weight_specs if fws.feature.ch2 != "ry"
+            ]
 
         # Ensure that the feature_weight_specs is not empty
         if not cws.feature_weight_specs:
-            raise ValueError(
-                "No valid feature_weight_specs found in channel weight spec."
-            )
-
-        output.append(cws)
+            msg = "No valid feature_weight_specs found in channel weight spec."
+            logger.error(msg)
+        else:
+            output.append(cws)
 
     return output
 
@@ -128,10 +203,18 @@ def tst_feature_weights(
     run_summary.from_mth5s(list((mth5_path,)))
 
     kernel_dataset = KernelDataset()
-    kernel_dataset.from_run_summary(run_summary, "test1", "test2")
+    # kernel_dataset.from_run_summary(run_summary, "test1", "test2")
+    # config = processing_obj
+    # z_file = "test1_RRtest2.zrr"
 
-    # Define the processing Configuration
+    kernel_dataset.from_run_summary(run_summary, "test1")
     config = processing_obj
+    config.stations.remote = []  # TODO: allow this to be False
+    for dec in config.decimations:
+        dec.estimator.engine = "RME"
+        dec.reference_channels = []
+    z_file = "test1.zss"
+
     # cc = ConfigCreator()
     # config = cc.create_from_kernel_dataset(kernel_dataset)
 
@@ -139,7 +222,8 @@ def tst_feature_weights(
         config,
         kernel_dataset,
         units="MT",
-        z_file_path="test1_RRtest2.zrr",
+        z_file_path=z_file,
+        show_plot=True,
     )
     return tf_cls
 
@@ -199,17 +283,19 @@ def load_processing_objects_from_file() -> dict:
                 weight_values = wk.evaluate(np.arange(10) / 10.0)
                 assert (weight_values >= 0).all()  # print(weight_values)
 
-    return processing_objects
-
 
 def main():
-    synthetic_test_paths = SyntheticTestPaths()
-    mth5_path = synthetic_test_paths.mth5_path.joinpath("test12rr.h5")
+    # Create a synthetic mth5 file for testing
+    mth5_path = create_synthetic_mth5_with_noise()
+    mth5_path = TEST_PATH.joinpath("synthetic", "test1.h5")
+    mth5_path = TEST_PATH.joinpath("synthetic", "test1_noisy.h5")
+    # synthetic_test_paths = SyntheticTestPaths()
+    # mth5_path = synthetic_test_paths.mth5_path.joinpath("test12rr.h5")
     processing_objects = load_processing_objects_from_file()
 
-    # print(processing_objects["default"])
+    # # print(processing_objects["default"])
     # tst_feature_weights(mth5_path,  processing_objects["default"])
-    # print("OK-1")
+    # # print("OK-1")
     tst_feature_weights(mth5_path, processing_objects["use_this"])
     print("OK-2")
 
