@@ -791,7 +791,7 @@ def extract_features(
                     logger.info(msg)
                     # Compute the feature.
                     freqs, coherence_spectrogram = feature.compute(ch1_data, ch2_data)
-
+                    # TODO: consider making get_time_axis() a method of the feature class
                     # Get Time Axis (See Development Note #4)
                     # now create a WindowedTimeSeries and get the time axis")
                     from aurora.time_series.windowing_scheme import (
@@ -816,7 +816,6 @@ def extract_features(
                     feature_chunks.append(coherence_spectrogram_xr)
                 feature_data = xr.concat(feature_chunks, "time")
                 feature.data = feature_data  # bind feature data to feature instance (maybe temporal workaround)
-                print("OK")
 
     return
 
@@ -869,8 +868,6 @@ def calculate_weights(
     -------
 
     """
-    msg = "Weights calculation Not implemented"
-    logger.error(msg)
 
     # loop the channel weight specs
     for chws in dec_level_config.channel_weight_specs:
@@ -887,18 +884,19 @@ def calculate_weights(
                 msg = f"feature: {feature}"
                 logger.info(msg)
                 # TODO: confirm that the feature object has its data
-                print(len(feature.data))
+                print("feature.data", feature.data, len(feature.data))
 
                 # TODO: Now apply the fws weighting to the feature data
                 #  Hopefully this is independent of the feature.
-
+                weights = None
                 for wk in fws.weight_kernels:
-                    print(wk)
-                    msg = "TODO -- finish weighting here"
-                    msg += "\napply weights to data"
+                    if weights is None:
+                        weights = wk.evaluate(feature.data)
+                    else:
+                        weights *= wk.evaluate(feature.data)
+                # chws.weights[fws.feature.name] = weights
+                chws.weights = weights
 
-                    raise NotImplementedError(msg)
-                print("now Take product of weighted data")
         else:
             msg = f"chws.combination_style {chws.combination_style} not implemented"
             raise ValueError(msg)
