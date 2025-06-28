@@ -236,10 +236,10 @@ class ZFile:
         u[hx_index, hy_index] = np.sin(
             (self.orientation[hx_index, 0] - angle) * np.pi / 180.0
         )
-        u[hy_index, hx_index] = np.cos(
+        u[hy_index, hx_index] = np.sin(
             (self.orientation[hy_index, 0] - angle) * np.pi / 180.0
         )
-        u[hy_index, hy_index] = np.sin(
+        u[hy_index, hy_index] = np.cos(
             (self.orientation[hy_index, 0] - angle) * np.pi / 180.0
         )
         u = np.linalg.inv(u)  # Identity if angle=0
