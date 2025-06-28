@@ -381,26 +381,13 @@ def process_transfer_functions_with_weights(
                 #  This is a temporary solution and should be replaced with a more robust method.
                 # band_weights = chws.get_weights_for_band(band)
                 band_weights = weights.mean(axis=1)  # chws.get_weights_for_band(band)
-                # print(
-                #     f" \n X shapes: {[v.shape for v in X.data_vars.values()]}, \
-                #       \n Y shape: {[v.shape for v in Y_ch.data_vars.values()]}, "
-                # )
-                # print(f"band weights shape {band_weights.shape}")
+
                 apply_weights(
                     X, Y_ch, RR, band_weights.squeeze(), segment=True, dropna=False
                 )
-                # print(
-                #     f" \n X shapes: {[v.shape for v in X.data_vars.values()]}, \
-                #       \n Y shape: {[v.shape for v in Y_ch.data_vars.values()]}, "
-                # )
-                # print(f"band weights shape {band_weights.shape}")
 
             # Reshape to 2d
             X, Y_ch, RR = stack_fcs(X, Y_ch, RR)
-            # print(
-            #     f"L395 \n X shapes: {[v.shape for v in X.data_vars.values()]}, \
-            #           \n Y shape: {[v.shape for v in Y_ch.data_vars.values()]}, "
-            # )
             # Should only be needed if weights were applied
             # X, Y_ch, RR = handle_nan(X, Y_ch, RR)
             X, Y_ch, RR = drop_nans(X, Y_ch, RR)
