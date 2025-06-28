@@ -94,32 +94,46 @@ def set_up_iter_control(config: AuroraDecimationLevel):
 
 def drop_nans(X: xr.Dataset, Y: xr.Dataset, RR: Union[xr.Dataset, None]) -> tuple:
     """
-
-    Drops Nan from any input xarrays.
-    - Just a helper intended to enhance readability
-
-    Development Notes:
-        TODO: document the implications of dropna on index of xarray for other weights
-
-    Parameters
-    ----------
-    X: xr.Dataset
-        The input data for regression
-    Y: xr.Dataset
-        The output data for regression
-    RR: Union[xr.Dataset, None]
-        The remote refernce data for regression
-
-    Returns
-    -------
-    X, Y, RR: tuple
-        Returns the input arugments with nan dropped form the xarrays.
-
+    Drops any observation where any variable in X, Y, or RR is NaN.
     """
-    X = X.dropna(dim="observation")
-    Y = Y.dropna(dim="observation")
+    import numpy as np
+
+    def get_obs_mask(ds):
+        """
+        Generate a boolean mask indicating which 'observation' entries are finite across all data variables in an xarray Dataset.
+
+        This function iterates over all data variables in the provided xarray Dataset `ds`, checks for finite values (i.e., not NaN or infinite)
+        along all axes except the 'observation' axis, and combines the results to produce a single boolean mask. The resulting mask is True
+        for each 'observation' index where all data variables are finite, and False otherwise.
+
+
+        Parameters
+        ds : xarray.Dataset
+            The input dataset containing data variables with an 'observation' dimension.
+
+        Returns
+        numpy.ndarray
+            A boolean array with shape matching the 'observation' dimension, where True indicates all data variables are finite
+        """
+        mask = None
+        for v in ds.data_vars.values():
+            # Reduce all axes except 'observation'
+            axes = tuple(i for i, d in enumerate(v.dims) if d != "observation")
+            this_mask = np.isfinite(v)
+            if axes:
+                this_mask = this_mask.all(axis=axes)
+            mask = this_mask if mask is None else mask & this_mask
+        return mask
+
+    mask = get_obs_mask(X)
+    mask = mask & get_obs_mask(Y)
     if RR is not None:
-        RR = RR.dropna(dim="observation")
+        mask = mask & get_obs_mask(RR)
+
+    X = X.isel(observation=mask)
+    Y = Y.isel(observation=mask)
+    if RR is not None:
+        RR = RR.isel(observation=mask)
     return X, Y, RR
 
 
@@ -295,26 +309,115 @@ def process_transfer_functions(
     return transfer_function_obj
 
 
-# def select_channel(xrda: xr.DataArray, channel_label):
-#     """
-#     Returns the channel specified by input channel_label as xarray.
-#
-#     - Extra helper function to make process_transfer_functions more readable without
-#     black (the uncompromising formatter) forcing multiple lines.
-#
-#     Parameters
-#     ----------
-#     xrda:
-#     channel_label
-#
-#     Returns
-#     -------
-#     ch: xr.Dataset
-#         The channel specified by input channel_label as an xarray.
-#     """
-#     ch = xrda.sel(
-#         channel=[
-#             channel_label,
-#         ]
-#     )
-#     return ch
+def process_transfer_functions_with_weights(
+    dec_level_config: AuroraDecimationLevel,
+    local_stft_obj: xr.Dataset,
+    remote_stft_obj: xr.Dataset,
+    transfer_function_obj,
+    segment_weights_obj: Optional[dict] = None,
+    channel_weights_obj: Optional[dict] = None,
+):
+    """
+        This is another version of process_transfer_functions that applies weights to the data.
+
+    Development Notes:
+    Note #1: This is only for per-channel estimation, so it does not support the
+    dec_level_config.estimator.estimate_per_channel = False
+    Note #2: This was adapted from the process_transfer_functions method but the core loop
+    is inverted to loop over channels first, then bands.
+
+    Parameters
+    ----------
+    dec_level_config: AuroraDecimationLevel
+        Processing parameters for the active decimation level.
+    local_stft_obj: xarray.core.dataset.Dataset
+    remote_stft_obj: xarray.core.dataset.Dataset or None
+    transfer_function_obj: aurora.transfer_function.TTFZ.TTFZ
+        The transfer function container ready to receive values in this method.
+    segment_weights : numpy array or list of strings
+        1D array which should be of the same length as the time axis of the STFT objects
+        If these weights are zero anywhere, we drop all that segment across all channels
+        If it is a list of strings, each string corresponds to a weighting
+        algorithm to be applied.
+        ["jackknife_jj84", "multiple_coherence", "simple_coherence"]
+    channel_weights : dict of numpy arrays or None
+
+    Returns
+    -------
+    transfer_function_obj: aurora.transfer_function.TTFZ.TTFZ
+    """
+    if not dec_level_config.estimator.estimate_per_channel:
+        msg = (
+            "process_transfer_functions_with_weights is only for per-channel estimation"
+        )
+        logger.error(msg)
+        raise ValueError(msg)
+
+    estimator_class: RegressionEstimator = get_estimator_class(
+        dec_level_config.estimator.engine
+    )
+    iter_control = set_up_iter_control(dec_level_config)
+    for ch in dec_level_config.output_channels:
+
+        # check if there are channel weights for this channel
+        weights = None
+        for chws in dec_level_config.channel_weight_specs:
+            if ch in chws.output_channels:
+                weights = chws.weights
+
+        for band in transfer_function_obj.frequency_bands.bands():
+
+            X, Y, RR = get_band_for_tf_estimate(
+                band, dec_level_config, local_stft_obj, remote_stft_obj
+            )
+            Y_ch = Y[ch].to_dataset()  # keep as a dataset, maybe not needed
+            if weights is not None:
+                # now we need to extract the weights for this band
+
+                # TODO: Investigate best way to extract the weights for band
+                #  This may involve finding the nearest frequency bin to the band center period
+                #  and then applying the weights for that bin, or some tapered region around it.
+                #  For now, we will just use the mean of the weights for the band.
+                #  This is a temporary solution and should be replaced with a more robust method.
+                # band_weights = chws.get_weights_for_band(band)
+                band_weights = weights.mean(axis=1)  # chws.get_weights_for_band(band)
+                # print(
+                #     f" \n X shapes: {[v.shape for v in X.data_vars.values()]}, \
+                #       \n Y shape: {[v.shape for v in Y_ch.data_vars.values()]}, "
+                # )
+                # print(f"band weights shape {band_weights.shape}")
+                apply_weights(
+                    X, Y_ch, RR, band_weights.squeeze(), segment=True, dropna=False
+                )
+                # print(
+                #     f" \n X shapes: {[v.shape for v in X.data_vars.values()]}, \
+                #       \n Y shape: {[v.shape for v in Y_ch.data_vars.values()]}, "
+                # )
+                # print(f"band weights shape {band_weights.shape}")
+
+            # Reshape to 2d
+            X, Y_ch, RR = stack_fcs(X, Y_ch, RR)
+            # print(
+            #     f"L395 \n X shapes: {[v.shape for v in X.data_vars.values()]}, \
+            #           \n Y shape: {[v.shape for v in Y_ch.data_vars.values()]}, "
+            # )
+            # Should only be needed if weights were applied
+            # X, Y_ch, RR = handle_nan(X, Y_ch, RR)
+            X, Y_ch, RR = drop_nans(X, Y_ch, RR)
+            # print(
+            #     f"L399 \n X shapes: {[v.shape for v in X.data_vars.values()]}, \
+            #           \n Y shape: {[v.shape for v in Y_ch.data_vars.values()]}, "
+            # )
+
+            W = effective_degrees_of_freedom_weights(X, RR, edf_obj=None)
+            # print(f"L404 W shape {W.shape}")
+
+            X, Y_ch, RR = apply_weights(X, Y_ch, RR, W, segment=False, dropna=True)
+            X_, Y_, RR_ = handle_nan(X, Y_ch, RR, drop_dim="observation")
+            regression_estimator = estimator_class(
+                X=X_, Y=Y_, Z=RR_, iter_control=iter_control
+            )
+            regression_estimator.estimate()
+            transfer_function_obj.set_tf(regression_estimator, band.center_period)
+
+    return transfer_function_obj
