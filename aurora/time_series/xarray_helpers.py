@@ -31,6 +31,8 @@ def handle_nan(
     input_channels to X.data_vars.  In general, this method could be robustified by
     renaming all the data_vars with a prefix, not just the reference channels
 
+    TODO: Merge this with drop_nan in transfer_function_helpers.py
+
     Parameters
     ----------
     X : xr.Dataset
