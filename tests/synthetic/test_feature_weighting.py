@@ -46,7 +46,7 @@ def create_synthetic_mth5_with_noise(
     source_file: Optional[pathlib.Path] = None,
     target_file: Optional[pathlib.Path] = None,
     noise_channels=("ex", "hy"),
-    frac=0.75,
+    frac=0.5,
     noise_level=1000.0,
     seed=None,
 ):
@@ -188,8 +188,7 @@ def _load_example_channel_weight_specs(
 
 
 def tst_feature_weights(
-    mth5_path: pathlib.Path,
-    processing_obj: Processing,
+    mth5_path: pathlib.Path, processing_obj: Processing, z_file="test1.zss"
 ) -> mt_metadata.transfer_functions.TF:
     """
     Executes aurora processing on mth5_path, and returns mt_metadata TF object.
@@ -213,7 +212,6 @@ def tst_feature_weights(
     for dec in config.decimations:
         dec.estimator.engine = "RME"
         dec.reference_channels = []
-    z_file = "test1.zss"
 
     # cc = ConfigCreator()
     # config = cc.create_from_kernel_dataset(kernel_dataset)
@@ -223,7 +221,7 @@ def tst_feature_weights(
         kernel_dataset,
         units="MT",
         z_file_path=z_file,
-        show_plot=True,
+        show_plot=False,
     )
     return tf_cls
 
@@ -278,25 +276,44 @@ def load_processing_objects_from_file() -> dict:
     po_dec0 = processing_objects["new"].decimations[0]
     for chws in po_dec0.channel_weight_specs:
         for fws in chws.feature_weight_specs:
-            # print(fws.feature.name)
             for wk in fws.weight_kernels:
                 weight_values = wk.evaluate(np.arange(10) / 10.0)
                 assert (weight_values >= 0).all()  # print(weight_values)
+    return processing_objects
 
 
 def main():
+    SYNTHETIC_FOLDER = TEST_PATH.joinpath("synthetic")
     # Create a synthetic mth5 file for testing
     mth5_path = create_synthetic_mth5_with_noise()
-    mth5_path = TEST_PATH.joinpath("synthetic", "test1.h5")
-    mth5_path = TEST_PATH.joinpath("synthetic", "test1_noisy.h5")
-    # synthetic_test_paths = SyntheticTestPaths()
-    # mth5_path = synthetic_test_paths.mth5_path.joinpath("test12rr.h5")
+    mth5_path = SYNTHETIC_FOLDER.joinpath("test1.h5")
+    mth5_path = SYNTHETIC_FOLDER.joinpath("test1_noisy.h5")
+
     processing_objects = load_processing_objects_from_file()
+    json_str = processing_objects["use_this"].to_json()
+    with open(SYNTHETIC_FOLDER.joinpath("used_processing.json"), "w") as f:
+        f.write(json_str)
 
     # # print(processing_objects["default"])
-    # tst_feature_weights(mth5_path,  processing_objects["default"])
-    # # print("OK-1")
-    tst_feature_weights(mth5_path, processing_objects["use_this"])
+    tst_feature_weights(
+        mth5_path, processing_objects["default"], z_file="test1_default.zss"
+    )
+    tst_feature_weights(
+        mth5_path, processing_objects["use_this"], z_file="test1_weights.zss"
+    )
+    from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
+
+    compare_two_z_files(
+        z_path1=SYNTHETIC_FOLDER.joinpath("test1_default.zss"),
+        z_path2=SYNTHETIC_FOLDER.joinpath("test1_weights.zss"),
+        label1="default",
+        label2="weights",
+        scale_factor1=1,
+        out_file="output_png.png",
+        markersize=3,
+        rho_ylims=[1e-2, 5e2],
+        xlims=[1.0, 500],
+    )
     print("OK-2")
 
 
