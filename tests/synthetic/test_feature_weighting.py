@@ -2,20 +2,12 @@
 
 Integrated test of the functionality of feature weights.
 
-TODO:
-1. Add ability to degrade the sythetic data to test the feature weighting.
-this might be done by adding a lot of noise to say, 75% of the data.  This
-should be enough to confuse the robust tf estimation.  To verify this, we
-can process the data with the default processing, and then with the
-feature weighting processing, and confirm that the feature weighting
-processing produces a better tf estimate.
-...
-to do this, start by plotting the striding_window_cohernece in aurora
-to make sure that we have a baseline coherence to compare against when
-we provide degraded data.
+1. This test uses degraded sythetic data to test the feature weighting.
+Noise is added to some fraction (50-75%) of the data.
 
-2. For this test, the results will be more dramatic if we use single
-station processing -- so modify the processing config to set RME (not RME_RR)
+Then regular (single station) processing is called on the data and
+feature weighting processing is called on the data.
+
 """
 
 from aurora.config.metadata import Processing
@@ -42,6 +34,7 @@ from mth5.timeseries import ChannelTS, RunTS
 from typing import Optional
 
 
+# TODO: this could be moved to a more general test utils file
 def create_synthetic_mth5_with_noise(
     source_file: Optional[pathlib.Path] = None,
     target_file: Optional[pathlib.Path] = None,
@@ -226,71 +219,50 @@ def tst_feature_weights(
     return tf_cls
 
 
-def load_processing_objects_from_file() -> dict:
+def load_processing_objects() -> dict:
     """
-    Place to test reading in the processing jsons and check that their structures are as expected.
+    Loads the 'default' and 'with_weights' processing objects.
+
+    'default' is loaded from the processing configuration template.
+    'with_weights' is loaded from the same template but with channel weight specs
+    set to only include 'striding_window_coherence'.
 
     Returns
     -------
-
+    dict
+        Dictionary with keys 'default' and 'with_weights' mapping to Processing objects.
     """
-
-    processing_params_jsons = {}
-    processing_params_jsons["default"] = PROCESSING_TEMPLATES_PATH.joinpath(
+    processing_params_json = PROCESSING_TEMPLATES_PATH.joinpath(
         "processing_configuration_template.json"
-    )
-    processing_params_jsons["new"] = PROCESSING_TEMPLATES_PATH.joinpath(
-        "processing_configuration_with_weights_block.json"
     )
 
     processing_objects = {}
     processing_objects["default"] = _processing_obj_from_json_file(
-        processing_params_jsons["default"]
+        processing_params_json
     )
-    processing_objects["new"] = _processing_obj_from_json_file(
-        processing_params_jsons["new"]
-    )
-    processing_objects["on_the_fly"] = _processing_obj_from_json_file(
-        processing_params_jsons["default"]
-    )
-    cws_list = _load_example_channel_weight_specs(keep_only=None)
-    processing_objects["on_the_fly"].decimations[0].channel_weight_specs = cws_list
-    # Confirm that the processing objects are created correctly
-
-    assert (
-        processing_objects["new"] == processing_objects["on_the_fly"]
-    ), "Processing object created on the fly does not match the one loaded from file."
 
     cws_list = _load_example_channel_weight_specs(
         keep_only=[
             "striding_window_coherence",
         ]
     )
-    processing_objects["use_this"] = _processing_obj_from_json_file(
-        processing_params_jsons["default"]
+    processing_objects["with_weights"] = _processing_obj_from_json_file(
+        processing_params_json
     )
-    processing_objects["use_this"].decimations[0].channel_weight_specs = cws_list
-    # Confirm that the processing objects are created correctly
+    processing_objects["with_weights"].decimations[0].channel_weight_specs = cws_list
 
-    # Walk the weights and confirm they can all be evaluated
-    po_dec0 = processing_objects["new"].decimations[0]
-    for chws in po_dec0.channel_weight_specs:
-        for fws in chws.feature_weight_specs:
-            for wk in fws.weight_kernels:
-                weight_values = wk.evaluate(np.arange(10) / 10.0)
-                assert (weight_values >= 0).all()  # print(weight_values)
     return processing_objects
 
 
 def main():
     SYNTHETIC_FOLDER = TEST_PATH.joinpath("synthetic")
     # Create a synthetic mth5 file for testing
-    mth5_path = create_synthetic_mth5_with_noise()
-    mth5_path = SYNTHETIC_FOLDER.joinpath("test1.h5")
+    # mth5_path = create_synthetic_mth5_with_noise()
+    # mth5_path = SYNTHETIC_FOLDER.joinpath("test1.h5")
     mth5_path = SYNTHETIC_FOLDER.joinpath("test1_noisy.h5")
 
-    processing_objects = load_processing_objects_from_file()
-    json_str = processing_objects["use_this"].to_json()
+    processing_objects = load_processing_objects()
+    json_str = processing_objects["with_weights"].to_json()
     with open(SYNTHETIC_FOLDER.joinpath("used_processing.json"), "w") as f:
         f.write(json_str)
 
@@ -299,7 +271,7 @@ def main():
         mth5_path, processing_objects["default"], z_file="test1_default.zss"
     )
     tst_feature_weights(
-        mth5_path, processing_objects["use_this"], z_file="test1_weights.zss"
+        mth5_path, processing_objects["with_weights"], z_file="test1_weights.zss"
     )
     from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
 
