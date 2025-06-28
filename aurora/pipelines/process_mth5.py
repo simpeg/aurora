@@ -39,6 +39,7 @@ from aurora.pipelines.time_series_helpers import calibrate_stft_obj
 from aurora.pipelines.time_series_helpers import run_ts_to_stft
 from aurora.pipelines.transfer_function_helpers import (
     process_transfer_functions,
+    process_transfer_functions_with_weights,
 )
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
 from aurora.pipelines.transfer_function_kernel import station_obj_from_row
@@ -217,14 +218,26 @@ def process_tf_decimation_level(
     else:
         segment_weights_obj = None
 
-    transfer_function_obj = process_transfer_functions(
-        dec_level_config=dec_level_config,
-        local_stft_obj=local_stft_obj,
-        remote_stft_obj=remote_stft_obj,
-        transfer_function_obj=transfer_function_obj,
-        segment_weights_obj=segment_weights_obj,
-    )
-
+    try:
+        transfer_function_obj = process_transfer_functions_with_weights(
+            dec_level_config=dec_level_config,
+            local_stft_obj=local_stft_obj,
+            remote_stft_obj=remote_stft_obj,
+            transfer_function_obj=transfer_function_obj,
+            segment_weights_obj=segment_weights_obj,
+        )
+    except Exception as e:
+        msg = (
+            f"Processing transfer functions with weights failed for decimation level {i_dec_level} "
+            f"with exception: {e}"
+        )
+        logger.warning(msg)
+        transfer_function_obj = process_transfer_functions(
+            dec_level_config=dec_level_config,
+            local_stft_obj=local_stft_obj,
+            remote_stft_obj=remote_stft_obj,
+            transfer_function_obj=transfer_function_obj,
+        )
     return transfer_function_obj
 
 
@@ -583,12 +596,12 @@ def process_mth5_legacy(
 
         # FC TF Interface here (see Note #3)
         try:
+            # Feature Extraction, Selection of weights
             extract_features(dec_level_config, tfk_dataset)
             calculate_weights(dec_level_config, tfk_dataset)
         except Exception as e:
-            msg = f"Features could not be accessed -- {e}"
+            msg = f"Feature weights calculation Failed -- procesing without weights -- {e}"
             logger.warning(msg)
-        # Feature Extraction, Selection of weights
 
         ttfz_obj = process_tf_decimation_level(
             tfk.config,
