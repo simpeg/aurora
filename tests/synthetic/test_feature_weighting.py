@@ -157,45 +157,6 @@ def _load_example_channel_weight_specs(
     return output
 
 
-def tst_feature_weights(
-    mth5_path: pathlib.Path, processing_obj: Processing, z_file="test1.zss"
-) -> mt_metadata.transfer_functions.TF:
-    """
-    Executes aurora processing on mth5_path, and returns mt_metadata TF object.
-
-    """
-    from aurora.general_helper_functions import PROCESSING_TEMPLATES_PATH
-    from aurora.config.config_creator import ConfigCreator
-    from mth5.processing import RunSummary, KernelDataset
-
-    run_summary = RunSummary()
-    run_summary.from_mth5s(list((mth5_path,)))
-
-    kernel_dataset = KernelDataset()
-    # kernel_dataset.from_run_summary(run_summary, "test1", "test2")
-    # config = processing_obj
-    # z_file = "test1_RRtest2.zrr"
-
-    kernel_dataset.from_run_summary(run_summary, "test1")
-    config = processing_obj
-    config.stations.remote = []  # TODO: allow this to be False
-    for dec in config.decimations:
-        dec.estimator.engine = "RME"
-        dec.reference_channels = []
-
-    # cc = ConfigCreator()
-    # config = cc.create_from_kernel_dataset(kernel_dataset)
-
-    tf_cls = process_mth5(
-        config,
-        kernel_dataset,
-        units="MT",
-        z_file_path=z_file,
-        show_plot=False,
-    )
-    return tf_cls
-
-
 def load_processing_objects() -> dict:
     """
     Loads the 'default' and 'with_weights' processing objects.
@@ -231,6 +192,37 @@ def load_processing_objects() -> dict:
     return processing_objects
 
 
+def process_mth5_with_config(
+    mth5_path: pathlib.Path, processing_obj: Processing, z_file="test1.zss"
+) -> mt_metadata.transfer_functions.TF:
+    """
+    Executes aurora processing on mth5_path, and returns mt_metadata TF object.
+
+    """
+    from mth5.processing import RunSummary, KernelDataset
+
+    run_summary = RunSummary()
+    run_summary.from_mth5s(list((mth5_path,)))
+
+    kernel_dataset = KernelDataset()
+    kernel_dataset.from_run_summary(run_summary, "test1")
+    config = processing_obj
+    config.stations.remote = []  # TODO: allow this to be False
+    for dec in config.decimations:
+        dec.estimator.engine = "RME"
+        dec.reference_channels = []
+
+    tf_cls = process_mth5(
+        config,
+        kernel_dataset,
+        units="MT",
+        z_file_path=z_file,
+        show_plot=False,
+    )
+    return tf_cls
+
+
+# Uncomment the blocks below to run the test as a script
 def main():
     SYNTHETIC_FOLDER = TEST_PATH.joinpath("synthetic")
     # Create a synthetic mth5 file for testing
@@ -238,15 +230,16 @@ def main():
     # mth5_path = SYNTHETIC_FOLDER.joinpath("test1_noisy.h5")
 
     processing_objects = load_processing_objects()
-    json_str = processing_objects["with_weights"].to_json()
-    with open(SYNTHETIC_FOLDER.joinpath("used_processing.json"), "w") as f:
-        f.write(json_str)
 
-    # # print(processing_objects["default"])
-    tst_feature_weights(
+    # TODO: compare this against stored template
+    # json_str = processing_objects["with_weights"].to_json()
+    # with open(SYNTHETIC_FOLDER.joinpath("used_processing.json"), "w") as f:
+    #     f.write(json_str)
+
+    process_mth5_with_config(
         mth5_path, processing_objects["default"], z_file="test1_default.zss"
     )
-    tst_feature_weights(
+    process_mth5_with_config(
         mth5_path, processing_objects["with_weights"], z_file="test1_weights.zss"
     )
     from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
@@ -262,9 +255,7 @@ def main():
         rho_ylims=[1e-2, 5e2],
         xlims=[1.0, 500],
     )
-    print("OK-2")
 
 
 if __name__ == "__main__":
     main()
-    print("OK-OK")
