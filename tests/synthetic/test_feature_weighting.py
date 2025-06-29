@@ -157,29 +157,6 @@ def _load_example_channel_weight_specs(
     return output
 
 
-# class TestFeatureWeighting(unittest.TestCase):
-#     """ """
-#
-#     @classmethod
-#     def setUpClass(cls):
-#         synthetic_test_paths = SyntheticTestPaths()
-#         self.mth5_path = synthetic_test_paths.mth5_path.joinpath("test12rr.h5")
-#
-#
-#         pass
-#
-#     def setUp(self):
-#         pass
-#
-#     def test_supported_band_specification_styles(self):
-#         cc = ConfigCreator()
-#         # confirm that we are restricting scope of styles
-#         with self.assertRaises(NotImplementedError):
-
-
-# Set UP Class stuffs
-
-
 def tst_feature_weights(
     mth5_path: pathlib.Path, processing_obj: Processing, z_file="test1.zss"
 ) -> mt_metadata.transfer_functions.TF:
@@ -257,9 +234,8 @@ def load_processing_objects() -> dict:
 def main():
     SYNTHETIC_FOLDER = TEST_PATH.joinpath("synthetic")
     # Create a synthetic mth5 file for testing
-    # mth5_path = create_synthetic_mth5_with_noise()
-    # mth5_path = SYNTHETIC_FOLDER.joinpath("test1.h5")
-    mth5_path = SYNTHETIC_FOLDER.joinpath("test1_noisy.h5")
+    mth5_path = create_synthetic_mth5_with_noise()
+    # mth5_path = SYNTHETIC_FOLDER.joinpath("test1_noisy.h5")
 
     processing_objects = load_processing_objects()
     json_str = processing_objects["with_weights"].to_json()
