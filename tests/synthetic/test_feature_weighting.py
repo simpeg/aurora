@@ -222,8 +222,95 @@ def process_mth5_with_config(
     return tf_cls
 
 
+def print_apparent_resistivity(tf, label="TF"):
+    """
+    Print apparent resistivity and phase for each period/frequency in the TF object.
+    Returns the mean apparent resistivity (averaged over all frequencies and both Zxy/Zyx).
+    """
+    if not hasattr(tf, "impedance"):
+        print(f"{label}: TF object missing impedance attribute.")
+        return np.nan
+    z = tf.impedance
+    print(
+        f"{label} impedance shape: {getattr(z, 'shape', None)}, dims: {getattr(z, 'dims', None)}"
+    )
+
+    # Get period and convert to frequency
+    if hasattr(tf, "period"):
+        period = np.array(tf.period)
+        freq = 1.0 / period
+    elif hasattr(tf, "frequency"):
+        freq = np.array(tf.frequency)
+    else:
+        print(f"{label}: TF object missing period/frequency attribute.")
+        return np.nan
+
+    n_periods = z.shape[0]
+    n_out = z.shape[1]
+    n_in = z.shape[2]
+    print(
+        f"{label} n_periods={n_periods}, n_out={n_out}, n_in={n_in}, len(freq)={len(freq)}"
+    )
+
+    rho_vals = []
+    for i in range(min(n_periods, len(freq))):
+        f = freq[i]
+        for comp, out_idx, in_idx in [("Zxy", 0, 1), ("Zyx", 1, 0)]:
+            if out_idx < n_out and in_idx < n_in:
+                zval = z[i, out_idx, in_idx]
+                rho = (np.abs(zval) ** 2) / (2 * np.pi * f)
+                phase = np.angle(zval, deg=True)
+                print(
+                    f"{label} f={f:.4g} Hz {comp}: rho={rho:.3g} ohm-m, phase={phase:.2f} deg"
+                )
+                rho_vals.append(rho)
+            else:
+                print(
+                    f"{label} index out of bounds: out_idx={out_idx}, in_idx={in_idx}"
+                )
+    mean_rho = np.nanmean(rho_vals) if rho_vals else np.nan
+    print(
+        f"{label} MEAN apparent resistivity (all freqs, Zxy/Zyx): {mean_rho:.3g} ohm-m"
+    )
+    return mean_rho
+
+
 # Uncomment the blocks below to run the test as a script
-def main():
+# def main():
+#     SYNTHETIC_FOLDER = TEST_PATH.joinpath("synthetic")
+#     # Create a synthetic mth5 file for testing
+#     mth5_path = create_synthetic_mth5_with_noise()
+#     # mth5_path = SYNTHETIC_FOLDER.joinpath("test1_noisy.h5")
+
+#     processing_objects = load_processing_objects()
+
+#     # TODO: compare this against stored template
+#     # json_str = processing_objects["with_weights"].to_json()
+#     # with open(SYNTHETIC_FOLDER.joinpath("used_processing.json"), "w") as f:
+#     #     f.write(json_str)
+
+#     process_mth5_with_config(
+#         mth5_path, processing_objects["default"], z_file="test1_default.zss"
+#     )
+#     process_mth5_with_config(
+#         mth5_path, processing_objects["with_weights"], z_file="test1_weights.zss"
+#     )
+#     from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
+
+#     compare_two_z_files(
+#         z_path1=SYNTHETIC_FOLDER.joinpath("test1_default.zss"),
+#         z_path2=SYNTHETIC_FOLDER.joinpath("test1_weights.zss"),
+#         label1="default",
+#         label2="weights",
+#         scale_factor1=1,
+#         out_file="output_png.png",
+#         markersize=3,
+#         rho_ylims=[1e-2, 5e2],
+#         xlims=[1.0, 500],
+#     )
+
+
+def test_feature_weighting():
     SYNTHETIC_FOLDER = TEST_PATH.joinpath("synthetic")
     # Create a synthetic mth5 file for testing
     mth5_path = create_synthetic_mth5_with_noise()
@@ -231,31 +318,68 @@ def main():
 
     processing_objects = load_processing_objects()
 
-    # TODO: compare this against stored template
-    # json_str = processing_objects["with_weights"].to_json()
-    # with open(SYNTHETIC_FOLDER.joinpath("used_processing.json"), "w") as f:
-    #     f.write(json_str)
-
     process_mth5_with_config(
         mth5_path, processing_objects["default"], z_file="test1_default.zss"
     )
     process_mth5_with_config(
         mth5_path, processing_objects["with_weights"], z_file="test1_weights.zss"
     )
-    from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
+    z_path1 = SYNTHETIC_FOLDER.joinpath("test1_default.zss")
+    z_path2 = SYNTHETIC_FOLDER.joinpath("test1_weights.zss")
+    from mt_metadata.transfer_functions import TF
 
-    compare_two_z_files(
-        z_path1=SYNTHETIC_FOLDER.joinpath("test1_default.zss"),
-        z_path2=SYNTHETIC_FOLDER.joinpath("test1_weights.zss"),
-        label1="default",
-        label2="weights",
-        scale_factor1=1,
-        out_file="output_png.png",
-        markersize=3,
-        rho_ylims=[1e-2, 5e2],
-        xlims=[1.0, 500],
+    print("zpath1", z_path1, type(z_path1))
+    tf1 = TF(fn=z_path1)
+    tf2 = TF(fn=z_path2)
+    tf1.read()
+    tf2.read()
+    assert (
+        tf1.impedance.data != tf2.impedance.data
+    ).any(), "TF1 and TF2 should have different impedance values after processing with weights."
+
+    print("TF1 Apparent Resistivity and Phase:")
+    mean_rho1 = print_apparent_resistivity(tf1, label="TF1")
+    print("TF2 Apparent Resistivity and Phase:")
+    mean_rho2 = print_apparent_resistivity(tf2, label="TF2")
+    print(
+        f"\nSUMMARY: Mean apparent resistivity TF1: {mean_rho1:.3g} ohm-m, TF2: {mean_rho2:.3g} ohm-m"
     )
 
 
-if __name__ == "__main__":
-    main()
+# Uncomment the blocks below to run the test as a script
+# def main():
+#     SYNTHETIC_FOLDER = TEST_PATH.joinpath("synthetic")
+#     # Create a synthetic mth5 file for testing
+#     mth5_path = create_synthetic_mth5_with_noise()
+#     # mth5_path = SYNTHETIC_FOLDER.joinpath("test1_noisy.h5")
+
+#     processing_objects = load_processing_objects()
+
+#     # TODO: compare this against stored template
+#     # json_str = processing_objects["with_weights"].to_json()
+#     # with open(SYNTHETIC_FOLDER.joinpath("used_processing.json"), "w") as f:
+#     #     f.write(json_str)
+
+#     process_mth5_with_config(
+#         mth5_path, processing_objects["default"], z_file="test1_default.zss"
+#     )
+#     process_mth5_with_config(
+#         mth5_path, processing_objects["with_weights"], z_file="test1_weights.zss"
+#     )
+#     from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
+
+#     compare_two_z_files(
+#         z_path1=SYNTHETIC_FOLDER.joinpath("test1_default.zss"),
+#         z_path2=SYNTHETIC_FOLDER.joinpath("test1_weights.zss"),
+#         label1="default",
+#         label2="weights",
+#         scale_factor1=1,
+#         out_file="output_png.png",
+#         markersize=3,
+#         rho_ylims=[1e-2, 5e2],
+#         xlims=[1.0, 500],
+#     )
+
+# if __name__ == "__main__":
+#     main()
+#     # test_feature_weighting()
