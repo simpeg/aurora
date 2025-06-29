@@ -5,6 +5,8 @@ Development notes:
 The code here is based on the function Edfwts.m from egbert_codes-
 20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/functions/Edfwts.m
 
+
+
 """
 
 import numpy as np
@@ -78,20 +80,18 @@ class EffectiveDegreesOfFreedom(object):
 
         Development Notes:
         The data covariance matrix s and its inverse h are iteratively recomputed using
-        fewer and fewer observations. However, the edf_weights are also computed at every
-        iteration but doesn't seem to use any fewer observations.
-        Thus the edf weights change as use drops, even for indices that were
-        previously computed ... TODO: Could that be an error?
+        fewer and fewer observations. The edf_weights are also computed at every
+        iteration (but for all data points).
 
         Discussing this with Gary:
         "... because you are down-weighting (omitting) more and more highpower events
         the total signal is going down.  The signal power goes down with every call
         to this method"
         ...
-        "The "HAT" Matrix, where the diagonals of this matrix are really big it means an
+        "The Hat Matrix, where the diagonals of this matrix are really big means an
         individual data point is controlling its own prediction, and the estimate.
-        If the problem was balanced (N data points contributing equally), each data point
-        would contribute equally (1/N) to each parameter. When one data point is large and
+        If the problem was balanced (n data points contributing equally), each data point
+        would contribute equally (1/n) to each parameter. When one data point is large and
         the others are tiny, then it may be contributing a lot, say 1/2 rather than 1/n.
         edf is like the diagonal of the Hat matrix (in the single station case)
         How much does the data point contribute to the prediction of itself.
@@ -177,6 +177,30 @@ class EffectiveDegreesOfFreedom(object):
         yy_term = np.real(X[1, :] * np.conj(X[1, :]) * H[1, 1])
         xy_term = 2 * np.real(np.conj(X[1, :]) * X[0, :] * H[1, 0])
         edf = xx_term + yy_term + xy_term
+
+        # CONNECTION TO THE HAT MATRIX:
+        # In linear regression, the projection or "hat" matrix P maps observed data to fitted values,
+        # and the diagonal elements of P represent the leverage of each observation. For real-valued
+        # data, the EDF (effective degrees of freedom) is exactly the diagonal of P. In the complex-
+        # valued, multivariate case here, the quadratic form using the inverse covariance matrix H is
+        # mathematically equivalent to computing the leverage (diagonal of P) for each observation.
+        # Thus, the EDF values returned by this function correspond to the diagonal of the projection
+        # (hat) matrix for the regression problem, and could be derived directly from P if it were
+        # explicitly constructed. This approach is a computational shortcut that avoids building the
+        # full P matrix, which is more efficient for large datasets.
+        #
+        # IMPORTANT STATISTICAL NOTE:
+        # If you were to restrict the EDF calculation to only the current inliers (i.e.,
+        # use X[0, use], X[1, use], etc.), you would only compute leverage for those already
+        # considered inliers. This would break the robust, iterative weighting procedure:
+        # you would lose the ability to evaluate the leverage of excluded (outlier) points,
+        # and could not iteratively update the mask. The weights would only be valid for the
+        # current inlier set, and you would not be able to robustly downweight high-leverage
+        # points outside that set. This would defeat the purpose of the robust approach and
+        # make the method statistically invalid for robust outlier detection. The correct
+        # approach is to use the inlier covariance (from `use`) to compute leverage for all
+        # points, so you can iteratively refine the inlier set.
+
         return edf
 
 
