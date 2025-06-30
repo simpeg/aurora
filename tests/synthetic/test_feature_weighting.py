@@ -317,18 +317,15 @@ def test_feature_weighting():
     # mth5_path = SYNTHETIC_FOLDER.joinpath("test1_noisy.h5")
 
     processing_objects = load_processing_objects()
-
-    process_mth5_with_config(
-        mth5_path, processing_objects["default"], z_file="test1_default.zss"
-    )
-    process_mth5_with_config(
-        mth5_path, processing_objects["with_weights"], z_file="test1_weights.zss"
-    )
     z_path1 = SYNTHETIC_FOLDER.joinpath("test1_default.zss")
     z_path2 = SYNTHETIC_FOLDER.joinpath("test1_weights.zss")
+    process_mth5_with_config(mth5_path, processing_objects["default"], z_file=z_path1)
+    process_mth5_with_config(
+        mth5_path, processing_objects["with_weights"], z_file=z_path2
+    )
+
     from mt_metadata.transfer_functions import TF
 
-    print("zpath1", z_path1, type(z_path1))
     tf1 = TF(fn=z_path1)
     tf2 = TF(fn=z_path2)
     tf1.read()
