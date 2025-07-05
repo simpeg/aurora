@@ -104,23 +104,12 @@ def process_tf_decimation_level(
     transfer_function_obj = TTFZ(i_dec_level, frequency_bands, processing_config=config)
     dec_level_config = config.decimations[i_dec_level]
 
-    # Get weights if requested
-    if weights:
-        from aurora.transfer_function.weights.segment_weights import _get_weights
-
-        segment_weights_obj = _get_weights(
-            dec_level_config, local_stft_obj, remote_stft_obj
-        )
-    else:
-        segment_weights_obj = None
-
     try:
         transfer_function_obj = process_transfer_functions_with_weights(
             dec_level_config=dec_level_config,
             local_stft_obj=local_stft_obj,
             remote_stft_obj=remote_stft_obj,
             transfer_function_obj=transfer_function_obj,
-            segment_weights_obj=segment_weights_obj,
         )
     except Exception as e:
         msg = (
