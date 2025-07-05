@@ -7,7 +7,43 @@ import numpy as np
 import xarray as xr
 import pytest
 
-from aurora.time_series.xarray_helpers import handle_nan
+from aurora.time_series.xarray_helpers import handle_nan, nan_to_mean
+
+
+def test_nan_to_mean_basic():
+    """Test nan_to_mean replaces NaNs with mean per channel."""
+    times = np.array([0, 1, 2, 3])
+    data = np.array([1.0, np.nan, 3.0, 4.0])
+    ds = xr.Dataset({"hx": ("time", data)}, coords={"time": times})
+
+    ds_filled = nan_to_mean(ds.copy())
+    # The mean ignoring NaN is (1+3+4)/3 = 2.666...
+    expected = np.array([1.0, 2.66666667, 3.0, 4.0])
+    assert np.allclose(ds_filled.hx.values, expected)
+    # No NaNs should remain
+    assert not np.any(np.isnan(ds_filled.hx.values))
+
+
+def test_nan_to_mean_multiple_channels():
+    """Test nan_to_mean with multiple channels and NaNs in different places."""
+    times = np.array([0, 1, 2, 3])
+    data_hx = np.array([1.0, np.nan, 3.0, 4.0])
+    data_hy = np.array([np.nan, 2.0, 3.0, 4.0])
+    ds = xr.Dataset(
+        {
+            "hx": ("time", data_hx),
+            "hy": ("time", data_hy),
+        },
+        coords={"time": times},
+    )
+
+    ds_filled = nan_to_mean(ds.copy())
+    expected_hx = np.array([1.0, 2.66666667, 3.0, 4.0])
+    expected_hy = np.array([3.0, 2.0, 3.0, 4.0])
+    assert np.allclose(ds_filled.hx.values, expected_hx)
+    assert np.allclose(ds_filled.hy.values, expected_hy)
+    assert not np.any(np.isnan(ds_filled.hx.values))
+    assert not np.any(np.isnan(ds_filled.hy.values))
 
 
 def test_handle_nan_basic():
