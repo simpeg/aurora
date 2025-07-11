@@ -192,6 +192,7 @@ def calculate_weights(
 
         msg = f"{chws}"
         logger.info(msg)
+        # TODO: Consider calculating all the weight kernels in advance, case switching on the combination style.
         if chws.combination_style == "multiplication":
             print(f"chws.combination_style {chws.combination_style}")
 
