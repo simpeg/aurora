@@ -7,7 +7,7 @@ from loguru import logger
 import numpy as np
 
 from aurora.pipelines.time_series_helpers import prototype_decimate
-from aurora.pipelines.time_series_helpers import run_ts_to_stft
+from aurora.time_series.spectrogram_helpers import run_ts_to_stft
 from aurora.test_utils.synthetic.make_processing_configs import (
     create_test_run_config,
 )

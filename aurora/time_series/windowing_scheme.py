@@ -391,26 +391,6 @@ class WindowingScheme(ApodizationWindow):
 
         return spectral_ds
 
-    # 20240824 - comment out as method is unused
-    # def apply_spectral_density_calibration(self, dataset: xr.Dataset) -> xr.Dataset:
-    #     """
-    #     Scale the spectral data by spectral density calibration factor
-    #
-    #     Parameters
-    #     ----------
-    #     dataset: xr.Dataset
-    #         the spectral data (spectrogram)
-    #
-    #     Returns
-    #     -------
-    #     dataset: xr.Dataset
-    #         same as input but scaled for spectral density correction. (See Heinzel et al.)
-    #
-    #     """
-    #     scale_factor = self.linear_spectral_density_calibration_factor
-    #     dataset *= scale_factor
-    #     return dataset
-
     # PROPERTIES THAT NEED SAMPLING RATE
     # these may be moved elsewhere later
     @property
@@ -458,6 +438,9 @@ class WindowingScheme(ApodizationWindow):
 def window_scheme_from_decimation(decimation: AuroraDecimationLevel):
     """
     Helper function to workaround mt_metadata to not import form aurora
+
+    TODO: Make this a method of AuroraDecimationLevel that returns a WindowingScheme.
+     - This requires making WindowingScheme available in mt_metadata.
 
     Parameters
     ----------

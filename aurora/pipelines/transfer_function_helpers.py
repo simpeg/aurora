@@ -218,8 +218,6 @@ def process_transfer_functions(
     local_stft_obj: xr.Dataset,
     remote_stft_obj: xr.Dataset,
     transfer_function_obj,
-    segment_weights_obj: Optional[dict] = None,
-    channel_weights_obj: Optional[dict] = None,
 ):
     """
     This is the main tf_processing method.  It is based on the Matlab legacy code TTFestBand.m.
@@ -237,14 +235,6 @@ def process_transfer_functions(
     remote_stft_obj: xarray.core.dataset.Dataset or None
     transfer_function_obj: aurora.transfer_function.TTFZ.TTFZ
         The transfer function container ready to receive values in this method.
-    segment_weights : numpy array or list of strings
-        1D array which should be of the same length as the time axis of the STFT objects
-        If these weights are zero anywhere, we drop all that segment across all channels
-        If it is a list of strings, each string corresponds to a weighting
-        algorithm to be applied.
-        ["jackknife_jj84", "multiple_coherence", "simple_coherence"]
-    channel_weights : dict of numpy arrays or None
-
 
     Returns
     -------
@@ -260,14 +250,6 @@ def process_transfer_functions(
             band, dec_level_config, local_stft_obj, remote_stft_obj
         )
 
-        # TODO: WORK IN PROGRESS  (see Issue #119)
-        # Apply segment weights first if provided.
-        if segment_weights_obj:
-            weights = segment_weights_obj.get_weights_for_band(band)
-            apply_weights(X, Y, RR, weights, segment=True, dropna=False)
-
-        # if there are channel weights apply them here
-
         # Reshape to 2d
         X, Y, RR = stack_fcs(X, Y, RR)
 
@@ -281,10 +263,6 @@ def process_transfer_functions(
             for ch in dec_level_config.output_channels:
 
                 Y_ch = Y[ch].to_dataset()  # keep as a dataset, maybe not needed
-
-                if channel_weights_obj:
-                    weights = channel_weights_obj.get_weights_for_band(band)
-                    apply_weights(X, Y_ch, RR, weights, segment=True, dropna=False)
 
                 X_, Y_, RR_ = handle_nan(X, Y_ch, RR, drop_dim="observation")
 
@@ -314,11 +292,9 @@ def process_transfer_functions_with_weights(
     local_stft_obj: xr.Dataset,
     remote_stft_obj: xr.Dataset,
     transfer_function_obj,
-    segment_weights_obj: Optional[dict] = None,
-    channel_weights_obj: Optional[dict] = None,
 ):
     """
-        This is another version of process_transfer_functions that applies weights to the data.
+    This is version of process_transfer_functions applies weights to the data.
 
     Development Notes:
     Note #1: This is only for per-channel estimation, so it does not support the
@@ -334,13 +310,6 @@ def process_transfer_functions_with_weights(
     remote_stft_obj: xarray.core.dataset.Dataset or None
     transfer_function_obj: aurora.transfer_function.TTFZ.TTFZ
         The transfer function container ready to receive values in this method.
-    segment_weights : numpy array or list of strings
-        1D array which should be of the same length as the time axis of the STFT objects
-        If these weights are zero anywhere, we drop all that segment across all channels
-        If it is a list of strings, each string corresponds to a weighting
-        algorithm to be applied.
-        ["jackknife_jj84", "multiple_coherence", "simple_coherence"]
-    channel_weights : dict of numpy arrays or None
 
     Returns
     -------
@@ -371,9 +340,9 @@ def process_transfer_functions_with_weights(
                 band, dec_level_config, local_stft_obj, remote_stft_obj
             )
             Y_ch = Y[ch].to_dataset()  # keep as a dataset, maybe not needed
-            if weights is not None:
-                # now we need to extract the weights for this band
 
+            # extract the weights for this band
+            if weights is not None:
                 # TODO: Investigate best way to extract the weights for band
                 #  This may involve finding the nearest frequency bin to the band center period
                 #  and then applying the weights for that bin, or some tapered region around it.
@@ -386,18 +355,12 @@ def process_transfer_functions_with_weights(
                     X, Y_ch, RR, band_weights.squeeze(), segment=True, dropna=False
                 )
 
-            # Reshape to 2d
-            X, Y_ch, RR = stack_fcs(X, Y_ch, RR)
+            X, Y_ch, RR = stack_fcs(X, Y_ch, RR)  # Reshape to 2d
+
             # Should only be needed if weights were applied
-            # X, Y_ch, RR = handle_nan(X, Y_ch, RR)
             X, Y_ch, RR = drop_nans(X, Y_ch, RR)
-            # print(
-            #     f"L399 \n X shapes: {[v.shape for v in X.data_vars.values()]}, \
-            #           \n Y shape: {[v.shape for v in Y_ch.data_vars.values()]}, "
-            # )
 
             W = effective_degrees_of_freedom_weights(X, RR, edf_obj=None)
-            # print(f"L404 W shape {W.shape}")
 
             X, Y_ch, RR = apply_weights(X, Y_ch, RR, W, segment=False, dropna=True)
             X_, Y_, RR_ = handle_nan(X, Y_ch, RR, drop_dim="observation")
