@@ -62,14 +62,14 @@ class TestSyntheticProcessing(unittest.TestCase):
         tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
     def test_can_use_channel_nomenclature(self):
-        channel_nomencalture = "LEMI12"
-        z_file_path = AURORA_RESULTS_PATH.joinpath(f"syn1-{channel_nomencalture}.zss")
+        channel_nomenclature = "LEMI12"
+        z_file_path = AURORA_RESULTS_PATH.joinpath(f"syn1-{channel_nomenclature}.zss")
         tf_cls = process_synthetic_1(
             z_file_path=z_file_path,
             file_version=self.file_version,
-            channel_nomenclature=channel_nomencalture,
+            channel_nomenclature=channel_nomenclature,
         )
-        xml_file_base = f"syn1_mth5-{self.file_version}_{channel_nomencalture}.xml"
+        xml_file_base = f"syn1_mth5-{self.file_version}_{channel_nomenclature}.xml"
         xml_file_name = AURORA_RESULTS_PATH.joinpath(xml_file_base)
         tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
