@@ -43,7 +43,7 @@ jobs:
     - name: Install Our Package
       run: |
         echo $CONDA_PREFIX
-        pip install -e .
+        uv pip install -e .
         echo "Install complete"
         conda list
         pip freeze
