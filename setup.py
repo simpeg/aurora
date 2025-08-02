@@ -1,59 +1,6 @@
 #!/usr/bin/env python
 
-"""The setup script."""
+import setuptools
 
-from setuptools import setup, find_packages
-
-with open("README.rst") as readme_file:
-    readme = readme_file.read()
-
-# with open("HISTORY.rst") as history_file:
-#    history = history_file.read()
-
-requirements = [
-    # "mt_metadata",
-    # "mth5",
-    # "mtpy-v2",
-    "numba",
-    "psutil",
-]
-
-setup_requirements = [
-    "pytest-runner",
-]
-
-test_requirements = [
-    "pytest>=3",
-]
-
-setup(
-    author="Karl Kappler",
-    author_email="karl.kappler@berkeley.edu",
-    python_requires=">=3.8",
-    classifiers=[
-        "Development Status :: 2 - Pre-Alpha",
-        "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
-        "Natural Language :: English",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
-        "Programming Language :: Python :: 3.11",
-    ],
-    description="Processing Codes for Magnetotelluric Data",
-    install_requires=requirements,
-    license="MIT license",
-    license_files=["LICENSE"],
-    long_description=readme,
-    include_package_data=True,
-    keywords="aurora",
-    name="aurora",
-    packages=find_packages(include=["aurora", "aurora.*"]),
-    setup_requires=setup_requirements,
-    test_suite="tests",
-    tests_require=test_requirements,
-    url="https://github.com/simpeg/aurora",
-    version="0.5.0",
-    zip_safe=False,
-)
+if __name__ == "__main__":
+    setuptools.setup()
