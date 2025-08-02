@@ -59,6 +59,7 @@ dev = [
     "ipython",
     "nbsphinx",
     "numpydoc",
+    "papermill",
     "pre-commit",
     "pytest",
     "pytest-cov",
