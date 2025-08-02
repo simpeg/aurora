@@ -1,9 +1,0 @@
-black
-flake8
-nbsphinx
-numpydoc
-pre-commit
-pytest
-sphinx_gallery
-sphinx_rtd_theme
-ipython

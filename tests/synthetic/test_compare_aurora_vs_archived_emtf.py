@@ -6,6 +6,7 @@ from mth5.data.make_mth5_from_asc import create_test12rr_h5
 from aurora.test_utils.synthetic.make_processing_configs import (
     create_test_run_config,
 )
+from aurora.test_utils.synthetic.plot_helpers_synthetic import plot_rho_phi
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 from aurora.test_utils.synthetic.rms_helpers import assert_rms_misfit_ok
 from aurora.test_utils.synthetic.rms_helpers import compute_rms
@@ -14,7 +15,6 @@ from aurora.transfer_function.emtf_z_file_helpers import (
     merge_tf_collection_to_match_z_file,
 )
 
-from plot_helpers_synthetic import plot_rho_phi
 from loguru import logger
 from mth5.helpers import close_open_files
 from mth5.processing import RunSummary, KernelDataset
