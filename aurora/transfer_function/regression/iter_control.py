@@ -21,8 +21,8 @@ class IterControl(object):
          the abstract base class solved Y = X*b + epsilon for b, complex-valued.
          Perhaps this was intended as an intrinsic tolerated noise level.  The value of
          epsilon was set to 1000.
-         -  TODO The return covariance boolean just initializes arrays of zeros.  Needs to be
-         made functional or removed
+         - TODO The return covariance boolean just initializes arrays of zeros.  Needs to be
+          made functional or removed
     """
 
     def __init__(
@@ -35,7 +35,7 @@ class IterControl(object):
         verbosity: int = 0,
     ) -> None:
         """
-        Constructor
+        Constructor.
 
         Parameters
         ----------
@@ -43,7 +43,7 @@ class IterControl(object):
             Set to zero for OLS, otherwise, this is how many times the RME
             will refine the estimate.
         max_number_of_redescending_iterations : int
-            1 or 2 is fine at most.  If set to zero we ignore the redescend code block.
+            1 or 2 is fine at most.  If set to zero, the redescend code block is ignored.
         r0: float
             Effectively infinty for OLS, this controls the point at which residuals
             transition from being penalized by a squared vs a linear function.  The
@@ -126,17 +126,15 @@ class IterControl(object):
             the most recent regression estimate
         b0 : complex-valued numpy array
             The previous regression estimate
-        verbose: bool
-            Set to True for debugging
 
         Returns
         -------
         converged: bool
             True of the regression has terminated, False otherwise
 
-        Notes:
+        Developement Notes:
         The variable maximum_change finds the maximum amplitude component of the vector
-        1-b/b0.  Looking at the formula, one might want to cast this instead as
+        1 - b/b0.  Looking at the formula, one might want to cast this instead as
         1 - abs(b/b0), however, that will be insensitive to phase changes in b,
         which is complex valued.  The way it is coded np.max(np.abs(1 - b / b0)) is
         correct as it stands.
@@ -165,7 +163,16 @@ class IterControl(object):
         return converged
 
     @property
-    def continue_redescending(self):
+    def continue_redescending(self) -> bool:
+        """
+            Checks if the max_number_of_redescending_iterations has been reached
+
+        Returns
+        -------
+        maxxed_out: bool
+            True if max_number_of_redescending_iterations has been reached, otherwise False.
+
+        """
         maxxed_out = (
             self.number_of_redescending_iterations
             >= self.max_number_of_redescending_iterations
@@ -176,7 +183,7 @@ class IterControl(object):
             return True
 
     @property
-    def correction_factor(self):
+    def correction_factor(self) -> float:
         """
         Returns correction factor for residual variances.
 

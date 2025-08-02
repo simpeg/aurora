@@ -3,18 +3,22 @@ This module contains a Helper class to make config files.
 
 The processing config is still evolving and this class and its methods may change.
 
+Development Notes:
+ - Initially, we only supported EMTF style band specification, but this should be updated
+ to allow logarithmically spaced bands of constant Q.
+
 """
 
 from typing import Optional, Union
-import pathlib
 from loguru import logger
 
 from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config.metadata import Processing
 from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
+from mth5.processing.kernel_dataset import KernelDataset
+from mt_metadata.transfer_functions.processing.window import Window
 
-from mt_metadata.transfer_functions.processing.aurora.window import Window
-
+import pathlib
 
 SUPPORTED_BAND_SPECIFICATION_STYLES = ["EMTF", "band_edges"]
 
@@ -42,6 +46,7 @@ class ConfigCreator:
         self._band_edges = band_edges
         self._band_specification_style = None
 
+    # TODO: Delete or update with config info ... currently kernel_dataset.processing_id is used.
     # def processing_id(self, kernel_dataset):
     #     """
     #     Generates a string id label for the processing config: WIP.
@@ -97,7 +102,7 @@ class ConfigCreator:
 
     def determine_band_specification_style(self) -> None:
         """
-        Try to identify which scheme was used to define the bands
+            Tries to identify which scheme was used to define the bands
 
         TODO: Should emtf_band_file path be stored in config to support reproducibility?
 
@@ -108,9 +113,7 @@ class ConfigCreator:
             logger.info(msg)
             self._emtf_band_file = BANDS_DEFAULT_FILE
             self._band_specification_style = "EMTF"
-        elif (self._emtf_band_file is not None) & (
-            self._band_edges is not None
-        ):
+        elif (self._emtf_band_file is not None) & (self._band_edges is not None):
             msg = "Bands defined twice, and possibly inconsistently"
             logger.error(msg)
             raise ValueError(msg)
@@ -121,15 +124,15 @@ class ConfigCreator:
 
     def create_from_kernel_dataset(
         self,
-        kernel_dataset,
-        input_channels=None,
-        output_channels=None,
-        estimator: Optional[Union[str, None]] = None,
-        emtf_band_file: Optional[Union[str, pathlib.Path, None]] = None,
-        band_edges: Optional[Union[dict, None]] = None,
-        decimation_factors: Optional[Union[list, None]] = None,
-        num_samples_window: Optional[Union[int, None]] = None,
-    ):
+        kernel_dataset: KernelDataset,
+        input_channels: Optional[list] = None,
+        output_channels: Optional[list] = None,
+        estimator: Optional[str] = None,
+        emtf_band_file: Optional[Union[str, pathlib.Path]] = None,
+        band_edges: Optional[dict] = None,
+        decimation_factors: Optional[list] = None,
+        num_samples_window: Optional[int] = None,
+    ) -> Processing:
         """
         This creates a processing config from a kernel dataset.
 
@@ -152,6 +155,8 @@ class ConfigCreator:
 
           Theoretically, you could also use the number of decimations implied by bands_dict but this is sloppy, because it would assume the decimation factor.
 
+         3. 2024-12-29 Added setting of decimation_obj.stft.per_window_detrend_type = "linear"
+          This makes tests pass following a refactoring of mt_metadata.  Could use more testing.
 
         Parameters
         ----------
@@ -178,9 +183,7 @@ class ConfigCreator:
             Object storing the processing parameters.
         """
 
-        processing_obj = Processing(
-            id=kernel_dataset.processing_id
-        )  # , **kwargs)
+        processing_obj = Processing(id=kernel_dataset.processing_id)  # , **kwargs)
 
         # pack station and run info into processing object
         processing_obj.stations.from_dataset_dataframe(kernel_dataset.df)
@@ -209,9 +212,7 @@ class ConfigCreator:
                 decimation_factors[0] = 1
             if num_samples_window is None:
                 default_window = Window()
-                num_samples_window = num_decimations * [
-                    default_window.num_samples
-                ]
+                num_samples_window = num_decimations * [default_window.num_samples]
             elif isinstance(num_samples_window, int):
                 num_samples_window = num_decimations * [num_samples_window]
             # now you can define the frequency bands
@@ -241,11 +242,13 @@ class ConfigCreator:
                 decimation_obj.output_channels = output_channels
 
             if num_samples_window is not None:
-                decimation_obj.window.num_samples = num_samples_window[key]
+                decimation_obj.stft.window.num_samples = num_samples_window[key]
             # set estimator if provided as kwarg
             if estimator:
                 try:
                     decimation_obj.estimator.engine = estimator["engine"]
                 except KeyError:
                     pass
+            decimation_obj.stft.per_window_detrend_type = "linear"
+
         return processing_obj

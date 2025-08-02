@@ -5,13 +5,14 @@ Development notes:
 The code here is based on the function Edfwts.m from egbert_codes-
 20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/functions/Edfwts.m
 
+
+
 """
 
 import numpy as np
 import xarray as xr
 from loguru import logger
 from typing import Optional, Union
-import aurora.transfer_function.weights.edf_weights
 
 
 class EffectiveDegreesOfFreedom(object):
@@ -74,30 +75,69 @@ class EffectiveDegreesOfFreedom(object):
         """
         Compute the EDF Weights
 
+        y_hat = P * y
+        where P is the "hat" matrix, and y_hat is the predicted value of y
+
         Development Notes:
         The data covariance matrix s and its inverse h are iteratively recomputed using
-        fewer and fewer observations. However, the edf is also computed at every
-        iteration but doesn't seem to use any fewer observations.
-        Thus the edf weights change as use drops, even for indices that were
-        previously computed ... TODO: Could that be an error?
+        fewer and fewer observations. The edf_weights are also computed at every
+        iteration (but for all data points).
 
         Discussing this with Gary:
         "... because you are down-weighting (omitting) more and more highpower events
         the total signal is going down.  The signal power goes down with every call
         to this method"
         ...
-        "The "HAT" Matrix, where the diagonals of this matrix are really big it means an
+        "The Hat Matrix, where the diagonals of this matrix are really big means an
         individual data point is controlling its own prediction, and the estimate.
-        If the problem was balanced, each data point would contribute equally to the
-        estimate.  Each data point should contribute 1/N to each parameter. When one
-        data point is large and the others are tiny, then it may be contributing a
-        lot, say 1/2 rather than 1/n.
+        If the problem was balanced (n data points contributing equally), each data point
+        would contribute equally (1/n) to each parameter. When one data point is large and
+        the others are tiny, then it may be contributing a lot, say 1/2 rather than 1/n.
         edf is like the diagonal of the Hat matrix (in the single station case)
         How much does the data point contribute to the prediction of itself.
-        If there are n data points contributing equally, each datapoint
-        should contribute ~1/n to its prediction
-        - Note: H = inv(S) in general has equal H[0,1] = H[1,0];  2x2 matrices with
+
+        Note: H = inv(S) in general has equal H[0,1] = H[1,0];  2x2 matrices with
         matching off-diagonal terms have inverses with the same property.
+
+        ---AI Explaination of the code---
+        The effective degrees of freedom (edf) weights are computed based on the covariance
+        matrix of the input data. The covariance matrix is calculated using the selected
+        observations (indicated by the `use` boolean array). The inverse of the covariance
+        matrix is then used to compute the edf weights for each observation.
+        The edf weights are calculated as follows:
+        - The covariance matrix `S` is computed as the outer product of the selected data.
+        - The covariance matrix is normalized by the number of selected observations.
+        - The inverse covariance matrix `H` is computed.
+        - The edf weights are then calculated using the diagonal and off-diagonal elements
+          of the inverse covariance matrix `H` and the selected data.
+
+        ---Statistical Context---
+        The inverse covariance matrix (H = S^{-1}) is used here because it "whitens" the data:
+        it removes correlations and scales by variance, so each observation is measured in units
+        of its statistical uncertainty. This is analogous to the Mahalanobis distance, which
+        accounts for the covariance structure of the data. In the context of regression, the
+        resulting EDF (effective degrees of freedom) value for each observation is proportional
+        to its leverage, similar to the diagonal of the Hat matrix. Observations that are outliers
+        in the whitened space (i.e., unusual given the covariance structure) receive higher EDF
+        values, indicating greater influence on the fit. Thus, the inverse covariance matrix is
+        essential for properly quantifying the statistical distinctiveness and leverage of each
+        observation, enabling robust down-weighting of high-leverage (potentially outlier) points.
+
+        In summary: The inverse covariance matrix is used to weight each observation according to
+        its contribution to the fit, accounting for both variance and correlation, ensuring that
+        the EDF weights reflect true statistical leverage.
+
+        A note on usage of real vs complex data:
+        The terms ( X[0, :] * \conj{X[0, :]} ) and ( X[1, :] * \conj{X[1, :]} ) are always real
+        and non-negative (they are squared magnitudes). The cross term ( \conj{X[1, :]} * X[0, :] )
+        can be complex, but in the context of covariance and quadratic forms you want the real part,
+        not the absolute value.
+        Why?
+        The quadratic form ( x^H H x ) (where ( x ) is a complex vector and ( H ) is Hermitian) is
+        always real, and the real part is what contributes to the variance/leverage.
+        Taking the absolute value would overstate the contribution of the cross term and would not be
+        statistically correct for covariance-based leverage calculations.
+
 
         Parameters
         ----------
@@ -116,19 +156,58 @@ class EffectiveDegreesOfFreedom(object):
         S /= sum(use)  # normalize by the number of datapoints
         H = np.linalg.inv(S)  # inverse covariance matrix
 
-        # x = X[0, :]
-        # y = X[1, :]
+        # TODO: why are we not using the `use` boolean to select the data?
+        #       This is a bit of a mystery, but it seems to be the way the
+        #       original code was written.
+        # EXPLANATION:
+        # The `use` boolean is applied when computing the covariance matrix S (i.e., X[:, use]),
+        # so H (the inverse covariance) reflects only the selected (inlier) data. However, when
+        # computing the EDF terms (xx_term, yy_term, xy_term), the code uses all columns of X,
+        # not just those where `use` is True. This mirrors the original Matlab code and is a bit
+        # counterintuitive. The intent is to evaluate the leverage (EDF) for all data points,
+        # using the covariance structure estimated from the current inlier set. This allows the
+        # algorithm to iteratively update which points are considered inliers/outliers, by seeing
+        # how each point would behave if it were included, given the current inlier covariance.
+        #
+        # In summary:
+        # - The covariance matrix is computed from the inliers (`use`).
+        # - The leverage (EDF) is computed for all points, using the inlier covariance.
+        # - This lets the algorithm decide which points to drop next, based on their leverage under the current model.
         xx_term = np.real(X[0, :] * np.conj(X[0, :]) * H[0, 0])
         yy_term = np.real(X[1, :] * np.conj(X[1, :]) * H[1, 1])
-        xy_term = 2 * np.real(np.conj(X[1, :]) * X[0, :] * H[1, 0])  # real or abs?
+        xy_term = 2 * np.real(np.conj(X[1, :]) * X[0, :] * H[1, 0])
         edf = xx_term + yy_term + xy_term
+
+        # CONNECTION TO THE HAT MATRIX:
+        # In linear regression, the projection or "hat" matrix P maps observed data to fitted values,
+        # and the diagonal elements of P represent the leverage of each observation. For real-valued
+        # data, the EDF (effective degrees of freedom) is exactly the diagonal of P. In the complex-
+        # valued, multivariate case here, the quadratic form using the inverse covariance matrix H is
+        # mathematically equivalent to computing the leverage (diagonal of P) for each observation.
+        # Thus, the EDF values returned by this function correspond to the diagonal of the projection
+        # (hat) matrix for the regression problem, and could be derived directly from P if it were
+        # explicitly constructed. This approach is a computational shortcut that avoids building the
+        # full P matrix, which is more efficient for large datasets.
+        #
+        # IMPORTANT STATISTICAL NOTE:
+        # If you were to restrict the EDF calculation to only the current inliers (i.e.,
+        # use X[0, use], X[1, use], etc.), you would only compute leverage for those already
+        # considered inliers. This would break the robust, iterative weighting procedure:
+        # you would lose the ability to evaluate the leverage of excluded (outlier) points,
+        # and could not iteratively update the mask. The weights would only be valid for the
+        # current inlier set, and you would not be able to robustly downweight high-leverage
+        # points outside that set. This would defeat the purpose of the robust approach and
+        # make the method statistically invalid for robust outlier detection. The correct
+        # approach is to use the inlier covariance (from `use`) to compute leverage for all
+        # points, so you can iteratively refine the inlier set.
+
         return edf
 
 
 def effective_degrees_of_freedom_weights(
     X: xr.Dataset,
-    R: Union[xr.Dataset, None],
-    edf_obj=None,
+    R: Optional[xr.Dataset] = None,
+    edf_obj: Optional[EffectiveDegreesOfFreedom] = None,
 ) -> np.ndarray:
     """
     Computes the effective degrees of freedom weights. Emulates edfwts ("effective dof") from tranmt.
@@ -198,17 +277,19 @@ def effective_degrees_of_freedom_weights(
         Weights for reducing leverage points.
 
     """
+    # Initialize the weights
+    n_observations_initial = len(X.observation)
+    weights = np.ones(n_observations_initial)
 
+    # validate num channels
     num_channels = len(X.data_vars)
     if num_channels != 2:
-        logger.error("edfwts only works for 2 input channels")
-        raise Exception
+        logger.error(f"edfwts only works for 2 input channels, not {num_channels}")
+        return weights
+
     X = X.to_array(dim="channel")
     if R is not None:
         R = R.to_array(dim="channel")
-
-    n_observations_initial = len(X.observation)
-    weights = np.ones(n_observations_initial)
 
     # reduce the data to only valid (non-nan) observations
     if R is not None:
@@ -248,6 +329,7 @@ def effective_degrees_of_freedom_weights(
         ref_use = np.ones(n_observations_numeric, dtype=bool)
         edf_ref = edf_obj.compute_weights(RR, ref_use)
 
+        # TODO: FIXME - when this gets set to zero below, then line ~260 will encounter RuntimeWarning div by 0
         wtRef[edf_ref > edf_obj.p2] = 0
         cond = (edf_ref <= edf_obj.p2) & (edf_ref > edf_obj.p1)
         wtRef[cond] = np.sqrt(edf_obj.p1 / edf_ref[cond])

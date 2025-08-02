@@ -3,7 +3,6 @@
 Extend the mt_metadata.transfer_functions.processing.aurora.processing.Processing class
 with some aurora-specific methods.
 """
-import pathlib
 
 # =============================================================================
 # Imports
@@ -11,13 +10,18 @@ import pathlib
 
 from aurora.time_series.windowing_scheme import window_scheme_from_decimation
 from loguru import logger
-from mt_metadata.transfer_functions.processing.aurora.processing import Processing
+from mt_metadata.transfer_functions.processing.aurora.processing import (
+    Processing as AuroraProcessing,
+)
 from mt_metadata.utils.list_dict import ListDict
 from typing import Optional, Union
+
+import json
 import pandas as pd
+import pathlib
 
 
-class Processing(Processing):
+class Processing(AuroraProcessing):
     def __init__(self, **kwargs):
         """
         Constructor
@@ -63,6 +67,7 @@ class Processing(Processing):
             logger.error(f"unexpected rtype for window_scheme {as_type}")
             raise TypeError
 
+    @property
     def decimation_info(self):
         """
         Zips decimation level ids to the Decimation objects adn returns as a dict
@@ -153,6 +158,26 @@ class Processing(Processing):
         )
 
         return tf_obj
+
+
+def _processing_obj_from_json_file(json_path: pathlib.Path) -> Processing:
+    """
+    Read in a processing parameters json file and return a Processing object.
+    Parameters
+    ----------
+    json_path: pathlib.Path
+        Path to a json file containing processing parameters
+
+    Returns
+         processing_obj: Processing
+    """
+    assert json_path.exists()
+    with open(json_path, "r") as f:
+        json_str = f.read()
+    p_dict = json.loads(json_str)
+    processing_obj = Processing()
+    processing_obj.from_dict(p_dict)
+    return processing_obj
 
 
 class EMTFTFHeader(ListDict):

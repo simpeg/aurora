@@ -22,6 +22,13 @@ DATA_PATH = AURORA_PATH.joinpath("data")
 TEST_PATH = AURORA_PATH.joinpath("tests")
 CONFIG_PATH = AURORA_PATH.joinpath("aurora", "config")
 BAND_SETUP_PATH = CONFIG_PATH.joinpath("emtf_band_setup")
+PROCESSING_TEMPLATES_PATH = CONFIG_PATH.joinpath("templates")
+
+mt_metadata_init_file = inspect.getfile(mt_metadata)
+MT_METADATA_PATH = pathlib.Path(mt_metadata_init_file).parent.parent
+MT_METADATA_FEATURES_TEST_HELPERS_PATH = MT_METADATA_PATH.joinpath(
+    "mt_metadata", "features", "test_helpers"
+)
 
 
 def get_test_path() -> pathlib.Path:

@@ -1,15 +1,16 @@
 """
-    This module contains some helper functions that are called during the
-    execution of aurora's tests of processing on synthetic data.
+This module contains some helper functions that are called during the
+execution of aurora's tests of processing on synthetic data.
 """
 
 import mt_metadata.transfer_functions
 import pathlib
 from aurora.pipelines.process_mth5 import process_mth5
 from mth5.data.make_mth5_from_asc import create_test1_h5
+from mth5.data.make_mth5_from_asc import create_test12rr_h5
 
 
-def get_example_kernel_dataset():
+def get_example_kernel_dataset(num_stations: int = 1):
     """
     Creates a kernel dataset object from the synthetic data
      - Helper function for synthetic tests.
@@ -20,9 +21,12 @@ def get_example_kernel_dataset():
         The kernel dataset from a synthetic, single station mth5
     """
 
-    from mtpy.processing import RunSummary, KernelDataset
+    from mth5.processing import RunSummary, KernelDataset
 
-    mth5_path = create_test1_h5(force_make_mth5=False)
+    if num_stations == 1:
+        mth5_path = create_test1_h5(force_make_mth5=False)
+    elif num_stations == 2:
+        mth5_path = create_test12rr_h5(force_make_mth5=False)
 
     run_summary = RunSummary()
     run_summary.from_mth5s(
@@ -33,7 +37,17 @@ def get_example_kernel_dataset():
 
     kernel_dataset = KernelDataset()
     station_id = run_summary.df.station.iloc[0]
-    kernel_dataset.from_run_summary(run_summary, station_id)
+    if num_stations == 1:
+        kernel_dataset.from_run_summary(
+            run_summary=run_summary, local_station_id=station_id
+        )
+    elif num_stations == 2:
+        remote_station_id = run_summary.df.station.iloc[1]
+        kernel_dataset.from_run_summary(
+            run_summary=run_summary,
+            local_station_id=station_id,
+            remote_station_id=remote_station_id,
+        )
     return kernel_dataset
 
 
@@ -46,7 +60,7 @@ def tf_obj_from_synthetic_data(
 
     """
     from aurora.config.config_creator import ConfigCreator
-    from mtpy.processing import RunSummary, KernelDataset
+    from mth5.processing import RunSummary, KernelDataset
 
     run_summary = RunSummary()
     run_summary.from_mth5s(list((mth5_path,)))

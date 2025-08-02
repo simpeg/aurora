@@ -74,10 +74,11 @@ from aurora.time_series.apodization_window import ApodizationWindow
 from aurora.time_series.windowed_time_series import WindowedTimeSeries
 from aurora.time_series.window_helpers import available_number_of_windows_in_array
 from aurora.time_series.window_helpers import SLIDING_WINDOW_FUNCTIONS
-
 from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
-    get_fft_harmonics,
+    DecimationLevel as AuroraDecimationLevel,
 )
+from mt_metadata.transfer_functions.processing.window import get_fft_harmonics
+
 from loguru import logger
 from typing import Optional, Union
 
@@ -94,6 +95,8 @@ class WindowingScheme(ApodizationWindow):
     window ... but once the window is applied to data, the sample rate is defined.
     Sample rate is defined here because this window will operate on time series
     with a defined time axis.
+
+    TODO: Add dtypes and docstrings.  Is it possible to replace kwargs with Optional arguments?
     """
 
     def __init__(self, **kwargs):
@@ -106,8 +109,9 @@ class WindowingScheme(ApodizationWindow):
         """
         super(WindowingScheme, self).__init__(**kwargs)
         self.num_samples_overlap = kwargs.get(
-            "num_samples_overlap", None
-        )  # make this 75% of num_samples_window by default
+            "num_samples_overlap",
+            None,  # TODO: make this 75% of num_samples_window by default
+        )
         self.striding_function_label = kwargs.get("striding_function_label", "crude")
         self._left_hand_window_edge_indices = None
         self.sample_rate = kwargs.get("sample_rate", None)
@@ -123,6 +127,9 @@ class WindowingScheme(ApodizationWindow):
             f"overlap {self.num_samples_overlap}"
         )
         return info_string
+
+    def __repr__(self):
+        return self.__str__()
 
     @property
     def num_samples_advance(self) -> int:
@@ -360,7 +367,7 @@ class WindowingScheme(ApodizationWindow):
 
         Assumes sliding window and taper already applied.
 
-        TODO: Make this return a Specrtogram() object.
+        TODO: Make this return a Spectrogram() object.
 
         Parameters
         ----------
@@ -383,26 +390,6 @@ class WindowingScheme(ApodizationWindow):
         )
 
         return spectral_ds
-
-    # 20240824 - comment out as method is unused
-    # def apply_spectral_density_calibration(self, dataset: xr.Dataset) -> xr.Dataset:
-    #     """
-    #     Scale the spectral data by spectral density calibration factor
-    #
-    #     Parameters
-    #     ----------
-    #     dataset: xr.Dataset
-    #         the spectral data (spectrogram)
-    #
-    #     Returns
-    #     -------
-    #     dataset: xr.Dataset
-    #         same as input but scaled for spectral density correction. (See Heinzel et al.)
-    #
-    #     """
-    #     scale_factor = self.linear_spectral_density_calibration_factor
-    #     dataset *= scale_factor
-    #     return dataset
 
     # PROPERTIES THAT NEED SAMPLING RATE
     # these may be moved elsewhere later
@@ -448,14 +435,17 @@ class WindowingScheme(ApodizationWindow):
         return np.sqrt(2 / (self.sample_rate * self.S2))
 
 
-def window_scheme_from_decimation(decimation):
+def window_scheme_from_decimation(decimation: AuroraDecimationLevel):
     """
     Helper function to workaround mt_metadata to not import form aurora
 
+    TODO: Make this a method of AuroraDecimationLevel that returns a WindowingScheme.
+     - This requires making WindowingScheme available in mt_metadata.
+
     Parameters
     ----------
-    decimation: mt_metadata.transfer_function.processing.aurora.decimation_level
-    .DecimationLevel
+    decimation: AuroraDecimationLevel
+        Decimation level metadata object
 
     Returns
     -------
@@ -464,10 +454,10 @@ def window_scheme_from_decimation(decimation):
     from aurora.time_series.windowing_scheme import WindowingScheme
 
     windowing_scheme = WindowingScheme(
-        taper_family=decimation.window.type,
-        num_samples_window=decimation.window.num_samples,
-        num_samples_overlap=decimation.window.overlap,
-        taper_additional_args=decimation.window.additional_args,
-        sample_rate=decimation.sample_rate_decimation,
+        taper_family=decimation.stft.window.type,
+        num_samples_window=decimation.stft.window.num_samples,
+        num_samples_overlap=decimation.stft.window.overlap,
+        taper_additional_args=decimation.stft.window.additional_args,
+        sample_rate=decimation.decimation.sample_rate,
     )
     return windowing_scheme

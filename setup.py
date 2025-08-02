@@ -13,7 +13,7 @@ with open("README.rst") as readme_file:
 requirements = [
     # "mt_metadata",
     # "mth5",
-    "mtpy-v2",
+    # "mtpy-v2",
     "numba",
     "psutil",
 ]
@@ -53,6 +53,6 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/simpeg/aurora",
-    version="0.4.2",
+    version="0.5.0",
     zip_safe=False,
 )

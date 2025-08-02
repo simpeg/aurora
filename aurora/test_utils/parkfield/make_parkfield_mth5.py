@@ -6,20 +6,16 @@
 import pathlib
 
 from aurora.test_utils.dataset_definitions import TEST_DATA_SET_CONFIGS
-from mth5.utils.helpers import read_back_data
-from mth5.helpers import close_open_files
-from aurora.sandbox.io_helpers.fdsn_dataset import FDSNDataset
 from aurora.sandbox.io_helpers.make_mth5_helpers import create_from_server_multistation
 from aurora.test_utils.parkfield.path_helpers import PARKFIELD_PATHS
 from loguru import logger
-from typing import Union
-
+from mth5.utils.helpers import read_back_data
+from mth5.helpers import close_open_files
+from typing import Optional, Union
 
 DATA_SOURCES = ["NCEDC", "https://service.ncedc.org/"]
 DATASET_ID = "pkd_sao_test_00"
 FDSN_DATASET = TEST_DATA_SET_CONFIGS[DATASET_ID]
-
-#
 
 
 def select_data_source() -> None:
@@ -44,16 +40,17 @@ def select_data_source() -> None:
             except:
                 logger.warning(f"Data source {data_source} not initializing")
     if not ok:
-        logger.error("No data sources for Parkfield / Hollister initializing")
-        logger.error("NCEDC probably down")
-        raise ValueError
+        msg = "No data sources for Parkfield / Hollister initializing\n"
+        msg += "NCEDC probably down"
+        logger.error(msg)
+        raise ValueError(msg)
     else:
         return data_source
 
 
 def make_pkdsao_mth5(
     fdsn_dataset: FDSN_DATASET,
-    target_folder: Union[str, pathlib.Path, None] = PARKFIELD_PATHS["data"],
+    target_folder: Optional[Union[str, pathlib.Path]] = PARKFIELD_PATHS["data"],
 ) -> pathlib.Path:
     """
     Makes MTH5 file with data from Parkfield and Hollister stations to use for testing.
@@ -83,12 +80,13 @@ def ensure_h5_exists(
     Parameters
     ----------
     h5_path: Union[pathlib.Path, None]
-
+        The target path to build to mth5.
 
     Returns
     -------
     h5_path: pathlib.Path
         The path to the PKD SAO mth5 file to be used for testing.
+
     """
     h5_path = target_folder.joinpath(FDSN_DATASET.h5_filebase)
     if h5_path.exists():
