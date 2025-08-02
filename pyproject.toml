@@ -28,6 +28,7 @@ classifiers = [
 dependencies = [
     "mth5",
     "numba",
+    "obspy",
     "psutil",
 ]
 
