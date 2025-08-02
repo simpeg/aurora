@@ -609,13 +609,15 @@ class TransferFunctionKernel(object):
         # station_obj = station_obj_from_row(station_row)
 
         # modify the run metadata to match the channel nomenclature
+        # TODO: this should be done inside the TF initialization
         for i_run, run in enumerate(tf_cls.station_metadata.runs):
             for i_ch, channel in enumerate(run.channels):
+                new_ch = channel.copy()
                 default_component = channel.component
                 new_component = channel_nomenclature_dict[default_component]
-                tf_cls.station_metadata.runs[i_run].channels[
-                    i_ch
-                ].component = new_component
+                new_ch.component = new_component
+                tf_cls.station_metadata.runs[i_run].remove_channel(default_component)
+                tf_cls.station_metadata.runs[i_run].add_channel(new_ch)
 
         # set processing type
         tf_cls.station_metadata.transfer_function.processing_type = self.processing_type
