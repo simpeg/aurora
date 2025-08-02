@@ -43,13 +43,12 @@ include-package-data = true
 testpaths = ["tests"]
 addopts = ["--import-mode=importlib"]
 
+
 [project.optional-dependencies]
 test = [
     "pytest>=3",
     "pytest-runner",
 ]
-
-[project.optional-dependencies]
 dev = [
     "black",
     "flake8",
@@ -65,13 +64,6 @@ dev = [
 ]
 
 
-[project.urls]
-Repository = "https://github.com/kkappler/template.git"
-"Bug Tracker" = "https://github.com/kkappler/template/issues"
 
-[tool.pytest.ini_options]
-# pythonpath = "src"
-pythonpath = "."
-addopts = [
-    "--import-mode=importlib",
-]
+
+
