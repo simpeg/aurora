@@ -26,6 +26,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
 ]
 dependencies = [
+    "mth5",
     "numba",
     "psutil",
 ]
@@ -38,6 +39,8 @@ include = ["aurora", "aurora.*"]
 
 [tool.setuptools]
 include-package-data = true
+
+license-files = ["LICENSE"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
