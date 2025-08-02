@@ -44,6 +44,7 @@ setup(
     description="Processing Codes for Magnetotelluric Data",
     install_requires=requirements,
     license="MIT license",
+    license_files=["LICENSE"],
     long_description=readme,
     include_package_data=True,
     keywords="aurora",
