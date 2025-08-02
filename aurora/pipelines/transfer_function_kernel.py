@@ -601,7 +601,17 @@ class TransferFunctionKernel(object):
 
         # Set key as first el't of dict, nor currently supporting mixed surveys in TF
         tf_cls.survey_metadata = self.dataset.local_survey_metadata
+
+        # pack the station metadata into the TF object
+        station_id = self.processing_config.stations.local.id
+        station_sub_df = self.dataset_df[self.dataset_df["station"] == station_id]
+        station_row = station_sub_df.iloc[0]
+        station_obj = station_obj_from_row(station_row)
+        tf_cls.station_metadata = station_obj.metadata
+
+        # set processing type
         tf_cls.station_metadata.transfer_function.processing_type = self.processing_type
+
         # tf_cls.station_metadata.transfer_function.processing_config = (
         #     self.processing_config
         # )
