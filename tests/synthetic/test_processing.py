@@ -145,6 +145,7 @@ class TestSyntheticProcessing(unittest.TestCase):
         )
 
 
+# TODO: Move this to test_utils/synthetic/
 def process_synthetic_1(
     config_keyword: Optional[str] = "test1",
     z_file_path: Optional[Union[str, pathlib.Path]] = "",
@@ -239,7 +240,7 @@ def process_synthetic_1(
             )
     return tf_result
 
-
+# TODO: Move this to test_utils/synthetic/
 def process_synthetic_2(
     force_make_mth5: Optional[bool] = True,
     z_file_path: Optional[Union[str, pathlib.Path, None]] = None,
@@ -276,7 +277,7 @@ def process_synthetic_2(
     )
     return tfc
 
-
+# TODO: Move this to test_utils/synthetic/
 def process_synthetic_1r2(
     config_keyword="test1r2",
     channel_nomenclature="default",

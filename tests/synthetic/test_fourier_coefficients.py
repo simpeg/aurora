@@ -152,7 +152,7 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
 
     def test_create_then_use_stored_fcs_for_processing(self):
         """"""
-        from test_processing import process_synthetic_2
+        from .test_processing import process_synthetic_2
         from aurora.test_utils.synthetic.make_processing_configs import (
             make_processing_config_and_kernel_dataset,
         )
