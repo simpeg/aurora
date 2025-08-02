@@ -603,11 +603,19 @@ class TransferFunctionKernel(object):
         tf_cls.survey_metadata = self.dataset.local_survey_metadata
 
         # pack the station metadata into the TF object
-        station_id = self.processing_config.stations.local.id
-        station_sub_df = self.dataset_df[self.dataset_df["station"] == station_id]
-        station_row = station_sub_df.iloc[0]
-        station_obj = station_obj_from_row(station_row)
-        tf_cls.station_metadata = station_obj.metadata
+        # station_id = self.processing_config.stations.local.id
+        # station_sub_df = self.dataset_df[self.dataset_df["station"] == station_id]
+        # station_row = station_sub_df.iloc[0]
+        # station_obj = station_obj_from_row(station_row)
+
+        # modify the run metadata to match the channel nomenclature
+        for i_run, run in enumerate(tf_cls.station_metadata.runs):
+            for i_ch, channel in enumerate(run.channels):
+                default_component = channel.component
+                new_component = channel_nomenclature_dict[default_component]
+                tf_cls.station_metadata.runs[i_run].channels[
+                    i_ch
+                ].component = new_component
 
         # set processing type
         tf_cls.station_metadata.transfer_function.processing_type = self.processing_type

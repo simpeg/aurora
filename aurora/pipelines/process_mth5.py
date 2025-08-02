@@ -215,7 +215,19 @@ def process_mth5_legacy(
 
     try:
         tf_cls = tfk.export_tf_collection(tf_collection)
+        logger.info(f"type(tf_cls): {type(tf_cls)}")
+        # This export seems to have run successfully
         if z_file_path:
+            # debugging, this is not used in production, tf_cls.station_metadata.channels_recorded = ["e1", "e2", "bx", "by", "bz"]
+            # xml_path = z_file_path.with_suffix(".xml")
+            # tf_cls.write(xml_path, format="xml")  # this is where the failure is
+            # from mt_metadata.transfer_functions.TF import TF
+            # tf_cls2 = TF()
+            # tf_cls2.read(xml_path)
+            # from aurora.test_utils.synthetic.triage import tfs_nearly_equal
+            # assert tfs_nearly_equal(tf_cls, tf_cls2), "TF objects are not nearly equal"
+            # tf_cls2.write(z_file_path)
+            # print(f"TF cls2 object written to {z_file_path}")
             tf_cls.write(z_file_path)
     except Exception as e:
         msg = "TF collection could not export to mt_metadata TransferFunction\n"
