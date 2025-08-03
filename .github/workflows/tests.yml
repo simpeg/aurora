@@ -79,7 +79,7 @@ jobs:
       run: |
         # pytest -s -v tests/synthetic/test_fourier_coefficients.py
         # pytest -s -v tests/config/test_config_creator.py 
-        pytest -s -v --cov=./ --cov-report=xml --cov=aurora
+        uv pytest -s -v --cov=./ --cov-report=xml --cov=aurora
 
     - name: "Upload coverage reports to Codecov"
       uses: codecov/codecov-action@v4
