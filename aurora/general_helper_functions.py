@@ -19,6 +19,7 @@ import mth5
 init_file = inspect.getfile(aurora)
 AURORA_PATH = Path(init_file).parent.parent
 DATA_PATH = AURORA_PATH.joinpath("data")
+DOCS_PATH = AURORA_PATH.joinpath("docs")
 TEST_PATH = AURORA_PATH.joinpath("tests")
 CONFIG_PATH = AURORA_PATH.joinpath("aurora", "config")
 BAND_SETUP_PATH = CONFIG_PATH.joinpath("emtf_band_setup")
@@ -101,37 +102,25 @@ def execute_subprocess(cmd, **kwargs):
     return
 
 
-# TODO: Add test for execute_command or delete.
-# def execute_command(cmd, **kwargs):
-#     """
-#     Executes command in terminal from script.
-#
-#     Parameters:
-#     ----------
-#     cmd : str
-#         command to execute from a terminal
-#     kwargs: exec_dir (str): the directory from which to execute
-#     kwargs: no_exception: suppress output if exception
-#
-#     Other Parameters:
-#         exit_status: :code:`0` is good, otherwise there is some problem
-#
-#     .. note:: When executing :code:`rm *` this crashes if the directory we are removing
-#         from is empty
-#
-#     .. note:: if you can you should probably use execute_subprocess() instead
-#     """
-#     exec_dir = kwargs.get("exec_dir", os.path.expanduser("~/"))
-#     allow_exception = kwargs.get("allow_exception", True)
-#     logger.info("executing from {}".format(exec_dir))
-#     cwd = os.getcwd()
-#     os.chdir(exec_dir)
-#     exit_status = os.system(cmd)
-#     if exit_status != 0:
-#         logger.info(f"exit_status of {cmd} = {exit_status}")
-#         if allow_exception:
-#             raise Exception(f"Failed to successfully execute \n {cmd}")
-#     os.chdir(cwd)
+def replace_in_file(file_path: pathlib.Path, old: str, new: str) -> None:
+    """
+        Replace all instances of 'old' with 'new' in the given file.
+        :param file_path: Path to the file where replacements should be made.
+
+    """
+    if not file_path.exists():
+        logger.warning(f"File not found: {file_path}")
+        return
+
+    with open(file_path, "r", encoding="utf-8") as f:
+        lines: list[str] = f.readlines()
+
+    updated: list[str] = [line.replace(old, new) for line in lines]
+
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.writelines(updated)
+
+    logger.info(f"Updated: {file_path}")
 
 
 def save_to_mat(data, variable_name, filename):
