@@ -1,0 +1,319 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.sandbox.io_helpers.emtf_band_setup &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aurora.sandbox.io_helpers.emtf_band_setup</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.sandbox.io_helpers.emtf_band_setup</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    In this module is a class that emulates the old EMTF Band Setup File</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+
+
+<div class="viewcode-block" id="EMTFBandSetupFile"><a class="viewcode-back" href="../../../../api/aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">EMTFBandSetupFile</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">filepath</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">sample_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sample_rate: float</span>
+<span class="sd">            this is the sampling rate of the un-decimated data,</span>
+<span class="sd">            aka decimation level 1 in EMTF (and probably zero in the</span>
+<span class="sd">            aurora nomenclature)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filepath</span> <span class="o">=</span> <span class="n">filepath</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_bands</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span> <span class="o">=</span> <span class="n">sample_rate</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_bands</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;return the number of bands in the band setup file&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_bands</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_decimation_levels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the number of decimation levels&quot;&quot;&quot;</span>
+        <span class="n">num_dec</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">decimation_levels</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">num_dec</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decimation_levels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the decimation level names (they are integers) in an array&quot;&quot;&quot;</span>
+        <span class="n">dec_levels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">decimation_level</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+        <span class="n">dec_levels</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">dec_levels</span>
+
+<div class="viewcode-block" id="EMTFBandSetupFile.load"><a class="viewcode-back" href="../../../../api/aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.load">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads an EMTF band setup file and casts it to a dataframe.</span>
+<span class="sd">        - populates self.df with the EMTF band setup dataframe.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filepath: Optional[Union[str, pathlib.Path, None]]</span>
+<span class="sd">            The path to the emtf band setup (.cfrg) file.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">filepath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filepath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filepath</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;loading band setup file </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">filepath</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">num_bands</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_bands</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_bands</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+            <span class="n">filepath</span><span class="p">,</span>
+            <span class="n">skiprows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span>
+            <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;decimation_level&quot;</span><span class="p">,</span> <span class="s2">&quot;lower_bound_index&quot;</span><span class="p">,</span> <span class="s2">&quot;upper_bound_index&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_bands</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;unexpected number of bounds read in from </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">df</span></div>
+
+<div class="viewcode-block" id="EMTFBandSetupFile.get_decimation_level"><a class="viewcode-back" href="../../../../api/aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.get_decimation_level">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_decimation_level</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">decimation_level</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">order</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ascending_frequency&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a sub-dataframe with only the rows that correspond to the requested decimation level</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        decimation_level: int</span>
+<span class="sd">            The id of the decimation level</span>
+<span class="sd">        order: str</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        decimation_level_df: pd.DataFrame</span>
+<span class="sd">            A sub-dataframe with only the rows that correspond to the requested decimation level</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+        <span class="n">decimation_level_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;decimation_level&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">decimation_level</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">order</span> <span class="o">==</span> <span class="s2">&quot;ascending_frequency&quot;</span><span class="p">:</span>
+            <span class="n">decimation_level_df</span> <span class="o">=</span> <span class="n">decimation_level_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span>
+                <span class="n">by</span><span class="o">=</span><span class="s2">&quot;lower_bound_index&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;order of decimation dataframe </span><span class="si">{</span><span class="n">order</span><span class="si">}</span><span class="s2"> not supported -- returning default order&quot;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">decimation_level_df</span></div>
+
+<div class="viewcode-block" id="EMTFBandSetupFile.compute_band_edges"><a class="viewcode-back" href="../../../../api/aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.compute_band_edges">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">compute_band_edges</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">decimation_factors</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">num_samples_window</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds columns to df defining the upper and lower bounds of the frequency bands in Hz.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        decimation_factors: list</span>
+<span class="sd">            The decimation factors</span>
+<span class="sd">        num_samples_window: int</span>
+<span class="sd">            The window size</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        band_edges: dict</span>
+<span class="sd">            Keys are decimation level ids and values are numpy arrays with shape num_bands x 2.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">band_edges</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">lower_edges</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">)</span>
+        <span class="n">upper_edges</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;cannot define frequencies if sample rate undefined&quot;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">decimation_factors</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_decimation_levels</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;Number of decimation_factors must equal number of decimation levels&quot;</span>
+            <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;There are </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">decimation_factors</span><span class="p">)</span><span class="si">}</span><span class="s2"> decimation_factors but &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_decimation_levels</span><span class="si">}</span><span class="s2"> decimation levels&quot;</span>
+            <span class="p">)</span>
+        <span class="c1"># add a similar check for num_samples_window</span>
+        <span class="k">for</span> <span class="n">i_dec</span><span class="p">,</span> <span class="n">decimation_level</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">decimation_levels</span><span class="p">):</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">decimation_level</span> <span class="o">==</span> <span class="n">decimation_level</span>
+
+            <span class="c1"># emtf decimation levels start at 1, but i_dec indexes them from 0</span>
+            <span class="n">downsample_factor</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">decimation_factors</span><span class="p">[</span><span class="mi">0</span> <span class="p">:</span> <span class="n">i_dec</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">sample_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span> <span class="o">/</span> <span class="n">downsample_factor</span>
+            <span class="n">delta_f</span> <span class="o">=</span> <span class="n">sample_rate</span> <span class="o">/</span> <span class="n">num_samples_window</span><span class="p">[</span><span class="n">i_dec</span><span class="p">]</span>
+            <span class="n">half_df</span> <span class="o">=</span> <span class="n">delta_f</span> <span class="o">/</span> <span class="mf">2.0</span>
+            <span class="n">lower_edges</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;lower_bound_index&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">delta_f</span> <span class="o">-</span> <span class="n">half_df</span>
+            <span class="n">upper_edges</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;upper_bound_index&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">delta_f</span> <span class="o">+</span> <span class="n">half_df</span>
+            <span class="n">band_edges</span><span class="p">[</span><span class="n">i_dec</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">lower_edges</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">upper_edges</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;lower_edge&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lower_edges</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;upper_edge&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">upper_edges</span>
+        <span class="k">return</span> <span class="n">band_edges</span></div></div>
+
+    <span class="c1"># def to_band_averaging_scheme(self):</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     probably better to give band averaging scheme a &quot;from emtf&quot;</span>
+    <span class="c1">#     method</span>
+    <span class="c1">#     Returns</span>
+    <span class="c1">#     -------</span>
+    <span class="c1">#</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     pass</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

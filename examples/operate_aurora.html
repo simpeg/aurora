@@ -1,0 +1,2801 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Build an MTH5 and Operate the Aurora Pipeline &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Dataset Definition DataFrame" href="dataset_definition.html" />
+    <link rel="prev" title="Installing" href="../user-docs/installing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Build an MTH5 and Operate the Aurora Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Flow-of-this-notebook">Flow of this notebook</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#1A:-Specify-the-data-to-access-from-IRIS">1A: Specify the data to access from IRIS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#1B:-Examine-and-Update-the-MTH5-object">1B: Examine and Update the MTH5 object</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#1C:-Optionally-Update-Metdata:">1C: Optionally Update Metdata:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#2:-Process-Data">2: Process Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Generate-an-Aurora-Configuration-file-using-MTH5-as-an-input">Generate an Aurora Configuration file using MTH5 as an input</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Channel-Summary">Channel Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Run-Summary">Run Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Kernel-Dataset">Kernel Dataset</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Select-only-runs-%22b%22-&amp;-%22d%22">Select only runs “b” &amp; “d”</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#The-same-result-can-be-obtained-by-excluding-runs-a-&amp;-c">The same result can be obtained by <em>excluding</em> runs a &amp; c</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#Exercise:">Exercise:</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#What-if-I-have-unconventional-channel-names?">What if I have unconventional channel names?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Build an MTH5 and Operate the Aurora Pipeline</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/operate_aurora.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Build-an-MTH5-and-Operate-the-Aurora-Pipeline">
+<h1>Build an MTH5 and Operate the Aurora Pipeline<a class="headerlink" href="#Build-an-MTH5-and-Operate-the-Aurora-Pipeline" title="Permalink to this heading">¶</a></h1>
+<p>This notebook pulls MT miniSEED data from the IRIS Dataselect web service to produce an MTH5 file, and then process the time series to create transfer function outputs.</p>
+<p>It outlines the process of making an MTH5 file, generating a processing configuration object, and running the Aurora processor.</p>
+<p>Aurora must be installed to run the notebook. Installation instructions are <a class="reference external" href="http://simpeg.xyz/aurora/">here</a>. This will also install <code class="docutils literal notranslate"><span class="pre">mth5</span></code>, <code class="docutils literal notranslate"><span class="pre">mt_metadata</span></code> and <code class="docutils literal notranslate"><span class="pre">mtpy-v2</span></code>.</p>
+<section id="Flow-of-this-notebook">
+<h2>Flow of this notebook<a class="headerlink" href="#Flow-of-this-notebook" title="Permalink to this heading">¶</a></h2>
+<p>Section 1: Construct a table of the data that will be accessed(in future this process may be automated via Earthscope’s data availability tools). The table is then used to build an MTH5 archive.</p>
+<p>Section 2: The metadata and the data are accessed and used to process the data and generate transfer functions.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># # Uncomment while developing</span>
+<span class="c1"># %load_ext autoreload</span>
+<span class="c1"># %autoreload 2</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Required imports for the program.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">mth5</span><span class="w"> </span><span class="kn">import</span> <span class="n">mth5</span><span class="p">,</span> <span class="n">timeseries</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mth5.clients.fdsn</span><span class="w"> </span><span class="kn">import</span> <span class="n">FDSN</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mth5.clients.make_mth5</span><span class="w"> </span><span class="kn">import</span> <span class="n">MakeMTH5</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mth5.utils.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">initialize_mth5</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mt_metadata.utils.mttime</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_now_utc</span><span class="p">,</span> <span class="n">MTime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">BANDS_DEFAULT_FILE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.config.config_creator</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigCreator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.pipelines.process_mth5</span><span class="w"> </span><span class="kn">import</span> <span class="n">process_mth5</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mth5.processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunSummary</span><span class="p">,</span> <span class="n">KernelDataset</span>
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="1.-Build-an-MTH5-file-from-Earthscope-archives">
+<h1>1. Build an MTH5 file from Earthscope archives<a class="headerlink" href="#1.-Build-an-MTH5-file-from-Earthscope-archives" title="Permalink to this heading">¶</a></h1>
+<ul class="simple">
+<li><p>If you have already built an MTH5 you can skip this section</p></li>
+</ul>
+<p>Set path so MTH5 file builds to current working directory.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">default_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">()</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+<span class="n">default_path</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+PosixPath(&#39;/home/kkappler/software/irismt/aurora/docs/examples&#39;)
+</pre></div></div>
+</div>
+<p>Select mth5 file version</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># mth5_version = &#39;0.1.0&#39;</span>
+<span class="n">mth5_version</span> <span class="o">=</span> <span class="s1">&#39;0.2.0&#39;</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initalize an FDSN object to access column names for request df</span>
+<span class="n">fdsn_obj</span> <span class="o">=</span> <span class="n">FDSN</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<section id="1A:-Specify-the-data-to-access-from-IRIS">
+<h2>1A: Specify the data to access from IRIS<a class="headerlink" href="#1A:-Specify-the-data-to-access-from-IRIS" title="Permalink to this heading">¶</a></h2>
+<p>Note that here we explicitly prescribe the data, but this dataframe could be built from IRIS data availability tools in a programatic way</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate data frame of FDSN Network, Station, Location, Channel, Startime, Endtime codes of interest</span>
+<span class="n">station_id</span> <span class="o">=</span> <span class="s2">&quot;CAS04&quot;</span>
+
+<span class="n">CAS04LQE</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;8P&#39;</span><span class="p">,</span> <span class="n">station_id</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;LQE&#39;</span><span class="p">,</span> <span class="s1">&#39;2020-06-02T19:00:00&#39;</span><span class="p">,</span> <span class="s1">&#39;2020-07-13T19:00:00&#39;</span><span class="p">]</span>
+<span class="n">CAS04LQN</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;8P&#39;</span><span class="p">,</span> <span class="n">station_id</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;LQN&#39;</span><span class="p">,</span> <span class="s1">&#39;2020-06-02T19:00:00&#39;</span><span class="p">,</span> <span class="s1">&#39;2020-07-13T19:00:00&#39;</span><span class="p">]</span>
+<span class="n">CAS04BFE</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;8P&#39;</span><span class="p">,</span> <span class="n">station_id</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;LFE&#39;</span><span class="p">,</span> <span class="s1">&#39;2020-06-02T19:00:00&#39;</span><span class="p">,</span> <span class="s1">&#39;2020-07-13T19:00:00&#39;</span><span class="p">]</span>
+<span class="n">CAS04BFN</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;8P&#39;</span><span class="p">,</span> <span class="n">station_id</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;LFN&#39;</span><span class="p">,</span> <span class="s1">&#39;2020-06-02T19:00:00&#39;</span><span class="p">,</span> <span class="s1">&#39;2020-07-13T19:00:00&#39;</span><span class="p">]</span>
+<span class="n">CAS04BFZ</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;8P&#39;</span><span class="p">,</span> <span class="n">station_id</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;LFZ&#39;</span><span class="p">,</span> <span class="s1">&#39;2020-06-02T19:00:00&#39;</span><span class="p">,</span> <span class="s1">&#39;2020-07-13T19:00:00&#39;</span><span class="p">]</span>
+
+<span class="n">request_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">CAS04LQE</span><span class="p">,</span> <span class="n">CAS04LQN</span><span class="p">,</span> <span class="n">CAS04BFE</span><span class="p">,</span> <span class="n">CAS04BFN</span><span class="p">,</span> <span class="n">CAS04BFZ</span><span class="p">]</span>
+
+<span class="c1"># Turn list into dataframe</span>
+<span class="n">request_df</span> <span class="o">=</span>  <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">request_list</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">fdsn_obj</span><span class="o">.</span><span class="n">request_columns</span><span class="p">)</span>
+
+<span class="c1"># Note that the file that will be build</span>
+<span class="n">h5_basename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;8P_</span><span class="si">{</span><span class="n">station_id</span><span class="si">}</span><span class="s2">.h5&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The MTH5 file will be named (automatically) based on the network and station: </span><span class="si">{</span><span class="n">h5_basename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The MTH5 file will be named (automatically) based on the network and station: 8P_CAS04.h5
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Inspect the dataframe</span>
+<span class="n">request_df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>network</th>
+      <th>station</th>
+      <th>location</th>
+      <th>channel</th>
+      <th>start</th>
+      <th>end</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>8P</td>
+      <td>CAS04</td>
+      <td></td>
+      <td>LQE</td>
+      <td>2020-06-02T19:00:00</td>
+      <td>2020-07-13T19:00:00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>8P</td>
+      <td>CAS04</td>
+      <td></td>
+      <td>LQN</td>
+      <td>2020-06-02T19:00:00</td>
+      <td>2020-07-13T19:00:00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>8P</td>
+      <td>CAS04</td>
+      <td></td>
+      <td>LFE</td>
+      <td>2020-06-02T19:00:00</td>
+      <td>2020-07-13T19:00:00</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>8P</td>
+      <td>CAS04</td>
+      <td></td>
+      <td>LFN</td>
+      <td>2020-06-02T19:00:00</td>
+      <td>2020-07-13T19:00:00</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>8P</td>
+      <td>CAS04</td>
+      <td></td>
+      <td>LFZ</td>
+      <td>2020-06-02T19:00:00</td>
+      <td>2020-07-13T19:00:00</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Request the inventory information from IRIS</span>
+<span class="n">inventory</span> <span class="o">=</span> <span class="n">fdsn_obj</span><span class="o">.</span><span class="n">get_inventory_from_df</span><span class="p">(</span><span class="n">request_df</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Inspect the inventory</span>
+<span class="n">inventory</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(Inventory created at 2025-07-12T00:38:45.505865Z
+        Created by: ObsPy 1.4.1
+                    https://www.obspy.org
+        Sending institution: MTH5
+        Contains:
+                Networks (1):
+                        8P
+                Stations (1):
+                        8P.CAS04 (Corral Hollow, CA, USA)
+                Channels (8):
+                        8P.CAS04..LFZ, 8P.CAS04..LFN, 8P.CAS04..LFE, 8P.CAS04..LQN (2x),
+                        8P.CAS04..LQE (3x),
+ 0 Trace(s) in Stream:
+)
+</pre></div></div>
+</div>
+<p>Builds an MTH5 file from the user defined database.</p>
+<p>With the mth5 object set, we are ready to actually request the data from the fdsn client (IRIS) and save it to an MTH5 file. This process builds an MTH5 file and can take some time depending on how much data is requested.</p>
+<p>Note: <code class="docutils literal notranslate"><span class="pre">interact</span></code> keeps the MTH5 open after it is done building</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mth5_path</span> <span class="o">=</span> <span class="n">MakeMTH5</span><span class="o">.</span><span class="n">from_fdsn_client</span><span class="p">(</span><span class="n">request_df</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2025-07-11T17:38:55.199698-0700 | INFO | mt_metadata.timeseries.filters.obspy_stages | create_filter_from_stage | Converting PoleZerosResponseStage electric_si_units to a CoefficientFilter.</span>
+<span class="ansi-bold">2025-07-11T17:38:55.202648-0700 | INFO | mt_metadata.timeseries.filters.obspy_stages | create_filter_from_stage | Converting PoleZerosResponseStage electric_dipole_92.000 to a CoefficientFilter.</span>
+<span class="ansi-bold">2025-07-11T17:38:55.221132-0700 | INFO | mt_metadata.timeseries.filters.obspy_stages | create_filter_from_stage | Converting PoleZerosResponseStage electric_si_units to a CoefficientFilter.</span>
+<span class="ansi-bold">2025-07-11T17:38:55.224140-0700 | INFO | mt_metadata.timeseries.filters.obspy_stages | create_filter_from_stage | Converting PoleZerosResponseStage electric_dipole_92.000 to a CoefficientFilter.</span>
+<span class="ansi-bold">2025-07-11T17:38:55.240748-0700 | INFO | mt_metadata.timeseries.filters.obspy_stages | create_filter_from_stage | Converting PoleZerosResponseStage electric_si_units to a CoefficientFilter.</span>
+<span class="ansi-bold">2025-07-11T17:38:55.245410-0700 | INFO | mt_metadata.timeseries.filters.obspy_stages | create_filter_from_stage | Converting PoleZerosResponseStage electric_dipole_92.000 to a CoefficientFilter.</span>
+<span class="ansi-bold">2025-07-11T17:38:55.264651-0700 | INFO | mt_metadata.timeseries.filters.obspy_stages | create_filter_from_stage | Converting PoleZerosResponseStage electric_si_units to a CoefficientFilter.</span>
+<span class="ansi-bold">2025-07-11T17:38:55.267511-0700 | INFO | mt_metadata.timeseries.filters.obspy_stages | create_filter_from_stage | Converting PoleZerosResponseStage electric_dipole_92.000 to a CoefficientFilter.</span>
+<span class="ansi-bold">2025-07-11T17:38:55.288150-0700 | INFO | mt_metadata.timeseries.filters.obspy_stages | create_filter_from_stage | Converting PoleZerosResponseStage electric_si_units to a CoefficientFilter.</span>
+<span class="ansi-bold">2025-07-11T17:38:55.293274-0700 | INFO | mt_metadata.timeseries.filters.obspy_stages | create_filter_from_stage | Converting PoleZerosResponseStage electric_dipole_92.000 to a CoefficientFilter.</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:55.352578-0700 | WARNING | mth5.mth5 | open_mth5 | 8P_CAS04.h5 will be overwritten in &#39;w&#39; mode</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:55.363350-0700 | WARNING | mth5.groups.base | read_metadata | No metadata found for MasterSurvey, skipping from_dict.</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:55.364174-0700 | WARNING | mth5.groups.base | read_metadata | No metadata found for Reports, skipping from_dict.</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:55.650559-0700 | WARNING | mth5.groups.base | read_metadata | No metadata found for Standards, skipping from_dict.</span>
+<span class="ansi-bold">2025-07-11T17:38:55.655107-0700 | INFO | mth5.mth5 | _initialize_file | Initialized MTH5 0.2.0 file /home/kkappler/software/irismt/aurora/docs/examples/8P_CAS04.h5 in mode w</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:55.661714-0700 | WARNING | mth5.groups.base | read_metadata | No metadata found for MasterStation, skipping from_dict.</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:55.663257-0700 | WARNING | mth5.groups.base | read_metadata | No metadata found for Reports, skipping from_dict.</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:55.665236-0700 | WARNING | mth5.groups.base | read_metadata | No metadata found for Filters, skipping from_dict.</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:55.923083-0700 | WARNING | mth5.groups.base | read_metadata | No metadata found for Standards, skipping from_dict.</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:55.934927-0700 | WARNING | mth5.groups.base | read_metadata | No metadata found for Station, skipping from_dict.</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:55.943460-0700 | WARNING | mth5.groups.base | read_metadata | No metadata found for TransferFunctions, skipping from_dict.</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:55.944362-0700 | WARNING | mth5.groups.base | read_metadata | No metadata found for MasterFC, skipping from_dict.</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:55.945333-0700 | WARNING | mth5.groups.base | read_metadata | No metadata found for MasterFeatures, skipping from_dict.</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:55.950347-0700 | WARNING | mth5.groups.base | read_metadata | No metadata found for Run, skipping from_dict.</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:55.988470-0700 | WARNING | mth5.groups.base | read_metadata | No metadata found for Run, skipping from_dict.</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:56.025298-0700 | WARNING | mth5.groups.base | read_metadata | No metadata found for Run, skipping from_dict.</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:56.063017-0700 | WARNING | mth5.groups.base | read_metadata | No metadata found for Run, skipping from_dict.</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:56.644677-0700 | WARNING | mth5.clients.fdsn | wrangle_runs_into_containers | More or less runs have been requested by the user than are defined in the metadata. Runs will be defined but only the requested run extents contain time series data based on the users request.</span>
+<span class="ansi-bold">2025-07-11T17:38:56.651064-0700 | INFO | mth5.groups.base | _add_group | RunGroup Features already exists, returning existing group.</span>
+<span class="ansi-bold">2025-07-11T17:38:56.659210-0700 | INFO | mth5.groups.base | _add_group | RunGroup a already exists, returning existing group.</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:56.784591-0700 | WARNING | mth5.timeseries.run_ts | validate_metadata | start time of dataset 2020-06-02T19:00:00+00:00 does not match metadata start 2020-06-02T18:41:43+00:00 updating metatdata value to 2020-06-02T19:00:00+00:00</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:56.905979-0700 | WARNING | mth5.groups.run | from_runts | Channel run.id sr1_001 !=  group run.id a. Setting to ch.run_metadata.id to a</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:57.062055-0700 | WARNING | mth5.groups.run | from_runts | Channel run.id sr1_001 !=  group run.id a. Setting to ch.run_metadata.id to a</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:57.213695-0700 | WARNING | mth5.groups.run | from_runts | Channel run.id sr1_001 !=  group run.id a. Setting to ch.run_metadata.id to a</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:57.366738-0700 | WARNING | mth5.groups.run | from_runts | Channel run.id sr1_001 !=  group run.id a. Setting to ch.run_metadata.id to a</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:57.518731-0700 | WARNING | mth5.groups.run | from_runts | Channel run.id sr1_001 !=  group run.id a. Setting to ch.run_metadata.id to a</span>
+<span class="ansi-bold">2025-07-11T17:38:57.580181-0700 | INFO | mth5.groups.base | _add_group | RunGroup Features already exists, returning existing group.</span>
+<span class="ansi-bold">2025-07-11T17:38:57.585893-0700 | INFO | mth5.groups.base | _add_group | RunGroup a already exists, returning existing group.</span>
+<span class="ansi-bold">2025-07-11T17:38:57.615171-0700 | INFO | mth5.groups.base | _add_group | RunGroup b already exists, returning existing group.</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:58.281363-0700 | WARNING | mth5.groups.run | from_runts | Channel run.id sr1_001 !=  group run.id b. Setting to ch.run_metadata.id to b</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:58.433788-0700 | WARNING | mth5.groups.run | from_runts | Channel run.id sr1_001 !=  group run.id b. Setting to ch.run_metadata.id to b</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:58.594554-0700 | WARNING | mth5.groups.run | from_runts | Channel run.id sr1_001 !=  group run.id b. Setting to ch.run_metadata.id to b</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:58.745508-0700 | WARNING | mth5.groups.run | from_runts | Channel run.id sr1_001 !=  group run.id b. Setting to ch.run_metadata.id to b</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:38:58.902618-0700 | WARNING | mth5.groups.run | from_runts | Channel run.id sr1_001 !=  group run.id b. Setting to ch.run_metadata.id to b</span>
+<span class="ansi-bold">2025-07-11T17:38:58.964310-0700 | INFO | mth5.groups.base | _add_group | RunGroup Features already exists, returning existing group.</span>
+<span class="ansi-bold">2025-07-11T17:38:58.970111-0700 | INFO | mth5.groups.base | _add_group | RunGroup a already exists, returning existing group.</span>
+<span class="ansi-bold">2025-07-11T17:38:58.998062-0700 | INFO | mth5.groups.base | _add_group | RunGroup b already exists, returning existing group.</span>
+<span class="ansi-bold">2025-07-11T17:38:59.022624-0700 | INFO | mth5.groups.base | _add_group | RunGroup c already exists, returning existing group.</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:39:00.177648-0700 | WARNING | mth5.groups.run | from_runts | Channel run.id sr1_001 !=  group run.id c. Setting to ch.run_metadata.id to c</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:39:00.367221-0700 | WARNING | mth5.groups.run | from_runts | Channel run.id sr1_001 !=  group run.id c. Setting to ch.run_metadata.id to c</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:39:00.561857-0700 | WARNING | mth5.groups.run | from_runts | Channel run.id sr1_001 !=  group run.id c. Setting to ch.run_metadata.id to c</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:39:00.727201-0700 | WARNING | mth5.groups.run | from_runts | Channel run.id sr1_001 !=  group run.id c. Setting to ch.run_metadata.id to c</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:39:00.894645-0700 | WARNING | mth5.groups.run | from_runts | Channel run.id sr1_001 !=  group run.id c. Setting to ch.run_metadata.id to c</span>
+<span class="ansi-bold">2025-07-11T17:39:00.962280-0700 | INFO | mth5.groups.base | _add_group | RunGroup Features already exists, returning existing group.</span>
+<span class="ansi-bold">2025-07-11T17:39:00.968133-0700 | INFO | mth5.groups.base | _add_group | RunGroup a already exists, returning existing group.</span>
+<span class="ansi-bold">2025-07-11T17:39:00.995525-0700 | INFO | mth5.groups.base | _add_group | RunGroup b already exists, returning existing group.</span>
+<span class="ansi-bold">2025-07-11T17:39:01.022895-0700 | INFO | mth5.groups.base | _add_group | RunGroup c already exists, returning existing group.</span>
+<span class="ansi-bold">2025-07-11T17:39:01.052501-0700 | INFO | mth5.groups.base | _add_group | RunGroup d already exists, returning existing group.</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:39:01.688527-0700 | WARNING | mth5.timeseries.run_ts | validate_metadata | end time of dataset 2020-07-13T19:00:00+00:00 does not match metadata end 2020-07-13T21:46:12+00:00 updating metatdata value to 2020-07-13T19:00:00+00:00</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:39:01.882289-0700 | WARNING | mth5.groups.run | from_runts | Channel run.id sr1_001 !=  group run.id d. Setting to ch.run_metadata.id to d</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:39:02.087284-0700 | WARNING | mth5.groups.run | from_runts | Channel run.id sr1_001 !=  group run.id d. Setting to ch.run_metadata.id to d</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:39:02.270654-0700 | WARNING | mth5.groups.run | from_runts | Channel run.id sr1_001 !=  group run.id d. Setting to ch.run_metadata.id to d</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:39:02.420140-0700 | WARNING | mth5.groups.run | from_runts | Channel run.id sr1_001 !=  group run.id d. Setting to ch.run_metadata.id to d</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:39:02.574915-0700 | WARNING | mth5.groups.run | from_runts | Channel run.id sr1_001 !=  group run.id d. Setting to ch.run_metadata.id to d</span>
+<span class="ansi-bold">2025-07-11T17:39:02.750420-0700 | INFO | mth5.mth5 | close_mth5 | Flushing and closing /home/kkappler/software/irismt/aurora/docs/examples/8P_CAS04.h5</span>
+</pre></div></div>
+</div>
+</section>
+<section id="1B:-Examine-and-Update-the-MTH5-object">
+<h2>1B: Examine and Update the MTH5 object<a class="headerlink" href="#1B:-Examine-and-Update-the-MTH5-object" title="Permalink to this heading">¶</a></h2>
+<p>With the open MTH5 Object, we can start to examine what is in it. For example, retrieve the filename and file_version. You can additionally do things such as getting the station information and edit it by setting a new value, in this case the declination model.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mth5_object</span> <span class="o">=</span> <span class="n">initialize_mth5</span><span class="p">(</span><span class="n">mth5_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mth5_object</span><span class="o">.</span><span class="n">file_version</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#39;0.2.0&#39;
+</pre></div></div>
+</div>
+</section>
+<section id="1C:-Optionally-Update-Metdata:">
+<h2>1C: Optionally Update Metdata:<a class="headerlink" href="#1C:-Optionally-Update-Metdata:" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Edit and update the MTH5 metadata</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">mth5_object</span><span class="o">.</span><span class="n">get_station</span><span class="p">(</span><span class="n">station_id</span><span class="p">,</span> <span class="n">survey</span><span class="o">=</span><span class="s2">&quot;CONUS_South&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">declination</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">declination</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="s1">&#39;IGRF&#39;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">declination</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">write_metadata</span><span class="p">()</span>    <span class="c1"># writes to file mth5_filename</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+IGRF-13
+IGRF
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Print some info about the mth5</span>
+<span class="n">mth5_filename</span> <span class="o">=</span> <span class="n">mth5_object</span><span class="o">.</span><span class="n">filename</span>
+<span class="n">version</span> <span class="o">=</span> <span class="n">mth5_object</span><span class="o">.</span><span class="n">file_version</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Filename: </span><span class="si">{</span><span class="n">mth5_filename</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> Version: </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ Filename: /home/kkappler/software/irismt/aurora/docs/examples/8P_CAS04.h5
+ Version: 0.2.0
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get the available stations and runs from the MTH5 object</span>
+<span class="n">mth5_object</span><span class="o">.</span><span class="n">channel_summary</span><span class="o">.</span><span class="n">summarize</span><span class="p">()</span>
+<span class="n">ch_summary</span> <span class="o">=</span> <span class="n">mth5_object</span><span class="o">.</span><span class="n">channel_summary</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="2:-Process-Data">
+<h1>2: Process Data<a class="headerlink" href="#2:-Process-Data" title="Permalink to this heading">¶</a></h1>
+<p>If MTH5 file already exists you can start here if you dont want to execute the previous code to get data again.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">interact</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="k">if</span> <span class="n">interact</span><span class="p">:</span>
+    <span class="k">pass</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">h5_basename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;8P_</span><span class="si">{</span><span class="n">station_id</span><span class="si">}</span><span class="s2">.h5&quot;</span>
+    <span class="n">h5_path</span> <span class="o">=</span> <span class="n">default_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">h5_basename</span><span class="p">)</span>
+    <span class="n">mth5_object</span> <span class="o">=</span> <span class="n">initialize_mth5</span><span class="p">(</span><span class="n">h5_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">file_version</span><span class="o">=</span><span class="n">mth5_version</span><span class="p">)</span>
+    <span class="n">ch_summary</span> <span class="o">=</span> <span class="n">mth5_object</span><span class="o">.</span><span class="n">channel_summary</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+<br/><br/></pre></div>
+</div>
+</div>
+<section id="Generate-an-Aurora-Configuration-file-using-MTH5-as-an-input">
+<h2>Generate an Aurora Configuration file using MTH5 as an input<a class="headerlink" href="#Generate-an-Aurora-Configuration-file-using-MTH5-as-an-input" title="Permalink to this heading">¶</a></h2>
+<p>Up to this point, we have used mth5 and mt_metadata, but haven’t yet used aurora. So we will use the MTH5 that we just created (and examined and updated) as input into Aurora.</p>
+</section>
+<section id="Channel-Summary">
+<h2>Channel Summary<a class="headerlink" href="#Channel-Summary" title="Permalink to this heading">¶</a></h2>
+<p>This is a very useful datastructure inside the mth5. It acts basically like an index of available data at the channel-run level, i.e. there is one row for every contiguous chunk of time-series recorded by an electric dipole or magnetometer</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ch_summary</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survey</th>
+      <th>station</th>
+      <th>run</th>
+      <th>latitude</th>
+      <th>longitude</th>
+      <th>elevation</th>
+      <th>component</th>
+      <th>start</th>
+      <th>end</th>
+      <th>n_samples</th>
+      <th>sample_rate</th>
+      <th>measurement_type</th>
+      <th>azimuth</th>
+      <th>tilt</th>
+      <th>units</th>
+      <th>has_data</th>
+      <th>hdf5_reference</th>
+      <th>run_hdf5_reference</th>
+      <th>station_hdf5_reference</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>a</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>335.261765</td>
+      <td>ex</td>
+      <td>2020-06-02 19:00:00+00:00</td>
+      <td>2020-06-02 22:07:46+00:00</td>
+      <td>11267</td>
+      <td>1.0</td>
+      <td>electric</td>
+      <td>13.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>True</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>a</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>335.261765</td>
+      <td>ey</td>
+      <td>2020-06-02 19:00:00+00:00</td>
+      <td>2020-06-02 22:07:46+00:00</td>
+      <td>11267</td>
+      <td>1.0</td>
+      <td>electric</td>
+      <td>103.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>True</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>a</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>335.261765</td>
+      <td>hx</td>
+      <td>2020-06-02 19:00:00+00:00</td>
+      <td>2020-06-02 22:07:46+00:00</td>
+      <td>11267</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>13.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>True</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>a</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>335.261765</td>
+      <td>hy</td>
+      <td>2020-06-02 19:00:00+00:00</td>
+      <td>2020-06-02 22:07:46+00:00</td>
+      <td>11267</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>103.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>True</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>a</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>335.261765</td>
+      <td>hz</td>
+      <td>2020-06-02 19:00:00+00:00</td>
+      <td>2020-06-02 22:07:46+00:00</td>
+      <td>11267</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>0.0</td>
+      <td>90.0</td>
+      <td>digital counts</td>
+      <td>True</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>b</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>335.261765</td>
+      <td>ex</td>
+      <td>2020-06-02 22:24:55+00:00</td>
+      <td>2020-06-12 17:52:23+00:00</td>
+      <td>847649</td>
+      <td>1.0</td>
+      <td>electric</td>
+      <td>13.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>True</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>b</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>335.261765</td>
+      <td>ey</td>
+      <td>2020-06-02 22:24:55+00:00</td>
+      <td>2020-06-12 17:52:23+00:00</td>
+      <td>847649</td>
+      <td>1.0</td>
+      <td>electric</td>
+      <td>103.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>True</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>b</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>335.261765</td>
+      <td>hx</td>
+      <td>2020-06-02 22:24:55+00:00</td>
+      <td>2020-06-12 17:52:23+00:00</td>
+      <td>847649</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>13.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>True</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>b</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>335.261765</td>
+      <td>hy</td>
+      <td>2020-06-02 22:24:55+00:00</td>
+      <td>2020-06-12 17:52:23+00:00</td>
+      <td>847649</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>103.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>True</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>b</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>335.261765</td>
+      <td>hz</td>
+      <td>2020-06-02 22:24:55+00:00</td>
+      <td>2020-06-12 17:52:23+00:00</td>
+      <td>847649</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>0.0</td>
+      <td>90.0</td>
+      <td>digital counts</td>
+      <td>True</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>c</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>335.261765</td>
+      <td>ex</td>
+      <td>2020-06-12 18:32:17+00:00</td>
+      <td>2020-07-01 17:32:59+00:00</td>
+      <td>1638043</td>
+      <td>1.0</td>
+      <td>electric</td>
+      <td>13.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>True</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>c</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>335.261765</td>
+      <td>ey</td>
+      <td>2020-06-12 18:32:17+00:00</td>
+      <td>2020-07-01 17:32:59+00:00</td>
+      <td>1638043</td>
+      <td>1.0</td>
+      <td>electric</td>
+      <td>103.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>True</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>c</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>335.261765</td>
+      <td>hx</td>
+      <td>2020-06-12 18:32:17+00:00</td>
+      <td>2020-07-01 17:32:59+00:00</td>
+      <td>1638043</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>13.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>True</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>c</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>335.261765</td>
+      <td>hy</td>
+      <td>2020-06-12 18:32:17+00:00</td>
+      <td>2020-07-01 17:32:59+00:00</td>
+      <td>1638043</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>103.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>True</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>c</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>335.261765</td>
+      <td>hz</td>
+      <td>2020-06-12 18:32:17+00:00</td>
+      <td>2020-07-01 17:32:59+00:00</td>
+      <td>1638043</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>0.0</td>
+      <td>90.0</td>
+      <td>digital counts</td>
+      <td>True</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>d</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>335.261765</td>
+      <td>ex</td>
+      <td>2020-07-01 19:36:55+00:00</td>
+      <td>2020-07-13 19:00:00+00:00</td>
+      <td>1034586</td>
+      <td>1.0</td>
+      <td>electric</td>
+      <td>13.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>True</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>d</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>335.261765</td>
+      <td>ey</td>
+      <td>2020-07-01 19:36:55+00:00</td>
+      <td>2020-07-13 19:00:00+00:00</td>
+      <td>1034586</td>
+      <td>1.0</td>
+      <td>electric</td>
+      <td>103.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>True</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>d</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>335.261765</td>
+      <td>hx</td>
+      <td>2020-07-01 19:36:55+00:00</td>
+      <td>2020-07-13 19:00:00+00:00</td>
+      <td>1034586</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>13.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>True</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>d</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>335.261765</td>
+      <td>hy</td>
+      <td>2020-07-01 19:36:55+00:00</td>
+      <td>2020-07-13 19:00:00+00:00</td>
+      <td>1034586</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>103.2</td>
+      <td>0.0</td>
+      <td>digital counts</td>
+      <td>True</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>d</td>
+      <td>37.633351</td>
+      <td>-121.468382</td>
+      <td>335.261765</td>
+      <td>hz</td>
+      <td>2020-07-01 19:36:55+00:00</td>
+      <td>2020-07-13 19:00:00+00:00</td>
+      <td>1034586</td>
+      <td>1.0</td>
+      <td>magnetic</td>
+      <td>0.0</td>
+      <td>90.0</td>
+      <td>digital counts</td>
+      <td>True</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>The Channel summary has a lot of uses, below we use it to check if the data have mixed sample rates, and to get a list of available stations</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">available_runs</span> <span class="o">=</span> <span class="n">ch_summary</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+<span class="n">sr</span> <span class="o">=</span> <span class="n">ch_summary</span><span class="o">.</span><span class="n">sample_rate</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sr</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Only one sample rate per run is available&#39;</span><span class="p">)</span>
+
+<span class="n">available_stations</span> <span class="o">=</span> <span class="n">ch_summary</span><span class="o">.</span><span class="n">station</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Available stations: </span><span class="si">{</span><span class="n">available_stations</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Available stations: [&#39;CAS04&#39;]
+</pre></div></div>
+</div>
+</section>
+<section id="Run-Summary">
+<h2>Run Summary<a class="headerlink" href="#Run-Summary" title="Permalink to this heading">¶</a></h2>
+<p>A cousin of the channel summary is the Run Summary. This is a condensed version of the channel summary, with one row per continuous acquistion run at a station.</p>
+<p>The run summary can be accessed from an open mth5 object, or from an iterable of h5 paths as in the example below</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mth5_run_summary</span> <span class="o">=</span> <span class="n">RunSummary</span><span class="p">()</span>
+<span class="n">h5_path</span> <span class="o">=</span> <span class="n">default_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">h5_basename</span><span class="p">)</span>
+<span class="n">mth5_run_summary</span><span class="o">.</span><span class="n">from_mth5s</span><span class="p">([</span><span class="n">h5_path</span><span class="p">,])</span>
+<span class="n">run_summary</span> <span class="o">=</span> <span class="n">mth5_run_summary</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+<span class="n">run_summary</span><span class="o">.</span><span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2025-07-11T17:39:03.857897-0700 | INFO | mth5.mth5 | close_mth5 | Flushing and closing /home/kkappler/software/irismt/aurora/docs/examples/8P_CAS04.h5</span>
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>channel_scale_factors</th>
+      <th>duration</th>
+      <th>end</th>
+      <th>has_data</th>
+      <th>input_channels</th>
+      <th>mth5_path</th>
+      <th>n_samples</th>
+      <th>output_channels</th>
+      <th>run</th>
+      <th>sample_rate</th>
+      <th>start</th>
+      <th>station</th>
+      <th>survey</th>
+      <th>run_hdf5_reference</th>
+      <th>station_hdf5_reference</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>{'ex': 1.0, 'ey': 1.0, 'hx': 1.0, 'hy': 1.0, '...</td>
+      <td>11266.0</td>
+      <td>2020-06-02 22:07:46+00:00</td>
+      <td>True</td>
+      <td>[hx, hy]</td>
+      <td>/home/kkappler/software/irismt/aurora/docs/exa...</td>
+      <td>11267</td>
+      <td>[ex, ey, hz]</td>
+      <td>a</td>
+      <td>1.0</td>
+      <td>2020-06-02 19:00:00+00:00</td>
+      <td>CAS04</td>
+      <td>CONUS South</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>{'ex': 1.0, 'ey': 1.0, 'hx': 1.0, 'hy': 1.0, '...</td>
+      <td>847648.0</td>
+      <td>2020-06-12 17:52:23+00:00</td>
+      <td>True</td>
+      <td>[hx, hy]</td>
+      <td>/home/kkappler/software/irismt/aurora/docs/exa...</td>
+      <td>847649</td>
+      <td>[ex, ey, hz]</td>
+      <td>b</td>
+      <td>1.0</td>
+      <td>2020-06-02 22:24:55+00:00</td>
+      <td>CAS04</td>
+      <td>CONUS South</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>{'ex': 1.0, 'ey': 1.0, 'hx': 1.0, 'hy': 1.0, '...</td>
+      <td>1638042.0</td>
+      <td>2020-07-01 17:32:59+00:00</td>
+      <td>True</td>
+      <td>[hx, hy]</td>
+      <td>/home/kkappler/software/irismt/aurora/docs/exa...</td>
+      <td>1638043</td>
+      <td>[ex, ey, hz]</td>
+      <td>c</td>
+      <td>1.0</td>
+      <td>2020-06-12 18:32:17+00:00</td>
+      <td>CAS04</td>
+      <td>CONUS South</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>{'ex': 1.0, 'ey': 1.0, 'hx': 1.0, 'hy': 1.0, '...</td>
+      <td>1034585.0</td>
+      <td>2020-07-13 19:00:00+00:00</td>
+      <td>True</td>
+      <td>[hx, hy]</td>
+      <td>/home/kkappler/software/irismt/aurora/docs/exa...</td>
+      <td>1034586</td>
+      <td>[ex, ey, hz]</td>
+      <td>d</td>
+      <td>1.0</td>
+      <td>2020-07-01 19:36:55+00:00</td>
+      <td>CAS04</td>
+      <td>CONUS South</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Now we have a dataframe of the available runs to process from the MTH5</p>
+<p>Sometimes we just want to look at the survey, station, run, and time intervals we can for that we can call mini_summary</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">run_summary</span><span class="o">.</span><span class="n">mini_summary</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survey</th>
+      <th>station</th>
+      <th>run</th>
+      <th>start</th>
+      <th>end</th>
+      <th>duration</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>a</td>
+      <td>2020-06-02 19:00:00+00:00</td>
+      <td>2020-06-02 22:07:46+00:00</td>
+      <td>11266.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>b</td>
+      <td>2020-06-02 22:24:55+00:00</td>
+      <td>2020-06-12 17:52:23+00:00</td>
+      <td>847648.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>c</td>
+      <td>2020-06-12 18:32:17+00:00</td>
+      <td>2020-07-01 17:32:59+00:00</td>
+      <td>1638042.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>d</td>
+      <td>2020-07-01 19:36:55+00:00</td>
+      <td>2020-07-13 19:00:00+00:00</td>
+      <td>1034585.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>But here are the columns in the run summary</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">run_summary</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Index([&#39;channel_scale_factors&#39;, &#39;duration&#39;, &#39;end&#39;, &#39;has_data&#39;,
+       &#39;input_channels&#39;, &#39;mth5_path&#39;, &#39;n_samples&#39;, &#39;output_channels&#39;, &#39;run&#39;,
+       &#39;sample_rate&#39;, &#39;start&#39;, &#39;station&#39;, &#39;survey&#39;, &#39;run_hdf5_reference&#39;,
+       &#39;station_hdf5_reference&#39;],
+      dtype=&#39;object&#39;)
+</pre></div></div>
+</div>
+<p>Make your own mini summary by choosing columns</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">coverage_short_list_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;survey&quot;</span><span class="p">,</span> <span class="s1">&#39;station&#39;</span><span class="p">,</span> <span class="s1">&#39;run&#39;</span><span class="p">,</span> <span class="s1">&#39;start&#39;</span><span class="p">,</span> <span class="s1">&#39;end&#39;</span><span class="p">,</span> <span class="p">]</span>
+<span class="n">run_summary</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">coverage_short_list_columns</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survey</th>
+      <th>station</th>
+      <th>run</th>
+      <th>start</th>
+      <th>end</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>a</td>
+      <td>2020-06-02 19:00:00+00:00</td>
+      <td>2020-06-02 22:07:46+00:00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>b</td>
+      <td>2020-06-02 22:24:55+00:00</td>
+      <td>2020-06-12 17:52:23+00:00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>c</td>
+      <td>2020-06-12 18:32:17+00:00</td>
+      <td>2020-07-01 17:32:59+00:00</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>d</td>
+      <td>2020-07-01 19:36:55+00:00</td>
+      <td>2020-07-13 19:00:00+00:00</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Kernel-Dataset">
+<h2>Kernel Dataset<a class="headerlink" href="#Kernel-Dataset" title="Permalink to this heading">¶</a></h2>
+<p>This is like a run summary, but for a single station or a pair of stations. It is used to specify the inputs to aurora processing.</p>
+<p>It takes a run_summary and a station name, and optionally, a remote reference station name</p>
+<p>It is made <em>based on the available data</em> in the MTH5 archive.</p>
+<p>Syntax: kernel_dataset.from_run_summary(run_summary, local_station_id, reference_station_id)</p>
+<p>By Default, all runs will be processed</p>
+<p>To restrict to processing a single run, or a list of runs, we can either tell KernelDataset to keep or drop a station_run dictionary.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">kernel_dataset</span> <span class="o">=</span> <span class="n">KernelDataset</span><span class="p">()</span>
+<span class="n">kernel_dataset</span><span class="o">.</span><span class="n">from_run_summary</span><span class="p">(</span><span class="n">run_summary</span><span class="p">,</span> <span class="n">station_id</span><span class="p">)</span>
+<span class="n">kernel_dataset</span><span class="o">.</span><span class="n">mini_summary</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2025-07-11T17:39:03.929904-0700 | INFO | mth5.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column fc, adding and setting dtype to &lt;class &#39;pandas._libs.missing.NAType&#39;&gt;.</span>
+<span class="ansi-bold">2025-07-11T17:39:03.930634-0700 | INFO | mth5.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column remote, adding and setting dtype to &lt;class &#39;bool&#39;&gt;.</span>
+<span class="ansi-bold">2025-07-11T17:39:03.931502-0700 | INFO | mth5.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column run_dataarray, adding and setting dtype to &lt;class &#39;NoneType&#39;&gt;.</span>
+<span class="ansi-bold">2025-07-11T17:39:03.932238-0700 | INFO | mth5.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column stft, adding and setting dtype to &lt;class &#39;NoneType&#39;&gt;.</span>
+<span class="ansi-bold">2025-07-11T17:39:03.933350-0700 | INFO | mth5.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column mth5_obj, adding and setting dtype to &lt;class &#39;NoneType&#39;&gt;.</span>
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survey</th>
+      <th>station</th>
+      <th>run</th>
+      <th>start</th>
+      <th>end</th>
+      <th>duration</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>a</td>
+      <td>2020-06-02 19:00:00+00:00</td>
+      <td>2020-06-02 22:07:46+00:00</td>
+      <td>11266.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>b</td>
+      <td>2020-06-02 22:24:55+00:00</td>
+      <td>2020-06-12 17:52:23+00:00</td>
+      <td>847648.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>c</td>
+      <td>2020-06-12 18:32:17+00:00</td>
+      <td>2020-07-01 17:32:59+00:00</td>
+      <td>1638042.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>d</td>
+      <td>2020-07-01 19:36:55+00:00</td>
+      <td>2020-07-13 19:00:00+00:00</td>
+      <td>1034585.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+</section>
+<section id="Here-is-one-way-to-select-a-single-run:">
+<h1>Here is one way to select a single run:<a class="headerlink" href="#Here-is-one-way-to-select-a-single-run:" title="Permalink to this heading">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">station_runs_dict</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">station_runs_dict</span><span class="p">[</span><span class="n">station_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="p">]</span>
+<span class="n">keep_or_drop</span> <span class="o">=</span> <span class="s2">&quot;keep&quot;</span>
+
+<span class="n">kernel_dataset</span><span class="o">.</span><span class="n">select_station_runs</span><span class="p">(</span><span class="n">station_runs_dict</span><span class="p">,</span> <span class="n">keep_or_drop</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">kernel_dataset</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">coverage_short_list_columns</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+        survey station run                     start                       end
+0  CONUS South   CAS04   a 2020-06-02 19:00:00+00:00 2020-06-02 22:07:46+00:00
+</pre></div></div>
+</div>
+</section>
+<section id="To-discard-runs-that-are-not-very-long">
+<h1>To discard runs that are not very long<a class="headerlink" href="#To-discard-runs-that-are-not-very-long" title="Permalink to this heading">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">kernel_dataset</span> <span class="o">=</span> <span class="n">KernelDataset</span><span class="p">()</span>
+<span class="n">kernel_dataset</span><span class="o">.</span><span class="n">from_run_summary</span><span class="p">(</span><span class="n">run_summary</span><span class="p">,</span> <span class="n">station_id</span><span class="p">)</span>
+<span class="n">cutoff_duration_in_seconds</span> <span class="o">=</span> <span class="mi">15000</span>
+<span class="n">kernel_dataset</span><span class="o">.</span><span class="n">drop_runs_shorter_than</span><span class="p">(</span><span class="n">cutoff_duration_in_seconds</span><span class="p">)</span>
+<span class="n">kernel_dataset</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">coverage_short_list_columns</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2025-07-11T17:39:03.963827-0700 | INFO | mth5.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column fc, adding and setting dtype to &lt;class &#39;pandas._libs.missing.NAType&#39;&gt;.</span>
+<span class="ansi-bold">2025-07-11T17:39:03.964847-0700 | INFO | mth5.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column remote, adding and setting dtype to &lt;class &#39;bool&#39;&gt;.</span>
+<span class="ansi-bold">2025-07-11T17:39:03.965563-0700 | INFO | mth5.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column run_dataarray, adding and setting dtype to &lt;class &#39;NoneType&#39;&gt;.</span>
+<span class="ansi-bold">2025-07-11T17:39:03.966362-0700 | INFO | mth5.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column stft, adding and setting dtype to &lt;class &#39;NoneType&#39;&gt;.</span>
+<span class="ansi-bold">2025-07-11T17:39:03.967914-0700 | INFO | mth5.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column mth5_obj, adding and setting dtype to &lt;class &#39;NoneType&#39;&gt;.</span>
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survey</th>
+      <th>station</th>
+      <th>run</th>
+      <th>start</th>
+      <th>end</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>b</td>
+      <td>2020-06-02 22:24:55+00:00</td>
+      <td>2020-06-12 17:52:23+00:00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>c</td>
+      <td>2020-06-12 18:32:17+00:00</td>
+      <td>2020-07-01 17:32:59+00:00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>d</td>
+      <td>2020-07-01 19:36:55+00:00</td>
+      <td>2020-07-13 19:00:00+00:00</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<section id="Select-only-runs-%22b%22-&amp;-%22d%22">
+<h2>Select only runs “b” &amp; “d”<a class="headerlink" href="#Select-only-runs-%22b%22-&-%22d%22" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">kernel_dataset</span> <span class="o">=</span> <span class="n">KernelDataset</span><span class="p">()</span>
+<span class="n">kernel_dataset</span><span class="o">.</span><span class="n">from_run_summary</span><span class="p">(</span><span class="n">run_summary</span><span class="p">,</span> <span class="s2">&quot;CAS04&quot;</span><span class="p">)</span>
+<span class="n">station_runs_dict</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">station_runs_dict</span><span class="p">[</span><span class="n">station_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">,</span><span class="s2">&quot;d&quot;</span><span class="p">]</span>
+<span class="n">keep_or_drop</span> <span class="o">=</span> <span class="s2">&quot;keep&quot;</span>
+<span class="n">kernel_dataset</span><span class="o">.</span><span class="n">select_station_runs</span><span class="p">(</span><span class="n">station_runs_dict</span><span class="p">,</span> <span class="n">keep_or_drop</span><span class="p">)</span>
+<span class="n">kernel_dataset</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">coverage_short_list_columns</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2025-07-11T17:39:03.982055-0700 | INFO | mth5.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column fc, adding and setting dtype to &lt;class &#39;pandas._libs.missing.NAType&#39;&gt;.</span>
+<span class="ansi-bold">2025-07-11T17:39:03.984903-0700 | INFO | mth5.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column remote, adding and setting dtype to &lt;class &#39;bool&#39;&gt;.</span>
+<span class="ansi-bold">2025-07-11T17:39:03.987201-0700 | INFO | mth5.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column run_dataarray, adding and setting dtype to &lt;class &#39;NoneType&#39;&gt;.</span>
+<span class="ansi-bold">2025-07-11T17:39:03.989808-0700 | INFO | mth5.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column stft, adding and setting dtype to &lt;class &#39;NoneType&#39;&gt;.</span>
+<span class="ansi-bold">2025-07-11T17:39:03.991178-0700 | INFO | mth5.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column mth5_obj, adding and setting dtype to &lt;class &#39;NoneType&#39;&gt;.</span>
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survey</th>
+      <th>station</th>
+      <th>run</th>
+      <th>start</th>
+      <th>end</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>b</td>
+      <td>2020-06-02 22:24:55+00:00</td>
+      <td>2020-06-12 17:52:23+00:00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>d</td>
+      <td>2020-07-01 19:36:55+00:00</td>
+      <td>2020-07-13 19:00:00+00:00</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="The-same-result-can-be-obtained-by-excluding-runs-a-&amp;-c">
+<h2>The same result can be obtained by <em>excluding</em> runs a &amp; c<a class="headerlink" href="#The-same-result-can-be-obtained-by-excluding-runs-a-&-c" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">kernel_dataset</span> <span class="o">=</span> <span class="n">KernelDataset</span><span class="p">()</span>
+<span class="n">kernel_dataset</span><span class="o">.</span><span class="n">from_run_summary</span><span class="p">(</span><span class="n">run_summary</span><span class="p">,</span> <span class="n">station_id</span><span class="p">)</span>
+<span class="n">station_runs_dict</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">station_runs_dict</span><span class="p">[</span><span class="n">station_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span><span class="s2">&quot;c&quot;</span><span class="p">]</span>
+<span class="n">keep_or_drop</span> <span class="o">=</span> <span class="s2">&quot;drop&quot;</span>
+<span class="n">kernel_dataset</span><span class="o">.</span><span class="n">select_station_runs</span><span class="p">(</span><span class="n">station_runs_dict</span><span class="p">,</span> <span class="n">keep_or_drop</span><span class="p">)</span>
+<span class="n">kernel_dataset</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">coverage_short_list_columns</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2025-07-11T17:39:04.008557-0700 | INFO | mth5.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column fc, adding and setting dtype to &lt;class &#39;pandas._libs.missing.NAType&#39;&gt;.</span>
+<span class="ansi-bold">2025-07-11T17:39:04.009698-0700 | INFO | mth5.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column remote, adding and setting dtype to &lt;class &#39;bool&#39;&gt;.</span>
+<span class="ansi-bold">2025-07-11T17:39:04.010545-0700 | INFO | mth5.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column run_dataarray, adding and setting dtype to &lt;class &#39;NoneType&#39;&gt;.</span>
+<span class="ansi-bold">2025-07-11T17:39:04.011360-0700 | INFO | mth5.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column stft, adding and setting dtype to &lt;class &#39;NoneType&#39;&gt;.</span>
+<span class="ansi-bold">2025-07-11T17:39:04.012052-0700 | INFO | mth5.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column mth5_obj, adding and setting dtype to &lt;class &#39;NoneType&#39;&gt;.</span>
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survey</th>
+      <th>station</th>
+      <th>run</th>
+      <th>start</th>
+      <th>end</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>b</td>
+      <td>2020-06-02 22:24:55+00:00</td>
+      <td>2020-06-12 17:52:23+00:00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>CONUS South</td>
+      <td>CAS04</td>
+      <td>d</td>
+      <td>2020-07-01 19:36:55+00:00</td>
+      <td>2020-07-13 19:00:00+00:00</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+</section>
+<section id="To-process-only-a-segment-of-data">
+<h1>To process only a segment of data<a class="headerlink" href="#To-process-only-a-segment-of-data" title="Permalink to this heading">¶</a></h1>
+<p>Say that you have weeks of data available, but you want to restrict the data processed to a subset. If it is one contiguous subset block, you can just modify the run_summary table as below. You should also update the duration column by calling kernel_dataset._add_duration_column() afterwards:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># kernel_dataset.df[&quot;start&quot;].iloc[0] += pd.Timedelta(days=5)</span>
+<span class="c1"># kernel_dataset.df[&quot;start&quot;].iloc[1] += pd.Timedelta(days=7)</span>
+<span class="c1"># kernel_dataset._add_duration_column()</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Exercise:">
+<h1>Exercise:<a class="headerlink" href="#Exercise:" title="Permalink to this heading">¶</a></h1>
+<ul class="simple">
+<li><p>Print the kernel_dataset dataframe by calling <code class="docutils literal notranslate"><span class="pre">kernel_dataset.df</span></code></p></li>
+<li><p>Modify the start and end times, call _add_duration_column() and print it again.</p></li>
+<li><p>You can also process the data with and without this change</p></li>
+<li><p>Are the TFs different?</p></li>
+</ul>
+<p>Make an aurora configuration file (and then save that json file.)</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cc</span> <span class="o">=</span> <span class="n">ConfigCreator</span><span class="p">()</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">cc</span><span class="o">.</span><span class="n">create_from_kernel_dataset</span><span class="p">(</span><span class="n">kernel_dataset</span><span class="p">,</span>
+                                       <span class="n">emtf_band_file</span><span class="o">=</span><span class="n">BANDS_DEFAULT_FILE</span><span class="p">,)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">decimation</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">decimations</span><span class="p">:</span>
+    <span class="c1"># decimation.output_channels = [&quot;ex&quot;, &quot;ey&quot;]</span>
+    <span class="n">decimation</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">engine</span> <span class="o">=</span> <span class="s2">&quot;RME&quot;</span>
+</pre></div>
+</div>
+</div>
+<p>Take a look at the config:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">config</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+    &#34;processing&#34;: {
+        &#34;band_setup_file&#34;: &#34;/home/kkappler/software/irismt/aurora/aurora/config/emtf_band_setup/bs_test.cfg&#34;,
+        &#34;band_specification_style&#34;: &#34;EMTF&#34;,
+        &#34;channel_nomenclature.ex&#34;: &#34;ex&#34;,
+        &#34;channel_nomenclature.ey&#34;: &#34;ey&#34;,
+        &#34;channel_nomenclature.hx&#34;: &#34;hx&#34;,
+        &#34;channel_nomenclature.hy&#34;: &#34;hy&#34;,
+        &#34;channel_nomenclature.hz&#34;: &#34;hz&#34;,
+        &#34;decimations&#34;: [
+            {
+                &#34;decimation_level&#34;: {
+                    &#34;bands&#34;: [
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.23828125,
+                                &#34;frequency_min&#34;: 0.19140625,
+                                &#34;index_max&#34;: 30,
+                                &#34;index_min&#34;: 25
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.19140625,
+                                &#34;frequency_min&#34;: 0.15234375,
+                                &#34;index_max&#34;: 24,
+                                &#34;index_min&#34;: 20
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.15234375,
+                                &#34;frequency_min&#34;: 0.12109375,
+                                &#34;index_max&#34;: 19,
+                                &#34;index_min&#34;: 16
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.12109375,
+                                &#34;frequency_min&#34;: 0.09765625,
+                                &#34;index_max&#34;: 15,
+                                &#34;index_min&#34;: 13
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.09765625,
+                                &#34;frequency_min&#34;: 0.07421875,
+                                &#34;index_max&#34;: 12,
+                                &#34;index_min&#34;: 10
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.07421875,
+                                &#34;frequency_min&#34;: 0.05859375,
+                                &#34;index_max&#34;: 9,
+                                &#34;index_min&#34;: 8
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.05859375,
+                                &#34;frequency_min&#34;: 0.04296875,
+                                &#34;index_max&#34;: 7,
+                                &#34;index_min&#34;: 6
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.04296875,
+                                &#34;frequency_min&#34;: 0.03515625,
+                                &#34;index_max&#34;: 5,
+                                &#34;index_min&#34;: 5
+                            }
+                        }
+                    ],
+                    &#34;channel_weight_specs&#34;: [],
+                    &#34;decimation.anti_alias_filter&#34;: &#34;default&#34;,
+                    &#34;decimation.factor&#34;: 1.0,
+                    &#34;decimation.level&#34;: 0,
+                    &#34;decimation.method&#34;: &#34;default&#34;,
+                    &#34;decimation.sample_rate&#34;: 1.0,
+                    &#34;estimator.engine&#34;: &#34;RME&#34;,
+                    &#34;estimator.estimate_per_channel&#34;: true,
+                    &#34;input_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;output_channels&#34;: [
+                        &#34;ex&#34;,
+                        &#34;ey&#34;,
+                        &#34;hz&#34;
+                    ],
+                    &#34;reference_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;regression.max_iterations&#34;: 10,
+                    &#34;regression.max_redescending_iterations&#34;: 2,
+                    &#34;regression.minimum_cycles&#34;: 10,
+                    &#34;regression.r0&#34;: 1.5,
+                    &#34;regression.tolerance&#34;: 0.005,
+                    &#34;regression.u0&#34;: 2.8,
+                    &#34;regression.verbosity&#34;: 0,
+                    &#34;save_fcs&#34;: false,
+                    &#34;stft.harmonic_indices&#34;: [
+                        -1
+                    ],
+                    &#34;stft.method&#34;: &#34;fft&#34;,
+                    &#34;stft.min_num_stft_windows&#34;: 2,
+                    &#34;stft.per_window_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;stft.pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;stft.prewhitening_type&#34;: &#34;first difference&#34;,
+                    &#34;stft.recoloring&#34;: true,
+                    &#34;stft.window.clock_zero_type&#34;: &#34;ignore&#34;,
+                    &#34;stft.window.normalized&#34;: true,
+                    &#34;stft.window.num_samples&#34;: 128,
+                    &#34;stft.window.overlap&#34;: 32,
+                    &#34;stft.window.type&#34;: &#34;boxcar&#34;
+                }
+            },
+            {
+                &#34;decimation_level&#34;: {
+                    &#34;bands&#34;: [
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0.0341796875,
+                                &#34;frequency_min&#34;: 0.0263671875,
+                                &#34;index_max&#34;: 17,
+                                &#34;index_min&#34;: 14
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0.0263671875,
+                                &#34;frequency_min&#34;: 0.0205078125,
+                                &#34;index_max&#34;: 13,
+                                &#34;index_min&#34;: 11
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0.0205078125,
+                                &#34;frequency_min&#34;: 0.0166015625,
+                                &#34;index_max&#34;: 10,
+                                &#34;index_min&#34;: 9
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0.0166015625,
+                                &#34;frequency_min&#34;: 0.0126953125,
+                                &#34;index_max&#34;: 8,
+                                &#34;index_min&#34;: 7
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0.0126953125,
+                                &#34;frequency_min&#34;: 0.0107421875,
+                                &#34;index_max&#34;: 6,
+                                &#34;index_min&#34;: 6
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0.0107421875,
+                                &#34;frequency_min&#34;: 0.0087890625,
+                                &#34;index_max&#34;: 5,
+                                &#34;index_min&#34;: 5
+                            }
+                        }
+                    ],
+                    &#34;channel_weight_specs&#34;: [],
+                    &#34;decimation.anti_alias_filter&#34;: &#34;default&#34;,
+                    &#34;decimation.factor&#34;: 4.0,
+                    &#34;decimation.level&#34;: 1,
+                    &#34;decimation.method&#34;: &#34;default&#34;,
+                    &#34;decimation.sample_rate&#34;: 0.25,
+                    &#34;estimator.engine&#34;: &#34;RME&#34;,
+                    &#34;estimator.estimate_per_channel&#34;: true,
+                    &#34;input_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;output_channels&#34;: [
+                        &#34;ex&#34;,
+                        &#34;ey&#34;,
+                        &#34;hz&#34;
+                    ],
+                    &#34;reference_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;regression.max_iterations&#34;: 10,
+                    &#34;regression.max_redescending_iterations&#34;: 2,
+                    &#34;regression.minimum_cycles&#34;: 10,
+                    &#34;regression.r0&#34;: 1.5,
+                    &#34;regression.tolerance&#34;: 0.005,
+                    &#34;regression.u0&#34;: 2.8,
+                    &#34;regression.verbosity&#34;: 0,
+                    &#34;save_fcs&#34;: false,
+                    &#34;stft.harmonic_indices&#34;: [
+                        -1
+                    ],
+                    &#34;stft.method&#34;: &#34;fft&#34;,
+                    &#34;stft.min_num_stft_windows&#34;: 2,
+                    &#34;stft.per_window_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;stft.pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;stft.prewhitening_type&#34;: &#34;first difference&#34;,
+                    &#34;stft.recoloring&#34;: true,
+                    &#34;stft.window.clock_zero_type&#34;: &#34;ignore&#34;,
+                    &#34;stft.window.normalized&#34;: true,
+                    &#34;stft.window.num_samples&#34;: 128,
+                    &#34;stft.window.overlap&#34;: 32,
+                    &#34;stft.window.type&#34;: &#34;boxcar&#34;
+                }
+            },
+            {
+                &#34;decimation_level&#34;: {
+                    &#34;bands&#34;: [
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0.008544921875,
+                                &#34;frequency_min&#34;: 0.006591796875,
+                                &#34;index_max&#34;: 17,
+                                &#34;index_min&#34;: 14
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0.006591796875,
+                                &#34;frequency_min&#34;: 0.005126953125,
+                                &#34;index_max&#34;: 13,
+                                &#34;index_min&#34;: 11
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0.005126953125,
+                                &#34;frequency_min&#34;: 0.004150390625,
+                                &#34;index_max&#34;: 10,
+                                &#34;index_min&#34;: 9
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0.004150390625,
+                                &#34;frequency_min&#34;: 0.003173828125,
+                                &#34;index_max&#34;: 8,
+                                &#34;index_min&#34;: 7
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0.003173828125,
+                                &#34;frequency_min&#34;: 0.002685546875,
+                                &#34;index_max&#34;: 6,
+                                &#34;index_min&#34;: 6
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0.002685546875,
+                                &#34;frequency_min&#34;: 0.002197265625,
+                                &#34;index_max&#34;: 5,
+                                &#34;index_min&#34;: 5
+                            }
+                        }
+                    ],
+                    &#34;channel_weight_specs&#34;: [],
+                    &#34;decimation.anti_alias_filter&#34;: &#34;default&#34;,
+                    &#34;decimation.factor&#34;: 4.0,
+                    &#34;decimation.level&#34;: 2,
+                    &#34;decimation.method&#34;: &#34;default&#34;,
+                    &#34;decimation.sample_rate&#34;: 0.0625,
+                    &#34;estimator.engine&#34;: &#34;RME&#34;,
+                    &#34;estimator.estimate_per_channel&#34;: true,
+                    &#34;input_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;output_channels&#34;: [
+                        &#34;ex&#34;,
+                        &#34;ey&#34;,
+                        &#34;hz&#34;
+                    ],
+                    &#34;reference_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;regression.max_iterations&#34;: 10,
+                    &#34;regression.max_redescending_iterations&#34;: 2,
+                    &#34;regression.minimum_cycles&#34;: 10,
+                    &#34;regression.r0&#34;: 1.5,
+                    &#34;regression.tolerance&#34;: 0.005,
+                    &#34;regression.u0&#34;: 2.8,
+                    &#34;regression.verbosity&#34;: 0,
+                    &#34;save_fcs&#34;: false,
+                    &#34;stft.harmonic_indices&#34;: [
+                        -1
+                    ],
+                    &#34;stft.method&#34;: &#34;fft&#34;,
+                    &#34;stft.min_num_stft_windows&#34;: 2,
+                    &#34;stft.per_window_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;stft.pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;stft.prewhitening_type&#34;: &#34;first difference&#34;,
+                    &#34;stft.recoloring&#34;: true,
+                    &#34;stft.window.clock_zero_type&#34;: &#34;ignore&#34;,
+                    &#34;stft.window.normalized&#34;: true,
+                    &#34;stft.window.num_samples&#34;: 128,
+                    &#34;stft.window.overlap&#34;: 32,
+                    &#34;stft.window.type&#34;: &#34;boxcar&#34;
+                }
+            },
+            {
+                &#34;decimation_level&#34;: {
+                    &#34;bands&#34;: [
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0.00274658203125,
+                                &#34;frequency_min&#34;: 0.00213623046875,
+                                &#34;index_max&#34;: 22,
+                                &#34;index_min&#34;: 18
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0.00213623046875,
+                                &#34;frequency_min&#34;: 0.00164794921875,
+                                &#34;index_max&#34;: 17,
+                                &#34;index_min&#34;: 14
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0.00164794921875,
+                                &#34;frequency_min&#34;: 0.00115966796875,
+                                &#34;index_max&#34;: 13,
+                                &#34;index_min&#34;: 10
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0.00115966796875,
+                                &#34;frequency_min&#34;: 0.00079345703125,
+                                &#34;index_max&#34;: 9,
+                                &#34;index_min&#34;: 7
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0.00079345703125,
+                                &#34;frequency_min&#34;: 0.00054931640625,
+                                &#34;index_max&#34;: 6,
+                                &#34;index_min&#34;: 5
+                            }
+                        }
+                    ],
+                    &#34;channel_weight_specs&#34;: [],
+                    &#34;decimation.anti_alias_filter&#34;: &#34;default&#34;,
+                    &#34;decimation.factor&#34;: 4.0,
+                    &#34;decimation.level&#34;: 3,
+                    &#34;decimation.method&#34;: &#34;default&#34;,
+                    &#34;decimation.sample_rate&#34;: 0.015625,
+                    &#34;estimator.engine&#34;: &#34;RME&#34;,
+                    &#34;estimator.estimate_per_channel&#34;: true,
+                    &#34;input_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;output_channels&#34;: [
+                        &#34;ex&#34;,
+                        &#34;ey&#34;,
+                        &#34;hz&#34;
+                    ],
+                    &#34;reference_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;regression.max_iterations&#34;: 10,
+                    &#34;regression.max_redescending_iterations&#34;: 2,
+                    &#34;regression.minimum_cycles&#34;: 10,
+                    &#34;regression.r0&#34;: 1.5,
+                    &#34;regression.tolerance&#34;: 0.005,
+                    &#34;regression.u0&#34;: 2.8,
+                    &#34;regression.verbosity&#34;: 0,
+                    &#34;save_fcs&#34;: false,
+                    &#34;stft.harmonic_indices&#34;: [
+                        -1
+                    ],
+                    &#34;stft.method&#34;: &#34;fft&#34;,
+                    &#34;stft.min_num_stft_windows&#34;: 2,
+                    &#34;stft.per_window_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;stft.pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;stft.prewhitening_type&#34;: &#34;first difference&#34;,
+                    &#34;stft.recoloring&#34;: true,
+                    &#34;stft.window.clock_zero_type&#34;: &#34;ignore&#34;,
+                    &#34;stft.window.normalized&#34;: true,
+                    &#34;stft.window.num_samples&#34;: 128,
+                    &#34;stft.window.overlap&#34;: 32,
+                    &#34;stft.window.type&#34;: &#34;boxcar&#34;
+                }
+            }
+        ],
+        &#34;id&#34;: &#34;CAS04_sr1&#34;,
+        &#34;stations.local.id&#34;: &#34;CAS04&#34;,
+        &#34;stations.local.mth5_path&#34;: &#34;/home/kkappler/software/irismt/aurora/docs/examples/8P_CAS04.h5&#34;,
+        &#34;stations.local.remote&#34;: false,
+        &#34;stations.local.runs&#34;: [
+            {
+                &#34;run&#34;: {
+                    &#34;id&#34;: &#34;b&#34;,
+                    &#34;input_channels&#34;: [
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hx&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hy&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        }
+                    ],
+                    &#34;output_channels&#34;: [
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;ex&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;ey&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hz&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        }
+                    ],
+                    &#34;sample_rate&#34;: 1.0,
+                    &#34;time_periods&#34;: [
+                        {
+                            &#34;time_period&#34;: {
+                                &#34;end&#34;: &#34;2020-06-12T17:52:23+00:00&#34;,
+                                &#34;start&#34;: &#34;2020-06-02T22:24:55+00:00&#34;
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                &#34;run&#34;: {
+                    &#34;id&#34;: &#34;d&#34;,
+                    &#34;input_channels&#34;: [
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hx&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hy&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        }
+                    ],
+                    &#34;output_channels&#34;: [
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;ex&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;ey&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hz&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        }
+                    ],
+                    &#34;sample_rate&#34;: 1.0,
+                    &#34;time_periods&#34;: [
+                        {
+                            &#34;time_period&#34;: {
+                                &#34;end&#34;: &#34;2020-07-13T19:00:00+00:00&#34;,
+                                &#34;start&#34;: &#34;2020-07-01T19:36:55+00:00&#34;
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        &#34;stations.remote&#34;: []
+    }
+}
+</pre></div></div>
+</div>
+<section id="What-if-I-have-unconventional-channel-names?">
+<h2>What if I have unconventional channel names?<a class="headerlink" href="#What-if-I-have-unconventional-channel-names?" title="Permalink to this heading">¶</a></h2>
+<p>Aurora uses “ex”, “ey”, “hx”, “hy”, “hz” as default names, but not all MTH5 files will use this nomenclauture. For example, files generated from some Phoenix system call channels “e1”, “e2”, “h1”, “h2”, “h3”</p>
+<p>A complete list of supported channel mappings is in mt_metadata/transfer_functions/processing/aurora/standards/channel_nomenclatures.json</p>
+<p>Here is an exmaple of how update the config in this case:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># config.channel_nomenclature.keyword = &quot;phoenix123&quot;</span>
+<span class="c1"># config.set_default_input_output_channels()</span>
+<span class="c1"># config.set_default_reference_channels()</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="id1">
+<h1>Exercise:<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h1>
+<ul class="simple">
+<li><p>Print the processing config by calling config</p></li>
+<li><p>Modify the nomenclature using the above code, and print it again.</p></li>
+<li><p>Confirm that the two configs are different. Can you spot the differences?</p></li>
+</ul>
+<p>Run the Aurora Pipeline using the input MTh5 and Confiugration File</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show_plot</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">tf_cls</span> <span class="o">=</span> <span class="n">process_mth5</span><span class="p">(</span><span class="n">config</span><span class="p">,</span>
+                    <span class="n">kernel_dataset</span><span class="p">,</span>
+                    <span class="n">units</span><span class="o">=</span><span class="s2">&quot;MT&quot;</span><span class="p">,</span>
+                    <span class="n">show_plot</span><span class="o">=</span><span class="n">show_plot</span><span class="p">,</span>
+                    <span class="n">z_file_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2025-07-11T17:39:04.124863-0700 | INFO | aurora.pipelines.transfer_function_kernel | show_processing_summary | Processing Summary Dataframe:</span>
+<span class="ansi-bold">2025-07-11T17:39:04.130200-0700 | INFO | aurora.pipelines.transfer_function_kernel | show_processing_summary |
+    duration  has_data  n_samples run station       survey       run_hdf5_reference   station_hdf5_reference    fc  remote  stft mth5_obj dec_level  dec_factor  sample_rate  window_duration  num_samples_window  num_samples  num_stft_windows
+0   847648.0      True     847649   b   CAS04  CONUS South  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;NA&gt;   False  None     None         0         1.0     1.000000            128.0                 128     847648.0            8829.0
+1   847648.0      True     847649   b   CAS04  CONUS South  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;NA&gt;   False  None     None         1         4.0     0.250000            512.0                 128     211912.0            2207.0
+2   847648.0      True     847649   b   CAS04  CONUS South  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;NA&gt;   False  None     None         2         4.0     0.062500           2048.0                 128      52978.0             551.0
+3   847648.0      True     847649   b   CAS04  CONUS South  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;NA&gt;   False  None     None         3         4.0     0.015625           8192.0                 128      13244.0             137.0
+4  1034585.0      True    1034586   d   CAS04  CONUS South  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;NA&gt;   False  None     None         0         1.0     1.000000            128.0                 128    1034585.0           10776.0
+5  1034585.0      True    1034586   d   CAS04  CONUS South  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;NA&gt;   False  None     None         1         4.0     0.250000            512.0                 128     258646.0            2693.0
+6  1034585.0      True    1034586   d   CAS04  CONUS South  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;NA&gt;   False  None     None         2         4.0     0.062500           2048.0                 128      64661.0             673.0
+7  1034585.0      True    1034586   d   CAS04  CONUS South  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;NA&gt;   False  None     None         3         4.0     0.015625           8192.0                 128      16165.0             168.0</span>
+<span class="ansi-bold">2025-07-11T17:39:04.132196-0700 | INFO | aurora.pipelines.transfer_function_kernel | memory_check | Total memory: 62.74 GB</span>
+<span class="ansi-bold">2025-07-11T17:39:04.133745-0700 | INFO | aurora.pipelines.transfer_function_kernel | memory_check | Total Bytes of Raw Data: 0.014 GB</span>
+<span class="ansi-bold">2025-07-11T17:39:04.134216-0700 | INFO | aurora.pipelines.transfer_function_kernel | memory_check | Raw Data will use: 0.022 % of memory</span>
+<span class="ansi-bold">2025-07-11T17:39:04.145551-0700 | INFO | aurora.pipelines.transfer_function_kernel | mth5_has_fcs | Fourier coefficients not detected for survey: CONUS South, station: CAS04, run: b-- Fourier coefficients will be computed</span>
+<span class="ansi-bold">2025-07-11T17:39:04.290234-0700 | INFO | mth5.mth5 | close_mth5 | Flushing and closing /home/kkappler/software/irismt/aurora/docs/examples/8P_CAS04.h5</span>
+<span class="ansi-bold">2025-07-11T17:39:04.301417-0700 | INFO | aurora.pipelines.transfer_function_kernel | mth5_has_fcs | Fourier coefficients not detected for survey: CONUS South, station: CAS04, run: d-- Fourier coefficients will be computed</span>
+<span class="ansi-bold">2025-07-11T17:39:04.416308-0700 | INFO | mth5.mth5 | close_mth5 | Flushing and closing /home/kkappler/software/irismt/aurora/docs/examples/8P_CAS04.h5</span>
+<span class="ansi-bold">2025-07-11T17:39:04.418028-0700 | INFO | aurora.pipelines.transfer_function_kernel | check_if_fcs_already_exist | FC levels not present</span>
+<span class="ansi-bold">2025-07-11T17:39:04.420113-0700 | INFO | aurora.pipelines.process_mth5 | process_mth5_legacy | Processing config indicates 4 decimation levels</span>
+<span class="ansi-bold">2025-07-11T17:39:04.421453-0700 | INFO | aurora.pipelines.transfer_function_kernel | valid_decimations | After validation there are 4 valid decimation levels</span>
+<span class="ansi-bold">2025-07-11T17:39:06.897331-0700 | INFO | mth5.processing.kernel_dataset | initialize_dataframe_for_processing | Dataset dataframe initialized successfully</span>
+<span class="ansi-bold">2025-07-11T17:39:06.898671-0700 | INFO | aurora.pipelines.transfer_function_kernel | update_dataset_df | Dataset Dataframe Updated for decimation level 0 Successfully</span>
+<span class="ansi-bold">2025-07-11T17:39:08.287010-0700 | INFO | aurora.time_series.spectrogram_helpers | save_fourier_coefficients | Skip saving FCs. dec_level_config.save_fc =  False</span>
+<span class="ansi-bold">2025-07-11T17:39:09.684219-0700 | INFO | aurora.time_series.spectrogram_helpers | save_fourier_coefficients | Skip saving FCs. dec_level_config.save_fc =  False</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:39:09.695812-0700 | WARNING | aurora.pipelines.feature_weights | extract_features | Features could not be accessed from MTH5 --
+Calculating features on the fly (development only)</span>
+<span class="ansi-bold">2025-07-11T17:39:09.710035-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 25.728968s  (0.038867Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:09.836324-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 19.929573s  (0.050177Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:10.021655-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 15.164131s  (0.065945Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:10.221885-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 11.746086s  (0.085135Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:10.478535-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 9.195791s  (0.108745Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:10.794427-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 7.362526s  (0.135823Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:11.195097-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 5.856115s  (0.170762Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:11.642160-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 4.682492s  (0.213562Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:12.117321-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 25.728968s  (0.038867Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:12.259111-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 19.929573s  (0.050177Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:12.464593-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 15.164131s  (0.065945Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:12.670809-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 11.746086s  (0.085135Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:12.930364-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 9.195791s  (0.108745Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:13.193437-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 7.362526s  (0.135823Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:13.532798-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 5.856115s  (0.170762Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:13.843935-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 4.682492s  (0.213562Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:14.340768-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 25.728968s  (0.038867Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:14.503653-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 19.929573s  (0.050177Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:14.687783-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 15.164131s  (0.065945Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:14.893185-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 11.746086s  (0.085135Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:15.139200-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 9.195791s  (0.108745Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:15.430306-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 7.362526s  (0.135823Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:15.722274-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 5.856115s  (0.170762Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:16.038793-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 4.682492s  (0.213562Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_operate_aurora_63_1.png" src="../_images/examples_operate_aurora_63_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2025-07-11T17:39:17.081456-0700 | INFO | aurora.pipelines.transfer_function_kernel | update_dataset_df | DECIMATION LEVEL 1</span>
+<span class="ansi-bold">2025-07-11T17:39:17.279036-0700 | INFO | aurora.pipelines.transfer_function_kernel | update_dataset_df | Dataset Dataframe Updated for decimation level 1 Successfully</span>
+<span class="ansi-bold">2025-07-11T17:39:17.883669-0700 | INFO | aurora.time_series.spectrogram_helpers | save_fourier_coefficients | Skip saving FCs. dec_level_config.save_fc =  False</span>
+<span class="ansi-bold">2025-07-11T17:39:18.406106-0700 | INFO | aurora.time_series.spectrogram_helpers | save_fourier_coefficients | Skip saving FCs. dec_level_config.save_fc =  False</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:39:18.412128-0700 | WARNING | aurora.pipelines.feature_weights | extract_features | Features could not be accessed from MTH5 --
+Calculating features on the fly (development only)</span>
+<span class="ansi-bold">2025-07-11T17:39:18.419603-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 102.915872s  (0.009717Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:18.472637-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 85.631182s  (0.011678Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:18.554829-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 68.881694s  (0.014518Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:18.652110-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 54.195827s  (0.018452Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:18.750223-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 43.003958s  (0.023254Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:18.858432-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 33.310722s  (0.030020Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:18.987259-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 102.915872s  (0.009717Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:19.075505-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 85.631182s  (0.011678Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:19.157763-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 68.881694s  (0.014518Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:19.256440-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 54.195827s  (0.018452Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:19.354031-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 43.003958s  (0.023254Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:19.460390-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 33.310722s  (0.030020Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:19.621506-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 102.915872s  (0.009717Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:19.726024-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 85.631182s  (0.011678Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:19.813092-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 68.881694s  (0.014518Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:19.912741-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 54.195827s  (0.018452Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:20.021794-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 43.003958s  (0.023254Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:20.142141-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 33.310722s  (0.030020Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_operate_aurora_63_3.png" src="../_images/examples_operate_aurora_63_3.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2025-07-11T17:39:20.776612-0700 | INFO | aurora.pipelines.transfer_function_kernel | update_dataset_df | DECIMATION LEVEL 2</span>
+<span class="ansi-bold">2025-07-11T17:39:20.851477-0700 | INFO | aurora.pipelines.transfer_function_kernel | update_dataset_df | Dataset Dataframe Updated for decimation level 2 Successfully</span>
+<span class="ansi-bold">2025-07-11T17:39:21.227456-0700 | INFO | aurora.time_series.spectrogram_helpers | save_fourier_coefficients | Skip saving FCs. dec_level_config.save_fc =  False</span>
+<span class="ansi-bold">2025-07-11T17:39:21.530786-0700 | INFO | aurora.time_series.spectrogram_helpers | save_fourier_coefficients | Skip saving FCs. dec_level_config.save_fc =  False</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:39:21.534637-0700 | WARNING | aurora.pipelines.feature_weights | extract_features | Features could not be accessed from MTH5 --
+Calculating features on the fly (development only)</span>
+<span class="ansi-bold">2025-07-11T17:39:21.545095-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 411.663489s  (0.002429Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:21.571250-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 342.524727s  (0.002919Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:21.601020-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 275.526776s  (0.003629Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:21.646823-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 216.783308s  (0.004613Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:21.729840-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 172.015831s  (0.005813Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:21.821838-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 133.242890s  (0.007505Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:21.977956-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 411.663489s  (0.002429Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:22.073634-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 342.524727s  (0.002919Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:22.104439-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 275.526776s  (0.003629Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:22.147826-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 216.783308s  (0.004613Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:22.227662-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 172.015831s  (0.005813Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:22.313085-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 133.242890s  (0.007505Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:22.406633-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 411.663489s  (0.002429Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:22.469859-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 342.524727s  (0.002919Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:22.499366-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 275.526776s  (0.003629Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:22.543015-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 216.783308s  (0.004613Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:22.618067-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 172.015831s  (0.005813Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:22.714298-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 133.242890s  (0.007505Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_operate_aurora_63_5.png" src="../_images/examples_operate_aurora_63_5.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2025-07-11T17:39:23.259964-0700 | INFO | aurora.pipelines.transfer_function_kernel | update_dataset_df | DECIMATION LEVEL 3</span>
+<span class="ansi-bold">2025-07-11T17:39:23.290801-0700 | INFO | aurora.pipelines.transfer_function_kernel | update_dataset_df | Dataset Dataframe Updated for decimation level 3 Successfully</span>
+<span class="ansi-bold">2025-07-11T17:39:23.568881-0700 | INFO | aurora.time_series.spectrogram_helpers | save_fourier_coefficients | Skip saving FCs. dec_level_config.save_fc =  False</span>
+<span class="ansi-bold">2025-07-11T17:39:23.786675-0700 | INFO | aurora.time_series.spectrogram_helpers | save_fourier_coefficients | Skip saving FCs. dec_level_config.save_fc =  False</span>
+<span class="ansi-yellow-intense-fg ansi-bold">2025-07-11T17:39:23.789638-0700 | WARNING | aurora.pipelines.feature_weights | extract_features | Features could not be accessed from MTH5 --
+Calculating features on the fly (development only)</span>
+<span class="ansi-bold">2025-07-11T17:39:23.796944-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 1514.701336s  (0.000660Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:23.821246-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 1042.488956s  (0.000959Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:23.847033-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 723.371271s  (0.001382Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:23.874233-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 532.971560s  (0.001876Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:23.898372-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 412.837995s  (0.002422Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:23.928249-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 1514.701336s  (0.000660Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:23.955901-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 1042.488956s  (0.000959Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:23.984639-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 723.371271s  (0.001382Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:24.019940-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 532.971560s  (0.001876Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:24.052375-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 412.837995s  (0.002422Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:24.090261-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 1514.701336s  (0.000660Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:24.118385-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 1042.488956s  (0.000959Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:24.159490-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 723.371271s  (0.001382Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:24.197207-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 532.971560s  (0.001876Hz)</span>
+<span class="ansi-bold">2025-07-11T17:39:24.235168-0700 | INFO | aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 412.837995s  (0.002422Hz)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_operate_aurora_63_7.png" src="../_images/examples_operate_aurora_63_7.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">2025-07-11T17:39:25.068677-0700 | INFO | mth5.mth5 | close_mth5 | Flushing and closing /home/kkappler/software/irismt/aurora/docs/examples/8P_CAS04.h5</span>
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="nb">type</span><span class="p">(</span><span class="n">tf_cls</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+mt_metadata.transfer_functions.core.TF
+</pre></div></div>
+</div>
+<p>Write the transfer functions generated by the Aurora pipeline</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tf_cls</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fn</span><span class="o">=</span><span class="s2">&quot;emtfxml_test.xml&quot;</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="s2">&quot;emtfxml&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+EMTFXML(station=&#39;0&#39;, latitude=0.00, longitude=0.00, elevation=0.00)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tf_cls</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fn</span><span class="o">=</span><span class="s2">&quot;emtfxml_test.edi&quot;</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="s2">&quot;edi&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Station: 0
+--------------------------------------------------
+        Survey:        0
+        Project:       None
+        Acquired by:   None
+        Acquired date: 1980-01-01
+        Latitude:      0.000
+        Longitude:     0.000
+        Elevation:     0.000
+        Impedance:     True
+        Tipper:        True
+        Number of periods: 25
+                Period Range:   4.68249E+00 -- 1.51470E+03 s
+                Frequency Range 6.60196E-04 -- 2.13561E-01 s
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tf_cls</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fn</span><span class="o">=</span><span class="s2">&quot;emtfxml_test.zss&quot;</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="s2">&quot;zmm&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+MT( station=&#39;0&#39;, latitude=0.00, longitude=0.00, elevation=0.00 )
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../user-docs/installing.html" class="btn btn-neutral float-left" title="Installing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="dataset_definition.html" class="btn btn-neutral float-right" title="Dataset Definition DataFrame" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

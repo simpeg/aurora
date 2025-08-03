@@ -1,0 +1,328 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.transfer_function.plot.comparison_plots &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aurora.transfer_function.plot.comparison_plots</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.transfer_function.plot.comparison_plots</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This module contains a function to for comparing legacy &quot;z-file&quot;</span>
+<span class="sd">     transfer function files.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.sandbox.io_helpers.zfile_murphy</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_z_file</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.transfer_function.plot.rho_phi_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_phi</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.transfer_function.plot.rho_phi_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_rho</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+
+<div class="viewcode-block" id="compare_two_z_files"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.plot.html#aurora.transfer_function.plot.comparison_plots.compare_two_z_files">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">compare_two_z_files</span><span class="p">(</span>
+    <span class="n">z_path1</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+    <span class="n">z_path2</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+    <span class="n">angle1</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">angle2</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">label1</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">label2</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">scale_factor1</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">scale_factor2</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">out_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">show_plot</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">use_ylims</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">use_xlims</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">rho_ax_label_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
+    <span class="n">phi_ax_label_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
+    <span class="n">markersize</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">rho_ylims</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1e3</span><span class="p">),</span>
+    <span class="n">phi_ylims</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">90</span><span class="p">),</span>
+    <span class="n">xlims</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1e-3</span><span class="p">,</span> <span class="mf">1e3</span><span class="p">),</span>
+    <span class="n">title_string</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">subtitle_string</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Takes as input two z-files and plots them both on the same axis</span>
+
+<span class="sd">    TODO: Replace with a method from MTpy</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    z_path1: Union[pathlib.Path, str]</span>
+<span class="sd">        The first z-file to compare</span>
+<span class="sd">    z_path2: Union[pathlib.Path, str]</span>
+<span class="sd">        The second z-file to compare</span>
+<span class="sd">    angle1: Optional[float] = 0.0</span>
+<span class="sd">        The angle to rotate the first TF</span>
+<span class="sd">    angle2: Optional[float] = 0.0</span>
+<span class="sd">        The angle to rotate the second TF</span>
+<span class="sd">    label1: Optional[str] = &quot;&quot;,</span>
+<span class="sd">        A legend label for the first TF</span>
+<span class="sd">    label2: Optional[str] = &quot;&quot;,</span>
+<span class="sd">        A legend label for the second TF</span>
+<span class="sd">    scale_factor1: Optional[float] = 1.0</span>
+<span class="sd">        A scale factor to shift rho of TF1</span>
+<span class="sd">    scale_factor2: Optional[float] =1.0</span>
+<span class="sd">        A scale factor to shift rho of TF2</span>
+<span class="sd">    out_file: Optional[Union[pathlib.Path, str]] = &quot;&quot;</span>
+<span class="sd">        A file to save the plot</span>
+<span class="sd">    show_plot: Optional[bool] = True</span>
+<span class="sd">        If True, show an interactive plot</span>
+<span class="sd">    use_ylims: Optional[bool] = True</span>
+<span class="sd">        If True, explicitly set y-axis limits to rho_ylims</span>
+<span class="sd">    use_xlims: Optional[bool] = True</span>
+<span class="sd">        If True, explicitly set x-axis limits to xlims</span>
+<span class="sd">    rho_ax_label_size: Optional[float] = 16</span>
+<span class="sd">        Set the y-axis label size for rho</span>
+<span class="sd">    phi_ax_label_size: Optional[float] = 16,</span>
+<span class="sd">        Set the y-axis label size for phi</span>
+<span class="sd">    markersize: Optional[float] = 3</span>
+<span class="sd">        Set the markersize (for both rho and phi)</span>
+<span class="sd">    rho_ylims: Optional[tuple] = (1, 1e3)</span>
+<span class="sd">        The Y-axis limits to apply on rho (if use_ylims is True)</span>
+<span class="sd">    phi_ylims: Optional[tuple] = (0, 90),</span>
+<span class="sd">        The Y-axis limits to apply on phi</span>
+<span class="sd">    xlims: Optional[tuple] = (1e-3, 1e3)</span>
+<span class="sd">        The Z-axis limits to apply (if use_xlims is True)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">zfile1</span> <span class="o">=</span> <span class="n">read_z_file</span><span class="p">(</span><span class="n">z_path1</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="n">angle1</span><span class="p">)</span>
+    <span class="n">zfile2</span> <span class="o">=</span> <span class="n">read_z_file</span><span class="p">(</span><span class="n">z_path2</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="n">angle2</span><span class="p">)</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Scaling TF scale_factor1: </span><span class="si">{</span><span class="n">scale_factor1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># figsize=(8, 6.),</span>
+
+    <span class="c1"># Make LaTeX symbol strings</span>
+    <span class="n">rho_phi_strings</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">rho_phi_strings</span><span class="p">[</span><span class="s2">&quot;rho&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">rho_phi_strings</span><span class="p">[</span><span class="s2">&quot;phi&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">xy_or_yx</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;xy&quot;</span><span class="p">,</span> <span class="s2">&quot;yx&quot;</span><span class="p">]:</span>
+        <span class="n">rho_phi_strings</span><span class="p">[</span><span class="s2">&quot;rho&quot;</span><span class="p">][</span><span class="n">xy_or_yx</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;$</span><span class="se">\\</span><span class="s2">rho_</span><span class="se">{{</span><span class="si">{</span><span class="n">xy_or_yx</span><span class="si">}</span><span class="se">}}</span><span class="s2">$&quot;</span>
+        <span class="n">rho_phi_strings</span><span class="p">[</span><span class="s2">&quot;phi&quot;</span><span class="p">][</span><span class="n">xy_or_yx</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;$\phi_</span><span class="se">{{</span><span class="si">{</span><span class="n">xy_or_yx</span><span class="si">}</span><span class="se">}}</span><span class="s2">$&quot;</span>
+
+    <span class="n">markers</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">markers</span><span class="p">[</span><span class="s2">&quot;xy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;^&quot;</span>
+    <span class="n">markers</span><span class="p">[</span><span class="s2">&quot;yx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;o&quot;</span>
+    <span class="n">file1_colors</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">file2_colors</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">file1_colors</span><span class="p">[</span><span class="s2">&quot;xy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;black&quot;</span>
+    <span class="n">file1_colors</span><span class="p">[</span><span class="s2">&quot;yx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;black&quot;</span>
+    <span class="n">file2_colors</span><span class="p">[</span><span class="s2">&quot;xy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;red&quot;</span>
+    <span class="n">file2_colors</span><span class="p">[</span><span class="s2">&quot;yx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;blue&quot;</span>
+
+    <span class="n">rho_or_phi</span> <span class="o">=</span> <span class="s2">&quot;rho&quot;</span>
+    <span class="k">for</span> <span class="n">xy_or_yx</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;xy&quot;</span><span class="p">,</span> <span class="s2">&quot;yx&quot;</span><span class="p">]:</span>
+        <span class="n">plot_rho</span><span class="p">(</span>
+            <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">zfile1</span><span class="o">.</span><span class="n">periods</span><span class="p">,</span>
+            <span class="n">zfile1</span><span class="o">.</span><span class="n">rho</span><span class="p">(</span><span class="n">xy_or_yx</span><span class="p">)</span> <span class="o">*</span> <span class="n">scale_factor1</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label1</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">rho_phi_strings</span><span class="p">[</span><span class="n">rho_or_phi</span><span class="p">][</span><span class="n">xy_or_yx</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">markersize</span><span class="o">=</span><span class="n">markersize</span><span class="p">,</span>
+            <span class="n">marker</span><span class="o">=</span><span class="n">markers</span><span class="p">[</span><span class="n">xy_or_yx</span><span class="p">],</span>
+            <span class="n">color</span><span class="o">=</span><span class="n">file1_colors</span><span class="p">[</span><span class="n">xy_or_yx</span><span class="p">],</span>
+            <span class="n">ax_label_size</span><span class="o">=</span><span class="n">rho_ax_label_size</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">plot_rho</span><span class="p">(</span>
+            <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">zfile2</span><span class="o">.</span><span class="n">periods</span><span class="p">,</span>
+            <span class="n">zfile2</span><span class="o">.</span><span class="n">rho</span><span class="p">(</span><span class="n">xy_or_yx</span><span class="p">)</span> <span class="o">*</span> <span class="n">scale_factor2</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label2</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">rho_phi_strings</span><span class="p">[</span><span class="n">rho_or_phi</span><span class="p">][</span><span class="n">xy_or_yx</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">markersize</span><span class="o">=</span><span class="n">markersize</span><span class="p">,</span>
+            <span class="n">marker</span><span class="o">=</span><span class="n">markers</span><span class="p">[</span><span class="n">xy_or_yx</span><span class="p">],</span>
+            <span class="n">color</span><span class="o">=</span><span class="n">file2_colors</span><span class="p">[</span><span class="n">xy_or_yx</span><span class="p">],</span>
+            <span class="n">ax_label_size</span><span class="o">=</span><span class="n">rho_ax_label_size</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">prop</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">})</span>
+    <span class="c1"># axs[0].set_ylabel(&quot;$\\rho_a$&quot;)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Apparent Resistivity $\Omega$-m&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">use_ylims</span><span class="p">:</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">rho_ylims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rho_ylims</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">use_xlims</span><span class="p">:</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">xlims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xlims</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">rho_or_phi</span> <span class="o">=</span> <span class="s2">&quot;phi&quot;</span>
+    <span class="k">for</span> <span class="n">xy_or_yx</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;xy&quot;</span><span class="p">,</span> <span class="s2">&quot;yx&quot;</span><span class="p">]:</span>
+        <span class="n">plot_phi</span><span class="p">(</span>
+            <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">zfile1</span><span class="o">.</span><span class="n">periods</span><span class="p">,</span>
+            <span class="n">zfile1</span><span class="o">.</span><span class="n">phi</span><span class="p">(</span><span class="n">xy_or_yx</span><span class="p">)</span> <span class="o">*</span> <span class="n">scale_factor1</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label1</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">rho_phi_strings</span><span class="p">[</span><span class="n">rho_or_phi</span><span class="p">][</span><span class="n">xy_or_yx</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">markersize</span><span class="o">=</span><span class="n">markersize</span><span class="p">,</span>
+            <span class="n">marker</span><span class="o">=</span><span class="n">markers</span><span class="p">[</span><span class="n">xy_or_yx</span><span class="p">],</span>
+            <span class="n">color</span><span class="o">=</span><span class="n">file1_colors</span><span class="p">[</span><span class="n">xy_or_yx</span><span class="p">],</span>
+            <span class="n">ax_label_size</span><span class="o">=</span><span class="n">phi_ax_label_size</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">plot_phi</span><span class="p">(</span>
+            <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">zfile2</span><span class="o">.</span><span class="n">periods</span><span class="p">,</span>
+            <span class="n">zfile2</span><span class="o">.</span><span class="n">phi</span><span class="p">(</span><span class="n">xy_or_yx</span><span class="p">)</span> <span class="o">*</span> <span class="n">scale_factor2</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label2</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">rho_phi_strings</span><span class="p">[</span><span class="n">rho_or_phi</span><span class="p">][</span><span class="n">xy_or_yx</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">markersize</span><span class="o">=</span><span class="n">markersize</span><span class="p">,</span>
+            <span class="n">marker</span><span class="o">=</span><span class="n">markers</span><span class="p">[</span><span class="n">xy_or_yx</span><span class="p">],</span>
+            <span class="n">color</span><span class="o">=</span><span class="n">file2_colors</span><span class="p">[</span><span class="n">xy_or_yx</span><span class="p">],</span>
+            <span class="n">ax_label_size</span><span class="o">=</span><span class="n">phi_ax_label_size</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">prop</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">})</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Period (s)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Phase (degrees)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">phi_ylims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">phi_ylims</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span>
+        <span class="n">which</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span>
+        <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span>
+        <span class="n">which</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span>
+        <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">title_string</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title_string</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">subtitle_string</span><span class="p">:</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">subtitle_string</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">out_file</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">out_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">show_plot</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,389 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.test_utils.synthetic.processing_helpers &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aurora.test_utils.synthetic.processing_helpers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.test_utils.synthetic.processing_helpers</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains some helper functions that are called during the</span>
+<span class="sd">execution of aurora&#39;s tests of processing on synthetic data.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">mt_metadata.transfer_functions</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.pipelines.process_mth5</span><span class="w"> </span><span class="kn">import</span> <span class="n">process_mth5</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.test_utils.synthetic.make_processing_configs</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">make_processing_config_and_kernel_dataset</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">mth5.data.make_mth5_from_asc</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_test1_h5</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mth5.data.make_mth5_from_asc</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_test2_h5</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mth5.data.make_mth5_from_asc</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_test12rr_h5</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<div class="viewcode-block" id="get_example_kernel_dataset"><a class="viewcode-back" href="../../../../api/aurora.test_utils.synthetic.html#aurora.test_utils.synthetic.processing_helpers.get_example_kernel_dataset">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_example_kernel_dataset</span><span class="p">(</span><span class="n">num_stations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates a kernel dataset object from the synthetic data</span>
+<span class="sd">     - Helper function for synthetic tests.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    kernel_dataset: aurora.transfer_function.kernel_dataset.KernelDataset</span>
+<span class="sd">        The kernel dataset from a synthetic, single station mth5</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mth5.processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunSummary</span><span class="p">,</span> <span class="n">KernelDataset</span>
+
+    <span class="k">if</span> <span class="n">num_stations</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">mth5_path</span> <span class="o">=</span> <span class="n">create_test1_h5</span><span class="p">(</span><span class="n">force_make_mth5</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">num_stations</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">mth5_path</span> <span class="o">=</span> <span class="n">create_test12rr_h5</span><span class="p">(</span><span class="n">force_make_mth5</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">run_summary</span> <span class="o">=</span> <span class="n">RunSummary</span><span class="p">()</span>
+    <span class="n">run_summary</span><span class="o">.</span><span class="n">from_mth5s</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">mth5_path</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">kernel_dataset</span> <span class="o">=</span> <span class="n">KernelDataset</span><span class="p">()</span>
+    <span class="n">station_id</span> <span class="o">=</span> <span class="n">run_summary</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">station</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">num_stations</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">kernel_dataset</span><span class="o">.</span><span class="n">from_run_summary</span><span class="p">(</span>
+            <span class="n">run_summary</span><span class="o">=</span><span class="n">run_summary</span><span class="p">,</span> <span class="n">local_station_id</span><span class="o">=</span><span class="n">station_id</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">num_stations</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">remote_station_id</span> <span class="o">=</span> <span class="n">run_summary</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">station</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">kernel_dataset</span><span class="o">.</span><span class="n">from_run_summary</span><span class="p">(</span>
+            <span class="n">run_summary</span><span class="o">=</span><span class="n">run_summary</span><span class="p">,</span>
+            <span class="n">local_station_id</span><span class="o">=</span><span class="n">station_id</span><span class="p">,</span>
+            <span class="n">remote_station_id</span><span class="o">=</span><span class="n">remote_station_id</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">kernel_dataset</span></div>
+
+
+<div class="viewcode-block" id="tf_obj_from_synthetic_data"><a class="viewcode-back" href="../../../../api/aurora.test_utils.synthetic.html#aurora.test_utils.synthetic.processing_helpers.tf_obj_from_synthetic_data">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">tf_obj_from_synthetic_data</span><span class="p">(</span>
+    <span class="n">mth5_path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mt_metadata</span><span class="o">.</span><span class="n">transfer_functions</span><span class="o">.</span><span class="n">TF</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Executes aurora processing on mth5_path, and returns mt_metadata TF object.</span>
+<span class="sd">    - Helper function for test_issue_139</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">aurora.config.config_creator</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigCreator</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mth5.processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunSummary</span><span class="p">,</span> <span class="n">KernelDataset</span>
+
+    <span class="n">run_summary</span> <span class="o">=</span> <span class="n">RunSummary</span><span class="p">()</span>
+    <span class="n">run_summary</span><span class="o">.</span><span class="n">from_mth5s</span><span class="p">(</span><span class="nb">list</span><span class="p">((</span><span class="n">mth5_path</span><span class="p">,)))</span>
+
+    <span class="n">kernel_dataset</span> <span class="o">=</span> <span class="n">KernelDataset</span><span class="p">()</span>
+    <span class="n">kernel_dataset</span><span class="o">.</span><span class="n">from_run_summary</span><span class="p">(</span><span class="n">run_summary</span><span class="p">,</span> <span class="s2">&quot;test1&quot;</span><span class="p">,</span> <span class="s2">&quot;test2&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Define the processing Configuration</span>
+    <span class="n">cc</span> <span class="o">=</span> <span class="n">ConfigCreator</span><span class="p">()</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">cc</span><span class="o">.</span><span class="n">create_from_kernel_dataset</span><span class="p">(</span><span class="n">kernel_dataset</span><span class="p">)</span>
+
+    <span class="n">tf_cls</span> <span class="o">=</span> <span class="n">process_mth5</span><span class="p">(</span>
+        <span class="n">config</span><span class="p">,</span>
+        <span class="n">kernel_dataset</span><span class="p">,</span>
+        <span class="n">units</span><span class="o">=</span><span class="s2">&quot;MT&quot;</span><span class="p">,</span>
+        <span class="n">z_file_path</span><span class="o">=</span><span class="s2">&quot;test1_RRtest2.zrr&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">tf_cls</span></div>
+
+
+<div class="viewcode-block" id="process_synthetic_1"><a class="viewcode-back" href="../../../../api/aurora.test_utils.synthetic.html#aurora.test_utils.synthetic.processing_helpers.process_synthetic_1">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">process_synthetic_1</span><span class="p">(</span>
+    <span class="n">config_keyword</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;test1&quot;</span><span class="p">,</span>
+    <span class="n">z_file_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">test_scale_factor</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">simultaneous_regression</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">file_version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;0.1.0&quot;</span><span class="p">,</span>  <span class="c1"># TODO: set to Literal[&quot;0.1.0&quot;, &quot;0.2.0&quot;]</span>
+    <span class="n">return_collection</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">channel_nomenclature</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">reload_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config_keyword: str</span>
+<span class="sd">        &quot;test1&quot;, &quot;test1_tfk&quot;, this is an argument passed to the create_test_run_config</span>
+<span class="sd">        as test_case_id.</span>
+<span class="sd">    z_file_path: str or path</span>
+<span class="sd">        Where the z-file will be output</span>
+<span class="sd">    test_scale_factor: bool</span>
+<span class="sd">        If true, will assign scale factors to the channels</span>
+<span class="sd">    simultaneous_regression: bool</span>
+<span class="sd">        If True will do regression all outut channels in one step, rather than the</span>
+<span class="sd">        usual, channel-by-channel method</span>
+<span class="sd">    file_version: str</span>
+<span class="sd">        one of [&quot;0.1.0&quot;, &quot;0.2.0&quot;]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tf_result: TransferFunctionCollection or mt_metadata.transfer_functions.TF</span>
+<span class="sd">        Should change so that it is mt_metadata.TF (see Issue #143)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mth5_path</span> <span class="o">=</span> <span class="n">create_test1_h5</span><span class="p">(</span>
+        <span class="n">file_version</span><span class="o">=</span><span class="n">file_version</span><span class="p">,</span> <span class="n">channel_nomenclature</span><span class="o">=</span><span class="n">channel_nomenclature</span>
+    <span class="p">)</span>
+    <span class="n">mth5_paths</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">mth5_path</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">station_id</span> <span class="o">=</span> <span class="s2">&quot;test1&quot;</span>
+    <span class="n">tfk_dataset</span><span class="p">,</span> <span class="n">processing_config</span> <span class="o">=</span> <span class="n">make_processing_config_and_kernel_dataset</span><span class="p">(</span>
+        <span class="n">config_keyword</span><span class="o">=</span><span class="n">station_id</span><span class="p">,</span>
+        <span class="n">station_id</span><span class="o">=</span><span class="n">station_id</span><span class="p">,</span>
+        <span class="n">remote_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># TODO: allow empty str instead of None</span>
+        <span class="n">mth5s</span><span class="o">=</span><span class="n">mth5_paths</span><span class="p">,</span>
+        <span class="n">channel_nomenclature</span><span class="o">=</span><span class="n">channel_nomenclature</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Test that channel_scale_factors column is optional</span>
+    <span class="k">if</span> <span class="n">test_scale_factor</span><span class="p">:</span>
+        <span class="n">scale_factors</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;ex&quot;</span><span class="p">:</span> <span class="mf">10.0</span><span class="p">,</span>
+            <span class="s2">&quot;ey&quot;</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span>
+            <span class="s2">&quot;hx&quot;</span><span class="p">:</span> <span class="mf">6.0</span><span class="p">,</span>
+            <span class="s2">&quot;hy&quot;</span><span class="p">:</span> <span class="mf">5.0</span><span class="p">,</span>
+            <span class="s2">&quot;hz&quot;</span><span class="p">:</span> <span class="mf">100.0</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">tfk_dataset</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;channel_scale_factors&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">scale_factors</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">tfk_dataset</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;channel_scale_factors&quot;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Relates to issue #172</span>
+    <span class="c1"># reload_config = True</span>
+    <span class="c1"># if reload_config:</span>
+    <span class="c1">#     from mt_metadata.transfer_functions.processing.aurora import Processing</span>
+    <span class="c1">#     p = Processing()</span>
+    <span class="c1">#     config_path = pathlib.Path(&quot;config&quot;)</span>
+    <span class="c1">#     json_fn = config_path.joinpath(processing_config.json_fn())</span>
+    <span class="c1">#     p.from_json(json_fn)</span>
+
+    <span class="k">if</span> <span class="n">simultaneous_regression</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">decimation</span> <span class="ow">in</span> <span class="n">processing_config</span><span class="o">.</span><span class="n">decimations</span><span class="p">:</span>
+            <span class="n">decimation</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">estimate_per_channel</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">tf_result</span> <span class="o">=</span> <span class="n">process_mth5</span><span class="p">(</span>
+        <span class="n">processing_config</span><span class="p">,</span>
+        <span class="n">tfk_dataset</span><span class="o">=</span><span class="n">tfk_dataset</span><span class="p">,</span>
+        <span class="n">z_file_path</span><span class="o">=</span><span class="n">z_file_path</span><span class="p">,</span>
+        <span class="n">return_collection</span><span class="o">=</span><span class="n">return_collection</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">return_collection</span><span class="p">:</span>
+        <span class="n">z_figure_name</span> <span class="o">=</span> <span class="n">z_file_path</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;zss&quot;</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">xy_or_yx</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;xy&quot;</span><span class="p">,</span> <span class="s2">&quot;yx&quot;</span><span class="p">]:</span>
+            <span class="n">ttl_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">xy_or_yx</span><span class="si">}</span><span class="s2"> component, test_scale_factor = </span><span class="si">{</span><span class="n">test_scale_factor</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">out_png_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">xy_or_yx</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">z_figure_name</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">tf_result</span><span class="o">.</span><span class="n">rho_phi_plot</span><span class="p">(</span>
+                <span class="n">xy_or_yx</span><span class="o">=</span><span class="n">xy_or_yx</span><span class="p">,</span>
+                <span class="n">ttl_str</span><span class="o">=</span><span class="n">ttl_str</span><span class="p">,</span>
+                <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">figure_basename</span><span class="o">=</span><span class="n">out_png_name</span><span class="p">,</span>
+                <span class="n">figures_path</span><span class="o">=</span><span class="n">AURORA_RESULTS_PATH</span><span class="p">,</span>
+            <span class="p">)</span>
+    <span class="k">return</span> <span class="n">tf_result</span></div>
+
+<div class="viewcode-block" id="process_synthetic_2"><a class="viewcode-back" href="../../../../api/aurora.test_utils.synthetic.html#aurora.test_utils.synthetic.processing_helpers.process_synthetic_2">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">process_synthetic_2</span><span class="p">(</span>
+    <span class="n">force_make_mth5</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">z_file_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">save_fc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">file_version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;0.2.0&quot;</span><span class="p">,</span>
+    <span class="n">channel_nomenclature</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;&quot;&quot;&quot;</span>
+    <span class="n">station_id</span> <span class="o">=</span> <span class="s2">&quot;test2&quot;</span>
+    <span class="n">mth5_path</span> <span class="o">=</span> <span class="n">create_test2_h5</span><span class="p">(</span>
+        <span class="n">force_make_mth5</span><span class="o">=</span><span class="n">force_make_mth5</span><span class="p">,</span> <span class="n">file_version</span><span class="o">=</span><span class="n">file_version</span>
+    <span class="p">)</span>
+    <span class="n">mth5_paths</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">mth5_path</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="n">tfk_dataset</span><span class="p">,</span> <span class="n">processing_config</span> <span class="o">=</span> <span class="n">make_processing_config_and_kernel_dataset</span><span class="p">(</span>
+        <span class="n">config_keyword</span><span class="o">=</span><span class="n">station_id</span><span class="p">,</span>
+        <span class="n">station_id</span><span class="o">=</span><span class="n">station_id</span><span class="p">,</span>
+        <span class="n">remote_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">mth5s</span><span class="o">=</span><span class="n">mth5_paths</span><span class="p">,</span>
+        <span class="n">channel_nomenclature</span><span class="o">=</span><span class="n">channel_nomenclature</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">decimation_level</span> <span class="ow">in</span> <span class="n">processing_config</span><span class="o">.</span><span class="n">decimations</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">save_fc</span><span class="p">:</span>
+            <span class="n">decimation_level</span><span class="o">.</span><span class="n">save_fcs</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">decimation_level</span><span class="o">.</span><span class="n">save_fcs_type</span> <span class="o">=</span> <span class="s2">&quot;h5&quot;</span>  <span class="c1"># h5 instead of &quot;csv&quot;</span>
+
+    <span class="n">tfc</span> <span class="o">=</span> <span class="n">process_mth5</span><span class="p">(</span>
+        <span class="n">processing_config</span><span class="p">,</span>
+        <span class="n">tfk_dataset</span><span class="o">=</span><span class="n">tfk_dataset</span><span class="p">,</span>
+        <span class="n">z_file_path</span><span class="o">=</span><span class="n">z_file_path</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">tfc</span></div>
+
+<div class="viewcode-block" id="process_synthetic_1r2"><a class="viewcode-back" href="../../../../api/aurora.test_utils.synthetic.html#aurora.test_utils.synthetic.processing_helpers.process_synthetic_1r2">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">process_synthetic_1r2</span><span class="p">(</span>
+    <span class="n">config_keyword</span><span class="o">=</span><span class="s2">&quot;test1r2&quot;</span><span class="p">,</span>
+    <span class="n">channel_nomenclature</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">return_collection</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">mth5_path</span> <span class="o">=</span> <span class="n">create_test12rr_h5</span><span class="p">(</span><span class="n">channel_nomenclature</span><span class="o">=</span><span class="n">channel_nomenclature</span><span class="p">)</span>
+    <span class="n">mth5_paths</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">mth5_path</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="n">tfk_dataset</span><span class="p">,</span> <span class="n">processing_config</span> <span class="o">=</span> <span class="n">make_processing_config_and_kernel_dataset</span><span class="p">(</span>
+        <span class="n">config_keyword</span><span class="p">,</span>
+        <span class="n">station_id</span><span class="o">=</span><span class="s2">&quot;test1&quot;</span><span class="p">,</span>
+        <span class="n">remote_id</span><span class="o">=</span><span class="s2">&quot;test2&quot;</span><span class="p">,</span>
+        <span class="n">mth5s</span><span class="o">=</span><span class="n">mth5_paths</span><span class="p">,</span>
+        <span class="n">channel_nomenclature</span><span class="o">=</span><span class="n">channel_nomenclature</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">tfc</span> <span class="o">=</span> <span class="n">process_mth5</span><span class="p">(</span>
+        <span class="n">processing_config</span><span class="p">,</span>
+        <span class="n">tfk_dataset</span><span class="o">=</span><span class="n">tfk_dataset</span><span class="p">,</span>
+        <span class="n">return_collection</span><span class="o">=</span><span class="n">return_collection</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">tfc</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

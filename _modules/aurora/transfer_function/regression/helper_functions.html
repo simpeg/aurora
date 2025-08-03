@@ -1,0 +1,270 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.transfer_function.regression.helper_functions &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aurora.transfer_function.regression.helper_functions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.transfer_function.regression.helper_functions</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This module contains methods for performing regression to solve Y = Xb.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+
+<div class="viewcode-block" id="rme_beta"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.helper_functions.rme_beta">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">rme_beta</span><span class="p">(</span><span class="n">r0</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns a normalization factor to correct for bias in residual variance.</span>
+
+<span class="sd">    Details:</span>
+<span class="sd">    - This is an RME specific property.  It represents a bias in the calculation of</span>
+<span class="sd">    residual_variance which we correct for in TRME and TRME_RR. The implemented</span>
+<span class="sd">    formula is an approximation.  This is approximately equal to 1/beta where beta is</span>
+<span class="sd">    defined by Equation A3 in Egbert &amp; Booker 1986.</span>
+
+<span class="sd">    For r0=1.5 the correction factor is ~1.28 and beta ~0.78</span>
+
+<span class="sd">    Some notes from a discussion with Gary:</span>
+<span class="sd">    In the regression estimate you down-weight things with large errors, but you need</span>
+<span class="sd">    to define what is large.  You estimate the standard deviation (sigma) of the errors</span>
+<span class="sd">    from the residuals BUT with this cleaned data approach (Yc) sigma is smaller than</span>
+<span class="sd">    it should be.  You need to compensate for this by using a correction_factor. It&#39;s</span>
+<span class="sd">    basically the expectation, if the data really were Gaussian, and you estimated from</span>
+<span class="sd">    the corrected data. This is how much too small the estimate would be.</span>
+
+<span class="sd">    If you change the penalty functional you may need pencil, paper and some calculus.</span>
+<span class="sd">    The relationship between the corrected-data-residuals and the Gaussian residuals</span>
+<span class="sd">    could change if you change the penalty.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    r0 : float</span>
+<span class="sd">        The number of standard errors at which the RME method transitions from</span>
+<span class="sd">        quadratic weighting to linear</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    beta : float</span>
+<span class="sd">        correction factor = 1/beta</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">beta</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">r0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">beta</span></div>
+
+
+<div class="viewcode-block" id="simple_solve_tf"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.helper_functions.simple_solve_tf">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">simple_solve_tf</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Cast problem Y = Xb into scipy.linalg.solve form which solves: a @ x = b</span>
+
+<span class="sd">    - Note that the &quot;b&quot; in the two equations is different.</span>
+<span class="sd">      - The EMTF regression problem (and many regression problems in general) use Y=Xb</span>
+<span class="sd">      - Y, X are known and b is the solution</span>
+<span class="sd">      - scipy.linalg.solve form which solves: a @ x = b</span>
+<span class="sd">      - Here a, b are known and x is the solution.</span>
+<span class="sd">    - This function is used for testing vectorized, direct solver.</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Y: numpy.ndarray</span>
+<span class="sd">        The &quot;output&quot; of regression problem.  For testing this often has shape (N,).</span>
+<span class="sd">        Y is normally a vector of Electric field FCs</span>
+<span class="sd">    X: numpy.ndarray</span>
+<span class="sd">        The &quot;input&quot; of regression problem.  For testing this often has shape (N,2).</span>
+<span class="sd">        X is normally an array of Magnetic field FCs (two-component)</span>
+<span class="sd">    R: numpy.ndarray or None</span>
+<span class="sd">        Remote reference channels (optional)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    z: numpy.ndarray</span>
+<span class="sd">        The TF estimate -- Usually two complex numbers, (Zxx, Zxy), or (Zyx, Zyy)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">R</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">xH</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">conjugate</span><span class="p">()</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">xH</span> <span class="o">=</span> <span class="n">R</span><span class="o">.</span><span class="n">conjugate</span><span class="p">()</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">xH</span> <span class="o">@</span> <span class="n">X</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">xH</span> <span class="o">@</span> <span class="n">Y</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">z</span></div>
+
+
+<div class="viewcode-block" id="direct_solve_tf"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.helper_functions.direct_solve_tf">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">direct_solve_tf</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Solve problem Y = Xb for b.</span>
+
+<span class="sd">    This function can be used for testing.  It is not as stable as using simple_solve_tf,</span>
+<span class="sd">     but it is instructive to have an example of regression using the crudest approach.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Y: numpy.ndarray</span>
+<span class="sd">        The &quot;output&quot; of regression problem.  For testing this often has shape (N,).</span>
+<span class="sd">        Y is normally a vector of Electric field FCs</span>
+<span class="sd">    X: numpy.ndarray</span>
+<span class="sd">        The &quot;input&quot; of regression problem.  For testing this often has shape (N,2).</span>
+<span class="sd">        X is normally an array of Magnetic field FCs (two-component)</span>
+<span class="sd">    R: numpy.ndarray or None</span>
+<span class="sd">        Remote reference channels (optional)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    z: numpy.ndarray</span>
+<span class="sd">        The TF estimate -- Usually two complex numbers, (Zxx, Zxy), or (Zyx, Zyy)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">R</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">xH</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">conjugate</span><span class="p">()</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">xH</span> <span class="o">=</span> <span class="n">R</span><span class="o">.</span><span class="n">conjugate</span><span class="p">()</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+
+    <span class="c1"># multiply both sides by conjugate transpose</span>
+    <span class="n">xHx</span> <span class="o">=</span> <span class="n">xH</span> <span class="o">@</span> <span class="n">X</span>
+    <span class="n">xHY</span> <span class="o">=</span> <span class="n">xH</span> <span class="o">@</span> <span class="n">Y</span>
+
+    <span class="c1"># Invert the square matrix</span>
+    <span class="n">inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">xHx</span><span class="p">)</span>
+
+    <span class="c1"># get solution</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">inv</span> <span class="o">@</span> <span class="n">xHY</span>
+    <span class="k">return</span> <span class="n">b</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

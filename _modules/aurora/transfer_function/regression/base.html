@@ -1,0 +1,687 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.transfer_function.regression.base &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aurora.transfer_function.regression.base</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.transfer_function.regression.base</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">This module contains the base class for regression functions.</span>
+<span class="sd"> It follows Gary Egbert&#39;s EMTF Matlab code TRegression.m in</span>
+<span class="sd"> which can be found in</span>
+<span class="sd">iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes</span>
+
+<span class="sd">This class originally used numpy arrays to make adapting the Matlab easier, but</span>
+<span class="sd">experimental support for xarray is now added (2024).</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.transfer_function.regression.iter_control</span><span class="w"> </span><span class="kn">import</span> <span class="n">IterControl</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+
+<div class="viewcode-block" id="RegressionEstimator"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">RegressionEstimator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Abstract base class for solving Y = X*b + epsilon for b, complex-valued</span>
+
+<span class="sd">    Many of the robust transfer estimation methods we will use repeat the</span>
+<span class="sd">    model of solving Y = X*b +epsilon for b.  X is variously called the &quot;input&quot;,</span>
+<span class="sd">    &quot;predictor&quot;, &quot;explanatory&quot;, &quot;confounding&quot;, &quot;independent&quot; &quot;exogenous&quot;, variable(s)</span>
+<span class="sd">    or the &quot;design matrix&quot;, &quot;model matrix&quot; or &quot;regressor matrix&quot;.</span>
+<span class="sd">    Y are variously called the &quot;output&quot;, &quot;predicted&quot;, &quot;outcome&quot;,</span>
+<span class="sd">    &quot;response&quot;, &quot;endogenous&quot;, &quot;regressand&quot;, or &quot;dependent&quot; variable.  I will try to</span>
+<span class="sd">    use input and output.</span>
+
+<span class="sd">    When we &quot;regress Y on X&quot;, we use the values of variable X to predict</span>
+<span class="sd">    those of Y.</span>
+
+<span class="sd">    Typically operates on single &quot;frequency_band&quot;.</span>
+<span class="sd">    Allows multiple columns of Y, but estimates b for each column separately.</span>
+
+
+<span class="sd">    Estimated signal and noise covariance matrices can be used to compute error</span>
+<span class="sd">    together to compute covariance for the matrix of regression coefficients b</span>
+
+<span class="sd">    If the class has public attributes, they may be documented here</span>
+<span class="sd">    in an ``Attributes`` section and follow the same formatting as a</span>
+<span class="sd">    function&#39;s ``Args`` section. Alternatively, attributes may be documented</span>
+<span class="sd">    inline with the attribute&#39;s declaration (see __init__ method below).</span>
+
+<span class="sd">    Properties created with the ``@property`` decorator should be documented</span>
+<span class="sd">    in the property&#39;s getter method.</span>
+
+
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    _X : Union[xr.Dataset, xr.DataArray, np.ndarray]</span>
+<span class="sd">        The underlying dataset is assumed to be if shape nCH x nObs (normally 2-dimensional)</span>
+<span class="sd">        These are the input variables.  In the matlab codes each observation</span>
+<span class="sd">        corresponds to a row and each parameter (channel) is a column.</span>
+<span class="sd">        These data are transposed before regression</span>
+<span class="sd">    X : numpy array (normally 2-dimensional)</span>
+<span class="sd">        This is a &quot;pure array&quot; representation of _X used to emulate Gary</span>
+<span class="sd">        Egbert&#39;s matlab codes. It may or may not be deprecated.</span>
+<span class="sd">    _Y : xarray.Dataset</span>
+<span class="sd">        These are the output variables, arranged same as X above.</span>
+<span class="sd">    Y : numpy array (normally 2-dimensional)</span>
+<span class="sd">        This is a &quot;pure array&quot; representation of _Y used to emulate Gary</span>
+<span class="sd">        Egbert&#39;s matlab codes. It may or may not be deprecated.</span>
+<span class="sd">    b : numpy array (normally 2-dimensional)</span>
+<span class="sd">        Matrix of regression coefficients, i.e. the solution to the regression</span>
+<span class="sd">        problem.  In our context they are the &quot;Transfer Function&quot;</span>
+<span class="sd">        The dimension of b, to match X and Y is [n_input_ch, n_output_ch]</span>
+<span class="sd">        When we are solving &quot;channel-by-channel&quot;, b is usually [2,1].</span>
+
+<span class="sd">    inverse_signal_covariance: numpy array (n_input_ch, n_input_ch)</span>
+<span class="sd">        This was Cov_SS in Gary&#39;s matlab codes.  It is basically inv(X.H @ X)</span>
+<span class="sd">        Reference needed</span>
+<span class="sd">    noise_covariance : numpy array (n_output_ch, n_output_ch)</span>
+<span class="sd">        This was Cov_NN in Gary&#39;s matlab codes</span>
+<span class="sd">        Reference needed</span>
+<span class="sd">    squared_coherence: numpy array (n_output_ch)</span>
+<span class="sd">        This was R2 in Gary&#39;s matlab codes</span>
+<span class="sd">        Formula?  Reference?</span>
+<span class="sd">        Squared coherence (top row is using raw data, bottom cleaned, with crude</span>
+<span class="sd">        correction for amount of downweighted data)</span>
+<span class="sd">    Yc : numpy array (normally 2-dimensional)</span>
+<span class="sd">        A &quot;cleaned&quot; version of Y the output variables.</span>
+<span class="sd">    iter_control : transfer_function.iter_control.IterControl()</span>
+<span class="sd">        is a structure which controls the robust scheme iteration.</span>
+<span class="sd">        On return also contains number of iterations.</span>
+
+<span class="sd">    Kwargs:</span>
+<span class="sd">    input_channel_names: list</span>
+<span class="sd">        List of strings for channel names.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">X</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+        <span class="n">Y</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+        <span class="n">iter_control</span><span class="p">:</span> <span class="n">IterControl</span> <span class="o">=</span> <span class="n">IterControl</span><span class="p">(),</span>
+        <span class="n">input_channel_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">output_channel_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>  <span class="c1"># n</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X: Union[xr.Dataset, xr.DataArray, np.ndarray]</span>
+<span class="sd">            The input channels for regression</span>
+<span class="sd">        Y: Union[xr.Dataset, xr.DataArray, np.ndarray]</span>
+<span class="sd">            The output channels for regression</span>
+<span class="sd">        iter_control: IterControl</span>
+<span class="sd">            Contains parameters controlling the regression, e.g. convergence criteria, thresholds, etc.</span>
+<span class="sd">        input_channel_names: Optional[Union[list, None]]</span>
+<span class="sd">            If X is np.ndarray, this allows associating channel names to X&#39;s columns</span>
+<span class="sd">        output_channel_names: Optional[Union[list, None]]</span>
+<span class="sd">            If Y is np.ndarray, this allows associating channel names to Y&#39;s columns</span>
+
+<span class="sd">        ----------</span>
+<span class="sd">        kwargs</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_X</span> <span class="o">=</span> <span class="n">X</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_Y</span> <span class="o">=</span> <span class="n">Y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iter_control</span> <span class="o">=</span> <span class="n">iter_control</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cov_nn</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cov_ss_inv</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">squared_coherence</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_up_regression_variables</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">R2</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qr_input</span> <span class="o">=</span> <span class="s2">&quot;X&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_Q</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_R</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_QH</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># conjugate transpose of Q (Hermitian operator)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_QHY</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1">#</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_QHYc</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_channels_out</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_input_channel_names</span> <span class="o">=</span> <span class="n">input_channel_names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_channel_names</span> <span class="o">=</span> <span class="n">output_channel_names</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_up_regression_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize arrays needed for regression and cast any xarray to numpy</span>
+
+<span class="sd">        Development Notes:</span>
+
+<span class="sd">        When xr.Datasets are X, Y we cast to array (num channels x num observations) and then transpose them</span>
+<span class="sd">        When xr.DataArrays are X, Y extract the array -- but how do we know whether or not to transpose?</span>
+<span class="sd">        - it would be nice to have a helper function that applies the logic of getting the data from the</span>
+<span class="sd">         xarray and transposing or not appropriately.</span>
+<span class="sd">        - for now we assume that the input data are organized so that input arrays are (n_ch x n_observations).</span>
+<span class="sd">        This assumption is OK for xr.Dataset where the datavars are the MT components (&quot;hx&quot;, &quot;hy&quot;, etc)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">_input_to_numpy_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_X</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="o">=</span> <span class="n">_input_to_numpy_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_Y</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Yc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_number_of_observations_xy_consistent</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">input_channel_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;returns the list of channel names associated with X&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_input_channel_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_input_channel_names</span> <span class="o">=</span> <span class="n">_get_channel_names</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_X</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;IN&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_input_channel_names</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">output_channel_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;returns the list of channel names associated with Y&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_channel_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_output_channel_names</span> <span class="o">=</span> <span class="n">_get_channel_names</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_Y</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;OUT&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_channel_names</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inverse_signal_covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the inverse signal covariance matrix of the input channels as xarray&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov_ss_inv</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">noise_covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the noise covariance matrix of the output channels  as xarray&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov_nn</span>
+
+<div class="viewcode-block" id="RegressionEstimator.b_to_xarray"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.b_to_xarray">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">b_to_xarray</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Wraps the TF results as an xarray&quot;&quot;&quot;</span>
+        <span class="n">xra</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">),</span>
+            <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;output_channel&quot;</span><span class="p">,</span> <span class="s2">&quot;input_channel&quot;</span><span class="p">],</span>
+            <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;output_channel&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_channel_names</span><span class="p">,</span>
+                <span class="s2">&quot;input_channel&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_channel_names</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">xra</span></div>
+
+<div class="viewcode-block" id="RegressionEstimator.solve_underdetermined"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.solve_underdetermined">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">solve_underdetermined</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Solves the regression problem if it is under-determined -- Not Stable</span>
+
+<span class="sd">        Development Notes:</span>
+<span class="sd">        20210806</span>
+<span class="sd">        This method was originally in TRME.m, but it does not depend in</span>
+<span class="sd">        general on using RME method so putting it in the base class.</span>
+
+<span class="sd">        We basically never get here and when we do, we don&#39;t trust the results</span>
+<span class="sd">        https://docs.scipy.org/doc/numpy-1.9.2/reference/generated/numpy.linalg.svd.html</span>
+<span class="sd">        https://www.mathworks.com/help/matlab/ref/double.svd.html</span>
+
+<span class="sd">        Note that the svd outputs are different in matlab and numpy</span>
+<span class="sd">        https://stackoverflow.com/questions/50930899/svd-command-in-python-v-s-matlab</span>
+<span class="sd">        &quot;The SVD of a matrix can be written as</span>
+
+<span class="sd">        A = U S V^H</span>
+
+<span class="sd">        Where the ^H signifies the conjugate transpose. Matlab&#39;s svd command returns U, S and V,</span>
+<span class="sd">        while numpy.linalg.svd returns U, the diagonal of S, and V^H.</span>
+<span class="sd">        Thus, to get the same S and V as in Matlab you need to reconstruct the S and also get the V:</span>
+
+
+<span class="sd">        ORIGINAL MATLAB</span>
+
+<span class="sd">        % Overdetermined problem...use svd to invert, return</span>
+<span class="sd">        % NOTE: the solution IS non - unique... and by itself RME is not setup</span>
+<span class="sd">        % to do anything sensible to resolve the non - uniqueness(no prior info</span>
+<span class="sd">        % is passed!).  This is stop-gap, to prevent errors when using RME as</span>
+<span class="sd">        % part of some other estimation scheme!</span>
+<span class="sd">        [u,s,v] = svd(obj.X,&#39;econ&#39;);</span>
+<span class="sd">        sInv = 1./diag(s);</span>
+<span class="sd">        obj.b = v*diag(sInv)*u&#39;*obj.Y;</span>
+<span class="sd">        if ITER.returnCovariance</span>
+<span class="sd">           obj.Cov_NN = zeros(K,K);</span>
+<span class="sd">           obj.Cov_SS = zeros(nParam,nParam);</span>
+<span class="sd">        end</span>
+<span class="sd">        result = obj.b</span>
+
+
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">U</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">full_matrices</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">S_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">s</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="n">V</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span> <span class="o">@</span> <span class="n">S_inv</span> <span class="o">@</span> <span class="n">U</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">conj</span><span class="p">())</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_control</span><span class="o">.</span><span class="n">return_covariance</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Warning covariances are not xarray, may break things downstream&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cov_nn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n_channels_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_channels_out</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cov_ss_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n_channels_in</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_channels_in</span><span class="p">))</span>
+
+        <span class="k">return</span></div>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_number_of_observations_xy_consistent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Raises an exception if the X, Y data have different number of observations&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Design matrix (X) has </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> rows but data (Y) &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;has </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">n_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the number of multivariate observations in the regression dataset.</span>
+
+<span class="sd">        Development Notes:</span>
+<span class="sd">         This may need to be modified if we use masked arrays</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int:</span>
+<span class="sd">            The number of rows in the input data vector</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">n_channels_in</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the number of input channels.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int:</span>
+<span class="sd">            The number of channels of input data (columns of X)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">n_channels_out</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        number of output variables</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        int</span>
+<span class="sd">            number of output variables (Assumed to be num columns of a 2D array)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_channels_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_n_channels_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_channels_out</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">degrees_of_freedom</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        gets the number of degress of freedom in the dataset.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        int</span>
+<span class="sd">            The total number of multivariate observations minus the number of input channels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_data</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_channels_in</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_underdetermined</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if the regression problem is under-determined</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if regression problem is under-determined, otherwise False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">degrees_of_freedom</span> <span class="o">&lt;</span> <span class="mi">0</span>
+
+    <span class="c1"># TODO Add support for masked arrays</span>
+    <span class="c1"># def mask_input_channels(self):</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     ADD NAN MANAGEMENT HERE</span>
+    <span class="c1">#     Returns</span>
+    <span class="c1">#     -------</span>
+    <span class="c1">#</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     pass</span>
+
+<div class="viewcode-block" id="RegressionEstimator.qr_decomposition"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.qr_decomposition">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">qr_decomposition</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sanity_check</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        performs QR decomposition on input matrix X.</span>
+
+<span class="sd">        If X is not provided as an optional argument then check the value of self.qr_input</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X: numpy array</span>
+<span class="sd">            In RME this is the Input channels X</span>
+<span class="sd">            In RME_RR this is the RR channels Z</span>
+<span class="sd">        sanity_check: boolean</span>
+<span class="sd">            check QR decomposition is working correctly.  Set to True for debugging.</span>
+<span class="sd">            Can probably be deprecated.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Q, R: tuple</span>
+<span class="sd">            The matrices Q and R from the QR-decomposition.</span>
+<span class="sd">            X = Q R where Q is unitary/orthogonal and R upper triangular.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">qr_input</span> <span class="o">==</span> <span class="s2">&quot;X&quot;</span><span class="p">:</span>
+                <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">qr_input</span> <span class="o">==</span> <span class="s2">&quot;Z&quot;</span><span class="p">:</span>
+                <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Matrix to perform QR decomposition not specified by </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">qr_input</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;msg&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">Q</span><span class="p">,</span> <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_Q</span> <span class="o">=</span> <span class="n">Q</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_R</span> <span class="o">=</span> <span class="n">R</span>
+        <span class="k">if</span> <span class="n">sanity_check</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span> <span class="o">-</span> <span class="n">X</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Failed QR decomposition sanity check&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">Exception</span>
+        <span class="k">return</span> <span class="n">Q</span><span class="p">,</span> <span class="n">R</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Q</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the Q matrix from the QR decomposition&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Q</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">R</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the R matrix from the QR decomposition&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_R</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">QH</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the conjugate transpose of the Q matrix from the QR decomposition&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_QH</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_QH</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_QH</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">QHY</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the QH @ Y</span>
+
+<span class="sd">        QHY is a convenience matrix that makes computing the predicted data (QQHY) more efficient.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_QHY</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_QHY</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">QH</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_QHY</span>
+
+<div class="viewcode-block" id="RegressionEstimator.estimate_ols"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.estimate_ols">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">estimate_ols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;solve&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Solve Y = Xb with ordinary least squares, not robust regression.</span>
+
+<span class="sd">        Development Notes:</span>
+<span class="sd">        Brute Force tends to be less stable because we actually compute the</span>
+<span class="sd">        inverse matrix.  It is not recommended, its just here for completeness.</span>
+<span class="sd">        X&#39;Y=X&#39;Xb</span>
+<span class="sd">        (X&#39;X)^-1 X&#39;Y = b</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mode : str</span>
+<span class="sd">            must be one of [&quot;qr&quot;, &quot;brute_force&quot;, &quot;solve&quot;]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        b : numpy array</span>
+<span class="sd">            Normally the impedance tensor Z</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">mode</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;qr&quot;</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">solve_triangular</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">qr_decomposition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">solve_triangular</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">QH</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span>
+            <span class="n">Y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span>
+            <span class="n">XH</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+            <span class="n">XHX</span> <span class="o">=</span> <span class="n">XH</span> <span class="o">@</span> <span class="n">X</span>
+            <span class="n">XHY</span> <span class="o">=</span> <span class="n">XH</span> <span class="o">@</span> <span class="n">Y</span>
+            <span class="k">if</span> <span class="n">mode</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;brute_force&quot;</span><span class="p">:</span>
+                <span class="n">XHX_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">XHX</span><span class="p">)</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">XHX_inv</span><span class="p">,</span> <span class="n">XHY</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">mode</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;solve&quot;</span><span class="p">:</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">XHX</span><span class="p">,</span> <span class="n">XHY</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mode </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2"> not recognized&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">Exception</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span>
+        <span class="k">return</span> <span class="n">b</span></div>
+
+<div class="viewcode-block" id="RegressionEstimator.estimate"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.estimate">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes the regression</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        b: np.ndarray</span>
+<span class="sd">            The regression solution to Y = Xb</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_ols</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;qr&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">b</span></div></div>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_input_to_numpy_array</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Casts data input to regression as numpy array, with channels as column vectors.</span>
+
+<span class="sd">    Currently, we store array channels row-wise (as num_channels x num_observations),</span>
+<span class="sd">    but the way regression is set up the variables should be column vectors (num_observations x num_channels)</span>
+
+<span class="sd">    This is a place where we could distill the logic for which dimension is which.</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X: Union[xr.Dataset, xr.DataArray]</span>
+<span class="sd">        Data to be used in regression in xarray form</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    output: np.ndarray</span>
+<span class="sd">        Data to be used in regression as a numpy array</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">to_array</span><span class="p">()</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">T</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">output</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># cast to 2D if 1D</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;np.ndarray input is assumed to be nCH x nObs -- transposing&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;input argument of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="si">}</span><span class="s2"> not supported -- try an xarray&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">output</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_channel_names</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns list of channel names.</span>
+
+<span class="sd">    If X is a numpy array, names will be created. These are needed by TRME.estimate() to return xarrays.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X: Union[xr.Dataset, xr.DataArray, np.ndarray]</span>
+<span class="sd">        If X is xarray just return the labels</span>
+<span class="sd">        If X is numpy array, make the names up.  numpy array assumed to contain data from each channel</span>
+<span class="sd">        in a separate row, i.e. (n_ch x n_observations) shaped array.</span>
+<span class="sd">    label: Optional[str]</span>
+<span class="sd">        This gets prepended onto incrementing integers for channel labels.</span>
+<span class="sd">        For example, this could be &quot;input&quot;, &quot;output&quot;, or a station name.</span>
+<span class="sd">        Used to keep the indexing a 2D xarray unique.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    channel_names: list</span>
+<span class="sd">        The names of the channels for the input array X</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+        <span class="n">channel_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+        <span class="c1"># Beware hard coded assumption of &quot;variable&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">channel_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;variable&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>  <span class="c1"># This happens when xarray has only one channel</span>
+            <span class="n">channel_names</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">X</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;variable&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span>
+            <span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># numpy array doesn&#39;t have input channel_names predefined</span>
+        <span class="n">channel_names</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+            <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>  <span class="c1"># note its 0, not 1 here because we are talking to _X</span>
+        <span class="n">channel_names</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label</span><span class="si">}{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">channel_names</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">channel_names</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

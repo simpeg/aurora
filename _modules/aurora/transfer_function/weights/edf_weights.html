@@ -1,0 +1,492 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.transfer_function.weights.edf_weights &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aurora.transfer_function.weights.edf_weights</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.transfer_function.weights.edf_weights</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This module contains a class for computing so-called &quot;Effective Degrees of Freedom&quot; weights.</span>
+
+<span class="sd">Development notes:</span>
+<span class="sd">The code here is based on the function Edfwts.m from egbert_codes-</span>
+<span class="sd">20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/functions/Edfwts.m</span>
+
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+
+<div class="viewcode-block" id="EffectiveDegreesOfFreedom"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.weights.html#aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">EffectiveDegreesOfFreedom</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">edf_l1</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">20.0</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">c1</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+        <span class="n">c2</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
+        <span class="n">p3</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">,</span>
+        <span class="n">n_data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        n_data : int</span>
+<span class="sd">            Number of &quot;numeric&quot; observations in the input and remote reference data.</span>
+<span class="sd">            Any time-frequency index having nan value in any channel is subtracted</span>
+<span class="sd">            from the total number of observations before computation of p1, p2</span>
+<span class="sd">        edf_l1 : float</span>
+<span class="sd">             the effective number of degrees of freedom at which a datapoint should be</span>
+<span class="sd">              removed from the total energy calculation in the iterative loop</span>
+<span class="sd">        alpha : float</span>
+<span class="sd">            The exponent on n_data in formulae for thresholds p1 and p2</span>
+<span class="sd">        c1 : float</span>
+<span class="sd">            ad hoc parameter for scaling the p1 threshold</span>
+<span class="sd">        c2 : float</span>
+<span class="sd">            ad hoc parameter for scaling the p2 threshold</span>
+<span class="sd">        p3 : float</span>
+<span class="sd">            parameter controlling threshold at which the ratio of a data weighting</span>
+<span class="sd">            associated with remote and input channel is unacceptable.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">edf_l1</span> <span class="o">=</span> <span class="n">edf_l1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c1</span> <span class="o">=</span> <span class="n">c1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c2</span> <span class="o">=</span> <span class="n">c2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p3</span> <span class="o">=</span> <span class="n">p3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_data</span> <span class="o">=</span> <span class="n">n_data</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">p1</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Threshold applied to edf.  All edf below  this value</span>
+<span class="sd">        are set to weight=0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">c1</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_data</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">p2</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Threshold applied to edf.  All edf above th  this value</span>
+<span class="sd">        are set to weight=0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">c2</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_data</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EffectiveDegreesOfFreedom.compute_weights"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.weights.html#aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom.compute_weights">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">compute_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">use</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the EDF Weights</span>
+
+<span class="sd">        y_hat = P * y</span>
+<span class="sd">        where P is the &quot;hat&quot; matrix, and y_hat is the predicted value of y</span>
+
+<span class="sd">        Development Notes:</span>
+<span class="sd">        The data covariance matrix s and its inverse h are iteratively recomputed using</span>
+<span class="sd">        fewer and fewer observations. The edf_weights are also computed at every</span>
+<span class="sd">        iteration (but for all data points).</span>
+
+<span class="sd">        Discussing this with Gary:</span>
+<span class="sd">        &quot;... because you are down-weighting (omitting) more and more highpower events</span>
+<span class="sd">        the total signal is going down.  The signal power goes down with every call</span>
+<span class="sd">        to this method&quot;</span>
+<span class="sd">        ...</span>
+<span class="sd">        &quot;The Hat Matrix, where the diagonals of this matrix are really big means an</span>
+<span class="sd">        individual data point is controlling its own prediction, and the estimate.</span>
+<span class="sd">        If the problem was balanced (n data points contributing equally), each data point</span>
+<span class="sd">        would contribute equally (1/n) to each parameter. When one data point is large and</span>
+<span class="sd">        the others are tiny, then it may be contributing a lot, say 1/2 rather than 1/n.</span>
+<span class="sd">        edf is like the diagonal of the Hat matrix (in the single station case)</span>
+<span class="sd">        How much does the data point contribute to the prediction of itself.</span>
+
+<span class="sd">        Note: H = inv(S) in general has equal H[0,1] = H[1,0];  2x2 matrices with</span>
+<span class="sd">        matching off-diagonal terms have inverses with the same property.</span>
+
+<span class="sd">        ---AI Explaination of the code---</span>
+<span class="sd">        The effective degrees of freedom (edf) weights are computed based on the covariance</span>
+<span class="sd">        matrix of the input data. The covariance matrix is calculated using the selected</span>
+<span class="sd">        observations (indicated by the `use` boolean array). The inverse of the covariance</span>
+<span class="sd">        matrix is then used to compute the edf weights for each observation.</span>
+<span class="sd">        The edf weights are calculated as follows:</span>
+<span class="sd">        - The covariance matrix `S` is computed as the outer product of the selected data.</span>
+<span class="sd">        - The covariance matrix is normalized by the number of selected observations.</span>
+<span class="sd">        - The inverse covariance matrix `H` is computed.</span>
+<span class="sd">        - The edf weights are then calculated using the diagonal and off-diagonal elements</span>
+<span class="sd">          of the inverse covariance matrix `H` and the selected data.</span>
+
+<span class="sd">        ---Statistical Context---</span>
+<span class="sd">        The inverse covariance matrix (H = S^{-1}) is used here because it &quot;whitens&quot; the data:</span>
+<span class="sd">        it removes correlations and scales by variance, so each observation is measured in units</span>
+<span class="sd">        of its statistical uncertainty. This is analogous to the Mahalanobis distance, which</span>
+<span class="sd">        accounts for the covariance structure of the data. In the context of regression, the</span>
+<span class="sd">        resulting EDF (effective degrees of freedom) value for each observation is proportional</span>
+<span class="sd">        to its leverage, similar to the diagonal of the Hat matrix. Observations that are outliers</span>
+<span class="sd">        in the whitened space (i.e., unusual given the covariance structure) receive higher EDF</span>
+<span class="sd">        values, indicating greater influence on the fit. Thus, the inverse covariance matrix is</span>
+<span class="sd">        essential for properly quantifying the statistical distinctiveness and leverage of each</span>
+<span class="sd">        observation, enabling robust down-weighting of high-leverage (potentially outlier) points.</span>
+
+<span class="sd">        In summary: The inverse covariance matrix is used to weight each observation according to</span>
+<span class="sd">        its contribution to the fit, accounting for both variance and correlation, ensuring that</span>
+<span class="sd">        the EDF weights reflect true statistical leverage.</span>
+
+<span class="sd">        A note on usage of real vs complex data:</span>
+<span class="sd">        The terms ( X[0, :] * \conj{X[0, :]} ) and ( X[1, :] * \conj{X[1, :]} ) are always real</span>
+<span class="sd">        and non-negative (they are squared magnitudes). The cross term ( \conj{X[1, :]} * X[0, :] )</span>
+<span class="sd">        can be complex, but in the context of covariance and quadratic forms you want the real part,</span>
+<span class="sd">        not the absolute value.</span>
+<span class="sd">        Why?</span>
+<span class="sd">        The quadratic form ( x^H H x ) (where ( x ) is a complex vector and ( H ) is Hermitian) is</span>
+<span class="sd">        always real, and the real part is what contributes to the variance/leverage.</span>
+<span class="sd">        Taking the absolute value would overstate the contribution of the cross term and would not be</span>
+<span class="sd">        statistically correct for covariance-based leverage calculations.</span>
+
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X: np.ndarray</span>
+<span class="sd">            The data to for which to determine weights.</span>
+<span class="sd">        use : np.ndarray</span>
+<span class="sd">            populated with booleans</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        edf:np.ndarray</span>
+<span class="sd">            The weights values.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="n">use</span><span class="p">]</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="n">use</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># covariance matrix, 2x2</span>
+        <span class="n">S</span> <span class="o">/=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">use</span><span class="p">)</span>  <span class="c1"># normalize by the number of datapoints</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>  <span class="c1"># inverse covariance matrix</span>
+
+        <span class="c1"># TODO: why are we not using the `use` boolean to select the data?</span>
+        <span class="c1">#       This is a bit of a mystery, but it seems to be the way the</span>
+        <span class="c1">#       original code was written.</span>
+        <span class="c1"># EXPLANATION:</span>
+        <span class="c1"># The `use` boolean is applied when computing the covariance matrix S (i.e., X[:, use]),</span>
+        <span class="c1"># so H (the inverse covariance) reflects only the selected (inlier) data. However, when</span>
+        <span class="c1"># computing the EDF terms (xx_term, yy_term, xy_term), the code uses all columns of X,</span>
+        <span class="c1"># not just those where `use` is True. This mirrors the original Matlab code and is a bit</span>
+        <span class="c1"># counterintuitive. The intent is to evaluate the leverage (EDF) for all data points,</span>
+        <span class="c1"># using the covariance structure estimated from the current inlier set. This allows the</span>
+        <span class="c1"># algorithm to iteratively update which points are considered inliers/outliers, by seeing</span>
+        <span class="c1"># how each point would behave if it were included, given the current inlier covariance.</span>
+        <span class="c1">#</span>
+        <span class="c1"># In summary:</span>
+        <span class="c1"># - The covariance matrix is computed from the inliers (`use`).</span>
+        <span class="c1"># - The leverage (EDF) is computed for all points, using the inlier covariance.</span>
+        <span class="c1"># - This lets the algorithm decide which points to drop next, based on their leverage under the current model.</span>
+        <span class="n">xx_term</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:])</span> <span class="o">*</span> <span class="n">H</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">yy_term</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:])</span> <span class="o">*</span> <span class="n">H</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">xy_term</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:])</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">*</span> <span class="n">H</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">edf</span> <span class="o">=</span> <span class="n">xx_term</span> <span class="o">+</span> <span class="n">yy_term</span> <span class="o">+</span> <span class="n">xy_term</span>
+
+        <span class="c1"># CONNECTION TO THE HAT MATRIX:</span>
+        <span class="c1"># In linear regression, the projection or &quot;hat&quot; matrix P maps observed data to fitted values,</span>
+        <span class="c1"># and the diagonal elements of P represent the leverage of each observation. For real-valued</span>
+        <span class="c1"># data, the EDF (effective degrees of freedom) is exactly the diagonal of P. In the complex-</span>
+        <span class="c1"># valued, multivariate case here, the quadratic form using the inverse covariance matrix H is</span>
+        <span class="c1"># mathematically equivalent to computing the leverage (diagonal of P) for each observation.</span>
+        <span class="c1"># Thus, the EDF values returned by this function correspond to the diagonal of the projection</span>
+        <span class="c1"># (hat) matrix for the regression problem, and could be derived directly from P if it were</span>
+        <span class="c1"># explicitly constructed. This approach is a computational shortcut that avoids building the</span>
+        <span class="c1"># full P matrix, which is more efficient for large datasets.</span>
+        <span class="c1">#</span>
+        <span class="c1"># IMPORTANT STATISTICAL NOTE:</span>
+        <span class="c1"># If you were to restrict the EDF calculation to only the current inliers (i.e.,</span>
+        <span class="c1"># use X[0, use], X[1, use], etc.), you would only compute leverage for those already</span>
+        <span class="c1"># considered inliers. This would break the robust, iterative weighting procedure:</span>
+        <span class="c1"># you would lose the ability to evaluate the leverage of excluded (outlier) points,</span>
+        <span class="c1"># and could not iteratively update the mask. The weights would only be valid for the</span>
+        <span class="c1"># current inlier set, and you would not be able to robustly downweight high-leverage</span>
+        <span class="c1"># points outside that set. This would defeat the purpose of the robust approach and</span>
+        <span class="c1"># make the method statistically invalid for robust outlier detection. The correct</span>
+        <span class="c1"># approach is to use the inlier covariance (from `use`) to compute leverage for all</span>
+        <span class="c1"># points, so you can iteratively refine the inlier set.</span>
+
+        <span class="k">return</span> <span class="n">edf</span></div></div>
+
+
+<div class="viewcode-block" id="effective_degrees_of_freedom_weights"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.weights.html#aurora.transfer_function.weights.edf_weights.effective_degrees_of_freedom_weights">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">effective_degrees_of_freedom_weights</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">R</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">edf_obj</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EffectiveDegreesOfFreedom</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the effective degrees of freedom weights. Emulates edfwts (&quot;effective dof&quot;) from tranmt.</span>
+<span class="sd">    - Based on Edfwts.m matlab code from</span>
+<span class="sd">    iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/functions/</span>
+
+<span class="sd">    Flow:</span>
+<span class="sd">    0. Initialize weights vector (of 1&#39;s) the length of the &quot;observation&quot; axis</span>
+<span class="sd">    1. Remove any nan in X,R</span>
+<span class="sd">    2. compute the weights on the reduced (no-nan) arrays of X and R</span>
+<span class="sd">    3. Overwrite the weights vector for the non-nan entries.</span>
+<span class="sd">    4. Return weights and broadcast-multiply against data to apply.</span>
+
+<span class="sd">    Development Notes:</span>
+<span class="sd">    Note about the while loop: variable &quot;use&quot; never changes length, it only</span>
+<span class="sd">    flips its bit.  The while loop exits when n_valid_observations == sum(use)</span>
+<span class="sd">    i.e.the effective dof are all below threshold Estimate dof.  Then we &quot;use&quot;</span>
+<span class="sd">    only points whose dof are smaller than the threshold.  Then we recompute dof.</span>
+<span class="sd">    This time the covariance matrix diagonals are smaller, there is less energy</span>
+<span class="sd">    in the time series for the S, H calculation.</span>
+
+<span class="sd">    TODO:</span>
+<span class="sd">     This follows the matlab code by using a boolean index vector.  An xarray</span>
+<span class="sd">     implementation which uses the observation dimension of X, R was started but never</span>
+<span class="sd">     finished.  Here are the breadcrumbs for the xarray method:</span>
+<span class="sd">     0. Create weights:</span>
+<span class="sd">     import xarray as xr</span>
+<span class="sd">     X = X.assign(weights=lambda x: X.frequency*0+1.0)</span>
+<span class="sd">     weights = X[&quot;weights&quot;]</span>
+<span class="sd">     X = X[[&quot;hx&quot;,&quot;hy&quot;]]</span>
+<span class="sd">     1. Then to drop nan:</span>
+<span class="sd">     from aurora.time_series.xarray_helpers import handle_nan</span>
+<span class="sd">     X, Y, RR = handle_nan(XX, None, R, drop_dim=&quot;observation&quot;)</span>
+<span class="sd">     2. Same as below</span>
+<span class="sd">     3. Overwrite: Got stuck here.</span>
+<span class="sd">     Accessing the weights was done by:</span>
+<span class="sd">     weights.sel(observation=X.observation)</span>
+<span class="sd">     Assignment should be something like weights.loc[x.observation]</span>
+<span class="sd">     May need cast as dataarray for the assignment step.</span>
+
+<span class="sd">    TODO:</span>
+<span class="sd">     Why is the Remote reference weighting not done with a while loop?  Maybe</span>
+<span class="sd">     an oversight in the matlab codes.</span>
+
+<span class="sd">    TODO:</span>
+<span class="sd">     Since zero-weights assigned to Nan, could probably remove the keep_indices</span>
+<span class="sd">     methods and simply assign nan or zero weights to those data up front. Since the</span>
+<span class="sd">     &quot;use&quot; boolean selects data before computation are performed on X, R we should</span>
+<span class="sd">     never get nans in the computed edfs, but should simplify the code somewhat.</span>
+
+<span class="sd">    TODO:</span>
+<span class="sd">     Add tests for data having Nan values</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : xr.Dataset</span>
+<span class="sd">        The input channels for regression.  Usually horizontal magnetics hx, hy</span>
+<span class="sd">    R : xr.Dataset or None</span>
+<span class="sd">        The remote reference channels, usually hx, hy.  Can be None if single-station</span>
+<span class="sd">        processing</span>
+<span class="sd">    edf_obj : aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom</span>
+<span class="sd">        Object with parameters for Gary&#39;s adhoc edfwts method.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    weights : numpy.ndarray</span>
+<span class="sd">        Weights for reducing leverage points.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Initialize the weights</span>
+    <span class="n">n_observations_initial</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">observation</span><span class="p">)</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_observations_initial</span><span class="p">)</span>
+
+    <span class="c1"># validate num channels</span>
+    <span class="n">num_channels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">num_channels</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;edfwts only works for 2 input channels, not </span><span class="si">{</span><span class="n">num_channels</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">weights</span>
+
+    <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">to_array</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;channel&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">R</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="n">R</span><span class="o">.</span><span class="n">to_array</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;channel&quot;</span><span class="p">)</span>
+
+    <span class="c1"># reduce the data to only valid (non-nan) observations</span>
+    <span class="k">if</span> <span class="n">R</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">keep_x_indices</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">keep_r_indices</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">keep_indices</span> <span class="o">=</span> <span class="n">keep_r_indices</span> <span class="o">&amp;</span> <span class="n">keep_x_indices</span>
+        <span class="n">RR</span> <span class="o">=</span> <span class="n">R</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="n">keep_indices</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">keep_indices</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">n_observations_numeric</span> <span class="o">=</span> <span class="n">keep_indices</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">XX</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="n">keep_indices</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">edf_obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">edf_obj</span> <span class="o">=</span> <span class="n">EffectiveDegreesOfFreedom</span><span class="p">(</span><span class="n">n_data</span><span class="o">=</span><span class="n">n_observations_numeric</span><span class="p">)</span>
+
+    <span class="c1"># %    determine initial robust B-field cross-power matrix; this just uses</span>
+    <span class="c1"># %    edf_l1 -- cut off for estimating robust local magnetic covariance</span>
+    <span class="n">nOmit</span> <span class="o">=</span> <span class="n">n_observations_numeric</span>
+    <span class="n">use</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_observations_numeric</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="c1"># initialize use as a boolean of True, as large as XX</span>
+    <span class="n">n_valid_observations</span> <span class="o">=</span> <span class="n">n_observations_numeric</span>
+
+    <span class="k">while</span> <span class="n">nOmit</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">eff_deg_of_freedom</span> <span class="o">=</span> <span class="n">edf_obj</span><span class="o">.</span><span class="n">compute_weights</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span> <span class="n">use</span><span class="p">)</span>
+        <span class="n">use</span> <span class="o">=</span> <span class="n">eff_deg_of_freedom</span> <span class="o">&lt;=</span> <span class="n">edf_obj</span><span class="o">.</span><span class="n">edf_l1</span>  <span class="c1"># update &quot;use&quot; boolean selector</span>
+        <span class="n">nOmit</span> <span class="o">=</span> <span class="n">n_valid_observations</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">use</span><span class="p">)</span>
+        <span class="n">n_valid_observations</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">use</span><span class="p">)</span>
+
+    <span class="n">wt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_observations_numeric</span><span class="p">)</span>
+    <span class="n">wt</span><span class="p">[</span><span class="n">eff_deg_of_freedom</span> <span class="o">&gt;</span> <span class="n">edf_obj</span><span class="o">.</span><span class="n">p2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">cond</span> <span class="o">=</span> <span class="p">(</span><span class="n">eff_deg_of_freedom</span> <span class="o">&lt;=</span> <span class="n">edf_obj</span><span class="o">.</span><span class="n">p2</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">eff_deg_of_freedom</span> <span class="o">&gt;</span> <span class="n">edf_obj</span><span class="o">.</span><span class="n">p1</span><span class="p">)</span>
+    <span class="n">wt</span><span class="p">[</span><span class="n">cond</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">edf_obj</span><span class="o">.</span><span class="n">p1</span> <span class="o">/</span> <span class="n">eff_deg_of_freedom</span><span class="p">[</span><span class="n">cond</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">R</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># now find additional segments with crazy remotes</span>
+        <span class="n">wtRef</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_observations_numeric</span><span class="p">)</span>
+        <span class="n">ref_use</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_observations_numeric</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="n">edf_ref</span> <span class="o">=</span> <span class="n">edf_obj</span><span class="o">.</span><span class="n">compute_weights</span><span class="p">(</span><span class="n">RR</span><span class="p">,</span> <span class="n">ref_use</span><span class="p">)</span>
+
+        <span class="c1"># TODO: FIXME - when this gets set to zero below, then line ~260 will encounter RuntimeWarning div by 0</span>
+        <span class="n">wtRef</span><span class="p">[</span><span class="n">edf_ref</span> <span class="o">&gt;</span> <span class="n">edf_obj</span><span class="o">.</span><span class="n">p2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">cond</span> <span class="o">=</span> <span class="p">(</span><span class="n">edf_ref</span> <span class="o">&lt;=</span> <span class="n">edf_obj</span><span class="o">.</span><span class="n">p2</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">edf_ref</span> <span class="o">&gt;</span> <span class="n">edf_obj</span><span class="o">.</span><span class="n">p1</span><span class="p">)</span>
+        <span class="n">wtRef</span><span class="p">[</span><span class="n">cond</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">edf_obj</span><span class="o">.</span><span class="n">p1</span> <span class="o">/</span> <span class="n">edf_ref</span><span class="p">[</span><span class="n">cond</span><span class="p">])</span>
+
+        <span class="c1"># are either of the weights very different</span>
+        <span class="n">cond1</span> <span class="o">=</span> <span class="n">wtRef</span> <span class="o">/</span> <span class="n">wt</span> <span class="o">&gt;</span> <span class="n">edf_obj</span><span class="o">.</span><span class="n">p3</span>
+        <span class="n">cond2</span> <span class="o">=</span> <span class="n">wt</span> <span class="o">/</span> <span class="n">wtRef</span> <span class="o">&gt;</span> <span class="n">edf_obj</span><span class="o">.</span><span class="n">p3</span>
+        <span class="n">differentAmp</span> <span class="o">=</span> <span class="n">cond1</span> <span class="o">|</span> <span class="n">cond2</span>
+        <span class="n">wt</span> <span class="o">=</span> <span class="n">wt</span> <span class="o">*</span> <span class="n">wtRef</span>
+        <span class="n">wt</span><span class="p">[</span><span class="n">differentAmp</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">weights</span><span class="p">[</span><span class="n">keep_indices</span><span class="p">]</span> <span class="o">=</span> <span class="n">wt</span>
+    <span class="n">weights</span><span class="p">[</span><span class="n">weights</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="k">return</span> <span class="n">weights</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
