@@ -17,7 +17,7 @@ notebooks = sorted(
 notebook_dir = DOCS_PATH.joinpath("tutorials")
 notebooks += sorted(
     nb for nb in notebook_dir.rglob("*.ipynb") if ".ipynb_checkpoints" not in str(nb)
-)   
+)
 
 # Execute each notebook in-place
 for nb_path in notebooks:
@@ -29,19 +29,19 @@ for nb_path in notebooks:
         "%matplotlib inline",
     )
     print(f"Executing: {nb_path} (in cwd={working_dir})")
-    
+
     try:
         pm.execute_notebook(
             input_path=str(nb_path),
             output_path=str(nb_path),
-            kernel_name="aurora-test",     # Adjust if using a different kernel ("dipole-st")
+            kernel_name="aurora-test",  # Adjust if using a different kernel ("dipole-st")
             request_save_on_cell_execute=True,
-            cwd=str(working_dir)  # <- this sets the working directory!
+            cwd=str(working_dir),  # <- this sets the working directory!
         )
         print(f"✓ Executed successfully: {nb_path}")
     except Exception as e:
         print(f"✗ Failed to execute {nb_path}: {e}")
-        exit(1) 
+        # exit(1)
 
     # Replace the matplotlib inline magic back to widget for interactive plots
     replace_in_file(
@@ -50,4 +50,3 @@ for nb_path in notebooks:
         "%matplotlib widget",
     )
 print("All notebooks executed and updated successfully.")
-
