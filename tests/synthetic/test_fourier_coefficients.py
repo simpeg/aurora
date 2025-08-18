@@ -1,24 +1,25 @@
 import unittest
+from loguru import logger
 
 from aurora.config.config_creator import ConfigCreator
-from aurora.pipelines.fourier_coefficients import add_fcs_to_mth5
-from aurora.pipelines.fourier_coefficients import fc_decimations_creator
-from aurora.pipelines.fourier_coefficients import read_back_fcs
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.test_utils.synthetic.make_processing_configs import (
     create_test_run_config,
 )
+from aurora.test_utils.synthetic.triage import tfs_nearly_equal
+
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 from mth5.data.make_mth5_from_asc import create_test1_h5
 from mth5.data.make_mth5_from_asc import create_test2_h5
 from mth5.data.make_mth5_from_asc import create_test3_h5
 from mth5.data.make_mth5_from_asc import create_test12rr_h5
+from mth5.processing import RunSummary, KernelDataset
 
-# from mtpy-v2
-from mtpy.processing import RunSummary, KernelDataset
-
-from loguru import logger
 from mth5.helpers import close_open_files
+from mth5.timeseries.spectre.helpers import add_fcs_to_mth5
+from mth5.timeseries.spectre.helpers import fc_decimations_creator
+from mth5.timeseries.spectre.helpers import read_back_fcs
+
 
 synthetic_test_paths = SyntheticTestPaths()
 synthetic_test_paths.mkdirs()
@@ -30,9 +31,8 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
     Runs several synthetic processing tests from config creation to tf_cls.
 
     There are two ways to prepare the FC-schema
-      a) use the mt_metadata.FCDecimation class explictly
-      b) mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel has
-      a to_fc_decimation() method that returns mt_metadata.FCDecimation
+      a) use the mt_metadata.FCDecimation class
+      b) use AuroraDecimationLevel's to_fc_decimation() method that returns mt_metadata.FCDecimation
 
     Flow is to make some mth5 files from synthetic data, then loop over those files adding fcs.
     Finally, process the mth5s to make TFs.
@@ -73,8 +73,7 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
         - This could probably be shortened, it isn't clear that all the h5 files need to have fc added
         and be processed too.
 
-        uses the to_fc_decimation() method of
-        mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel.
+        uses the to_fc_decimation() method of AuroraDecimationLevel.
 
         Returns
         -------
@@ -115,6 +114,7 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
                 x.to_fc_decimation() for x in processing_config.decimations
             ]
             # For code coverage, have a case where fc_decimations is None
+            # This also (indirectly) tests a different FCDeecimation object.
             if mth5_path.stem == "test1":
                 fc_decimations = None
 
@@ -127,8 +127,13 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
         return tfc
 
     def test_fc_decimations_creator(self):
-        """"""
-        cfgs = fc_decimations_creator(1.0)
+        """
+        # TODO: Move this into mt_metadata
+        Returns
+        -------
+
+        """
+        cfgs = fc_decimations_creator(initial_sample_rate=1.0)
 
         # test time period must of of type
         with self.assertRaises(NotImplementedError):
@@ -136,13 +141,22 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
             fc_decimations_creator(1.0, time_period=time_period)
         return cfgs
 
+    def test_spectrogram(self):
+        """
+            Place holder method. TODO: Move this into MTH5
+
+            Development Notes:
+                Currently mth5 does not have any STFT methods.  Once that
+        :return:
+        """
+
     def test_create_then_use_stored_fcs_for_processing(self):
         """"""
-        from test_processing import process_synthetic_2
+        from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
+        from aurora.test_utils.synthetic.processing_helpers import process_synthetic_2
         from aurora.test_utils.synthetic.make_processing_configs import (
             make_processing_config_and_kernel_dataset,
         )
-        from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
 
         z_file_path_1 = AURORA_RESULTS_PATH.joinpath("test2.zss")
         z_file_path_2 = AURORA_RESULTS_PATH.joinpath("test2_from_stored_fc.zss")
@@ -160,10 +174,10 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
         )
 
         # Intialize a TF kernel to check for FCs
-        original_window = processing_config.decimations[0].window.type
+        original_window = processing_config.decimations[0].stft.window.type
 
         tfk = TransferFunctionKernel(dataset=tfk_dataset, config=processing_config)
-        tfk.make_processing_summary()
+        tfk.update_processing_summary()
         tfk.check_if_fcs_already_exist()
         assert (
             tfk.dataset_df.fc.all()
@@ -171,9 +185,9 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
 
         # now change the window type and show that FCs are not detected
         for decimation in processing_config.decimations:
-            decimation.window.type = "hamming"
+            decimation.stft.window.type = "hamming"
         tfk = TransferFunctionKernel(dataset=tfk_dataset, config=processing_config)
-        tfk.make_processing_summary()
+        tfk.update_processing_summary()
         tfk.check_if_fcs_already_exist()
         assert not (
             tfk.dataset_df.fc.all()
@@ -181,16 +195,16 @@ class TestAddFourierCoefficientsToSyntheticData(unittest.TestCase):
 
         # Now reprocess with the FCs
         for decimation in processing_config.decimations:
-            decimation.window.type = original_window
+            decimation.stft.window.type = original_window
         tfk = TransferFunctionKernel(dataset=tfk_dataset, config=processing_config)
-        tfk.make_processing_summary()
+        tfk.update_processing_summary()
         tfk.check_if_fcs_already_exist()
         assert (
             tfk.dataset_df.fc.all()
         )  # assert fcs True in dataframe -- i.e. they were detected.
 
         tf2 = process_synthetic_2(force_make_mth5=False, z_file_path=z_file_path_2)
-        assert tf1 == tf2
+        assert tfs_nearly_equal(tf1, tf2)
 
 
 def main():

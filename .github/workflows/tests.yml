@@ -19,7 +19,6 @@ jobs:
       matrix:
         os: ["ubuntu-latest"]
         python-version: [3.8, 3.9, "3.10", "3.11"]
-#        python-version: ["3.10", ] 
 
     steps:
     - uses: actions/checkout@v4
@@ -30,20 +29,22 @@ jobs:
         activate-environment: aurora-test
         python-version: ${{ matrix.python-version }}
 
-    - name: Install Env
+
+    - name: Install uv and project dependencies
       run: |
         python --version
-        conda install -c conda-forge pytest pytest-cov certifi">=2017.4.17" pandoc
-        pip install -r requirements-dev.txt
-        # pip install git+https://github.com/kujaku11/mt_metadata.git@main
-        # pip install git+https://github.com/kujaku11/mth5.git@master
-        # pip install git+https://github.com/MTgeophysics/mtpy-v2.git@main
-        pip install git+https://github.com/MTgeophysics/mtpy-v2.git@main
-        pip uninstall aurora -y
+        echo $CONDA_PREFIX
+        pip install uv
+        uv pip install -e ".[dev]"
+        uv pip install "mt_metadata[obspy] @ git+https://github.com/kujaku11/mt_metadata.git"
+        uv pip install git+https://github.com/kujaku11/mth5.git
+        conda install -c conda-forge certifi">=2017.4.17" pandoc
 
     - name: Install Our Package
       run: |
-        pip install -e .
+        echo $CONDA_PREFIX
+        uv pip install -e .
+        echo "Install complete"
         conda list
         pip freeze
         
@@ -63,7 +64,6 @@ jobs:
         jupyter nbconvert --to notebook --execute docs/tutorials/processing_configuration.ipynb
         jupyter nbconvert --to notebook --execute docs/tutorials/process_cas04_multiple_station.ipynb
         jupyter nbconvert --to notebook --execute docs/tutorials/synthetic_data_processing.ipynb
-        jupyter nbconvert --to notebook --execute tests/test_run_on_commit.ipynb
         # Replace "notebook.ipynb" with your notebook's filename
 
 #    - name: Commit changes (if any)
@@ -78,7 +78,7 @@ jobs:
     - name: Run Tests
       run: |
         # pytest -s -v tests/synthetic/test_fourier_coefficients.py
-        # pytest -s -v tests/test_general_helper_functions.py 
+        # pytest -s -v tests/config/test_config_creator.py 
         pytest -s -v --cov=./ --cov-report=xml --cov=aurora
 
     - name: "Upload coverage reports to Codecov"

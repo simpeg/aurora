@@ -2,9 +2,9 @@
 This module contains helper methods that are used during transfer function processing.
 
 Development Notes:
-Note #1: repeatedly applying edf_weights seems to have no effect at all.
-tested 20240118 and found that test_compare in synthetic passed whether this was commented
-or not.  TODO confirm this is a one-and-done add doc about why this is so.
+ Note #1: repeatedly applying edf_weights seems to have no effect at all.
+ tested 20240118 and found that test_compare in synthetic passed whether this was commented
+ or not.  TODO confirm this is a one-and-done add doc about why this is so.
 
 """
 
@@ -15,24 +15,30 @@ from aurora.transfer_function.regression.iter_control import IterControl
 from aurora.transfer_function.regression.RME import RME
 from aurora.transfer_function.regression.RME_RR import RME_RR
 
-# from aurora.transfer_function.weights.coherence_weights import compute_multiple_coherence_weights
 from aurora.transfer_function.weights.edf_weights import (
     effective_degrees_of_freedom_weights,
 )
+from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
+    DecimationLevel as AuroraDecimationLevel,
+)
 from loguru import logger
-from typing import Union
+from typing import Literal, Optional, Union
+
 import numpy as np
 import xarray as xr
 
 ESTIMATOR_LIBRARY = {"OLS": RegressionEstimator, "RME": RME, "RME_RR": RME_RR}
+SUPPORTED_REGRESSION_ESTIMATOR = Literal["OLS", "RME", "RME_RR"]
 
 
-def get_estimator_class(estimation_engine: str) -> RegressionEstimator:
+def get_estimator_class(
+    estimation_engine: SUPPORTED_REGRESSION_ESTIMATOR,
+) -> RegressionEstimator:
     """
 
     Parameters
     ----------
-    estimation_engine: str
+    estimation_engine: Literal["OLS", "RME", "RME_RR"]
         One of the keys in the ESTIMATOR_LIBRARY, designates the method that will be
         used to estimate the transfer function
 
@@ -52,7 +58,7 @@ def get_estimator_class(estimation_engine: str) -> RegressionEstimator:
     return estimator_class
 
 
-def set_up_iter_control(config):
+def set_up_iter_control(config: AuroraDecimationLevel):
     """
     Initializes an IterControl object based on values in the processing config.
 
@@ -62,7 +68,8 @@ def set_up_iter_control(config):
 
     Parameters
     ----------
-    config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
+    config: AuroraDecimationLevel
+        metadata about the decimation level processing.
 
     Returns
     -------
@@ -81,62 +88,52 @@ def set_up_iter_control(config):
         "OLS",
     ]:
         iter_control = None
+
     return iter_control
-
-
-# def select_channel(xrda: xr.DataArray, channel_label):
-#     """
-#     Returns the channel specified by input channel_label as xarray.
-#
-#     - Extra helper function to make process_transfer_functions more readable without
-#     black (the uncompromising formatter) forcing multiple lines.
-#
-#     Parameters
-#     ----------
-#     xrda:
-#     channel_label
-#
-#     Returns
-#     -------
-#     ch: xr.Dataset
-#         The channel specified by input channel_label as an xarray.
-#     """
-#     ch = xrda.sel(
-#         channel=[
-#             channel_label,
-#         ]
-#     )
-#     return ch
 
 
 def drop_nans(X: xr.Dataset, Y: xr.Dataset, RR: Union[xr.Dataset, None]) -> tuple:
     """
-
-    Drops Nan from any input xarrays.
-    - Just a helper intended to enhance readability
-
-    Development Notes:
-        TODO: document the implications of dropna on index of xarray for other weights
-
-    Parameters
-    ----------
-    X: xr.Dataset
-        The input data for regression
-    Y: xr.Dataset
-        The output data for regression
-    RR: Union[xr.Dataset, None]
-        The remote refernce data for regression
-
-    Returns
-    -------
-    X, Y, RR: tuple
-        Returns the input arugments with nan dropped form the xarrays.
-
+    Drops any observation where any variable in X, Y, or RR is NaN.
     """
-    X = X.dropna(dim="observation")
-    Y = Y.dropna(dim="observation")
+    import numpy as np
+
+    def get_obs_mask(ds):
+        """
+        Generate a boolean mask indicating which 'observation' entries are finite across all data variables in an xarray Dataset.
+
+        This function iterates over all data variables in the provided xarray Dataset `ds`, checks for finite values (i.e., not NaN or infinite)
+        along all axes except the 'observation' axis, and combines the results to produce a single boolean mask. The resulting mask is True
+        for each 'observation' index where all data variables are finite, and False otherwise.
+
+
+        Parameters
+        ds : xarray.Dataset
+            The input dataset containing data variables with an 'observation' dimension.
+
+        Returns
+        numpy.ndarray
+            A boolean array with shape matching the 'observation' dimension, where True indicates all data variables are finite
+        """
+        mask = None
+        for v in ds.data_vars.values():
+            # Reduce all axes except 'observation'
+            axes = tuple(i for i, d in enumerate(v.dims) if d != "observation")
+            this_mask = np.isfinite(v)
+            if axes:
+                this_mask = this_mask.all(axis=axes)
+            mask = this_mask if mask is None else mask & this_mask
+        return mask
+
+    mask = get_obs_mask(X)
+    mask = mask & get_obs_mask(Y)
     if RR is not None:
-        RR = RR.dropna(dim="observation")
+        mask = mask & get_obs_mask(RR)
+
+    X = X.isel(observation=mask)
+    Y = Y.isel(observation=mask)
+    if RR is not None:
+        RR = RR.isel(observation=mask)
     return X, Y, RR
 
 
@@ -173,7 +170,14 @@ def stack_fcs(X, Y, RR):
     return X, Y, RR
 
 
-def apply_weights(X, Y, RR, W, segment=False, dropna=False):
+def apply_weights(
+    X: xr.Dataset,
+    Y: xr.Dataset,
+    RR: xr.Dataset,
+    W: np.ndarray,
+    segment: bool = False,
+    dropna: bool = False,
+) -> tuple:
     """
     Applies data weights (W) to each of X, Y, RR.
     If weight is zero, we set to nan and optionally dropna.
@@ -210,89 +214,41 @@ def apply_weights(X, Y, RR, W, segment=False, dropna=False):
 
 
 def process_transfer_functions(
-    dec_level_config,
-    local_stft_obj,
-    remote_stft_obj,
+    dec_level_config: AuroraDecimationLevel,
+    local_stft_obj: xr.Dataset,
+    remote_stft_obj: xr.Dataset,
     transfer_function_obj,
-    # segment_weights=["multiple_coherence",],#["simple_coherence",],#["multiple_coherence",],#jj84_coherence_weights",],
-    segment_weights=[],
-    channel_weights=None,
 ):
     """
-    This is the main tf_processing method.  It is based on TTFestBand.m
+    This is the main tf_processing method.  It is based on the Matlab legacy code TTFestBand.m.
 
     Note #1: Although it is advantageous to execute the regression channel-by-channel
-    vs. all-at-once, we need to keep the all-at-once to get residual covariances (see issue #87)
-
-    Note #2:
-    Consider placing the segment weight logic in its own module with the various functions in a dictionary.
-    Possibly can combines (product) all segment weights, like the following pseudocode:
-
-    .. code-block:: python
-
-      W = ones
-      for wt_style in segment_weights:
-        fcn = wt_functions[style]
-        w = fcn(X, Y, RR, )
-        W *= w
-      return W
+    vs. all-at-once, we need to keep the all-at-once to get residual covariances (see aurora issue #87)
 
     TODO: Consider push the nan-handling into the band extraction as a kwarg.
 
     Parameters
     ----------
-    dec_level_config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
+    dec_level_config: AuroraDecimationLevel
+        Processing parameters for the active decimation level.
     local_stft_obj: xarray.core.dataset.Dataset
     remote_stft_obj: xarray.core.dataset.Dataset or None
     transfer_function_obj: aurora.transfer_function.TTFZ.TTFZ
         The transfer function container ready to receive values in this method.
-    segment_weights : numpy array or list of strings
-        1D array which should be of the same length as the time axis of the STFT objects
-        If these weights are zero anywhere, we drop all that segment across all channels
-        If it is a list of strings, each string corresponds to a weighting
-        algorithm to be applied.
-        ["jackknife_jj84", "multiple_coherence", "simple_coherence"]
-    channel_weights : numpy array or None
-
 
     Returns
     -------
     transfer_function_obj: aurora.transfer_function.TTFZ.TTFZ
     """
-    estimator_class = get_estimator_class(dec_level_config.estimator.engine)
+    estimator_class: RegressionEstimator = get_estimator_class(
+        dec_level_config.estimator.engine
+    )
     iter_control = set_up_iter_control(dec_level_config)
     for band in transfer_function_obj.frequency_bands.bands():
 
         X, Y, RR = get_band_for_tf_estimate(
             band, dec_level_config, local_stft_obj, remote_stft_obj
         )
-
-        # TODO: WORK IN PROGRESS  (see Issue #119)
-        # Apply segment weights first -- see Note #2
-        # if "jackknife_jj84" in segment_weights:
-        #     from aurora.transfer_function.weights.coherence_weights import (
-        #         coherence_weights_jj84,
-        #     )
-        #
-        #     Wjj84 = coherence_weights_jj84(band, local_stft_obj, remote_stft_obj)
-        #     apply_weights(X, Y, RR, Wjj84, segment=True, dropna=False)
-        # if "simple_coherence" in segment_weights:
-        #     from aurora.transfer_function.weights.coherence_weights import (
-        #         simple_coherence_weights,
-        #     )
-        #
-        #     W = simple_coherence_weights(band, local_stft_obj, remote_stft_obj)
-        #     apply_weights(X, Y, RR, W, segment=True, dropna=False)
-        #
-        # if "multiple_coherence" in segment_weights:
-        #     from aurora.transfer_function.weights.coherence_weights import (
-        #         multiple_coherence_weights,
-        #     )
-        #
-        #     W = multiple_coherence_weights(band, local_stft_obj, remote_stft_obj)
-        #     apply_weights(X, Y, RR, W, segment=True, dropna=False)
-
-        # if there are channel weights apply them here
 
         # Reshape to 2d
         X, Y, RR = stack_fcs(X, Y, RR)
@@ -305,6 +261,7 @@ def process_transfer_functions(
 
         if dec_level_config.estimator.estimate_per_channel:
             for ch in dec_level_config.output_channels:
+
                 Y_ch = Y[ch].to_dataset()  # keep as a dataset, maybe not needed
 
                 X_, Y_, RR_ = handle_nan(X, Y_ch, RR, drop_dim="observation")
@@ -323,6 +280,92 @@ def process_transfer_functions(
             X, Y, RR = handle_nan(X, Y, RR, drop_dim="observation")
             regression_estimator = estimator_class(
                 X=X, Y=Y, Z=RR, iter_control=iter_control
+            )
+            regression_estimator.estimate()
+            transfer_function_obj.set_tf(regression_estimator, band.center_period)
+
+    return transfer_function_obj
+
+
+def process_transfer_functions_with_weights(
+    dec_level_config: AuroraDecimationLevel,
+    local_stft_obj: xr.Dataset,
+    remote_stft_obj: xr.Dataset,
+    transfer_function_obj,
+):
+    """
+    This is version of process_transfer_functions applies weights to the data.
+
+    Development Notes:
+    Note #1: This is only for per-channel estimation, so it does not support the
+    dec_level_config.estimator.estimate_per_channel = False
+    Note #2: This was adapted from the process_transfer_functions method but the core loop
+    is inverted to loop over channels first, then bands.
+
+    Parameters
+    ----------
+    dec_level_config: AuroraDecimationLevel
+        Processing parameters for the active decimation level.
+    local_stft_obj: xarray.core.dataset.Dataset
+    remote_stft_obj: xarray.core.dataset.Dataset or None
+    transfer_function_obj: aurora.transfer_function.TTFZ.TTFZ
+        The transfer function container ready to receive values in this method.
+
+    Returns
+    -------
+    transfer_function_obj: aurora.transfer_function.TTFZ.TTFZ
+    """
+    if not dec_level_config.estimator.estimate_per_channel:
+        msg = (
+            "process_transfer_functions_with_weights is only for per-channel estimation"
+        )
+        logger.error(msg)
+        raise ValueError(msg)
+
+    estimator_class: RegressionEstimator = get_estimator_class(
+        dec_level_config.estimator.engine
+    )
+    iter_control = set_up_iter_control(dec_level_config)
+    for ch in dec_level_config.output_channels:
+
+        # check if there are channel weights for this channel
+        weights = None
+        for chws in dec_level_config.channel_weight_specs:
+            if ch in chws.output_channels:
+                weights = chws.weights
+
+        for band in transfer_function_obj.frequency_bands.bands():
+
+            X, Y, RR = get_band_for_tf_estimate(
+                band, dec_level_config, local_stft_obj, remote_stft_obj
+            )
+            Y_ch = Y[ch].to_dataset()  # keep as a dataset, maybe not needed
+
+            # extract the weights for this band
+            if weights is not None:
+                # TODO: Investigate best way to extract the weights for band
+                #  This may involve finding the nearest frequency bin to the band center period
+                #  and then applying the weights for that bin, or some tapered region around it.
+                #  For now, we will just use the mean of the weights for the band.
+                #  This is a temporary solution and should be replaced with a more robust method.
+                # band_weights = chws.get_weights_for_band(band)
+                band_weights = weights.mean(axis=1)  # chws.get_weights_for_band(band)
+
+                apply_weights(
+                    X, Y_ch, RR, band_weights.squeeze(), segment=True, dropna=False
+                )
+
+            X, Y_ch, RR = stack_fcs(X, Y_ch, RR)  # Reshape to 2d
+
+            # Should only be needed if weights were applied
+            X, Y_ch, RR = drop_nans(X, Y_ch, RR)
+
+            W = effective_degrees_of_freedom_weights(X, RR, edf_obj=None)
+
+            X, Y_ch, RR = apply_weights(X, Y_ch, RR, W, segment=False, dropna=True)
+            X_, Y_, RR_ = handle_nan(X, Y_ch, RR, drop_dim="observation")
+            regression_estimator = estimator_class(
+                X=X_, Y=Y_, Z=RR_, iter_control=iter_control
             )
             regression_estimator.estimate()
             transfer_function_obj.set_tf(regression_estimator, band.center_period)

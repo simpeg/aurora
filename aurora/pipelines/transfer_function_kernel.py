@@ -4,27 +4,43 @@
 
 """
 
+from aurora.config.metadata.processing import Processing
 from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.time_series_helpers import prototype_decimate
+from aurora.time_series.windowing_scheme import WindowingScheme
+from aurora.transfer_function import TransferFunctionCollection
 from loguru import logger
 from mth5.utils.exceptions import MTH5Error
 from mth5.utils.helpers import path_or_mth5_object
 from mt_metadata.transfer_functions.core import TF
+from mt_metadata.transfer_functions.processing.aurora import (
+    DecimationLevel as AuroraDecimationLevel,
+)
+from mth5.processing.kernel_dataset import KernelDataset
+
+from typing import List, Union
 
 import numpy as np
 import pandas as pd
+import pathlib
 import psutil
 
 
 class TransferFunctionKernel(object):
-    def __init__(self, dataset=None, config=None):
+    def __init__(
+        self,
+        dataset: KernelDataset,
+        config: Union[Processing, str, pathlib.Path],
+    ):
         """
-        Constructor
+        Constructor.
 
         Parameters
         ----------
-        dataset: aurora.transfer_function.kernel_dataset.KernelDataset
+        dataset: mth5.processing.kernel_dataset.KernelDataset
+         Specification of the dataset that will be processed to yield a transfer function.
         config: aurora.config.metadata.processing.Processing
+         Specification of the processing parameters to be applied to the dataset.
         """
         processing_config = initialize_config(config)
         self._config = processing_config
@@ -33,12 +49,12 @@ class TransferFunctionKernel(object):
         self._memory_warning = False
 
     @property
-    def dataset(self):
+    def dataset(self) -> KernelDataset:
         """returns the KernelDataset object"""
         return self._dataset
 
     @property
-    def kernel_dataset(self):
+    def kernel_dataset(self) -> KernelDataset:
         """returns the KernelDataset object"""
         return self._dataset
 
@@ -48,20 +64,20 @@ class TransferFunctionKernel(object):
         return self._dataset.df
 
     @property
-    def processing_config(self):
+    def processing_config(self) -> Processing:
         """Returns the processing config object"""
         return self._config
 
     @property
-    def config(self):
+    def config(self) -> Processing:
         """Returns the processing config object"""
         return self._config
 
     @property
-    def processing_summary(self):
+    def processing_summary(self) -> pd.DataFrame:
         """Returns the processing summary object -- creates if it doesn't yet exist."""
         if self._processing_summary is None:
-            self.make_processing_summary()
+            self.update_processing_summary()
         return self._processing_summary
 
     @property
@@ -87,7 +103,7 @@ class TransferFunctionKernel(object):
         mode = self.get_mth5_file_open_mode()
         self._mth5_objs = self.kernel_dataset.initialize_mth5s(mode)
 
-    def update_dataset_df(self, i_dec_level):
+    def update_dataset_df(self, i_dec_level: int) -> None:
         """
         This function has two different modes.  The first mode initializes values in the
         array, and could be placed into TFKDataset.initialize_time_series_data()
@@ -103,8 +119,6 @@ class TransferFunctionKernel(object):
         ----------
         i_dec_level: int
             decimation level id, indexed from zero
-        config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
-            decimation level config
 
         Returns
         -------
@@ -145,21 +159,21 @@ class TransferFunctionKernel(object):
         )
         return
 
-    def apply_clock_zero(self, dec_level_config):
+    def apply_clock_zero(self, dec_level_config: AuroraDecimationLevel):
         """
         get clock-zero from data if needed
 
         Parameters
         ----------
-        dec_level_config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
-
+        dec_level_config: AuroraDecimationLevel
+            metadata about the decimation level processing.
         Returns
         -------
-        dec_level_config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
+        dec_level_config: AuroraDecimationLevel
             The modified DecimationLevel with clock-zero information set.
         """
-        if dec_level_config.window.clock_zero_type == "data start":
-            dec_level_config.window.clock_zero = str(self.dataset_df.start.min())
+        if dec_level_config.stft.window.clock_zero_type == "data start":
+            dec_level_config.stft.window.clock_zero = str(self.dataset_df.start.min())
         return dec_level_config
 
     @property
@@ -277,9 +291,10 @@ class TransferFunctionKernel(object):
         logger.info("Processing Summary Dataframe:")
         logger.info(f"\n{self.processing_summary[columns_to_show].to_string()}")
 
-    def make_processing_summary(self):
+    def update_processing_summary(self):
         """
-        Create the processing summary table.
+        Creates or updates the processing summary table based on processing parameters
+        and kernel dataset.
         - Melt the decimation levels over the run summary.
         - Add columns to estimate the number of FFT windows for each row
 
@@ -288,62 +303,16 @@ class TransferFunctionKernel(object):
         processing_summary: pd.DataFrame
             One row per each run-deciamtion pair
         """
-        from aurora.time_series.windowing_scheme import WindowingScheme
-
-        # Create correctly shaped dataframe
-        tmp = self.kernel_dataset.df.copy(deep=True)
-        id_vars = list(tmp.columns)
-        decimation_info = self.config.decimation_info()
-        for i_dec, dec_factor in decimation_info.items():
-            tmp[i_dec] = dec_factor
-        tmp = tmp.melt(id_vars=id_vars, value_name="dec_factor", var_name="dec_level")
-        sortby = ["survey", "station", "run", "start", "dec_level"]
-        tmp.sort_values(by=sortby, inplace=True)
-        tmp.reset_index(drop=True, inplace=True)
-        tmp.drop("sample_rate", axis=1, inplace=True)  # not valid for decimated data
-
-        # Add window info
-        group_by = [
-            "survey",
-            "station",
-            "run",
-            "start",
-        ]
-        groups = []
-        grouper = tmp.groupby(group_by)
-        for group, df in grouper:
-            try:
-                try:
-                    cond = (df.dec_level.diff()[1:] == 1).all()
-                    assert cond  # dec levels increment by 1
-                except AssertionError:
-                    msg = f"Skipping {group} because decimation levels are messy."
-                    logger.info(msg)
-                    continue
-                assert df.dec_factor.iloc[0] == 1
-                assert df.dec_level.iloc[0] == 0
-            except AssertionError:
-                msg = "Decimation levels not structured as expected"
-                raise AssertionError(msg)
-            # df.sample_rate /= np.cumprod(df.dec_factor)  # better to take from config
-            window_params_df = self.config.window_scheme(as_type="df")
-            df.reset_index(inplace=True, drop=True)
-            df = df.join(window_params_df)
-            df["num_samples"] = np.floor(df.duration * df.sample_rate)
-            num_windows = np.zeros(len(df))
-            for i, row in df.iterrows():
-                ws = WindowingScheme(
-                    num_samples_window=row.num_samples_window,
-                    num_samples_overlap=row.num_samples_overlap,
-                )
-                num_windows[i] = ws.available_number_of_windows(row.num_samples)
-            df["num_stft_windows"] = num_windows
-            groups.append(df)
-
-        processing_summary = pd.concat(groups)
-        processing_summary.reset_index(drop=True, inplace=True)
-        self._processing_summary = processing_summary
-        return processing_summary
+        processing_summary = _make_processing_summary(
+            self.kernel_dataset.df,
+            self.config.decimation_info,
+            self.config.window_scheme(as_type="df"),
+        )
+        if processing_summary is not None:
+            self._processing_summary = processing_summary
+        else:
+            msg = "Failed to update processing_summary"
+            raise ValueError(msg)
 
     def validate_decimation_scheme_and_dataset_compatability(
         self, min_num_stft_windows=None
@@ -378,7 +347,7 @@ class TransferFunctionKernel(object):
         """
         if min_num_stft_windows is None:
             min_stft_window_info = {
-                x.decimation.level: x.min_num_stft_windows
+                x.decimation.level: x.stft.min_num_stft_windows
                 for x in self.processing_config.decimations
             }
             min_stft_window_list = [
@@ -424,11 +393,11 @@ class TransferFunctionKernel(object):
         self.memory_check()
         self.validate_save_fc_settings()
 
-    def valid_decimations(self):
+    def valid_decimations(self) -> List[AuroraDecimationLevel]:
         """
         Get the decimation levels that are valid.
-        This is used when iterating over decimation levels in the processing, we do
-        not want to have invalid levels get processed (they will fail).
+        This is used when iterating over decimation levels in the processing.
+        We do not want to try processing invalid levels (they will fail).
 
         Returns
         -------
@@ -531,13 +500,13 @@ class TransferFunctionKernel(object):
 
         return processing_type
 
-    def export_tf_collection(self, tf_collection):
+    def export_tf_collection(self, tf_collection: TransferFunctionCollection):
         """
         Assign transfer_function, residual_covariance, inverse_signal_power, station, survey
 
         Parameters
         ----------
-        tf_collection: aurora.transfer_function.transfer_function_collection.TransferFunctionCollection
+        tf_collection: aurora.transfer_function.TransferFunctionCollection
             Contains TF estimates, covariance, and signal power values
 
         Returns
@@ -546,10 +515,13 @@ class TransferFunctionKernel(object):
             Transfer function container
         """
 
-        def make_decimation_dict_for_tf(tf_collection, processing_config):
+        def make_decimation_dict_for_tf(
+            tf_collection: TransferFunctionCollection,
+            processing_config: Processing,
+        ) -> dict:
             """
-            Decimation dict is used by mt_metadata's TF class when it is writing z-files.
-            If no z-files will be written this is not needed
+            Helper function to create a dictionary used by mt_metadata's TF class when
+            writing z-files.  If no z-files will be written this is not needed
 
             sample element of decimation_dict:
             '1514.70134': {'level': 4, 'bands': (5, 6), 'npts': 386, 'df': 0.015625}}
@@ -562,25 +534,30 @@ class TransferFunctionKernel(object):
 
             Parameters
             ----------
-            tfc
+            tf_collection: TransferFunctionCollection
+                Collection of transfer function estimates from aurora.
+            processing_config: Processing
+                Instructions for processing with aurora
 
             Returns
             -------
-
+            decimation_dict: dict
+                Keyed by a string representing the period
+                Values are a custom dictionary.
             """
             from mt_metadata.transfer_functions.io.zfiles.zmm import (
                 PERIOD_FORMAT,
             )
 
             decimation_dict = {}
-
+            # dec_level_cfg is an AuroraDecimationLevel
             for i_dec, dec_level_cfg in enumerate(processing_config.decimations):
                 for i_band, band in enumerate(dec_level_cfg.bands):
                     period_key = f"{band.center_period:{PERIOD_FORMAT}}"
                     period_value = {}
                     period_value["level"] = i_dec + 1  # +1 to match EMTF standard
                     period_value["bands"] = tuple(band.harmonic_indices[np.r_[0, -1]])
-                    period_value["sample_rate"] = dec_level_cfg.sample_rate_decimation
+                    period_value["sample_rate"] = dec_level_cfg.decimation.sample_rate
                     try:
                         period_value["npts"] = tf_collection.tf_dict[
                             i_dec
@@ -624,7 +601,27 @@ class TransferFunctionKernel(object):
 
         # Set key as first el't of dict, nor currently supporting mixed surveys in TF
         tf_cls.survey_metadata = self.dataset.local_survey_metadata
+
+        # pack the station metadata into the TF object
+        # station_id = self.processing_config.stations.local.id
+        # station_sub_df = self.dataset_df[self.dataset_df["station"] == station_id]
+        # station_row = station_sub_df.iloc[0]
+        # station_obj = station_obj_from_row(station_row)
+
+        # modify the run metadata to match the channel nomenclature
+        # TODO: this should be done inside the TF initialization
+        for i_run, run in enumerate(tf_cls.station_metadata.runs):
+            for i_ch, channel in enumerate(run.channels):
+                new_ch = channel.copy()
+                default_component = channel.component
+                new_component = channel_nomenclature_dict[default_component]
+                new_ch.component = new_component
+                tf_cls.station_metadata.runs[i_run].remove_channel(default_component)
+                tf_cls.station_metadata.runs[i_run].add_channel(new_ch)
+
+        # set processing type
         tf_cls.station_metadata.transfer_function.processing_type = self.processing_type
+
         # tf_cls.station_metadata.transfer_function.processing_config = (
         #     self.processing_config
         # )
@@ -673,6 +670,117 @@ class TransferFunctionKernel(object):
 # ###################################################################
 # ######## Helper Functions #########################################
 # ###################################################################
+
+
+def _decimation_level_info_valid(
+    df: pd.DataFrame,
+) -> bool:
+    """
+        Applies some sanity checks to a processing summary dataframe chunk.
+
+        Development Notes:
+        This was previously a fairly janky block of code in `update_processing_summary`.
+        It is being factored to label and contain the jank, and could still be improved.
+        In particular, just because the conditions being checked are expected, it
+        may be that they do not make the processing invalid if they are not True.
+        i.e. The conditions being checked are likely overly conservative and can be relaxed.
+
+
+        Parameters
+        ----------
+        df: pd.DataFrame
+            Input has already been grouped by ["survey", "station", "run", "start",]
+            This is like a "run chunk".
+            This run chunk can have several decimation levels, often these are
+            [1, 4, 4, 4]
+
+    Returns
+    -------
+
+    """
+    # assert that decimation levels are incrementing (usually 0,1,2,3...)
+    cond = (df.dec_level.diff()[1:] == 1).all()
+    if cond:  # dec levels increment by 1
+        pass
+    else:
+        msg = "Processing summary chunk decimation levels are not incrementing by 1."
+        logger.error(msg)
+        return False
+
+    # check that first decimation level is zero
+    cond1 = df.dec_factor.iloc[0] == 1
+    cond2 = df.dec_level.iloc[0] == 0
+    cond = cond1 & cond2
+    if cond:
+        pass
+    else:
+        msg = "Processing summary chunk was expecting first decimation level 0 and decimation factor 1"
+        logger.error(msg)
+        return False
+
+    return True
+
+
+def _make_processing_summary(
+    kernel_dataset_df: pd.DataFrame,
+    decimation_info: dict,
+    window_params_df: pd.DataFrame,
+) -> pd.DataFrame:
+    """
+    Creates or updates the processing summary table based on processing parameters
+    and kernel dataset.
+    - Melt the decimation levels over the run summary.
+    - Add columns to estimate the number of FFT windows for each row
+
+    Returns
+    -------
+    processing_summary: pd.DataFrame
+        One row per each run-decimation pair
+    """
+
+    # Create correctly shaped dataframe
+    tmp = kernel_dataset_df.copy(deep=True)
+    id_vars = list(tmp.columns)
+    for i_dec, dec_factor in decimation_info.items():
+        tmp[i_dec] = dec_factor
+    tmp = tmp.melt(id_vars=id_vars, value_name="dec_factor", var_name="dec_level")
+    sortby = ["survey", "station", "run", "start", "dec_level"]
+    tmp.sort_values(by=sortby, inplace=True)
+    tmp.reset_index(drop=True, inplace=True)
+    tmp.drop("sample_rate", axis=1, inplace=True)  # not valid for decimated data
+
+    # Add window info
+    group_by = [
+        "survey",
+        "station",
+        "run",
+        "start",
+    ]
+    chunks = []
+    grouper = tmp.groupby(group_by)
+
+    for group, chunk_df in grouper:
+        if not _decimation_level_info_valid(chunk_df):
+            msg = f"Failed to update processing summary -- {group} had invalid decimation level info"
+            logger.error(msg)
+            return
+        # df.sample_rate /= np.cumprod(df.dec_factor)  # better to take from config, maybe add as a test though?
+        chunk_df.reset_index(inplace=True, drop=True)
+        chunk_df = chunk_df.join(window_params_df)
+        chunk_df["num_samples"] = np.floor(chunk_df.duration * chunk_df.sample_rate)
+        num_windows = np.zeros(len(chunk_df))
+        for i, row in chunk_df.iterrows():
+            ws = WindowingScheme(
+                num_samples_window=row.num_samples_window,
+                num_samples_overlap=row.num_samples_overlap,
+            )
+            num_windows[i] = ws.available_number_of_windows(row.num_samples)
+        chunk_df["num_stft_windows"] = num_windows
+        chunks.append(chunk_df)
+
+    processing_summary = pd.concat(chunks)
+    processing_summary.reset_index(drop=True, inplace=True)
+    return processing_summary
 
 
 @path_or_mth5_object

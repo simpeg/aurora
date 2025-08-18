@@ -41,8 +41,8 @@ class TestZFileReadWrite(unittest.TestCase):
         self.mth5_path = synthetic_test_paths.mth5_path.joinpath("test12rr.h5")
         self.zrr_file_base = pathlib.Path("synthetic_test1.zrr")
 
-        if not self.mth5_path.exists():
-            create_test12rr_h5(target_folder=self.mth5_path.parent)
+        #if not self.mth5_path.exists():
+        create_test12rr_h5(target_folder=self.mth5_path.parent)
 
         self._tf_obj = tf_obj_from_synthetic_data(self.mth5_path)
         write_zrr(self._tf_obj, self.zrr_file_base)
@@ -65,17 +65,6 @@ class TestZFileReadWrite(unittest.TestCase):
             np.isclose(tf_z.transfer_function.data, tf.transfer_function.data, 1e-4)
         ).all()
         return tf
-
-    # An equivalent to this test in in mt_metadata on fix_issue_190
-    # def test_tf_read_and_write(self):
-    #     """Checks that an ingested z-file is written back out the same"""
-    #     import filecmp
-    #
-    #     tf_z = self._tf_z_obj
-    #     out_file_name = str(self.zrr_file_base).replace(".zrr", "_rewrite.zrr")
-    #     out_file_path = pathlib.Path(out_file_name)
-    #     tf_z.write(out_file_path)
-    #     assert filecmp.cmp(self.zrr_file_base, out_file_path)
 
 
 def main():

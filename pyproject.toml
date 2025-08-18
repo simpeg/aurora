@@ -1,0 +1,74 @@
+
+[build-system]
+requires = ["setuptools >= 61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aurora"
+version = "0.5.2"
+description = "Processing Codes for Magnetotelluric Data"
+readme = "README.rst"
+requires-python = ">=3.8"
+authors = [
+  {name = "Karl Kappler", email = "karl.kappler@berkeley.edu"},
+]
+license = {text = "MIT license"}
+keywords = ["aurora"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    "mth5",
+    "numba",
+    "obspy",
+    "psutil",
+]
+
+[project.urls]
+Homepage = "https://github.com/simpeg/aurora"
+
+[tool.setuptools.packages.find]
+include = ["aurora", "aurora.*"]
+
+[tool.setuptools]
+include-package-data = true
+
+license-files = ["LICENSE"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["--import-mode=importlib"]
+
+
+[project.optional-dependencies]
+test = [
+    "pytest>=3",
+    "pytest-runner",
+]
+dev = [
+    "black",
+    "flake8",
+    "ipython",
+    "nbsphinx",
+    "numpydoc",
+    "papermill",
+    "pre-commit",
+    "pytest",
+    "pytest-cov",
+    "toml",
+    "sphinx_gallery",
+    "sphinx_rtd_theme",
+]
+
+
+
+
+

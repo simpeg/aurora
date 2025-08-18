@@ -6,6 +6,7 @@ from mth5.data.make_mth5_from_asc import create_test12rr_h5
 from aurora.test_utils.synthetic.make_processing_configs import (
     create_test_run_config,
 )
+from aurora.test_utils.synthetic.plot_helpers_synthetic import plot_rho_phi
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
 from aurora.test_utils.synthetic.rms_helpers import assert_rms_misfit_ok
 from aurora.test_utils.synthetic.rms_helpers import compute_rms
@@ -14,12 +15,9 @@ from aurora.transfer_function.emtf_z_file_helpers import (
     merge_tf_collection_to_match_z_file,
 )
 
-# from mtpy-v2
-from mtpy.processing import RunSummary, KernelDataset
-
-from plot_helpers_synthetic import plot_rho_phi
 from loguru import logger
 from mth5.helpers import close_open_files
+from mth5.processing import RunSummary, KernelDataset
 
 synthetic_test_paths = SyntheticTestPaths()
 synthetic_test_paths.mkdirs()
@@ -87,9 +85,7 @@ def aurora_vs_emtf(
     )
 
     aux_data = read_z_file(auxilliary_z_file)
-    aurora_rho_phi = merge_tf_collection_to_match_z_file(
-        aux_data, tf_collection
-    )
+    aurora_rho_phi = merge_tf_collection_to_match_z_file(aux_data, tf_collection)
     data_dict = {}
     data_dict["period"] = aux_data.periods
     data_dict["emtf_rho_xy"] = aux_data.rxy
@@ -146,9 +142,7 @@ def run_test1(emtf_version, ds_df):
     test_case_id = "test1"
     auxilliary_z_file = EMTF_RESULTS_PATH.joinpath("test1.zss")
     z_file_base = f"{test_case_id}_aurora_{emtf_version}.zss"
-    aurora_vs_emtf(
-        test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df
-    )
+    aurora_vs_emtf(test_case_id, emtf_version, auxilliary_z_file, z_file_base, ds_df)
     return
 
 
