@@ -13,50 +13,41 @@ jobs:
     runs-on: ${{ matrix.os }}
     defaults:
       run:
-        shell: bash -l {0}
+        shell: bash
     strategy:
       fail-fast: false
       matrix:
         os: ["ubuntu-latest"]
-        python-version: [3.8, 3.9, "3.10", "3.11"]
+        python-version: [3.9, "3.10", "3.11", "3.12"]
 
     steps:
     - uses: actions/checkout@v4
 
-    - name: Setup Miniconda
-      uses: conda-incubator/setup-miniconda@v2.1.1
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
       with:
-        activate-environment: aurora-test
-        python-version: ${{ matrix.python-version }}
+        version: "latest"
 
+    - name: Set up Python ${{ matrix.python-version }}
+      run: uv python install ${{ matrix.python-version }}
 
-    - name: Install uv and project dependencies
+    - name: Create virtual environment and install dependencies
       run: |
-        python --version
-        echo $CONDA_PREFIX
-        pip install uv
-        uv pip install -e ".[dev]"
+        uv venv --python ${{ matrix.python-version }}
+        uv pip install -e ".[dev,test]"
         uv pip install "mt_metadata[obspy] @ git+https://github.com/kujaku11/mt_metadata.git"
         uv pip install git+https://github.com/kujaku11/mth5.git
-        conda install -c conda-forge certifi">=2017.4.17" pandoc
+        uv pip install jupyter ipykernel pytest pytest-cov codecov
 
-    - name: Install Our Package
+    - name: Install system dependencies
       run: |
-        echo $CONDA_PREFIX
-        uv pip install -e .
-        echo "Install complete"
-        conda list
-        pip freeze
-        
-    - name: Install Jupyter and dependencies
-      run: |
-        pip install jupyter
-        pip install ipykernel
-        python -m ipykernel install --user --name aurora-test
-        # Install any other dependencies you need
+        sudo apt-get update
+        sudo apt-get install -y pandoc
 
     - name: Execute Jupyter Notebooks
       run: |
+        source .venv/bin/activate
+        python -m ipykernel install --user --name aurora-test
         jupyter nbconvert --to notebook --execute docs/examples/dataset_definition.ipynb
         jupyter nbconvert --to notebook --execute docs/examples/operate_aurora.ipynb
         jupyter nbconvert --to notebook --execute docs/tutorials/pkd_units_check.ipynb
@@ -64,22 +55,14 @@ jobs:
         jupyter nbconvert --to notebook --execute docs/tutorials/processing_configuration.ipynb
         jupyter nbconvert --to notebook --execute docs/tutorials/process_cas04_multiple_station.ipynb
         jupyter nbconvert --to notebook --execute docs/tutorials/synthetic_data_processing.ipynb
-        # Replace "notebook.ipynb" with your notebook's filename
-
-#    - name: Commit changes (if any)
-#      run: |
-#        git config --local user.email "action@github.com"
-#        git config --local user.name "GitHub Action"
-#        git commit -a -m "Execute Jupyter notebook"
-#        git push
-#      if: ${{ success() }}
-
 
     - name: Run Tests
       run: |
+        source .venv/bin/activate
+        pytest -s -v --cov=./ --cov-report=xml --cov=aurora
         # pytest -s -v tests/synthetic/test_fourier_coefficients.py
         # pytest -s -v tests/config/test_config_creator.py 
-        pytest -s -v --cov=./ --cov-report=xml --cov=aurora
+
 
     - name: "Upload coverage reports to Codecov"
       uses: codecov/codecov-action@v4
@@ -87,11 +70,11 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         fail_ci_if_error: false
         flags: tests
-        # token: ${{ secrets.CODECOV_TOKEN }}
 
     - name: Build Doc
       if: ${{ (github.ref == 'refs/heads/main') && (matrix.python-version == '3.8')}}
       run: |
+        source .venv/bin/activate
         cd docs
         make html
         cd ..
