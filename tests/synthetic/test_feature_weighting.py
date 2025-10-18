@@ -1,13 +1,21 @@
 """
-
 Integrated test of the functionality of feature weights.
 
-1. This test uses degraded sythetic data to test the feature weighting.
+1. This test uses degraded synthetic data to test the feature weighting.
 Noise is added to some fraction (50-75%) of the data.
 
 Then regular (single station) processing is called on the data and
 feature weighting processing is called on the data.
 
+---
+Feature weights are specified using the mt_metadata.features.weights module.
+This test demonstrates how feature-based channel weighting (e.g., striding_window_coherence)
+can be injected into Aurora's processing pipeline. In the future, these features will be
+used to enable more robust, data-driven weighting strategies for transfer function estimation,
+including integration of new features from mt_metadata and more flexible weighting schemes.
+
+See also: mt_metadata.features.weights.channel_weight_spec and test_feature_weighting.py for
+examples of how to define, load, and use feature weights in Aurora workflows.
 """
 
 from aurora.config.metadata import Processing
