@@ -1,0 +1,360 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.sandbox.mth5_helpers &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aurora.sandbox.mth5_helpers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.sandbox.mth5_helpers</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains utility functions for working with MTH5 files.</span>
+<span class="sd">TODO: Review and move to mth5 if relevant</span>
+
+<span class="sd">Background: This module was inside of mth5/clients/helper_functions.py on branch issue_76_make_mth5_factoring</span>
+
+<span class="sd">Some of these functions are handy, and should eventually be merged into mth5. I would also like to</span>
+<span class="sd">use some of these functions from time-to-time, so I am putting them here for now, until we can</span>
+<span class="sd">decide what to move to mth5 and what to keep in aurora (and what to throw out).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">mt_metadata.timeseries.stationxml</span><span class="w"> </span><span class="kn">import</span> <span class="n">XMLInventoryMTExperiment</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mth5.clients</span><span class="w"> </span><span class="kn">import</span> <span class="n">FDSN</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mth5.utils.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">initialize_mth5</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+
+
+<div class="viewcode-block" id="enrich_channel_summary"><a class="viewcode-back" href="../../../api/aurora.sandbox.html#aurora.sandbox.mth5_helpers.enrich_channel_summary">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">enrich_channel_summary</span><span class="p">(</span><span class="n">mth5_object</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">keyword</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Operates on a channel summary df and adds some information in a new column.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mth5_object: mth5.mth5.MTH5</span>
+<span class="sd">    df: pd.DataFrame</span>
+<span class="sd">        A channel summary dataframe</span>
+<span class="sd">    keyword: str</span>
+<span class="sd">        supported keywords are [&quot;num_filters&quot;,]</span>
+<span class="sd">        &quot;num_filters&quot; computes the number of filters associated with each row (channel-run) and adds that &quot;num_filters&quot; column of df</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    df: pd.DataFrame</span>
+<span class="sd">        The channel summary df with the new column</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span><span class="p">[</span><span class="n">keyword</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">if</span> <span class="n">keyword</span> <span class="o">==</span> <span class="s2">&quot;num_filters&quot;</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i_row</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">channel</span> <span class="o">=</span> <span class="n">mth5_object</span><span class="o">.</span><span class="n">get_channel</span><span class="p">(</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">station</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">component</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">survey</span>
+            <span class="p">)</span>
+            <span class="n">num_filters</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">channel</span><span class="o">.</span><span class="n">channel_response</span><span class="o">.</span><span class="n">filters_list</span><span class="p">)</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">keyword</span><span class="p">]</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">i_row</span><span class="p">]</span> <span class="o">=</span> <span class="n">num_filters</span>
+    <span class="k">elif</span> <span class="n">keyword</span> <span class="o">==</span> <span class="s2">&quot;filter_units_in&quot;</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i_row</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">channel</span> <span class="o">=</span> <span class="n">mth5_object</span><span class="o">.</span><span class="n">get_channel</span><span class="p">(</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">station</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">component</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">survey</span>
+            <span class="p">)</span>
+            <span class="n">units_in</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">units_in</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">channel</span><span class="o">.</span><span class="n">channel_response</span><span class="o">.</span><span class="n">filters_list</span><span class="p">]</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">keyword</span><span class="p">]</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">i_row</span><span class="p">]</span> <span class="o">=</span> <span class="n">units_in</span>
+    <span class="k">elif</span> <span class="n">keyword</span> <span class="o">==</span> <span class="s2">&quot;filter_units_out&quot;</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i_row</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">channel</span> <span class="o">=</span> <span class="n">mth5_object</span><span class="o">.</span><span class="n">get_channel</span><span class="p">(</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">station</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">component</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">survey</span>
+            <span class="p">)</span>
+            <span class="n">units_out</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">units_out</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">channel</span><span class="o">.</span><span class="n">channel_response</span><span class="o">.</span><span class="n">filters_list</span><span class="p">]</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">keyword</span><span class="p">]</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">i_row</span><span class="p">]</span> <span class="o">=</span> <span class="n">units_out</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="augmented_channel_summary"><a class="viewcode-back" href="../../../api/aurora.sandbox.html#aurora.sandbox.mth5_helpers.augmented_channel_summary">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">augmented_channel_summary</span><span class="p">(</span><span class="n">mth5_object</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds column &quot;n_filters&quot; to mth5 channel summary.</span>
+
+<span class="sd">    This function was used when debugging and wide scale testing at IRIS/Earthscope.</span>
+
+<span class="sd">    Development Notes:</span>
+<span class="sd">    TODO: Consider supporting a list of keyeords that tell what columns to add</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df: channel summary dataframe</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    df: pd.Dataframe</span>
+<span class="sd">        Same as input but with new column</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">df</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">mth5_object</span><span class="o">.</span><span class="n">channel_summary</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;n_filters&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">for</span> <span class="n">i_row</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="n">channel</span> <span class="o">=</span> <span class="n">mth5_object</span><span class="o">.</span><span class="n">get_channel</span><span class="p">(</span>
+            <span class="n">row</span><span class="o">.</span><span class="n">station</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">component</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">survey</span>
+        <span class="p">)</span>
+        <span class="n">n_filters</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">channel</span><span class="o">.</span><span class="n">channel_response</span><span class="o">.</span><span class="n">filters_list</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">n_filters</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">i_row</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_filters</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="build_request_df"><a class="viewcode-back" href="../../../api/aurora.sandbox.html#aurora.sandbox.mth5_helpers.build_request_df">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">build_request_df</span><span class="p">(</span>
+    <span class="n">network_id</span><span class="p">,</span>
+    <span class="n">station_id</span><span class="p">,</span>
+    <span class="n">channels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">time_period_dict</span><span class="o">=</span><span class="p">{},</span>
+    <span class="n">mth5_version</span><span class="o">=</span><span class="s2">&quot;0.2.0&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given some information about an earthscope dataset, format the dataset description</span>
+<span class="sd">     into a request_df dataframe.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    network_id: string</span>
+<span class="sd">        Two-character network identifier string fro FDSN.</span>
+<span class="sd">    station_id: string</span>
+<span class="sd">        Short identifier code used by FDSN, e.g. CAS04, NVR11</span>
+<span class="sd">    channels: list or None</span>
+<span class="sd">        3-character channel identifiers, e.g. [&quot;LQ2&quot;, &quot;MFZ&quot;],</span>
+<span class="sd">        support for wildcards of the form [&quot;*F*&quot;, &quot;*Q*&quot;,] is experimental</span>
+<span class="sd">        Does not support wildcards of the form [&quot;*&quot;,]</span>
+<span class="sd">    start: string</span>
+<span class="sd">        ISO-8601 representation of a timestamp</span>
+<span class="sd">    end: string</span>
+<span class="sd">        ISO-8601 representation of a timestamp</span>
+<span class="sd">    time_period_dict: dict</span>
+<span class="sd">        Keyed by same values as channels, this gives explicit start/end times for each of the channels</span>
+<span class="sd">    mth5_version: str</span>
+<span class="sd">        From [&quot;0.1.0&quot;, &quot;0.2.0&quot;]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    request_df: pd.DataFrame</span>
+<span class="sd">        A formatted dataframe that can be passed to mth5.clients.FDSN to request metdata or data.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_time_period_bounds</span><span class="p">(</span><span class="n">ch</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">time_period_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="c1"># time_interval = time_period_dict[ch]</span>
+            <span class="n">ch_start</span> <span class="o">=</span> <span class="n">time_period_dict</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+            <span class="n">ch_end</span> <span class="o">=</span> <span class="n">time_period_dict</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ch_start</span> <span class="o">=</span> <span class="s2">&quot;1970-01-01 00:00:00&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ch_start</span> <span class="o">=</span> <span class="n">start</span>
+            <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ch_end</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+                <span class="n">ch_end</span> <span class="o">=</span> <span class="n">ch_end</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">hour</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">second</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">microsecond</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">ch_end</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ch_end</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ch_end</span> <span class="o">=</span> <span class="n">end</span>
+        <span class="k">return</span> <span class="n">ch_start</span><span class="p">,</span> <span class="n">ch_end</span>
+
+    <span class="n">fdsn_object</span> <span class="o">=</span> <span class="n">FDSN</span><span class="p">(</span><span class="n">mth5_version</span><span class="o">=</span><span class="n">mth5_version</span><span class="p">)</span>
+    <span class="n">fdsn_object</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="s2">&quot;IRIS&quot;</span>
+
+    <span class="n">request_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">:</span>
+        <span class="n">ch_start</span><span class="p">,</span> <span class="n">ch_end</span> <span class="o">=</span> <span class="n">get_time_period_bounds</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span>
+        <span class="n">request_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">network_id</span><span class="p">,</span> <span class="n">station_id</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">ch_start</span><span class="p">,</span> <span class="n">ch_end</span><span class="p">])</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;request_list: </span><span class="si">{</span><span class="n">request_list</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">request_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">request_list</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">fdsn_object</span><span class="o">.</span><span class="n">request_columns</span><span class="p">)</span>
+    <span class="c1"># workaround for having a channel with missing run</span>
+    <span class="c1"># request_df[&quot;start&quot;] = request_df[&quot;start&quot;].max()</span>
+    <span class="k">return</span> <span class="n">request_df</span></div>
+
+
+<div class="viewcode-block" id="get_experiment_from_obspy_inventory"><a class="viewcode-back" href="../../../api/aurora.sandbox.html#aurora.sandbox.mth5_helpers.get_experiment_from_obspy_inventory">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_experiment_from_obspy_inventory</span><span class="p">(</span><span class="n">inventory</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts an FDSN inventory to an MTH5 Experiment object&quot;&quot;&quot;</span>
+    <span class="n">translator</span> <span class="o">=</span> <span class="n">XMLInventoryMTExperiment</span><span class="p">()</span>
+    <span class="n">experiment</span> <span class="o">=</span> <span class="n">translator</span><span class="o">.</span><span class="n">xml_to_mt</span><span class="p">(</span><span class="n">inventory_object</span><span class="o">=</span><span class="n">inventory</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">experiment</span></div>
+
+
+<div class="viewcode-block" id="mth5_from_experiment"><a class="viewcode-back" href="../../../api/aurora.sandbox.html#aurora.sandbox.mth5_helpers.mth5_from_experiment">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">mth5_from_experiment</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span> <span class="n">h5_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts an experiment object into an mth5 file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    experiment</span>
+<span class="sd">    h5_path</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mth5_obj</span> <span class="o">=</span> <span class="n">initialize_mth5</span><span class="p">(</span><span class="n">h5_path</span><span class="p">)</span>
+    <span class="n">mth5_obj</span><span class="o">.</span><span class="n">from_experiment</span><span class="p">(</span><span class="n">experiment</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mth5_obj</span></div>
+
+
+<div class="viewcode-block" id="get_channel_summary"><a class="viewcode-back" href="../../../api/aurora.sandbox.html#aurora.sandbox.mth5_helpers.get_channel_summary">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_channel_summary</span><span class="p">(</span><span class="n">h5_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gets a channel summary from an mth5;</span>
+<span class="sd">    TODO: This can be replaced by methods in mth5.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    h5_path: pathlib.Path</span>
+<span class="sd">        Where is the h5</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    channel_summary_df: pd.DataFrame</span>
+<span class="sd">        channel summary from mth5</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mth5_obj</span> <span class="o">=</span> <span class="n">initialize_mth5</span><span class="p">(</span>
+        <span class="n">h5_path</span><span class="o">=</span><span class="n">h5_path</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">mth5_obj</span><span class="o">.</span><span class="n">channel_summary</span><span class="o">.</span><span class="n">summarize</span><span class="p">()</span>
+    <span class="n">channel_summary_df</span> <span class="o">=</span> <span class="n">mth5_obj</span><span class="o">.</span><span class="n">channel_summary</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+    <span class="n">mth5_obj</span><span class="o">.</span><span class="n">close_mth5</span><span class="p">()</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">channel_summary_df</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">channel_summary_df</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

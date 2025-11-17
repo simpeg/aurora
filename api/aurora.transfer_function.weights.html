@@ -1,0 +1,339 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.transfer_function.weights package &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="aurora.transfer_function.regression package" href="aurora.transfer_function.regression.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">aurora</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="aurora.html">aurora package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="aurora.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="aurora.config.html">aurora.config package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html">aurora.pipelines package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.html">aurora.sandbox package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.html">aurora.test_utils package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html">aurora.time_series package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="aurora.transfer_function.html">aurora.transfer_function package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.html#module-aurora.general_helper_functions">aurora.general_helper_functions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.html#module-aurora">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">aurora</a></li>
+          <li class="breadcrumb-item"><a href="aurora.html">aurora package</a></li>
+          <li class="breadcrumb-item"><a href="aurora.transfer_function.html">aurora.transfer_function package</a></li>
+      <li class="breadcrumb-item active">aurora.transfer_function.weights package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/aurora.transfer_function.weights.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="aurora-transfer-function-weights-package">
+<h1>aurora.transfer_function.weights package<a class="headerlink" href="#aurora-transfer-function-weights-package" title="Permalink to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-aurora.transfer_function.weights.edf_weights">
+<span id="aurora-transfer-function-weights-edf-weights-module"></span><h2>aurora.transfer_function.weights.edf_weights module<a class="headerlink" href="#module-aurora.transfer_function.weights.edf_weights" title="Permalink to this heading">¶</a></h2>
+<blockquote>
+<div><p>This module contains a class for computing so-called “Effective Degrees of Freedom” weights.</p>
+</div></blockquote>
+<p>Development notes:
+The code here is based on the function Edfwts.m from egbert_codes-
+20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/functions/Edfwts.m</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.transfer_function.weights.edf_weights.</span></span><span class="sig-name descname"><span class="pre">EffectiveDegreesOfFreedom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edf_l1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p3</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/transfer_function/weights/edf_weights.html#EffectiveDegreesOfFreedom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="#aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom.p1" title="aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom.p1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">p1</span></code></a></dt><dd><p>Threshold applied to edf.</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom.p2" title="aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom.p2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">p2</span></code></a></dt><dd><p>Threshold applied to edf.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom.compute_weights" title="aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom.compute_weights"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_weights</span></code></a>(X, use)</p></td>
+<td><p>Compute the EDF Weights</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom.compute_weights">
+<span class="sig-name descname"><span class="pre">compute_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">use</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a></span></span><a class="reference internal" href="../_modules/aurora/transfer_function/weights/edf_weights.html#EffectiveDegreesOfFreedom.compute_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom.compute_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the EDF Weights</p>
+<p>y_hat = P * y
+where P is the “hat” matrix, and y_hat is the predicted value of y</p>
+<p>Development Notes:
+The data covariance matrix s and its inverse h are iteratively recomputed using
+fewer and fewer observations. The edf_weights are also computed at every
+iteration (but for all data points).</p>
+<p>Discussing this with Gary:
+“… because you are down-weighting (omitting) more and more highpower events
+the total signal is going down.  The signal power goes down with every call
+to this method”
+…
+“The Hat Matrix, where the diagonals of this matrix are really big means an
+individual data point is controlling its own prediction, and the estimate.
+If the problem was balanced (n data points contributing equally), each data point
+would contribute equally (1/n) to each parameter. When one data point is large and
+the others are tiny, then it may be contributing a lot, say 1/2 rather than 1/n.
+edf is like the diagonal of the Hat matrix (in the single station case)
+How much does the data point contribute to the prediction of itself.</p>
+<p>Note: H = inv(S) in general has equal H[0,1] = H[1,0];  2x2 matrices with
+matching off-diagonal terms have inverses with the same property.</p>
+<p>—AI Explaination of the code—
+The effective degrees of freedom (edf) weights are computed based on the covariance
+matrix of the input data. The covariance matrix is calculated using the selected
+observations (indicated by the <cite>use</cite> boolean array). The inverse of the covariance
+matrix is then used to compute the edf weights for each observation.
+The edf weights are calculated as follows:
+- The covariance matrix <cite>S</cite> is computed as the outer product of the selected data.
+- The covariance matrix is normalized by the number of selected observations.
+- The inverse covariance matrix <cite>H</cite> is computed.
+- The edf weights are then calculated using the diagonal and off-diagonal elements</p>
+<blockquote>
+<div><p>of the inverse covariance matrix <cite>H</cite> and the selected data.</p>
+</div></blockquote>
+<p>—Statistical Context—
+The inverse covariance matrix (H = S^{-1}) is used here because it “whitens” the data:
+it removes correlations and scales by variance, so each observation is measured in units
+of its statistical uncertainty. This is analogous to the Mahalanobis distance, which
+accounts for the covariance structure of the data. In the context of regression, the
+resulting EDF (effective degrees of freedom) value for each observation is proportional
+to its leverage, similar to the diagonal of the Hat matrix. Observations that are outliers
+in the whitened space (i.e., unusual given the covariance structure) receive higher EDF
+values, indicating greater influence on the fit. Thus, the inverse covariance matrix is
+essential for properly quantifying the statistical distinctiveness and leverage of each
+observation, enabling robust down-weighting of high-leverage (potentially outlier) points.</p>
+<p>In summary: The inverse covariance matrix is used to weight each observation according to
+its contribution to the fit, accounting for both variance and correlation, ensuring that
+the EDF weights reflect true statistical leverage.</p>
+<p>A note on usage of real vs complex data:
+The terms ( X[0, :] * conj{X[0, :]} ) and ( X[1, :] * conj{X[1, :]} ) are always real
+and non-negative (they are squared magnitudes). The cross term ( conj{X[1, :]} * X[0, :] )
+can be complex, but in the context of covariance and quadratic forms you want the real part,
+not the absolute value.
+Why?
+The quadratic form ( x^H H x ) (where ( x ) is a complex vector and ( H ) is Hermitian) is
+always real, and the real part is what contributes to the variance/leverage.
+Taking the absolute value would overstate the contribution of the cross term and would not be
+statistically correct for covariance-based leverage calculations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>np.ndarray</em>) – The data to for which to determine weights.</p></li>
+<li><p><strong>use</strong> (<em>np.ndarray</em>) – populated with booleans</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>edf</strong> – The weights values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom.p1">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">p1</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></em><a class="headerlink" href="#aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom.p1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Threshold applied to edf.  All edf below  this value
+are set to weight=0</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom.p2">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">p2</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></em><a class="headerlink" href="#aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom.p2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Threshold applied to edf.  All edf above th  this value
+are set to weight=0</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.transfer_function.weights.edf_weights.effective_degrees_of_freedom_weights">
+<span class="sig-prename descclassname"><span class="pre">aurora.transfer_function.weights.edf_weights.</span></span><span class="sig-name descname"><span class="pre">effective_degrees_of_freedom_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edf_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom" title="aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom"><span class="pre">EffectiveDegreesOfFreedom</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a></span></span><a class="reference internal" href="../_modules/aurora/transfer_function/weights/edf_weights.html#effective_degrees_of_freedom_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.transfer_function.weights.edf_weights.effective_degrees_of_freedom_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the effective degrees of freedom weights. Emulates edfwts (“effective dof”) from tranmt.
+- Based on Edfwts.m matlab code from
+iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/functions/</p>
+<p>Flow:
+0. Initialize weights vector (of 1’s) the length of the “observation” axis
+1. Remove any nan in X,R
+2. compute the weights on the reduced (no-nan) arrays of X and R
+3. Overwrite the weights vector for the non-nan entries.
+4. Return weights and broadcast-multiply against data to apply.</p>
+<p>Development Notes:
+Note about the while loop: variable “use” never changes length, it only
+flips its bit.  The while loop exits when n_valid_observations == sum(use)
+i.e.the effective dof are all below threshold Estimate dof.  Then we “use”
+only points whose dof are smaller than the threshold.  Then we recompute dof.
+This time the covariance matrix diagonals are smaller, there is less energy
+in the time series for the S, H calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>xr.Dataset</em>) – The input channels for regression.  Usually horizontal magnetics hx, hy</p></li>
+<li><p><strong>R</strong> (<em>xr.Dataset</em><em> or </em><em>None</em>) – The remote reference channels, usually hx, hy.  Can be None if single-station
+processing</p></li>
+<li><p><strong>edf_obj</strong> (<a class="reference internal" href="#aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom" title="aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom"><em>aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom</em></a>) – Object with parameters for Gary’s adhoc edfwts method.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>weights</strong> – Weights for reducing leverage points.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)">numpy.ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-aurora.transfer_function.weights">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-aurora.transfer_function.weights" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="aurora.transfer_function.regression.html" class="btn btn-neutral float-left" title="aurora.transfer_function.regression package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

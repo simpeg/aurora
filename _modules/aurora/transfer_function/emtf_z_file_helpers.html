@@ -1,0 +1,304 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.transfer_function.emtf_z_file_helpers &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aurora.transfer_function.emtf_z_file_helpers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.transfer_function.emtf_z_file_helpers</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">This module contains methods associated with legacy EMTF z-file TF format.</span>
+
+<span class="sd">Development notes:</span>
+<span class="sd">They extract info needed to setup emtf_z files.</span>
+<span class="sd">These methods can possibly be moved under mt_metadata, or deprecated.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.transfer_function.transfer_function_collection</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">TransferFunctionCollection</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.sandbox.io_helpers.zfile_murphy</span><span class="w"> </span><span class="kn">import</span> <span class="n">ZFile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="n">EMTF_CHANNEL_ORDER</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;hx&quot;</span><span class="p">,</span> <span class="s2">&quot;hy&quot;</span><span class="p">,</span> <span class="s2">&quot;hz&quot;</span><span class="p">,</span> <span class="s2">&quot;ex&quot;</span><span class="p">,</span> <span class="s2">&quot;ey&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="get_default_orientation_block"><a class="viewcode-back" href="../../../api/aurora.transfer_function.html#aurora.transfer_function.emtf_z_file_helpers.get_default_orientation_block">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_default_orientation_block</span><span class="p">(</span><span class="n">n_ch</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    creates a text block like the part of the z-file that holds channel orientations.</span>
+
+<span class="sd">    Helper function used when working with matlab structs which do not have enough</span>
+<span class="sd">    info to make headers</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_ch: int</span>
+<span class="sd">        number of channels at the station</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    orientation_strs: list</span>
+<span class="sd">        List of text strings, one per channel</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">orientation_strs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">orientation_strs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;    1     0.00     0.00 tes  Hx</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">orientation_strs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;    2    90.00     0.00 tes  Hy</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n_ch</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="n">orientation_strs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;    3     0.00     0.00 tes  Hz</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">orientation_strs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;    4     0.00     0.00 tes  Ex</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">orientation_strs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;    5    90.00     0.00 tes  Ey</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">orientation_strs</span></div>
+
+
+<div class="viewcode-block" id="merge_tf_collection_to_match_z_file"><a class="viewcode-back" href="../../../api/aurora.transfer_function.html#aurora.transfer_function.emtf_z_file_helpers.merge_tf_collection_to_match_z_file">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">merge_tf_collection_to_match_z_file</span><span class="p">(</span>
+    <span class="n">aux_data</span><span class="p">:</span> <span class="n">ZFile</span><span class="p">,</span> <span class="n">tf_collection</span><span class="p">:</span> <span class="n">TransferFunctionCollection</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    method to merge tf data from a tf_collection with a Z-file when there are potentially</span>
+<span class="sd">    multiple estimates of TF at the same periods for different decimation levels.</span>
+
+<span class="sd">    Development Notes:</span>
+<span class="sd">    Currently this is only used for the the synthetic test where aurora results</span>
+<span class="sd">    are compared against a stored legacy Z-file.  Given data from a z_file, and a</span>
+<span class="sd">    tf_collection, the tf_collection may have several TF estimates at the same</span>
+<span class="sd">    frequency from multiple decimation levels.  This tries to make a single array as</span>
+<span class="sd">    a function of period for all rho and phi.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    aux_data: aurora.sandbox.io_helpers.zfile_murphy.ZFile</span>
+<span class="sd">        Object representing a z-file</span>
+<span class="sd">    tf_collection: aurora.transfer_function.transfer_function_collection</span>
+<span class="sd">    .TransferFunctionCollection</span>
+<span class="sd">        Object representing the transfer function returned from the aurora processing</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    result: dict of dicts</span>
+<span class="sd">        Keyed by [&quot;rho&quot;, &quot;phi&quot;], below each of these is an [&quot;xy&quot;, &quot;yx&quot;,] entry.  The</span>
+<span class="sd">        lowest level entries are numpy arrays.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rxy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">aux_data</span><span class="o">.</span><span class="n">decimation_levels</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+    <span class="n">ryx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">aux_data</span><span class="o">.</span><span class="n">decimation_levels</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+    <span class="n">pxy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">aux_data</span><span class="o">.</span><span class="n">decimation_levels</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+    <span class="n">pyx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">aux_data</span><span class="o">.</span><span class="n">decimation_levels</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+    <span class="n">dec_levels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">aux_data</span><span class="o">.</span><span class="n">decimation_levels</span><span class="p">))</span>
+    <span class="n">dec_levels</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">dec_levels</span><span class="p">]</span>
+    <span class="n">dec_levels</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">dec_level</span> <span class="ow">in</span> <span class="n">dec_levels</span><span class="p">:</span>
+        <span class="n">aurora_tf</span> <span class="o">=</span> <span class="n">tf_collection</span><span class="o">.</span><span class="n">tf_dict</span><span class="p">[</span><span class="n">dec_level</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">aux_data</span><span class="o">.</span><span class="n">decimation_levels</span> <span class="o">==</span> <span class="n">dec_level</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">ndx</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+            <span class="n">period</span> <span class="o">=</span> <span class="n">aux_data</span><span class="o">.</span><span class="n">periods</span><span class="p">[</span><span class="n">ndx</span><span class="p">]</span>
+            <span class="c1"># find the nearest period in aurora_tf</span>
+            <span class="n">aurora_ndx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">aurora_tf</span><span class="o">.</span><span class="n">periods</span> <span class="o">-</span> <span class="n">period</span><span class="p">))</span>
+            <span class="n">rxy</span><span class="p">[</span><span class="n">ndx</span><span class="p">]</span> <span class="o">=</span> <span class="n">aurora_tf</span><span class="o">.</span><span class="n">rho</span><span class="p">[</span><span class="n">aurora_ndx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">ryx</span><span class="p">[</span><span class="n">ndx</span><span class="p">]</span> <span class="o">=</span> <span class="n">aurora_tf</span><span class="o">.</span><span class="n">rho</span><span class="p">[</span><span class="n">aurora_ndx</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">pxy</span><span class="p">[</span><span class="n">ndx</span><span class="p">]</span> <span class="o">=</span> <span class="n">aurora_tf</span><span class="o">.</span><span class="n">phi</span><span class="p">[</span><span class="n">aurora_ndx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">pyx</span><span class="p">[</span><span class="n">ndx</span><span class="p">]</span> <span class="o">=</span> <span class="n">aurora_tf</span><span class="o">.</span><span class="n">phi</span><span class="p">[</span><span class="n">aurora_ndx</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;rho&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;phi&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;rho&quot;</span><span class="p">][</span><span class="s2">&quot;xy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rxy</span>
+    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;phi&quot;</span><span class="p">][</span><span class="s2">&quot;xy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pxy</span>
+    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;rho&quot;</span><span class="p">][</span><span class="s2">&quot;yx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ryx</span>
+    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;phi&quot;</span><span class="p">][</span><span class="s2">&quot;yx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pyx</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="clip_bands_from_z_file"><a class="viewcode-back" href="../../../api/aurora.transfer_function.html#aurora.transfer_function.emtf_z_file_helpers.clip_bands_from_z_file">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">clip_bands_from_z_file</span><span class="p">(</span>
+    <span class="n">z_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">],</span>
+    <span class="n">n_bands_clip</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">output_z_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">n_sensors</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function clips periods off the end of an EMTF legacy z_file.</span>
+
+<span class="sd">    Development Notes:</span>
+<span class="sd">    It can come in handy for manipulating matlab results of synthetic data.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    z_path: Path or str</span>
+<span class="sd">        path to the z_file to read in and clip periods from</span>
+<span class="sd">    n_periods_clip: integer</span>
+<span class="sd">        how many periods to clip from the end of the zfile</span>
+<span class="sd">    overwrite: bool</span>
+<span class="sd">        whether to overwrite the zfile or rename it</span>
+<span class="sd">    n_sensors</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">output_z_path</span><span class="p">:</span>
+        <span class="n">output_z_path</span> <span class="o">=</span> <span class="n">z_path</span>
+
+    <span class="k">if</span> <span class="n">n_sensors</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="n">n_lines_per_period</span> <span class="o">=</span> <span class="mi">13</span>
+    <span class="k">elif</span> <span class="n">n_sensors</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="n">n_lines_per_period</span> <span class="o">=</span> <span class="mi">11</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;WARNING n_sensors==4 NOT TESTED&quot;</span><span class="p">)</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">z_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_bands_clip</span><span class="p">):</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[:</span><span class="o">-</span><span class="n">n_lines_per_period</span><span class="p">]</span>
+    <span class="n">n_bands_str</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">n_bands</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_bands_str</span><span class="p">)</span>
+    <span class="n">new_n_bands</span> <span class="o">=</span> <span class="n">n_bands</span> <span class="o">-</span> <span class="n">n_bands_clip</span>
+    <span class="n">new_n_bands_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">new_n_bands</span><span class="p">)</span>
+    <span class="n">lines</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">n_bands_str</span><span class="p">,</span> <span class="n">new_n_bands_str</span><span class="p">)</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_z_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,613 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Problem Statement &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+      <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Problem Statement</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/tutorials/pole_zero_fitting/lemi_pole_zero_fitting_example.nbconvert.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1><p>Poles/Zeros/Gain from Look-Up Tables (Prototyping)</p>
+</h1><section id="Problem-Statement">
+<h1>Problem Statement<a class="headerlink" href="#Problem-Statement" title="Permalink to this heading">¶</a></h1>
+<p>The IRIS metadata archiving process had a strong preference for pole-zero (‘zpk’) representations of analog filters. However, calibrations of many MT instruments are characterized in the form of frequency sweeps, and manufacturer’s calibrations are often provided in terms of tables of frequency, with amplitude and phase responses (‘fap’).</p>
+<p>Thus we are faced with the problem of expressing a generic <em>fap</em> instrument resposne in the <em>zpk</em> format.</p>
+</section>
+<section id="Inverse-Problem-Setup">
+<h1>Inverse Problem Setup<a class="headerlink" href="#Inverse-Problem-Setup" title="Permalink to this heading">¶</a></h1>
+<p>Starting with the classic inversion model notation:</p>
+<p><span class="math notranslate nohighlight">\(\bf{d} = \bf{Gm}\)</span></p>
+<p><span class="math notranslate nohighlight">\(\bf{d}\)</span>: The “data” in the the ‘fap’ table. This is simply a set of <span class="math notranslate nohighlight">\(N\)</span> ordered pairs, <span class="math notranslate nohighlight">\(\{(f_1, x_1), (f_2, x_2), ... (f_N, x_N)\}\)</span> where <span class="math notranslate nohighlight">\(f_i \in \mathbb{R}^+\)</span> and <span class="math notranslate nohighlight">\(x_i \in \mathbb{C}\)</span></p>
+<p><span class="math notranslate nohighlight">\(\bf{G}\)</span>: The function relating the data and the model can take on several parameterizations. One parameterization is as a ratio of (possibly complex-valued) polynomials but with only real-valued coefficients. We apply a change of notation as the data-to-model relationship denoted above as <span class="math notranslate nohighlight">\(\bf{G}\)</span> is more commonly referred to in signal processing as <span class="math notranslate nohighlight">\(h(s)\)</span> , thus <span class="math notranslate nohighlight">\(h(s) \leftarrow \bf{G}(s)\)</span></p>
+<p>$ <span class="math">\displaystyle `h(s) = :nbsphinx-math:</span>frac{a_{m}s^m + a_{m-1}s^{m-1} + … + a_{1}s^{1} + a_{0}}{b_{n}s^{n} + b_{n-1}s^{n-1} + … + b_{1}s^{1} + b_{0}}` $</p>
+<p>Where the Laplace variable <em>s</em> = <em>j</em> <span class="math notranslate nohighlight">\(\omega\)</span></p>
+<p><span class="math notranslate nohighlight">\(\bf{m}\)</span>: Using the above parameterization <span class="math notranslate nohighlight">\(\bf{m}\)</span> would be the set of <span class="math notranslate nohighlight">\(m + n + 2\)</span> coefficients <span class="math notranslate nohighlight">\({a_0, a_1, ...a_m, b_0, b_1, ... b_n}\)</span> with <span class="math notranslate nohighlight">\(a_i, b_i \in \mathbb{R}\)</span></p>
+<p>The coefficients in the numerator and denominator polynomials in the Laplace domain representation of the filter are real. They typically correspond to values of circuit parameters resistance, capacitance, inductance, etc. in analog EE applications. This means that these polynomials factor completely over the complex plane and moreover, the roots are either real or occur in complex-conjugate pairs.</p>
+<p>Factoring <span class="math notranslate nohighlight">\(h(s)\)</span> on top and bottom yields the form:</p>
+<p>$ <span class="math">\displaystyle `h (s) = k :nbsphinx-math:</span>frac{(s-z_1)(s-z_2)…(s-z_m) }{(s-p_1)(s-p_2)…(s-p_n)}` $</p>
+<p>There are well defined transformations between these representations and they are available through <em>scipy.signal.tf2zpk</em> or <em>zpk2tf</em>.</p>
+<section id="Recent-Activity-in-PZ-fitting">
+<h2>Recent Activity in PZ-fitting<a class="headerlink" href="#Recent-Activity-in-PZ-fitting" title="Permalink to this heading">¶</a></h2>
+<p>Ben Murphy tried a variety of methods to solve this problem but invariably wound up encountering poles and zeros (roots) that did not obey the principle of complex-conjugate roots, and sometimes poles on the right hand side of the plane, and or k values that were complex-valued. The complex k values are particularly concerning because IRIS does not provide support for complex-valued k <span class="math notranslate nohighlight">\(-\)</span> it is just one double-precision number.</p>
+<p>The reason for these issues deserves some analysis but at a high level seems to be due to parameterizations that ultimately wound up searching complex-valued spaces for soltuions.</p>
+<p>Karl tried some variants on Ben’s methods which involved some regularization functions that penalized non-conjugate root pairs, and imaginary parts of k, but these never matured so their value is questionable.</p>
+<p>It seems like we should be able to use a numeric method to solve in the real valued form (even though the evaluation of the TF is Complex, the coefficients are real) and then extract the zpk afterwards. Following is an example of a numeric solution.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="c1"># from matplotlib.gridspec import GridSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">signal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">minimize</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.sandbox.plot_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_complex_response</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.sandbox.plot_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_response_pz</span>
+
+<span class="c1"># from regularization_function_development import add_regularization_term</span>
+<span class="c1"># from regularization_function_development import get_pz_regularization</span>
+
+<span class="c1"># %matplotlib inline</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">DEG2RAD</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="Load-the-data-from-data-repo">
+<h1>Load the data from data repo<a class="headerlink" href="#Load-the-data-from-data-repo" title="Permalink to this heading">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">calibration_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;Lemi-039_N131BxByBz&quot;</span><span class="p">,</span> <span class="s2">&quot;Lemi-039_N131.cal&quot;</span><span class="p">)</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">calibration_file_path</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">column_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;frequency&#39;</span><span class="p">,</span> <span class="s1">&#39;amplitude_x&#39;</span><span class="p">,</span> <span class="s1">&#39;phase_x&#39;</span><span class="p">,</span> <span class="s1">&#39;amplitude_y&#39;</span><span class="p">,</span> <span class="s1">&#39;phase_y&#39;</span><span class="p">,</span> <span class="s1">&#39;amplitude_z&#39;</span><span class="p">,</span> <span class="s1">&#39;phase_z&#39;</span><span class="p">]</span>
+<span class="n">columns_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">column_labels</span><span class="p">))</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">columns_map</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Index([&#39;frequency&#39;, &#39;amplitude_x&#39;, &#39;phase_x&#39;, &#39;amplitude_y&#39;, &#39;phase_y&#39;,
+       &#39;amplitude_z&#39;, &#39;phase_z&#39;],
+      dtype=&#39;object&#39;)
+</pre></div></div>
+</div>
+</section>
+<section id="Preliminary-Response-Curve">
+<h1>Preliminary Response Curve<a class="headerlink" href="#Preliminary-Response-Curve" title="Permalink to this heading">¶</a></h1>
+<p>In the following, the variables are sometimes prefixed with an <span class="math notranslate nohighlight">\(x\)</span>. The reason for this is that the LEMI calibration file has columns in the table for <span class="math notranslate nohighlight">\(x, y, z\)</span> and in this example we select the <span class="math notranslate nohighlight">\(x\)</span> columns for analysis.</p>
+<p>We start by reading the amplitude and phase from the dataframe, and combining them into a single complex-valued response function.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x_phase_radians</span> <span class="o">=</span> <span class="n">DEG2RAD</span><span class="o">*</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;phase_x&#39;</span><span class="p">]</span>
+<span class="n">x_phasor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">1.</span><span class="n">J</span><span class="o">*</span><span class="n">x_phase_radians</span><span class="p">)</span> <span class="c1">#(np.cos( x_phase_radians)+ 1.j*np.sin(x_phase_radians))</span>
+<span class="n">x_complex_response</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;amplitude_x&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">x_phasor</span>
+<span class="n">frequencies</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;frequency&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+
+<span class="n">plot_complex_response</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;frequency&#39;</span><span class="p">],</span> <span class="n">x_complex_response</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_pole_zero_fitting_lemi_pole_zero_fitting_example.nbconvert_13_0.png" src="../../_images/tutorials_pole_zero_fitting_lemi_pole_zero_fitting_example.nbconvert_13_0.png" />
+</div>
+</div>
+</section>
+<section id="Estimate-the-response-amplitude-in-the-pass-band">
+<h1>Estimate the response amplitude in the pass band<a class="headerlink" href="#Estimate-the-response-amplitude-in-the-pass-band" title="Permalink to this heading">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nominal_passband_response_amplitude</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;amplitude_x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;nominal_passband_response_amplitude&#39;</span><span class="p">,</span> <span class="n">nominal_passband_response_amplitude</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+nominal_passband_response_amplitude 0.02847
+</pre></div></div>
+</div>
+</section>
+<section id="Express-in-units-of-deciBels-and-plot-on-semilog">
+<h1>Express in units of deciBels and plot on semilog<a class="headerlink" href="#Express-in-units-of-deciBels-and-plot-on-semilog" title="Permalink to this heading">¶</a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">amplitude_in_db</span> <span class="o">=</span> <span class="mi">20</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;amplitude_x&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">nominal_passband_response_amplitude</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;frequency&#39;</span><span class="p">],</span> <span class="n">amplitude_in_db</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;frequency&#39;</span><span class="p">],</span> <span class="n">amplitude_in_db</span><span class="p">,</span> <span class="s1">&#39;r*&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Amplitude Response of Instrument in dB&#39;</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Text(0.5, 1.0, &#39;Amplitude Response of Instrument in dB&#39;)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_pole_zero_fitting_lemi_pole_zero_fitting_example.nbconvert_18_1.png" src="../../_images/tutorials_pole_zero_fitting_lemi_pole_zero_fitting_example.nbconvert_18_1.png" />
+</div>
+</div>
+</section>
+<section id="Note-that-the-decay-is-log-linear-after-about-5Hz">
+<h1>Note that the decay is log-linear after about 5Hz<a class="headerlink" href="#Note-that-the-decay-is-log-linear-after-about-5Hz" title="Permalink to this heading">¶</a></h1>
+<p>The last 13 points are approximately a straight line on the log plot. Thus we can fit a line to them and estimate the number of decibels per decade roll-off by the slope of the fit line.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_asymptotic_log_linear</span> <span class="o">=</span> <span class="mi">13</span>
+<span class="n">frq_line</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;frequency&#39;</span><span class="p">][</span><span class="o">-</span><span class="n">n_asymptotic_log_linear</span><span class="p">:]</span>
+<span class="n">ampl_line</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;amplitude_x&#39;</span><span class="p">][</span><span class="o">-</span><span class="n">n_asymptotic_log_linear</span><span class="p">:]</span>
+<span class="n">db_line</span> <span class="o">=</span> <span class="n">amplitude_in_db</span><span class="p">[</span><span class="o">-</span><span class="n">n_asymptotic_log_linear</span><span class="p">:]</span>
+<span class="n">log_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">frq_line</span><span class="p">))</span>
+<span class="n">log_a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">ampl_line</span><span class="p">))</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">db_line</span><span class="p">)</span>
+<span class="n">db_per_decade</span> <span class="o">=</span> <span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">db</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">log_f</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">log_f</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">log_f</span><span class="p">,</span> <span class="n">db_line</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;log$_</span><span class="si">{10}</span><span class="s1">$ frequency&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;dB&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;db_per_decade: </span><span class="si">{</span><span class="n">db_per_decade</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_pole_zero_fitting_lemi_pole_zero_fitting_example.nbconvert_20_0.png" src="../../_images/tutorials_pole_zero_fitting_lemi_pole_zero_fitting_example.nbconvert_20_0.png" />
+</div>
+</div>
+<section id="looks-like-approximately--20dB/decade,-which-theoretically-corresponds-to-a-single-pole.-We-obtain-a-decent-fit-with-one-pole,-but-a-better-fit-with-3poles-and-one-zero.">
+<h2>looks like approximately -20dB/decade, which theoretically corresponds to a single pole. We obtain a decent fit with one pole, but a better fit with 3poles and one zero.<a class="headerlink" href="#looks-like-approximately--20dB/decade,-which-theoretically-corresponds-to-a-single-pole.-We-obtain-a-decent-fit-with-one-pole,-but-a-better-fit-with-3poles-and-one-zero." title="Permalink to this heading">¶</a></h2>
+<p>If we want to optimize we need to add constraints however. In particular, a regulariization that forces 1: complex poles to be conjugates, and the ‘odd’ poles to be pure real. This means modifying the LLSQ process.</p>
+<p>If the roll off is ~20dB/ decade then we would expect a 1 pole filter, or at least a filter with one more pole than zeros</p>
+</section>
+</section>
+<section id="Optimization-of-pole-zero-fit">
+<h1>Optimization of pole-zero fit<a class="headerlink" href="#Optimization-of-pole-zero-fit" title="Permalink to this heading">¶</a></h1>
+<p>Below, a simple numeric optimization is set up that will search for the pole-zero coefficients.</p>
+<p>The steps are:</p>
+<ol class="arabic simple">
+<li><p>Define global variables needed for optimization</p></li>
+<li><p>Define the objective function</p></li>
+<li><p>Select a method of searching the space</p></li>
+</ol>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<section id="Global-Variables-needed-for-optimization">
+<h2>Global Variables needed for optimization<a class="headerlink" href="#Global-Variables-needed-for-optimization" title="Permalink to this heading">¶</a></h2>
+<p>In the following, some global variables are defined that the objective function needs access to. These are in all upper-case letters</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># fap-table based response function, used to measure misfit</span>
+<span class="n">X_COMPLEX_RESPONSE</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">x_complex_response</span><span class="p">)</span>
+
+<span class="c1"># define angular frequencies</span>
+<span class="n">W</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">frequencies</span>
+
+<span class="c1"># Define the number of poles and zeros in the model</span>
+
+<span class="c1"># N_ZEROS = 0; N_POLES = 1 #Not great</span>
+<span class="n">N_ZEROS</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">N_POLES</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1">#Good when seeded with 1</span>
+<span class="c1"># N_ZEROS = 2; N_POLES = 3 #Good when seeded with 3</span>
+<span class="c1"># N_ZEROS = 3; N_POLES = 4 #not so good</span>
+
+<span class="c1"># Seed a random number generator and generate an initial condition</span>
+<span class="n">seed_value</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed_value</span><span class="p">)</span>
+<span class="n">b0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">N_ZEROS</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">a0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">N_POLES</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Define the initial model vector, made of all the polynomial coefficients</span>
+<span class="n">MODEL_VECTOR_0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">b0</span><span class="p">,</span> <span class="n">a0</span><span class="p">))</span>
+<span class="c1">#print(&#39;MODEL_VECTOR_0&#39;,MODEL_VECTOR_0)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Define-the-objective-function">
+<h2>Define the objective function<a class="headerlink" href="#Define-the-objective-function" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="Lets-try-a-numerical-approach-using-scipy-optimize-and-some-regularization-that-penalizes-deviations-from-the-fundamental-theorem-of-algebra-solutions">
+<h2>Lets try a numerical approach using scipy optimize and some regularization that penalizes deviations from the fundamental theorem of algebra solutions<a class="headerlink" href="#Lets-try-a-numerical-approach-using-scipy-optimize-and-some-regularization-that-penalizes-deviations-from-the-fundamental-theorem-of-algebra-solutions" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">objective_function</span><span class="p">(</span><span class="n">model_vector</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function evaluates the complex-valued response of the poles and zeros using</span>
+<span class="sd">    scipy.signal, and then measures the goodness-of-fit by differencing the response</span>
+<span class="sd">    from the fap-table generated COMPLEX_RESPONSE</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#unpack the model vector</span>
+    <span class="n">bb</span> <span class="o">=</span> <span class="n">model_vector</span><span class="p">[:</span><span class="n">N_ZEROS</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">aa</span> <span class="o">=</span> <span class="n">model_vector</span><span class="p">[</span><span class="n">N_ZEROS</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;numerator &#39;</span><span class="p">,</span> <span class="n">bb</span><span class="p">,</span> <span class="n">N_ZEROS</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;denominator&#39;</span><span class="p">,</span> <span class="n">aa</span><span class="p">,</span> <span class="n">N_POLES</span><span class="p">)</span>
+
+    <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">freqs</span><span class="p">(</span><span class="n">bb</span><span class="p">,</span> <span class="n">aa</span><span class="p">,</span> <span class="n">worN</span><span class="o">=</span><span class="n">W</span><span class="p">)</span>
+    <span class="n">residual</span> <span class="o">=</span> <span class="n">X_COMPLEX_RESPONSE</span> <span class="o">-</span> <span class="n">h</span>
+    <span class="n">misfit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">residual</span><span class="o">**</span><span class="mi">2</span><span class="p">)))</span>
+    <span class="c1"># print(residual)</span>
+    <span class="c1"># misfit = add_regularization_term(zeros, poles, k, misfit, aa=0.1)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;misfit&#39;</span><span class="p">,</span><span class="n">misfit</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">misfit</span>
+
+<span class="n">objective_function</span><span class="p">(</span><span class="n">MODEL_VECTOR_0</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+numerator  [0.417022   0.72032449] 1
+denominator [1.14374817e-04 3.02332573e-01 1.46755891e-01] 2
+misfit 2.4605533025729573
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2.4605533025729573
+</pre></div></div>
+</div>
+</section>
+<section id="Select-the-optimization-search-method">
+<h2>Select the optimization search-method<a class="headerlink" href="#Select-the-optimization-search-method" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#method = &#39;nelder-mead&#39;</span>
+<span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;Powell&#39;</span>
+<span class="c1">#method = &#39;CG&#39;</span>
+<span class="c1">#method = &#39;Newton-CG&#39; #needs Jacobian</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Solve-the-optimization-problem">
+<h2>Solve the optimization problem<a class="headerlink" href="#Solve-the-optimization-problem" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">res</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">objective_function</span><span class="p">,</span> <span class="n">MODEL_VECTOR_0</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;xatol&#39;</span><span class="p">:</span> <span class="mf">1e-10</span><span class="p">,</span> <span class="s1">&#39;disp&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/tmp/ipykernel_2744/3488554344.py:1: OptimizeWarning: Unknown solver options: xatol
+  res = minimize(objective_function, MODEL_VECTOR_0, method=method, options={&#39;xatol&#39;: 1e-10, &#39;disp&#39;: True, })
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Optimization terminated successfully.
+         Current function value: 0.000202
+         Iterations: 14
+         Function evaluations: 1012
+</pre></div></div>
+</div>
+</section>
+<section id="Extract-the-b's-and-a's-(polynomial-coefficients)-and-convert-to-Poles-and-Zeros">
+<h2>Extract the b’s and a’s (polynomial coefficients) and convert to Poles and Zeros<a class="headerlink" href="#Extract-the-b's-and-a's-(polynomial-coefficients)-and-convert-to-Poles-and-Zeros" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bb</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">x</span><span class="p">[:</span><span class="n">N_ZEROS</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">aa</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">N_ZEROS</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
+<span class="n">zpk</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">(</span><span class="n">bb</span><span class="p">,</span> <span class="n">aa</span><span class="p">)</span><span class="o">.</span><span class="n">to_zpk</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">zpk</span><span class="p">)</span>
+<span class="c1">#print(type(zpk))</span>
+<span class="c1"># res.x</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ZerosPolesGainContinuous(
+array([-37.78764719]),
+array([-18.49867054+16.57300946j, -18.49867054-16.57300946j]),
+-0.46488298338597395,
+dt: None
+)
+</pre></div></div>
+</div>
+</section>
+<section id="Take-a-look-at-the-Model-Fit">
+<h2>Take a look at the Model Fit<a class="headerlink" href="#Take-a-look-at-the-Model-Fit" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_response_pz</span><span class="p">(</span><span class="n">w_obs</span><span class="o">=</span><span class="n">W</span><span class="p">,</span> <span class="n">resp_obs</span><span class="o">=</span><span class="n">X_COMPLEX_RESPONSE</span><span class="p">,</span> <span class="n">x_units</span><span class="o">=</span><span class="s1">&#39;frequency&#39;</span><span class="p">,</span>
+              <span class="n">zpk_pred</span><span class="o">=</span><span class="n">zpk</span><span class="p">,</span> <span class="n">w_values</span><span class="o">=</span><span class="n">W</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_pole_zero_fitting_lemi_pole_zero_fitting_example.nbconvert_37_0.png" src="../../_images/tutorials_pole_zero_fitting_lemi_pole_zero_fitting_example.nbconvert_37_0.png" />
+</div>
+</div>
+<p>what percent differences are we looking at here?</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_pred</span><span class="p">,</span> <span class="n">resp_pred</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">freqresp</span><span class="p">(</span><span class="n">zpk</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="n">W</span><span class="p">)</span>
+<span class="n">pct_diff_ampl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">((</span><span class="n">resp_pred</span><span class="o">-</span><span class="n">X_COMPLEX_RESPONSE</span><span class="p">)</span><span class="o">/</span><span class="n">X_COMPLEX_RESPONSE</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span>
+<span class="n">pct_diff_phase</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">DEG2RAD</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">resp_pred</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">X_COMPLEX_RESPONSE</span><span class="p">))</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">X_COMPLEX_RESPONSE</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">W</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">),</span> <span class="n">pct_diff_ampl</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;amplitude&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">W</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">),</span> <span class="n">pct_diff_phase</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;phase&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Frequency (Hz)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Percent Difference (%)&quot;</span><span class="p">)</span>
+<span class="c1">#ax.set_xlim(9e-1, 5)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Text(0, 0.5, &#39;Percent Difference (%)&#39;)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_pole_zero_fitting_lemi_pole_zero_fitting_example.nbconvert_40_1.png" src="../../_images/tutorials_pole_zero_fitting_lemi_pole_zero_fitting_example.nbconvert_40_1.png" />
+</div>
+</div>
+<p>So, the model agrees to within 1 or 2 percent below 1Hz, and for the LEMI system this is above Nyquist.</p>
+</section>
+</section>
+<section id="So,-where-are-we?">
+<h1>So, where are we?<a class="headerlink" href="#So,-where-are-we?" title="Permalink to this heading">¶</a></h1>
+<p>We have a numeric method that works “pretty well” but could use some serious tuning</p>
+<ol class="arabic">
+<li><p>We have analytic expressions so lets get some Jacobians and Hessians and try some of the more classical approaches in scipy.minimize</p></li>
+<li><div class="line-block">
+<div class="line">Lets try a bunch of seed values for each optimization and explore the sum RMS misfits.</div>
+</div>
+</li>
+<li><p>Do (2) above for a collection of n_poles, n_zeros controls</p></li>
+<li><p>Tidy up supporting codes and make some metrics/reports to use for these fits</p></li>
+<li><p>Move on</p></li>
+</ol>
+<p>If you are interested in exploring more check out Prototyping.ipynb in Ben Murphy’s ipynb in iris-mt-scratch repo (iris_mt_scratch/murphy_codes_20210207/system_response_conversion)</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

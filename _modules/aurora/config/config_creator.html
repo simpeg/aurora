@@ -1,0 +1,400 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.config.config_creator &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aurora.config.config_creator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.config.config_creator</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains a Helper class to make config files.</span>
+
+<span class="sd">The processing config is still evolving and this class and its methods may change.</span>
+
+<span class="sd">Development Notes:</span>
+<span class="sd"> - Initially, we only supported EMTF style band specification, but this should be updated</span>
+<span class="sd"> to allow logarithmically spaced bands of constant Q.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">BANDS_DEFAULT_FILE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.config.metadata</span><span class="w"> </span><span class="kn">import</span> <span class="n">Processing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.sandbox.io_helpers.emtf_band_setup</span><span class="w"> </span><span class="kn">import</span> <span class="n">EMTFBandSetupFile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mth5.processing.kernel_dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">KernelDataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mt_metadata.transfer_functions.processing.window</span><span class="w"> </span><span class="kn">import</span> <span class="n">Window</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+
+<span class="n">SUPPORTED_BAND_SPECIFICATION_STYLES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;EMTF&quot;</span><span class="p">,</span> <span class="s2">&quot;band_edges&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="ConfigCreator"><a class="viewcode-back" href="../../../api/aurora.config.html#aurora.config.config_creator.ConfigCreator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ConfigCreator</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">emtf_band_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">band_edges</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        emtf_band_file: Optional[Union[str, pathlib.Path, None]]</span>
+<span class="sd">            Allows the specification of an EMTF &quot;band setup file&quot; for defining frequency bands.</span>
+<span class="sd">        band_edges: dict</span>
+<span class="sd">            Keys are integers corresponding to decimation level.  Values are numpy arrays.</span>
+<span class="sd">            Numpy arrays are one-row-per-band.  Array shape n_bands x 2. array[i_band,0] is the</span>
+<span class="sd">            lower edge of band, and array[i_band,0] is the upper.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_emtf_band_file</span> <span class="o">=</span> <span class="n">emtf_band_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_band_edges</span> <span class="o">=</span> <span class="n">band_edges</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_band_specification_style</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># TODO: Delete or update with config info ... currently kernel_dataset.processing_id is used.</span>
+    <span class="c1"># def processing_id(self, kernel_dataset):</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     Generates a string id label for the processing config: WIP.</span>
+
+    <span class="c1">#     In the past, we used f&quot;{local}-{remote}&quot; or  f&quot;{local}-{run_id}&quot;</span>
+    <span class="c1">#     Neither of these is sufficiently unique.  In fact, they only describe the</span>
+    <span class="c1">#     dataset, and not the processing config.  It is difficult to see how to make a</span>
+    <span class="c1">#     comprehensive, unique id without it being very long or involving hash</span>
+    <span class="c1">#     functions.</span>
+
+    <span class="c1">#     For now, will try to use {local}-{local_runs}-{remote}-{remote_runs},</span>
+    <span class="c1">#     which at least describes the dataset, then a string can be generated by the</span>
+    <span class="c1">#     config and appended if needed.</span>
+
+    <span class="c1">#     Parameters</span>
+    <span class="c1">#     ----------</span>
+    <span class="c1">#     kernel_dataset: aurora.transfer_function.kernel_dataset.KernelDataset</span>
+    <span class="c1">#         An object that defines the data to be processed.</span>
+
+    <span class="c1">#     Returns</span>
+    <span class="c1">#     -------</span>
+    <span class="c1">#     id: str</span>
+    <span class="c1">#         A label for the processing config.</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     id = f&quot;{kernel_dataset.local_station_id}-{kernel_dataset.remote_station_id}&quot;</span>
+    <span class="c1">#     return id</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">band_specification_style</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;return a description of the scheme used to define the bands.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_band_specification_style</span>
+
+    <span class="nd">@band_specification_style</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">band_specification_style</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the band_specification_style</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        value: str</span>
+<span class="sd">            The label for the scheme used to define the bands.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">SUPPORTED_BAND_SPECIFICATION_STYLES</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Won&#39;t set band specification style to unrecognized value </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_band_specification_style</span> <span class="o">=</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="ConfigCreator.determine_band_specification_style"><a class="viewcode-back" href="../../../api/aurora.config.html#aurora.config.config_creator.ConfigCreator.determine_band_specification_style">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">determine_band_specification_style</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Tries to identify which scheme was used to define the bands</span>
+
+<span class="sd">        TODO: Should emtf_band_file path be stored in config to support reproducibility?</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_emtf_band_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_band_edges</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Bands not defined; setting to EMTF BANDS_DEFAULT_FILE&quot;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_emtf_band_file</span> <span class="o">=</span> <span class="n">BANDS_DEFAULT_FILE</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_band_specification_style</span> <span class="o">=</span> <span class="s2">&quot;EMTF&quot;</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_emtf_band_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_band_edges</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Bands defined twice, and possibly inconsistently&quot;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_band_edges</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_band_specification_style</span> <span class="o">=</span> <span class="s2">&quot;band_edges&quot;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emtf_band_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_band_specification_style</span> <span class="o">=</span> <span class="s2">&quot;EMTF&quot;</span></div>
+
+<div class="viewcode-block" id="ConfigCreator.create_from_kernel_dataset"><a class="viewcode-back" href="../../../api/aurora.config.html#aurora.config.config_creator.ConfigCreator.create_from_kernel_dataset">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_from_kernel_dataset</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">kernel_dataset</span><span class="p">:</span> <span class="n">KernelDataset</span><span class="p">,</span>
+        <span class="n">input_channels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">output_channels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">estimator</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">emtf_band_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">band_edges</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">decimation_factors</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">num_samples_window</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Processing</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This creates a processing config from a kernel dataset.</span>
+
+<span class="sd">        TODO: Make this a method of kernel_dataset.</span>
+
+<span class="sd">        **Development Notes:**</span>
+
+<span class="sd">         1. 2022-09-10</span>
+
+<span class="sd">         The reading-in from EMTF band setup file used to be very terse, carried</span>
+<span class="sd">         some baked in assumptions about decimation factors, and did not acknowledge</span>
+<span class="sd">         specific frequency bands in Hz.  I am adding some complexity to the method</span>
+<span class="sd">         that populates bands from EMTF band setup file but am now explict about the</span>
+<span class="sd">         assumption of decimation factors, and do provide the frequency bands in Hz.</span>
+
+<span class="sd">         2. The number of decimation levels must be defined either by:</span>
+
+<span class="sd">          - decimation_factors argument (normally accompanied by a bands_dict)</span>
+<span class="sd">          - number of decimations implied by EMTF band setup file.</span>
+
+<span class="sd">          Theoretically, you could also use the number of decimations implied by bands_dict but this is sloppy, because it would assume the decimation factor.</span>
+
+<span class="sd">         3. 2024-12-29 Added setting of decimation_obj.stft.per_window_detrend_type = &quot;linear&quot;</span>
+<span class="sd">          This makes tests pass following a refactoring of mt_metadata.  Could use more testing.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kernel_dataset: aurora.transfer_function.kernel_dataset.KernelDataset</span>
+<span class="sd">            An object that defines the data to be processed.</span>
+<span class="sd">        input_channels: list</span>
+<span class="sd">            List of the input channels that will be used in TF estimation (usually &quot;hx&quot;, &quot;hy&quot;)</span>
+<span class="sd">        output_channels: list</span>
+<span class="sd">            List of the output channels that will be estimated by TF (usually &quot;ex&quot;, &quot;ey&quot;, &quot;hz&quot;)</span>
+<span class="sd">        estimator:  Optional[Union[str, None]]</span>
+<span class="sd">            The name of the regression estimator to use for TF estimation.</span>
+<span class="sd">        emtf_band_file: Optional[Union[str, pathlib.Path, None]]</span>
+<span class="sd">            The emtf and setup file if used.</span>
+<span class="sd">        band_edges: Optional[Union[dict, None]]</span>
+<span class="sd">            The band edges if emtf_band_file not used</span>
+<span class="sd">        decimation_factors: Optional[Union[list, None]]</span>
+<span class="sd">            List of decimation factors, normally [1, 4, 4, 4, ... 4]</span>
+<span class="sd">        num_samples_window: Optional[Union[int, None]]</span>
+<span class="sd">            The size of the window (usually for FFT)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        processing_obj: aurora.config.metadata.processing.Processing</span>
+<span class="sd">            Object storing the processing parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">processing_obj</span> <span class="o">=</span> <span class="n">Processing</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">kernel_dataset</span><span class="o">.</span><span class="n">processing_id</span><span class="p">)</span>  <span class="c1"># , **kwargs)</span>
+
+        <span class="c1"># pack station and run info into processing object</span>
+        <span class="n">processing_obj</span><span class="o">.</span><span class="n">stations</span><span class="o">.</span><span class="n">from_dataset_dataframe</span><span class="p">(</span><span class="n">kernel_dataset</span><span class="o">.</span><span class="n">df</span><span class="p">)</span>
+
+        <span class="c1"># Unpack optional arguments</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_emtf_band_file</span> <span class="o">=</span> <span class="n">emtf_band_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_band_edges</span> <span class="o">=</span> <span class="n">band_edges</span>
+        <span class="n">decimation_factors</span> <span class="o">=</span> <span class="n">decimation_factors</span>
+        <span class="n">num_samples_window</span> <span class="o">=</span> <span class="n">num_samples_window</span>
+
+        <span class="c1"># Determine if band_setup or edges dict is to be used for bands</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">determine_band_specification_style</span><span class="p">()</span>
+
+        <span class="c1"># Set Frequency Bands</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">band_specification_style</span> <span class="o">==</span> <span class="s2">&quot;EMTF&quot;</span><span class="p">:</span>
+            <span class="c1"># see note 1</span>
+            <span class="n">emtf_band_setup_file</span> <span class="o">=</span> <span class="n">EMTFBandSetupFile</span><span class="p">(</span>
+                <span class="n">filepath</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_emtf_band_file</span><span class="p">,</span>
+                <span class="n">sample_rate</span><span class="o">=</span><span class="n">kernel_dataset</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">num_decimations</span> <span class="o">=</span> <span class="n">emtf_band_setup_file</span><span class="o">.</span><span class="n">num_decimation_levels</span>
+            <span class="c1"># Assign optional arguments if they have not been passed</span>
+            <span class="k">if</span> <span class="n">decimation_factors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># set default values to EMTF default values [1, 4, 4, 4, ..., 4]</span>
+                <span class="n">decimation_factors</span> <span class="o">=</span> <span class="n">num_decimations</span> <span class="o">*</span> <span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+                <span class="n">decimation_factors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">num_samples_window</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">default_window</span> <span class="o">=</span> <span class="n">Window</span><span class="p">()</span>
+                <span class="n">num_samples_window</span> <span class="o">=</span> <span class="n">num_decimations</span> <span class="o">*</span> <span class="p">[</span><span class="n">default_window</span><span class="o">.</span><span class="n">num_samples</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">num_samples_window</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="n">num_samples_window</span> <span class="o">=</span> <span class="n">num_decimations</span> <span class="o">*</span> <span class="p">[</span><span class="n">num_samples_window</span><span class="p">]</span>
+            <span class="c1"># now you can define the frequency bands</span>
+            <span class="n">band_edges</span> <span class="o">=</span> <span class="n">emtf_band_setup_file</span><span class="o">.</span><span class="n">compute_band_edges</span><span class="p">(</span>
+                <span class="n">decimation_factors</span><span class="p">,</span> <span class="n">num_samples_window</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_band_edges</span> <span class="o">=</span> <span class="n">band_edges</span>
+
+        <span class="n">processing_obj</span><span class="o">.</span><span class="n">assign_bands</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_band_edges</span><span class="p">,</span>
+            <span class="n">kernel_dataset</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span>
+            <span class="n">decimation_factors</span><span class="p">,</span>
+            <span class="n">num_samples_window</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">processing_obj</span><span class="o">.</span><span class="n">band_specification_style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">band_specification_style</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">band_specification_style</span> <span class="o">==</span> <span class="s2">&quot;EMTF&quot;</span><span class="p">:</span>
+            <span class="n">processing_obj</span><span class="o">.</span><span class="n">band_setup_file</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_emtf_band_file</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">decimation_obj</span> <span class="ow">in</span> <span class="n">processing_obj</span><span class="o">.</span><span class="n">decimations_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">input_channels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">decimation_obj</span><span class="o">.</span><span class="n">input_channels</span> <span class="o">=</span> <span class="n">kernel_dataset</span><span class="o">.</span><span class="n">input_channels</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">decimation_obj</span><span class="o">.</span><span class="n">input_channels</span> <span class="o">=</span> <span class="n">input_channels</span>
+
+            <span class="k">if</span> <span class="n">output_channels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">decimation_obj</span><span class="o">.</span><span class="n">output_channels</span> <span class="o">=</span> <span class="n">kernel_dataset</span><span class="o">.</span><span class="n">output_channels</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">decimation_obj</span><span class="o">.</span><span class="n">output_channels</span> <span class="o">=</span> <span class="n">output_channels</span>
+
+            <span class="k">if</span> <span class="n">num_samples_window</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">decimation_obj</span><span class="o">.</span><span class="n">stft</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">num_samples</span> <span class="o">=</span> <span class="n">num_samples_window</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="c1"># set estimator if provided as kwarg</span>
+            <span class="k">if</span> <span class="n">estimator</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">decimation_obj</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">engine</span> <span class="o">=</span> <span class="n">estimator</span><span class="p">[</span><span class="s2">&quot;engine&quot;</span><span class="p">]</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+            <span class="n">decimation_obj</span><span class="o">.</span><span class="n">stft</span><span class="o">.</span><span class="n">per_window_detrend_type</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span>
+
+        <span class="k">return</span> <span class="n">processing_obj</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

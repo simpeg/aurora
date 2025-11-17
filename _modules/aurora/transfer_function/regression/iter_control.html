@@ -1,0 +1,348 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.transfer_function.regression.iter_control &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aurora.transfer_function.regression.iter_control</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.transfer_function.regression.iter_control</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains a class that holds parameters to control the iterations of</span>
+<span class="sd">robust regression including convergence criteria and thresholds.</span>
+
+<span class="sd">Based on Gary&#39;s IterControl.m in</span>
+<span class="sd">iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.transfer_function.regression.helper_functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">rme_beta</span>
+
+
+<div class="viewcode-block" id="IterControl"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.iter_control.IterControl">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">IterControl</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Notes:</span>
+<span class="sd">         Here is a class to hold variables that are used to control the regression</span>
+<span class="sd">         - currently this is used for variations on RME (Robust M-Estimator)</span>
+<span class="sd">         - TODO: in the original matlab code there was a class property called `epsilon`, but</span>
+<span class="sd">         it was unused; There was no documentation about it&#39;s purpose, except possibly that</span>
+<span class="sd">         the abstract base class solved Y = X*b + epsilon for b, complex-valued.</span>
+<span class="sd">         Perhaps this was intended as an intrinsic tolerated noise level.  The value of</span>
+<span class="sd">         epsilon was set to 1000.</span>
+<span class="sd">         - TODO The return covariance boolean just initializes arrays of zeros.  Needs to be</span>
+<span class="sd">          made functional or removed</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">max_number_of_iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="n">max_number_of_redescending_iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">r0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.4</span><span class="p">,</span>
+        <span class="n">u0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.8</span><span class="p">,</span>
+        <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0005</span><span class="p">,</span>
+        <span class="n">verbosity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        max_number_of_iterations: int</span>
+<span class="sd">            Set to zero for OLS, otherwise, this is how many times the RME</span>
+<span class="sd">            will refine the estimate.</span>
+<span class="sd">        max_number_of_redescending_iterations : int</span>
+<span class="sd">            1 or 2 is fine at most.  If set to zero, the redescend code block is ignored.</span>
+<span class="sd">        r0: float</span>
+<span class="sd">            Effectively infinty for OLS, this controls the point at which residuals</span>
+<span class="sd">            transition from being penalized by a squared vs a linear function.  The</span>
+<span class="sd">            units are standard deviations of the residual distribution.  Normally</span>
+<span class="sd">            1.4, 1.5 or thereabouts</span>
+<span class="sd">        u0: float</span>
+<span class="sd">            u0 is a parameter for the redescending portion of the robust regression.</span>
+<span class="sd">            It is controlled by a double exponential formula (REFERENCE NEEDED).  It</span>
+<span class="sd">            makes for severe downweighting about u0.  The function is continuous</span>
+<span class="sd">            &quot;math friendly&quot; (all derivates exist etc) so you can prove theorems about it</span>
+<span class="sd">            etc.</span>
+<span class="sd">        tolerance : float</span>
+<span class="sd">            minimum fractional change in any term in b.  Any smaller change</span>
+<span class="sd">            than this will trigger convergence</span>
+<span class="sd">        verbosity: int</span>
+<span class="sd">            Allows setting of custom logging messages in development.</span>
+
+<span class="sd">        Development notes:</span>
+<span class="sd">        There was originally a parameter called epsilon (float) but it was not used.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_iterations</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_redescending_iterations</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="o">=</span> <span class="n">tolerance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_number_of_iterations</span> <span class="o">=</span> <span class="n">max_number_of_iterations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_number_of_redescending_iterations</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">max_number_of_redescending_iterations</span>
+        <span class="p">)</span>
+
+        <span class="c1"># regression-M estimator params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r0</span> <span class="o">=</span> <span class="n">r0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">u0</span> <span class="o">=</span> <span class="n">u0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">=</span> <span class="n">verbosity</span>
+        <span class="c1"># Additional properties</span>
+        <span class="c1"># used sometimes to control one or another of the iterative algorithms</span>
+        <span class="c1"># These were translated from the matlab code and may be moved in future</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">return_covariance</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># TODO: add functionality</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_cleaned</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># TODO: add functionality</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">robust_diagonalize</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># TODO: add functionality</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">number_of_iterations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_iterations</span>
+
+    <span class="c1"># @number_of_iterations.setter</span>
+    <span class="c1"># def number_of_iterations(self, value) -&gt; int:</span>
+    <span class="c1">#     self._number_of_iterations = value</span>
+
+<div class="viewcode-block" id="IterControl.reset_number_of_iterations"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.iter_control.IterControl.reset_number_of_iterations">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">reset_number_of_iterations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_iterations</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="IterControl.increment_iteration_number"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.iter_control.IterControl.increment_iteration_number">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">increment_iteration_number</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_iterations</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">number_of_redescending_iterations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_redescending_iterations</span>
+
+<div class="viewcode-block" id="IterControl.reset_number_of_redescending_iterations"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.iter_control.IterControl.reset_number_of_redescending_iterations">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">reset_number_of_redescending_iterations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_redescending_iterations</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="IterControl.increment_redescending_iteration_number"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.iter_control.IterControl.increment_redescending_iteration_number">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">increment_redescending_iteration_number</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_redescending_iterations</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">max_iterations_reached</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return True of the number of iterations carried out is greater or equal the</span>
+<span class="sd">        maximum number of iterations set in the processing config</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_of_iterations</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_number_of_iterations</span>
+
+<div class="viewcode-block" id="IterControl.converged"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.iter_control.IterControl.converged">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">converged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">b0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        b : complex-valued numpy array</span>
+<span class="sd">            the most recent regression estimate</span>
+<span class="sd">        b0 : complex-valued numpy array</span>
+<span class="sd">            The previous regression estimate</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        converged: bool</span>
+<span class="sd">            True of the regression has terminated, False otherwise</span>
+
+<span class="sd">        Developement Notes:</span>
+<span class="sd">        The variable maximum_change finds the maximum amplitude component of the vector</span>
+<span class="sd">        1 - b/b0.  Looking at the formula, one might want to cast this instead as</span>
+<span class="sd">        1 - abs(b/b0), however, that will be insensitive to phase changes in b,</span>
+<span class="sd">        which is complex valued.  The way it is coded np.max(np.abs(1 - b / b0)) is</span>
+<span class="sd">        correct as it stands.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">maximum_change</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">b</span> <span class="o">/</span> <span class="n">b0</span><span class="p">))</span>
+        <span class="n">tolerance_cond</span> <span class="o">=</span> <span class="n">maximum_change</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span>
+        <span class="n">iteration_cond</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iterations_reached</span>
+        <span class="k">if</span> <span class="n">tolerance_cond</span> <span class="ow">or</span> <span class="n">iteration_cond</span><span class="p">:</span>
+            <span class="n">converged</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">msg_start</span> <span class="o">=</span> <span class="s2">&quot;Converged due to&quot;</span>
+                <span class="n">msg_end</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_iterations</span><span class="si">}</span><span class="s2"> of &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_number_of_iterations</span><span class="si">}</span><span class="s2"> iterations&quot;</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">tolerance_cond</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">msg_start</span><span class="si">}</span><span class="s2"> MaxChange &lt; Tolerance after </span><span class="si">{</span><span class="n">msg_end</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">elif</span> <span class="n">iteration_cond</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">msg_start</span><span class="si">}</span><span class="s2"> maximum number_of_iterations </span><span class="si">{</span><span class="n">msg_end</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">converged</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="n">converged</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">continue_redescending</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Checks if the max_number_of_redescending_iterations has been reached</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        maxxed_out: bool</span>
+<span class="sd">            True if max_number_of_redescending_iterations has been reached, otherwise False.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">maxxed_out</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">number_of_redescending_iterations</span>
+            <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_number_of_redescending_iterations</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">maxxed_out</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">correction_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns correction factor for residual variances.</span>
+
+<span class="sd">        Detailed notes on usage in</span>
+<span class="sd">        transfer_function.regression.helper_functions.rme_beta</span>
+
+<span class="sd">        TODO: This is an RME specific property.  Suggest move r0, u0 and this method</span>
+<span class="sd">         into an RME-config class.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        correction_factor : float</span>
+<span class="sd">            correction factor used for scaling the residual error_variance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">correction_factor</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">rme_beta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">correction_factor</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1336 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Processing Configuration &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css?v=7f9a90b1" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Accessing Magnetic Field Data from EarthScope Using MTH5" href="earthscope_magnetic_data_tutorial.html" />
+    <link rel="prev" title="Dataset Definition DataFrame" href="../examples/dataset_definition.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Processing Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Using-ConfigCreator">Using ConfigCreator</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Create-Config-from-KernelDataset">Create Config from KernelDataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Default-Parameters">Default Parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#What-can-user-change-with-the-Config?">What can user change with the Config?</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Processing Configuration</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials/processing_configuration.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Processing-Configuration">
+<h1>Processing Configuration<a class="headerlink" href="#Processing-Configuration" title="Permalink to this heading">¶</a></h1>
+<p>The processing_config (“config”) together with the kernel dataset represent the key inputs to the processing pipeline. The processing config is based on the <code class="docutils literal notranslate"><span class="pre">mt_metadata.base.Base</span></code> class. This means it is a container that has a JSON or dictionary representation.</p>
+<p>It is the purpose of the config to encapsulate all the parameters required for processing. There are many parameters and effort has been given to selecting some “reasonable” default values so that users do not need to worry about all of these parameters if they don’t want to.</p>
+<p>The ProcessingConfig is expected to evolve with aurora as new functionalities become available. This is one reason why such a genreic data srtuctrue was selected In this tutorial, we will use the synthetic dataset example to show some of the features of the config object.</p>
+<p>Hopefully, it will be fairly easy to add other parameters to the config, such as:</p>
+<ul class="simple">
+<li><p>coherencey sorting</p></li>
+<li><p>polarization sorting</p></li>
+<li><p>ARMA prewhitening</p></li>
+<li><p>Other tools from the community</p></li>
+</ul>
+<p>There are two main ways one would normally build the object:</p>
+<ol class="arabic simple">
+<li><p>Use the ConfigCreator class</p></li>
+<li><p>Edit existing config.json files</p></li>
+</ol>
+<p>But one can also initialize a Processing object, which is what is done inside ConfigCreator</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mt_metadata.transfer_functions.processing.aurora</span><span class="w"> </span><span class="kn">import</span> <span class="n">Processing</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="n">Processing</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+    &#34;processing&#34;: {
+        &#34;channel_nomenclature.ex&#34;: &#34;ex&#34;,
+        &#34;channel_nomenclature.ey&#34;: &#34;ey&#34;,
+        &#34;channel_nomenclature.hx&#34;: &#34;hx&#34;,
+        &#34;channel_nomenclature.hy&#34;: &#34;hy&#34;,
+        &#34;channel_nomenclature.hz&#34;: &#34;hz&#34;,
+        &#34;decimations&#34;: [],
+        &#34;id&#34;: null,
+        &#34;stations.local.id&#34;: null,
+        &#34;stations.local.mth5_path&#34;: null,
+        &#34;stations.local.remote&#34;: false,
+        &#34;stations.local.runs&#34;: [],
+        &#34;stations.remote&#34;: []
+    }
+}
+</pre></div></div>
+</div>
+<section id="Using-ConfigCreator">
+<h2>Using ConfigCreator<a class="headerlink" href="#Using-ConfigCreator" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">aurora.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">BANDS_DEFAULT_FILE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.config.config_creator</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigCreator</span>
+<br/></pre></div>
+</div>
+</div>
+<p>The config creator does not need any arguments to initialize, but it uses a KernelDataset to generate a processing object with station and run information, and default settings are applied to the processing parameters.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cc</span> <span class="o">=</span> <span class="n">ConfigCreator</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>The ConfigCreator class generates a processing config with default arguments if it is provided with a KernelDataset</p>
+</section>
+</section>
+<section id="Example-of-making-a-KernelDataset-from-an-mth5">
+<h1>Example of making a KernelDataset from an mth5<a class="headerlink" href="#Example-of-making-a-KernelDataset-from-an-mth5" title="Permalink to this heading">¶</a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mth5.data.paths</span><span class="w"> </span><span class="kn">import</span> <span class="n">SyntheticTestPaths</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mth5.processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunSummary</span><span class="p">,</span> <span class="n">KernelDataset</span>
+
+<span class="n">synthetic_test_paths</span> <span class="o">=</span> <span class="n">SyntheticTestPaths</span><span class="p">()</span>
+<span class="n">MTH5_PATH</span> <span class="o">=</span> <span class="n">synthetic_test_paths</span><span class="o">.</span><span class="n">mth5_path</span>
+</pre></div>
+</div>
+</div>
+<p>Make an example file to work with</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mth5_path</span> <span class="o">=</span> <span class="n">MTH5_PATH</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;test12rr.h5&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">mth5_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="k">pass</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">synthetic_test_paths</span><span class="o">.</span><span class="n">mkdirs</span><span class="p">()</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mth5.data.make_mth5_from_asc</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_test12rr_h5</span>
+    <span class="n">create_test12rr_h5</span><span class="p">(</span><span class="n">target_folder</span><span class="o">=</span><span class="n">MTH5_PATH</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">run_summary</span> <span class="o">=</span> <span class="n">RunSummary</span><span class="p">()</span>
+<span class="n">run_summary</span><span class="o">.</span><span class="n">from_mth5s</span><span class="p">([</span><span class="n">mth5_path</span><span class="p">,])</span>
+<span class="n">run_summary</span><span class="o">.</span><span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">24:08:28T15:59:26 | INFO | line:761 |mth5.mth5 | close_mth5 | Flushing and closing /home/kkappler/software/irismt/aurora/data/synthetic/mth5/test12rr.h5</span>
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>channel_scale_factors</th>
+      <th>duration</th>
+      <th>end</th>
+      <th>has_data</th>
+      <th>input_channels</th>
+      <th>mth5_path</th>
+      <th>n_samples</th>
+      <th>output_channels</th>
+      <th>run</th>
+      <th>sample_rate</th>
+      <th>start</th>
+      <th>station</th>
+      <th>survey</th>
+      <th>run_hdf5_reference</th>
+      <th>station_hdf5_reference</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>{'ex': 1.0, 'ey': 1.0, 'hx': 1.0, 'hy': 1.0, '...</td>
+      <td>39999.0</td>
+      <td>1980-01-01 11:06:39+00:00</td>
+      <td>True</td>
+      <td>[hx, hy]</td>
+      <td>/home/kkappler/software/irismt/aurora/data/syn...</td>
+      <td>40000</td>
+      <td>[ex, ey, hz]</td>
+      <td>001</td>
+      <td>1.0</td>
+      <td>1980-01-01 00:00:00+00:00</td>
+      <td>test1</td>
+      <td>EMTF Synthetic</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>{'ex': 1.0, 'ey': 1.0, 'hx': 1.0, 'hy': 1.0, '...</td>
+      <td>39999.0</td>
+      <td>1980-01-01 11:06:39+00:00</td>
+      <td>True</td>
+      <td>[hx, hy]</td>
+      <td>/home/kkappler/software/irismt/aurora/data/syn...</td>
+      <td>40000</td>
+      <td>[ex, ey, hz]</td>
+      <td>001</td>
+      <td>1.0</td>
+      <td>1980-01-01 00:00:00+00:00</td>
+      <td>test2</td>
+      <td>EMTF Synthetic</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">kernel_dataset</span> <span class="o">=</span> <span class="n">KernelDataset</span><span class="p">()</span>
+<span class="n">kernel_dataset</span><span class="o">.</span><span class="n">from_run_summary</span><span class="p">(</span><span class="n">run_summary</span><span class="p">,</span> <span class="s2">&quot;test1&quot;</span><span class="p">,</span> <span class="s2">&quot;test2&quot;</span><span class="p">)</span>
+<span class="n">kernel_dataset</span><span class="o">.</span><span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">24:08:28T15:59:26 | INFO | line:250 |mtpy.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column fc, adding and setting dtype to &lt;class &#39;bool&#39;&gt;.</span>
+<span class="ansi-bold">24:08:28T15:59:26 | INFO | line:250 |mtpy.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column remote, adding and setting dtype to &lt;class &#39;bool&#39;&gt;.</span>
+<span class="ansi-bold">24:08:28T15:59:26 | INFO | line:250 |mtpy.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column run_dataarray, adding and setting dtype to &lt;class &#39;object&#39;&gt;.</span>
+<span class="ansi-bold">24:08:28T15:59:26 | INFO | line:250 |mtpy.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column stft, adding and setting dtype to &lt;class &#39;object&#39;&gt;.</span>
+<span class="ansi-bold">24:08:28T15:59:26 | INFO | line:250 |mtpy.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column mth5_obj, adding and setting dtype to &lt;class &#39;object&#39;&gt;.</span>
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>channel_scale_factors</th>
+      <th>duration</th>
+      <th>end</th>
+      <th>has_data</th>
+      <th>input_channels</th>
+      <th>mth5_path</th>
+      <th>n_samples</th>
+      <th>output_channels</th>
+      <th>run</th>
+      <th>sample_rate</th>
+      <th>start</th>
+      <th>station</th>
+      <th>survey</th>
+      <th>run_hdf5_reference</th>
+      <th>station_hdf5_reference</th>
+      <th>fc</th>
+      <th>remote</th>
+      <th>run_dataarray</th>
+      <th>stft</th>
+      <th>mth5_obj</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>{'ex': 1.0, 'ey': 1.0, 'hx': 1.0, 'hy': 1.0, '...</td>
+      <td>39999.0</td>
+      <td>1980-01-01 11:06:39+00:00</td>
+      <td>True</td>
+      <td>[hx, hy]</td>
+      <td>/home/kkappler/software/irismt/aurora/data/syn...</td>
+      <td>40000</td>
+      <td>[ex, ey, hz]</td>
+      <td>001</td>
+      <td>1.0</td>
+      <td>1980-01-01 00:00:00+00:00</td>
+      <td>test1</td>
+      <td>EMTF Synthetic</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>False</td>
+      <td>False</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>{'ex': 1.0, 'ey': 1.0, 'hx': 1.0, 'hy': 1.0, '...</td>
+      <td>39999.0</td>
+      <td>1980-01-01 11:06:39+00:00</td>
+      <td>True</td>
+      <td>[hx, hy]</td>
+      <td>/home/kkappler/software/irismt/aurora/data/syn...</td>
+      <td>40000</td>
+      <td>[ex, ey, hz]</td>
+      <td>001</td>
+      <td>1.0</td>
+      <td>1980-01-01 00:00:00+00:00</td>
+      <td>test2</td>
+      <td>EMTF Synthetic</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>&lt;HDF5 object reference&gt;</td>
+      <td>False</td>
+      <td>True</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">kernel_dataset</span><span class="o">.</span><span class="n">mini_summary</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survey</th>
+      <th>station</th>
+      <th>run</th>
+      <th>start</th>
+      <th>end</th>
+      <th>duration</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>EMTF Synthetic</td>
+      <td>test1</td>
+      <td>001</td>
+      <td>1980-01-01 00:00:00+00:00</td>
+      <td>1980-01-01 11:06:39+00:00</td>
+      <td>39999.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>EMTF Synthetic</td>
+      <td>test2</td>
+      <td>001</td>
+      <td>1980-01-01 00:00:00+00:00</td>
+      <td>1980-01-01 11:06:39+00:00</td>
+      <td>39999.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<section id="Create-Config-from-KernelDataset">
+<h2>Create Config from KernelDataset<a class="headerlink" href="#Create-Config-from-KernelDataset" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="o">=</span> <span class="n">cc</span><span class="o">.</span><span class="n">create_from_kernel_dataset</span><span class="p">(</span><span class="n">kernel_dataset</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">24:08:28T15:59:26 | INFO | line:108 |aurora.config.config_creator | determine_band_specification_style | Bands not defined; setting to EMTF BANDS_DEFAULT_FILE</span>
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">config</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+    &#34;processing&#34;: {
+        &#34;band_setup_file&#34;: &#34;/home/kkappler/software/irismt/aurora/aurora/config/emtf_band_setup/bs_test.cfg&#34;,
+        &#34;band_specification_style&#34;: &#34;EMTF&#34;,
+        &#34;channel_nomenclature.ex&#34;: &#34;ex&#34;,
+        &#34;channel_nomenclature.ey&#34;: &#34;ey&#34;,
+        &#34;channel_nomenclature.hx&#34;: &#34;hx&#34;,
+        &#34;channel_nomenclature.hy&#34;: &#34;hy&#34;,
+        &#34;channel_nomenclature.hz&#34;: &#34;hz&#34;,
+        &#34;decimations&#34;: [
+            {
+                &#34;decimation_level&#34;: {
+                    &#34;anti_alias_filter&#34;: &#34;default&#34;,
+                    &#34;bands&#34;: [
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.23828125,
+                                &#34;frequency_min&#34;: 0.19140625,
+                                &#34;index_max&#34;: 30,
+                                &#34;index_min&#34;: 25
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.19140625,
+                                &#34;frequency_min&#34;: 0.15234375,
+                                &#34;index_max&#34;: 24,
+                                &#34;index_min&#34;: 20
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.15234375,
+                                &#34;frequency_min&#34;: 0.12109375,
+                                &#34;index_max&#34;: 19,
+                                &#34;index_min&#34;: 16
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.12109375,
+                                &#34;frequency_min&#34;: 0.09765625,
+                                &#34;index_max&#34;: 15,
+                                &#34;index_min&#34;: 13
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.09765625,
+                                &#34;frequency_min&#34;: 0.07421875,
+                                &#34;index_max&#34;: 12,
+                                &#34;index_min&#34;: 10
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.07421875,
+                                &#34;frequency_min&#34;: 0.05859375,
+                                &#34;index_max&#34;: 9,
+                                &#34;index_min&#34;: 8
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.05859375,
+                                &#34;frequency_min&#34;: 0.04296875,
+                                &#34;index_max&#34;: 7,
+                                &#34;index_min&#34;: 6
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.04296875,
+                                &#34;frequency_min&#34;: 0.03515625,
+                                &#34;index_max&#34;: 5,
+                                &#34;index_min&#34;: 5
+                            }
+                        }
+                    ],
+                    &#34;decimation.factor&#34;: 1.0,
+                    &#34;decimation.level&#34;: 0,
+                    &#34;decimation.method&#34;: &#34;default&#34;,
+                    &#34;decimation.sample_rate&#34;: 1.0,
+                    &#34;estimator.engine&#34;: &#34;RME_RR&#34;,
+                    &#34;estimator.estimate_per_channel&#34;: true,
+                    &#34;extra_pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;input_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;method&#34;: &#34;fft&#34;,
+                    &#34;min_num_stft_windows&#34;: 2,
+                    &#34;output_channels&#34;: [
+                        &#34;ex&#34;,
+                        &#34;ey&#34;,
+                        &#34;hz&#34;
+                    ],
+                    &#34;pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;prewhitening_type&#34;: &#34;first difference&#34;,
+                    &#34;recoloring&#34;: true,
+                    &#34;reference_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;regression.max_iterations&#34;: 10,
+                    &#34;regression.max_redescending_iterations&#34;: 2,
+                    &#34;regression.minimum_cycles&#34;: 10,
+                    &#34;regression.r0&#34;: 1.5,
+                    &#34;regression.tolerance&#34;: 0.005,
+                    &#34;regression.u0&#34;: 2.8,
+                    &#34;regression.verbosity&#34;: 0,
+                    &#34;save_fcs&#34;: false,
+                    &#34;window.clock_zero_type&#34;: &#34;ignore&#34;,
+                    &#34;window.num_samples&#34;: 128,
+                    &#34;window.overlap&#34;: 32,
+                    &#34;window.type&#34;: &#34;boxcar&#34;
+                }
+            },
+            {
+                &#34;decimation_level&#34;: {
+                    &#34;anti_alias_filter&#34;: &#34;default&#34;,
+                    &#34;bands&#34;: [
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0.0341796875,
+                                &#34;frequency_min&#34;: 0.0263671875,
+                                &#34;index_max&#34;: 17,
+                                &#34;index_min&#34;: 14
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0.0263671875,
+                                &#34;frequency_min&#34;: 0.0205078125,
+                                &#34;index_max&#34;: 13,
+                                &#34;index_min&#34;: 11
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0.0205078125,
+                                &#34;frequency_min&#34;: 0.0166015625,
+                                &#34;index_max&#34;: 10,
+                                &#34;index_min&#34;: 9
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0.0166015625,
+                                &#34;frequency_min&#34;: 0.0126953125,
+                                &#34;index_max&#34;: 8,
+                                &#34;index_min&#34;: 7
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0.0126953125,
+                                &#34;frequency_min&#34;: 0.0107421875,
+                                &#34;index_max&#34;: 6,
+                                &#34;index_min&#34;: 6
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0.0107421875,
+                                &#34;frequency_min&#34;: 0.0087890625,
+                                &#34;index_max&#34;: 5,
+                                &#34;index_min&#34;: 5
+                            }
+                        }
+                    ],
+                    &#34;decimation.factor&#34;: 4.0,
+                    &#34;decimation.level&#34;: 1,
+                    &#34;decimation.method&#34;: &#34;default&#34;,
+                    &#34;decimation.sample_rate&#34;: 0.25,
+                    &#34;estimator.engine&#34;: &#34;RME_RR&#34;,
+                    &#34;estimator.estimate_per_channel&#34;: true,
+                    &#34;extra_pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;input_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;method&#34;: &#34;fft&#34;,
+                    &#34;min_num_stft_windows&#34;: 2,
+                    &#34;output_channels&#34;: [
+                        &#34;ex&#34;,
+                        &#34;ey&#34;,
+                        &#34;hz&#34;
+                    ],
+                    &#34;pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;prewhitening_type&#34;: &#34;first difference&#34;,
+                    &#34;recoloring&#34;: true,
+                    &#34;reference_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;regression.max_iterations&#34;: 10,
+                    &#34;regression.max_redescending_iterations&#34;: 2,
+                    &#34;regression.minimum_cycles&#34;: 10,
+                    &#34;regression.r0&#34;: 1.5,
+                    &#34;regression.tolerance&#34;: 0.005,
+                    &#34;regression.u0&#34;: 2.8,
+                    &#34;regression.verbosity&#34;: 0,
+                    &#34;save_fcs&#34;: false,
+                    &#34;window.clock_zero_type&#34;: &#34;ignore&#34;,
+                    &#34;window.num_samples&#34;: 128,
+                    &#34;window.overlap&#34;: 32,
+                    &#34;window.type&#34;: &#34;boxcar&#34;
+                }
+            },
+            {
+                &#34;decimation_level&#34;: {
+                    &#34;anti_alias_filter&#34;: &#34;default&#34;,
+                    &#34;bands&#34;: [
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0.008544921875,
+                                &#34;frequency_min&#34;: 0.006591796875,
+                                &#34;index_max&#34;: 17,
+                                &#34;index_min&#34;: 14
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0.006591796875,
+                                &#34;frequency_min&#34;: 0.005126953125,
+                                &#34;index_max&#34;: 13,
+                                &#34;index_min&#34;: 11
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0.005126953125,
+                                &#34;frequency_min&#34;: 0.004150390625,
+                                &#34;index_max&#34;: 10,
+                                &#34;index_min&#34;: 9
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0.004150390625,
+                                &#34;frequency_min&#34;: 0.003173828125,
+                                &#34;index_max&#34;: 8,
+                                &#34;index_min&#34;: 7
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0.003173828125,
+                                &#34;frequency_min&#34;: 0.002685546875,
+                                &#34;index_max&#34;: 6,
+                                &#34;index_min&#34;: 6
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0.002685546875,
+                                &#34;frequency_min&#34;: 0.002197265625,
+                                &#34;index_max&#34;: 5,
+                                &#34;index_min&#34;: 5
+                            }
+                        }
+                    ],
+                    &#34;decimation.factor&#34;: 4.0,
+                    &#34;decimation.level&#34;: 2,
+                    &#34;decimation.method&#34;: &#34;default&#34;,
+                    &#34;decimation.sample_rate&#34;: 0.0625,
+                    &#34;estimator.engine&#34;: &#34;RME_RR&#34;,
+                    &#34;estimator.estimate_per_channel&#34;: true,
+                    &#34;extra_pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;input_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;method&#34;: &#34;fft&#34;,
+                    &#34;min_num_stft_windows&#34;: 2,
+                    &#34;output_channels&#34;: [
+                        &#34;ex&#34;,
+                        &#34;ey&#34;,
+                        &#34;hz&#34;
+                    ],
+                    &#34;pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;prewhitening_type&#34;: &#34;first difference&#34;,
+                    &#34;recoloring&#34;: true,
+                    &#34;reference_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;regression.max_iterations&#34;: 10,
+                    &#34;regression.max_redescending_iterations&#34;: 2,
+                    &#34;regression.minimum_cycles&#34;: 10,
+                    &#34;regression.r0&#34;: 1.5,
+                    &#34;regression.tolerance&#34;: 0.005,
+                    &#34;regression.u0&#34;: 2.8,
+                    &#34;regression.verbosity&#34;: 0,
+                    &#34;save_fcs&#34;: false,
+                    &#34;window.clock_zero_type&#34;: &#34;ignore&#34;,
+                    &#34;window.num_samples&#34;: 128,
+                    &#34;window.overlap&#34;: 32,
+                    &#34;window.type&#34;: &#34;boxcar&#34;
+                }
+            },
+            {
+                &#34;decimation_level&#34;: {
+                    &#34;anti_alias_filter&#34;: &#34;default&#34;,
+                    &#34;bands&#34;: [
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0.00274658203125,
+                                &#34;frequency_min&#34;: 0.00213623046875,
+                                &#34;index_max&#34;: 22,
+                                &#34;index_min&#34;: 18
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0.00213623046875,
+                                &#34;frequency_min&#34;: 0.00164794921875,
+                                &#34;index_max&#34;: 17,
+                                &#34;index_min&#34;: 14
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0.00164794921875,
+                                &#34;frequency_min&#34;: 0.00115966796875,
+                                &#34;index_max&#34;: 13,
+                                &#34;index_min&#34;: 10
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0.00115966796875,
+                                &#34;frequency_min&#34;: 0.00079345703125,
+                                &#34;index_max&#34;: 9,
+                                &#34;index_min&#34;: 7
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0.00079345703125,
+                                &#34;frequency_min&#34;: 0.00054931640625,
+                                &#34;index_max&#34;: 6,
+                                &#34;index_min&#34;: 5
+                            }
+                        }
+                    ],
+                    &#34;decimation.factor&#34;: 4.0,
+                    &#34;decimation.level&#34;: 3,
+                    &#34;decimation.method&#34;: &#34;default&#34;,
+                    &#34;decimation.sample_rate&#34;: 0.015625,
+                    &#34;estimator.engine&#34;: &#34;RME_RR&#34;,
+                    &#34;estimator.estimate_per_channel&#34;: true,
+                    &#34;extra_pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;input_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;method&#34;: &#34;fft&#34;,
+                    &#34;min_num_stft_windows&#34;: 2,
+                    &#34;output_channels&#34;: [
+                        &#34;ex&#34;,
+                        &#34;ey&#34;,
+                        &#34;hz&#34;
+                    ],
+                    &#34;pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;prewhitening_type&#34;: &#34;first difference&#34;,
+                    &#34;recoloring&#34;: true,
+                    &#34;reference_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;regression.max_iterations&#34;: 10,
+                    &#34;regression.max_redescending_iterations&#34;: 2,
+                    &#34;regression.minimum_cycles&#34;: 10,
+                    &#34;regression.r0&#34;: 1.5,
+                    &#34;regression.tolerance&#34;: 0.005,
+                    &#34;regression.u0&#34;: 2.8,
+                    &#34;regression.verbosity&#34;: 0,
+                    &#34;save_fcs&#34;: false,
+                    &#34;window.clock_zero_type&#34;: &#34;ignore&#34;,
+                    &#34;window.num_samples&#34;: 128,
+                    &#34;window.overlap&#34;: 32,
+                    &#34;window.type&#34;: &#34;boxcar&#34;
+                }
+            }
+        ],
+        &#34;id&#34;: &#34;test1-rr_test2_sr1&#34;,
+        &#34;stations.local.id&#34;: &#34;test1&#34;,
+        &#34;stations.local.mth5_path&#34;: &#34;/home/kkappler/software/irismt/aurora/data/synthetic/mth5/test12rr.h5&#34;,
+        &#34;stations.local.remote&#34;: false,
+        &#34;stations.local.runs&#34;: [
+            {
+                &#34;run&#34;: {
+                    &#34;id&#34;: &#34;001&#34;,
+                    &#34;input_channels&#34;: [
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hx&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hy&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        }
+                    ],
+                    &#34;output_channels&#34;: [
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;ex&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;ey&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hz&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        }
+                    ],
+                    &#34;sample_rate&#34;: 1.0,
+                    &#34;time_periods&#34;: [
+                        {
+                            &#34;time_period&#34;: {
+                                &#34;end&#34;: &#34;1980-01-01T11:06:39+00:00&#34;,
+                                &#34;start&#34;: &#34;1980-01-01T00:00:00+00:00&#34;
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        &#34;stations.remote&#34;: [
+            {
+                &#34;station&#34;: {
+                    &#34;id&#34;: &#34;test2&#34;,
+                    &#34;mth5_path&#34;: &#34;/home/kkappler/software/irismt/aurora/data/synthetic/mth5/test12rr.h5&#34;,
+                    &#34;remote&#34;: true,
+                    &#34;runs&#34;: [
+                        {
+                            &#34;run&#34;: {
+                                &#34;id&#34;: &#34;001&#34;,
+                                &#34;input_channels&#34;: [
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hx&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hy&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    }
+                                ],
+                                &#34;output_channels&#34;: [
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;ex&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;ey&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hz&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    }
+                                ],
+                                &#34;sample_rate&#34;: 1.0,
+                                &#34;time_periods&#34;: [
+                                    {
+                                        &#34;time_period&#34;: {
+                                            &#34;end&#34;: &#34;1980-01-01T11:06:39+00:00&#34;,
+                                            &#34;start&#34;: &#34;1980-01-01T00:00:00+00:00&#34;
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
+</pre></div></div>
+</div>
+<p>You can see the entire config by executing the cell below, or you can cut and paste the json code into a json editor (e.g. <a class="reference external" href="https://jsoneditoronline.org">https://jsoneditoronline.org</a>) and then you can look at it heirarchically.</p>
+<p><img alt="CONFIG_0" src="tutorials/figures/config_0.png" /></p>
+<p>You can also transform the processing object to a json string</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">json_string</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">json_string</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#39;{\n    &#34;processing&#34;: {\n        &#34;band_setup_file&#34;: &#34;/home/kkappler/software/irismt/aurora/aurora/config/emtf_band_setup/bs_test.cfg&#34;,\n        &#34;band_specification_style&#34;: &#34;EMTF&#34;,\n        &#34;channel_nomenclature.ex&#34;: &#34;ex&#34;,\n        &#34;channel_nomenclature.ey&#34;: &#34;ey&#34;,\n        &#34;channel_nomenclature.hx&#34;: &#34;hx&#34;,\n        &#34;channel_nomenclature.hy&#34;: &#34;hy&#34;,\n        &#34;channel_nomenclature.hz&#34;: &#34;hz&#34;,\n        &#34;decimations&#34;: [\n            {\n                &#34;decimation_level&#34;: {\n                    &#34;anti_alias_filter&#34;: &#34;default&#34;,\n                    &#34;bands&#34;: [\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 0,\n                                &#34;frequency_max&#34;: 0.23828125,\n                                &#34;frequency_min&#34;: 0.19140625,\n                                &#34;index_max&#34;: 30,\n                                &#34;index_min&#34;: 25\n                            }\n                        },\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 0,\n                                &#34;frequency_max&#34;: 0.19140625,\n                                &#34;frequency_min&#34;: 0.15234375,\n                                &#34;index_max&#34;: 24,\n                                &#34;index_min&#34;: 20\n                            }\n                        },\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 0,\n                                &#34;frequency_max&#34;: 0.15234375,\n                                &#34;frequency_min&#34;: 0.12109375,\n                                &#34;index_max&#34;: 19,\n                                &#34;index_min&#34;: 16\n                            }\n                        },\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 0,\n                                &#34;frequency_max&#34;: 0.12109375,\n                                &#34;frequency_min&#34;: 0.09765625,\n                                &#34;index_max&#34;: 15,\n                                &#34;index_min&#34;: 13\n                            }\n                        },\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 0,\n                                &#34;frequency_max&#34;: 0.09765625,\n                                &#34;frequency_min&#34;: 0.07421875,\n                                &#34;index_max&#34;: 12,\n                                &#34;index_min&#34;: 10\n                            }\n                        },\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 0,\n                                &#34;frequency_max&#34;: 0.07421875,\n                                &#34;frequency_min&#34;: 0.05859375,\n                                &#34;index_max&#34;: 9,\n                                &#34;index_min&#34;: 8\n                            }\n                        },\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 0,\n                                &#34;frequency_max&#34;: 0.05859375,\n                                &#34;frequency_min&#34;: 0.04296875,\n                                &#34;index_max&#34;: 7,\n                                &#34;index_min&#34;: 6\n                            }\n                        },\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 0,\n                                &#34;frequency_max&#34;: 0.04296875,\n                                &#34;frequency_min&#34;: 0.03515625,\n                                &#34;index_max&#34;: 5,\n                                &#34;index_min&#34;: 5\n                            }\n                        }\n                    ],\n                    &#34;decimation.factor&#34;: 1.0,\n                    &#34;decimation.level&#34;: 0,\n                    &#34;decimation.method&#34;: &#34;default&#34;,\n                    &#34;decimation.sample_rate&#34;: 1.0,\n                    &#34;estimator.engine&#34;: &#34;RME_RR&#34;,\n                    &#34;estimator.estimate_per_channel&#34;: true,\n                    &#34;extra_pre_fft_detrend_type&#34;: &#34;linear&#34;,\n                    &#34;input_channels&#34;: [\n                        &#34;hx&#34;,\n                        &#34;hy&#34;\n                    ],\n                    &#34;method&#34;: &#34;fft&#34;,\n                    &#34;min_num_stft_windows&#34;: 2,\n                    &#34;output_channels&#34;: [\n                        &#34;ex&#34;,\n                        &#34;ey&#34;,\n                        &#34;hz&#34;\n                    ],\n                    &#34;pre_fft_detrend_type&#34;: &#34;linear&#34;,\n                    &#34;prewhitening_type&#34;: &#34;first difference&#34;,\n                    &#34;recoloring&#34;: true,\n                    &#34;reference_channels&#34;: [\n                        &#34;hx&#34;,\n                        &#34;hy&#34;\n                    ],\n                    &#34;regression.max_iterations&#34;: 10,\n                    &#34;regression.max_redescending_iterations&#34;: 2,\n                    &#34;regression.minimum_cycles&#34;: 10,\n                    &#34;regression.r0&#34;: 1.5,\n                    &#34;regression.tolerance&#34;: 0.005,\n                    &#34;regression.u0&#34;: 2.8,\n                    &#34;regression.verbosity&#34;: 0,\n                    &#34;save_fcs&#34;: false,\n                    &#34;window.clock_zero_type&#34;: &#34;ignore&#34;,\n                    &#34;window.num_samples&#34;: 128,\n                    &#34;window.overlap&#34;: 32,\n                    &#34;window.type&#34;: &#34;boxcar&#34;\n                }\n            },\n            {\n                &#34;decimation_level&#34;: {\n                    &#34;anti_alias_filter&#34;: &#34;default&#34;,\n                    &#34;bands&#34;: [\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 1,\n                                &#34;frequency_max&#34;: 0.0341796875,\n                                &#34;frequency_min&#34;: 0.0263671875,\n                                &#34;index_max&#34;: 17,\n                                &#34;index_min&#34;: 14\n                            }\n                        },\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 1,\n                                &#34;frequency_max&#34;: 0.0263671875,\n                                &#34;frequency_min&#34;: 0.0205078125,\n                                &#34;index_max&#34;: 13,\n                                &#34;index_min&#34;: 11\n                            }\n                        },\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 1,\n                                &#34;frequency_max&#34;: 0.0205078125,\n                                &#34;frequency_min&#34;: 0.0166015625,\n                                &#34;index_max&#34;: 10,\n                                &#34;index_min&#34;: 9\n                            }\n                        },\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 1,\n                                &#34;frequency_max&#34;: 0.0166015625,\n                                &#34;frequency_min&#34;: 0.0126953125,\n                                &#34;index_max&#34;: 8,\n                                &#34;index_min&#34;: 7\n                            }\n                        },\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 1,\n                                &#34;frequency_max&#34;: 0.0126953125,\n                                &#34;frequency_min&#34;: 0.0107421875,\n                                &#34;index_max&#34;: 6,\n                                &#34;index_min&#34;: 6\n                            }\n                        },\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 1,\n                                &#34;frequency_max&#34;: 0.0107421875,\n                                &#34;frequency_min&#34;: 0.0087890625,\n                                &#34;index_max&#34;: 5,\n                                &#34;index_min&#34;: 5\n                            }\n                        }\n                    ],\n                    &#34;decimation.factor&#34;: 4.0,\n                    &#34;decimation.level&#34;: 1,\n                    &#34;decimation.method&#34;: &#34;default&#34;,\n                    &#34;decimation.sample_rate&#34;: 0.25,\n                    &#34;estimator.engine&#34;: &#34;RME_RR&#34;,\n                    &#34;estimator.estimate_per_channel&#34;: true,\n                    &#34;extra_pre_fft_detrend_type&#34;: &#34;linear&#34;,\n                    &#34;input_channels&#34;: [\n                        &#34;hx&#34;,\n                        &#34;hy&#34;\n                    ],\n                    &#34;method&#34;: &#34;fft&#34;,\n                    &#34;min_num_stft_windows&#34;: 2,\n                    &#34;output_channels&#34;: [\n                        &#34;ex&#34;,\n                        &#34;ey&#34;,\n                        &#34;hz&#34;\n                    ],\n                    &#34;pre_fft_detrend_type&#34;: &#34;linear&#34;,\n                    &#34;prewhitening_type&#34;: &#34;first difference&#34;,\n                    &#34;recoloring&#34;: true,\n                    &#34;reference_channels&#34;: [\n                        &#34;hx&#34;,\n                        &#34;hy&#34;\n                    ],\n                    &#34;regression.max_iterations&#34;: 10,\n                    &#34;regression.max_redescending_iterations&#34;: 2,\n                    &#34;regression.minimum_cycles&#34;: 10,\n                    &#34;regression.r0&#34;: 1.5,\n                    &#34;regression.tolerance&#34;: 0.005,\n                    &#34;regression.u0&#34;: 2.8,\n                    &#34;regression.verbosity&#34;: 0,\n                    &#34;save_fcs&#34;: false,\n                    &#34;window.clock_zero_type&#34;: &#34;ignore&#34;,\n                    &#34;window.num_samples&#34;: 128,\n                    &#34;window.overlap&#34;: 32,\n                    &#34;window.type&#34;: &#34;boxcar&#34;\n                }\n            },\n            {\n                &#34;decimation_level&#34;: {\n                    &#34;anti_alias_filter&#34;: &#34;default&#34;,\n                    &#34;bands&#34;: [\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 2,\n                                &#34;frequency_max&#34;: 0.008544921875,\n                                &#34;frequency_min&#34;: 0.006591796875,\n                                &#34;index_max&#34;: 17,\n                                &#34;index_min&#34;: 14\n                            }\n                        },\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 2,\n                                &#34;frequency_max&#34;: 0.006591796875,\n                                &#34;frequency_min&#34;: 0.005126953125,\n                                &#34;index_max&#34;: 13,\n                                &#34;index_min&#34;: 11\n                            }\n                        },\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 2,\n                                &#34;frequency_max&#34;: 0.005126953125,\n                                &#34;frequency_min&#34;: 0.004150390625,\n                                &#34;index_max&#34;: 10,\n                                &#34;index_min&#34;: 9\n                            }\n                        },\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 2,\n                                &#34;frequency_max&#34;: 0.004150390625,\n                                &#34;frequency_min&#34;: 0.003173828125,\n                                &#34;index_max&#34;: 8,\n                                &#34;index_min&#34;: 7\n                            }\n                        },\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 2,\n                                &#34;frequency_max&#34;: 0.003173828125,\n                                &#34;frequency_min&#34;: 0.002685546875,\n                                &#34;index_max&#34;: 6,\n                                &#34;index_min&#34;: 6\n                            }\n                        },\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 2,\n                                &#34;frequency_max&#34;: 0.002685546875,\n                                &#34;frequency_min&#34;: 0.002197265625,\n                                &#34;index_max&#34;: 5,\n                                &#34;index_min&#34;: 5\n                            }\n                        }\n                    ],\n                    &#34;decimation.factor&#34;: 4.0,\n                    &#34;decimation.level&#34;: 2,\n                    &#34;decimation.method&#34;: &#34;default&#34;,\n                    &#34;decimation.sample_rate&#34;: 0.0625,\n                    &#34;estimator.engine&#34;: &#34;RME_RR&#34;,\n                    &#34;estimator.estimate_per_channel&#34;: true,\n                    &#34;extra_pre_fft_detrend_type&#34;: &#34;linear&#34;,\n                    &#34;input_channels&#34;: [\n                        &#34;hx&#34;,\n                        &#34;hy&#34;\n                    ],\n                    &#34;method&#34;: &#34;fft&#34;,\n                    &#34;min_num_stft_windows&#34;: 2,\n                    &#34;output_channels&#34;: [\n                        &#34;ex&#34;,\n                        &#34;ey&#34;,\n                        &#34;hz&#34;\n                    ],\n                    &#34;pre_fft_detrend_type&#34;: &#34;linear&#34;,\n                    &#34;prewhitening_type&#34;: &#34;first difference&#34;,\n                    &#34;recoloring&#34;: true,\n                    &#34;reference_channels&#34;: [\n                        &#34;hx&#34;,\n                        &#34;hy&#34;\n                    ],\n                    &#34;regression.max_iterations&#34;: 10,\n                    &#34;regression.max_redescending_iterations&#34;: 2,\n                    &#34;regression.minimum_cycles&#34;: 10,\n                    &#34;regression.r0&#34;: 1.5,\n                    &#34;regression.tolerance&#34;: 0.005,\n                    &#34;regression.u0&#34;: 2.8,\n                    &#34;regression.verbosity&#34;: 0,\n                    &#34;save_fcs&#34;: false,\n                    &#34;window.clock_zero_type&#34;: &#34;ignore&#34;,\n                    &#34;window.num_samples&#34;: 128,\n                    &#34;window.overlap&#34;: 32,\n                    &#34;window.type&#34;: &#34;boxcar&#34;\n                }\n            },\n            {\n                &#34;decimation_level&#34;: {\n                    &#34;anti_alias_filter&#34;: &#34;default&#34;,\n                    &#34;bands&#34;: [\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 3,\n                                &#34;frequency_max&#34;: 0.00274658203125,\n                                &#34;frequency_min&#34;: 0.00213623046875,\n                                &#34;index_max&#34;: 22,\n                                &#34;index_min&#34;: 18\n                            }\n                        },\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 3,\n                                &#34;frequency_max&#34;: 0.00213623046875,\n                                &#34;frequency_min&#34;: 0.00164794921875,\n                                &#34;index_max&#34;: 17,\n                                &#34;index_min&#34;: 14\n                            }\n                        },\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 3,\n                                &#34;frequency_max&#34;: 0.00164794921875,\n                                &#34;frequency_min&#34;: 0.00115966796875,\n                                &#34;index_max&#34;: 13,\n                                &#34;index_min&#34;: 10\n                            }\n                        },\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 3,\n                                &#34;frequency_max&#34;: 0.00115966796875,\n                                &#34;frequency_min&#34;: 0.00079345703125,\n                                &#34;index_max&#34;: 9,\n                                &#34;index_min&#34;: 7\n                            }\n                        },\n                        {\n                            &#34;band&#34;: {\n                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,\n                                &#34;closed&#34;: &#34;left&#34;,\n                                &#34;decimation_level&#34;: 3,\n                                &#34;frequency_max&#34;: 0.00079345703125,\n                                &#34;frequency_min&#34;: 0.00054931640625,\n                                &#34;index_max&#34;: 6,\n                                &#34;index_min&#34;: 5\n                            }\n                        }\n                    ],\n                    &#34;decimation.factor&#34;: 4.0,\n                    &#34;decimation.level&#34;: 3,\n                    &#34;decimation.method&#34;: &#34;default&#34;,\n                    &#34;decimation.sample_rate&#34;: 0.015625,\n                    &#34;estimator.engine&#34;: &#34;RME_RR&#34;,\n                    &#34;estimator.estimate_per_channel&#34;: true,\n                    &#34;extra_pre_fft_detrend_type&#34;: &#34;linear&#34;,\n                    &#34;input_channels&#34;: [\n                        &#34;hx&#34;,\n                        &#34;hy&#34;\n                    ],\n                    &#34;method&#34;: &#34;fft&#34;,\n                    &#34;min_num_stft_windows&#34;: 2,\n                    &#34;output_channels&#34;: [\n                        &#34;ex&#34;,\n                        &#34;ey&#34;,\n                        &#34;hz&#34;\n                    ],\n                    &#34;pre_fft_detrend_type&#34;: &#34;linear&#34;,\n                    &#34;prewhitening_type&#34;: &#34;first difference&#34;,\n                    &#34;recoloring&#34;: true,\n                    &#34;reference_channels&#34;: [\n                        &#34;hx&#34;,\n                        &#34;hy&#34;\n                    ],\n                    &#34;regression.max_iterations&#34;: 10,\n                    &#34;regression.max_redescending_iterations&#34;: 2,\n                    &#34;regression.minimum_cycles&#34;: 10,\n                    &#34;regression.r0&#34;: 1.5,\n                    &#34;regression.tolerance&#34;: 0.005,\n                    &#34;regression.u0&#34;: 2.8,\n                    &#34;regression.verbosity&#34;: 0,\n                    &#34;save_fcs&#34;: false,\n                    &#34;window.clock_zero_type&#34;: &#34;ignore&#34;,\n                    &#34;window.num_samples&#34;: 128,\n                    &#34;window.overlap&#34;: 32,\n                    &#34;window.type&#34;: &#34;boxcar&#34;\n                }\n            }\n        ],\n        &#34;id&#34;: &#34;test1-rr_test2_sr1&#34;,\n        &#34;stations.local.id&#34;: &#34;test1&#34;,\n        &#34;stations.local.mth5_path&#34;: &#34;/home/kkappler/software/irismt/aurora/data/synthetic/mth5/test12rr.h5&#34;,\n        &#34;stations.local.remote&#34;: false,\n        &#34;stations.local.runs&#34;: [\n            {\n                &#34;run&#34;: {\n                    &#34;id&#34;: &#34;001&#34;,\n                    &#34;input_channels&#34;: [\n                        {\n                            &#34;channel&#34;: {\n                                &#34;id&#34;: &#34;hx&#34;,\n                                &#34;scale_factor&#34;: 1.0\n                            }\n                        },\n                        {\n                            &#34;channel&#34;: {\n                                &#34;id&#34;: &#34;hy&#34;,\n                                &#34;scale_factor&#34;: 1.0\n                            }\n                        }\n                    ],\n                    &#34;output_channels&#34;: [\n                        {\n                            &#34;channel&#34;: {\n                                &#34;id&#34;: &#34;ex&#34;,\n                                &#34;scale_factor&#34;: 1.0\n                            }\n                        },\n                        {\n                            &#34;channel&#34;: {\n                                &#34;id&#34;: &#34;ey&#34;,\n                                &#34;scale_factor&#34;: 1.0\n                            }\n                        },\n                        {\n                            &#34;channel&#34;: {\n                                &#34;id&#34;: &#34;hz&#34;,\n                                &#34;scale_factor&#34;: 1.0\n                            }\n                        }\n                    ],\n                    &#34;sample_rate&#34;: 1.0,\n                    &#34;time_periods&#34;: [\n                        {\n                            &#34;time_period&#34;: {\n                                &#34;end&#34;: &#34;1980-01-01T11:06:39+00:00&#34;,\n                                &#34;start&#34;: &#34;1980-01-01T00:00:00+00:00&#34;\n                            }\n                        }\n                    ]\n                }\n            }\n        ],\n        &#34;stations.remote&#34;: [\n            {\n                &#34;station&#34;: {\n                    &#34;id&#34;: &#34;test2&#34;,\n                    &#34;mth5_path&#34;: &#34;/home/kkappler/software/irismt/aurora/data/synthetic/mth5/test12rr.h5&#34;,\n                    &#34;remote&#34;: true,\n                    &#34;runs&#34;: [\n                        {\n                            &#34;run&#34;: {\n                                &#34;id&#34;: &#34;001&#34;,\n                                &#34;input_channels&#34;: [\n                                    {\n                                        &#34;channel&#34;: {\n                                            &#34;id&#34;: &#34;hx&#34;,\n                                            &#34;scale_factor&#34;: 1.0\n                                        }\n                                    },\n                                    {\n                                        &#34;channel&#34;: {\n                                            &#34;id&#34;: &#34;hy&#34;,\n                                            &#34;scale_factor&#34;: 1.0\n                                        }\n                                    }\n                                ],\n                                &#34;output_channels&#34;: [\n                                    {\n                                        &#34;channel&#34;: {\n                                            &#34;id&#34;: &#34;ex&#34;,\n                                            &#34;scale_factor&#34;: 1.0\n                                        }\n                                    },\n                                    {\n                                        &#34;channel&#34;: {\n                                            &#34;id&#34;: &#34;ey&#34;,\n                                            &#34;scale_factor&#34;: 1.0\n                                        }\n                                    },\n                                    {\n                                        &#34;channel&#34;: {\n                                            &#34;id&#34;: &#34;hz&#34;,\n                                            &#34;scale_factor&#34;: 1.0\n                                        }\n                                    }\n                                ],\n                                &#34;sample_rate&#34;: 1.0,\n                                &#34;time_periods&#34;: [\n                                    {\n                                        &#34;time_period&#34;: {\n                                            &#34;end&#34;: &#34;1980-01-01T11:06:39+00:00&#34;,\n                                            &#34;start&#34;: &#34;1980-01-01T00:00:00+00:00&#34;\n                                        }\n                                    }\n                                ]\n                            }\n                        }\n                    ]\n                }\n            }\n        ]\n    }\n}&#39;
+</pre></div></div>
+</div>
+<p>Which can be saved:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;config.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fid</span><span class="p">:</span>
+    <span class="n">fid</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json_string</span><span class="p">)</span>
+<br/><br/></pre></div>
+</div>
+</div>
+</section>
+<section id="Default-Parameters">
+<h2>Default Parameters<a class="headerlink" href="#Default-Parameters" title="Permalink to this heading">¶</a></h2>
+<p>The default config parameters are listed below:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">input_channels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;hx&quot;</span><span class="p">,</span> <span class="s2">&quot;hy&quot;</span><span class="p">],</span>
+<span class="n">output_channels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;hz&quot;</span><span class="p">,</span> <span class="s2">&quot;ex&quot;</span><span class="p">,</span> <span class="s2">&quot;ey&quot;</span><span class="p">],</span>
+<span class="n">estimator</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="n">emtf_band_file</span> <span class="o">=</span> <span class="n">BANDS_DEFAULT_FILE</span><span class="p">,</span>
+</pre></div>
+</div>
+</div>
+<section id="What-can-user-change-with-the-Config?">
+<h3>What can user change with the Config?<a class="headerlink" href="#What-can-user-change-with-the-Config?" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Channel Nomenclature</p>
+<ul>
+<li><p>for example ex,ey maybe called e1, e2 in the mth5</p>
+<ul>
+<li><p>This is handled by passing a channel_nomenclature keyword argument.</p></li>
+<li><p>Examples of systems that might need this are LEMI and Phoenix</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Windowing Parameters</p>
+<ul>
+<li><p>Window shape (family)</p></li>
+<li><p>Window length</p></li>
+<li><p>Sliding window overlap</p></li>
+<li><p>Clock-Zero (optional)</p></li>
+</ul>
+</li>
+<li><p>Choice of Stations</p>
+<ul>
+<li><p>This is currently done via KernelDataset</p></li>
+</ul>
+</li>
+<li><p>Scale Factors for Individual Channels</p>
+<ul>
+<li><p>allows for correcting, or trying to add simple, frequency independent gain corrections</p></li>
+</ul>
+</li>
+<li><p>Frequency Bands</p>
+<ul>
+<li><p>Group the Fourier coefficients into bands to be processed together and averaged for a TF estimate</p></li>
+<li><p>currently via an emtf-style band_setup file</p></li>
+</ul>
+</li>
+<li><p>Number of Decimation Levels</p>
+<ul>
+<li><p>currently via an emtf-style band_setup file</p></li>
+</ul>
+</li>
+<li><p>Regression Estimator Engine</p>
+<ul>
+<li><p>Currently only choices are RME, RME_RR (Regression M-estimate) and Remote reference regresson M-estimate</p></li>
+</ul>
+</li>
+<li><p>Regression Parameters</p>
+<ul>
+<li><p>Maximum number of iterations</p></li>
+<li><p>Maximum number of redecending iterations</p></li>
+<li><p>Minimum number of frequecny cycles</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+</section>
+<section id="EMTF-Band-Setup-File">
+<h1>EMTF Band Setup File<a class="headerlink" href="#EMTF-Band-Setup-File" title="Permalink to this heading">¶</a></h1>
+<p>The frequency bands will eventually be setup in a variety of ways, but currently aurora supports only specification of bands either by explicit construction or via EMTF “band setup” files.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">BANDS_DEFAULT_FILE</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+PosixPath(&#39;/home/kkappler/software/irismt/aurora/aurora/config/emtf_band_setup/bs_test.cfg&#39;)
+</pre></div></div>
+</div>
+<p>Here is the content of a typical EMTF band setup file:</p>
+25
+1 25 30
+1 20 24
+1 16 19
+1 13 15
+1 10 12
+1 8 9
+1 6 7
+1 5 5
+2 14 17
+2 11 13
+2 9 10
+2 7 8
+2 6 6
+2 5 5
+3 14 17
+3 11 13
+3 9 10
+3 7 8
+3 6 6
+3 5 5
+4 18 22
+4 14 17
+4 10 13
+4 7 9
+4 5 6<p>These legacy files have the following significance; The first line, 25 indicates the number of bands, and there are 25 lines following, one line per frequency band.</p>
+<p>Each line comprises three numbers:</p>
+<p><code class="docutils literal notranslate"><span class="pre">decimation_level,</span> <span class="pre">first_FC_index,</span> <span class="pre">last_FC_index</span></code></p>
+<p>where “FC” stands for Fourier coefficient</p>
+<p>The decimation factor applied at each level was controlled in EMTF by a sepearate file, called <code class="docutils literal notranslate"><span class="pre">decset.cfg</span></code>. In the old EMTF codes, this controlled the window length, overlap, the decimation factor, and the corners of the anti-alias filter applied before downsampling.</p>
+<p>The decimation factor in EMTF was almost always 4, and the default behaviour of the ConfigCreator is to assume a decimation factor of 4 at each level, but this can be changed manually.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../examples/dataset_definition.html" class="btn btn-neutral float-left" title="Dataset Definition DataFrame" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="earthscope_magnetic_data_tutorial.html" class="btn btn-neutral float-right" title="Accessing Magnetic Field Data from EarthScope Using MTH5" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

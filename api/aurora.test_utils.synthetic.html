@@ -1,0 +1,439 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.test_utils.synthetic package &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css?v=7f9a90b1" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="aurora.time_series package" href="aurora.time_series.html" />
+    <link rel="prev" title="aurora.test_utils.parkfield package" href="aurora.test_utils.parkfield.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">aurora</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="aurora.html">aurora package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="aurora.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="aurora.config.html">aurora.config package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html">aurora.pipelines package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.html">aurora.sandbox package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="aurora.test_utils.html">aurora.test_utils package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html">aurora.time_series package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html">aurora.transfer_function package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.html#module-aurora.general_helper_functions">aurora.general_helper_functions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.html#module-aurora">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">aurora</a></li>
+          <li class="breadcrumb-item"><a href="aurora.html">aurora package</a></li>
+          <li class="breadcrumb-item"><a href="aurora.test_utils.html">aurora.test_utils package</a></li>
+      <li class="breadcrumb-item active">aurora.test_utils.synthetic package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/aurora.test_utils.synthetic.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="aurora-test-utils-synthetic-package">
+<h1>aurora.test_utils.synthetic package<a class="headerlink" href="#aurora-test-utils-synthetic-package" title="Permalink to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="aurora-test-utils-synthetic-make-mth5-from-asc-module">
+<h2>aurora.test_utils.synthetic.make_mth5_from_asc module<a class="headerlink" href="#aurora-test-utils-synthetic-make-mth5-from-asc-module" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-aurora.test_utils.synthetic.make_processing_configs">
+<span id="aurora-test-utils-synthetic-make-processing-configs-module"></span><h2>aurora.test_utils.synthetic.make_processing_configs module<a class="headerlink" href="#module-aurora.test_utils.synthetic.make_processing_configs" title="Permalink to this heading">¶</a></h2>
+<p>This module contains methods for generating processing config objects that are
+used in aurora’s tests of processing synthetic data.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.test_utils.synthetic.make_processing_configs.create_test_run_config">
+<span class="sig-prename descclassname"><span class="pre">aurora.test_utils.synthetic.make_processing_configs.</span></span><span class="sig-name descname"><span class="pre">create_test_run_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_case_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matlab_or_fortran</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'json'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_nomenclature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/test_utils/synthetic/make_processing_configs.html#create_test_run_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.test_utils.synthetic.make_processing_configs.create_test_run_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use config creator to generate a processing config file for the synthetic data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>test_case_id</strong> (<em>string</em>) – Must be in SUPPORTED_TEST_CASE_IDS</p></li>
+<li><p><strong>kernel_dataset</strong> (<em>aurora.transfer_function.kernel_dataset.KernelDataset</em>) – Description of the dataset to process</p></li>
+<li><p><strong>matlab_or_fortran</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – “”, “matlab”, “fortran”</p></li>
+<li><p><strong>save</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – if this has the value “json” a copy of the processing config will be written to a json file
+The json file name is p.json_fn() with p the processing config object.</p></li>
+<li><p><strong>channel_nomenclature</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – A label for the channel nomenclature.  This should be one of the values in
+mt_metadata/transfer_functions/processing/aurora/standards/channel_nomenclatures.json
+currently [“default”, “lemi12”, “lemi34”, “phoenix123”, “musgraves”,]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>p</strong> – The processing config object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="aurora.config.metadata.html#aurora.config.metadata.processing.Processing" title="aurora.config.metadata.processing.Processing">aurora.config.metadata.processing.Processing</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.test_utils.synthetic.make_processing_configs.main">
+<span class="sig-prename descclassname"><span class="pre">aurora.test_utils.synthetic.make_processing_configs.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/test_utils/synthetic/make_processing_configs.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.test_utils.synthetic.make_processing_configs.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allow the module to be called from the command line</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.test_utils.synthetic.make_processing_configs.make_processing_config_and_kernel_dataset">
+<span class="sig-prename descclassname"><span class="pre">aurora.test_utils.synthetic.make_processing_configs.</span></span><span class="sig-name descname"><span class="pre">make_processing_config_and_kernel_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_keyword</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">remote_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mth5s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_nomenclature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'default'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/test_utils/synthetic/make_processing_configs.html#make_processing_config_and_kernel_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.test_utils.synthetic.make_processing_configs.make_processing_config_and_kernel_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the processing config and the tfk_dataset</p>
+<dl class="simple">
+<dt>TODO: Move this to aurora/test_utils/synthetic/</dt><dd><ul class="simple">
+<li><p>this can then be used by test_fourier_coefficients to validate that the FCs are there before processing</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_keyword</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Must be in SUPPORTED_TEST_CASE_IDS</p></li>
+<li><p><strong>station_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The name of the station to proces</p></li>
+<li><p><strong>remote_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – </p></li>
+<li><p><strong>mth5s</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>]</em>) – </p></li>
+<li><p><strong>channel_nomenclature</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.test_utils.synthetic.make_processing_configs.test_to_from_json">
+<span class="sig-prename descclassname"><span class="pre">aurora.test_utils.synthetic.make_processing_configs.</span></span><span class="sig-name descname"><span class="pre">test_to_from_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/test_utils/synthetic/make_processing_configs.html#test_to_from_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.test_utils.synthetic.make_processing_configs.test_to_from_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Intended to test that processing config can be stored as a json, then
+reloaded from json and is equal.</p>
+<p>WORK IN PROGRESS – see mt_metadata Issue #222</p>
+<p>Development Notes:
+TODO: This test should be completed and moved into tests.
+The json does not load into an mt_metadata object.
+The problem seems to be that at the run-level of the processing config there is an
+intention to allow for multiple time-periods. This is reasonable, consider a station
+running for several months, we may want to only process data from certain chunks
+of the time series.
+However, the time period reader does not seem to work as expected.
+A partial fix is on fix_issue_222 branch of mt_metadata</p>
+<p>Related to issue #172</p>
+</dd></dl>
+
+</section>
+<section id="module-aurora.test_utils.synthetic.paths">
+<span id="aurora-test-utils-synthetic-paths-module"></span><h2>aurora.test_utils.synthetic.paths module<a class="headerlink" href="#module-aurora.test_utils.synthetic.paths" title="Permalink to this heading">¶</a></h2>
+<p>This module contains a class that helps manage data paths for testing aurora on synthetic data.</p>
+<dl class="simple">
+<dt>Development Notes:</dt><dd><ul class="simple">
+<li><p>This class was built to handle Issue #303 (installation on read-only file system). <a class="reference external" href="https://github.com/simpeg/aurora/issues/303">https://github.com/simpeg/aurora/issues/303</a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.test_utils.synthetic.paths.SyntheticTestPaths">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.test_utils.synthetic.paths.</span></span><span class="sig-name descname"><span class="pre">SyntheticTestPaths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sandbox_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">PosixPath('/home/runner/work/aurora/aurora/data/synthetic')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ascii_data_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/test_utils/synthetic/paths.html#SyntheticTestPaths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.test_utils.synthetic.paths.SyntheticTestPaths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">SyntheticTestPaths</span></code></p>
+<p>sandbox path must be a place that has write access.  This class was created because on some
+installations we only have read access.  Originally there was a data/ folder with the synthetic
+ascii data stored there, and we created the mth5 and other data products in the same place.</p>
+<p>Here we have a ascii_data_path which points at the ascii files (which may be read only), but we
+also accept a kwarg for “sandbox_path” which is writable and this is where the mth5 and etc. will
+get built.</p>
+<p>TODO: consider creating a symlink in aurora’s legacy data path that points at the mth5 ascii files.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.test_utils.synthetic.paths.SyntheticTestPaths.mkdirs" title="aurora.test_utils.synthetic.paths.SyntheticTestPaths.mkdirs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mkdirs</span></code></a>()</p></td>
+<td><p>Makes the directories that the tests will write results to.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.test_utils.synthetic.paths.SyntheticTestPaths.writability_check" title="aurora.test_utils.synthetic.paths.SyntheticTestPaths.writability_check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">writability_check</span></code></a>(...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.test_utils.synthetic.paths.SyntheticTestPaths.mkdirs">
+<span class="sig-name descname"><span class="pre">mkdirs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/test_utils/synthetic/paths.html#SyntheticTestPaths.mkdirs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.test_utils.synthetic.paths.SyntheticTestPaths.mkdirs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes the directories that the tests will write results to.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.test_utils.synthetic.paths.SyntheticTestPaths.writability_check">
+<span class="sig-name descname"><span class="pre">writability_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">).home()</span> <span class="pre">workaround_sandbox</span> <span class="pre">=</span> <span class="pre">HOME.joinpath(&quot;.cache&quot;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&quot;aurora&quot;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&quot;sandbox&quot;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/test_utils/synthetic/paths.html#SyntheticTestPaths.writability_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.test_utils.synthetic.paths.SyntheticTestPaths.writability_check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-aurora.test_utils.synthetic.processing_helpers">
+<span id="aurora-test-utils-synthetic-processing-helpers-module"></span><h2>aurora.test_utils.synthetic.processing_helpers module<a class="headerlink" href="#module-aurora.test_utils.synthetic.processing_helpers" title="Permalink to this heading">¶</a></h2>
+<p>This module contains some helper functions that are called during the
+execution of aurora’s tests of processing on synthetic data.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.test_utils.synthetic.processing_helpers.get_example_kernel_dataset">
+<span class="sig-prename descclassname"><span class="pre">aurora.test_utils.synthetic.processing_helpers.</span></span><span class="sig-name descname"><span class="pre">get_example_kernel_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_stations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/test_utils/synthetic/processing_helpers.html#get_example_kernel_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.test_utils.synthetic.processing_helpers.get_example_kernel_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Creates a kernel dataset object from the synthetic data</dt><dd><ul class="simple">
+<li><p>Helper function for synthetic tests.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kernel_dataset</strong> – The kernel dataset from a synthetic, single station mth5</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>aurora.transfer_function.kernel_dataset.KernelDataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.test_utils.synthetic.processing_helpers.process_synthetic_1">
+<span class="sig-prename descclassname"><span class="pre">aurora.test_utils.synthetic.processing_helpers.</span></span><span class="sig-name descname"><span class="pre">process_synthetic_1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_keyword</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'test1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><span class="pre">Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_scale_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simultaneous_regression</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'0.1.0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_collection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_nomenclature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reload_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/test_utils/synthetic/processing_helpers.html#process_synthetic_1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.test_utils.synthetic.processing_helpers.process_synthetic_1" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_keyword</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – “test1”, “test1_tfk”, this is an argument passed to the create_test_run_config
+as test_case_id.</p></li>
+<li><p><strong>z_file_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> or </em><em>path</em>) – Where the z-file will be output</p></li>
+<li><p><strong>test_scale_factor</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If true, will assign scale factors to the channels</p></li>
+<li><p><strong>simultaneous_regression</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True will do regression all outut channels in one step, rather than the
+usual, channel-by-channel method</p></li>
+<li><p><strong>file_version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – one of [“0.1.0”, “0.2.0”]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tf_result</strong> – Should change so that it is mt_metadata.TF (see Issue #143)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection" title="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection">TransferFunctionCollection</a> or mt_metadata.transfer_functions.TF</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.test_utils.synthetic.processing_helpers.process_synthetic_1r2">
+<span class="sig-prename descclassname"><span class="pre">aurora.test_utils.synthetic.processing_helpers.</span></span><span class="sig-name descname"><span class="pre">process_synthetic_1r2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_keyword</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'test1r2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_nomenclature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_collection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/test_utils/synthetic/processing_helpers.html#process_synthetic_1r2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.test_utils.synthetic.processing_helpers.process_synthetic_1r2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.test_utils.synthetic.processing_helpers.process_synthetic_2">
+<span class="sig-prename descclassname"><span class="pre">aurora.test_utils.synthetic.processing_helpers.</span></span><span class="sig-name descname"><span class="pre">process_synthetic_2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">force_make_mth5</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><span class="pre">Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_fc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'0.2.0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_nomenclature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'default'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/test_utils/synthetic/processing_helpers.html#process_synthetic_2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.test_utils.synthetic.processing_helpers.process_synthetic_2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.test_utils.synthetic.processing_helpers.tf_obj_from_synthetic_data">
+<span class="sig-prename descclassname"><span class="pre">aurora.test_utils.synthetic.processing_helpers.</span></span><span class="sig-name descname"><span class="pre">tf_obj_from_synthetic_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mth5_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><span class="pre">Path</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">TF</span></span></span><a class="reference internal" href="../_modules/aurora/test_utils/synthetic/processing_helpers.html#tf_obj_from_synthetic_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.test_utils.synthetic.processing_helpers.tf_obj_from_synthetic_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes aurora processing on mth5_path, and returns mt_metadata TF object.
+- Helper function for test_issue_139</p>
+</dd></dl>
+
+</section>
+<section id="module-aurora.test_utils.synthetic.rms_helpers">
+<span id="aurora-test-utils-synthetic-rms-helpers-module"></span><h2>aurora.test_utils.synthetic.rms_helpers module<a class="headerlink" href="#module-aurora.test_utils.synthetic.rms_helpers" title="Permalink to this heading">¶</a></h2>
+<p>This module contains methods associated with RMS calculations that are used in testing
+aurora processing on synthetic data.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.test_utils.synthetic.rms_helpers.assert_rms_misfit_ok">
+<span class="sig-prename descclassname"><span class="pre">aurora.test_utils.synthetic.rms_helpers.</span></span><span class="sig-name descname"><span class="pre">assert_rms_misfit_ok</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expected_rms_misfit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xy_or_yx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_rms_aurora</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_rms_aurora</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/aurora/test_utils/synthetic/rms_helpers.html#assert_rms_misfit_ok"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.test_utils.synthetic.rms_helpers.assert_rms_misfit_ok" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compares actual RMS misfit from processing against expected values.
+Raises Assertion errors if test processing results different from expected.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>expected_rms_misfit</strong> (<em>dictionary</em>) – precomputed RMS misfits for test data in rho and phi</p></li>
+<li><p><strong>xy_or_yx</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – mode</p></li>
+<li><p><strong>rho_rms_aurora</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – </p></li>
+<li><p><strong>phi_rms_aurora</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.test_utils.synthetic.rms_helpers.compute_rms">
+<span class="sig-prename descclassname"><span class="pre">aurora.test_utils.synthetic.rms_helpers.</span></span><span class="sig-name descname"><span class="pre">compute_rms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_rho_a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">45.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/test_utils/synthetic/rms_helpers.html#compute_rms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.test_utils.synthetic.rms_helpers.compute_rms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the RMS between processing results (rho, phi) and model (rho, phi).</p>
+<p>It is used to make annotations for comparative plots for synthetic data. Could be
+used in general to compare different processing results. For example by replacing
+model_rho_a and model_phi with other processing results, or other (non-uniform)
+model results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rho</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><em>numpy.ndarray</em></a>) – 1D array of computed apparent resistivities (expected in Ohmm)</p></li>
+<li><p><strong>phi</strong> (<em>numpy.ndarrayx</em>) – 1D array of computed phases (expected in degrees)</p></li>
+<li><p><strong>model_rho_a</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> or </em><em>numpy array</em>) – if numpy array must be the same shape as rho</p></li>
+<li><p><strong>model_phi</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> or </em><em>numpy array</em>) – if numpy array must be the same shape as phi.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>rho_rms</strong> (<em>float</em>) – rms misfit between the model apparent resistivity and the computed resistivity</p></li>
+<li><p><strong>phi_rms</strong> (<em>float</em>) – rms misfit between the model phase (or phases) and the computed phase</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.test_utils.synthetic.rms_helpers.get_expected_rms_misfit">
+<span class="sig-prename descclassname"><span class="pre">aurora.test_utils.synthetic.rms_helpers.</span></span><span class="sig-name descname"><span class="pre">get_expected_rms_misfit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_case_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">emtf_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../_modules/aurora/test_utils/synthetic/rms_helpers.html#get_expected_rms_misfit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.test_utils.synthetic.rms_helpers.get_expected_rms_misfit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns hard-coded expected results from synthetic data processing.
+These results are a benchmark against which test results are compared on push to
+github.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>test_case_id</strong> – </p></li>
+<li><p><strong>emtf_version</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="aurora-test-utils-synthetic-station-config-module">
+<h2>aurora.test_utils.synthetic.station_config module<a class="headerlink" href="#aurora-test-utils-synthetic-station-config-module" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-aurora.test_utils.synthetic">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-aurora.test_utils.synthetic" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="aurora.test_utils.parkfield.html" class="btn btn-neutral float-left" title="aurora.test_utils.parkfield package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="aurora.time_series.html" class="btn btn-neutral float-right" title="aurora.time_series package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

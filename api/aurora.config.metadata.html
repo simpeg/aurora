@@ -1,0 +1,664 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.config.metadata package &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="aurora.pipelines package" href="aurora.pipelines.html" />
+    <link rel="prev" title="aurora.config.emtf_band_setup package" href="aurora.config.emtf_band_setup.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">aurora</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="aurora.html">aurora package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="aurora.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="aurora.config.html">aurora.config package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html">aurora.pipelines package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.html">aurora.sandbox package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.html">aurora.test_utils package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html">aurora.time_series package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html">aurora.transfer_function package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.html#module-aurora.general_helper_functions">aurora.general_helper_functions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.html#module-aurora">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">aurora</a></li>
+          <li class="breadcrumb-item"><a href="aurora.html">aurora package</a></li>
+          <li class="breadcrumb-item"><a href="aurora.config.html">aurora.config package</a></li>
+      <li class="breadcrumb-item active">aurora.config.metadata package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/aurora.config.metadata.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="aurora-config-metadata-package">
+<h1>aurora.config.metadata package<a class="headerlink" href="#aurora-config-metadata-package" title="Permalink to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-aurora.config.metadata.processing">
+<span id="aurora-config-metadata-processing-module"></span><h2>aurora.config.metadata.processing module<a class="headerlink" href="#module-aurora.config.metadata.processing" title="Permalink to this heading">¶</a></h2>
+<p>Extend the mt_metadata.transfer_functions.processing.aurora.processing.Processing class
+with some aurora-specific methods.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.config.metadata.processing.EMTFTFHeader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.config.metadata.processing.</span></span><span class="sig-name descname"><span class="pre">EMTFTFHeader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/config/metadata/processing.html#EMTFTFHeader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.config.metadata.processing.EMTFTFHeader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ListDict</span></code></p>
+<p>Convenience class for storing metadata for a TF estimate.
+Based on Gary Egbert’s TFHeader.m originally in
+iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes</p>
+<p>It completely depends on the Processing class</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">append</span></code>(obj)</p></td>
+<td><p>Append an object</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>()</p></td>
+<td><p>Copy object</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">extend</span></code>(other[, skip_keys])</p></td>
+<td><p>extend the dictionary from another ListDict object</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code>(key)</p></td>
+<td><p>pop item off of dictionary.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove</span></code>(key)</p></td>
+<td><p>remove an item based on key or index</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort</span></code>([inplace])</p></td>
+<td><p>sort the dictionary keys into alphabetical order</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(other)</p></td>
+<td><p>Update from another ListDict</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>items</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>keys</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>values</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.config.metadata.processing.Processing">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.config.metadata.processing.</span></span><span class="sig-name descname"><span class="pre">Processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/config/metadata/processing.html#Processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.config.metadata.processing.Processing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Processing</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>band_edges_dict</strong></dt><dd></dd>
+<dt><strong>changed</strong></dt><dd></dd>
+<dt><a class="reference internal" href="#aurora.config.metadata.processing.Processing.decimation_info" title="aurora.config.metadata.processing.Processing.decimation_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decimation_info</span></code></a></dt><dd><p>Zips decimation level ids to the Decimation objects adn returns as a dict</p>
+</dd>
+<dt><strong>decimations</strong></dt><dd></dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">decimations_dict</span></code></dt><dd><p>need to have a dictionary, but it can’t be an attribute cause that</p>
+</dd>
+<dt><strong>num_decimation_levels</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_base_attribute</span></code>(name, value, value_dict)</p></td>
+<td><p>Add an attribute to _attr_dict so it will be included in the output dictionary</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_decimation_level</span></code>(decimation_level)</p></td>
+<td><p>add a decimation level</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assign_bands</span></code>(band_edges_dict, sample_rate, ...)</p></td>
+<td><p>Warning: This does not actually tell us how many samples we are decimating down at each level.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assign_decimation_level_data_emtf</span></code>(sample_rate)</p></td>
+<td><p>Warning: This does not actually tell us how many samples we are decimating down at each level.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">attribute_information</span></code>([name])</p></td>
+<td><p>return a descriptive string of the attribute if none returns for all</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>()</p></td>
+<td><p>Copy object</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.config.metadata.processing.Processing.emtf_tf_header" title="aurora.config.metadata.processing.Processing.emtf_tf_header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">emtf_tf_header</span></code></a>(dec_level_id)</p></td>
+<td><p>Returns a ListDict object that has the information that was in the old EMTF TF</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_dict</span></code>(meta_dict[, skip_none])</p></td>
+<td><p>fill attributes from a dictionary</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_json</span></code>(json_str)</p></td>
+<td><p>read in a json string and update attributes of an object</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_series</span></code>(pd_series)</p></td>
+<td><p>Fill attributes from a Pandas series</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_xml</span></code>(xml_element)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">param xml_element<span class="colon">:</span></dt>
+<dd class="field-odd"><p>XML element</p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_attr_from_name</span></code>(name)</p></td>
+<td><p>Access attribute from the given name.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_attribute_list</span></code>()</p></td>
+<td><p>return a list of the attributes</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_decimation_level</span></code>(level)</p></td>
+<td><p>Get a decimation level for easy access</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.config.metadata.processing.Processing.make_tf_level" title="aurora.config.metadata.processing.Processing.make_tf_level"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_tf_level</span></code></a>(dec_level_id)</p></td>
+<td><p>Initialize container for a single decimation level -- &quot;flat&quot; transfer function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.config.metadata.processing.Processing.save_as_json" title="aurora.config.metadata.processing.Processing.save_as_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_as_json</span></code></a>([filename, nested, required])</p></td>
+<td><p>Exports self to a JSON</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_attr_from_name</span></code>(name, value[, ...])</p></td>
+<td><p>Helper function to set attribute from the given name.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">setattr_skip_validation</span></code>(name, value)</p></td>
+<td><p>Set attribute without validation</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dict</span></code>([nested, single, required])</p></td>
+<td><p>make a dictionary from attributes, makes dictionary from _attr_list.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code>([nested, indent, required])</p></td>
+<td><p>Write a json string from a given object, taking into account other class objects contained within the given object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_series</span></code>([required])</p></td>
+<td><p>Convert attribute list to a pandas.Series</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_xml</span></code>([string, required])</p></td>
+<td><p>make an xml element for the attribute that will add types and units.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(other[, match])</p></td>
+<td><p>Update attribute values from another like element, skipping None</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_processing</span></code>(kernel_dataset)</p></td>
+<td><p>Placeholder.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.config.metadata.processing.Processing.window_scheme" title="aurora.config.metadata.processing.Processing.window_scheme"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_scheme</span></code></a>([as_type])</p></td>
+<td><p>Make a dataframe of processing parameters one row per decimation level.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>drop_reference_channels</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>json_fn</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>set_default_input_output_channels</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>set_default_reference_channels</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>set_input_channels</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>set_output_channels</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>set_reference_channels</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.config.metadata.processing.Processing.decimation_info">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">decimation_info</span></span><a class="headerlink" href="#aurora.config.metadata.processing.Processing.decimation_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Zips decimation level ids to the Decimation objects adn returns as a dict</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>decimation_info</strong> – The decimation objects keyed by decimation level id.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.config.metadata.processing.Processing.emtf_tf_header">
+<span class="sig-name descname"><span class="pre">emtf_tf_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dec_level_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ListDict</span></span></span><a class="reference internal" href="../_modules/aurora/config/metadata/processing.html#Processing.emtf_tf_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.config.metadata.processing.Processing.emtf_tf_header" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns a ListDict object that has the information that was in the old EMTF TF</dt><dd><p>Header object.  This may be deprecated in future – it is an artefact of the
+old matlab implementation.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dec_level_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – This may tolerate strings in the future, but keep as int for now</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>tfh</strong> (<em>ListDict</em>)</p></li>
+<li><p><em>Object with the properties of the old EMTF TransferFunctionHeader class.</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.config.metadata.processing.Processing.make_tf_level">
+<span class="sig-name descname"><span class="pre">make_tf_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dec_level_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/config/metadata/processing.html#Processing.make_tf_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.config.metadata.processing.Processing.make_tf_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize container for a single decimation level – “flat” transfer function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dec_level_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – This may tolerate strings in the future, but keep as int for now</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tf_obj</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.TTFZ.TTFZ" title="aurora.transfer_function.TTFZ.TTFZ">aurora.transfer_function.TTFZ.TTFZ</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.config.metadata.processing.Processing.save_as_json">
+<span class="sig-name descname"><span class="pre">save_as_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><span class="pre">Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nested</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/aurora/config/metadata/processing.html#Processing.save_as_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.config.metadata.processing.Processing.save_as_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exports self to a JSON</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>pathlib.Path</em></a><em>, </em><em>None</em><em>]</em>) – Where to write the json</p></li>
+<li><p><strong>nested</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>] </em><em>= True</em><em>,</em>) – An mt_metadata argument</p></li>
+<li><p><strong>required</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>] </em><em>= False</em><em>,</em>) – An mt_metadata argument</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.config.metadata.processing.Processing.window_scheme">
+<span class="sig-name descname"><span class="pre">window_scheme</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">as_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'df'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/config/metadata/processing.html#Processing.window_scheme"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.config.metadata.processing.Processing.window_scheme" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a dataframe of processing parameters one row per decimation level.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>as_type</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>) – if “df” return a dataframe, if “dict” return dict</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>windowing</strong> – return type depends on as_type argument.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a>, pd.DataFrame]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-aurora.config.metadata">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-aurora.config.metadata" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.config.metadata.Processing">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.config.metadata.</span></span><span class="sig-name descname"><span class="pre">Processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/config/metadata/processing.html#Processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.config.metadata.Processing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Processing</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>band_edges_dict</strong></dt><dd></dd>
+<dt><strong>changed</strong></dt><dd></dd>
+<dt><a class="reference internal" href="#aurora.config.metadata.Processing.decimation_info" title="aurora.config.metadata.Processing.decimation_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decimation_info</span></code></a></dt><dd><p>Zips decimation level ids to the Decimation objects adn returns as a dict</p>
+</dd>
+<dt><strong>decimations</strong></dt><dd></dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">decimations_dict</span></code></dt><dd><p>need to have a dictionary, but it can’t be an attribute cause that</p>
+</dd>
+<dt><strong>num_decimation_levels</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_base_attribute</span></code>(name, value, value_dict)</p></td>
+<td><p>Add an attribute to _attr_dict so it will be included in the output dictionary</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_decimation_level</span></code>(decimation_level)</p></td>
+<td><p>add a decimation level</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assign_bands</span></code>(band_edges_dict, sample_rate, ...)</p></td>
+<td><p>Warning: This does not actually tell us how many samples we are decimating down at each level.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assign_decimation_level_data_emtf</span></code>(sample_rate)</p></td>
+<td><p>Warning: This does not actually tell us how many samples we are decimating down at each level.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">attribute_information</span></code>([name])</p></td>
+<td><p>return a descriptive string of the attribute if none returns for all</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>()</p></td>
+<td><p>Copy object</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.config.metadata.Processing.emtf_tf_header" title="aurora.config.metadata.Processing.emtf_tf_header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">emtf_tf_header</span></code></a>(dec_level_id)</p></td>
+<td><p>Returns a ListDict object that has the information that was in the old EMTF TF</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_dict</span></code>(meta_dict[, skip_none])</p></td>
+<td><p>fill attributes from a dictionary</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_json</span></code>(json_str)</p></td>
+<td><p>read in a json string and update attributes of an object</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_series</span></code>(pd_series)</p></td>
+<td><p>Fill attributes from a Pandas series</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_xml</span></code>(xml_element)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">param xml_element<span class="colon">:</span></dt>
+<dd class="field-odd"><p>XML element</p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_attr_from_name</span></code>(name)</p></td>
+<td><p>Access attribute from the given name.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_attribute_list</span></code>()</p></td>
+<td><p>return a list of the attributes</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_decimation_level</span></code>(level)</p></td>
+<td><p>Get a decimation level for easy access</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.config.metadata.Processing.make_tf_level" title="aurora.config.metadata.Processing.make_tf_level"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_tf_level</span></code></a>(dec_level_id)</p></td>
+<td><p>Initialize container for a single decimation level -- &quot;flat&quot; transfer function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.config.metadata.Processing.save_as_json" title="aurora.config.metadata.Processing.save_as_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_as_json</span></code></a>([filename, nested, required])</p></td>
+<td><p>Exports self to a JSON</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_attr_from_name</span></code>(name, value[, ...])</p></td>
+<td><p>Helper function to set attribute from the given name.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">setattr_skip_validation</span></code>(name, value)</p></td>
+<td><p>Set attribute without validation</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dict</span></code>([nested, single, required])</p></td>
+<td><p>make a dictionary from attributes, makes dictionary from _attr_list.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code>([nested, indent, required])</p></td>
+<td><p>Write a json string from a given object, taking into account other class objects contained within the given object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_series</span></code>([required])</p></td>
+<td><p>Convert attribute list to a pandas.Series</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_xml</span></code>([string, required])</p></td>
+<td><p>make an xml element for the attribute that will add types and units.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(other[, match])</p></td>
+<td><p>Update attribute values from another like element, skipping None</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_processing</span></code>(kernel_dataset)</p></td>
+<td><p>Placeholder.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.config.metadata.Processing.window_scheme" title="aurora.config.metadata.Processing.window_scheme"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_scheme</span></code></a>([as_type])</p></td>
+<td><p>Make a dataframe of processing parameters one row per decimation level.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>drop_reference_channels</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>json_fn</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>set_default_input_output_channels</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>set_default_reference_channels</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>set_input_channels</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>set_output_channels</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>set_reference_channels</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.config.metadata.Processing.decimation_info">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">decimation_info</span></span><a class="headerlink" href="#aurora.config.metadata.Processing.decimation_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Zips decimation level ids to the Decimation objects adn returns as a dict</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>decimation_info</strong> – The decimation objects keyed by decimation level id.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.config.metadata.Processing.emtf_tf_header">
+<span class="sig-name descname"><span class="pre">emtf_tf_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dec_level_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ListDict</span></span></span><a class="reference internal" href="../_modules/aurora/config/metadata/processing.html#Processing.emtf_tf_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.config.metadata.Processing.emtf_tf_header" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns a ListDict object that has the information that was in the old EMTF TF</dt><dd><p>Header object.  This may be deprecated in future – it is an artefact of the
+old matlab implementation.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dec_level_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – This may tolerate strings in the future, but keep as int for now</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>tfh</strong> (<em>ListDict</em>)</p></li>
+<li><p><em>Object with the properties of the old EMTF TransferFunctionHeader class.</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.config.metadata.Processing.make_tf_level">
+<span class="sig-name descname"><span class="pre">make_tf_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dec_level_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/config/metadata/processing.html#Processing.make_tf_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.config.metadata.Processing.make_tf_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize container for a single decimation level – “flat” transfer function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dec_level_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – This may tolerate strings in the future, but keep as int for now</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tf_obj</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.TTFZ.TTFZ" title="aurora.transfer_function.TTFZ.TTFZ">aurora.transfer_function.TTFZ.TTFZ</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.config.metadata.Processing.save_as_json">
+<span class="sig-name descname"><span class="pre">save_as_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><span class="pre">Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nested</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/aurora/config/metadata/processing.html#Processing.save_as_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.config.metadata.Processing.save_as_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exports self to a JSON</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>pathlib.Path</em></a><em>, </em><em>None</em><em>]</em>) – Where to write the json</p></li>
+<li><p><strong>nested</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>] </em><em>= True</em><em>,</em>) – An mt_metadata argument</p></li>
+<li><p><strong>required</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>] </em><em>= False</em><em>,</em>) – An mt_metadata argument</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.config.metadata.Processing.window_scheme">
+<span class="sig-name descname"><span class="pre">window_scheme</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">as_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'df'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/config/metadata/processing.html#Processing.window_scheme"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.config.metadata.Processing.window_scheme" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a dataframe of processing parameters one row per decimation level.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>as_type</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>) – if “df” return a dataframe, if “dict” return dict</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>windowing</strong> – return type depends on as_type argument.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a>, pd.DataFrame]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="aurora.config.emtf_band_setup.html" class="btn btn-neutral float-left" title="aurora.config.emtf_band_setup package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="aurora.pipelines.html" class="btn btn-neutral float-right" title="aurora.pipelines package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

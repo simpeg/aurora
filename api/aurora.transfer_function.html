@@ -1,0 +1,1013 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.transfer_function package &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css?v=7f9a90b1" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="aurora.transfer_function.plot package" href="aurora.transfer_function.plot.html" />
+    <link rel="prev" title="aurora.time_series package" href="aurora.time_series.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">aurora</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="aurora.html">aurora package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="aurora.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="aurora.config.html">aurora.config package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html">aurora.pipelines package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.html">aurora.sandbox package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.html">aurora.test_utils package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html">aurora.time_series package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">aurora.transfer_function package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.html#module-aurora.general_helper_functions">aurora.general_helper_functions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.html#module-aurora">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">aurora</a></li>
+          <li class="breadcrumb-item"><a href="aurora.html">aurora package</a></li>
+      <li class="breadcrumb-item active">aurora.transfer_function package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/aurora.transfer_function.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="aurora-transfer-function-package">
+<h1>aurora.transfer_function package<a class="headerlink" href="#aurora-transfer-function-package" title="Permalink to this heading">¶</a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="aurora.transfer_function.plot.html">aurora.transfer_function.plot package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.plot.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.plot.html#module-aurora.transfer_function.plot.comparison_plots">aurora.transfer_function.plot.comparison_plots module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.plot.html#aurora.transfer_function.plot.comparison_plots.compare_two_z_files"><code class="docutils literal notranslate"><span class="pre">compare_two_z_files()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.plot.html#module-aurora.transfer_function.plot.error_bar_helpers">aurora.transfer_function.plot.error_bar_helpers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.plot.html#aurora.transfer_function.plot.error_bar_helpers.err_log"><code class="docutils literal notranslate"><span class="pre">err_log()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.plot.html#module-aurora.transfer_function.plot.rho_phi_helpers">aurora.transfer_function.plot.rho_phi_helpers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.plot.html#aurora.transfer_function.plot.rho_phi_helpers.plot_phi"><code class="docutils literal notranslate"><span class="pre">plot_phi()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.plot.html#aurora.transfer_function.plot.rho_phi_helpers.plot_rho"><code class="docutils literal notranslate"><span class="pre">plot_rho()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.plot.html#module-aurora.transfer_function.plot.rho_plot">aurora.transfer_function.plot.rho_plot module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.plot.html#aurora.transfer_function.plot.rho_plot.RhoPlot"><code class="docutils literal notranslate"><span class="pre">RhoPlot</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.plot.html#aurora.transfer_function.plot.rho_plot.RhoPlot.phase_sub_plot"><code class="docutils literal notranslate"><span class="pre">RhoPlot.phase_sub_plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.plot.html#aurora.transfer_function.plot.rho_plot.RhoPlot.rho_sub_plot"><code class="docutils literal notranslate"><span class="pre">RhoPlot.rho_sub_plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.plot.html#aurora.transfer_function.plot.rho_plot.RhoPlot.set_lims"><code class="docutils literal notranslate"><span class="pre">RhoPlot.set_lims()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.plot.html#aurora.transfer_function.plot.rho_plot.RhoPlot.set_period_limits"><code class="docutils literal notranslate"><span class="pre">RhoPlot.set_period_limits()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.plot.html#aurora.transfer_function.plot.rho_plot.RhoPlot.set_rho_limits"><code class="docutils literal notranslate"><span class="pre">RhoPlot.set_rho_limits()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.plot.html#module-aurora.transfer_function.plot">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="aurora.transfer_function.regression.html">aurora.transfer_function.regression package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.regression.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.regression.html#module-aurora.transfer_function.regression.RME">aurora.transfer_function.regression.RME module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.RME.RME"><code class="docutils literal notranslate"><span class="pre">RME</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.RME.RME.compute_inverse_signal_covariance"><code class="docutils literal notranslate"><span class="pre">RME.compute_inverse_signal_covariance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.RME.RME.update_b"><code class="docutils literal notranslate"><span class="pre">RME.update_b()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.RME.RME.update_residual_variance"><code class="docutils literal notranslate"><span class="pre">RME.update_residual_variance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.RME.RME.update_y_hat"><code class="docutils literal notranslate"><span class="pre">RME.update_y_hat()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.regression.html#module-aurora.transfer_function.regression.RME_RR">aurora.transfer_function.regression.RME_RR module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.RME_RR.RME_RR"><code class="docutils literal notranslate"><span class="pre">RME_RR</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.RME_RR.RME_RR.QHX"><code class="docutils literal notranslate"><span class="pre">RME_RR.QHX</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.RME_RR.RME_RR.check_for_enough_data_for_rr_estimate"><code class="docutils literal notranslate"><span class="pre">RME_RR.check_for_enough_data_for_rr_estimate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.RME_RR.RME_RR.check_for_nan"><code class="docutils literal notranslate"><span class="pre">RME_RR.check_for_nan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.RME_RR.RME_RR.check_reference_data_shape"><code class="docutils literal notranslate"><span class="pre">RME_RR.check_reference_data_shape()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.RME_RR.RME_RR.compute_inverse_signal_covariance"><code class="docutils literal notranslate"><span class="pre">RME_RR.compute_inverse_signal_covariance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.RME_RR.RME_RR.update_b"><code class="docutils literal notranslate"><span class="pre">RME_RR.update_b()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.RME_RR.RME_RR.update_residual_variance"><code class="docutils literal notranslate"><span class="pre">RME_RR.update_residual_variance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.RME_RR.RME_RR.update_y_hat"><code class="docutils literal notranslate"><span class="pre">RME_RR.update_y_hat()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.regression.html#module-aurora.transfer_function.regression.base">aurora.transfer_function.regression.base module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator._X"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator._X</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.X"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.X</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator._Y"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator._Y</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.Y"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.Y</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.b"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.b</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.inverse_signal_covariance"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.inverse_signal_covariance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.noise_covariance"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.noise_covariance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.squared_coherence"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.squared_coherence</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.Yc"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.Yc</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.iter_control"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.iter_control</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.Kwargs"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.Kwargs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.input_channel_names"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.input_channel_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.Q"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.Q</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.QH"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.QH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.QHY"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.QHY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.R"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.R</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.b_to_xarray"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.b_to_xarray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.degrees_of_freedom"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.degrees_of_freedom</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.estimate"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.estimate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.estimate_ols"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.estimate_ols()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#id0"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.input_channel_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#id1"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.inverse_signal_covariance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.is_underdetermined"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.is_underdetermined</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.n_channels_in"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.n_channels_in</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.n_channels_out"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.n_channels_out</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.n_data"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.n_data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#id2"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.noise_covariance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.output_channel_names"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.output_channel_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.qr_decomposition"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.qr_decomposition()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator.solve_underdetermined"><code class="docutils literal notranslate"><span class="pre">RegressionEstimator.solve_underdetermined()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.regression.html#module-aurora.transfer_function.regression.helper_functions">aurora.transfer_function.regression.helper_functions module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.helper_functions.direct_solve_tf"><code class="docutils literal notranslate"><span class="pre">direct_solve_tf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.helper_functions.rme_beta"><code class="docutils literal notranslate"><span class="pre">rme_beta()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.helper_functions.simple_solve_tf"><code class="docutils literal notranslate"><span class="pre">simple_solve_tf()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.regression.html#module-aurora.transfer_function.regression.iter_control">aurora.transfer_function.regression.iter_control module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.iter_control.IterControl"><code class="docutils literal notranslate"><span class="pre">IterControl</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.iter_control.IterControl.continue_redescending"><code class="docutils literal notranslate"><span class="pre">IterControl.continue_redescending</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.iter_control.IterControl.converged"><code class="docutils literal notranslate"><span class="pre">IterControl.converged()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.iter_control.IterControl.correction_factor"><code class="docutils literal notranslate"><span class="pre">IterControl.correction_factor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.iter_control.IterControl.increment_iteration_number"><code class="docutils literal notranslate"><span class="pre">IterControl.increment_iteration_number()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.iter_control.IterControl.increment_redescending_iteration_number"><code class="docutils literal notranslate"><span class="pre">IterControl.increment_redescending_iteration_number()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.iter_control.IterControl.max_iterations_reached"><code class="docutils literal notranslate"><span class="pre">IterControl.max_iterations_reached</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.iter_control.IterControl.number_of_iterations"><code class="docutils literal notranslate"><span class="pre">IterControl.number_of_iterations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.iter_control.IterControl.number_of_redescending_iterations"><code class="docutils literal notranslate"><span class="pre">IterControl.number_of_redescending_iterations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.iter_control.IterControl.reset_number_of_iterations"><code class="docutils literal notranslate"><span class="pre">IterControl.reset_number_of_iterations()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.iter_control.IterControl.reset_number_of_redescending_iterations"><code class="docutils literal notranslate"><span class="pre">IterControl.reset_number_of_redescending_iterations()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.regression.html#module-aurora.transfer_function.regression.m_estimator">aurora.transfer_function.regression.m_estimator module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator"><code class="docutils literal notranslate"><span class="pre">MEstimator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.QHYc"><code class="docutils literal notranslate"><span class="pre">MEstimator.QHYc</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.Y_hat"><code class="docutils literal notranslate"><span class="pre">MEstimator.Y_hat</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.apply_huber_regression"><code class="docutils literal notranslate"><span class="pre">MEstimator.apply_huber_regression()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.apply_redecending_influence_function"><code class="docutils literal notranslate"><span class="pre">MEstimator.apply_redecending_influence_function()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.compute_noise_covariance"><code class="docutils literal notranslate"><span class="pre">MEstimator.compute_noise_covariance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.compute_squared_coherence"><code class="docutils literal notranslate"><span class="pre">MEstimator.compute_squared_coherence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.correction_factor"><code class="docutils literal notranslate"><span class="pre">MEstimator.correction_factor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.estimate"><code class="docutils literal notranslate"><span class="pre">MEstimator.estimate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.initial_estimate"><code class="docutils literal notranslate"><span class="pre">MEstimator.initial_estimate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.r0"><code class="docutils literal notranslate"><span class="pre">MEstimator.r0</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.residual_variance"><code class="docutils literal notranslate"><span class="pre">MEstimator.residual_variance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.residual_variance_method1"><code class="docutils literal notranslate"><span class="pre">MEstimator.residual_variance_method1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.residual_variance_method2"><code class="docutils literal notranslate"><span class="pre">MEstimator.residual_variance_method2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.u0"><code class="docutils literal notranslate"><span class="pre">MEstimator.u0</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.update_QHYc"><code class="docutils literal notranslate"><span class="pre">MEstimator.update_QHYc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.update_residual_variance"><code class="docutils literal notranslate"><span class="pre">MEstimator.update_residual_variance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.update_y_cleaned_via_huber_weights"><code class="docutils literal notranslate"><span class="pre">MEstimator.update_y_cleaned_via_huber_weights()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.update_y_cleaned_via_redescend_weights"><code class="docutils literal notranslate"><span class="pre">MEstimator.update_y_cleaned_via_redescend_weights()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.update_y_hat"><code class="docutils literal notranslate"><span class="pre">MEstimator.update_y_hat()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.regression.html#module-aurora.transfer_function.regression">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="aurora.transfer_function.weights.html">aurora.transfer_function.weights package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.weights.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.weights.html#module-aurora.transfer_function.weights.edf_weights">aurora.transfer_function.weights.edf_weights module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.weights.html#aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom"><code class="docutils literal notranslate"><span class="pre">EffectiveDegreesOfFreedom</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.weights.html#aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom.compute_weights"><code class="docutils literal notranslate"><span class="pre">EffectiveDegreesOfFreedom.compute_weights()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.weights.html#aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom.p1"><code class="docutils literal notranslate"><span class="pre">EffectiveDegreesOfFreedom.p1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.weights.html#aurora.transfer_function.weights.edf_weights.EffectiveDegreesOfFreedom.p2"><code class="docutils literal notranslate"><span class="pre">EffectiveDegreesOfFreedom.p2</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.weights.html#aurora.transfer_function.weights.edf_weights.effective_degrees_of_freedom_weights"><code class="docutils literal notranslate"><span class="pre">effective_degrees_of_freedom_weights()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.weights.html#module-aurora.transfer_function.weights">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-aurora.transfer_function.TTFZ">
+<span id="aurora-transfer-function-ttfz-module"></span><h2>aurora.transfer_function.TTFZ module<a class="headerlink" href="#module-aurora.transfer_function.TTFZ" title="Permalink to this heading">¶</a></h2>
+<p>This module contains an extension of aurora’s TransferFunction base class.
+This class can return estimates of standard error, apparent resistivity and phase.</p>
+<p>Development Notes:
+This class follows  Gary’s legacy matlab code  TTFZ.m from
+iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
+TODO: This should be replaced by methods in mtpy.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.transfer_function.TTFZ.TTFZ">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.transfer_function.TTFZ.</span></span><span class="sig-name descname"><span class="pre">TTFZ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/transfer_function/TTFZ.html#TTFZ"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.transfer_function.TTFZ.TTFZ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#aurora.transfer_function.base.TransferFunction" title="aurora.transfer_function.base.TransferFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransferFunction</span></code></a></p>
+<p>subclass to support some more MT impedance specific functions  –
+initially just apparent resistivity and phase for diagonal elements.
++ rotation/fixed coordinate system</p>
+<p>TODO: This class should be deprecated and mt_metadata TF object should be used instead.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">emtf_tf_header</span></code></dt><dd><p>Returns ——- emtf_tf_header: None or OrderedDict A legacy construction from the old EMTF codes with some metadata about the TF.</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">maximum_period</span></code></dt><dd><p>return the maximum (longest) period in self.periods</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">minimum_period</span></code></dt><dd><p>return the minimum (shortest) period in self.periods</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_bands</span></code></dt><dd><p>Get number of bands associated with TF</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_channels_in</span></code></dt><dd><p>return the number of input channels in the TF</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_channels_out</span></code></dt><dd><p>return the number of output channels in the TF</p>
+</dd>
+<dt><strong>periods</strong></dt><dd></dd>
+<dt><strong>tf</strong></dt><dd></dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">tf_header</span></code></dt><dd><p>returns the emtf_header</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.transfer_function.TTFZ.TTFZ.apparent_resistivity" title="aurora.transfer_function.TTFZ.TTFZ.apparent_resistivity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apparent_resistivity</span></code></a>(channel_nomenclature[, ...])</p></td>
+<td><p>Computes the apparent resistivity and phase.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">frequency_index</span></code>(frequency)</p></td>
+<td><p>Gets the index of the tf array associated with the input frequency</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">period_index</span></code>(period)</p></td>
+<td><p>Gets the index of the tf array associated with the input period.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_tf</span></code>(regression_estimator, period)</p></td>
+<td><p>Sets TF elements for one band, using contents of regression_estimator object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.transfer_function.TTFZ.TTFZ.standard_error" title="aurora.transfer_function.TTFZ.TTFZ.standard_error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">standard_error</span></code></a>()</p></td>
+<td><p>estimate the standard error, used for error bars and inversion.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.transfer_function.TTFZ.TTFZ.apparent_resistivity">
+<span class="sig-name descname"><span class="pre">apparent_resistivity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_nomenclature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SI'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/transfer_function/TTFZ.html#TTFZ.apparent_resistivity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.transfer_function.TTFZ.TTFZ.apparent_resistivity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the apparent resistivity and phase.</p>
+<p>Development notes:
+Original Matlab Documentation:
+ap_res(…) : computes app. res., phase, errors, given imped., cov.
+%USAGE: [rho,rho_se,ph,ph_se] = ap_res(z,sig_s,sig_e,periods) ;
+% Z = array of impedances (from Z_***** file)
+% sig_s = inverse signal covariance matrix (from Z_****** file)
+% sig_e = residual covariance matrix (from Z_****** file)
+% periods = array of periods (sec)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>units</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – one of [“MT”,”SI”]</p></li>
+<li><p><strong>channel_nomenclature</strong> – </p></li>
+<li><p><strong>mt_metadata.transfer_functions.processing.aurora.channel_nomenclature.ChannelNomenclature</strong> – has a dict that maps the channel names in TF to the standard channel labellings.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.transfer_function.TTFZ.TTFZ.standard_error">
+<span class="sig-name descname"><span class="pre">standard_error</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/transfer_function/TTFZ.html#TTFZ.standard_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.transfer_function.TTFZ.TTFZ.standard_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>estimate the standard error, used for error bars and inversion.</p>
+<p>Development Notes:
+The standard error is normally thought of as the sqrt of the error variance.
+since the code here sets std_err = np.sqrt(np.abs(cov_ss_inv * cov_nn))
+that means the inverse signal covariance times the noise covariance is like the error variance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>standard_error</strong></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>xr.DataArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-aurora.transfer_function.base">
+<span id="aurora-transfer-function-base-module"></span><h2>aurora.transfer_function.base module<a class="headerlink" href="#module-aurora.transfer_function.base" title="Permalink to this heading">¶</a></h2>
+<p>This module contains a base class for Transfer function information.</p>
+<dl class="simple">
+<dt>Development Notes:</dt><dd><p>The class is based on Gary’s TTF.m in iris_mt_scratch egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes</p>
+</dd>
+</dl>
+<p>TODO: This class should be updated to use mt_metadata.transfer_function.TF, or replaced by it (issue #203)</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.transfer_function.base.TransferFunction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.transfer_function.base.</span></span><span class="sig-name descname"><span class="pre">TransferFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decimation_level_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency_bands</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">FrequencyBands</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processing_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="aurora.config.metadata.html#aurora.config.metadata.processing.Processing" title="aurora.config.metadata.processing.Processing"><span class="pre">Processing</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/transfer_function/base.html#TransferFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.transfer_function.base.TransferFunction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class to contain transfer function array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>TF</strong> (<em>numpy array</em>) – array of transfer functions: TF(Nout, Nin, Nperiods)</p></li>
+<li><p><strong>T</strong> (<em>numpy array</em>) – list of periods</p></li>
+<li><p><strong>cov_ss_inv</strong> (<em>numpy array</em>) – inverse signal power matrix.  aka Cov_SS in EMTF matlab codes</p></li>
+<li><p><strong>cov_nn</strong> (<em>numpy array</em>) – noise covariance matrix: aka Cov_NN in EMTF matlab codes</p></li>
+<li><p><strong>num_segments</strong> (<em>integer array?</em>) – Number of samples used to estimate TF for each band, and for each         output channel (might be different for different channels)</p></li>
+<li><p><strong>R2</strong> (<em>xarray.DataArray</em>) – multiple coherence for each output channel / band</p></li>
+<li><p><strong>FullCov</strong> (<em>boolean</em>) – true if full covariance is provided</p></li>
+</ul>
+</dd>
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference internal" href="#aurora.transfer_function.base.TransferFunction.emtf_tf_header" title="aurora.transfer_function.base.TransferFunction.emtf_tf_header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">emtf_tf_header</span></code></a></dt><dd><p>Returns ——- emtf_tf_header: None or OrderedDict A legacy construction from the old EMTF codes with some metadata about the TF.</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.transfer_function.base.TransferFunction.maximum_period" title="aurora.transfer_function.base.TransferFunction.maximum_period"><code class="xref py py-obj docutils literal notranslate"><span class="pre">maximum_period</span></code></a></dt><dd><p>return the maximum (longest) period in self.periods</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.transfer_function.base.TransferFunction.minimum_period" title="aurora.transfer_function.base.TransferFunction.minimum_period"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minimum_period</span></code></a></dt><dd><p>return the minimum (shortest) period in self.periods</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.transfer_function.base.TransferFunction.num_bands" title="aurora.transfer_function.base.TransferFunction.num_bands"><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_bands</span></code></a></dt><dd><p>Get number of bands associated with TF</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.transfer_function.base.TransferFunction.num_channels_in" title="aurora.transfer_function.base.TransferFunction.num_channels_in"><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_channels_in</span></code></a></dt><dd><p>return the number of input channels in the TF</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.transfer_function.base.TransferFunction.num_channels_out" title="aurora.transfer_function.base.TransferFunction.num_channels_out"><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_channels_out</span></code></a></dt><dd><p>return the number of output channels in the TF</p>
+</dd>
+<dt><strong>periods</strong></dt><dd></dd>
+<dt><strong>tf</strong></dt><dd></dd>
+<dt><a class="reference internal" href="#aurora.transfer_function.base.TransferFunction.tf_header" title="aurora.transfer_function.base.TransferFunction.tf_header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tf_header</span></code></a></dt><dd><p>returns the emtf_header</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.transfer_function.base.TransferFunction.frequency_index" title="aurora.transfer_function.base.TransferFunction.frequency_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frequency_index</span></code></a>(frequency)</p></td>
+<td><p>Gets the index of the tf array associated with the input frequency</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.transfer_function.base.TransferFunction.period_index" title="aurora.transfer_function.base.TransferFunction.period_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">period_index</span></code></a>(period)</p></td>
+<td><p>Gets the index of the tf array associated with the input period.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.transfer_function.base.TransferFunction.set_tf" title="aurora.transfer_function.base.TransferFunction.set_tf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_tf</span></code></a>(regression_estimator, period)</p></td>
+<td><p>Sets TF elements for one band, using contents of regression_estimator object.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.base.TransferFunction.emtf_tf_header">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">emtf_tf_header</span></span><a class="headerlink" href="#aurora.transfer_function.base.TransferFunction.emtf_tf_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns: <strong>emtf_tf_header</strong> – A legacy construction from the old EMTF codes with some metadata about the TF.
+:rtype: None or OrderedDict</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.transfer_function.base.TransferFunction.frequency_index">
+<span class="sig-name descname"><span class="pre">frequency_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frequency</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/transfer_function/base.html#TransferFunction.frequency_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.transfer_function.base.TransferFunction.frequency_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the index of the tf array associated with the input frequency</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>frequency</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The period in seconds</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>frequency_index</strong> – The index of the tf array corresponding to the frequency</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.base.TransferFunction.maximum_period">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">maximum_period</span></span><a class="headerlink" href="#aurora.transfer_function.base.TransferFunction.maximum_period" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the maximum (longest) period in self.periods</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.base.TransferFunction.minimum_period">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">minimum_period</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></em><a class="headerlink" href="#aurora.transfer_function.base.TransferFunction.minimum_period" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the minimum (shortest) period in self.periods</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.base.TransferFunction.num_bands">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_bands</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#aurora.transfer_function.base.TransferFunction.num_bands" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get number of bands associated with TF</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>num_bands</strong> – a count of the frequency bands associated with the TF</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.base.TransferFunction.num_channels_in">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_channels_in</span></span><a class="headerlink" href="#aurora.transfer_function.base.TransferFunction.num_channels_in" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the number of input channels in the TF</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.base.TransferFunction.num_channels_out">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_channels_out</span></span><a class="headerlink" href="#aurora.transfer_function.base.TransferFunction.num_channels_out" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the number of output channels in the TF</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.transfer_function.base.TransferFunction.period_index">
+<span class="sig-name descname"><span class="pre">period_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></span><a class="reference internal" href="../_modules/aurora/transfer_function/base.html#TransferFunction.period_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.transfer_function.base.TransferFunction.period_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the index of the tf array associated with the input period.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>period</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The period in seconds</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>period_index</strong> – The index of the tf array corresponding to the period</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.base.TransferFunction.periods">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">periods</span></span><a class="headerlink" href="#aurora.transfer_function.base.TransferFunction.periods" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.transfer_function.base.TransferFunction.set_tf">
+<span class="sig-name descname"><span class="pre">set_tf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">regression_estimator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/transfer_function/base.html#TransferFunction.set_tf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.transfer_function.base.TransferFunction.set_tf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets TF elements for one band, using contents of regression_estimator object.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.base.TransferFunction.tf">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tf</span></span><a class="headerlink" href="#aurora.transfer_function.base.TransferFunction.tf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.base.TransferFunction.tf_header">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tf_header</span></span><a class="headerlink" href="#aurora.transfer_function.base.TransferFunction.tf_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the emtf_header</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-aurora.transfer_function.emtf_z_file_helpers">
+<span id="aurora-transfer-function-emtf-z-file-helpers-module"></span><h2>aurora.transfer_function.emtf_z_file_helpers module<a class="headerlink" href="#module-aurora.transfer_function.emtf_z_file_helpers" title="Permalink to this heading">¶</a></h2>
+<p>This module contains methods associated with legacy EMTF z-file TF format.</p>
+<p>Development notes:
+They extract info needed to setup emtf_z files.
+These methods can possibly be moved under mt_metadata, or deprecated.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.transfer_function.emtf_z_file_helpers.clip_bands_from_z_file">
+<span class="sig-prename descclassname"><span class="pre">aurora.transfer_function.emtf_z_file_helpers.</span></span><span class="sig-name descname"><span class="pre">clip_bands_from_z_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><span class="pre">Path</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_bands_clip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_z_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><span class="pre">Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_sensors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/transfer_function/emtf_z_file_helpers.html#clip_bands_from_z_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.transfer_function.emtf_z_file_helpers.clip_bands_from_z_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function clips periods off the end of an EMTF legacy z_file.</p>
+<p>Development Notes:
+It can come in handy for manipulating matlab results of synthetic data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z_path</strong> (<em>Path</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – path to the z_file to read in and clip periods from</p></li>
+<li><p><strong>n_periods_clip</strong> (<em>integer</em>) – how many periods to clip from the end of the zfile</p></li>
+<li><p><strong>overwrite</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – whether to overwrite the zfile or rename it</p></li>
+<li><p><strong>n_sensors</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.transfer_function.emtf_z_file_helpers.get_default_orientation_block">
+<span class="sig-prename descclassname"><span class="pre">aurora.transfer_function.emtf_z_file_helpers.</span></span><span class="sig-name descname"><span class="pre">get_default_orientation_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_ch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></span><a class="reference internal" href="../_modules/aurora/transfer_function/emtf_z_file_helpers.html#get_default_orientation_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.transfer_function.emtf_z_file_helpers.get_default_orientation_block" title="Permalink to this definition">¶</a></dt>
+<dd><p>creates a text block like the part of the z-file that holds channel orientations.</p>
+<p>Helper function used when working with matlab structs which do not have enough
+info to make headers</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>n_ch</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of channels at the station</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>orientation_strs</strong> – List of text strings, one per channel</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.transfer_function.emtf_z_file_helpers.merge_tf_collection_to_match_z_file">
+<span class="sig-prename descclassname"><span class="pre">aurora.transfer_function.emtf_z_file_helpers.</span></span><span class="sig-name descname"><span class="pre">merge_tf_collection_to_match_z_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">aux_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.zfile_murphy.ZFile" title="aurora.sandbox.io_helpers.zfile_murphy.ZFile"><span class="pre">ZFile</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tf_collection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection" title="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection"><span class="pre">TransferFunctionCollection</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../_modules/aurora/transfer_function/emtf_z_file_helpers.html#merge_tf_collection_to_match_z_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.transfer_function.emtf_z_file_helpers.merge_tf_collection_to_match_z_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>method to merge tf data from a tf_collection with a Z-file when there are potentially
+multiple estimates of TF at the same periods for different decimation levels.</p>
+<p>Development Notes:
+Currently this is only used for the the synthetic test where aurora results
+are compared against a stored legacy Z-file.  Given data from a z_file, and a
+tf_collection, the tf_collection may have several TF estimates at the same
+frequency from multiple decimation levels.  This tries to make a single array as
+a function of period for all rho and phi.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>aux_data</strong> (<a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.zfile_murphy.ZFile" title="aurora.sandbox.io_helpers.zfile_murphy.ZFile"><em>aurora.sandbox.io_helpers.zfile_murphy.ZFile</em></a>) – Object representing a z-file</p></li>
+<li><p><strong>tf_collection</strong> (<em>aurora.transfer_function.transfer_function_collection</em>) – </p></li>
+<li><p><strong>.TransferFunctionCollection</strong> – Object representing the transfer function returned from the aurora processing</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>result</strong> – Keyed by [“rho”, “phi”], below each of these is an [“xy”, “yx”,] entry.  The
+lowest level entries are numpy arrays.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a> of dicts</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="aurora-transfer-function-kernel-dataset-module">
+<h2>aurora.transfer_function.kernel_dataset module<a class="headerlink" href="#aurora-transfer-function-kernel-dataset-module" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-aurora.transfer_function.transfer_function_collection">
+<span id="aurora-transfer-function-transfer-function-collection-module"></span><h2>aurora.transfer_function.transfer_function_collection module<a class="headerlink" href="#module-aurora.transfer_function.transfer_function_collection" title="Permalink to this heading">¶</a></h2>
+<p>This module provides a TransferFunctionCollection container to hold:
+1. TransferFunctionHeader
+2. Dictionary of TransferFunction Objects</p>
+<dl>
+<dt>Development Notes:</dt><dd><p>This class could use substantial updating.  There are two main issues to be aware of.</p>
+<p>First, the transfer function objects that is “collects” are themselves things
+that could use substantial updates.  This is because the aurora TransferFunction
+objects to not use the mt_metadata.transfer_function.TF and they should.  This
+is issue #203.</p>
+<p>Second, the Collection can have more than one value for a TF at a given
+frequency or period because the TFs can be estimated from different
+decimation levels.</p>
+<p>A single transfer function object is associated with a station, here called
+the “local_station”. In a database of TFs could add a column for
+local_station and one for reference station.</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.transfer_function.transfer_function_collection.</span></span><span class="sig-name descname"><span class="pre">TransferFunctionCollection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tf_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processing_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="aurora.config.metadata.html#aurora.config.metadata.processing.Processing" title="aurora.config.metadata.processing.Processing"><span class="pre">Processing</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/transfer_function/transfer_function_collection.html#TransferFunctionCollection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.channel_list" title="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.channel_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">channel_list</span></code></a></dt><dd><p>Gets all channel names.</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.header" title="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a></dt><dd><p>returns the tf_header (ordered dict) from the first tf in the dict</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.local_station_id" title="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.local_station_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">local_station_id</span></code></a></dt><dd><p>return the local station id</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.number_of_decimation_levels" title="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.number_of_decimation_levels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">number_of_decimation_levels</span></code></a></dt><dd><p>Returns a count of number of decimation levels - assumes that each entry in dict is a separate decimation level.</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.remote_station_id" title="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.remote_station_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remote_station_id</span></code></a></dt><dd><p>return the remote station id</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.total_number_of_channels" title="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.total_number_of_channels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">total_number_of_channels</span></code></a></dt><dd><p>Get a count of all channels (input and output) in the TF</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.total_number_of_frequencies" title="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.total_number_of_frequencies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">total_number_of_frequencies</span></code></a></dt><dd><p>Returns int:</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.check_all_channels_present" title="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.check_all_channels_present"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_all_channels_present</span></code></a>(channel_nomenclature)</p></td>
+<td><p>Checks if TF has tipper.  If not, fill in the tipper data with NaN and also</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.get_merged_dict" title="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.get_merged_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_merged_dict</span></code></a>(channel_nomenclature)</p></td>
+<td><p>merges all decimation levels and returns a dict</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.rho_phi_plot" title="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.rho_phi_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rho_phi_plot</span></code></a>(xy_or_yx[, show, aux_data, ...])</p></td>
+<td><p>One-off plotting method intended only for the synthetic test data for aurora dev</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.channel_list">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">channel_list</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></em><a class="headerlink" href="#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.channel_list" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Gets all channel names.</dt><dd><ul class="simple">
+<li><p>assumes the first TF in dict is representative of all</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>all_channels</strong> – All the channel names for the first TF</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.check_all_channels_present">
+<span class="sig-name descname"><span class="pre">check_all_channels_present</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_nomenclature</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/aurora/transfer_function/transfer_function_collection.html#TransferFunctionCollection.check_all_channels_present"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.check_all_channels_present" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Checks if TF has tipper.  If not, fill in the tipper data with NaN and also</dt><dd><p>update the noise covariance matrix so shape is as expected by mt_metadata.</p>
+</dd>
+<dt>Development Notes:</dt><dd><p>For testing, at least some Parkfield tests have no hz.
+Synthetic tests do not (currently) have missing hz.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>channel_nomenclature</strong> (<em>mt_metadata.transfer_functions.processing.aurora.channel_nomenclature.ChannelNomenclature</em>) – Scheme according to how channels are named</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.get_merged_dict">
+<span class="sig-name descname"><span class="pre">get_merged_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_nomenclature</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../_modules/aurora/transfer_function/transfer_function_collection.html#TransferFunctionCollection.get_merged_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.get_merged_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>merges all decimation levels and returns a dict</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>output</strong> – merged tf values
+- this can be used to assign values to an mt_metadata.transfer_function.TF</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.header">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">header</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></em><a class="headerlink" href="#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.header" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the tf_header (ordered dict) from the first tf in the dict</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.local_station_id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">local_station_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="headerlink" href="#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.local_station_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the local station id</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.number_of_decimation_levels">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">number_of_decimation_levels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.number_of_decimation_levels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a count of number of decimation levels
+- assumes that each entry in dict is a separate decimation level.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.remote_station_id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">remote_station_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="headerlink" href="#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.remote_station_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the remote station id</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.rho_phi_plot">
+<span class="sig-name descname"><span class="pre">rho_phi_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xy_or_yx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.zfile_murphy.ZFile" title="aurora.sandbox.io_helpers.zfile_murphy.ZFile"><span class="pre">ZFile</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ttl_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_axis_fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_axis_fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ttl_fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">markersize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_ylims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[10,</span> <span class="pre">1000]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_ylims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[0,</span> <span class="pre">90]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figures_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><span class="pre">Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">PosixPath('/home/runner/work/aurora/aurora/data/figures')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figure_basename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/aurora/transfer_function/transfer_function_collection.html#TransferFunctionCollection.rho_phi_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.rho_phi_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>One-off plotting method intended only for the synthetic test data for aurora dev</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xy_or_yx</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Must be “xy” or “yx” – the mode of the TF to plot</p></li>
+<li><p><strong>show</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>]</em>) – If True show figure on screen</p></li>
+<li><p><strong>aux_data</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.zfile_murphy.ZFile" title="aurora.sandbox.io_helpers.zfile_murphy.ZFile"><em>ZFile</em></a><em>, </em><em>None</em><em>]</em><em>]</em>) – If not none, plot the data from the z-file as well as data from self</p></li>
+<li><p><strong>ttl_str</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>) – If provided, ttl_str will be appended to the plot title</p></li>
+<li><p><strong>x_axis_fontsize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Font size for the x-axis</p></li>
+<li><p><strong>y_axis_fontsize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Font size for the y-axis</p></li>
+<li><p><strong>ttl_fontsize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Font size for the title</p></li>
+<li><p><strong>markersize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – the marker size for the plot symbols</p></li>
+<li><p><strong>rho_ylims</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – The lower and upper limits for the y-axis on rho plot</p></li>
+<li><p><strong>phi_ylims</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – The lower and upper limits for the y-axis on phi plot</p></li>
+<li><p><strong>figures_path</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>pathlib.Path</em></a><em>]</em>) – Where to save the figure</p></li>
+<li><p><strong>figure_basename</strong> – What the name of the figure will be.
+If not given, a default name is assigned</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.total_number_of_channels">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">total_number_of_channels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.total_number_of_channels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a count of all channels (input and output) in the TF</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.total_number_of_frequencies">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">total_number_of_frequencies</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.total_number_of_frequencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns int:
+Count of number of frequencies over all TFs in dict</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-aurora.transfer_function">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-aurora.transfer_function" title="Permalink to this heading">¶</a></h2>
+<p>Staging area for functions we want to import directly from transfer_function.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.transfer_function.TransferFunctionCollection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.transfer_function.</span></span><span class="sig-name descname"><span class="pre">TransferFunctionCollection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tf_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processing_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="aurora.config.metadata.html#aurora.config.metadata.processing.Processing" title="aurora.config.metadata.processing.Processing"><span class="pre">Processing</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/transfer_function/transfer_function_collection.html#TransferFunctionCollection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.transfer_function.TransferFunctionCollection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="#aurora.transfer_function.TransferFunctionCollection.channel_list" title="aurora.transfer_function.TransferFunctionCollection.channel_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">channel_list</span></code></a></dt><dd><p>Gets all channel names.</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.transfer_function.TransferFunctionCollection.header" title="aurora.transfer_function.TransferFunctionCollection.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a></dt><dd><p>returns the tf_header (ordered dict) from the first tf in the dict</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.transfer_function.TransferFunctionCollection.local_station_id" title="aurora.transfer_function.TransferFunctionCollection.local_station_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">local_station_id</span></code></a></dt><dd><p>return the local station id</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.transfer_function.TransferFunctionCollection.number_of_decimation_levels" title="aurora.transfer_function.TransferFunctionCollection.number_of_decimation_levels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">number_of_decimation_levels</span></code></a></dt><dd><p>Returns a count of number of decimation levels - assumes that each entry in dict is a separate decimation level.</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.transfer_function.TransferFunctionCollection.remote_station_id" title="aurora.transfer_function.TransferFunctionCollection.remote_station_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remote_station_id</span></code></a></dt><dd><p>return the remote station id</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.transfer_function.TransferFunctionCollection.total_number_of_channels" title="aurora.transfer_function.TransferFunctionCollection.total_number_of_channels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">total_number_of_channels</span></code></a></dt><dd><p>Get a count of all channels (input and output) in the TF</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.transfer_function.TransferFunctionCollection.total_number_of_frequencies" title="aurora.transfer_function.TransferFunctionCollection.total_number_of_frequencies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">total_number_of_frequencies</span></code></a></dt><dd><p>Returns int:</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.transfer_function.TransferFunctionCollection.check_all_channels_present" title="aurora.transfer_function.TransferFunctionCollection.check_all_channels_present"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_all_channels_present</span></code></a>(channel_nomenclature)</p></td>
+<td><p>Checks if TF has tipper.  If not, fill in the tipper data with NaN and also</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.transfer_function.TransferFunctionCollection.get_merged_dict" title="aurora.transfer_function.TransferFunctionCollection.get_merged_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_merged_dict</span></code></a>(channel_nomenclature)</p></td>
+<td><p>merges all decimation levels and returns a dict</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.transfer_function.TransferFunctionCollection.rho_phi_plot" title="aurora.transfer_function.TransferFunctionCollection.rho_phi_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rho_phi_plot</span></code></a>(xy_or_yx[, show, aux_data, ...])</p></td>
+<td><p>One-off plotting method intended only for the synthetic test data for aurora dev</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.TransferFunctionCollection.channel_list">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">channel_list</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></em><a class="headerlink" href="#aurora.transfer_function.TransferFunctionCollection.channel_list" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Gets all channel names.</dt><dd><ul class="simple">
+<li><p>assumes the first TF in dict is representative of all</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>all_channels</strong> – All the channel names for the first TF</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.transfer_function.TransferFunctionCollection.check_all_channels_present">
+<span class="sig-name descname"><span class="pre">check_all_channels_present</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_nomenclature</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/aurora/transfer_function/transfer_function_collection.html#TransferFunctionCollection.check_all_channels_present"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.transfer_function.TransferFunctionCollection.check_all_channels_present" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Checks if TF has tipper.  If not, fill in the tipper data with NaN and also</dt><dd><p>update the noise covariance matrix so shape is as expected by mt_metadata.</p>
+</dd>
+<dt>Development Notes:</dt><dd><p>For testing, at least some Parkfield tests have no hz.
+Synthetic tests do not (currently) have missing hz.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>channel_nomenclature</strong> (<em>mt_metadata.transfer_functions.processing.aurora.channel_nomenclature.ChannelNomenclature</em>) – Scheme according to how channels are named</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.transfer_function.TransferFunctionCollection.get_merged_dict">
+<span class="sig-name descname"><span class="pre">get_merged_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_nomenclature</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../_modules/aurora/transfer_function/transfer_function_collection.html#TransferFunctionCollection.get_merged_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.transfer_function.TransferFunctionCollection.get_merged_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>merges all decimation levels and returns a dict</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>output</strong> – merged tf values
+- this can be used to assign values to an mt_metadata.transfer_function.TF</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.TransferFunctionCollection.header">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">header</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></em><a class="headerlink" href="#aurora.transfer_function.TransferFunctionCollection.header" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the tf_header (ordered dict) from the first tf in the dict</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.TransferFunctionCollection.local_station_id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">local_station_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="headerlink" href="#aurora.transfer_function.TransferFunctionCollection.local_station_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the local station id</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.TransferFunctionCollection.number_of_decimation_levels">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">number_of_decimation_levels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#aurora.transfer_function.TransferFunctionCollection.number_of_decimation_levels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a count of number of decimation levels
+- assumes that each entry in dict is a separate decimation level.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.TransferFunctionCollection.remote_station_id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">remote_station_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="headerlink" href="#aurora.transfer_function.TransferFunctionCollection.remote_station_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the remote station id</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.transfer_function.TransferFunctionCollection.rho_phi_plot">
+<span class="sig-name descname"><span class="pre">rho_phi_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xy_or_yx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.zfile_murphy.ZFile" title="aurora.sandbox.io_helpers.zfile_murphy.ZFile"><span class="pre">ZFile</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ttl_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_axis_fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_axis_fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ttl_fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">markersize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_ylims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[10,</span> <span class="pre">1000]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_ylims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[0,</span> <span class="pre">90]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figures_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><span class="pre">Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">PosixPath('/home/runner/work/aurora/aurora/data/figures')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figure_basename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/aurora/transfer_function/transfer_function_collection.html#TransferFunctionCollection.rho_phi_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.transfer_function.TransferFunctionCollection.rho_phi_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>One-off plotting method intended only for the synthetic test data for aurora dev</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xy_or_yx</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Must be “xy” or “yx” – the mode of the TF to plot</p></li>
+<li><p><strong>show</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>]</em>) – If True show figure on screen</p></li>
+<li><p><strong>aux_data</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.zfile_murphy.ZFile" title="aurora.sandbox.io_helpers.zfile_murphy.ZFile"><em>ZFile</em></a><em>, </em><em>None</em><em>]</em><em>]</em>) – If not none, plot the data from the z-file as well as data from self</p></li>
+<li><p><strong>ttl_str</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>) – If provided, ttl_str will be appended to the plot title</p></li>
+<li><p><strong>x_axis_fontsize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Font size for the x-axis</p></li>
+<li><p><strong>y_axis_fontsize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Font size for the y-axis</p></li>
+<li><p><strong>ttl_fontsize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Font size for the title</p></li>
+<li><p><strong>markersize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – the marker size for the plot symbols</p></li>
+<li><p><strong>rho_ylims</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – The lower and upper limits for the y-axis on rho plot</p></li>
+<li><p><strong>phi_ylims</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – The lower and upper limits for the y-axis on phi plot</p></li>
+<li><p><strong>figures_path</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>pathlib.Path</em></a><em>]</em>) – Where to save the figure</p></li>
+<li><p><strong>figure_basename</strong> – What the name of the figure will be.
+If not given, a default name is assigned</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.TransferFunctionCollection.total_number_of_channels">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">total_number_of_channels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#aurora.transfer_function.TransferFunctionCollection.total_number_of_channels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a count of all channels (input and output) in the TF</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.transfer_function.TransferFunctionCollection.total_number_of_frequencies">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">total_number_of_frequencies</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#aurora.transfer_function.TransferFunctionCollection.total_number_of_frequencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns int:
+Count of number of frequencies over all TFs in dict</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="aurora.time_series.html" class="btn btn-neutral float-left" title="aurora.time_series package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="aurora.transfer_function.plot.html" class="btn btn-neutral float-right" title="aurora.transfer_function.plot package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

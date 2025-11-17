@@ -1,0 +1,313 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.time_series.xarray_helpers &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aurora.time_series.xarray_helpers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.time_series.xarray_helpers</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Placeholder module for methods manipulating xarray time series</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+
+
+<div class="viewcode-block" id="handle_nan"><a class="viewcode-back" href="../../../api/aurora.time_series.html#aurora.time_series.xarray_helpers.handle_nan">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">handle_nan</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">Y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">],</span>
+    <span class="n">RR</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">],</span>
+    <span class="n">drop_dim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Drops Nan from multiple channel series.</span>
+
+<span class="sd">    Initial use case is for Fourier coefficients, but could be more general.</span>
+
+<span class="sd">    Idea is to merge X,Y,RR together, and then call dropna.  We have to be careful</span>
+<span class="sd">    with merging because there can be namespace clashes in the channel labels.</span>
+<span class="sd">    Currently handling this by relabelling the remote reference channels from for</span>
+<span class="sd">    example &quot;hx&quot;--&gt; &quot;remote_hx&quot;, &quot;hy&quot;--&gt;&quot;remote_hy&quot;.  If needed we could add &quot;local&quot; to</span>
+<span class="sd">    local the other channels in X, Y.</span>
+
+<span class="sd">    It would be nice to maintain an index of what was dropped.</span>
+
+<span class="sd">    Development Note: Even if there are no NaNs in the data, this function can still encounter issues,</span>
+<span class="sd">    in particular if the time coordinates of X and RR do not match exactly.</span>
+<span class="sd">    In this case, the merge will fail, and we will log an error message.</span>
+
+<span class="sd">    TODO: This should be handled more gracefully, perhaps by aligning the time coordinates</span>
+<span class="sd">    before merging, or by using a different merge strategy that allows for slight mismatches.</span>
+<span class="sd">    Alternatively, a validator could be added to ensure that the time coordinates of X and RR match before calling this function.</span>
+<span class="sd">    That validation could be done by tfk, or at least immediately following the construction / access of the FCs.</span>
+
+<span class="sd">    TODO: Merge this with drop_nan in transfer_function_helpers.py</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : xr.Dataset</span>
+<span class="sd">    Y : xr.Dataset or None</span>
+<span class="sd">    RR : xr.Dataset or None</span>
+<span class="sd">    drop_dim: string</span>
+<span class="sd">        specifies the dimension on which dropna is happening.  For 3D STFT arrays</span>
+<span class="sd">        this is &quot;time&quot;, for 2D stacked STFT this is &quot;observation&quot;</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    X : xr.Dataset</span>
+<span class="sd">    Y : xr.Dataset</span>
+<span class="sd">    RR : xr.Dataset or None</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">time_axis_problem</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">time_axis_match</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">RR</span><span class="p">):</span>
+        <span class="n">time_axis_problem</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Time axes do not match, merging datasets with left join&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;This may lead to unexpected results, please check your data.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">Y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">RR</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">RR</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">()</span>
+
+    <span class="n">input_channels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>
+    <span class="n">output_channels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">Y</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>
+    <span class="n">reference_channels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">RR</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>
+    <span class="n">data_var_add_label_mapper</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">data_var_rm_label_mapper</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">reference_channels</span><span class="p">:</span>
+        <span class="n">data_var_add_label_mapper</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;remote_</span><span class="si">{</span><span class="n">ch</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">data_var_rm_label_mapper</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;remote_</span><span class="si">{</span><span class="n">ch</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ch</span>
+    <span class="n">RR</span> <span class="o">=</span> <span class="n">RR</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">data_var_add_label_mapper</span><span class="p">)</span>
+
+    <span class="n">merged_xr</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="s2">&quot;exact&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">time_axis_problem</span><span class="p">:</span>
+        <span class="c1"># If the time axes do not match, we cannot merge them directly.</span>
+        <span class="c1"># Instead, we will merge RR with a left join, which will keep all timestamps from</span>
+        <span class="c1"># X and Y, and fill in the missing values from RR where available.</span>
+        <span class="n">merged_xr</span> <span class="o">=</span> <span class="n">merged_xr</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">RR</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">RR</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="n">merged_xr</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">RR</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># If the time axes match, we can merge them directly.</span>
+        <span class="n">merged_xr</span> <span class="o">=</span> <span class="n">merged_xr</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">RR</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="s2">&quot;exact&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Time axes match, merging datasets&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Drop NaN values across the specified dimension</span>
+    <span class="n">merged_xr</span> <span class="o">=</span> <span class="n">merged_xr</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">drop_dim</span><span class="p">)</span>
+    <span class="n">merged_xr</span> <span class="o">=</span> <span class="n">merged_xr</span><span class="o">.</span><span class="n">to_array</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;channel&quot;</span><span class="p">)</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">merged_xr</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">input_channels</span><span class="p">)</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;channel&quot;</span><span class="p">)</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">merged_xr</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">output_channels</span><span class="p">)</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">Y</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;channel&quot;</span><span class="p">)</span>
+
+    <span class="n">remote_channels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data_var_rm_label_mapper</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">RR</span> <span class="o">=</span> <span class="n">merged_xr</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">remote_channels</span><span class="p">)</span>
+    <span class="n">RR</span> <span class="o">=</span> <span class="n">RR</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;channel&quot;</span><span class="p">)</span>
+    <span class="n">RR</span> <span class="o">=</span> <span class="n">RR</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">data_var_rm_label_mapper</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">RR</span></div>
+
+
+<div class="viewcode-block" id="time_axis_match"><a class="viewcode-back" href="../../../api/aurora.time_series.html#aurora.time_series.xarray_helpers.time_axis_match">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">time_axis_match</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">Y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">RR</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if the time axes of X, Y, and RR match.</span>
+
+<span class="sd">    TODO: consider raising an exception if they do not match, rather than returning False.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : xr.Dataset</span>
+<span class="sd">        Dataset containing time series data.</span>
+<span class="sd">    Y : xr.Dataset</span>
+<span class="sd">        Dataset containing time series data.</span>
+<span class="sd">    RR : xr.Dataset or None</span>
+<span class="sd">        Optional dataset for remote reference channels.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if all time axes match, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">RR</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ok</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">Y</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">Y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ok</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">RR</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ok</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">Y</span><span class="o">.</span><span class="n">time</span><span class="p">)</span> <span class="ow">and</span> <span class="n">X</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">RR</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ok</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Coordinate alignment mismatch -- see aurora issue #228 &quot;</span><span class="p">)</span>
+        <span class="n">matches</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">values</span> <span class="o">==</span> <span class="n">RR</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">matches</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span><span class="si">}</span><span class="s2"> timestamps match exactly&quot;</span><span class="p">)</span>
+        <span class="n">deltas</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="n">RR</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Maximum offset is </span><span class="si">{</span><span class="n">deltas</span><span class="o">.</span><span class="fm">__abs__</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">}</span><span class="s2">ns&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ok</span></div>
+
+
+<div class="viewcode-block" id="nan_to_mean"><a class="viewcode-back" href="../../../api/aurora.time_series.html#aurora.time_series.xarray_helpers.nan_to_mean">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">nan_to_mean</span><span class="p">(</span><span class="n">xrds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set Nan values in xr.Dataset to the mean value per channel.</span>
+
+<span class="sd">    xrds: xr.Dataset</span>
+<span class="sd">        Time series data</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    run_xrds : xr.Dataset</span>
+<span class="sd">        The same as the input time series but NaN values are replaced by the mean of the time series (per channel).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">xrds</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">null_values_present</span> <span class="o">=</span> <span class="n">xrds</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">null_values_present</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Unexpected Null values in xrds -- this should be examined&quot;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">xrds</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+            <span class="n">xrds</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span> <span class="o">=</span> <span class="n">xrds</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">xrds</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,291 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.sandbox.io_helpers.inventory_review &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aurora.sandbox.io_helpers.inventory_review</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.sandbox.io_helpers.inventory_review</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    In this module are some helper functions for working with FDSN inventory objects.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">obspy</span>
+
+
+<div class="viewcode-block" id="describe_inventory_stages"><a class="viewcode-back" href="../../../../api/aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.inventory_review.describe_inventory_stages">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">describe_inventory_stages</span><span class="p">(</span>
+    <span class="n">inventory</span><span class="p">:</span> <span class="n">obspy</span><span class="o">.</span><span class="n">Inventory</span><span class="p">,</span>
+    <span class="n">assign_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Scans inventory looking for stages.  Has option to assign names to stages,</span>
+<span class="sd">    these names are used as keys in MTH5. Modifies inventory in place.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    inventory: obspy.Inventory</span>
+<span class="sd">        obspy representation of station XML</span>
+<span class="sd">    assign_names: bool</span>
+<span class="sd">        If True, inventory stage names will be assigned</span>
+<span class="sd">    verbose: bool</span>
+<span class="sd">        If True, some info logs are created.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">new_names_were_assigned</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">networks</span> <span class="o">=</span> <span class="n">inventory</span><span class="o">.</span><span class="n">networks</span>
+    <span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="n">networks</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">network</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">station</span><span class="p">:</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">channel</span><span class="o">.</span><span class="n">response</span>
+                <span class="n">stages</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">response_stages</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="n">info</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">network</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">station</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">channel</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">stages</span><span class="p">)</span><span class="si">}</span><span class="s2">-stage response&quot;</span>
+                    <span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">stage</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">stages</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;stagename </span><span class="si">{</span><span class="n">stage</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">stage</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">assign_names</span><span class="p">:</span>
+                            <span class="n">new_names_were_assigned</span> <span class="o">=</span> <span class="kc">True</span>
+                            <span class="n">new_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">station</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">channel</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="n">stage</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">new_name</span>
+                            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                                    <span class="sa">f</span><span class="s2">&quot;ASSIGNING stage </span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2">, name </span><span class="si">{</span><span class="n">stage</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+                                <span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">stage</span><span class="p">,</span> <span class="s2">&quot;symmetry&quot;</span><span class="p">):</span>
+                        <span class="k">pass</span>
+                        <span class="c1"># import matplotlib.pyplot as plt</span>
+                        <span class="c1"># print(f&quot;symmetry: {stage.symmetry}&quot;)</span>
+                        <span class="c1"># plt.figure()</span>
+                        <span class="c1"># plt.clf()</span>
+                        <span class="c1"># plt.plot(stage.coefficients)</span>
+                        <span class="c1"># plt.ylabel(&quot;Filter Amplitude&quot;)</span>
+                        <span class="c1"># plt.xlabel(&quot;Filter &#39;Tap&#39;&quot;)</span>
+                        <span class="c1"># plt.title(f&quot;{stage.name}; symmetry: {stage.symmetry}&quot;)</span>
+                        <span class="c1"># plt.savefig(f&quot;{stage.name}.png&quot;))</span>
+                        <span class="c1"># plt.show()</span>
+    <span class="k">if</span> <span class="n">new_names_were_assigned</span><span class="p">:</span>
+        <span class="n">inventory</span><span class="o">.</span><span class="n">networks</span> <span class="o">=</span> <span class="n">networks</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Inventory Networks Reassigned&quot;</span><span class="p">)</span>
+    <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="scan_inventory_for_nonconformity"><a class="viewcode-back" href="../../../../api/aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.inventory_review.scan_inventory_for_nonconformity">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">scan_inventory_for_nonconformity</span><span class="p">(</span><span class="n">inventory</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    One off method for dealing with issues of historical data.</span>
+<span class="sd">    Checks for the following:</span>
+<span class="sd">    1. Channel Codes: Q2, Q3 --&gt; Q1, Q2</span>
+<span class="sd">    2. Field-type code: &quot;T&quot; instead of &quot;F&quot;</span>
+<span class="sd">    3. Tesla to nT</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    inventory : obspy.core.inventory.inventory.Inventory</span>
+<span class="sd">        Object containing metadata about station and channels</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    inventory : obspy.core.inventory.inventory.Inventory</span>
+<span class="sd">        Object containing metadata about station and channels</span>
+<span class="sd">        Might be modified during this function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">networks</span> <span class="o">=</span> <span class="n">inventory</span><span class="o">.</span><span class="n">networks</span>
+    <span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="n">networks</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">network</span><span class="p">:</span>
+            <span class="n">channel_codes</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">code</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">station</span><span class="o">.</span><span class="n">channels</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">channel_codes</span><span class="p">)</span>
+
+            <span class="c1"># Electric channel remap {Q2, Q3}--&gt;{Q1, Q2}&gt;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;Q2&quot;</span> <span class="ow">in</span> <span class="n">channel_codes</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="s2">&quot;Q3&quot;</span> <span class="ow">in</span> <span class="n">channel_codes</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="s2">&quot;Detected a likely non-FDSN conformant convnetion &quot;</span>
+                        <span class="s2">&quot;unless there is a vertical electric dipole&quot;</span>
+                    <span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Fixing Electric channel codes&quot;</span><span class="p">)</span>
+                <span class="c1"># run the loop twice so don&#39;t accidentally map Q3 to Q2 and Q2 to Q3</span>
+                <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">station</span><span class="o">.</span><span class="n">channels</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">channel</span><span class="o">.</span><span class="n">code</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Q2&quot;</span><span class="p">:</span>
+                        <span class="n">channel</span><span class="o">.</span><span class="n">_code</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">channel</span><span class="o">.</span><span class="n">code</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">Q1&quot;</span>
+                <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">station</span><span class="o">.</span><span class="n">channels</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">channel</span><span class="o">.</span><span class="n">code</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Q3&quot;</span><span class="p">:</span>
+                        <span class="n">channel</span><span class="o">.</span><span class="n">_code</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">channel</span><span class="o">.</span><span class="n">code</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">Q2&quot;</span>
+                <span class="c1"># print(&quot;Applied unstable fix to electric channel names&quot;)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;{Q2, Q3} --&gt; {Q1, Q2}&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Magnetic channle remap {T1,T2,T3}--&gt;{F1, F2, F3}</span>
+            <span class="n">cond1</span> <span class="o">=</span> <span class="s2">&quot;T1&quot;</span> <span class="ow">in</span> <span class="n">channel_codes</span>
+            <span class="n">cond2</span> <span class="o">=</span> <span class="s2">&quot;T2&quot;</span> <span class="ow">in</span> <span class="n">channel_codes</span>
+            <span class="n">cond3</span> <span class="o">=</span> <span class="s2">&quot;T3&quot;</span> <span class="ow">in</span> <span class="n">channel_codes</span>
+            <span class="k">if</span> <span class="n">cond1</span> <span class="ow">or</span> <span class="n">cond2</span> <span class="ow">or</span> <span class="n">cond3</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Detected a likely non-FDSN conformant convention &quot;</span><span class="p">)</span>
+                    <span class="c1"># unless there is Tidal data (channel code T)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Fixing Magnetic channel codes&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">station</span><span class="o">.</span><span class="n">channels</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">channel</span><span class="o">.</span><span class="n">code</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;T&quot;</span><span class="p">:</span>
+                        <span class="n">channel</span><span class="o">.</span><span class="n">_code</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">channel</span><span class="o">.</span><span class="n">code</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">F</span><span class="si">{</span><span class="n">channel</span><span class="o">.</span><span class="n">code</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="c1"># print(&quot;Applied unstable fix to magnetic channel names&quot;)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;{T1,T2,T3} --&gt; {F1, F2, F3}&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Below represents correct syntax for a valid, but not conventional way to correct units</span>
+            <span class="c1"># leaving the code (commented) for future reference</span>
+            <span class="c1"># # Tesla to nanoTesla</span>
+            <span class="c1"># for channel in station:</span>
+            <span class="c1">#     response = channel.response</span>
+            <span class="c1">#     for stage in response.response_stages:</span>
+            <span class="c1">#         if verbose:</span>
+            <span class="c1">#             msg = f&quot;{channel.code} {stage.stage_sequence_number}&quot;</span>
+            <span class="c1">#             msg = f&quot;{msg} {stage.input_units}&quot;</span>
+            <span class="c1">#             logger.info(msg)</span>
+            <span class="c1">#         if stage.input_units == &quot;T&quot;:</span>
+            <span class="c1">#             stage.input_units = &quot;nT&quot;</span>
+            <span class="c1">#             stage.stage_gain *= 1e-9</span>
+    <span class="k">return</span> <span class="n">inventory</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

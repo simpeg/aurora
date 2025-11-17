@@ -1,0 +1,1013 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.pipelines.transfer_function_kernel &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aurora.pipelines.transfer_function_kernel</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.pipelines.transfer_function_kernel</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This module contains the TrasnferFunctionKernel class which is the main object that</span>
+<span class="sd">    links the KernelDataset to Processing configuration.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.config.metadata.processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Processing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.pipelines.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">initialize_config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.pipelines.time_series_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">prototype_decimate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.time_series.windowing_scheme</span><span class="w"> </span><span class="kn">import</span> <span class="n">WindowingScheme</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.transfer_function</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransferFunctionCollection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mth5.utils.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">MTH5Error</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mth5.utils.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">path_or_mth5_object</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mt_metadata.transfer_functions.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">TF</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mt_metadata.transfer_functions.processing.aurora</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DecimationLevel</span> <span class="k">as</span> <span class="n">AuroraDecimationLevel</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mth5.processing.kernel_dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">KernelDataset</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">psutil</span>
+
+
+<div class="viewcode-block" id="TransferFunctionKernel"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">TransferFunctionKernel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="n">KernelDataset</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Processing</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">],</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dataset: mth5.processing.kernel_dataset.KernelDataset</span>
+<span class="sd">         Specification of the dataset that will be processed to yield a transfer function.</span>
+<span class="sd">        config: aurora.config.metadata.processing.Processing</span>
+<span class="sd">         Specification of the processing parameters to be applied to the dataset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">processing_config</span> <span class="o">=</span> <span class="n">initialize_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">processing_config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span> <span class="o">=</span> <span class="n">dataset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mth5_objs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_memory_warning</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">KernelDataset</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;returns the KernelDataset object&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">kernel_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">KernelDataset</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;returns the KernelDataset object&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dataset_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;returns the KernelDataset dataframe&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">df</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">processing_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Processing</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the processing config object&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Processing</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the processing config object&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">processing_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the processing summary object -- creates if it doesn&#39;t yet exist.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_processing_summary</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_processing_summary</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_processing_summary</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mth5_objs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns self._mth5_objs&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mth5_objs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">initialize_mth5s</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mth5_objs</span>
+
+<div class="viewcode-block" id="TransferFunctionKernel.initialize_mth5s"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.initialize_mth5s">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">initialize_mth5s</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        returns a dict of open mth5 objects, keyed by station_id</span>
+
+<span class="sd">        A future version of this for multiple station processing may need nested dict with [survey_id][station]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        mth5_objs : dict</span>
+<span class="sd">            Keyed by stations.</span>
+<span class="sd">            local station id : mth5.mth5.MTH5</span>
+<span class="sd">            remote station id: mth5.mth5.MTH5</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_mth5_file_open_mode</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mth5_objs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel_dataset</span><span class="o">.</span><span class="n">initialize_mth5s</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TransferFunctionKernel.update_dataset_df"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.update_dataset_df">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_dataset_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i_dec_level</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function has two different modes.  The first mode initializes values in the</span>
+<span class="sd">        array, and could be placed into TFKDataset.initialize_time_series_data()</span>
+<span class="sd">        The second mode, decimates. The function is kept in pipelines because it calls</span>
+<span class="sd">        time series operations.</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">        1. When assigning xarrays to dataframe cells, df dislikes xr.Dataset,</span>
+<span class="sd">        so we convert to DataArray before assignment</span>
+
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        i_dec_level: int</span>
+<span class="sd">            decimation level id, indexed from zero</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dataset_df: pd.DataFrame</span>
+<span class="sd">            Same df that was input to the function but now has columns:</span>
+
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">i_dec_level</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># ANY MERGING OF RUNS IN TIME DOMAIN WOULD GO HERE</span>
+
+            <span class="c1"># Assign additional columns to dataset_df, populate with mth5_objs and xr_ts</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">initialize_dataframe_for_processing</span><span class="p">()</span>
+
+            <span class="c1"># APPLY TIMING CORRECTIONS HERE</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DECIMATION LEVEL </span><span class="si">{</span><span class="n">i_dec_level</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_valid_dataset</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">i_dec_level</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">fc</span><span class="p">:</span>
+                    <span class="n">row_ssr_str</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;survey: </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">survey</span><span class="si">}</span><span class="s2">, station: </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">station</span><span class="si">}</span><span class="s2">, run: </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">run</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;FC already exists for </span><span class="si">{</span><span class="n">row_ssr_str</span><span class="si">}</span><span class="s2"> -- skipping decimation&quot;</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="n">run_xrds</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;run_dataarray&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">(</span><span class="s2">&quot;channel&quot;</span><span class="p">)</span>
+                <span class="n">decimation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">decimations</span><span class="p">[</span><span class="n">i_dec_level</span><span class="p">]</span><span class="o">.</span><span class="n">decimation</span>
+                <span class="n">decimated_xrds</span> <span class="o">=</span> <span class="n">prototype_decimate</span><span class="p">(</span><span class="n">decimation</span><span class="p">,</span> <span class="n">run_xrds</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dataset_df</span><span class="p">[</span><span class="s2">&quot;run_dataarray&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">decimated_xrds</span><span class="o">.</span><span class="n">to_array</span><span class="p">(</span>
+                    <span class="s2">&quot;channel&quot;</span>
+                <span class="p">)</span>  <span class="c1"># See Note 1 above</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Dataset Dataframe Updated for decimation level </span><span class="si">{</span><span class="n">i_dec_level</span><span class="si">}</span><span class="s2"> Successfully&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="TransferFunctionKernel.apply_clock_zero"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.apply_clock_zero">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">apply_clock_zero</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dec_level_config</span><span class="p">:</span> <span class="n">AuroraDecimationLevel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get clock-zero from data if needed</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dec_level_config: AuroraDecimationLevel</span>
+<span class="sd">            metadata about the decimation level processing.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dec_level_config: AuroraDecimationLevel</span>
+<span class="sd">            The modified DecimationLevel with clock-zero information set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dec_level_config</span><span class="o">.</span><span class="n">stft</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">clock_zero_type</span> <span class="o">==</span> <span class="s2">&quot;data start&quot;</span><span class="p">:</span>
+            <span class="n">dec_level_config</span><span class="o">.</span><span class="n">stft</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">clock_zero</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_df</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">dec_level_config</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">all_fcs_already_exist</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return true of all FCs needed to process data already exist in the mth5s&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel_dataset</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;fc&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_if_fcs_already_exist</span><span class="p">()</span>
+
+        <span class="c1"># these should all be booleans now</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel_dataset</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;fc&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel_dataset</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">fc</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<div class="viewcode-block" id="TransferFunctionKernel.check_if_fcs_already_exist"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.check_if_fcs_already_exist">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">check_if_fcs_already_exist</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fills out the &quot;fc&quot; column of dataset dataframe with True/False.</span>
+
+<span class="sd">        If all FC Levels for a given station-run are already built, mark True otherwise False.</span>
+
+<span class="sd">        Iterates over the processing summary_df, grouping by unique &quot;Survey-Station-Run&quot;s.</span>
+<span class="sd">        (Could also iterate over kernel_dataset.dataframe, to get the groupby).</span>
+
+<span class="sd">        Note 1:  Because decimation is a cascading operation, we avoid the case where some (valid) decimation</span>
+<span class="sd">        levels exist in the mth5 FC archive and others do not.  The maximum granularity is the</span>
+<span class="sd">        &quot;station-run&quot; level. For a given run, either all relevant FCs are in the h5 or we treat as if none</span>
+<span class="sd">        of them are.  To support variations at the decimation-level, an appropriate way to address would</span>
+<span class="sd">        be to store decimated time series in the archive as well (they would simply be runs with different sample</span>
+<span class="sd">        rates, and some extra filters).</span>
+
+<span class="sd">        Note #2: run_sub_df may have multiple rows, even though the run id is unique.</span>
+<span class="sd">        This could happen for example when you have a long run at the local station, but multiple (say two) shorter runs</span>
+<span class="sd">        at the reference station.  In that case, the processing summary will have a separate row for the</span>
+<span class="sd">        intersection of the long run with each of the remote runs. We ignore this for now, selecting only the first</span>
+<span class="sd">        element of the run_sub_df, under the assumption that FCs have been created for the entire run,</span>
+<span class="sd">        or not at all.  This assumption can be relaxed in future by using the time_period attribute of the FC layer.</span>
+<span class="sd">        For now, we proceed with the all-or-none logic.  That is, if a [&#39;survey&#39;, &#39;station&#39;, &#39;run&#39;,] has FCs,</span>
+<span class="sd">        assume that the FCs are present for the entire run. We assign the &quot;fc&quot; column of dataset_df to have the same</span>
+<span class="sd">        boolean value for all rows of same  [&#39;survey&#39;, &#39;station&#39;, &#39;run&#39;] .</span>
+
+
+<span class="sd">        Returns: None</span>
+<span class="sd">            Modifies self.dataset_df inplace, assigning bools to the &quot;fc&quot; column</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">groupby</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;survey&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;station&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;run&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">grouper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">processing_summary</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">groupby</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">survey_id</span><span class="p">,</span> <span class="n">station_id</span><span class="p">,</span> <span class="n">run_id</span><span class="p">),</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">grouper</span><span class="p">:</span>
+            <span class="n">cond1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_df</span><span class="o">.</span><span class="n">survey</span> <span class="o">==</span> <span class="n">survey_id</span>
+            <span class="n">cond2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_df</span><span class="o">.</span><span class="n">station</span> <span class="o">==</span> <span class="n">station_id</span>
+            <span class="n">cond3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_df</span><span class="o">.</span><span class="n">run</span> <span class="o">==</span> <span class="n">run_id</span>
+            <span class="n">run_sub_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_df</span><span class="p">[</span><span class="n">cond1</span> <span class="o">&amp;</span> <span class="n">cond2</span> <span class="o">&amp;</span> <span class="n">cond3</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">run_sub_df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># See Note #2</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Not all runs will process as a continuous chunk &quot;</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;-- in future may need to loop over runlets to check for FCs&quot;</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="n">dataset_df_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">run_sub_df</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+            <span class="n">remote</span> <span class="o">=</span> <span class="n">run_sub_df</span><span class="o">.</span><span class="n">remote</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">mth5_path</span> <span class="o">=</span> <span class="n">run_sub_df</span><span class="o">.</span><span class="n">mth5_path</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">fcs_present</span> <span class="o">=</span> <span class="n">mth5_has_fcs</span><span class="p">(</span>
+                <span class="n">mth5_path</span><span class="p">,</span>
+                <span class="n">survey_id</span><span class="p">,</span>
+                <span class="n">station_id</span><span class="p">,</span>
+                <span class="n">run_id</span><span class="p">,</span>
+                <span class="n">remote</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">processing_config</span><span class="p">,</span>
+                <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dataset_df_indices</span><span class="p">,</span> <span class="s2">&quot;fc&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fcs_present</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_df</span><span class="p">[</span><span class="s2">&quot;fc&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_df</span><span class="p">[</span><span class="s2">&quot;fc&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;All fc_levels already exist&quot;</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;Skip time series processing is OK&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Some, but not all fc_levels already exist = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_df</span><span class="p">[</span><span class="s1">&#39;fc&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;FC levels not present&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="TransferFunctionKernel.show_processing_summary"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.show_processing_summary">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">show_processing_summary</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">omit_columns</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;mth5_path&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;channel_scale_factors&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;start&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;end&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;input_channels&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;output_channels&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;num_samples_overlap&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;num_samples_advance&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;run_dataarray&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prints the processing summary table via logger.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        omit_columns: tuple</span>
+<span class="sd">            List of columns to omit when showing channel summary (used to keep table small).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">columns_to_show</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">processing_summary</span><span class="o">.</span><span class="n">columns</span>
+        <span class="n">columns_to_show</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">columns_to_show</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">omit_columns</span><span class="p">]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Processing Summary Dataframe:&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">processing_summary</span><span class="p">[</span><span class="n">columns_to_show</span><span class="p">]</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TransferFunctionKernel.update_processing_summary"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.update_processing_summary">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_processing_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates or updates the processing summary table based on processing parameters</span>
+<span class="sd">        and kernel dataset.</span>
+<span class="sd">        - Melt the decimation levels over the run summary.</span>
+<span class="sd">        - Add columns to estimate the number of FFT windows for each row</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        processing_summary: pd.DataFrame</span>
+<span class="sd">            One row per each run-deciamtion pair</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">processing_summary</span> <span class="o">=</span> <span class="n">_make_processing_summary</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kernel_dataset</span><span class="o">.</span><span class="n">df</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">decimation_info</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">window_scheme</span><span class="p">(</span><span class="n">as_type</span><span class="o">=</span><span class="s2">&quot;df&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">processing_summary</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_processing_summary</span> <span class="o">=</span> <span class="n">processing_summary</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Failed to update processing_summary&quot;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TransferFunctionKernel.validate_decimation_scheme_and_dataset_compatability"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.validate_decimation_scheme_and_dataset_compatability">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">validate_decimation_scheme_and_dataset_compatability</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">min_num_stft_windows</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks that the decimation_scheme and dataset are compatable.</span>
+<span class="sd">        Marks as invalid any rows that will fail to process based incompatibility.</span>
+
+
+<span class="sd">        Refers to issue #182 (and #103, and possibly #196 and #233).</span>
+<span class="sd">        Determine if there exist (one or more) runs that will yield decimated datasets</span>
+<span class="sd">        that have too few samples to be passed to the STFT algorithm.</span>
+
+<span class="sd">        Strategy for handling this:</span>
+<span class="sd">        Mark as invlaid any rows of the processing summary that do not yield long</span>
+<span class="sd">        enough time series to window.  This way all other rows, with decimations up to</span>
+<span class="sd">        the invalid cases will still process.</span>
+
+
+<span class="sd">        WCGW: If the runs are &quot;chunked&quot; we could encounter a situation where the</span>
+<span class="sd">        chunk fails to yield a deep decimation level, yet the level could be produced</span>
+<span class="sd">        if the chunk size were larger.</span>
+<span class="sd">        In general, handling this seems a bit complicated.  We will ignore this for</span>
+<span class="sd">        now and assume that the user will select a chunk size that is appropriate to</span>
+<span class="sd">        the decimation scheme, i.e. use large chunks for deep decimations.</span>
+
+<span class="sd">        A general solution: return a log that tells the user about each run and</span>
+<span class="sd">        decimation level ... how many STFT-windows it yielded at each decimation level.</span>
+<span class="sd">        This conjures the notion of (run, decimation_level) pairs</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">min_num_stft_windows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">min_stft_window_info</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">decimation</span><span class="o">.</span><span class="n">level</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">stft</span><span class="o">.</span><span class="n">min_num_stft_windows</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">processing_config</span><span class="o">.</span><span class="n">decimations</span>
+            <span class="p">}</span>
+            <span class="n">min_stft_window_list</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">min_stft_window_info</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">processing_summary</span><span class="o">.</span><span class="n">dec_level</span>
+            <span class="p">]</span>
+            <span class="n">min_num_stft_windows</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">min_stft_window_list</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">processing_summary</span><span class="p">[</span><span class="s2">&quot;valid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">processing_summary</span><span class="o">.</span><span class="n">num_stft_windows</span> <span class="o">&gt;=</span> <span class="n">min_num_stft_windows</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="TransferFunctionKernel.validate_processing"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.validate_processing">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">validate_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Do some Validation checks. WIP.</span>
+
+<span class="sd">        Things that are validated:</span>
+<span class="sd">        1. The default estimation engine from the json file is &quot;RME_RR&quot;, which is fine (</span>
+<span class="sd">        we expect to in general to do more RR processing than SS) but if there is only</span>
+<span class="sd">        one station (no remote)then the RME_RR should be replaced by default with &quot;RME&quot;.</span>
+<span class="sd">        - also if there is only one station, set reference channels to []</span>
+
+<span class="sd">        2. make sure local station id is defined (correctly from kernel dataset)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Make sure a RR method is not being called for a SS config</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stations</span><span class="o">.</span><span class="n">remote</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">drop_reference_channels</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">decimation</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">decimations</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">decimation</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;RME_RR&quot;</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No RR station specified, switching RME_RR to RME&quot;</span><span class="p">)</span>
+                    <span class="n">decimation</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">engine</span> <span class="o">=</span> <span class="s2">&quot;RME&quot;</span>
+
+        <span class="c1"># Make sure that a local station is defined</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stations</span><span class="o">.</span><span class="n">local</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;WARNING: Local station not specified&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Setting local station from Kernel Dataset&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stations</span><span class="o">.</span><span class="n">from_dataset_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel_dataset</span><span class="o">.</span><span class="n">df</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TransferFunctionKernel.validate"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.validate">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;apply all validators&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_processing</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_decimation_scheme_and_dataset_compatability</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">memory_check</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_save_fc_settings</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TransferFunctionKernel.valid_decimations"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.valid_decimations">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">valid_decimations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">AuroraDecimationLevel</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the decimation levels that are valid.</span>
+<span class="sd">        This is used when iterating over decimation levels in the processing.</span>
+<span class="sd">        We do not want to try processing invalid levels (they will fail).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dec_levels: list</span>
+<span class="sd">            Decimations from the config that are valid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># identify valid rows of processing summary</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">processing_summary</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">processing_summary</span><span class="o">.</span><span class="n">valid</span><span class="p">]</span>
+        <span class="n">valid_levels</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">dec_level</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+
+        <span class="n">dec_levels</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">decimations</span><span class="p">]</span>
+        <span class="n">dec_levels</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">dec_levels</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">decimation</span><span class="o">.</span><span class="n">level</span> <span class="ow">in</span> <span class="n">valid_levels</span><span class="p">]</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;After validation there are </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dec_levels</span><span class="p">)</span><span class="si">}</span><span class="s2"> valid decimation levels&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dec_levels</span></div>
+
+<div class="viewcode-block" id="TransferFunctionKernel.validate_save_fc_settings"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.validate_save_fc_settings">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">validate_save_fc_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update save_fc values in the config to be appropriate.</span>
+<span class="sd">        - If all FCs exist, set save_fc to False.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_fcs_already_exist</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;FC Layer already exists -- forcing processing config save_fcs=False&quot;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">dec_level_config</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">decimations</span><span class="p">:</span>
+                <span class="c1"># if dec_level_config.save_fcs:</span>
+                <span class="n">dec_level_config</span><span class="o">.</span><span class="n">save_fcs</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stations</span><span class="o">.</span><span class="n">remote</span><span class="p">:</span>
+            <span class="n">save_any_fcs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">save_fcs</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">decimations</span><span class="p">])</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">save_any_fcs</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> Saving FCs for remote reference processing is not supported&quot;</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> - To save FCs, process as single station, then you can use the FCs for RR processing&quot;</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> - See issue #319 for details &quot;</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> - forcing processing config save_fcs = False &quot;</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">dec_level_config</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">decimations</span><span class="p">:</span>
+                    <span class="n">dec_level_config</span><span class="o">.</span><span class="n">save_fcs</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="TransferFunctionKernel.get_mth5_file_open_mode"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.get_mth5_file_open_mode">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_mth5_file_open_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;check the mode of an open mth5 (read, write, append)&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_fcs_already_exist</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;r&quot;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">decimations</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">save_fcs</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;a&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;r&quot;</span></div>
+
+<div class="viewcode-block" id="TransferFunctionKernel.is_valid_dataset"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.is_valid_dataset">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">is_valid_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">i_dec</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Given a row from the RunSummary, answer the question:</span>
+<span class="sd">         &quot;Will this decimation level yield a valid dataset?&quot;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        row: pandas.core.series.Series</span>
+<span class="sd">            Row of the self._dataset_df (corresponding to a run that will be processed)</span>
+<span class="sd">        i_dec: integer</span>
+<span class="sd">            refers to decimation level</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        is_valid: Bool</span>
+<span class="sd">            Whether the (run, decimation_level) pair associated with this row yields</span>
+<span class="sd">            a valid dataset</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Query processing on survey, station, run, decimation</span>
+        <span class="n">cond1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">processing_summary</span><span class="o">.</span><span class="n">survey</span> <span class="o">==</span> <span class="n">row</span><span class="o">.</span><span class="n">survey</span>
+        <span class="n">cond2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">processing_summary</span><span class="o">.</span><span class="n">station</span> <span class="o">==</span> <span class="n">row</span><span class="o">.</span><span class="n">station</span>
+        <span class="n">cond3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">processing_summary</span><span class="o">.</span><span class="n">run</span> <span class="o">==</span> <span class="n">row</span><span class="o">.</span><span class="n">run</span>
+        <span class="n">cond4</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">processing_summary</span><span class="o">.</span><span class="n">dec_level</span> <span class="o">==</span> <span class="n">i_dec</span>
+        <span class="n">cond5</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">processing_summary</span><span class="o">.</span><span class="n">start</span> <span class="o">==</span> <span class="n">row</span><span class="o">.</span><span class="n">start</span>
+
+        <span class="n">cond</span> <span class="o">=</span> <span class="n">cond1</span> <span class="o">&amp;</span> <span class="n">cond2</span> <span class="o">&amp;</span> <span class="n">cond3</span> <span class="o">&amp;</span> <span class="n">cond4</span> <span class="o">&amp;</span> <span class="n">cond5</span>
+        <span class="n">processing_row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">processing_summary</span><span class="p">[</span><span class="n">cond</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">processing_row</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">is_valid</span> <span class="o">=</span> <span class="n">processing_row</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">is_valid</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">processing_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A description of the processing, will get passed to TF object,</span>
+<span class="sd">        can be used for Z-file</span>
+
+<span class="sd">        Could add a version or a hashtag to this</span>
+<span class="sd">        Could also check dataset_df</span>
+<span class="sd">        If remote.all==False append &quot;Single Station&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">processing_type</span> <span class="o">=</span> <span class="s2">&quot;Aurora&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_df</span><span class="o">.</span><span class="n">remote</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="n">processing_type</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">processing_type</span><span class="si">}</span><span class="s2"> Robust Remote Reference&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">processing_type</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">processing_type</span><span class="si">}</span><span class="s2"> Robust Single Station&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;processing_type&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">processing_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_df</span><span class="p">[</span><span class="s2">&quot;processing_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">processing_type</span>
+
+<div class="viewcode-block" id="TransferFunctionKernel.export_tf_collection"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.export_tf_collection">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">export_tf_collection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tf_collection</span><span class="p">:</span> <span class="n">TransferFunctionCollection</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assign transfer_function, residual_covariance, inverse_signal_power, station, survey</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tf_collection: aurora.transfer_function.TransferFunctionCollection</span>
+<span class="sd">            Contains TF estimates, covariance, and signal power values</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tf_cls: mt_metadata.transfer_functions.core.TF</span>
+<span class="sd">            Transfer function container</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">make_decimation_dict_for_tf</span><span class="p">(</span>
+            <span class="n">tf_collection</span><span class="p">:</span> <span class="n">TransferFunctionCollection</span><span class="p">,</span>
+            <span class="n">processing_config</span><span class="p">:</span> <span class="n">Processing</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Helper function to create a dictionary used by mt_metadata&#39;s TF class when</span>
+<span class="sd">            writing z-files.  If no z-files will be written this is not needed</span>
+
+<span class="sd">            sample element of decimation_dict:</span>
+<span class="sd">            &#39;1514.70134&#39;: {&#39;level&#39;: 4, &#39;bands&#39;: (5, 6), &#39;npts&#39;: 386, &#39;df&#39;: 0.015625}}</span>
+
+<span class="sd">            Note #1:  The line that does</span>
+<span class="sd">            period_value[&quot;npts&quot;] = tf_collection.tf_dict[i_dec].num_segments.data[0, i_band]</span>
+<span class="sd">            doesn&#39;t feel very robust ... it would be better to explicitly select based on the num_segments</span>
+<span class="sd">            xarray location where period==fb.center_period.  This is a placeholder for now.  In future,</span>
+<span class="sd">            the TTFZ class is likely to be deprecated in favour of directly packing mt_metadata TFs during processing.</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">            tf_collection: TransferFunctionCollection</span>
+<span class="sd">                Collection of transfer function estimates from aurora.</span>
+<span class="sd">            processing_config: Processing</span>
+<span class="sd">                Instructions for processing with aurora</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">            decimation_dict: dict</span>
+<span class="sd">                Keyed by a string representing the period</span>
+<span class="sd">                Values are a custom dictionary.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">mt_metadata.transfer_functions.io.zfiles.zmm</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+                <span class="n">PERIOD_FORMAT</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">decimation_dict</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="c1"># dec_level_cfg is an AuroraDecimationLevel</span>
+            <span class="k">for</span> <span class="n">i_dec</span><span class="p">,</span> <span class="n">dec_level_cfg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">processing_config</span><span class="o">.</span><span class="n">decimations</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">i_band</span><span class="p">,</span> <span class="n">band</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dec_level_cfg</span><span class="o">.</span><span class="n">bands</span><span class="p">):</span>
+                    <span class="n">period_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band</span><span class="o">.</span><span class="n">center_period</span><span class="si">:{</span><span class="n">PERIOD_FORMAT</span><span class="si">}}</span><span class="s2">&quot;</span>
+                    <span class="n">period_value</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="n">period_value</span><span class="p">[</span><span class="s2">&quot;level&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">i_dec</span> <span class="o">+</span> <span class="mi">1</span>  <span class="c1"># +1 to match EMTF standard</span>
+                    <span class="n">period_value</span><span class="p">[</span><span class="s2">&quot;bands&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">band</span><span class="o">.</span><span class="n">harmonic_indices</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+                    <span class="n">period_value</span><span class="p">[</span><span class="s2">&quot;sample_rate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dec_level_cfg</span><span class="o">.</span><span class="n">decimation</span><span class="o">.</span><span class="n">sample_rate</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">period_value</span><span class="p">[</span><span class="s2">&quot;npts&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tf_collection</span><span class="o">.</span><span class="n">tf_dict</span><span class="p">[</span>
+                            <span class="n">i_dec</span>
+                        <span class="p">]</span><span class="o">.</span><span class="n">num_segments</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i_band</span><span class="p">]</span>
+                    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Possibly invalid decimation level&quot;</span><span class="p">)</span>
+                        <span class="n">period_value</span><span class="p">[</span><span class="s2">&quot;npts&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">decimation_dict</span><span class="p">[</span><span class="n">period_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">period_value</span>
+
+            <span class="k">return</span> <span class="n">decimation_dict</span>
+
+        <span class="n">channel_nomenclature</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">channel_nomenclature</span>
+        <span class="n">channel_nomenclature_dict</span> <span class="o">=</span> <span class="n">channel_nomenclature</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()[</span>
+            <span class="s2">&quot;channel_nomenclature&quot;</span>
+        <span class="p">]</span>
+        <span class="n">merged_tf_dict</span> <span class="o">=</span> <span class="n">tf_collection</span><span class="o">.</span><span class="n">get_merged_dict</span><span class="p">(</span><span class="n">channel_nomenclature</span><span class="p">)</span>
+        <span class="n">decimation_dict</span> <span class="o">=</span> <span class="n">make_decimation_dict_for_tf</span><span class="p">(</span>
+            <span class="n">tf_collection</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">processing_config</span>
+        <span class="p">)</span>
+
+        <span class="n">tf_cls</span> <span class="o">=</span> <span class="n">TF</span><span class="p">(</span>
+            <span class="n">channel_nomenclature</span><span class="o">=</span><span class="n">channel_nomenclature_dict</span><span class="p">,</span>
+            <span class="n">decimation_dict</span><span class="o">=</span><span class="n">decimation_dict</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">renamer_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;output_channel&quot;</span><span class="p">:</span> <span class="s2">&quot;output&quot;</span><span class="p">,</span> <span class="s2">&quot;input_channel&quot;</span><span class="p">:</span> <span class="s2">&quot;input&quot;</span><span class="p">}</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">merged_tf_dict</span><span class="p">[</span><span class="s2">&quot;tf&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">renamer_dict</span><span class="p">)</span>
+        <span class="n">tf_cls</span><span class="o">.</span><span class="n">transfer_function</span> <span class="o">=</span> <span class="n">tmp</span>
+
+        <span class="n">isp</span> <span class="o">=</span> <span class="n">merged_tf_dict</span><span class="p">[</span><span class="s2">&quot;cov_ss_inv&quot;</span><span class="p">]</span>
+        <span class="n">renamer_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;input_channel_1&quot;</span><span class="p">:</span> <span class="s2">&quot;input&quot;</span><span class="p">,</span> <span class="s2">&quot;input_channel_2&quot;</span><span class="p">:</span> <span class="s2">&quot;output&quot;</span><span class="p">}</span>
+        <span class="n">isp</span> <span class="o">=</span> <span class="n">isp</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">renamer_dict</span><span class="p">)</span>
+        <span class="n">tf_cls</span><span class="o">.</span><span class="n">inverse_signal_power</span> <span class="o">=</span> <span class="n">isp</span>
+
+        <span class="n">res_cov</span> <span class="o">=</span> <span class="n">merged_tf_dict</span><span class="p">[</span><span class="s2">&quot;cov_nn&quot;</span><span class="p">]</span>
+        <span class="n">renamer_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;output_channel_1&quot;</span><span class="p">:</span> <span class="s2">&quot;input&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;output_channel_2&quot;</span><span class="p">:</span> <span class="s2">&quot;output&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">res_cov</span> <span class="o">=</span> <span class="n">res_cov</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">renamer_dict</span><span class="p">)</span>
+        <span class="n">tf_cls</span><span class="o">.</span><span class="n">residual_covariance</span> <span class="o">=</span> <span class="n">res_cov</span>
+
+        <span class="c1"># Set key as first el&#39;t of dict, nor currently supporting mixed surveys in TF</span>
+        <span class="n">tf_cls</span><span class="o">.</span><span class="n">survey_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">local_survey_metadata</span>
+
+        <span class="c1"># pack the station metadata into the TF object</span>
+        <span class="c1"># station_id = self.processing_config.stations.local.id</span>
+        <span class="c1"># station_sub_df = self.dataset_df[self.dataset_df[&quot;station&quot;] == station_id]</span>
+        <span class="c1"># station_row = station_sub_df.iloc[0]</span>
+        <span class="c1"># station_obj = station_obj_from_row(station_row)</span>
+
+        <span class="c1"># modify the run metadata to match the channel nomenclature</span>
+        <span class="c1"># TODO: this should be done inside the TF initialization</span>
+        <span class="k">for</span> <span class="n">i_run</span><span class="p">,</span> <span class="n">run</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tf_cls</span><span class="o">.</span><span class="n">station_metadata</span><span class="o">.</span><span class="n">runs</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i_ch</span><span class="p">,</span> <span class="n">channel</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">run</span><span class="o">.</span><span class="n">channels</span><span class="p">):</span>
+                <span class="n">new_ch</span> <span class="o">=</span> <span class="n">channel</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">default_component</span> <span class="o">=</span> <span class="n">channel</span><span class="o">.</span><span class="n">component</span>
+                <span class="n">new_component</span> <span class="o">=</span> <span class="n">channel_nomenclature_dict</span><span class="p">[</span><span class="n">default_component</span><span class="p">]</span>
+                <span class="n">new_ch</span><span class="o">.</span><span class="n">component</span> <span class="o">=</span> <span class="n">new_component</span>
+                <span class="n">tf_cls</span><span class="o">.</span><span class="n">station_metadata</span><span class="o">.</span><span class="n">runs</span><span class="p">[</span><span class="n">i_run</span><span class="p">]</span><span class="o">.</span><span class="n">remove_channel</span><span class="p">(</span><span class="n">default_component</span><span class="p">)</span>
+                <span class="n">tf_cls</span><span class="o">.</span><span class="n">station_metadata</span><span class="o">.</span><span class="n">runs</span><span class="p">[</span><span class="n">i_run</span><span class="p">]</span><span class="o">.</span><span class="n">add_channel</span><span class="p">(</span><span class="n">new_ch</span><span class="p">)</span>
+
+        <span class="c1"># set processing type</span>
+        <span class="n">tf_cls</span><span class="o">.</span><span class="n">station_metadata</span><span class="o">.</span><span class="n">transfer_function</span><span class="o">.</span><span class="n">processing_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">processing_type</span>
+
+        <span class="c1"># tf_cls.station_metadata.transfer_function.processing_config = (</span>
+        <span class="c1">#     self.processing_config</span>
+        <span class="c1"># )</span>
+        <span class="k">return</span> <span class="n">tf_cls</span></div>
+
+<div class="viewcode-block" id="TransferFunctionKernel.memory_check"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.memory_check">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">memory_check</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Checks if a RAM issue should be anticipated.</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">        Requires an estimate of available RAM, and an estimate of the dataset size</span>
+<span class="sd">        Available RAM is taken from psutil,</span>
+<span class="sd">        Dataset size is number of samples, times the number of bytes per sample</span>
+<span class="sd">        Bits per sample is estimated to be 64 by default, (8-bytes)</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">bytes_per_sample</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># 64-bit</span>
+        <span class="n">memory_threshold</span> <span class="o">=</span> <span class="mf">0.5</span>
+
+        <span class="c1"># get the total amount of RAM in bytes</span>
+        <span class="n">total_memory</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span><span class="o">.</span><span class="n">total</span>
+
+        <span class="c1"># print the total amount of RAM in GB</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total memory: </span><span class="si">{</span><span class="n">total_memory</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mi">1024</span><span class="w"> </span><span class="o">**</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> GB&quot;</span><span class="p">)</span>
+        <span class="n">num_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_df</span><span class="o">.</span><span class="n">duration</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_df</span><span class="o">.</span><span class="n">sample_rate</span>
+        <span class="n">total_samples</span> <span class="o">=</span> <span class="n">num_samples</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">total_bytes</span> <span class="o">=</span> <span class="n">total_samples</span> <span class="o">*</span> <span class="n">bytes_per_sample</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total Bytes of Raw Data: </span><span class="si">{</span><span class="n">total_bytes</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mi">1024</span><span class="w"> </span><span class="o">**</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> GB&quot;</span><span class="p">)</span>
+
+        <span class="n">ram_fraction</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">total_bytes</span> <span class="o">/</span> <span class="n">total_memory</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Raw Data will use: </span><span class="si">{</span><span class="mi">100</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">ram_fraction</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> % of memory&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Check a condition</span>
+        <span class="k">if</span> <span class="n">total_bytes</span> <span class="o">&gt;</span> <span class="n">memory_threshold</span> <span class="o">*</span> <span class="n">total_memory</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_memory_warning</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_memory_warning</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_memory_warning</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Job requires too much memory&quot;</span><span class="p">)</span></div></div>
+
+
+<span class="c1"># ###################################################################</span>
+<span class="c1"># ######## Helper Functions #########################################</span>
+<span class="c1"># ###################################################################</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_decimation_level_info_valid</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Applies some sanity checks to a processing summary dataframe chunk.</span>
+
+<span class="sd">        Development Notes:</span>
+<span class="sd">        This was previously a fairly janky block of code in `update_processing_summary`.</span>
+<span class="sd">        It is being factored to label and contain the jank, and could still be improved.</span>
+<span class="sd">        In particular, just because the conditions being checked are expected, it</span>
+<span class="sd">        may be that they do not make the processing invalid if they are not True.</span>
+<span class="sd">        i.e. The conditions being checked are likely overly conservative and can be relaxed.</span>
+
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        df: pd.DataFrame</span>
+<span class="sd">            Input has already been grouped by [&quot;survey&quot;, &quot;station&quot;, &quot;run&quot;, &quot;start&quot;,]</span>
+<span class="sd">            This is like a &quot;run chunk&quot;.</span>
+<span class="sd">            This run chunk can have several decimation levels, often these are</span>
+<span class="sd">            [1, 4, 4, 4]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># assert that decimation levels are incrementing (usually 0,1,2,3...)</span>
+    <span class="n">cond</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">dec_level</span><span class="o">.</span><span class="n">diff</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">cond</span><span class="p">:</span>  <span class="c1"># dec levels increment by 1</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Processing summary chunk decimation levels are not incrementing by 1.&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="c1"># check that first decimation level is zero</span>
+    <span class="n">cond1</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">dec_factor</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="n">cond2</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">dec_level</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="n">cond</span> <span class="o">=</span> <span class="n">cond1</span> <span class="o">&amp;</span> <span class="n">cond2</span>
+    <span class="k">if</span> <span class="n">cond</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Processing summary chunk was expecting first decimation level 0 and decimation factor 1&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="kc">True</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_make_processing_summary</span><span class="p">(</span>
+    <span class="n">kernel_dataset_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">decimation_info</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">window_params_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates or updates the processing summary table based on processing parameters</span>
+<span class="sd">    and kernel dataset.</span>
+<span class="sd">    - Melt the decimation levels over the run summary.</span>
+<span class="sd">    - Add columns to estimate the number of FFT windows for each row</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    processing_summary: pd.DataFrame</span>
+<span class="sd">        One row per each run-decimation pair</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Create correctly shaped dataframe</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">kernel_dataset_df</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">id_vars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i_dec</span><span class="p">,</span> <span class="n">dec_factor</span> <span class="ow">in</span> <span class="n">decimation_info</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">tmp</span><span class="p">[</span><span class="n">i_dec</span><span class="p">]</span> <span class="o">=</span> <span class="n">dec_factor</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">id_vars</span><span class="o">=</span><span class="n">id_vars</span><span class="p">,</span> <span class="n">value_name</span><span class="o">=</span><span class="s2">&quot;dec_factor&quot;</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">&quot;dec_level&quot;</span><span class="p">)</span>
+    <span class="n">sortby</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;survey&quot;</span><span class="p">,</span> <span class="s2">&quot;station&quot;</span><span class="p">,</span> <span class="s2">&quot;run&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;dec_level&quot;</span><span class="p">]</span>
+    <span class="n">tmp</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">sortby</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">tmp</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">tmp</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;sample_rate&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># not valid for decimated data</span>
+
+    <span class="c1"># Add window info</span>
+    <span class="n">group_by</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;survey&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;station&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;run&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;start&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">chunks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">grouper</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">group_by</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">group</span><span class="p">,</span> <span class="n">chunk_df</span> <span class="ow">in</span> <span class="n">grouper</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_decimation_level_info_valid</span><span class="p">(</span><span class="n">chunk_df</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to update processing summary -- </span><span class="si">{</span><span class="n">group</span><span class="si">}</span><span class="s2"> had invalid decimation level info&quot;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="c1"># df.sample_rate /= np.cumprod(df.dec_factor)  # better to take from config, maybe add as a test though?</span>
+        <span class="n">chunk_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">chunk_df</span> <span class="o">=</span> <span class="n">chunk_df</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">window_params_df</span><span class="p">)</span>
+        <span class="n">chunk_df</span><span class="p">[</span><span class="s2">&quot;num_samples&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">chunk_df</span><span class="o">.</span><span class="n">duration</span> <span class="o">*</span> <span class="n">chunk_df</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">)</span>
+        <span class="n">num_windows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chunk_df</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">chunk_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">ws</span> <span class="o">=</span> <span class="n">WindowingScheme</span><span class="p">(</span>
+                <span class="n">num_samples_window</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">num_samples_window</span><span class="p">,</span>
+                <span class="n">num_samples_overlap</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">num_samples_overlap</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">num_windows</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ws</span><span class="o">.</span><span class="n">available_number_of_windows</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">num_samples</span><span class="p">)</span>
+        <span class="n">chunk_df</span><span class="p">[</span><span class="s2">&quot;num_stft_windows&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">num_windows</span>
+        <span class="n">chunks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chunk_df</span><span class="p">)</span>
+
+    <span class="n">processing_summary</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span>
+    <span class="n">processing_summary</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">processing_summary</span>
+
+
+<div class="viewcode-block" id="mth5_has_fcs"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.mth5_has_fcs">[docs]</a><span class="nd">@path_or_mth5_object</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mth5_has_fcs</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">survey_id</span><span class="p">,</span> <span class="n">station_id</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">remote</span><span class="p">,</span> <span class="n">processing_config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if all needed fc-levels for survey-station-run are present under processing_config</span>
+
+<span class="sd">    Note #1: At this point in the logic, it is established that there are FCs associated with run_id and there are</span>
+<span class="sd">        at least as many FC decimation levels as we require as per the processing config.  The next step is to</span>
+<span class="sd">        assert whether it is True that the existing FCs conform to the recipe in the processing config.</span>
+
+<span class="sd">    kwargs are here as a pass through to the decorator ... we pass mode=&quot;r&quot;,&quot;a&quot;,&quot;w&quot;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    m</span>
+<span class="sd">    survey_id</span>
+<span class="sd">    station_id</span>
+<span class="sd">    run_id</span>
+<span class="sd">    dataset_df</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">row_ssr_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;survey: </span><span class="si">{</span><span class="n">survey_id</span><span class="si">}</span><span class="s2">, station: </span><span class="si">{</span><span class="n">station_id</span><span class="si">}</span><span class="s2">, run: </span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">survey_obj</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">get_survey</span><span class="p">(</span><span class="n">survey_id</span><span class="p">)</span>
+    <span class="n">station_obj</span> <span class="o">=</span> <span class="n">survey_obj</span><span class="o">.</span><span class="n">stations_group</span><span class="o">.</span><span class="n">get_station</span><span class="p">(</span><span class="n">station_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">station_obj</span><span class="o">.</span><span class="n">fourier_coefficients_group</span><span class="o">.</span><span class="n">groups_list</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Fourier coefficients not detected for </span><span class="si">{</span><span class="n">row_ssr_str</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;-- Fourier coefficients will be computed&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;FCs detected -- checking against processing requirements.&quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">fc_group</span> <span class="o">=</span> <span class="n">station_obj</span><span class="o">.</span><span class="n">fourier_coefficients_group</span><span class="o">.</span><span class="n">get_fc_group</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">MTH5Error</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Run </span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2"> not found in FC Groups -- need to compute FCs&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fc_group</span><span class="o">.</span><span class="n">groups_list</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">processing_config</span><span class="o">.</span><span class="n">num_decimation_levels</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Not enough FC Groups found for </span><span class="si">{</span><span class="n">row_ssr_str</span><span class="si">}</span><span class="s2"> -- will build them&quot;</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="c1"># Can check time periods here if desired, but unique (survey, station, run) should make this unneeded</span>
+    <span class="c1"># processing_run = self.processing_config.stations.local.get_run(run_id)</span>
+    <span class="c1"># for tp in processing_run.time_periods:</span>
+    <span class="c1">#    assert tp in fc_group time periods</span>
+
+    <span class="c1"># See note #1</span>
+    <span class="n">fcs_already_there</span> <span class="o">=</span> <span class="n">fc_group</span><span class="o">.</span><span class="n">supports_aurora_processing_config</span><span class="p">(</span>
+        <span class="n">processing_config</span><span class="p">,</span> <span class="n">remote</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">fcs_already_there</span></div>
+
+
+<span class="c1"># =============================================================================</span>
+<span class="c1"># Helper Functions</span>
+<span class="c1"># =============================================================================</span>
+
+
+<div class="viewcode-block" id="station_obj_from_row"><a class="viewcode-back" href="../../../api/aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.station_obj_from_row">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">station_obj_from_row</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Access the station object</span>
+<span class="sd">    Note if/else could avoidable if replacing text string &quot;none&quot; with a None object in survey column</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    row: pd.Series</span>
+<span class="sd">        A row of tfk.dataset_df</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    station_obj:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">mth5_obj</span><span class="o">.</span><span class="n">file_version</span> <span class="o">==</span> <span class="s2">&quot;0.1.0&quot;</span><span class="p">:</span>
+        <span class="n">station_obj</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">mth5_obj</span><span class="o">.</span><span class="n">stations_group</span><span class="o">.</span><span class="n">get_station</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">station</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">row</span><span class="o">.</span><span class="n">mth5_obj</span><span class="o">.</span><span class="n">file_version</span> <span class="o">==</span> <span class="s2">&quot;0.2.0&quot;</span><span class="p">:</span>
+        <span class="n">survey_group</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">mth5_obj</span><span class="o">.</span><span class="n">surveys_group</span><span class="o">.</span><span class="n">get_survey</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">survey</span><span class="p">)</span>
+        <span class="n">station_obj</span> <span class="o">=</span> <span class="n">survey_group</span><span class="o">.</span><span class="n">stations_group</span><span class="o">.</span><span class="n">get_station</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">station</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">station_obj</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

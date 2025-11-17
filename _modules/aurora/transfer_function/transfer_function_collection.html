@@ -1,0 +1,552 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.transfer_function.transfer_function_collection &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aurora.transfer_function.transfer_function_collection</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.transfer_function.transfer_function_collection</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module provides a TransferFunctionCollection container to hold:</span>
+<span class="sd">1. TransferFunctionHeader</span>
+<span class="sd">2. Dictionary of TransferFunction Objects</span>
+
+<span class="sd">Development Notes:</span>
+<span class="sd"> This class could use substantial updating.  There are two main issues to be aware of.</span>
+
+<span class="sd"> First, the transfer function objects that is &quot;collects&quot; are themselves things</span>
+<span class="sd"> that could use substantial updates.  This is because the aurora TransferFunction</span>
+<span class="sd"> objects to not use the mt_metadata.transfer_function.TF and they should.  This</span>
+<span class="sd"> is issue #203.</span>
+
+<span class="sd"> Second, the Collection can have more than one value for a TF at a given</span>
+<span class="sd"> frequency or period because the TFs can be estimated from different</span>
+<span class="sd"> decimation levels.</span>
+
+<span class="sd"> A single transfer function object is associated with a station, here called</span>
+<span class="sd"> the &quot;local_station&quot;. In a database of TFs could add a column for</span>
+<span class="sd"> local_station and one for reference station.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.config.metadata.processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Processing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.sandbox.io_helpers.zfile_murphy</span><span class="w"> </span><span class="kn">import</span> <span class="n">ZFile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.transfer_function.plot.rho_phi_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_phi</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.transfer_function.plot.rho_phi_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_rho</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.general_helper_functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">FIGURES_PATH</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="n">EMTF_REGRESSION_ENGINE_LABELS</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">EMTF_REGRESSION_ENGINE_LABELS</span><span class="p">[</span><span class="s2">&quot;RME&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Robust Single Station&quot;</span>
+<span class="n">EMTF_REGRESSION_ENGINE_LABELS</span><span class="p">[</span><span class="s2">&quot;RME_RR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Robust Remote Reference&quot;</span>
+
+
+<div class="viewcode-block" id="TransferFunctionCollection"><a class="viewcode-back" href="../../../api/aurora.transfer_function.html#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">TransferFunctionCollection</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">tf_dict</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">processing_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Processing</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kwargs</span>
+
+<span class="sd">        tf_dict: dict</span>
+<span class="sd">            This is a dictionary of TTFZ objects, one per decimation level.  They are</span>
+<span class="sd">            keyed by the decimation_level_id, usually integers 0, 1, 2... n_dec</span>
+<span class="sd">        processing_config: Processing</span>
+<span class="sd">            The processing parameters associated with the TF objects in the dict.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tf_dict</span> <span class="o">=</span> <span class="n">tf_dict</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processing_config</span> <span class="o">=</span> <span class="n">processing_config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">merged_tf</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">merged_cov_nn</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">merged_cov_ss_inv</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">header</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;returns the tf_header (ordered dict) from the first tf in the dict&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tf_dict</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tf_header</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">local_station_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;return the local station id&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">local_station</span><span class="o">.</span><span class="n">id</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remote_station_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;return the remote station id&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">remote_station</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">remote_station</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">id</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">total_number_of_frequencies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns int:</span>
+<span class="sd">            Count of number of frequencies over all TFs in dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">num_frequecies</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">dec_level</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tf_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">num_frequecies</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tf_dict</span><span class="p">[</span><span class="n">dec_level</span><span class="p">]</span><span class="o">.</span><span class="n">periods</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">num_frequecies</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">channel_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets all channel names.</span>
+<span class="sd">         - assumes the first TF in dict is representative of all</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        all_channels: list</span>
+<span class="sd">            All the channel names for the first TF</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tf_input_chs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tf_dict</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">transfer_function</span><span class="o">.</span><span class="n">input_channel</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">tf_output_chs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tf_dict</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">transfer_function</span><span class="o">.</span><span class="n">output_channel</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">all_channels</span> <span class="o">=</span> <span class="n">tf_input_chs</span> <span class="o">+</span> <span class="n">tf_output_chs</span>
+        <span class="k">return</span> <span class="n">all_channels</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">total_number_of_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a count of all channels (input and output) in the TF&quot;&quot;&quot;</span>
+        <span class="n">num_channels</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">num_channels</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">input_channels</span><span class="p">)</span>
+        <span class="n">num_channels</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">output_channels</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">num_channels</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">number_of_decimation_levels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a count of number of decimation levels</span>
+<span class="sd">        - assumes that each entry in dict is a separate decimation level.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tf_dict</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TransferFunctionCollection.get_merged_dict"><a class="viewcode-back" href="../../../api/aurora.transfer_function.html#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.get_merged_dict">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_merged_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel_nomenclature</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        merges all decimation levels and returns a dict</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        output: dict</span>
+<span class="sd">            merged tf values</span>
+<span class="sd">            - this can be used to assign values to an mt_metadata.transfer_function.TF</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_merge_decimation_levels</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_all_channels_present</span><span class="p">(</span><span class="n">channel_nomenclature</span><span class="p">)</span>
+        <span class="n">output</span><span class="p">[</span><span class="s2">&quot;tf&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_tf</span>
+        <span class="n">output</span><span class="p">[</span><span class="s2">&quot;cov_ss_inv&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_cov_ss_inv</span>
+        <span class="n">output</span><span class="p">[</span><span class="s2">&quot;cov_nn&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_cov_nn</span>
+        <span class="k">return</span> <span class="n">output</span></div>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_merge_decimation_levels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Merge all decimation levels into a single xarray for export.</span>
+
+<span class="sd">        Development Notes:</span>
+<span class="sd">         The output of this may become its own class, MergedTransferFunction</span>
+
+<span class="sd">         One concern here is that the same period can be estimted at more then one</span>
+<span class="sd">         decimation level, making the frequency or period axis not of the same order</span>
+<span class="sd">         as the number of estimates.  Ways around this:</span>
+<span class="sd">         1. We can multi-index the period axis with decimation level</span>
+<span class="sd">         2. Make sure that the processing config does not dupliacate periods</span>
+<span class="sd">         3. Take the average estimate over all periods heving the same value</span>
+<span class="sd">         4. Drop all but one estimate accoring to a rule (keep most observations say)</span>
+
+<span class="sd">         Does TFXML support multiple estimates? How is it dealt with there?</span>
+<span class="sd">         There is an issue here -</span>
+
+<span class="sd">        Flow:</span>
+<span class="sd">        starting from self.tf_dict, cast each decimation level&#39;s tf, which is</span>
+<span class="sd">        an xr.DataArray to xr.Dataset, forming a list of datasets.</span>
+<span class="sd">        This dataset list is then combined over all periods forming a representation</span>
+<span class="sd">        of the TTFZ which is merged over all the decimation levels.</span>
+
+<span class="sd">        result is to build:</span>
+<span class="sd">        merged_tf</span>
+<span class="sd">        merged_cov_ss_inv</span>
+<span class="sd">        merged_cov_nn</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">n_dec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_of_decimation_levels</span>
+
+        <span class="n">tmp</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">tf_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">(</span><span class="s2">&quot;period&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_dec</span><span class="p">)]</span>
+        <span class="n">merged_tf</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">combine_by_coords</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+        <span class="n">merged_tf</span> <span class="o">=</span> <span class="n">merged_tf</span><span class="o">.</span><span class="n">to_array</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;period&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">merged_tf</span> <span class="o">=</span> <span class="n">merged_tf</span>
+
+        <span class="n">tmp</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">tf_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">cov_ss_inv</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">(</span><span class="s2">&quot;period&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_dec</span><span class="p">)]</span>
+        <span class="n">merged_cov_ss_inv</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">combine_by_coords</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+        <span class="n">merged_cov_ss_inv</span> <span class="o">=</span> <span class="n">merged_cov_ss_inv</span><span class="o">.</span><span class="n">to_array</span><span class="p">(</span><span class="s2">&quot;period&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">merged_cov_ss_inv</span> <span class="o">=</span> <span class="n">merged_cov_ss_inv</span>
+
+        <span class="n">tmp</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">tf_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">cov_nn</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">(</span><span class="s2">&quot;period&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_dec</span><span class="p">)]</span>
+        <span class="n">merged_cov_nn</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">combine_by_coords</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+        <span class="n">merged_cov_nn</span> <span class="o">=</span> <span class="n">merged_cov_nn</span><span class="o">.</span><span class="n">to_array</span><span class="p">(</span><span class="s2">&quot;period&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">merged_cov_nn</span> <span class="o">=</span> <span class="n">merged_cov_nn</span>
+
+        <span class="k">return</span>
+
+<div class="viewcode-block" id="TransferFunctionCollection.check_all_channels_present"><a class="viewcode-back" href="../../../api/aurora.transfer_function.html#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.check_all_channels_present">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">check_all_channels_present</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel_nomenclature</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if TF has tipper.  If not, fill in the tipper data with NaN and also</span>
+<span class="sd">         update the noise covariance matrix so shape is as expected by mt_metadata.</span>
+
+<span class="sd">        Development Notes:</span>
+<span class="sd">            For testing, at least some Parkfield tests have no hz.</span>
+<span class="sd">            Synthetic tests do not (currently) have missing hz.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        channel_nomenclature: mt_metadata.transfer_functions.processing.aurora.channel_nomenclature.ChannelNomenclature</span>
+<span class="sd">            Scheme according to how channels are named</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ex</span><span class="p">,</span> <span class="n">ey</span><span class="p">,</span> <span class="n">hx</span><span class="p">,</span> <span class="n">hy</span><span class="p">,</span> <span class="n">hz</span> <span class="o">=</span> <span class="n">channel_nomenclature</span><span class="o">.</span><span class="n">unpack</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">hz</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_tf</span><span class="o">.</span><span class="n">output_channel</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+            <span class="n">output_channels_original</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_tf</span><span class="o">.</span><span class="n">output_channel</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="n">output_channels</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;tmp___</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">output_channels_original</span><span class="p">]</span>
+            <span class="n">output_channels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">hz</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_tf</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">({</span><span class="s2">&quot;output_channel&quot;</span><span class="p">:</span> <span class="n">output_channels</span><span class="p">})</span>
+            <span class="n">tmp</span><span class="o">.</span><span class="n">data</span> <span class="o">*=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">(</span><span class="s2">&quot;period&quot;</span><span class="p">)</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">merged_tf</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">(</span><span class="s2">&quot;period&quot;</span><span class="p">))</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">to_array</span><span class="p">(</span><span class="s2">&quot;period&quot;</span><span class="p">)</span>
+            <span class="n">output_channels</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">output_channel</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="n">output_channels</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">output_channels</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;tmp___&quot;</span><span class="p">]</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">output_channel</span><span class="o">=</span><span class="n">output_channels</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">merged_tf</span> <span class="o">=</span> <span class="n">tmp</span>
+
+            <span class="n">n_output_ch</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">merged_tf</span><span class="o">.</span><span class="n">output_channel</span><span class="p">)</span>  <span class="c1"># this should be 3</span>
+            <span class="n">n_periods</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">merged_tf</span><span class="o">.</span><span class="n">period</span><span class="p">)</span>
+            <span class="n">cov_nn_dims</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_output_ch</span><span class="p">,</span> <span class="n">n_output_ch</span><span class="p">,</span> <span class="n">n_periods</span><span class="p">)</span>
+            <span class="n">cov_nn_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">cov_nn_dims</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+
+            <span class="n">cov_nn</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+                <span class="n">cov_nn_data</span><span class="p">,</span>
+                <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;output_channel_1&quot;</span><span class="p">,</span> <span class="s2">&quot;output_channel_2&quot;</span><span class="p">,</span> <span class="s2">&quot;period&quot;</span><span class="p">],</span>
+                <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;output_channel_1&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_tf</span><span class="o">.</span><span class="n">output_channel</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                    <span class="s2">&quot;output_channel_2&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_tf</span><span class="o">.</span><span class="n">output_channel</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                    <span class="s2">&quot;period&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_tf</span><span class="o">.</span><span class="n">period</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+
+            <span class="c1"># to dataset and back makes the coords line up -- this does not seem robust</span>
+            <span class="n">cov_nn</span> <span class="o">=</span> <span class="n">cov_nn</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">(</span><span class="s2">&quot;period&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_array</span><span class="p">(</span><span class="s2">&quot;period&quot;</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">out_ch_1</span> <span class="ow">in</span> <span class="n">cov_nn</span><span class="o">.</span><span class="n">output_channel_1</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">out_ch_2</span> <span class="ow">in</span> <span class="n">cov_nn</span><span class="o">.</span><span class="n">output_channel_1</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_cov_nn</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">out_ch_1</span><span class="p">,</span> <span class="n">out_ch_2</span><span class="p">]</span>
+                        <span class="n">cov_nn</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">out_ch_1</span><span class="p">,</span> <span class="n">out_ch_2</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span>
+                    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                        <span class="k">pass</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">merged_cov_nn</span> <span class="o">=</span> <span class="n">cov_nn</span>
+        <span class="k">if</span> <span class="n">ex</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_tf</span><span class="o">.</span><span class="n">output_channel</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+            <span class="c1"># placeholder: logic for missing ex would go here</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;No handling for missing ex channel&quot;</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ey</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">merged_tf</span><span class="o">.</span><span class="n">output_channel</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+            <span class="c1"># placeholder: logic for missing ey would go here</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;No handling for missing ey channel&quot;</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TransferFunctionCollection.rho_phi_plot"><a class="viewcode-back" href="../../../api/aurora.transfer_function.html#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.rho_phi_plot">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">rho_phi_plot</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">xy_or_yx</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">show</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">aux_data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">ZFile</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">ttl_str</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">x_axis_fontsize</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span>
+        <span class="n">y_axis_fontsize</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span>
+        <span class="n">ttl_fontsize</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
+        <span class="n">markersize</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="n">rho_ylims</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1000</span><span class="p">],</span>
+        <span class="n">phi_ylims</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
+        <span class="n">figures_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="n">FIGURES_PATH</span><span class="p">,</span>
+        <span class="n">figure_basename</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        One-off plotting method intended only for the synthetic test data for aurora dev</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        xy_or_yx: str</span>
+<span class="sd">            Must be &quot;xy&quot; or &quot;yx&quot; -- the mode of the TF to plot</span>
+<span class="sd">        show: Optional[bool]</span>
+<span class="sd">            If True show figure on screen</span>
+<span class="sd">        aux_data: Optional[Union[ZFile, None]]</span>
+<span class="sd">            If not none, plot the data from the z-file as well as data from self</span>
+<span class="sd">        ttl_str: Optional[str]</span>
+<span class="sd">            If provided, ttl_str will be appended to the plot title</span>
+<span class="sd">        x_axis_fontsize: int</span>
+<span class="sd">            Font size for the x-axis</span>
+<span class="sd">        y_axis_fontsize: int</span>
+<span class="sd">            Font size for the y-axis</span>
+<span class="sd">        ttl_fontsize: int</span>
+<span class="sd">            Font size for the title</span>
+<span class="sd">        markersize: int</span>
+<span class="sd">            the marker size for the plot symbols</span>
+<span class="sd">        rho_ylims: list</span>
+<span class="sd">            The lower and upper limits for the y-axis on rho plot</span>
+<span class="sd">        phi_ylims: list</span>
+<span class="sd">            The lower and upper limits for the y-axis on phi plot</span>
+<span class="sd">        figures_path: Union[str, pathlib.Path]</span>
+<span class="sd">            Where to save the figure</span>
+<span class="sd">        figure_basename:</span>
+<span class="sd">            What the name of the figure will be.</span>
+<span class="sd">            If not given, a default name is assigned</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+        <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mf">8.5</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+
+        <span class="n">color_cyc</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="s2">&quot;k&quot;</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">i_dec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tf_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">tf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tf_dict</span><span class="p">[</span><span class="n">i_dec</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">xy_or_yx</span> <span class="o">==</span> <span class="s2">&quot;xy&quot;</span><span class="p">:</span>
+                <span class="n">aurora_rho</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">rho</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">aurora_rho</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">rho</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">plot_rho</span><span class="p">(</span>
+                <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">tf</span><span class="o">.</span><span class="n">periods</span><span class="p">,</span>
+                <span class="n">aurora_rho</span><span class="p">,</span>
+                <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="n">color_cyc</span><span class="p">[</span><span class="n">i_dec</span><span class="p">],</span>
+                <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;None&quot;</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;aurora </span><span class="si">{</span><span class="n">i_dec</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">markersize</span><span class="o">=</span><span class="n">markersize</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">xy_or_yx</span> <span class="o">==</span> <span class="s2">&quot;xy&quot;</span><span class="p">:</span>
+                <span class="n">aurora_phi</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">phi</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">aurora_phi</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">phi</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="c1"># rotate phases so all are positive:</span>
+            <span class="n">negative_phi_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">aurora_phi</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">aurora_phi</span><span class="p">[</span><span class="n">negative_phi_indices</span><span class="p">]</span> <span class="o">+=</span> <span class="mf">180.0</span>
+            <span class="n">plot_phi</span><span class="p">(</span>
+                <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">tf</span><span class="o">.</span><span class="n">periods</span><span class="p">,</span>
+                <span class="n">aurora_phi</span><span class="p">,</span>
+                <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="n">color_cyc</span><span class="p">[</span><span class="n">i_dec</span><span class="p">],</span>
+                <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;None&quot;</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;aurora </span><span class="si">{</span><span class="n">i_dec</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">markersize</span><span class="o">=</span><span class="n">markersize</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">aux_data</span><span class="p">:</span>
+            <span class="n">decimation_levels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">aux_data</span><span class="o">.</span><span class="n">decimation_levels</span><span class="p">))</span>
+            <span class="n">shape_cyc</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s2">&quot;^&quot;</span><span class="p">}</span>
+            <span class="k">if</span> <span class="n">xy_or_yx</span> <span class="o">==</span> <span class="s2">&quot;xy&quot;</span><span class="p">:</span>
+                <span class="n">emtf_rho</span> <span class="o">=</span> <span class="n">aux_data</span><span class="o">.</span><span class="n">rxy</span>
+                <span class="n">emtf_phi</span> <span class="o">=</span> <span class="n">aux_data</span><span class="o">.</span><span class="n">pxy</span>
+            <span class="k">elif</span> <span class="n">xy_or_yx</span> <span class="o">==</span> <span class="s2">&quot;yx&quot;</span><span class="p">:</span>
+                <span class="n">emtf_rho</span> <span class="o">=</span> <span class="n">aux_data</span><span class="o">.</span><span class="n">ryx</span>
+                <span class="n">emtf_phi</span> <span class="o">=</span> <span class="n">aux_data</span><span class="o">.</span><span class="n">pyx</span>
+
+            <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">(),</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+            <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">(),</span> <span class="mi">45</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i_dec</span> <span class="ow">in</span> <span class="n">decimation_levels</span><span class="p">:</span>
+
+                <span class="n">ndx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">aux_data</span><span class="o">.</span><span class="n">decimation_levels</span> <span class="o">==</span> <span class="n">i_dec</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span>
+                    <span class="n">aux_data</span><span class="o">.</span><span class="n">periods</span><span class="p">[</span><span class="n">ndx</span><span class="p">],</span>
+                    <span class="n">emtf_rho</span><span class="p">[</span><span class="n">ndx</span><span class="p">],</span>
+                    <span class="n">marker</span><span class="o">=</span><span class="n">shape_cyc</span><span class="p">[</span><span class="n">i_dec</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span>
+                    <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span>
+                    <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;None&quot;</span><span class="p">,</span>
+                    <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;emtf &quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">i_dec</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">markersize</span><span class="o">=</span><span class="n">markersize</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span>
+                    <span class="n">aux_data</span><span class="o">.</span><span class="n">periods</span><span class="p">[</span><span class="n">ndx</span><span class="p">],</span>
+                    <span class="n">emtf_phi</span><span class="p">[</span><span class="n">ndx</span><span class="p">],</span>
+                    <span class="n">marker</span><span class="o">=</span><span class="n">shape_cyc</span><span class="p">[</span><span class="n">i_dec</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span>
+                    <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span>
+                    <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;None&quot;</span><span class="p">,</span>
+                    <span class="n">markersize</span><span class="o">=</span><span class="n">markersize</span><span class="p">,</span>
+                    <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;emtf &quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">i_dec</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+        <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">ncol</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">ncol</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Period (s)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">x_axis_fontsize</span><span class="p">)</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\Omega$-m&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">y_axis_fontsize</span><span class="p">)</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Degrees&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">y_axis_fontsize</span><span class="p">)</span>
+
+        <span class="n">ttl_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tf</span><span class="o">.</span><span class="n">tf_header</span><span class="o">.</span><span class="n">local_station</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">xy_or_yx</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="si">{</span><span class="n">ttl_str</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">ttl_str</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">ttl_fontsize</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rho_ylims</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">rho_ylims</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">phi_ylims</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">phi_ylims</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">figures_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;figures path is not defined -- skipping saving figures&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">figure_basename</span><span class="p">:</span>
+                <span class="n">figure_basename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">local_station_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">xy_or_yx</span><span class="si">}</span><span class="s2">.png&quot;</span>
+            <span class="n">out_file</span> <span class="o">=</span> <span class="n">figures_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">figure_basename</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">out_file</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,639 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.sandbox package &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="aurora.sandbox.io_helpers package" href="aurora.sandbox.io_helpers.html" />
+    <link rel="prev" title="aurora.pipelines package" href="aurora.pipelines.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">aurora</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="aurora.html">aurora package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="aurora.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="aurora.config.html">aurora.config package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html">aurora.pipelines package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">aurora.sandbox package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.html">aurora.test_utils package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html">aurora.time_series package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html">aurora.transfer_function package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.html#module-aurora.general_helper_functions">aurora.general_helper_functions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.html#module-aurora">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">aurora</a></li>
+          <li class="breadcrumb-item"><a href="aurora.html">aurora package</a></li>
+      <li class="breadcrumb-item active">aurora.sandbox package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/aurora.sandbox.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="aurora-sandbox-package">
+<h1>aurora.sandbox package<a class="headerlink" href="#aurora-sandbox-package" title="Permalink to this heading">¶</a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="aurora.sandbox.io_helpers.html">aurora.sandbox.io_helpers package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aurora.sandbox.io_helpers.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.sandbox.io_helpers.html#module-aurora.sandbox.io_helpers.emtf_band_setup">aurora.sandbox.io_helpers.emtf_band_setup module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile"><code class="docutils literal notranslate"><span class="pre">EMTFBandSetupFile</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.compute_band_edges"><code class="docutils literal notranslate"><span class="pre">EMTFBandSetupFile.compute_band_edges()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.decimation_levels"><code class="docutils literal notranslate"><span class="pre">EMTFBandSetupFile.decimation_levels</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.get_decimation_level"><code class="docutils literal notranslate"><span class="pre">EMTFBandSetupFile.get_decimation_level()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.load"><code class="docutils literal notranslate"><span class="pre">EMTFBandSetupFile.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.num_bands"><code class="docutils literal notranslate"><span class="pre">EMTFBandSetupFile.num_bands</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.num_decimation_levels"><code class="docutils literal notranslate"><span class="pre">EMTFBandSetupFile.num_decimation_levels</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.sandbox.io_helpers.html#module-aurora.sandbox.io_helpers.fdsn_dataset">aurora.sandbox.io_helpers.fdsn_dataset module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset"><code class="docutils literal notranslate"><span class="pre">FDSNDataset</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.client"><code class="docutils literal notranslate"><span class="pre">FDSNDataset.client</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.describe"><code class="docutils literal notranslate"><span class="pre">FDSNDataset.describe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.get_data_via_fdsn_client"><code class="docutils literal notranslate"><span class="pre">FDSNDataset.get_data_via_fdsn_client()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.get_inventory"><code class="docutils literal notranslate"><span class="pre">FDSNDataset.get_inventory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.h5_filebase"><code class="docutils literal notranslate"><span class="pre">FDSNDataset.h5_filebase</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.initialize_client"><code class="docutils literal notranslate"><span class="pre">FDSNDataset.initialize_client()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.sandbox.io_helpers.html#module-aurora.sandbox.io_helpers.inventory_review">aurora.sandbox.io_helpers.inventory_review module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.inventory_review.describe_inventory_stages"><code class="docutils literal notranslate"><span class="pre">describe_inventory_stages()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.inventory_review.scan_inventory_for_nonconformity"><code class="docutils literal notranslate"><span class="pre">scan_inventory_for_nonconformity()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.sandbox.io_helpers.html#module-aurora.sandbox.io_helpers.make_mth5_helpers">aurora.sandbox.io_helpers.make_mth5_helpers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.sandbox.io_helpers.html#module-aurora.sandbox.io_helpers.zfile_murphy">aurora.sandbox.io_helpers.zfile_murphy module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.zfile_murphy.ZFile"><code class="docutils literal notranslate"><span class="pre">ZFile</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.zfile_murphy.ZFile.apparent_resistivity"><code class="docutils literal notranslate"><span class="pre">ZFile.apparent_resistivity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.zfile_murphy.ZFile.get_station_id"><code class="docutils literal notranslate"><span class="pre">ZFile.get_station_id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.zfile_murphy.ZFile.impedance"><code class="docutils literal notranslate"><span class="pre">ZFile.impedance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.zfile_murphy.ZFile.load"><code class="docutils literal notranslate"><span class="pre">ZFile.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.zfile_murphy.ZFile.open_file"><code class="docutils literal notranslate"><span class="pre">ZFile.open_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.zfile_murphy.ZFile.phi"><code class="docutils literal notranslate"><span class="pre">ZFile.phi()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.zfile_murphy.ZFile.read_channel_information"><code class="docutils literal notranslate"><span class="pre">ZFile.read_channel_information()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.zfile_murphy.ZFile.read_coordinates_and_declination"><code class="docutils literal notranslate"><span class="pre">ZFile.read_coordinates_and_declination()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.zfile_murphy.ZFile.read_number_of_channels_and_number_of_frequencies"><code class="docutils literal notranslate"><span class="pre">ZFile.read_number_of_channels_and_number_of_frequencies()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.zfile_murphy.ZFile.rho"><code class="docutils literal notranslate"><span class="pre">ZFile.rho()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.zfile_murphy.ZFile.skip_header_lines"><code class="docutils literal notranslate"><span class="pre">ZFile.skip_header_lines()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.zfile_murphy.ZFile.tippers"><code class="docutils literal notranslate"><span class="pre">ZFile.tippers()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.zfile_murphy.read_z_file"><code class="docutils literal notranslate"><span class="pre">read_z_file()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.sandbox.io_helpers.html#module-aurora.sandbox.io_helpers">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-aurora.sandbox.debug_mt_metadata_issue_85">
+<span id="aurora-sandbox-debug-mt-metadata-issue-85-module"></span><h2>aurora.sandbox.debug_mt_metadata_issue_85 module<a class="headerlink" href="#module-aurora.sandbox.debug_mt_metadata_issue_85" title="Permalink to this heading">¶</a></h2>
+<p>This module contains a test that should be moved into mt_metadata
+TODO: Make this a test in mt_metadata</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.sandbox.debug_mt_metadata_issue_85.main">
+<span class="sig-prename descclassname"><span class="pre">aurora.sandbox.debug_mt_metadata_issue_85.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/debug_mt_metadata_issue_85.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.debug_mt_metadata_issue_85.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.sandbox.debug_mt_metadata_issue_85.test_can_add_location">
+<span class="sig-prename descclassname"><span class="pre">aurora.sandbox.debug_mt_metadata_issue_85.</span></span><span class="sig-name descname"><span class="pre">test_can_add_location</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/debug_mt_metadata_issue_85.html#test_can_add_location"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.debug_mt_metadata_issue_85.test_can_add_location" title="Permalink to this definition">¶</a></dt>
+<dd><p>20220624: This mini test is being factored out of the normal tests.
+Want to assign location.  The location lands in the station_group but not in the
+run_group.
+Reported this conundrum <a class="reference external" href="https://github.com/kujaku11/mt_metadata/issues/85">https://github.com/kujaku11/mt_metadata/issues/85</a></p>
+<p>When I close and reopen the file, I cannot find the latitude I set anywhere.</p>
+</dd></dl>
+
+</section>
+<section id="module-aurora.sandbox.mth5_channel_summary_helpers">
+<span id="aurora-sandbox-mth5-channel-summary-helpers-module"></span><h2>aurora.sandbox.mth5_channel_summary_helpers module<a class="headerlink" href="#module-aurora.sandbox.mth5_channel_summary_helpers" title="Permalink to this heading">¶</a></h2>
+<p>This module contains methods to help make mth5 files.
+TODO: Review and move to make_mth5 if relevant</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.sandbox.mth5_channel_summary_helpers.channel_summary_to_make_mth5">
+<span class="sig-prename descclassname"><span class="pre">aurora.sandbox.mth5_channel_summary_helpers.</span></span><span class="sig-name descname"><span class="pre">channel_summary_to_make_mth5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_nomenclature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/mth5_channel_summary_helpers.html#channel_summary_to_make_mth5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.mth5_channel_summary_helpers.channel_summary_to_make_mth5" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a dataframe that can be passed to make_mth5.</p>
+<p>Context is say you have a station_xml that has come from somewhere and you want
+to make an mth5 from it, with all the relevant data.  Then you should use
+make_mth5.  But make_mth5 wants a df with a particular schema (which should be
+written down somewhere!) This method returns a dataframe with the schema that
+MakeMTH5() expects.  Specifically, there is one row for each channel-run
+combination.</p>
+<p>This method could be an option for output format of mth5.channel_summary()</p>
+<p>TODO: Add support for channel_nomenclature</p>
+<p>This method could be an option for output format of mth5.channel_summary()</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pd.DataFrame</em>) – Output from mth5_obj.channel_summary</p></li>
+<li><p><strong>network</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Usually two characters, the network code specifies the network on which
+the data were acquired.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Set to true to see some strings describing what is happening</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>out_df</strong> – The make_mth5 formatted dataframe</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-aurora.sandbox.mth5_helpers">
+<span id="aurora-sandbox-mth5-helpers-module"></span><h2>aurora.sandbox.mth5_helpers module<a class="headerlink" href="#module-aurora.sandbox.mth5_helpers" title="Permalink to this heading">¶</a></h2>
+<p>This module contains utility functions for working with MTH5 files.
+TODO: Review and move to mth5 if relevant</p>
+<p>Background: This module was inside of mth5/clients/helper_functions.py on branch issue_76_make_mth5_factoring</p>
+<p>Some of these functions are handy, and should eventually be merged into mth5. I would also like to
+use some of these functions from time-to-time, so I am putting them here for now, until we can
+decide what to move to mth5 and what to keep in aurora (and what to throw out).</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.sandbox.mth5_helpers.augmented_channel_summary">
+<span class="sig-prename descclassname"><span class="pre">aurora.sandbox.mth5_helpers.</span></span><span class="sig-name descname"><span class="pre">augmented_channel_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mth5_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/mth5_helpers.html#augmented_channel_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.mth5_helpers.augmented_channel_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds column “n_filters” to mth5 channel summary.</p>
+<p>This function was used when debugging and wide scale testing at IRIS/Earthscope.</p>
+<p>Development Notes:
+TODO: Consider supporting a list of keyeords that tell what columns to add</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>df</strong> (<em>channel summary dataframe</em>) – </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>df</strong> – Same as input but with new column</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.Dataframe</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.sandbox.mth5_helpers.build_request_df">
+<span class="sig-prename descclassname"><span class="pre">aurora.sandbox.mth5_helpers.</span></span><span class="sig-name descname"><span class="pre">build_request_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_period_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mth5_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'0.2.0'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="../_modules/aurora/sandbox/mth5_helpers.html#build_request_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.mth5_helpers.build_request_df" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Given some information about an earthscope dataset, format the dataset description</dt><dd><p>into a request_df dataframe.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>network_id</strong> (<em>string</em>) – Two-character network identifier string fro FDSN.</p></li>
+<li><p><strong>station_id</strong> (<em>string</em>) – Short identifier code used by FDSN, e.g. CAS04, NVR11</p></li>
+<li><p><strong>channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> or </em><em>None</em>) – 3-character channel identifiers, e.g. [“LQ2”, “MFZ”],
+support for wildcards of the form [”<em>F</em>”, “<em>Q</em>”,] is experimental
+Does not support wildcards of the form [“*”,]</p></li>
+<li><p><strong>start</strong> (<em>string</em>) – ISO-8601 representation of a timestamp</p></li>
+<li><p><strong>end</strong> (<em>string</em>) – ISO-8601 representation of a timestamp</p></li>
+<li><p><strong>time_period_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Keyed by same values as channels, this gives explicit start/end times for each of the channels</p></li>
+<li><p><strong>mth5_version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – From [“0.1.0”, “0.2.0”]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>request_df</strong> – A formatted dataframe that can be passed to mth5.clients.FDSN to request metdata or data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.sandbox.mth5_helpers.enrich_channel_summary">
+<span class="sig-prename descclassname"><span class="pre">aurora.sandbox.mth5_helpers.</span></span><span class="sig-name descname"><span class="pre">enrich_channel_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mth5_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keyword</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/mth5_helpers.html#enrich_channel_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.mth5_helpers.enrich_channel_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Operates on a channel summary df and adds some information in a new column.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mth5_object</strong> (<em>mth5.mth5.MTH5</em>) – </p></li>
+<li><p><strong>df</strong> (<em>pd.DataFrame</em>) – A channel summary dataframe</p></li>
+<li><p><strong>keyword</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – supported keywords are [“num_filters”,]
+“num_filters” computes the number of filters associated with each row (channel-run) and adds that “num_filters” column of df</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>df</strong> – The channel summary df with the new column</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.sandbox.mth5_helpers.get_channel_summary">
+<span class="sig-prename descclassname"><span class="pre">aurora.sandbox.mth5_helpers.</span></span><span class="sig-name descname"><span class="pre">get_channel_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h5_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/mth5_helpers.html#get_channel_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.mth5_helpers.get_channel_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a channel summary from an mth5;
+TODO: This can be replaced by methods in mth5.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>h5_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>pathlib.Path</em></a>) – Where is the h5</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>channel_summary_df</strong> – channel summary from mth5</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.sandbox.mth5_helpers.get_experiment_from_obspy_inventory">
+<span class="sig-prename descclassname"><span class="pre">aurora.sandbox.mth5_helpers.</span></span><span class="sig-name descname"><span class="pre">get_experiment_from_obspy_inventory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inventory</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/mth5_helpers.html#get_experiment_from_obspy_inventory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.mth5_helpers.get_experiment_from_obspy_inventory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts an FDSN inventory to an MTH5 Experiment object</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.sandbox.mth5_helpers.mth5_from_experiment">
+<span class="sig-prename descclassname"><span class="pre">aurora.sandbox.mth5_helpers.</span></span><span class="sig-name descname"><span class="pre">mth5_from_experiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">experiment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h5_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/mth5_helpers.html#mth5_from_experiment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.mth5_helpers.mth5_from_experiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts an experiment object into an mth5 file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>experiment</strong> – </p></li>
+<li><p><strong>h5_path</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-aurora.sandbox.obspy_helpers">
+<span id="aurora-sandbox-obspy-helpers-module"></span><h2>aurora.sandbox.obspy_helpers module<a class="headerlink" href="#module-aurora.sandbox.obspy_helpers" title="Permalink to this heading">¶</a></h2>
+<p>This module contains helper functions for working with obspy objects.</p>
+<p>Development Notes
+- TODO: Most of this could likely be moved into MTH5</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.sandbox.obspy_helpers.align_streams">
+<span class="sig-prename descclassname"><span class="pre">aurora.sandbox.obspy_helpers.</span></span><span class="sig-name descname"><span class="pre">align_streams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">streams</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clock_start</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/obspy_helpers.html#align_streams"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.obspy_helpers.align_streams" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shift stream timestamps so that they are aligned.</p>
+<p>This is a hack around to handle data that are asynchronously sampled.
+It should not be used in general.  It is only appropriate for datasets that have
+been tested with it.
+PKD, SAO only at this point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>streams</strong> (<em>iterable</em><em> of </em><em>types obspy.core.stream.Stream</em>) – </p></li>
+<li><p><strong>clock_start</strong> (<em>obspy UTCDateTime</em>) – this is a reference time that we set the first sample to be</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>streams</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.sandbox.obspy_helpers.make_channel_labels_fdsn_compliant">
+<span class="sig-prename descclassname"><span class="pre">aurora.sandbox.obspy_helpers.</span></span><span class="sig-name descname"><span class="pre">make_channel_labels_fdsn_compliant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">streams</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/obspy_helpers.html#make_channel_labels_fdsn_compliant"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.obspy_helpers.make_channel_labels_fdsn_compliant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renames channels to FDSN compliant channel names.</p>
+<p>Workaround because NCEDC channel nomenclature is not FDSN Compliant for PKD, SAO
+Specifically, re-assign non-conventional channel labels
+Q2 –&gt; Q1
+Q3 –&gt; Q2
+T1 –&gt; F1
+T2 –&gt; F2
+T3 –&gt; F3</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>streams</strong> (<em>iterable</em><em> of </em><em>types obspy.core.stream.Stream</em>) – </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>streams</strong> – Same as input but updated with new channel names.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>iterable of types obspy.core.stream.Stream</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.sandbox.obspy_helpers.trim_streams_to_common_timestamps">
+<span class="sig-prename descclassname"><span class="pre">aurora.sandbox.obspy_helpers.</span></span><span class="sig-name descname"><span class="pre">trim_streams_to_common_timestamps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">streams</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/obspy_helpers.html#trim_streams_to_common_timestamps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.obspy_helpers.trim_streams_to_common_timestamps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Slices streams to common time stamps.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>streams</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-aurora.sandbox.plot_helpers">
+<span id="aurora-sandbox-plot-helpers-module"></span><h2>aurora.sandbox.plot_helpers module<a class="headerlink" href="#module-aurora.sandbox.plot_helpers" title="Permalink to this heading">¶</a></h2>
+<p>This module contains some plotting helper functions.</p>
+<p>Most of these were used in initial development and should be replaced by methods in MTpy.
+TODO: review which of these can be replaced with methods in MTpy-v2</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.sandbox.plot_helpers.cast_angular_frequency_to_period_or_hertz">
+<span class="sig-prename descclassname"><span class="pre">aurora.sandbox.plot_helpers.</span></span><span class="sig-name descname"><span class="pre">cast_angular_frequency_to_period_or_hertz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/plot_helpers.html#cast_angular_frequency_to_period_or_hertz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.plot_helpers.cast_angular_frequency_to_period_or_hertz" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Converts angular frequency to period or Hertz</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>w</strong> (<em>numpy array</em>) – Angular frequencies (radians per second)</p></li>
+<li><p><strong>units</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Requested output units (“period” or “frequency”)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>x_axis</strong> – Same as input but units are now the requested ones.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.sandbox.plot_helpers.plot_complex_response">
+<span class="sig-prename descclassname"><span class="pre">aurora.sandbox.plot_helpers.</span></span><span class="sig-name descname"><span class="pre">plot_complex_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frequency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">complex_response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linewidth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">make</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/plot_helpers.html#plot_complex_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.plot_helpers.plot_complex_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots amplitude and phase of a complex response as a function of frequency.</p>
+<p>Development Notes:
+ToDo: add methods for supporting instrument object but for now take as kwargs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frequency</strong> – numpy array of frequencies at which complex response is defined</p></li>
+<li><p><strong>complex_response</strong> – numpy array of full complex valued response function</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.sandbox.plot_helpers.plot_response_pz">
+<span class="sig-prename descclassname"><span class="pre">aurora.sandbox.plot_helpers.</span></span><span class="sig-name descname"><span class="pre">plot_response_pz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w_obs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resp_obs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zpk_obs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zpk_pred</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Period'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/plot_helpers.html#plot_response_pz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.plot_helpers.plot_response_pz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots the pole zero response.</p>
+<p>This function was contributed by Ben Murphy at USGS
+2021-03-17: there are some issues encountered when using this function to plot
+generic resposnes, looks like the x-axis gets out of order when using frequency
+as the axis …</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>w_obs</strong> (<em>numpy array</em>) – Angular frequencies from lab observations, for example a fap calibration table</p></li>
+<li><p><strong>resp_obs</strong> (<em>numpy array</em>) – Complex valued response associated with lab observation</p></li>
+<li><p><strong>zpk_obs</strong> (<em>scipy.signal.ltisys.ZerosPolesGainContinuous</em>) – Pole-Zero object representing the lab observation</p></li>
+<li><p><strong>zpk_pred</strong> (<em>scipy.signal.ltisys.ZerosPolesGainContinuous</em>) – Pole-Zero object representing the model</p></li>
+<li><p><strong>w_values</strong> (<em>numpy array</em>) – Angular frequencies at which to evaluate zpk_pred and zpk_obs</p></li>
+<li><p><strong>xlim</strong> – </p></li>
+<li><p><strong>title</strong> (<em>string</em>) – Title for the plot</p></li>
+<li><p><strong>x_units</strong> (<em>string</em>) – One of [“Period” , “frequency”], case insensitve</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.sandbox.plot_helpers.plot_tf_obj">
+<span class="sig-prename descclassname"><span class="pre">aurora.sandbox.plot_helpers.</span></span><span class="sig-name descname"><span class="pre">plot_tf_obj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tf_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/plot_helpers.html#plot_tf_obj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.plot_helpers.plot_tf_obj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the transfer function object in terms of apparent resistivity and phase.</p>
+<dl class="simple">
+<dt>Development Notes:</dt><dd><p>This function is only used in the processing pipeline to give some QC plots</p>
+</dd>
+</dl>
+<p>TODO: Get plotter from MTpy or elsewhere.
+See Issue #209
+<a class="reference external" href="https://github.com/simpeg/aurora/issues/209">https://github.com/simpeg/aurora/issues/209</a>
+:param tf_obj: The transfer function values packed into an object
+:type tf_obj: aurora.transfer_function.TTFZ.TTFZ
+:param out_filename: Where to save the file.  No png is saved if this is False
+:type out_filename: string</p>
+</dd></dl>
+
+</section>
+<section id="module-aurora.sandbox.triage_metadata">
+<span id="aurora-sandbox-triage-metadata-module"></span><h2>aurora.sandbox.triage_metadata module<a class="headerlink" href="#module-aurora.sandbox.triage_metadata" title="Permalink to this heading">¶</a></h2>
+<p>This module contains various helper functions that were used to fix errors in metadata.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.sandbox.triage_metadata.triage_missing_coil_hollister">
+<span class="sig-prename descclassname"><span class="pre">aurora.sandbox.triage_metadata.</span></span><span class="sig-name descname"><span class="pre">triage_missing_coil_hollister</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">experiment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Experiment</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Experiment</span></span></span><a class="reference internal" href="../_modules/aurora/sandbox/triage_metadata.html#triage_missing_coil_hollister"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.triage_metadata.triage_missing_coil_hollister" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fixes missing metadata for Hollister station</p>
+<p>One-off for hollister missing hy metadata in NCEDC archive.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>experiment</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.sandbox.triage_metadata.triage_mt_units_electric_field">
+<span class="sig-prename descclassname"><span class="pre">aurora.sandbox.triage_metadata.</span></span><span class="sig-name descname"><span class="pre">triage_mt_units_electric_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">experiment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Experiment</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Experiment</span></span></span><a class="reference internal" href="../_modules/aurora/sandbox/triage_metadata.html#triage_mt_units_electric_field"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.triage_metadata.triage_mt_units_electric_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates an mth5 experiment with filter information</p>
+<p>One-off example of adding a filter to an mth5 in the case where the electric
+field data are given in V/m, but they were expected in mV/km.  This adds the
+correct filter to the metadata so that the calibrated data have units of
+mV/km.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>experiment</strong> (<em>mt_metadata.timeseries.Experiment</em>) – mt_metadata representation of station XML</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>experiment</strong> – Updated experiment with additional filter to make electric field into MT Units (mV/km)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>mt_metadata.timeseries.Experiment</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.sandbox.triage_metadata.triage_mt_units_magnetic_field">
+<span class="sig-prename descclassname"><span class="pre">aurora.sandbox.triage_metadata.</span></span><span class="sig-name descname"><span class="pre">triage_mt_units_magnetic_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">experiment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Experiment</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Experiment</span></span></span><a class="reference internal" href="../_modules/aurora/sandbox/triage_metadata.html#triage_mt_units_magnetic_field"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.triage_metadata.triage_mt_units_magnetic_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates an mth5 experiment with filter information</p>
+<p>One-off example of adding a filter to an mth5 in the case where the magnetic
+field data are given in T, but they were expected in nT.  This adds the
+correct filter to the metadata so that the calibrated data have units of nT.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>experiment</strong> (<em>mt_metadata.timeseries.Experiment</em>) – mt_metadata representation of station XML</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>experiment</strong> – Updated experiment with additional filter to make magnetic field into MT Units (nT)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>mt_metadata.timeseries.Experiment</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.sandbox.triage_metadata.triage_run_id">
+<span class="sig-prename descclassname"><span class="pre">aurora.sandbox.triage_metadata.</span></span><span class="sig-name descname"><span class="pre">triage_run_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expected_run_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RunGroup</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/aurora/sandbox/triage_metadata.html#triage_run_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.triage_metadata.triage_run_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fixes metadata from an old version of MTH5.</p>
+<p>This situation was encountered during the Musgraves processing for 2023 HPC workshop.
+The MTH5 files being used were from a previous era, and the run_object metadata did not
+contain the expected value for run_id.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>expected_run_id</strong> (<em>string</em>) – The expected name of the run</p></li>
+<li><p><strong>run_obj</strong> (<em>mth5.groups.run.RunGroup</em>) – The run object that should have correct name.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-aurora.sandbox">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-aurora.sandbox" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="aurora.pipelines.html" class="btn btn-neutral float-left" title="aurora.pipelines package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="aurora.sandbox.io_helpers.html" class="btn btn-neutral float-right" title="aurora.sandbox.io_helpers package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

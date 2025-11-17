@@ -1,0 +1,1056 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Review of natural field transfer function algebra &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Review of natural field transfer function algebra</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials/tf_calculation.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Review-of-natural-field-transfer-function-algebra">
+<h1>Review of natural field transfer function algebra<a class="headerlink" href="#Review-of-natural-field-transfer-function-algebra" title="Permalink to this heading">¶</a></h1>
+<section id="Learning-Objectives:">
+<h2>Learning Objectives:<a class="headerlink" href="#Learning-Objectives:" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>the basic TF Equation set-up and how OLS solutions solve it</p></li>
+<li><p>How to cast the solution in terms of cross-and-auto-powers of array channels</p></li>
+<li><p>The concept of MT signal and noise</p>
+<ul>
+<li><p>the difference between coherent and incoherent noise</p></li>
+</ul>
+</li>
+<li><p>The role of incoherent noise in results bias</p></li>
+<li><p>The role of the remote reference station in reducing bias</p></li>
+</ul>
+</section>
+<section id="What-is-not-covered:">
+<h2>What is not covered:<a class="headerlink" href="#What-is-not-covered:" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>We start with the concept of an MT Station and time series of calibrated Fourier coefficients</p>
+<ul>
+<li><p>No discussion in this module is provided for how these are obtained</p></li>
+</ul>
+</li>
+</ul>
+<p>In a noise free world, at a fixed frequency, under the plane wave assumption, the measured fields at any fixed location should obey the following equation:</p>
+<p><span class="math">\begin{equation*}
+\begin{bmatrix} E_x \\ E_y \\ H_z \end{bmatrix}
+=
+\begin{bmatrix} Z_{xx} & Z_{xy}  \\ Z_{yx} & Z_{yy} \\ T_{x} & T_{y} \end{bmatrix}
+\begin{bmatrix} H_x \\ H_y \end{bmatrix}
+\label{eq:MTTF} \tag{1}
+\end{equation*}</span></p>
+<p>The fundamental TF relationship is defined by equation <span class="math notranslate nohighlight">\(\eqref{eq:MTTF}\)</span>. The elements of the 3x2 tensor <span class="math notranslate nohighlight">\(Z_{ij}\)</span> and <span class="math notranslate nohighlight">\(T_i\)</span> are 9theroetically) invariants for a fixed measurement location for simultaneous measurements of $E.</p>
+<p>*Note that we can regress on <span class="math notranslate nohighlight">\(H_x, H_y\)</span> as if they were “inputs” and the <span class="math notranslate nohighlight">\(E_x, E_y, H_z\)</span> were “output” even though physically the <span class="math notranslate nohighlight">\(H_x, H_y\)</span> may be some combination of input and output.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<p>This is three equations in six unknowns, but each of the three equations can be solved separately for pairs of tensor elements (rows of Equation 1).</p>
+<p>Extracting the first equation from the system we write:</p>
+<p><span class="math">\begin{equation*}
+\begin{bmatrix} E_x \end{bmatrix}
+=
+\begin{bmatrix} Z_{xx} & Z_{xy} \end{bmatrix}
+\begin{bmatrix} H_x \\ H_y \end{bmatrix}
+\label{eq:2a} \tag{2a}
+\end{equation*}</span></p>
+<p>In the “E_x” equation. the values for E, H are themselves vector observations</p>
+<p>$ <span class="math">\begin{equation*}
+\begin{bmatrix}
+E_{x,1} & E_{x,2} & ... & E_{x,N} \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+Z_{xx} & Z_{xy} \\
+\end{bmatrix}
+\begin{bmatrix}
+H_{x,1} & H_{x,2} & ... & H_{x,N} \\
+H_{y,1} & H_{y,2} & ... & H_{y,N} \\
+\end{bmatrix}
+\label{eq:2b} \tag{2b}
+\end{equation*}</span> $</p>
+<p>This is an equation with two unknowns, <span class="math notranslate nohighlight">\(Z_{xy}, Z_{xy}\)</span>.</p>
+<p>Here the data are organized into row vectors. <span class="math notranslate nohighlight">\(E_x\)</span> is <span class="math notranslate nohighlight">\(1\)</span> x <span class="math notranslate nohighlight">\(N\)</span>, <span class="math notranslate nohighlight">\(Z\)</span> is <span class="math notranslate nohighlight">\(1\)</span> x <span class="math notranslate nohighlight">\(2\)</span>, and <span class="math notranslate nohighlight">\(H\)</span> is <span class="math notranslate nohighlight">\(2\)</span> x <span class="math notranslate nohighlight">\(N\)</span>. 1</p>
+<p>The standard (Ordinary Least Squares – OLS) way to solve this is by multiplying <span class="math notranslate nohighlight">\(H\)</span> on the right by <span class="math notranslate nohighlight">\(H^{\dagger}\)</span> , the <span class="math notranslate nohighlight">\(N\)</span> x <span class="math notranslate nohighlight">\(2\)</span> conjugate transpose, yielding a square2 matrix, and then multiplying on the right by the inverse of this newly formed square matrix.</p>
+<p>The next few equations parameterize the OLS solution in terms of cross powers, but they boil down to the following, 2d solves 2c for OLS:</p>
+<p>$ <span class="math">\begin{equation*}
+\bf{E} =  \bf{Z} \bf{H}
+\label{eq:2c} \tag{2c}
+\end{equation*}</span> $</p>
+<p>$ <span class="math">\begin{equation*}
+\bf{Z} =  \bf{E} \bf{H}^{\dagger} (\bf{H} \bf{H}^{\dagger})^{-1}
+\label{eq:2d} \tag{2d}
+\end{equation*}</span> $</p>
+<section id="Footnotes">
+<h3>Footnotes<a class="headerlink" href="#Footnotes" title="Permalink to this heading">¶</a></h3>
+<p>1 If we used column vectors the equation would be modified so that Z is right multiplying H.</p>
+<p>2 However, in practice, all that is required to solve the equation is to muliply by a matrix <span class="math notranslate nohighlight">\(C\)</span> such <span class="math notranslate nohighlight">\(HC\)</span> is invertible.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="The-OLS-Solution">
+<h1>The OLS Solution<a class="headerlink" href="#The-OLS-Solution" title="Permalink to this heading">¶</a></h1>
+<p><span class="math">\begin{equation*}
+\begin{bmatrix} E_{x,1} & E_{x,2} & ... & E_{x,N} \end{bmatrix}
+\begin{bmatrix} H^{*}_{x,1} & H^{*}_{y,1}  \\ H^{*}_{x,2} & H^{*}_{y,2} \\ \vdots & \vdots \\ H^{*}_{x,N} & H^{*}_{y,N}  \end{bmatrix}
+=
+\begin{bmatrix} Z_{xx} & Z_{xy} \end{bmatrix}
+\begin{bmatrix} H_{x,1} & H_{x,2} & ... & H_{x,N} \\ H_{y,1} & H_{y,2} & ... & H_{y,N} \end{bmatrix}
+\begin{bmatrix} H^{*}_{x,1} & H^{*}_{y,1}  \\ H^{*}_{x,2} & H^{*}_{y,2} \\ \vdots & \vdots \\ H^{*}_{x,N} & H^{*}_{y,N}  \end{bmatrix}
+\label{eq:EXTFHDaggerSolutionStep} \tag{3a}
+\end{equation*}</span></p>
+<p>The matrix multiplications in <span class="math notranslate nohighlight">\(\eqref{eq:EXTFHDaggerSolutionStep}\)</span> involving <span class="math notranslate nohighlight">\(H^{\dagger}\)</span> can be written in terms of cross powers</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<p>Let <span class="math notranslate nohighlight">\(\left&lt;A B^* \right&gt;\)</span> to denote the cross power (inner product) between complex vectors <span class="math notranslate nohighlight">\(A\)</span>, and <span class="math notranslate nohighlight">\(B\)</span></p>
+<p>Then we can express the above as:</p>
+<p><span class="math">\begin{equation*}
+\begin{bmatrix}  \left< E_{x} H_{x}^{*} \right> & \left<E_{x} H_{y}^{*} \right> \end{bmatrix}
+=
+\begin{bmatrix} Z_{xx} & Z_{xy} \end{bmatrix}
+\begin{bmatrix}
+\left<H_{x} H_{x}^* \right> & \left<H_{x} H_{y}^* \right> \\
+\left<H_{y} H_{x}^* \right> &  \left<H_{y} H_{y}^* \right>
+\end{bmatrix}
+\label{eq:3b} \tag{3b}
+\end{equation*}</span></p>
+<p>The equation is now in a form where we can call numpy or scipy’s solve functions, but note that since the solution is only <span class="math notranslate nohighlight">\(2x2\)</span> we can also solve explicitly.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<p>The 2x2 on the right (we can call it <span class="math notranslate nohighlight">\(HH^{\dagger}\)</span>)is basically the covariance matrix of the magnetic field data.</p>
+<p><span class="math">\begin{equation*}
+\begin{bmatrix}
+\left<H_{x} H_{x}^* \right> & \left<H_{x} H_{y}^* \right> \\
+\left<H_{y} H_{x}^* \right> &  \left<H_{y} H_{y}^* \right>
+\end{bmatrix}
+=
+H H^{\dagger}
+\label{eq:4a} \tag{4a}
+\end{equation*}</span></p>
+<p>A has the following inverse:</p>
+<p><span class="math">\begin{equation*}
+({HH^{\dagger}})^{-1}
+=
+\frac{1}{Det(HH^{\dagger})}
+\begin{bmatrix}
+\left<H_{y} H_{y}^* \right> & -\left<H_{x} H_{y}^* \right>\\
+-\left<H_{y} H_{x}^* \right> & \left<H_{x} H_{x}^* \right>\\
+\end{bmatrix}
+\label{eq:4b} \tag{4b}
+\end{equation*}</span></p>
+<p>where the determinant is:</p>
+<p><span class="math">\begin{equation*}
+Det(HH^{\dagger})
+=
+\left<H_{x} H_{x}^* \right>  \left<H_{y} H_{y}^* \right>
+-
+\left<H_{x} H_{y}^* \right> \left<H_{y} H_{x}^* \right>
+\label{eq:4c} \tag{4c}
+\end{equation*}</span></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<p>Substituting the form of 4a into 3b we have:</p>
+<p><span class="math">\begin{equation*}
+E H^{\dagger}
+=
+\begin{bmatrix}  \left< E_{x} H_{x}^{*} \right> & \left<E_{x} H_{y}^{*} \right> \end{bmatrix}
+=
+\begin{bmatrix} Z_{xx} & Z_{xy} \end{bmatrix}
+H H^{\dagger}
+\label{eq:5a} \tag{5a}
+\end{equation*}</span></p>
+<p>Now multiply both sides by 4b (using the expanded form on the left)</p>
+<p><span class="math">\begin{equation*}
+\frac{1}{Det(HH^{\dagger})}
+\begin{bmatrix}  \left< E_{x} H_{x}^{*} \right> & \left<E_{x} H_{y}^{*} \right> \end{bmatrix}
+\begin{bmatrix}
+\left<H_{y} H_{y}^* \right> & -\left<H_{x} H_{y}^* \right>\\
+-\left<H_{y} H_{x}^* \right> & \left<H_{x} H_{x}^* \right>\\
+\end{bmatrix}
+=
+\begin{bmatrix} Z_{xx} & Z_{xy} \end{bmatrix}
+H H^{\dagger}
+({HH^{\dagger}})^{-1}
+\label{eq:5b} \tag{5b}
+\end{equation*}</span></p>
+<p>On the right hand side we have isolated our solution as <span class="math notranslate nohighlight">\(HH^{\dagger}\)</span> cancels with with it’s inverse (assuming it exists!)</p>
+<p><span class="math">\begin{equation*}
+\frac{1}{Det(HH^{\dagger})}
+\begin{bmatrix}  \left< E_{x} H_{x}^{*} \right> & \left<E_{x} H_{y}^{*} \right> \end{bmatrix}
+\begin{bmatrix}
+\left<H_{y} H_{y}^* \right> & -\left<H_{x} H_{y}^* \right>\\
+-\left<H_{y} H_{x}^* \right> & \left<H_{x} H_{x}^* \right>\\
+\end{bmatrix}
+=
+\begin{bmatrix} Z_{xx} & Z_{xy} \end{bmatrix}
+\label{eq:5c} \tag{5c}
+\end{equation*}</span></p>
+<p>Expanding the LHS by multiplying out the cross powers we arrive at the solution:</p>
+<p><span class="math">\begin{equation*}
+\frac{1}{Det(HH^{\dagger})}
+\begin{bmatrix}  \left< E_{x} H_{x}^{*} \right> \left<H_{y} H_{y}^* \right> - \left<E_{x} H_{y}^{*} \right> \left<H_{y} H_{x}^* \right>
+&
+\left<E_{x} H_{y}^{*} \right> \left<H_{x} H_{x}^* \right> - \left< E_{x} H_{x}^{*} \right> \left<H_{x} H_{y}^* \right>
+\end{bmatrix}
+=
+\begin{bmatrix} Z_{xx} & Z_{xy} \end{bmatrix}
+\label{eq:5d} \tag{5d}
+\end{equation*}</span></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<p>We can now express separate equations for <span class="math notranslate nohighlight">\(Z_{xx}\)</span> and <span class="math notranslate nohighlight">\(Z_{xy}\)</span></p>
+<p><span class="math">\begin{equation*}
+Z_{xx}
+=
+\frac{\left< E_{x} H_{x}^{*} \right> \left<H_{y} H_{y}^* \right> - \left<E_{x} H_{y}^{*} \right> \left<H_{y} H_{x}^* \right> }
+{Det(HH^{\dagger})}
+\label{eq:6a} \tag{6a}
+\end{equation*}</span></p>
+<p><span class="math">\begin{equation*}
+Z_{xy}
+=
+\frac{\left<E_{x} H_{y}^{*} \right> \left<H_{x} H_{x}^* \right> - \left< E_{x} H_{x}^{*} \right> \left<H_{x} H_{y}^* \right>}
+{Det(HH^{\dagger})}
+\label{eq:6b} \tag{6b}
+\end{equation*}</span></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<p>And, finally, substituting 4c for the determinant:</p>
+<p>Now we substitute 4c into the denominators to get <span class="math notranslate nohighlight">\(Z_{xy}\)</span>:</p>
+<p><span class="math">\begin{equation*}
+Z_{xx}
+=
+\frac{\left< E_{x} H_{x}^{*} \right> \left<H_{y} H_{y}^* \right> - \left<E_{x} H_{y}^{*} \right> \left<H_{y} H_{x}^* \right> }
+{\left<H_{x} H_{x}^* \right>  \left<H_{y} H_{y}^* \right>
+-
+\left<H_{x} H_{y}^* \right> \left<H_{y} H_{x}^* \right> }
+\label{eq:7a} \tag{7a}
+\end{equation*}</span></p>
+<p>And for <span class="math notranslate nohighlight">\(Z_{yx}\)</span>:</p>
+<p><span class="math">\begin{equation*}
+Z_{xy}
+=
+\frac{\left<E_{x} H_{y}^{*} \right> \left<H_{x} H_{x}^* \right> - \left< E_{x} H_{x}^{*} \right> \left<H_{x} H_{y}^* \right>}
+{\left<H_{x} H_{x}^* \right>  \left<H_{y} H_{y}^* \right>
+-
+\left<H_{x} H_{y}^* \right> \left<H_{y} H_{x}^* \right> }
+\label{eq:7b} \tag{7b}
+\end{equation*}</span></p>
+<p>N.B. We recover the solutions for <span class="math notranslate nohighlight">\(Z_{yx}\)</span> and <span class="math notranslate nohighlight">\(Z_{yy}\)</span> simply by substition of <span class="math notranslate nohighlight">\(E_y\)</span> for <span class="math notranslate nohighlight">\(E_x\)</span> in the above equations, and similarly <span class="math notranslate nohighlight">\(T_{x}\)</span> and <span class="math notranslate nohighlight">\(T_{y}\)</span> by substition of <span class="math notranslate nohighlight">\(H_z\)</span> for <span class="math notranslate nohighlight">\(E_x\)</span>. Proof is left as an exercise for the reader.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="A-more-general-approach">
+<h1>A more general approach<a class="headerlink" href="#A-more-general-approach" title="Permalink to this heading">¶</a></h1>
+<p>In Equation 3a, the <em>standard</em> method of using <span class="math notranslate nohighlight">\(H^{\dagger}\)</span> was applied, but what happens if we use some arbitrary matrix <span class="math notranslate nohighlight">\(C\)</span>,</p>
+<p><span class="math">\begin{equation*}
+C
+=
+\begin{bmatrix} A^{*}_{1} & B^{*}_{1}  \\ A^{*}_{2} & B^{*}_{2} \\ \vdots & \vdots \\ A^{*}_{n} & B^{*}_{n}  \end{bmatrix}
+\label{eq:8} \tag{8}
+\end{equation*}</span></p>
+<p>Go back to Equation 3a, but instead of using <span class="math notranslate nohighlight">\(H^{\dagger}\)</span>, use <span class="math notranslate nohighlight">\(C\)</span>, made of column vectors A, B</p>
+<p><span class="math">\begin{equation*}
+\begin{bmatrix} E_{x,1} & E_{x,2} & ... & E_{x,n} \end{bmatrix}
+\begin{bmatrix} A^{*}_{1} & B^{*}_{1}  \\ A^{*}_{2} & B^{*}_{2} \\ \vdots & \vdots \\ A^{*}_{N} & B^{*}_{N}  \end{bmatrix}
+=
+\begin{bmatrix} Z_{xx} & Z_{xy} \end{bmatrix}
+\begin{bmatrix} H_{x,1} & H_{x,2} & ... & H_{x,N} \\ H_{y,1} & H_{y,2} & ... & H_{y,N} \end{bmatrix}
+\begin{bmatrix} A^{*}_{1} & B^{*}_{1}  \\ A^{*}_{2} & B^{*}_{2} \\ \vdots & \vdots \\ A^{*}_{N} & B^{*}_{N}  \end{bmatrix}
+\label{eq:9a} \tag{9a}
+\end{equation*}</span></p>
+<p>The solution proceeds identically, (c.f. 9a with 3a)</p>
+<p>But now the analog to 3b is :</p>
+<p><span class="math">\begin{equation*}
+\begin{bmatrix}  \left< E_{x} A^{*} \right> & \left<E_{x} B^{*} \right> \end{bmatrix}
+=
+\begin{bmatrix} Z_{xx} & Z_{xy} \end{bmatrix}
+\begin{bmatrix}
+\left<H_{x} A^* \right> & \left<H_{x} B^* \right> \\
+\left<H_{y} A^* \right> &  \left<H_{y} B^* \right>
+\end{bmatrix}
+\label{eq:9b} \tag{9b}
+\end{equation*}</span></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<p>Now the 2x2 on the right is the covaraince matrix between <span class="math notranslate nohighlight">\(H\)</span> and <span class="math notranslate nohighlight">\(C\)</span> <span class="math">\begin{equation*}
+HC
+=
+\begin{bmatrix}
+\left<H_{x} A^* \right> & \left<H_{x} B^* \right> \\
+\left<H_{y} A^* \right> &  \left<H_{y} B^* \right>
+\end{bmatrix}
+\label{eq:10a} \tag{10a}
+\end{equation*}</span></p>
+<p>With corresponding inverse:</p>
+<p><span class="math">\begin{equation*}
+({HC})^{-1}
+=
+\frac{1}{Det(HC)}
+\begin{bmatrix}
+\left<H_{y} B^* \right> & -\left<H_{x} B^* \right>\\
+-\left<H_{y} A^* \right> & \left<H_{x} A^* \right>\\
+\end{bmatrix}
+\label{eq:10b} \tag{10b}
+\end{equation*}</span></p>
+<p>and determinant:</p>
+<p><span class="math">\begin{equation*}
+Det(HC) =
+\left<H_{x} A^* \right>  \left<H_{y} B^* \right>
+-
+\left<H_{x} B^* \right> \left<H_{y} A^* \right>
+\label{eq:10c} \tag{10c}
+\end{equation*}</span></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<p>Substituting the form of 10a into 9b we have (cf 5a):</p>
+<p><span class="math">\begin{equation*}
+\begin{bmatrix}  \left< E_{x} A^{*} \right> & \left<E_{x} B^{*} \right> \end{bmatrix}
+=
+\begin{bmatrix} Z_{xx} & Z_{xy} \end{bmatrix}
+H C
+\label{eq:11a} \tag{11a}
+\end{equation*}</span></p>
+<p>Now multiply both sides of 11a by 10b (using the expanded form on the left, and the condensed on the right) to get Equations 11b (c.f. 5b)</p>
+<p><span class="math">\begin{equation*}
+\frac{1}{Det(HC)}
+\begin{bmatrix}  \left< E_{x} A^{*} \right> & \left<E_{x} B^{*} \right> \end{bmatrix}
+\begin{bmatrix}
+\left<H_{y} B^* \right> & -\left<H_{x} B^* \right>\\
+-\left<H_{y} A^* \right> & \left<H_{x} A^* \right>\\
+\end{bmatrix}
+=
+\begin{bmatrix} Z_{xx} & Z_{xy} \end{bmatrix}
+HC
+(HC)^{-1}
+\label{eq:11b} \tag{11b}
+\end{equation*}</span></p>
+<p>Again isolate our solution as <span class="math notranslate nohighlight">\(HC\)</span> cancels with its inverse (assuming it exists!!!)</p>
+<p><span class="math">\begin{equation*}
+\frac{1}{Det(HC)}
+\begin{bmatrix}  \left< E_{x} A^{*} \right> & \left<E_{x} B^{*} \right> \end{bmatrix}
+\begin{bmatrix}
+\left<H_{y} B^* \right> & -\left<H_{x} B^* \right>\\
+-\left<H_{y} A^* \right> & \left<H_{x} A^* \right>\\
+\end{bmatrix}
+=
+\begin{bmatrix} Z_{xx} & Z_{xy} \end{bmatrix}
+\label{eq:11c} \tag{11c}
+\end{equation*}</span></p>
+<p>Again Expanding the LHS by multiplying out the cross powers</p>
+<p><span class="math">\begin{equation*}
+\frac{1}{Det(HC)}
+\begin{bmatrix}  \left< E_{x} A^{*} \right> \left<H_{y} B^* \right> - \left<E_{x} B^{*} \right> \left<H_{y} A^* \right>
+&
+\left<E_{x} B^{*} \right> \left<H_{x} A^* \right> - \left< E_{x} A^{*} \right> \left<H_{x} B^* \right>
+\end{bmatrix}
+=
+\begin{bmatrix} Z_{xx} & Z_{xy} \end{bmatrix}
+\label{eq:11d} \tag{11d}
+\end{equation*}</span></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<p>We can now express separate equations for <span class="math notranslate nohighlight">\(Z_{xx}\)</span> and <span class="math notranslate nohighlight">\(Z_{xy}\)</span></p>
+<p>:nbsphinx-math:<a href="#id1"><span class="problematic" id="id2">`</span></a>begin{equation*}
+Z_{xx} =
+frac{</p>
+<blockquote>
+<div><p>left&lt; E_{x} A^{*} right&gt; left&lt;H_{y} B^* right&gt; - left&lt;E_{x} B^{*} right&gt; left&lt;H_{y} A^* right&gt;  }</p>
+</div></blockquote>
+<p>{Det(HC)}
+label{eq:12a} tag{12a}
+end{equation*}`</p>
+<p><span class="math">\begin{equation*}
+Z_{xy} =
+\frac{
+\left<E_{x} B^{*} \right> \left<H_{x} A^* \right> - \left< E_{x} A^{*} \right> \left<H_{x} B^* \right>  }
+{Det(HC)}
+\label{eq:12b} \tag{12b}
+\end{equation*}</span></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<p>Finally, expanding the denominator, we have separate equations for <span class="math notranslate nohighlight">\(Z_{xx}\)</span> and <span class="math notranslate nohighlight">\(Z_{xy}\)</span> in terms of cross-powers</p>
+<p>:nbsphinx-math:<a href="#id3"><span class="problematic" id="id4">`</span></a>begin{equation*}
+Z_{xx} =
+frac{</p>
+<blockquote>
+<div><p>left&lt; E_{x} A^{*} right&gt; left&lt;H_{y} B^* right&gt; - left&lt;E_{x} B^{*} right&gt; left&lt;H_{y} A^* right&gt;  }</p>
+</div></blockquote>
+<p>{
+left&lt;H_{x} A^* right&gt;  left&lt;H_{y} B^* right&gt;
+-
+left&lt;H_{x} B^* right&gt; left&lt;H_{y} A^* right&gt;
+}
+label{eq:Vozoff42a} tag{13a}
+end{equation*}`</p>
+<p><span class="math">\begin{equation*}
+Z_{xy} =
+\frac{
+\left<E_{x} B^{*} \right> \left<H_{x} A^* \right> - \left< E_{x} A^{*} \right> \left<H_{x} B^* \right>  }
+{
+\left<H_{x} A^* \right>  \left<H_{y} B^* \right>
+-
+\left<H_{x} B^* \right> \left<H_{y} A^* \right>
+}
+\label{eq:Vozoff42b} \tag{13b}
+\end{equation*}</span></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Summary-of-the-Single-Station-Formualtion">
+<h1>Summary of the Single Station Formualtion<a class="headerlink" href="#Summary-of-the-Single-Station-Formualtion" title="Permalink to this heading">¶</a></h1>
+<p>We have shown that the elements of the impedance tensor can be derived from the cross-powers of the various channels.</p>
+<p>Note that this has all been one under the assumption that the measurements are being made at a single location (that is what the TF equation is relating – Ex, Ey, Hz, to local Hx, Hy.</p>
+<p>Mathematically, any channels <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(B\)</span> can be used to invert the matrix, provided that <span class="math notranslate nohighlight">\(HC\)</span> is invertable, which is the same as saying it’s determinant is non-zero. For example, we cannot allow A equal B.</p>
+<ul class="simple">
+<li><p><strong>TODO</strong>: There is a stronger condition which also must be obeyed, which is that the columns of <span class="math notranslate nohighlight">\(C\)</span> must be <em>coherent</em> with H, E.</p></li>
+</ul>
+<p>Sims et al. evaluate each of the 6 pairings of Ex, Ey, Hx, Hy (from a single station).</p>
+<ul class="simple">
+<li><p>They point out that pairings (Ex, Hx) and (Ey, Hy) are unstable – this is because tend to be co-linear, so the determinant of <span class="math notranslate nohighlight">\(HC\)</span> can be very close to <span class="math notranslate nohighlight">\(0\)</span>.</p></li>
+</ul>
+<p>The remaining combinations are all “legal”, with two of them tending to overestimate and two tending to underestimate the impedance tensor elements, … this can be seen by auto-power and cross power arguments (TODO add more detail here – AST).</p>
+<p>A corralary to this that seems worth mentioning is that any rotated version of the channels <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(B\)</span> would still result in an invertable HC. i.e. <span class="math notranslate nohighlight">\(C\)</span> is Nx2, so we can muliply it by any 2x2 rotation matrix and we still get a linear-independent Nx2. Say that we represent the rotation matrix by <span class="math notranslate nohighlight">\(R\)</span>, then <span class="math notranslate nohighlight">\((HCR)^{-1}\)</span> = <span class="math notranslate nohighlight">\(((HC)(R))^{-1}\)</span> = (R)<sup>{-1}(HC)</sup>{-1}$, i.e. we will recover the same solution no matter if the reference channels are rotated.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Noise-and-Bias">
+<h1>Noise and Bias<a class="headerlink" href="#Noise-and-Bias" title="Permalink to this heading">¶</a></h1>
+<p>It will help to consider a 1d earth and perfectly orthogonal sensors… in that case <span class="math notranslate nohighlight">\(Z_{xx}\)</span>=0.</p>
+<ul class="simple">
+<li><p>Proof left as an exercise for the reader – Hint: use Assumption 0 below.</p></li>
+</ul>
+<p>This is basically equivalent to <strong>Assumption 0</strong>: <span class="math notranslate nohighlight">\(H_x\)</span>, <span class="math notranslate nohighlight">\(H_y\)</span> are independent and incoherent.</p>
+<ul class="simple">
+<li><p>For a homogeneous earth this implies (by the Maxwell-Faraday Equation) <strong>Corollary 0</strong> that parallel <span class="math notranslate nohighlight">\(E\)</span> and <span class="math notranslate nohighlight">\(H\)</span> are incoherent.</p>
+<ul>
+<li><p>Exercise: Does this also hold for a 1-D earth? How about general 2-D? What about 2D along-strike-rotated?</p></li>
+</ul>
+</li>
+</ul>
+<p>So the first set of equations reduces to <span class="math notranslate nohighlight">\(Z_{xy}\)</span> only, .. repeating Equation 13b here</p>
+<p><span class="math">\begin{equation*}
+Z_{xy} =
+\frac{
+\left<E_{x} A^{*} \right> \left<H_{x} B^* \right>
+\text{-} \left<E_{x} B^{*} \right> \left<H_{x} A^* \right>
+}
+{
+\left<H_{y} A^* \right> \left<H_{x} B^* \right>
+\text{-} \left<H_{y} B^* \right> \left<H_{x} A^* \right>
+}
+\label{eq:A13b} \tag{A13b}
+\end{equation*}</span></p>
+<p>If we used the standard local channels, <span class="math notranslate nohighlight">\(A\)</span> = <span class="math notranslate nohighlight">\(H_y\)</span>, <span class="math notranslate nohighlight">\(B\)</span> = <span class="math notranslate nohighlight">\(H_y\)</span>, Then <span class="math notranslate nohighlight">\(Z_{xy}\)</span> becomes (repeating equation 7b):</p>
+<p><span class="math">\begin{equation*}
+Z_{xy} =
+\frac{
+\left< E_{x} H_x^{*} \right> \left<H_{x} H_y^* \right>
+-\left<E_{x} H_y^{*} \right> \left<H_{x} H_x^* \right>
+}
+{
+\left<H_{y} H_x^* \right> \left<H_{x} H_y^* \right>
+-
+\left<H_{y} H_y^* \right> \left<H_{x} H_x^* \right>
+}
+\label{eq:A7b} \tag{A7b}
+\end{equation*}</span></p>
+<p>But by <strong>Corollary 0</strong> the first term in the numerator is zero, (so is the second term in the numerator by <strong>Assumption 0</strong> – Hx and Hy are independent), so:</p>
+<p><span class="math">\begin{equation*}
+Z_{xy} =
+\frac
+{
+-\left<E_{x} H_y^{*} \right> \left<H_{x} H_x^* \right>
+}
+{
+\left<H_{y} H_x^* \right> \left<H_{x} H_y^* \right>
+-
+\left<H_{y} H_y^* \right> \left<H_{x} H_x^* \right>
+}
+\label{eq:tmp0} \tag{tmp0}
+\end{equation*}</span></p>
+<p>by <strong>Assumption 0</strong> first two terms in the denominator are also zero, so:</p>
+<p><span class="math">\begin{equation*}
+Z_{xy} =
+\frac
+{
+-\left<E_{x} H_y^{*} \right> \left<H_{x} H_x^* \right>
+}
+{
+-
+\left<H_{y} H_y^* \right> \left<H_{x} H_x^* \right>
+}
+\label{eq:tmp1} \tag{tmp1}
+\end{equation*}</span></p>
+<p>Cancelling minus signs and the autopower in Hx</p>
+<p><span class="math">\begin{equation*}
+Z_{xy} =
+\frac
+{
+\left<E_{x} H_y^{*} \right>
+}
+{
+\left<H_{y} H_y^* \right>
+}
+\label{eq:tmp2} \tag{tmp2}
+\end{equation*}</span></p>
+<p>Equation tmp2 will be used to illustrates why some channel pairings (Hx, Hy) resulted in an <em>under</em> estimation of <span class="math notranslate nohighlight">\(Z_{xy}\)</span> ala Sims et al. 1971.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<section id="Noise">
+<h2>Noise<a class="headerlink" href="#Noise" title="Permalink to this heading">¶</a></h2>
+<p>What if the data are not noise-free? What can we say about the derived solutions?</p>
+<p>That would depend on the details of the noise, so start with a simple noise model based on a few assumptions:</p>
+<p>Let any channel of data, <span class="math notranslate nohighlight">\(a_{obs}(t)\)</span> = <span class="math notranslate nohighlight">\(a_{s}(t) + a_{n}(t)\)</span>. 3</p>
+<p>The subsripts <span class="math notranslate nohighlight">\(s, n\)</span> are for the “signal part” and the “noise part” of the observed data respectively.</p>
+<p>Let’s evaluate the role of noise under some <strong>Assumptions</strong>:</p>
+<ul class="simple">
+<li><p><strong>Assumption 1</strong>: Noise is incoherent from all signal</p>
+<ul>
+<li><p>$&lt;a_{sig}(t),b_{n}(t)&gt; = 0 $ for any channels <span class="math notranslate nohighlight">\(a\)</span>, <span class="math notranslate nohighlight">\(b\)</span>. We haven’t really formlalized what is signal and what is noise yet, so this is a pretty weak constraint. For now say that signal plane wave, that obeys equation 1. So all noise is assumed incoherent with the signal source.</p></li>
+</ul>
+</li>
+<li><p><strong>Assumption 2</strong>: Noise is incoherent between channels</p>
+<ul>
+<li><p>$&lt;a_{n}(t),b_{n}(t)&gt; = 0 $ for any channels <span class="math notranslate nohighlight">\(a\)</span>, <span class="math notranslate nohighlight">\(b\)</span>. So the non-plane-wave part of the observed data that does not obey equation 1 is incoherent on all channels.</p></li>
+</ul>
+</li>
+</ul>
+<p>Relaxing the noise-free assumption:</p>
+<ul class="simple">
+<li><p>(technically should incorporate noise around Equation 13b_again, and carry the noise through the math above – but for now, just look at Equation tmp2 above, substituting the signal+noise model):</p></li>
+</ul>
+<p><span class="math">\begin{equation*}
+Z_{xy} =
+\frac
+{
+\left<E_{x,s}+E_{x,n},  H_{y,s}^{*}+H^*_{y, n} \right>
+}
+{
+\left<H_{y,s} + H_{y, n}, H_{y,s}^{*}+H^*_{y, n} \right>
+}
+\label{eq:tmp3} \tag{tmp3}
+\end{equation*}</span></p>
+<p>2 Technically, probably should have incorporated a noise model earlier and carried the noise terms through the math.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<p>Expanding the tmp3 above, (FOILing the numerator and denominator)</p>
+<p><span class="math">\begin{equation*}
+Z_{xy} =
+\frac
+{
+\left<E_{x,s} H_{y,s}^{*} \right>  + \left<E_{x,s} H^*_{y, n} \right> + \left<E_{x,n}, H_{y,s}^{*}\right> + \left<E_{x,n},H^*_{y, n} \right>
+}
+{
+\left<H_{y,s} H_{y,s}^{*} \right>  + \left<H_{y,s} H^*_{y, n} \right> + \left<H_{y,n}, H_{y,s}^{*}\right> + \left<H_{y,n},H^*_{y, n} \right>
+}
+\label{eq:tmp4a} \tag{tmp4a}
+\end{equation*}</span></p>
+<p>By applying <strong>Assumption 1</strong> we zero-out the terms that are a product of signal and noise:</p>
+<p><span class="math">\begin{equation*}
+Z_{xy} =
+\frac
+{
+\left<E_{x,s} H_{y,s}^{*} \right>  + 0 + 0 + \left<E_{x,n},H^*_{y, n} \right>
+}
+{
+\left<H_{y,s} H_{y,s}^{*} \right>  + 0 + 0 + \left<H_{y,n},H^*_{y, n} \right>
+}
+\label{eq:tmp4b} \tag{tmp4b}
+\end{equation*}</span></p>
+<p>And by applying <strong>Assumptions 2</strong> the last term in the numerator also goes to zero (but the last one in the denominator does not!</p>
+<p><span class="math">\begin{equation*}
+Z_{xy} =
+\frac
+{
+\left<E_{x,s} H_{y,s}^{*} \right>  + 0 + 0 + 0
+}
+{
+\left<H_{y,s} H_{y,s}^{*} \right>  + 0 + 0 + \left<H_{y,n},H^*_{y, n} \right>
+}
+\label{eq:tmp4c} \tag{tmp4c}
+\end{equation*}</span></p>
+<p>Leaving us with</p>
+<p><span class="math">\begin{equation*}
+Z_{xy} =
+\frac
+{
+\left<E_{x,s} H_{y,s}^{*} \right>
+}
+{
+\left<H_{y,s} H_{y,s}^{*} \right> + \left<H_{y,n},H^*_{y, n} \right>
+}
+\label{eq:tmp4d} \tag{tmp4d}
+\end{equation*}</span></p>
+<p>But this says that the denominator is biased up by the noise autopower in <span class="math notranslate nohighlight">\(H_y\)</span>, so <span class="math notranslate nohighlight">\(Z_{xy}\)</span> will be smaller than it ought to be.</p>
+<p>Other channel combinations will yield biasing up by <span class="math notranslate nohighlight">\(H_y\)</span> in the numerator, or by <span class="math notranslate nohighlight">\(E\)</span> in the numerator and denominator respectively.</p>
+<p>Proof left as an exercise.</p>
+<p>Aside: since noise levels in <span class="math notranslate nohighlight">\(H\)</span> tend to be lower than in <span class="math notranslate nohighlight">\(E\)</span>, if you have to have bias it maybe better to have it from H. That said, you can also compute the biased estimates and average them – this was the recommended approach until the Remote Reference method.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="Remote-Reference">
+<h1>Remote Reference<a class="headerlink" href="#Remote-Reference" title="Permalink to this heading">¶</a></h1>
+<p>The above approach motivates the RR approach as an unbiased estimator. WLOG we can replace channels <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span> in the matrix <span class="math notranslate nohighlight">\(C\)</span> with the remote <span class="math notranslate nohighlight">\(H_x\)</span> and remote <span class="math notranslate nohighlight">\(H_y\)</span> respectivley. If we assume that the remote reference channels are parallel to the channels at our station then all the assumptions 0,1,2 can be applied and we simply wind up with tmp4d, but in this case:</p>
+<p><span class="math">\begin{equation*}
+Z_{xy} =
+\frac
+{
+\left<E_{x,s} R_{y,s}^{*} \right>
+}
+{
+\left<H_{y,s} R_{y,s}^{*} \right> + \left<H_{y,n},R^*_{y, n} \right>
+}
+\label{eq:tmp4e} \tag{tmp4e}
+\end{equation*}</span></p>
+<p>And by <strong>Assumption 2</strong> the second term in the denominator is <span class="math notranslate nohighlight">\(0\)</span> and we recover an unbiased estimate:</p>
+<p><span class="math">\begin{equation*}
+Z_{xy} =
+\frac
+{
+\left<E_{x,s} R_{y,s}^{*} \right>
+}
+{
+\left<H_{y,s} R_{y,s}^{*} \right>
+}
+\label{eq:tmp4f} \tag{tmp4f}
+\end{equation*}</span></p>
+<p>This “cross-power trick” is a common enough in geophysics (and other fields) that it is worth looking at – If we had started from first principles on a noise-free homogeneous earth we could have derived that</p>
+<p><span class="math">\begin{equation*}
+Z_{xy} = \frac{E_x}{H_y}
+\label{eq:tmp4g} \tag{tmp4g}
+\end{equation*}</span></p>
+<ul class="simple">
+<li><p>Proof left as an exercise</p></li>
+</ul>
+<p>but when noise is present in the measurements, we can use the “cross-power trick” to get an unbiased estimate … this basically selects the part of the signal that is coherent with <span class="math notranslate nohighlight">\(R_y\)</span>. As long as <span class="math notranslate nohighlight">\(R_y\)</span> is relatively quiet, and the noise it does see is incoherent with the local station noise, then we are effectively projecting the local channels onto the coherent signal. It can be thought of as is something like</p>
+<p><span class="math">\begin{equation*}
+Z_{xy} =
+\frac
+{
+|E_{x}||R_y| cos({\theta})
+}
+{
+|H_{x}||R_y| cos({\theta})
+}
+\label{eq:tmp4h} \tag{tmp4h}
+\end{equation*}</span></p>
+<p>where <span class="math notranslate nohighlight">\(cos({\theta})\)</span> is like the angle between the real answer vector and the answer+noise, although for complex numbers the inner product is not quite as geometrically straightforward to sketch. The same trick can be used in controlled source applications for example to reduce noise in the receiver by taking</p>
+<p><span class="math">\begin{equation*}
+{\hat{R_x}}
+=
+\frac
+{
+\left<T_{x} R_x^{*} \right>
+}
+{
+\left<T_{x} T_x^{*}  \right>
+}
+\label{eq:tmp4i} \tag{tmp4i}
+\end{equation*}</span></p>
+</section>
+<section id="Discussion:">
+<h1>Discussion:<a class="headerlink" href="#Discussion:" title="Permalink to this heading">¶</a></h1>
+<p>Before moving on, consider a 3-D earth … then in 13b_with_R, we would not have had much simplification – we cannot say in general that <span class="math notranslate nohighlight">\(Z_{xx}\)</span> is <span class="math notranslate nohighlight">\(0\)</span> for one thing, so we would never have been able to strike the <span class="math notranslate nohighlight">\(H_x\)</span> autopowers like we did in tmp2 – because we would not have been able to “zero-out” the first terms in the sums of numerator and denominator as was done in tmp0, tmp1.</p>
+<p>We would have a bigger, messier algebraic expression to track.</p>
+<p>But what about <strong>Assumptions 1 &amp; 2</strong>.</p>
+<ul class="simple">
+<li><p><strong>Assumptions 1</strong> is a topic for discussion. It would seem that if you have noise that is effectively plane wave, as long as it is present at both local and remote, you should be able to treat is as signal – it walks like a duck – (CSMT, CSAMT).</p></li>
+<li><p><strong>Assumptions 2</strong> is not the same – incoherent channel noise is rather optimistic. A ground sqirrel chewing a cable is one wat this can happen, so is a faulty electronic component, but for a real physical process that generates EM Noise, assuming that it effects only one channel is not realistic. For one thing, E, H are coupled, so it is only plausible that noise in an H would have a corresponding noise in E (Discuss electric fences), and also, it woudl be very lucky if a noise source was so
+precisely polarized that it coupled into only one of say <span class="math notranslate nohighlight">\(H_x\)</span> or <span class="math notranslate nohighlight">\(H_y\)</span>, more likely it would be in both – and ditto for electrics.</p></li>
+</ul>
+</section>
+<section id="RR-Summary:">
+<h1>RR Summary:<a class="headerlink" href="#RR-Summary:" title="Permalink to this heading">¶</a></h1>
+<p>The RR method will still work well for 2 or 3D, BUT STILL ASSUMES that channel noise is uncorrelated with other channel noise to get an unbiased estimate. So– N.B. If the noise is not incoherent, i.e. say some channels at either site have noise correlated with noise at the same site, we do not get the friendly cancelations of the previous section, rather the noise contaminates the estimates. The details of working through that are somewhat algebraically involved, and it is probably better to
+build a toy model with coherent noise in various channel combinations and look at the bias rather than derive it – at least for now.</p>
+<ul class="simple">
+<li><p>For incoherent, Gaussian noise, we get an unbiased estimate of the TF</p>
+<ul>
+<li><p>these converge to the true value as the number of observations increases</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="Practical-Notes:">
+<h1>Practical Notes:<a class="headerlink" href="#Practical-Notes:" title="Permalink to this heading">¶</a></h1>
+<ul class="simple">
+<li><p>The time series described in Equation 3a are a sequence of observations.</p>
+<ul>
+<li><p>Without multiple observations, the solution to Equation 1 is underdetermined.</p></li>
+</ul>
+</li>
+<li><p>With noise in the measurements, incoherent or otherwise, we need to apply statistical methods to get TF estimates</p>
+<ul>
+<li><p>this involved compensation for outliers (leverage points)</p></li>
+<li><p>estimates improve as the number of observations increases.</p></li>
+<li><p>Noise sources may be transient and entire blocks of time series may be better discarded than processed</p></li>
+</ul>
+</li>
+<li><p>Processing should also consider nothc filtering power-lines or other nearby sources.</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<section id="References:">
+<h2>References:<a class="headerlink" href="#References:" title="Permalink to this heading">¶</a></h2>
+<p>Sims, W.E., F.X. Bostick, and H.W. SMITH. “THE ESTIMATION OF MAGNETOTELLURIC IMPEDANCE TENSOR ELEMENTS FROM MEASURED DATA?” GEOPHYSICS 36, no. 5 (1971). <a class="reference external" href="https://doi.org/DOI:10.1190/1.1440225">https://doi.org/DOI:10.1190/1.1440225</a>.</p>
+<p>Vozoff</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="APPENDIX">
+<h1>APPENDIX<a class="headerlink" href="#APPENDIX" title="Permalink to this heading">¶</a></h1>
+</section>
+<section id="Notes-on-Vozoff-1991:">
+<h1>Notes on Vozoff 1991:<a class="headerlink" href="#Notes-on-Vozoff-1991:" title="Permalink to this heading">¶</a></h1>
+<p>Note that <span class="math notranslate nohighlight">\(Z_{xx}\)</span> expression 13a is exactly (term-for-term) that of Vozoff Equation 42a.</p>
+<p>Note that <span class="math notranslate nohighlight">\(Z_{xy}\)</span> is 13b is nearly Vozoff 42b, but some terms are rearranged.</p>
+<p>FWIW, The steps to turn 13b into Vozoff42b are: 1: Multiply top and bottom by -1</p>
+<p><span class="math">\begin{equation*}
+Z_{xy} =
+\frac{
+-\left<E_{x} B^{*} \right> \left<H_{x} A^* \right>
++
+\left< E_{x} A^{*} \right> \left<H_{x} B^* \right>  }
+{
+-\left<H_{x} A^* \right>  \left<H_{y} B^* \right>
++
+\left<H_{x} B^* \right> \left<H_{y} A^* \right>
+}
+\label{eq:tmpa} \tag{tmpa}
+\end{equation*}</span></p>
+<p>Then switch order of addition so that postive terms are first</p>
+<p><span class="math">\begin{equation*}
+Z_{xy} =
+\frac{
+\left< E_{x} A^{*} \right> \left<H_{x} B^* \right>
+-\left<E_{x} B^{*} \right> \left<H_{x} A^* \right>
+}
+{
+\left<H_{x} B^* \right> \left<H_{y} A^* \right>
+-
+\left<H_{x} A^* \right>  \left<H_{y} B^* \right>
+}
+\label{eq:tmpb} \tag{tmpb}
+\end{equation*}</span></p>
+<p>And then switch permute the multiplcations in the denominator</p>
+<p><span class="math">\begin{equation*}
+Z_{xy} =
+\frac{
+\left< E_{x} A^{*} \right> \left<H_{x} B^* \right>
+-\left<E_{x} B^{*} \right> \left<H_{x} A^* \right>
+}
+{
+\left<H_{y} A^* \right> \left<H_{x} B^* \right>
+-
+\left<H_{y} B^* \right> \left<H_{x} A^* \right>
+}
+\label{eq:tmpc} \tag{tmpc}
+\end{equation*}</span></p>
+<p>There is one more difference with Vozoff91, which is that V91 Equation 42b has a typo: The very last term in bra-kets in the denominator (above <span class="math notranslate nohighlight">\(H_x A^*\)</span>) is unfortunately, incorrectly transcribed in V91 as (above <span class="math notranslate nohighlight">\(H_y A^*\)</span>).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<section id="Notes-on-invertability-,-and-independence-of-C">
+<h2>Notes on invertability , and independence of <span class="math notranslate nohighlight">\(C\)</span><a class="headerlink" href="#Notes-on-invertability-,-and-independence-of-C" title="Permalink to this heading">¶</a></h2>
+<p>Recall the determinant</p>
+<p><span class="math">\begin{equation*}
+Det(HC) =
+\left<H_{x} A^* \right>  \left<H_{y} B^* \right>
+-
+\left<H_{x} B^* \right> \left<H_{y} A^* \right>
+\end{equation*}</span></p>
+<p>so we dont want</p>
+<p><span class="math">\begin{equation*}
+0 =
+\left<H_{x} A^* \right>  \left<H_{y} B^* \right>
+-
+\left<H_{x} B^* \right> \left<H_{y} A^* \right>
+\end{equation*}</span></p>
+<p>i.e. the following is NOT OK</p>
+<p><span class="math">\begin{equation*}
+\left<H_{x} B^* \right> \left<H_{y} A^* \right>  =
+\left<H_{x} A^* \right>  \left<H_{y} B^* \right>
+\end{equation*}</span></p>
+<p>For example, we cannot allow A equal B since if we set A=B</p>
+<p><span class="math">\begin{equation*}
+Det(HC) =
+\left<H_{x} A^* \right>  \left<H_{y} A^* \right>
+-
+\left<H_{x} A^* \right> \left<H_{y} A^* \right>
+=
+0
+\end{equation*}</span></p>
+<p>Which is to say the matrix <span class="math notranslate nohighlight">\(C\)</span> must have columns that are linear independent.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,587 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.sandbox.io_helpers package &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="aurora.test_utils package" href="aurora.test_utils.html" />
+    <link rel="prev" title="aurora.sandbox package" href="aurora.sandbox.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">aurora</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="aurora.html">aurora package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="aurora.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="aurora.config.html">aurora.config package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html">aurora.pipelines package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="aurora.sandbox.html">aurora.sandbox package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.html">aurora.test_utils package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html">aurora.time_series package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html">aurora.transfer_function package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.html#module-aurora.general_helper_functions">aurora.general_helper_functions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.html#module-aurora">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">aurora</a></li>
+          <li class="breadcrumb-item"><a href="aurora.html">aurora package</a></li>
+          <li class="breadcrumb-item"><a href="aurora.sandbox.html">aurora.sandbox package</a></li>
+      <li class="breadcrumb-item active">aurora.sandbox.io_helpers package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/aurora.sandbox.io_helpers.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="aurora-sandbox-io-helpers-package">
+<h1>aurora.sandbox.io_helpers package<a class="headerlink" href="#aurora-sandbox-io-helpers-package" title="Permalink to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-aurora.sandbox.io_helpers.emtf_band_setup">
+<span id="aurora-sandbox-io-helpers-emtf-band-setup-module"></span><h2>aurora.sandbox.io_helpers.emtf_band_setup module<a class="headerlink" href="#module-aurora.sandbox.io_helpers.emtf_band_setup" title="Permalink to this heading">¶</a></h2>
+<p>In this module is a class that emulates the old EMTF Band Setup File</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.sandbox.io_helpers.emtf_band_setup.</span></span><span class="sig-name descname"><span class="pre">EMTFBandSetupFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><span class="pre">Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/emtf_band_setup.html#EMTFBandSetupFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="#aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.decimation_levels" title="aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.decimation_levels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decimation_levels</span></code></a></dt><dd><p>Return the decimation level names (they are integers) in an array</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.num_bands" title="aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.num_bands"><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_bands</span></code></a></dt><dd><p>return the number of bands in the band setup file</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.num_decimation_levels" title="aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.num_decimation_levels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_decimation_levels</span></code></a></dt><dd><p>Return the number of decimation levels</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.compute_band_edges" title="aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.compute_band_edges"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_band_edges</span></code></a>(decimation_factors, ...)</p></td>
+<td><p>Adds columns to df defining the upper and lower bounds of the frequency bands in Hz.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.get_decimation_level" title="aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.get_decimation_level"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_decimation_level</span></code></a>(decimation_level[, order])</p></td>
+<td><p>Return a sub-dataframe with only the rows that correspond to the requested decimation level</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.load" title="aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load</span></code></a>([filepath])</p></td>
+<td><p>Loads an EMTF band setup file and casts it to a dataframe.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.compute_band_edges">
+<span class="sig-name descname"><span class="pre">compute_band_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decimation_factors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_samples_window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/emtf_band_setup.html#EMTFBandSetupFile.compute_band_edges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.compute_band_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds columns to df defining the upper and lower bounds of the frequency bands in Hz.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>decimation_factors</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – The decimation factors</p></li>
+<li><p><strong>num_samples_window</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – The window size</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>band_edges</strong> – Keys are decimation level ids and values are numpy arrays with shape num_bands x 2.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.decimation_levels">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">decimation_levels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a></em><a class="headerlink" href="#aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.decimation_levels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the decimation level names (they are integers) in an array</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.get_decimation_level">
+<span class="sig-name descname"><span class="pre">get_decimation_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decimation_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ascending_frequency'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/emtf_band_setup.html#EMTFBandSetupFile.get_decimation_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.get_decimation_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a sub-dataframe with only the rows that correspond to the requested decimation level</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>decimation_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – The id of the decimation level</p></li>
+<li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>decimation_level_df</strong> – A sub-dataframe with only the rows that correspond to the requested decimation level</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><span class="pre">Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/emtf_band_setup.html#EMTFBandSetupFile.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads an EMTF band setup file and casts it to a dataframe.
+- populates self.df with the EMTF band setup dataframe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filepath</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>pathlib.Path</em></a><em>, </em><em>None</em><em>]</em><em>]</em>) – The path to the emtf band setup (.cfrg) file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.num_bands">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_bands</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.num_bands" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the number of bands in the band setup file</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.num_decimation_levels">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_decimation_levels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#aurora.sandbox.io_helpers.emtf_band_setup.EMTFBandSetupFile.num_decimation_levels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number of decimation levels</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-aurora.sandbox.io_helpers.fdsn_dataset">
+<span id="aurora-sandbox-io-helpers-fdsn-dataset-module"></span><h2>aurora.sandbox.io_helpers.fdsn_dataset module<a class="headerlink" href="#module-aurora.sandbox.io_helpers.fdsn_dataset" title="Permalink to this heading">¶</a></h2>
+<p>This module contains a class that can be used to create mth5 datasets from FDSN servers</p>
+<p>TODO: Review usages and consider replace with MTH5 FDSN class.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.sandbox.io_helpers.fdsn_dataset.</span></span><span class="sig-name descname"><span class="pre">FDSNDataset</span></span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/fdsn_dataset.html#FDSNDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>This class contains the information needed to uniquely specify a
+dataset that will be accessed from IRIS, NCEDC, or other FDSN client.
+This config will only work for single stations.</p>
+<p>Need:
+-fdsn_metadata_parameters
+-data_parameters (how to rover, or load from local)
+-a way to specify station-channel, this config will only work for single stations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.client" title="aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.client"><code class="xref py py-obj docutils literal notranslate"><span class="pre">client</span></code></a></dt><dd><p>Returns the client (creates if doesn’t exist)</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.h5_filebase" title="aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.h5_filebase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">h5_filebase</span></code></a></dt><dd><p>retruns an h5 filename</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.describe" title="aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.describe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">describe</span></code></a>()</p></td>
+<td><p>logs some info to terminal</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.get_data_via_fdsn_client" title="aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.get_data_via_fdsn_client"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_data_via_fdsn_client</span></code></a>()</p></td>
+<td><p>Gets data from client</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.get_inventory" title="aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.get_inventory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_inventory</span></code></a>([...])</p></td>
+<td><p>Gets inventory object from FDSN client</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.initialize_client" title="aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.initialize_client"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_client</span></code></a>()</p></td>
+<td><p>Initialize the client</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.client">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">client</span></span><a class="headerlink" href="#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the client (creates if doesn’t exist)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.describe">
+<span class="sig-name descname"><span class="pre">describe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/fdsn_dataset.html#FDSNDataset.describe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.describe" title="Permalink to this definition">¶</a></dt>
+<dd><p>logs some info to terminal</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.get_data_via_fdsn_client">
+<span class="sig-name descname"><span class="pre">get_data_via_fdsn_client</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/fdsn_dataset.html#FDSNDataset.get_data_via_fdsn_client"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.get_data_via_fdsn_client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets data from client</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.get_inventory">
+<span class="sig-name descname"><span class="pre">get_inventory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ensure_inventory_stages_are_named</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'response'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/fdsn_dataset.html#FDSNDataset.get_inventory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.get_inventory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets inventory object from FDSN client</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.h5_filebase">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">h5_filebase</span></span><a class="headerlink" href="#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.h5_filebase" title="Permalink to this definition">¶</a></dt>
+<dd><p>retruns an h5 filename</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.initialize_client">
+<span class="sig-name descname"><span class="pre">initialize_client</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/fdsn_dataset.html#FDSNDataset.initialize_client"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset.initialize_client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the client</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-aurora.sandbox.io_helpers.inventory_review">
+<span id="aurora-sandbox-io-helpers-inventory-review-module"></span><h2>aurora.sandbox.io_helpers.inventory_review module<a class="headerlink" href="#module-aurora.sandbox.io_helpers.inventory_review" title="Permalink to this heading">¶</a></h2>
+<p>In this module are some helper functions for working with FDSN inventory objects.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.inventory_review.describe_inventory_stages">
+<span class="sig-prename descclassname"><span class="pre">aurora.sandbox.io_helpers.inventory_review.</span></span><span class="sig-name descname"><span class="pre">describe_inventory_stages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inventory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Inventory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assign_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/inventory_review.html#describe_inventory_stages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.inventory_review.describe_inventory_stages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scans inventory looking for stages.  Has option to assign names to stages,
+these names are used as keys in MTH5. Modifies inventory in place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inventory</strong> (<em>obspy.Inventory</em>) – obspy representation of station XML</p></li>
+<li><p><strong>assign_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, inventory stage names will be assigned</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, some info logs are created.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.inventory_review.scan_inventory_for_nonconformity">
+<span class="sig-prename descclassname"><span class="pre">aurora.sandbox.io_helpers.inventory_review.</span></span><span class="sig-name descname"><span class="pre">scan_inventory_for_nonconformity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inventory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/inventory_review.html#scan_inventory_for_nonconformity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.inventory_review.scan_inventory_for_nonconformity" title="Permalink to this definition">¶</a></dt>
+<dd><p>One off method for dealing with issues of historical data.
+Checks for the following:
+1. Channel Codes: Q2, Q3 –&gt; Q1, Q2
+2. Field-type code: “T” instead of “F”
+3. Tesla to nT
+:param inventory: Object containing metadata about station and channels
+:type inventory: obspy.core.inventory.inventory.Inventory</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>inventory</strong> – Object containing metadata about station and channels
+Might be modified during this function</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>obspy.core.inventory.inventory.Inventory</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-aurora.sandbox.io_helpers.make_mth5_helpers">
+<span id="aurora-sandbox-io-helpers-make-mth5-helpers-module"></span><h2>aurora.sandbox.io_helpers.make_mth5_helpers module<a class="headerlink" href="#module-aurora.sandbox.io_helpers.make_mth5_helpers" title="Permalink to this heading">¶</a></h2>
+<p>This module contains helper functions for making mth5 from FDSN clients.</p>
+</section>
+<section id="module-aurora.sandbox.io_helpers.zfile_murphy">
+<span id="aurora-sandbox-io-helpers-zfile-murphy-module"></span><h2>aurora.sandbox.io_helpers.zfile_murphy module<a class="headerlink" href="#module-aurora.sandbox.io_helpers.zfile_murphy" title="Permalink to this heading">¶</a></h2>
+<p>This module contains a class that was contributed by Ben Murphy for working with EMTF “Z-files”</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.zfile_murphy.ZFile">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.sandbox.io_helpers.zfile_murphy.</span></span><span class="sig-name descname"><span class="pre">ZFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><span class="pre">Path</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/zfile_murphy.html#ZFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile.apparent_resistivity" title="aurora.sandbox.io_helpers.zfile_murphy.ZFile.apparent_resistivity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apparent_resistivity</span></code></a>([angle])</p></td>
+<td><p>compute the apparent resistivity from the impedance.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile.get_station_id" title="aurora.sandbox.io_helpers.zfile_murphy.ZFile.get_station_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_station_id</span></code></a>()</p></td>
+<td><p>get station ID from zfile</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile.impedance" title="aurora.sandbox.io_helpers.zfile_murphy.ZFile.impedance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">impedance</span></code></a>([angle])</p></td>
+<td><p>Compute the Impedance and errors from the transfer function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile.load" title="aurora.sandbox.io_helpers.zfile_murphy.ZFile.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load</span></code></a>()</p></td>
+<td><p>load Z-file and populate attributes of class</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile.open_file" title="aurora.sandbox.io_helpers.zfile_murphy.ZFile.open_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">open_file</span></code></a>()</p></td>
+<td><p>attempt to open file</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile.phi" title="aurora.sandbox.io_helpers.zfile_murphy.ZFile.phi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">phi</span></code></a>(mode)</p></td>
+<td><p>Return the phase for the given mode.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile.read_channel_information" title="aurora.sandbox.io_helpers.zfile_murphy.ZFile.read_channel_information"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_channel_information</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile.read_coordinates_and_declination" title="aurora.sandbox.io_helpers.zfile_murphy.ZFile.read_coordinates_and_declination"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_coordinates_and_declination</span></code></a>()</p></td>
+<td><p>read coordinates and declination</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile.read_number_of_channels_and_number_of_frequencies" title="aurora.sandbox.io_helpers.zfile_murphy.ZFile.read_number_of_channels_and_number_of_frequencies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_number_of_channels_and_number_of_frequencies</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile.rho" title="aurora.sandbox.io_helpers.zfile_murphy.ZFile.rho"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rho</span></code></a>(mode)</p></td>
+<td><p>Return the apparent resistivity for the given mode.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile.skip_header_lines" title="aurora.sandbox.io_helpers.zfile_murphy.ZFile.skip_header_lines"><code class="xref py py-obj docutils literal notranslate"><span class="pre">skip_header_lines</span></code></a>()</p></td>
+<td><p>Skip over the header when reading</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile.tippers" title="aurora.sandbox.io_helpers.zfile_murphy.ZFile.tippers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tippers</span></code></a>([angle])</p></td>
+<td><p>compute the tipper from transfer function</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.zfile_murphy.ZFile.apparent_resistivity">
+<span class="sig-name descname"><span class="pre">apparent_resistivity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/zfile_murphy.html#ZFile.apparent_resistivity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile.apparent_resistivity" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute the apparent resistivity from the impedance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.zfile_murphy.ZFile.get_station_id">
+<span class="sig-name descname"><span class="pre">get_station_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/zfile_murphy.html#ZFile.get_station_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile.get_station_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>get station ID from zfile</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.zfile_murphy.ZFile.impedance">
+<span class="sig-name descname"><span class="pre">impedance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/zfile_murphy.html#ZFile.impedance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile.impedance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the Impedance and errors from the transfer function.
+- note u,v are identity matrices if angle=0</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>angle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The angle about the vertical axis by which to rotate the Z tensor.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>z</strong> (<em>np.ndarray</em>) – The impedance tensor</p></li>
+<li><p><strong>error</strong> (<em>np.ndarray</em>) – Errors for the impedance tensor</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.zfile_murphy.ZFile.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/zfile_murphy.html#ZFile.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>load Z-file and populate attributes of class</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.zfile_murphy.ZFile.open_file">
+<span class="sig-name descname"><span class="pre">open_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/zfile_murphy.html#ZFile.open_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile.open_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>attempt to open file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.zfile_murphy.ZFile.phi">
+<span class="sig-name descname"><span class="pre">phi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/zfile_murphy.html#ZFile.phi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile.phi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the phase for the given mode.</p>
+<p>Convenience function to help with streamlining synthetic tests - to be
+eventually replaced by functionality in mt_metadata.tf
+:param mode: “xy” or “yx”
+:type mode: str</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>phi</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.zfile_murphy.ZFile.read_channel_information">
+<span class="sig-name descname"><span class="pre">read_channel_information</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/zfile_murphy.html#ZFile.read_channel_information"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile.read_channel_information" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.zfile_murphy.ZFile.read_coordinates_and_declination">
+<span class="sig-name descname"><span class="pre">read_coordinates_and_declination</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/zfile_murphy.html#ZFile.read_coordinates_and_declination"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile.read_coordinates_and_declination" title="Permalink to this definition">¶</a></dt>
+<dd><p>read coordinates and declination</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.zfile_murphy.ZFile.read_number_of_channels_and_number_of_frequencies">
+<span class="sig-name descname"><span class="pre">read_number_of_channels_and_number_of_frequencies</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/zfile_murphy.html#ZFile.read_number_of_channels_and_number_of_frequencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile.read_number_of_channels_and_number_of_frequencies" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.zfile_murphy.ZFile.rho">
+<span class="sig-name descname"><span class="pre">rho</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/zfile_murphy.html#ZFile.rho"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile.rho" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the apparent resistivity for the given mode.</p>
+<p>Convenience function to help with streamlining synthetic tests - to be
+eventually replaced by functionality in mt_metadata.tf</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – “xy” or “yx”</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>rho</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.zfile_murphy.ZFile.skip_header_lines">
+<span class="sig-name descname"><span class="pre">skip_header_lines</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/zfile_murphy.html#ZFile.skip_header_lines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile.skip_header_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Skip over the header when reading</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.zfile_murphy.ZFile.tippers">
+<span class="sig-name descname"><span class="pre">tippers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/zfile_murphy.html#ZFile.tippers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile.tippers" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute the tipper from transfer function</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.sandbox.io_helpers.zfile_murphy.read_z_file">
+<span class="sig-prename descclassname"><span class="pre">aurora.sandbox.io_helpers.zfile_murphy.</span></span><span class="sig-name descname"><span class="pre">read_z_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile" title="aurora.sandbox.io_helpers.zfile_murphy.ZFile"><span class="pre">ZFile</span></a></span></span><a class="reference internal" href="../_modules/aurora/sandbox/io_helpers/zfile_murphy.html#read_z_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.sandbox.io_helpers.zfile_murphy.read_z_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a zFile and returns a ZFile object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z_file_path</strong> (<em>string</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>pathlib.Path</em></a>) – The name of the EMTF-style z-file to operate on</p></li>
+<li><p><strong>angle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – How much rotation to apply.  This is a kludge variable used to help compare
+legacy SPUD results which are rotated onto a cardinal grid, vs aurora which
+store the TF in the coordinate system of acquisition</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>z_obj</strong> – The zFile as an object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#aurora.sandbox.io_helpers.zfile_murphy.ZFile" title="aurora.sandbox.io_helpers.zfile_murphy.ZFile">ZFile</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-aurora.sandbox.io_helpers">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-aurora.sandbox.io_helpers" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="aurora.sandbox.html" class="btn btn-neutral float-left" title="aurora.sandbox package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="aurora.test_utils.html" class="btn btn-neutral float-right" title="aurora.test_utils package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

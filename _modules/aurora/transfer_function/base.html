@@ -1,0 +1,438 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.transfer_function.base &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aurora.transfer_function.base</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.transfer_function.base</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains a base class for Transfer function information.</span>
+
+<span class="sd">Development Notes:</span>
+<span class="sd"> The class is based on Gary&#39;s TTF.m in iris_mt_scratch egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes</span>
+
+<span class="sd">TODO: This class should be updated to use mt_metadata.transfer_function.TF, or replaced by it (issue #203)</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.config.metadata.processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Processing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mt_metadata.transfer_functions.processing.aurora</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrequencyBands</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+
+<div class="viewcode-block" id="TransferFunction"><a class="viewcode-back" href="../../../api/aurora.transfer_function.html#aurora.transfer_function.base.TransferFunction">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">TransferFunction</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class to contain transfer function array.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    TF : numpy array</span>
+<span class="sd">        array of transfer functions: TF(Nout, Nin, Nperiods)</span>
+<span class="sd">    T : numpy array</span>
+<span class="sd">        list of periods</span>
+<span class="sd">    cov_ss_inv : numpy array</span>
+<span class="sd">        inverse signal power matrix.  aka Cov_SS in EMTF matlab codes</span>
+<span class="sd">    cov_nn : numpy array</span>
+<span class="sd">        noise covariance matrix: aka Cov_NN in EMTF matlab codes</span>
+<span class="sd">    num_segments : integer array?</span>
+<span class="sd">        Number of samples used to estimate TF for each band, and for each \</span>
+<span class="sd">        output channel (might be different for different channels)</span>
+<span class="sd">    R2 : xarray.DataArray</span>
+<span class="sd">        multiple coherence for each output channel / band</span>
+<span class="sd">    FullCov : boolean</span>
+<span class="sd">        true if full covariance is provided</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">decimation_level_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">frequency_bands</span><span class="p">:</span> <span class="n">FrequencyBands</span><span class="p">,</span>
+        <span class="n">processing_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Processing</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        _emtf_header : legacy header information used by Egbert&#39;s matlab class.  Header contains</span>
+<span class="sd">        local site header, remote site header if appropriate, and information about estimation approach</span>
+<span class="sd">        decimation_level_id: int</span>
+<span class="sd">            Identifies the relevant decimation level.  Used for accessing the</span>
+<span class="sd">            appropriate info in self.processing config.</span>
+<span class="sd">        frequency_bands: FrequencyBands</span>
+<span class="sd">            frequency bands object defining the tf estimation bands.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_emtf_tf_header</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decimation_level_id</span> <span class="o">=</span> <span class="n">decimation_level_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frequency_bands</span> <span class="o">=</span> <span class="n">frequency_bands</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_segments</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cov_ss_inv</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cov_nn</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">R2</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processing_config</span> <span class="o">=</span> <span class="n">processing_config</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">emtf_tf_header</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_bands</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_arrays</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">emtf_tf_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        emtf_tf_header: None or OrderedDict</span>
+<span class="sd">            A legacy construction from the old EMTF codes with some metadata about the TF.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">processing_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No header is available without a processing config&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_emtf_tf_header</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emtf_tf_header</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">tfh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">processing_config</span><span class="o">.</span><span class="n">emtf_tf_header</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">decimation_level_id</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_emtf_tf_header</span> <span class="o">=</span> <span class="n">tfh</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emtf_tf_header</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tf_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;returns the emtf_header&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">emtf_tf_header</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transfer_function</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_bands</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get number of bands associated with TF</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        num_bands: int</span>
+<span class="sd">            a count of the frequency bands associated with the TF</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency_bands</span><span class="o">.</span><span class="n">number_of_bands</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">periods</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">periods</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency_bands</span><span class="o">.</span><span class="n">band_centers</span><span class="p">(</span><span class="n">frequency_or_period</span><span class="o">=</span><span class="s2">&quot;period&quot;</span><span class="p">)</span>
+        <span class="n">periods</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">periods</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">periods</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize_arrays</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the xarray objects that will contain the TF data.</span>
+
+<span class="sd">        Development Notes:</span>
+<span class="sd">        There are four separate data strucutres, indexed by period here:</span>
+<span class="sd">        - TF (num_channels_out, num_channels_in)</span>
+<span class="sd">        - cov_ss_inv (num_channels_in, num_channels_in, num_bands),</span>
+<span class="sd">        - Cov_NN (num_channels_out, num_channels_out),</span>
+<span class="sd">        - R2 num_channels_out)</span>
+
+<span class="sd">        We use frequency in Fourier domain and period in TF domain.  Might</span>
+<span class="sd">        be better to be consistent.  It would be inexpensive to duplicate</span>
+<span class="sd">        the axis and simply provide both.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tf_header</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;header needed to allocate transfer function arrays&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span>
+
+        <span class="c1"># &lt;transfer function xarray&gt;</span>
+        <span class="n">tf_array_dims</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_channels_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_channels_in</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_bands</span><span class="p">)</span>
+        <span class="n">tf_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">tf_array_dims</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transfer_function</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">tf_array</span><span class="p">,</span>
+            <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;output_channel&quot;</span><span class="p">,</span> <span class="s2">&quot;input_channel&quot;</span><span class="p">,</span> <span class="s2">&quot;period&quot;</span><span class="p">],</span>  <span class="c1"># frequency&quot;],</span>
+            <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;period&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">periods</span><span class="p">,</span>
+                <span class="s2">&quot;output_channel&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tf_header</span><span class="o">.</span><span class="n">output_channels</span><span class="p">,</span>
+                <span class="s2">&quot;input_channel&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tf_header</span><span class="o">.</span><span class="n">input_channels</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="c1"># num_segments xarray</span>
+        <span class="n">num_segments</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">num_channels_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_bands</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+        <span class="n">num_segments_xr</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">num_segments</span><span class="p">,</span>
+            <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;channel&quot;</span><span class="p">,</span> <span class="s2">&quot;period&quot;</span><span class="p">],</span>
+            <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;period&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">periods</span><span class="p">,</span>
+                <span class="s2">&quot;channel&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tf_header</span><span class="o">.</span><span class="n">output_channels</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_segments</span> <span class="o">=</span> <span class="n">num_segments_xr</span>
+
+        <span class="c1"># Inverse signal covariance</span>
+        <span class="n">cov_ss_dims</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_channels_in</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_channels_in</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_bands</span><span class="p">)</span>
+        <span class="n">cov_ss_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">cov_ss_dims</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cov_ss_inv</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">cov_ss_inv</span><span class="p">,</span>
+            <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;input_channel_1&quot;</span><span class="p">,</span> <span class="s2">&quot;input_channel_2&quot;</span><span class="p">,</span> <span class="s2">&quot;period&quot;</span><span class="p">],</span>
+            <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;input_channel_1&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tf_header</span><span class="o">.</span><span class="n">input_channels</span><span class="p">,</span>
+                <span class="s2">&quot;input_channel_2&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tf_header</span><span class="o">.</span><span class="n">input_channels</span><span class="p">,</span>
+                <span class="s2">&quot;period&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">periods</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Noise covariance</span>
+        <span class="n">cov_nn_dims</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_channels_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_channels_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_bands</span><span class="p">)</span>
+        <span class="n">cov_nn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">cov_nn_dims</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cov_nn</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">cov_nn</span><span class="p">,</span>
+            <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;output_channel_1&quot;</span><span class="p">,</span> <span class="s2">&quot;output_channel_2&quot;</span><span class="p">,</span> <span class="s2">&quot;period&quot;</span><span class="p">],</span>
+            <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;output_channel_1&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tf_header</span><span class="o">.</span><span class="n">output_channels</span><span class="p">,</span>
+                <span class="s2">&quot;output_channel_2&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tf_header</span><span class="o">.</span><span class="n">output_channels</span><span class="p">,</span>
+                <span class="s2">&quot;period&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">periods</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Coefficient of determination</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">R2</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">num_channels_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_bands</span><span class="p">)),</span>
+            <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;output_channel&quot;</span><span class="p">,</span> <span class="s2">&quot;period&quot;</span><span class="p">],</span>
+            <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;output_channel&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tf_header</span><span class="o">.</span><span class="n">output_channels</span><span class="p">,</span>
+                <span class="s2">&quot;period&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">periods</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">minimum_period</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;return the minimum (shortest) period in self.periods&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">periods</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">maximum_period</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;return the maximum (longest) period in self.periods&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">periods</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_channels_in</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;return the number of input channels in the TF&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tf_header</span><span class="o">.</span><span class="n">input_channels</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_channels_out</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;return the number of output channels in the TF&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tf_header</span><span class="o">.</span><span class="n">output_channels</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TransferFunction.frequency_index"><a class="viewcode-back" href="../../../api/aurora.transfer_function.html#aurora.transfer_function.base.TransferFunction.frequency_index">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">frequency_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frequency</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the index of the tf array associated with the input frequency</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        frequency: float</span>
+<span class="sd">            The period in seconds</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        frequency_index: int</span>
+<span class="sd">            The index of the tf array corresponding to the frequency</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">period_index</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">frequency</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TransferFunction.period_index"><a class="viewcode-back" href="../../../api/aurora.transfer_function.html#aurora.transfer_function.base.TransferFunction.period_index">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">period_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">period</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the index of the tf array associated with the input period.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        period: float</span>
+<span class="sd">            The period in seconds</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        period_index: int</span>
+<span class="sd">            The index of the tf array corresponding to the period</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">period_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_segments</span><span class="o">.</span><span class="n">period</span><span class="p">,</span> <span class="n">period</span><span class="p">)</span>
+        <span class="n">period_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">period_index</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">period_index</span></div>
+
+<div class="viewcode-block" id="TransferFunction.set_tf"><a class="viewcode-back" href="../../../api/aurora.transfer_function.html#aurora.transfer_function.base.TransferFunction.set_tf">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_tf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regression_estimator</span><span class="p">,</span> <span class="n">period</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets TF elements for one band, using contents of regression_estimator object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">period_index</span><span class="p">(</span><span class="n">period</span><span class="p">)</span>
+
+        <span class="n">tf</span> <span class="o">=</span> <span class="n">regression_estimator</span><span class="o">.</span><span class="n">b_to_xarray</span><span class="p">()</span>
+        <span class="n">output_channels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">regression_estimator</span><span class="o">.</span><span class="n">_Y</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>
+        <span class="n">input_channels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">regression_estimator</span><span class="o">.</span><span class="n">_X</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">out_ch</span> <span class="ow">in</span> <span class="n">output_channels</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">inp_ch</span> <span class="ow">in</span> <span class="n">input_channels</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tf</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">out_ch</span><span class="p">,</span> <span class="n">inp_ch</span><span class="p">]</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">out_ch</span><span class="p">,</span> <span class="n">inp_ch</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">regression_estimator</span><span class="o">.</span><span class="n">noise_covariance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">out_ch_1</span> <span class="ow">in</span> <span class="n">output_channels</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">out_ch_2</span> <span class="ow">in</span> <span class="n">output_channels</span><span class="p">:</span>
+                    <span class="n">tmp</span> <span class="o">=</span> <span class="n">regression_estimator</span><span class="o">.</span><span class="n">cov_nn</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">out_ch_1</span><span class="p">,</span> <span class="n">out_ch_2</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">cov_nn</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">out_ch_1</span><span class="p">,</span> <span class="n">out_ch_2</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
+
+        <span class="k">if</span> <span class="n">regression_estimator</span><span class="o">.</span><span class="n">inverse_signal_covariance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">inp_ch_1</span> <span class="ow">in</span> <span class="n">input_channels</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">inp_ch_2</span> <span class="ow">in</span> <span class="n">input_channels</span><span class="p">:</span>
+                    <span class="n">tmp</span> <span class="o">=</span> <span class="n">regression_estimator</span><span class="o">.</span><span class="n">cov_ss_inv</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">inp_ch_1</span><span class="p">,</span> <span class="n">inp_ch_2</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">cov_ss_inv</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">inp_ch_1</span><span class="p">,</span> <span class="n">inp_ch_2</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
+
+        <span class="k">if</span> <span class="n">regression_estimator</span><span class="o">.</span><span class="n">R2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">out_ch</span> <span class="ow">in</span> <span class="n">output_channels</span><span class="p">:</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="n">regression_estimator</span><span class="o">.</span><span class="n">R2</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">out_ch</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">R2</span><span class="p">[:,</span> <span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">out_ch</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_segments</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">regression_estimator</span><span class="o">.</span><span class="n">n_data</span>
+
+        <span class="k">return</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

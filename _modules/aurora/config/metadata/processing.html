@@ -1,0 +1,369 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.config.metadata.processing &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aurora.config.metadata.processing</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.config.metadata.processing</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Extend the mt_metadata.transfer_functions.processing.aurora.processing.Processing class</span>
+<span class="sd">with some aurora-specific methods.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># =============================================================================</span>
+<span class="c1"># Imports</span>
+<span class="c1"># =============================================================================</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.time_series.windowing_scheme</span><span class="w"> </span><span class="kn">import</span> <span class="n">window_scheme_from_decimation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mt_metadata.transfer_functions.processing.aurora.processing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Processing</span> <span class="k">as</span> <span class="n">AuroraProcessing</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mt_metadata.utils.list_dict</span><span class="w"> </span><span class="kn">import</span> <span class="n">ListDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+
+
+<div class="viewcode-block" id="Processing"><a class="viewcode-back" href="../../../../api/aurora.config.metadata.html#aurora.config.metadata.processing.Processing">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Processing</span><span class="p">(</span><span class="n">AuroraProcessing</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kwargs</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># super().__init__(attr_dict=attr_dict, **kwargs)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Processing.window_scheme"><a class="viewcode-back" href="../../../../api/aurora.config.metadata.html#aurora.config.metadata.processing.Processing.window_scheme">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">window_scheme</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">as_type</span><span class="o">=</span><span class="s2">&quot;df&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Make a dataframe of processing parameters one row per decimation level.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        as_type: Optional[str]</span>
+<span class="sd">            if &quot;df&quot; return a dataframe, if &quot;dict&quot; return dict</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        windowing: Union[dict, pd.DataFrame]</span>
+<span class="sd">            return type depends on as_type argument.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">window_schemes</span> <span class="o">=</span> <span class="p">[</span><span class="n">window_scheme_from_decimation</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">decimations</span><span class="p">]</span>
+        <span class="n">data_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">data_dict</span><span class="p">[</span><span class="s2">&quot;sample_rate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">sample_rate</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">window_schemes</span><span class="p">]</span>
+        <span class="n">data_dict</span><span class="p">[</span><span class="s2">&quot;window_duration&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">window_duration</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">window_schemes</span><span class="p">]</span>
+        <span class="n">data_dict</span><span class="p">[</span><span class="s2">&quot;num_samples_window&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">num_samples_window</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">window_schemes</span><span class="p">]</span>
+        <span class="n">data_dict</span><span class="p">[</span><span class="s2">&quot;num_samples_overlap&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">num_samples_overlap</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">window_schemes</span>
+        <span class="p">]</span>
+        <span class="n">data_dict</span><span class="p">[</span><span class="s2">&quot;num_samples_advance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">num_samples_advance</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">window_schemes</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="n">as_type</span> <span class="o">==</span> <span class="s2">&quot;dict&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">data_dict</span>
+        <span class="k">elif</span> <span class="n">as_type</span> <span class="o">==</span> <span class="s2">&quot;df&quot;</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data_dict</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">df</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unexpected rtype for window_scheme </span><span class="si">{</span><span class="n">as_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decimation_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Zips decimation level ids to the Decimation objects adn returns as a dict</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        decimation_info: dict</span>
+<span class="sd">            The decimation objects keyed by decimation level id.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">decimation_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">decimation</span><span class="o">.</span><span class="n">level</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">decimations</span><span class="p">]</span>
+        <span class="n">decimation_factors</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">decimation</span><span class="o">.</span><span class="n">factor</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">decimations</span><span class="p">]</span>
+        <span class="n">decimation_info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">decimation_ids</span><span class="p">,</span> <span class="n">decimation_factors</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">decimation_info</span>
+
+<div class="viewcode-block" id="Processing.save_as_json"><a class="viewcode-back" href="../../../../api/aurora.config.metadata.html#aurora.config.metadata.processing.Processing.save_as_json">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">save_as_json</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">filename</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">nested</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">required</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Exports self to a JSON</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename: Optional[Union[str, pathlib.Path, None]</span>
+<span class="sd">            Where to write the json</span>
+<span class="sd">        nested: Optional[bool] = True,</span>
+<span class="sd">            An mt_metadata argument</span>
+<span class="sd">        required: Optional[bool] = False,</span>
+<span class="sd">            An mt_metadata argument</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_fn</span><span class="p">()</span>
+        <span class="n">json_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">nested</span><span class="o">=</span><span class="n">nested</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="n">required</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json_str</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Processing.emtf_tf_header"><a class="viewcode-back" href="../../../../api/aurora.config.metadata.html#aurora.config.metadata.processing.Processing.emtf_tf_header">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">emtf_tf_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dec_level_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ListDict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a ListDict object that has the information that was in the old EMTF TF</span>
+<span class="sd">         Header object.  This may be deprecated in future -- it is an artefact of the</span>
+<span class="sd">         old matlab implementation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dec_level_id: int</span>
+<span class="sd">            This may tolerate strings in the future, but keep as int for now</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            tfh: ListDict</span>
+<span class="sd">            Object with the properties of the old EMTF TransferFunctionHeader class.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tfh</span> <span class="o">=</span> <span class="n">ListDict</span><span class="p">()</span>
+        <span class="n">tfh</span><span class="o">.</span><span class="n">processing_scheme</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decimations</span><span class="p">[</span><span class="n">dec_level_id</span><span class="p">]</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">engine</span>
+        <span class="n">tfh</span><span class="o">.</span><span class="n">local_station</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stations</span><span class="o">.</span><span class="n">local</span>
+        <span class="n">tfh</span><span class="o">.</span><span class="n">remote_station</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stations</span><span class="o">.</span><span class="n">remote</span>
+        <span class="n">tfh</span><span class="o">.</span><span class="n">input_channels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decimations</span><span class="p">[</span><span class="n">dec_level_id</span><span class="p">]</span><span class="o">.</span><span class="n">input_channels</span>
+        <span class="n">tfh</span><span class="o">.</span><span class="n">output_channels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decimations</span><span class="p">[</span><span class="n">dec_level_id</span><span class="p">]</span><span class="o">.</span><span class="n">output_channels</span>
+        <span class="n">tfh</span><span class="o">.</span><span class="n">reference_channels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decimations</span><span class="p">[</span><span class="n">dec_level_id</span><span class="p">]</span><span class="o">.</span><span class="n">reference_channels</span>
+        <span class="n">tfh</span><span class="o">.</span><span class="n">decimation_level_id</span> <span class="o">=</span> <span class="n">dec_level_id</span>
+
+        <span class="k">return</span> <span class="n">tfh</span></div>
+
+<div class="viewcode-block" id="Processing.make_tf_level"><a class="viewcode-back" href="../../../../api/aurora.config.metadata.html#aurora.config.metadata.processing.Processing.make_tf_level">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">make_tf_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dec_level_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize container for a single decimation level -- &quot;flat&quot; transfer function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dec_level_id: int</span>
+<span class="sd">            This may tolerate strings in the future, but keep as int for now</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tf_obj: aurora.transfer_function.TTFZ.TTFZ</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># from aurora.transfer_function.base import TransferFunction</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">aurora.transfer_function.TTFZ</span><span class="w"> </span><span class="kn">import</span> <span class="n">TTFZ</span>
+
+        <span class="n">tf_obj</span> <span class="o">=</span> <span class="n">TTFZ</span><span class="p">(</span>
+            <span class="n">dec_level_id</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">decimations</span><span class="p">[</span><span class="n">dec_level_id</span><span class="p">]</span><span class="o">.</span><span class="n">frequency_bands_obj</span><span class="p">(),</span>
+            <span class="n">processing_config</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">tf_obj</span></div></div>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_processing_obj_from_json_file</span><span class="p">(</span><span class="n">json_path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Processing</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read in a processing parameters json file and return a Processing object.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    json_path: pathlib.Path</span>
+<span class="sd">        Path to a json file containing processing parameters</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">         processing_obj: Processing</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">json_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">json_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json_str</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">p_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_str</span><span class="p">)</span>
+    <span class="n">processing_obj</span> <span class="o">=</span> <span class="n">Processing</span><span class="p">()</span>
+    <span class="n">processing_obj</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">p_dict</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">processing_obj</span>
+
+
+<div class="viewcode-block" id="EMTFTFHeader"><a class="viewcode-back" href="../../../../api/aurora.config.metadata.html#aurora.config.metadata.processing.EMTFTFHeader">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">EMTFTFHeader</span><span class="p">(</span><span class="n">ListDict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convenience class for storing metadata for a TF estimate.</span>
+<span class="sd">    Based on Gary Egbert&#39;s TFHeader.m originally in</span>
+<span class="sd">    iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes</span>
+
+<span class="sd">    It completely depends on the Processing class</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        _local_station : mt_metadata.transfer_functions.tf.station.Station()</span>
+<span class="sd">            Station metadata object for the station to be estimated (</span>
+<span class="sd">            location, channel_azimuths, etc.)</span>
+<span class="sd">        _remote_station: same object type as local station</span>
+<span class="sd">            if no remote reference then this can be None</span>
+<span class="sd">        output_channels: list</span>
+<span class="sd">            Probably a list of channel keys -- usually [&quot;ex&quot;,&quot;ey&quot;,&quot;hz&quot;]</span>
+<span class="sd">        input_channels : list</span>
+<span class="sd">            Probably a list of channel keys -- usually [&quot;hx&quot;,&quot;hy&quot;]</span>
+<span class="sd">            These are the channels being provided as input to the regression.</span>
+<span class="sd">        reference_channels : list</span>
+<span class="sd">            These are the channels being used from the RR station. This is a</span>
+<span class="sd">            channel list -- usually [&quot;hx&quot;, &quot;hy&quot;]</span>
+<span class="sd">        processing_scheme: str</span>
+<span class="sd">            Denotes the regression engine used to estimate the transfer</span>
+<span class="sd">            function.  One of &quot;OLS&quot; or &quot;RME&quot;, &quot;RME_RR.  Future</span>
+<span class="sd">            versions could include , &quot;multivariate array&quot;, &quot;multiple remote&quot;,</span>
+<span class="sd">            etc.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processing_scheme</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;processing_scheme&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">local_station</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;local_station&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remote_station</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;remote_station&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_channels</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;input_channels&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;hx&quot;</span><span class="p">,</span> <span class="s2">&quot;hy&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_channels</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;output_channels&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;ex&quot;</span><span class="p">,</span> <span class="s2">&quot;ey&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reference_channels</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;reference_channels&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decimation_level_id</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;decimation_level_id&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_meta_data</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># placeholder for anything</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

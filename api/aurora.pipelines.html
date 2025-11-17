@@ -1,0 +1,1181 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.pipelines package &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css?v=7f9a90b1" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="aurora.sandbox package" href="aurora.sandbox.html" />
+    <link rel="prev" title="aurora.config.metadata package" href="aurora.config.metadata.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">aurora</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="aurora.html">aurora package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="aurora.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="aurora.config.html">aurora.config package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">aurora.pipelines package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.html">aurora.sandbox package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.html">aurora.test_utils package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html">aurora.time_series package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html">aurora.transfer_function package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.html#module-aurora.general_helper_functions">aurora.general_helper_functions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.html#module-aurora">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">aurora</a></li>
+          <li class="breadcrumb-item"><a href="aurora.html">aurora package</a></li>
+      <li class="breadcrumb-item active">aurora.pipelines package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/aurora.pipelines.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="aurora-pipelines-package">
+<h1>aurora.pipelines package<a class="headerlink" href="#aurora-pipelines-package" title="Permalink to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="aurora-pipelines-fourier-coefficients-module">
+<h2>aurora.pipelines.fourier_coefficients module<a class="headerlink" href="#aurora-pipelines-fourier-coefficients-module" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-aurora.pipelines.helpers">
+<span id="aurora-pipelines-helpers-module"></span><h2>aurora.pipelines.helpers module<a class="headerlink" href="#module-aurora.pipelines.helpers" title="Permalink to this heading">¶</a></h2>
+<p>Helper functions for processing pipelines.
+These maybe reorganized later into other modules.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.helpers.initialize_config">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.helpers.</span></span><span class="sig-name descname"><span class="pre">initialize_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processing_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Processing</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><span class="pre">Path</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Processing</span></span></span><a class="reference internal" href="../_modules/aurora/pipelines/helpers.html#initialize_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.helpers.initialize_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to return an intialized processing config.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>processing_cfg</strong> (<em>Union</em><em>[</em><a class="reference internal" href="aurora.config.metadata.html#aurora.config.metadata.processing.Processing" title="aurora.config.metadata.processing.Processing"><em>Processing</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>pathlib.Path</em></a><em>]</em>) – Either an instance of the processing class or a path to a json file that a
+Processing object is stored in.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>config</strong> – Object that contains the processing parameters</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>mt_metadata.transfer_functions.processing.aurora.Processing</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-aurora.pipelines.process_mth5">
+<span id="aurora-pipelines-process-mth5-module"></span><h2>aurora.pipelines.process_mth5 module<a class="headerlink" href="#module-aurora.pipelines.process_mth5" title="Permalink to this heading">¶</a></h2>
+<p>This module contains the main methods used in processing mth5 objects to transfer functions.</p>
+<p>The main function is called process_mth5.
+This function was recently changed to process_mth5_legacy, os that process_mth5
+can be repurposed for other TF estimation schemes.  The “legacy” version
+corresponds to aurora default processing.</p>
+<p>Notes on process_mth5_legacy:
+Note 1: process_mth5 assumes application of cascading decimation, and that the
+decimated data will be accessed from the previous decimation level.  This should be
+revisited. It may make more sense to have a get_decimation_level() interface that
+provides an option of applying decimation or loading pre-decimated data.
+This will be addressed via creation of the FC layer inside mth5.</p>
+<p>Note 2: We can encounter cases where some runs can be decimated and others can not.
+We need a way to handle this. For example, a short run may not yield any data from a
+later decimation level. An attempt to handle this has been made in TF Kernel by
+adding a is_valid_dataset column, associated with each run-decimation level pair.</p>
+<dl class="simple">
+<dt>Note 3: This point in the loop marks the interface between _generation_ of the FCs and</dt><dd><p>their _usage_. In future the code above this comment would be pushed into
+the creation of the spectrograms and the code below this would access those FCs and
+execute compute_transfer_function().
+This would also be an appropriate place to place a feature extraction layer, and
+compute weights for the FCs.</p>
+</dd>
+</dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.process_mth5.process_mth5">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.process_mth5.</span></span><span class="sig-name descname"><span class="pre">process_mth5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tfk_dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MT'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_file_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_collection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processing_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'legacy'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/process_mth5.html#process_mth5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.process_mth5.process_mth5" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a pass-through method that routes the config and tfk_dataset to MT data processing.
+It currently only supports legacy aurora processing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<em>mt_metadata.transfer_functions.processing.aurora.Processing</em><em> or </em><em>path to json</em>) – All processing parameters</p></li>
+<li><p><strong>tfk_dataset</strong> (<em>aurora.tf_kernel.dataset.Dataset</em><em> or </em><em>None</em>) – Specifies what datasets to process according to config</p></li>
+<li><p><strong>units</strong> (<em>string</em>) – “MT” or “SI”.  To be deprecated once data have units embedded</p></li>
+<li><p><strong>show_plot</strong> (<em>boolean</em>) – Only used for dev</p></li>
+<li><p><strong>z_file_path</strong> (<em>string</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>pathlib.Path</em></a>) – Target path for a z_file output if desired</p></li>
+<li><p><strong>return_collection</strong> (<em>boolean</em>) – return_collection=False will return an mt_metadata TF object
+return_collection=True will return
+aurora.transfer_function.transfer_function_collection.TransferFunctionCollection</p></li>
+<li><p><strong>processing_type</strong> (<em>string</em>) – Controlled vocabulary, must be one of [“legacy”,]
+This is not really supported now, but the idea is that in future, the config and tfk_dataset can be passed to
+another processing method if desired.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tf_obj</strong> – The transfer function object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection" title="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection">TransferFunctionCollection</a> or mt_metadata.transfer_functions.TF</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.process_mth5.process_mth5_legacy">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.process_mth5.</span></span><span class="sig-name descname"><span class="pre">process_mth5_legacy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tfk_dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MT'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_file_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_collection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/process_mth5.html#process_mth5_legacy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.process_mth5.process_mth5_legacy" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the main method used to transform a processing_config,
+and a kernel_dataset into a transfer function estimate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<em>mt_metadata.transfer_functions.processing.aurora.Processing</em><em> or </em><em>path to json</em>) – All processing parameters</p></li>
+<li><p><strong>tfk_dataset</strong> (<em>aurora.tf_kernel.dataset.Dataset</em><em> or </em><em>None</em>) – Specifies what datasets to process according to config</p></li>
+<li><p><strong>units</strong> (<em>string</em>) – “MT” or “SI”.  To be deprecated once data have units embedded</p></li>
+<li><p><strong>show_plot</strong> (<em>boolean</em>) – Only used for dev</p></li>
+<li><p><strong>z_file_path</strong> (<em>string</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>pathlib.Path</em></a>) – Target path for a z_file output if desired</p></li>
+<li><p><strong>return_collection</strong> (<em>boolean</em>) – return_collection=False will return an mt_metadata TF object
+return_collection=True will return
+aurora.transfer_function.transfer_function_collection.TransferFunctionCollection</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>tf_collection</strong> (<em>TransferFunctionCollection or mt_metadata TF</em>) – The transfer function object</p></li>
+<li><p><strong>tf_cls</strong> (<em>mt_metadata.transfer_functions.TF</em>) – TF object</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.process_mth5.process_tf_decimation_level">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.process_mth5.</span></span><span class="sig-name descname"><span class="pre">process_tf_decimation_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="aurora.config.metadata.html#aurora.config.metadata.processing.Processing" title="aurora.config.metadata.processing.Processing"><span class="pre">Processing</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_dec_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_stft_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remote_stft_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MT'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/process_mth5.html#process_tf_decimation_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.process_mth5.process_tf_decimation_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processing pipeline for a single decimation_level</p>
+<dl class="simple">
+<dt>TODO: Add a check that the processing config sample rates agree with the data</dt><dd><p>sampling rates otherwise raise Exception</p>
+</dd>
+</dl>
+<p>TODO: Add units to local_stft_obj, remote_stft_obj
+TODO: This is the method that should be accessing weights
+This method can be single station or remote based on the process cfg</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference internal" href="aurora.config.metadata.html#aurora.config.metadata.processing.Processing" title="aurora.config.metadata.processing.Processing"><em>aurora.config.metadata.processing.Processing</em></a><em>,</em>) – Config for a single decimation level</p></li>
+<li><p><strong>i_dec_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – decimation level_id
+?could we pack this into the decimation level as an attr?</p></li>
+<li><p><strong>local_stft_obj</strong> (<em>xarray.core.dataset.Dataset</em>) – The time series of Fourier coefficients from the local station</p></li>
+<li><p><strong>remote_stft_obj</strong> (<em>xarray.core.dataset.Dataset</em><em> or </em><em>None</em>) – The time series of Fourier coefficients from the remote station</p></li>
+<li><p><strong>units</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – one of [“MT”,”SI”]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>transfer_function_obj</strong> – The transfer function values packed into an object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.TTFZ.TTFZ" title="aurora.transfer_function.TTFZ.TTFZ">aurora.transfer_function.TTFZ.TTFZ</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-aurora.pipelines.run_summary">
+<span id="aurora-pipelines-run-summary-module"></span><h2>aurora.pipelines.run_summary module<a class="headerlink" href="#module-aurora.pipelines.run_summary" title="Permalink to this heading">¶</a></h2>
+<p>Note 1: Functionality of RunSummary()
+1. User can get a list of local_station options, which correspond to unique pairs
+of values: (survey_id,  station_id)</p>
+<p>2. User can see all possible ways of processing the data:
+- one list per (survey_id,  station_id) pair in the run_summary</p>
+<p>Some of the following functionalities may end up in KernelDataset:
+3. User can select local_station
+-this can trigger a reduction of runs to only those that are from the local staion
+and simultaneous runs at other stations
+4. Given a local station, a list of possible reference stations can be generated
+5. Given a remote reference station, a list of all relevent runs, truncated to
+maximize coverage of the local station runs is generated
+6. Given such a “restricted run list”, runs can be dropped
+7. Time interval endpoints can be changed</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.pipelines.run_summary.RunSummary">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.pipelines.run_summary.</span></span><span class="sig-name descname"><span class="pre">RunSummary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/run_summary.html#RunSummary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.run_summary.RunSummary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>The dependencies aren’t clear yet.
+Maybe still Dataset:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Could have methods</dt><dd><p>“drop_runs_shorter_than”
+“fill_gaps_by_time_interval”
+“fill_gaps_by_run_names”
+“</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>For the full MMT case this may need modification to a channel based summary.</p>
+<p>Question: To return a copy or modify in-place when querying.  Need to decide on
+standards and syntax.  Handling this in general could use a decorator that allows
+df as kwarg, and if it is not passed the modification is done in place.
+The user who doesn’t want to modify in place can work with a clone.
+Could also try the &#64;staticmethod decorator so that it returns a modified df.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>mini_summary</strong></dt><dd></dd>
+<dt><strong>print_mini_summary</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.pipelines.run_summary.RunSummary.add_duration" title="aurora.pipelines.run_summary.RunSummary.add_duration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_duration</span></code></a>([df])</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">param df<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.pipelines.run_summary.RunSummary.check_runs_are_valid" title="aurora.pipelines.run_summary.RunSummary.check_runs_are_valid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_runs_are_valid</span></code></a>([drop])</p></td>
+<td><p>kwargs can tell us what sorts of conditions to check, for example all_zero, there are nan, etc.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.pipelines.run_summary.RunSummary.clone" title="aurora.pipelines.run_summary.RunSummary.clone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clone</span></code></a>()</p></td>
+<td><p>2022-10-20: Cloning may be causing issues with extra instances of open h5 files ...</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>drop_invalid_rows</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>from_mth5s</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.pipelines.run_summary.RunSummary.add_duration">
+<span class="sig-name descname"><span class="pre">add_duration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/run_summary.html#RunSummary.add_duration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.run_summary.RunSummary.add_duration" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>df</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.pipelines.run_summary.RunSummary.check_runs_are_valid">
+<span class="sig-name descname"><span class="pre">check_runs_are_valid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/run_summary.html#RunSummary.check_runs_are_valid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.run_summary.RunSummary.check_runs_are_valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>kwargs can tell us what sorts of conditions to check, for example all_zero, there are nan, etc.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.pipelines.run_summary.RunSummary.clone">
+<span class="sig-name descname"><span class="pre">clone</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/run_summary.html#RunSummary.clone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.run_summary.RunSummary.clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>2022-10-20:
+Cloning may be causing issues with extra instances of open h5 files …</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.pipelines.run_summary.RunSummary.drop_invalid_rows">
+<span class="sig-name descname"><span class="pre">drop_invalid_rows</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/run_summary.html#RunSummary.drop_invalid_rows"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.run_summary.RunSummary.drop_invalid_rows" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.pipelines.run_summary.RunSummary.from_mth5s">
+<span class="sig-name descname"><span class="pre">from_mth5s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mth5_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/run_summary.html#RunSummary.from_mth5s"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.run_summary.RunSummary.from_mth5s" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.pipelines.run_summary.RunSummary.mini_summary">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mini_summary</span></span><a class="headerlink" href="#aurora.pipelines.run_summary.RunSummary.mini_summary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.pipelines.run_summary.RunSummary.print_mini_summary">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">print_mini_summary</span></span><a class="headerlink" href="#aurora.pipelines.run_summary.RunSummary.print_mini_summary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.run_summary.channel_summary_to_run_summary">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.run_summary.</span></span><span class="sig-name descname"><span class="pre">channel_summary_to_run_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ch_summary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_input_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['hx',</span> <span class="pre">'hy',</span> <span class="pre">'bx',</span> <span class="pre">'h2',</span> <span class="pre">'h1',</span> <span class="pre">'by']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_output_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['hz',</span> <span class="pre">'e3',</span> <span class="pre">'e4',</span> <span class="pre">'bz',</span> <span class="pre">'h3',</span> <span class="pre">'ex',</span> <span class="pre">'e1',</span> <span class="pre">'ey',</span> <span class="pre">'e2']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sortby</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['station_id',</span> <span class="pre">'start']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/run_summary.html#channel_summary_to_run_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.run_summary.channel_summary_to_run_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO: replace station_id with station, and run_id with run
+Note will need to modify: aurora/tests/config$ more test_dataset_dataframe.py
+TODO: Add logic for handling input and output channels based on channel
+summary.  Specifically, consider the case where there is no vertical magnetic
+field, this information is available via ch_summary, and output channels should
+then not include hz.
+TODO: Just inherit all the run-level and higher el’ts of the channel_summary,
+including n_samples?</p>
+<p>When creating the dataset dataframe, make it have these columns:
+[</p>
+<blockquote>
+<div><blockquote>
+<div><p>“station_id”,
+“run_id”,
+“start”,
+“end”,
+“mth5_path”,
+“sample_rate”,
+“input_channels”,
+“output_channels”,
+“remote”,
+“channel_scale_factors”,</p>
+</div></blockquote>
+<p>]</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ch_summary</strong> (<em>mth5.tables.channel_table.ChannelSummaryTable</em><em> or </em><em>pandas DataFrame</em>) – <dl class="simple">
+<dt>If its a dataframe it is a representation of an mth5 channel_summary.</dt><dd><p>Maybe restricted to only have certain stations and runs before being passed to
+this method</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>allowed_input_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> of </em><em>strings</em>) – Normally [“hx”, “hy”, ]
+These are the allowable input channel names for the processing.  See further
+note under allowed_output_channels.</p></li>
+<li><p><strong>allowed_output_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> of </em><em>strings</em>) – Normally [“ex”, “ey”, “hz”, ]
+These are the allowable output channel names for the processing.
+A global list of these is kept at the top of this module.  The purpose of
+this is to distinguish between runs that have different layouts, for example
+some runs will have hz and some will not, and we cannot process for hz the
+runs that do not have it.  By making this a kwarg we sort of prop the door
+open for more general names (see issue #74).</p></li>
+<li><p><strong>sortby</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – Default: [“station_id”, “start”]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>run_summary_df</strong> – A table with one row per “acquistion run” that was in the input channel
+summary table</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.Dataframe</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.run_summary.extract_run_summaries_from_mth5s">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.run_summary.</span></span><span class="sig-name descname"><span class="pre">extract_run_summaries_from_mth5s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mth5_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">summary_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'run'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deduplicate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/run_summary.html#extract_run_summaries_from_mth5s"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.run_summary.extract_run_summaries_from_mth5s" title="Permalink to this definition">¶</a></dt>
+<dd><p>ToDo: Move this method into mth5? or mth5_helpers?
+ToDo: Make this a class so that the __repr__ is a nice visual representation of the
+df, like what channel summary does in mth5</p>
+<p>2022-05-28 Modified to allow this method to accept mth5 objects as well as the
+already supported types of pathlib.Path or str</p>
+<p>Given a list of mth5s, this returns a dataframe of all available runs</p>
+<p>In order to drop duplicates I used the solution here:
+<a class="reference external" href="https://stackoverflow.com/questions/43855462/pandas-drop-duplicates-method-not-working-on-dataframe-containing-lists">https://stackoverflow.com/questions/43855462/pandas-drop-duplicates-method-not-working-on-dataframe-containing-lists</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mth5_paths</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – paths or strings that point to mth5s</p></li>
+<li><p><strong>summary_type</strong> (<em>string</em>) – one of [“channel”, “run”]
+“channel” returns concatenated channel summary,
+“run” returns concatenated run summary,</p></li>
+<li><p><strong>deduplicate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Default is True, deduplicates the summary_df</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>super_summary</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.run_summary.extract_run_summary_from_mth5">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.run_summary.</span></span><span class="sig-name descname"><span class="pre">extract_run_summary_from_mth5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mth5_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">summary_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'run'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/run_summary.html#extract_run_summary_from_mth5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.run_summary.extract_run_summary_from_mth5" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mth5_obj</strong> (<em>mth5.mth5.MTH5</em>) – The initialized mth5 object that will be interrogated</p></li>
+<li><p><strong>summary_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – One of [“run”, “channel”].  Returns a run summary or a channel summary</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>out_df</strong> – Table summarizing the available runs in the input mth5_obj</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.Dataframe</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-aurora.pipelines.time_series_helpers">
+<span id="aurora-pipelines-time-series-helpers-module"></span><h2>aurora.pipelines.time_series_helpers module<a class="headerlink" href="#module-aurora.pipelines.time_series_helpers" title="Permalink to this heading">¶</a></h2>
+<p>Collection of modules used in processing pipeline that operate on time series</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.time_series_helpers.prototype_decimate">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.time_series_helpers.</span></span><span class="sig-name descname"><span class="pre">prototype_decimate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_decimation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TimeSeriesDecimation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_xrds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dataset</span></span></span><a class="reference internal" href="../_modules/aurora/pipelines/time_series_helpers.html#prototype_decimate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.time_series_helpers.prototype_decimate" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Basically a wrapper for scipy.signal.decimate.  Takes input timeseries (as xarray</dt><dd><p>Dataset) and a TimeSeriesDecimation object and returns a decimated version of the
+input time series.</p>
+</dd>
+</dl>
+<p>TODO: Consider moving this function into time_series/decimate.py
+TODO: Consider Replacing the downsampled_time_axis with rolling mean, or somthing that takes the average value of the time, not the window start
+TODO: Compare outputs with scipy resample_poly, which also has an FIR AAF and appears faster
+TODO: Add handling for case that could occur when sliced time axis has a different length than the decimated data – see mth5 issue #217 <a class="reference external" href="https://github.com/kujaku11/mth5/issues/217">https://github.com/kujaku11/mth5/issues/217</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ts_decimation</strong> (<em>AuroraDecimationLevel</em>) – </p></li>
+<li><p><strong>run_xrds</strong> (<em>xr.Dataset</em>) – Originally from mth5.timeseries.run_ts.RunTS.dataset, but possibly decimated
+multiple times</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>xr_ds</strong> – Decimated version of the input run_xrds</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xr.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.time_series_helpers.truncate_to_clock_zero">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.time_series_helpers.</span></span><span class="sig-name descname"><span class="pre">truncate_to_clock_zero</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decimation_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DecimationLevel</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Decimation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_xrds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RunGroup</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/time_series_helpers.html#truncate_to_clock_zero"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.time_series_helpers.truncate_to_clock_zero" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the time interval between the first data sample and the clock zero
+Identify the first sample in the xarray time series that corresponds to a
+window start sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>decimation_obj</strong> (<em>Union</em><em>[</em><em>AuroraDecimationLevel</em><em>, </em><em>FCDecimation</em><em>]</em>) – Information about how the decimation level is to be processed</p></li>
+<li><p><strong>run_xrds</strong> (<em>xarray.core.dataset.Dataset</em>) – normally extracted from mth5.RunTS</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>run_xrds</strong> – same as the input time series, but possibly slightly shortened</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.core.dataset.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-aurora.pipelines.transfer_function_helpers">
+<span id="aurora-pipelines-transfer-function-helpers-module"></span><h2>aurora.pipelines.transfer_function_helpers module<a class="headerlink" href="#module-aurora.pipelines.transfer_function_helpers" title="Permalink to this heading">¶</a></h2>
+<p>This module contains helper methods that are used during transfer function processing.</p>
+<dl class="simple">
+<dt>Development Notes:</dt><dd><p>Note #1: repeatedly applying edf_weights seems to have no effect at all.
+tested 20240118 and found that test_compare in synthetic passed whether this was commented
+or not.  TODO confirm this is a one-and-done add doc about why this is so.</p>
+</dd>
+</dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_helpers.apply_weights">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.transfer_function_helpers.</span></span><span class="sig-name descname"><span class="pre">apply_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">RR</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">W</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropna</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a></span></span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_helpers.html#apply_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_helpers.apply_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies data weights (W) to each of X, Y, RR.
+If weight is zero, we set to nan and optionally dropna.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>xarray.core.dataset.Dataset</em>) – </p></li>
+<li><p><strong>Y</strong> (<em>xarray.core.dataset.Dataset</em>) – </p></li>
+<li><p><strong>RR</strong> (<em>xarray.core.dataset.Dataset</em><em> or </em><em>None</em>) – </p></li>
+<li><p><strong>W</strong> (<em>numpy array</em>) – The Weights to apply to the data</p></li>
+<li><p><strong>segment</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True the weights may need to be reshaped.</p></li>
+<li><p><strong>dropna</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Whether or not to drop zero-weighted data.  If true, we drop the nans.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>X, Y, RR</strong> – Same as input but with weights applied and (optionally) nan dropped.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_helpers.drop_nans">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.transfer_function_helpers.</span></span><span class="sig-name descname"><span class="pre">drop_nans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">RR</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a></span></span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_helpers.html#drop_nans"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_helpers.drop_nans" title="Permalink to this definition">¶</a></dt>
+<dd><p>Drops any observation where any variable in X, Y, or RR is NaN.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_helpers.get_estimator_class">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.transfer_function_helpers.</span></span><span class="sig-name descname"><span class="pre">get_estimator_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimation_engine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'OLS'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'RME'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'RME_RR'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator" title="aurora.transfer_function.regression.base.RegressionEstimator"><span class="pre">RegressionEstimator</span></a></span></span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_helpers.html#get_estimator_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_helpers.get_estimator_class" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>estimation_engine</strong> (<em>Literal</em><em>[</em><em>&quot;OLS&quot;</em><em>, </em><em>&quot;RME&quot;</em><em>, </em><em>&quot;RME_RR&quot;</em><em>]</em>) – One of the keys in the ESTIMATOR_LIBRARY, designates the method that will be
+used to estimate the transfer function</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>estimator_class</strong> – The class that will do the TF estimation</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.base.RegressionEstimator" title="aurora.transfer_function.regression.base.RegressionEstimator">aurora.transfer_function.regression.base.RegressionEstimator</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_helpers.process_transfer_functions">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.transfer_function_helpers.</span></span><span class="sig-name descname"><span class="pre">process_transfer_functions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dec_level_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DecimationLevel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_stft_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remote_stft_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transfer_function_obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_helpers.html#process_transfer_functions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_helpers.process_transfer_functions" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the main tf_processing method.  It is based on the Matlab legacy code TTFestBand.m.</p>
+<p>Note #1: Although it is advantageous to execute the regression channel-by-channel
+vs. all-at-once, we need to keep the all-at-once to get residual covariances (see aurora issue #87)</p>
+<p>TODO: Consider push the nan-handling into the band extraction as a kwarg.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dec_level_config</strong> (<em>AuroraDecimationLevel</em>) – Processing parameters for the active decimation level.</p></li>
+<li><p><strong>local_stft_obj</strong> (<em>xarray.core.dataset.Dataset</em>) – </p></li>
+<li><p><strong>remote_stft_obj</strong> (<em>xarray.core.dataset.Dataset</em><em> or </em><em>None</em>) – </p></li>
+<li><p><strong>transfer_function_obj</strong> (<a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.TTFZ.TTFZ" title="aurora.transfer_function.TTFZ.TTFZ"><em>aurora.transfer_function.TTFZ.TTFZ</em></a>) – The transfer function container ready to receive values in this method.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>transfer_function_obj</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.TTFZ.TTFZ" title="aurora.transfer_function.TTFZ.TTFZ">aurora.transfer_function.TTFZ.TTFZ</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_helpers.process_transfer_functions_with_weights">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.transfer_function_helpers.</span></span><span class="sig-name descname"><span class="pre">process_transfer_functions_with_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dec_level_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DecimationLevel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_stft_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remote_stft_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transfer_function_obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_helpers.html#process_transfer_functions_with_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_helpers.process_transfer_functions_with_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is version of process_transfer_functions applies weights to the data.</p>
+<p>Development Notes:
+Note #1: This is only for per-channel estimation, so it does not support the
+dec_level_config.estimator.estimate_per_channel = False
+Note #2: This was adapted from the process_transfer_functions method but the core loop
+is inverted to loop over channels first, then bands.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dec_level_config</strong> (<em>AuroraDecimationLevel</em>) – Processing parameters for the active decimation level.</p></li>
+<li><p><strong>local_stft_obj</strong> (<em>xarray.core.dataset.Dataset</em>) – </p></li>
+<li><p><strong>remote_stft_obj</strong> (<em>xarray.core.dataset.Dataset</em><em> or </em><em>None</em>) – </p></li>
+<li><p><strong>transfer_function_obj</strong> (<a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.TTFZ.TTFZ" title="aurora.transfer_function.TTFZ.TTFZ"><em>aurora.transfer_function.TTFZ.TTFZ</em></a>) – The transfer function container ready to receive values in this method.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>transfer_function_obj</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.TTFZ.TTFZ" title="aurora.transfer_function.TTFZ.TTFZ">aurora.transfer_function.TTFZ.TTFZ</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_helpers.set_up_iter_control">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.transfer_function_helpers.</span></span><span class="sig-name descname"><span class="pre">set_up_iter_control</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DecimationLevel</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_helpers.html#set_up_iter_control"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_helpers.set_up_iter_control" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes an IterControl object based on values in the processing config.</p>
+<p>Development Notes:
+TODO: Review: maybe better to just make this the __init__ method of the IterControl object, iter_control = IterControl(config)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>AuroraDecimationLevel</em>) – metadata about the decimation level processing.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>iter_control</strong> – Object with parameters about iteration control in regression</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="aurora.transfer_function.regression.html#aurora.transfer_function.regression.iter_control.IterControl" title="aurora.transfer_function.regression.iter_control.IterControl">aurora.transfer_function.regression.iter_control.IterControl</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_helpers.stack_fcs">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.transfer_function_helpers.</span></span><span class="sig-name descname"><span class="pre">stack_fcs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">RR</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_helpers.html#stack_fcs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_helpers.stack_fcs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reshape 2D arrays of frequency and time to 1D.</p>
+<p>Notes: When the data for a frequency band are extracted from the Spectrogram, each
+channel is a 2D array, one axis is time (the time of the window that was FFT-ed) and the
+other axis is frequency. However if we make no distinction between the harmonics
+(bins) within a band in regression, then all the FCs for each channel can be
+put into a 1D array.  This method performs that reshaping (ravelling) operation.
+It is not important how we unravel the FCs but it is important that the same indexing
+scheme is used for X, Y and RR.</p>
+<p>TODO: Consider this take a list and return a list rather than X,Y,RR</p>
+<p>TODO: Consider decorate this with &#64;dataset_or_dataarray</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>xarray.core.dataset.Dataset</em>) – </p></li>
+<li><p><strong>Y</strong> (<em>xarray.core.dataset.Dataset</em>) – </p></li>
+<li><p><strong>RR</strong> (<em>xarray.core.dataset.Dataset</em><em> or </em><em>None</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>X, Y, RR</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Same as input but with stacked time and frequency dimensions</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-aurora.pipelines.transfer_function_kernel">
+<span id="aurora-pipelines-transfer-function-kernel-module"></span><h2>aurora.pipelines.transfer_function_kernel module<a class="headerlink" href="#module-aurora.pipelines.transfer_function_kernel" title="Permalink to this heading">¶</a></h2>
+<p>This module contains the TrasnferFunctionKernel class which is the main object that
+links the KernelDataset to Processing configuration.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.pipelines.transfer_function_kernel.</span></span><span class="sig-name descname"><span class="pre">TransferFunctionKernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">KernelDataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="aurora.config.metadata.html#aurora.config.metadata.processing.Processing" title="aurora.config.metadata.processing.Processing"><span class="pre">Processing</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><span class="pre">Path</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_kernel.html#TransferFunctionKernel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.all_fcs_already_exist" title="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.all_fcs_already_exist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">all_fcs_already_exist</span></code></a></dt><dd><p>Return true of all FCs needed to process data already exist in the mth5s</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.config" title="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config</span></code></a></dt><dd><p>Returns the processing config object</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.dataset" title="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dataset</span></code></a></dt><dd><p>returns the KernelDataset object</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.dataset_df" title="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.dataset_df"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dataset_df</span></code></a></dt><dd><p>returns the KernelDataset dataframe</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.kernel_dataset" title="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.kernel_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kernel_dataset</span></code></a></dt><dd><p>returns the KernelDataset object</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.mth5_objs" title="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.mth5_objs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mth5_objs</span></code></a></dt><dd><p>Returns self._mth5_objs</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.processing_config" title="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.processing_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">processing_config</span></code></a></dt><dd><p>Returns the processing config object</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.processing_summary" title="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.processing_summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">processing_summary</span></code></a></dt><dd><p>Returns the processing summary object – creates if it doesn’t yet exist.</p>
+</dd>
+<dt><a class="reference internal" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.processing_type" title="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.processing_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">processing_type</span></code></a></dt><dd><p>A description of the processing, will get passed to TF object,</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.apply_clock_zero" title="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.apply_clock_zero"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_clock_zero</span></code></a>(dec_level_config)</p></td>
+<td><p>get clock-zero from data if needed</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.check_if_fcs_already_exist" title="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.check_if_fcs_already_exist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_if_fcs_already_exist</span></code></a>()</p></td>
+<td><p>Fills out the &quot;fc&quot; column of dataset dataframe with True/False.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.export_tf_collection" title="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.export_tf_collection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export_tf_collection</span></code></a>(tf_collection)</p></td>
+<td><p>Assign transfer_function, residual_covariance, inverse_signal_power, station, survey</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.get_mth5_file_open_mode" title="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.get_mth5_file_open_mode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mth5_file_open_mode</span></code></a>()</p></td>
+<td><p>check the mode of an open mth5 (read, write, append)</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.initialize_mth5s" title="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.initialize_mth5s"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_mth5s</span></code></a>()</p></td>
+<td><p>returns a dict of open mth5 objects, keyed by station_id</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.is_valid_dataset" title="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.is_valid_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_valid_dataset</span></code></a>(row, i_dec)</p></td>
+<td><p>Given a row from the RunSummary, answer the question:</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.memory_check" title="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.memory_check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">memory_check</span></code></a>()</p></td>
+<td><p>Checks if a RAM issue should be anticipated.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.show_processing_summary" title="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.show_processing_summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_processing_summary</span></code></a>([omit_columns])</p></td>
+<td><p>Prints the processing summary table via logger.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.update_dataset_df" title="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.update_dataset_df"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_dataset_df</span></code></a>(i_dec_level)</p></td>
+<td><p>This function has two different modes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.update_processing_summary" title="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.update_processing_summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_processing_summary</span></code></a>()</p></td>
+<td><p>Creates or updates the processing summary table based on processing parameters and kernel dataset.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.valid_decimations" title="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.valid_decimations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">valid_decimations</span></code></a>()</p></td>
+<td><p>Get the decimation levels that are valid.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.validate" title="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>()</p></td>
+<td><p>apply all validators</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.validate_decimation_scheme_and_dataset_compatability" title="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.validate_decimation_scheme_and_dataset_compatability"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_decimation_scheme_and_dataset_compatability</span></code></a>([...])</p></td>
+<td><p>Checks that the decimation_scheme and dataset are compatable.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.validate_processing" title="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.validate_processing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_processing</span></code></a>()</p></td>
+<td><p>Do some Validation checks.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.validate_save_fc_settings" title="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.validate_save_fc_settings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_save_fc_settings</span></code></a>()</p></td>
+<td><p>Update save_fc values in the config to be appropriate.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.all_fcs_already_exist">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">all_fcs_already_exist</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></em><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.all_fcs_already_exist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return true of all FCs needed to process data already exist in the mth5s</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.apply_clock_zero">
+<span class="sig-name descname"><span class="pre">apply_clock_zero</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dec_level_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DecimationLevel</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_kernel.html#TransferFunctionKernel.apply_clock_zero"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.apply_clock_zero" title="Permalink to this definition">¶</a></dt>
+<dd><p>get clock-zero from data if needed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dec_level_config</strong> (<em>AuroraDecimationLevel</em>) – metadata about the decimation level processing.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dec_level_config</strong> – The modified DecimationLevel with clock-zero information set.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>AuroraDecimationLevel</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.check_if_fcs_already_exist">
+<span class="sig-name descname"><span class="pre">check_if_fcs_already_exist</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_kernel.html#TransferFunctionKernel.check_if_fcs_already_exist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.check_if_fcs_already_exist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fills out the “fc” column of dataset dataframe with True/False.</p>
+<p>If all FC Levels for a given station-run are already built, mark True otherwise False.</p>
+<p>Iterates over the processing summary_df, grouping by unique “Survey-Station-Run”s.
+(Could also iterate over kernel_dataset.dataframe, to get the groupby).</p>
+<p>Note 1:  Because decimation is a cascading operation, we avoid the case where some (valid) decimation
+levels exist in the mth5 FC archive and others do not.  The maximum granularity is the
+“station-run” level. For a given run, either all relevant FCs are in the h5 or we treat as if none
+of them are.  To support variations at the decimation-level, an appropriate way to address would
+be to store decimated time series in the archive as well (they would simply be runs with different sample
+rates, and some extra filters).</p>
+<p>Note #2: run_sub_df may have multiple rows, even though the run id is unique.
+This could happen for example when you have a long run at the local station, but multiple (say two) shorter runs
+at the reference station.  In that case, the processing summary will have a separate row for the
+intersection of the long run with each of the remote runs. We ignore this for now, selecting only the first
+element of the run_sub_df, under the assumption that FCs have been created for the entire run,
+or not at all.  This assumption can be relaxed in future by using the time_period attribute of the FC layer.
+For now, we proceed with the all-or-none logic.  That is, if a [‘survey’, ‘station’, ‘run’,] has FCs,
+assume that the FCs are present for the entire run. We assign the “fc” column of dataset_df to have the same
+boolean value for all rows of same  [‘survey’, ‘station’, ‘run’] .</p>
+<dl class="simple">
+<dt>Returns: None</dt><dd><p>Modifies self.dataset_df inplace, assigning bools to the “fc” column</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.config">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="aurora.config.metadata.html#aurora.config.metadata.processing.Processing" title="aurora.config.metadata.processing.Processing"><span class="pre">Processing</span></a></em><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the processing config object</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.dataset">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dataset</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">KernelDataset</span></em><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the KernelDataset object</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.dataset_df">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dataset_df</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">DataFrame</span></em><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.dataset_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the KernelDataset dataframe</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.export_tf_collection">
+<span class="sig-name descname"><span class="pre">export_tf_collection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tf_collection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection" title="aurora.transfer_function.transfer_function_collection.TransferFunctionCollection"><span class="pre">TransferFunctionCollection</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_kernel.html#TransferFunctionKernel.export_tf_collection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.export_tf_collection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assign transfer_function, residual_covariance, inverse_signal_power, station, survey</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tf_collection</strong> (<a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.TransferFunctionCollection" title="aurora.transfer_function.TransferFunctionCollection"><em>aurora.transfer_function.TransferFunctionCollection</em></a>) – Contains TF estimates, covariance, and signal power values</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tf_cls</strong> – Transfer function container</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>mt_metadata.transfer_functions.core.TF</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.get_mth5_file_open_mode">
+<span class="sig-name descname"><span class="pre">get_mth5_file_open_mode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_kernel.html#TransferFunctionKernel.get_mth5_file_open_mode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.get_mth5_file_open_mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>check the mode of an open mth5 (read, write, append)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.initialize_mth5s">
+<span class="sig-name descname"><span class="pre">initialize_mth5s</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_kernel.html#TransferFunctionKernel.initialize_mth5s"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.initialize_mth5s" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a dict of open mth5 objects, keyed by station_id</p>
+<p>A future version of this for multiple station processing may need nested dict with [survey_id][station]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mth5_objs</strong> – Keyed by stations.
+local station id : mth5.mth5.MTH5
+remote station id: mth5.mth5.MTH5</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.is_valid_dataset">
+<span class="sig-name descname"><span class="pre">is_valid_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_dec</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_kernel.html#TransferFunctionKernel.is_valid_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.is_valid_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Given a row from the RunSummary, answer the question:</dt><dd><p>“Will this decimation level yield a valid dataset?”</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>row</strong> (<em>pandas.core.series.Series</em>) – Row of the self._dataset_df (corresponding to a run that will be processed)</p></li>
+<li><p><strong>i_dec</strong> (<em>integer</em>) – refers to decimation level</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>is_valid</strong> – Whether the (run, decimation_level) pair associated with this row yields
+a valid dataset</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.kernel_dataset">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kernel_dataset</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">KernelDataset</span></em><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.kernel_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the KernelDataset object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.memory_check">
+<span class="sig-name descname"><span class="pre">memory_check</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_kernel.html#TransferFunctionKernel.memory_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.memory_check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if a RAM issue should be anticipated.</p>
+<p>Notes:
+Requires an estimate of available RAM, and an estimate of the dataset size
+Available RAM is taken from psutil,
+Dataset size is number of samples, times the number of bytes per sample
+Bits per sample is estimated to be 64 by default, (8-bytes)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.mth5_objs">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mth5_objs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></em><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.mth5_objs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns self._mth5_objs</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.processing_config">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">processing_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="aurora.config.metadata.html#aurora.config.metadata.processing.Processing" title="aurora.config.metadata.processing.Processing"><span class="pre">Processing</span></a></em><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.processing_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the processing config object</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.processing_summary">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">processing_summary</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">DataFrame</span></em><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.processing_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the processing summary object – creates if it doesn’t yet exist.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.processing_type">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">processing_type</span></span><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.processing_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>A description of the processing, will get passed to TF object,
+can be used for Z-file</p>
+<p>Could add a version or a hashtag to this
+Could also check dataset_df
+If remote.all==False append “Single Station”</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.show_processing_summary">
+<span class="sig-name descname"><span class="pre">show_processing_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">omit_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('mth5_path',</span> <span class="pre">'channel_scale_factors',</span> <span class="pre">'start',</span> <span class="pre">'end',</span> <span class="pre">'input_channels',</span> <span class="pre">'output_channels',</span> <span class="pre">'num_samples_overlap',</span> <span class="pre">'num_samples_advance',</span> <span class="pre">'run_dataarray')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_kernel.html#TransferFunctionKernel.show_processing_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.show_processing_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints the processing summary table via logger.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>omit_columns</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a>) – List of columns to omit when showing channel summary (used to keep table small).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.update_dataset_df">
+<span class="sig-name descname"><span class="pre">update_dataset_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i_dec_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_kernel.html#TransferFunctionKernel.update_dataset_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.update_dataset_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function has two different modes.  The first mode initializes values in the
+array, and could be placed into TFKDataset.initialize_time_series_data()
+The second mode, decimates. The function is kept in pipelines because it calls
+time series operations.</p>
+<p>Notes:
+1. When assigning xarrays to dataframe cells, df dislikes xr.Dataset,
+so we convert to DataArray before assignment</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>i_dec_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – decimation level id, indexed from zero</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dataset_df</strong> – Same df that was input to the function but now has columns:</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.update_processing_summary">
+<span class="sig-name descname"><span class="pre">update_processing_summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_kernel.html#TransferFunctionKernel.update_processing_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.update_processing_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates or updates the processing summary table based on processing parameters
+and kernel dataset.
+- Melt the decimation levels over the run summary.
+- Add columns to estimate the number of FFT windows for each row</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>processing_summary</strong> – One row per each run-deciamtion pair</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.valid_decimations">
+<span class="sig-name descname"><span class="pre">valid_decimations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><span class="pre">DecimationLevel</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_kernel.html#TransferFunctionKernel.valid_decimations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.valid_decimations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the decimation levels that are valid.
+This is used when iterating over decimation levels in the processing.
+We do not want to try processing invalid levels (they will fail).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dec_levels</strong> – Decimations from the config that are valid.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_kernel.html#TransferFunctionKernel.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>apply all validators</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.validate_decimation_scheme_and_dataset_compatability">
+<span class="sig-name descname"><span class="pre">validate_decimation_scheme_and_dataset_compatability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_num_stft_windows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_kernel.html#TransferFunctionKernel.validate_decimation_scheme_and_dataset_compatability"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.validate_decimation_scheme_and_dataset_compatability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks that the decimation_scheme and dataset are compatable.
+Marks as invalid any rows that will fail to process based incompatibility.</p>
+<p>Refers to issue #182 (and #103, and possibly #196 and #233).
+Determine if there exist (one or more) runs that will yield decimated datasets
+that have too few samples to be passed to the STFT algorithm.</p>
+<p>Strategy for handling this:
+Mark as invlaid any rows of the processing summary that do not yield long
+enough time series to window.  This way all other rows, with decimations up to
+the invalid cases will still process.</p>
+<p>WCGW: If the runs are “chunked” we could encounter a situation where the
+chunk fails to yield a deep decimation level, yet the level could be produced
+if the chunk size were larger.
+In general, handling this seems a bit complicated.  We will ignore this for
+now and assume that the user will select a chunk size that is appropriate to
+the decimation scheme, i.e. use large chunks for deep decimations.</p>
+<p>A general solution: return a log that tells the user about each run and
+decimation level … how many STFT-windows it yielded at each decimation level.
+This conjures the notion of (run, decimation_level) pairs
+——-</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.validate_processing">
+<span class="sig-name descname"><span class="pre">validate_processing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_kernel.html#TransferFunctionKernel.validate_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.validate_processing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do some Validation checks. WIP.</p>
+<p>Things that are validated:
+1. The default estimation engine from the json file is “RME_RR”, which is fine (
+we expect to in general to do more RR processing than SS) but if there is only
+one station (no remote)then the RME_RR should be replaced by default with “RME”.
+- also if there is only one station, set reference channels to []</p>
+<ol class="arabic simple" start="2">
+<li><p>make sure local station id is defined (correctly from kernel dataset)</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.validate_save_fc_settings">
+<span class="sig-name descname"><span class="pre">validate_save_fc_settings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_kernel.html#TransferFunctionKernel.validate_save_fc_settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.validate_save_fc_settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update save_fc values in the config to be appropriate.
+- If all FCs exist, set save_fc to False.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.mth5_has_fcs">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.transfer_function_kernel.</span></span><span class="sig-name descname"><span class="pre">mth5_has_fcs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">survey_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remote</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processing_config</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_kernel.html#mth5_has_fcs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.mth5_has_fcs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if all needed fc-levels for survey-station-run are present under processing_config</p>
+<dl class="simple">
+<dt>Note #1: At this point in the logic, it is established that there are FCs associated with run_id and there are</dt><dd><p>at least as many FC decimation levels as we require as per the processing config.  The next step is to
+assert whether it is True that the existing FCs conform to the recipe in the processing config.</p>
+</dd>
+</dl>
+<p>kwargs are here as a pass through to the decorator … we pass mode=”r”,”a”,”w”</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>m</strong> – </p></li>
+<li><p><strong>survey_id</strong> – </p></li>
+<li><p><strong>station_id</strong> – </p></li>
+<li><p><strong>run_id</strong> – </p></li>
+<li><p><strong>dataset_df</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.pipelines.transfer_function_kernel.station_obj_from_row">
+<span class="sig-prename descclassname"><span class="pre">aurora.pipelines.transfer_function_kernel.</span></span><span class="sig-name descname"><span class="pre">station_obj_from_row</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/pipelines/transfer_function_kernel.html#station_obj_from_row"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.pipelines.transfer_function_kernel.station_obj_from_row" title="Permalink to this definition">¶</a></dt>
+<dd><p>Access the station object
+Note if/else could avoidable if replacing text string “none” with a None object in survey column</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>row</strong> (<em>pd.Series</em>) – A row of tfk.dataset_df</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>station_obj</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-aurora.pipelines">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-aurora.pipelines" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="aurora.config.metadata.html" class="btn btn-neutral float-left" title="aurora.config.metadata package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="aurora.sandbox.html" class="btn btn-neutral float-right" title="aurora.sandbox package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,317 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.test_utils package &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css?v=7f9a90b1" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="aurora.test_utils.mth5 package" href="aurora.test_utils.mth5.html" />
+    <link rel="prev" title="aurora.sandbox.io_helpers package" href="aurora.sandbox.io_helpers.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">aurora</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="aurora.html">aurora package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="aurora.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="aurora.config.html">aurora.config package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html">aurora.pipelines package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.html">aurora.sandbox package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">aurora.test_utils package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html">aurora.time_series package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html">aurora.transfer_function package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.html#module-aurora.general_helper_functions">aurora.general_helper_functions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.html#module-aurora">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">aurora</a></li>
+          <li class="breadcrumb-item"><a href="aurora.html">aurora package</a></li>
+      <li class="breadcrumb-item active">aurora.test_utils package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/aurora.test_utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="aurora-test-utils-package">
+<h1>aurora.test_utils package<a class="headerlink" href="#aurora-test-utils-package" title="Permalink to this heading">¶</a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="aurora.test_utils.mth5.html">aurora.test_utils.mth5 package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aurora.test_utils.mth5.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.test_utils.mth5.html#module-aurora.test_utils.mth5.fc_helpers">aurora.test_utils.mth5.fc_helpers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.mth5.html#aurora.test_utils.mth5.fc_helpers.read_fc_csv"><code class="docutils literal notranslate"><span class="pre">read_fc_csv()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.test_utils.mth5.html#module-aurora.test_utils.mth5">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="aurora.test_utils.parkfield.html">aurora.test_utils.parkfield package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aurora.test_utils.parkfield.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.test_utils.parkfield.html#module-aurora.test_utils.parkfield.calibration_helpers">aurora.test_utils.parkfield.calibration_helpers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.parkfield.html#aurora.test_utils.parkfield.calibration_helpers.load_bf4_fap_for_parkfield_test_using_mt_metadata"><code class="docutils literal notranslate"><span class="pre">load_bf4_fap_for_parkfield_test_using_mt_metadata()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.parkfield.html#aurora.test_utils.parkfield.calibration_helpers.parkfield_sanity_check"><code class="docutils literal notranslate"><span class="pre">parkfield_sanity_check()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.parkfield.html#aurora.test_utils.parkfield.calibration_helpers.plot_responses"><code class="docutils literal notranslate"><span class="pre">plot_responses()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.test_utils.parkfield.html#module-aurora.test_utils.parkfield.make_parkfield_mth5">aurora.test_utils.parkfield.make_parkfield_mth5 module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.parkfield.html#aurora.test_utils.parkfield.make_parkfield_mth5.ensure_h5_exists"><code class="docutils literal notranslate"><span class="pre">ensure_h5_exists()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.parkfield.html#aurora.test_utils.parkfield.make_parkfield_mth5.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.parkfield.html#aurora.test_utils.parkfield.make_parkfield_mth5.make_pkdsao_mth5"><code class="docutils literal notranslate"><span class="pre">make_pkdsao_mth5()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.parkfield.html#aurora.test_utils.parkfield.make_parkfield_mth5.select_data_source"><code class="docutils literal notranslate"><span class="pre">select_data_source()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.test_utils.parkfield.html#module-aurora.test_utils.parkfield.path_helpers">aurora.test_utils.parkfield.path_helpers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.parkfield.html#aurora.test_utils.parkfield.path_helpers.make_parkfield_paths"><code class="docutils literal notranslate"><span class="pre">make_parkfield_paths()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.test_utils.parkfield.html#module-aurora.test_utils.parkfield">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="aurora.test_utils.synthetic.html">aurora.test_utils.synthetic package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aurora.test_utils.synthetic.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.test_utils.synthetic.html#aurora-test-utils-synthetic-make-mth5-from-asc-module">aurora.test_utils.synthetic.make_mth5_from_asc module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.test_utils.synthetic.html#module-aurora.test_utils.synthetic.make_processing_configs">aurora.test_utils.synthetic.make_processing_configs module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.synthetic.html#aurora.test_utils.synthetic.make_processing_configs.create_test_run_config"><code class="docutils literal notranslate"><span class="pre">create_test_run_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.synthetic.html#aurora.test_utils.synthetic.make_processing_configs.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.synthetic.html#aurora.test_utils.synthetic.make_processing_configs.make_processing_config_and_kernel_dataset"><code class="docutils literal notranslate"><span class="pre">make_processing_config_and_kernel_dataset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.synthetic.html#aurora.test_utils.synthetic.make_processing_configs.test_to_from_json"><code class="docutils literal notranslate"><span class="pre">test_to_from_json()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.test_utils.synthetic.html#module-aurora.test_utils.synthetic.paths">aurora.test_utils.synthetic.paths module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.synthetic.html#aurora.test_utils.synthetic.paths.SyntheticTestPaths"><code class="docutils literal notranslate"><span class="pre">SyntheticTestPaths</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.synthetic.html#aurora.test_utils.synthetic.paths.SyntheticTestPaths.mkdirs"><code class="docutils literal notranslate"><span class="pre">SyntheticTestPaths.mkdirs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.synthetic.html#aurora.test_utils.synthetic.paths.SyntheticTestPaths.writability_check"><code class="docutils literal notranslate"><span class="pre">SyntheticTestPaths.writability_check()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.test_utils.synthetic.html#module-aurora.test_utils.synthetic.processing_helpers">aurora.test_utils.synthetic.processing_helpers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.synthetic.html#aurora.test_utils.synthetic.processing_helpers.get_example_kernel_dataset"><code class="docutils literal notranslate"><span class="pre">get_example_kernel_dataset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.synthetic.html#aurora.test_utils.synthetic.processing_helpers.process_synthetic_1"><code class="docutils literal notranslate"><span class="pre">process_synthetic_1()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.synthetic.html#aurora.test_utils.synthetic.processing_helpers.process_synthetic_1r2"><code class="docutils literal notranslate"><span class="pre">process_synthetic_1r2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.synthetic.html#aurora.test_utils.synthetic.processing_helpers.process_synthetic_2"><code class="docutils literal notranslate"><span class="pre">process_synthetic_2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.synthetic.html#aurora.test_utils.synthetic.processing_helpers.tf_obj_from_synthetic_data"><code class="docutils literal notranslate"><span class="pre">tf_obj_from_synthetic_data()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.test_utils.synthetic.html#module-aurora.test_utils.synthetic.rms_helpers">aurora.test_utils.synthetic.rms_helpers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.synthetic.html#aurora.test_utils.synthetic.rms_helpers.assert_rms_misfit_ok"><code class="docutils literal notranslate"><span class="pre">assert_rms_misfit_ok()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.synthetic.html#aurora.test_utils.synthetic.rms_helpers.compute_rms"><code class="docutils literal notranslate"><span class="pre">compute_rms()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.synthetic.html#aurora.test_utils.synthetic.rms_helpers.get_expected_rms_misfit"><code class="docutils literal notranslate"><span class="pre">get_expected_rms_misfit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.test_utils.synthetic.html#aurora-test-utils-synthetic-station-config-module">aurora.test_utils.synthetic.station_config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.test_utils.synthetic.html#module-aurora.test_utils.synthetic">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-aurora.test_utils.dataset_definitions">
+<span id="aurora-test-utils-dataset-definitions-module"></span><h2>aurora.test_utils.dataset_definitions module<a class="headerlink" href="#module-aurora.test_utils.dataset_definitions" title="Permalink to this heading">¶</a></h2>
+<p>This module contains methods that are used to define datasets to build from FDSN servers.</p>
+<p>These datasets are in turn used for testing.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.test_utils.dataset_definitions.make_cas04_nvr08_test_00_config">
+<span class="sig-prename descclassname"><span class="pre">aurora.test_utils.dataset_definitions.</span></span><span class="sig-name descname"><span class="pre">make_cas04_nvr08_test_00_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset" title="aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset"><span class="pre">FDSNDataset</span></a></span></span><a class="reference internal" href="../_modules/aurora/test_utils/dataset_definitions.html#make_cas04_nvr08_test_00_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.test_utils.dataset_definitions.make_cas04_nvr08_test_00_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a description of a CAS04,NVR08 dataset from IRIS.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.test_utils.dataset_definitions.make_iak34_test_00_config">
+<span class="sig-prename descclassname"><span class="pre">aurora.test_utils.dataset_definitions.</span></span><span class="sig-name descname"><span class="pre">make_iak34_test_00_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset" title="aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset"><span class="pre">FDSNDataset</span></a></span></span><a class="reference internal" href="../_modules/aurora/test_utils/dataset_definitions.html#make_iak34_test_00_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.test_utils.dataset_definitions.make_iak34_test_00_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a description of a IAK34 dataset from IRIS.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.test_utils.dataset_definitions.make_iak34_test_01_config">
+<span class="sig-prename descclassname"><span class="pre">aurora.test_utils.dataset_definitions.</span></span><span class="sig-name descname"><span class="pre">make_iak34_test_01_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset" title="aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset"><span class="pre">FDSNDataset</span></a></span></span><a class="reference internal" href="../_modules/aurora/test_utils/dataset_definitions.html#make_iak34_test_01_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.test_utils.dataset_definitions.make_iak34_test_01_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a description of a IAK34 dataset from IRIS.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.test_utils.dataset_definitions.make_iak34_test_02_config">
+<span class="sig-prename descclassname"><span class="pre">aurora.test_utils.dataset_definitions.</span></span><span class="sig-name descname"><span class="pre">make_iak34_test_02_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset" title="aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset"><span class="pre">FDSNDataset</span></a></span></span><a class="reference internal" href="../_modules/aurora/test_utils/dataset_definitions.html#make_iak34_test_02_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.test_utils.dataset_definitions.make_iak34_test_02_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a description of a IAK34 dataset from IRIS.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.test_utils.dataset_definitions.make_iak34_test_03_config">
+<span class="sig-prename descclassname"><span class="pre">aurora.test_utils.dataset_definitions.</span></span><span class="sig-name descname"><span class="pre">make_iak34_test_03_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset" title="aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset"><span class="pre">FDSNDataset</span></a></span></span><a class="reference internal" href="../_modules/aurora/test_utils/dataset_definitions.html#make_iak34_test_03_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.test_utils.dataset_definitions.make_iak34_test_03_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a description of a IAK34 dataset from IRIS.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.test_utils.dataset_definitions.make_iak34_test_04_config">
+<span class="sig-prename descclassname"><span class="pre">aurora.test_utils.dataset_definitions.</span></span><span class="sig-name descname"><span class="pre">make_iak34_test_04_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset" title="aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset"><span class="pre">FDSNDataset</span></a></span></span><a class="reference internal" href="../_modules/aurora/test_utils/dataset_definitions.html#make_iak34_test_04_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.test_utils.dataset_definitions.make_iak34_test_04_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a description of a IAK34 dataset from IRIS.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.test_utils.dataset_definitions.make_pkdsao_test_00_config">
+<span class="sig-prename descclassname"><span class="pre">aurora.test_utils.dataset_definitions.</span></span><span class="sig-name descname"><span class="pre">make_pkdsao_test_00_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minitest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset" title="aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset"><span class="pre">FDSNDataset</span></a></span></span><a class="reference internal" href="../_modules/aurora/test_utils/dataset_definitions.html#make_pkdsao_test_00_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.test_utils.dataset_definitions.make_pkdsao_test_00_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a description of a 2h PKD SAO 40Hz dataset from NCEDC.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>minitest</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Used for debugging, when set to True, it will just get a minute of data</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>test_data_set</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="aurora.sandbox.io_helpers.html#aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset" title="aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset">aurora.sandbox.io_helpers.fdsn_dataset.FDSNDataset</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.test_utils.dataset_definitions.make_test_configs">
+<span class="sig-prename descclassname"><span class="pre">aurora.test_utils.dataset_definitions.</span></span><span class="sig-name descname"><span class="pre">make_test_configs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../_modules/aurora/test_utils/dataset_definitions.html#make_test_configs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.test_utils.dataset_definitions.make_test_configs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make all the test dataset configs and put them in a dict</p>
+</dd></dl>
+
+</section>
+<section id="module-aurora.test_utils">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-aurora.test_utils" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="aurora.sandbox.io_helpers.html" class="btn btn-neutral float-left" title="aurora.sandbox.io_helpers package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="aurora.test_utils.mth5.html" class="btn btn-neutral float-right" title="aurora.test_utils.mth5 package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

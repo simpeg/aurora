@@ -1,0 +1,1863 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Synthetic Data Tutorial &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="aurora" href="../api/modules.html" />
+    <link rel="prev" title="Process CAS04 with Remote Reference" href="process_cas04_multiple_station.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Synthetic Data Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Contents:">Contents:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Process-Synthetic-Data-with-Aurora">Process Synthetic Data with Aurora</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Here-are-the-modules-we-will-need-to-import">Here are the modules we will need to import</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Define-target-folder-and-mth5-path">Define target folder and mth5 path</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Get-a-Run-Summary">Get a Run Summary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Define-a-Kernel-Dataset">Define a Kernel Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Now-define-the-processing-Configuration">Now define the processing Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Take-a-look-at-the-processing-configuration">Take a look at the processing configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Call-process_mth5">Call process_mth5</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Export-TF-to-a-file">Export TF to a file</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#Fourier-coefficient-storage-in-MTH5">Fourier coefficient storage in MTH5</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Storing-while-processing-with-Aurora">Storing while processing with Aurora</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Using-the-%22single-station-processing-method%22-of-FC-generation">Using the “single-station processing method” of FC generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Using-Dedicated-FC-Generation-(add_fcs-function)">Using Dedicated FC Generation (<code class="docutils literal notranslate"><span class="pre">add_fcs</span></code> function)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Synthetic Data Tutorial</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials/synthetic_data_processing.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Synthetic-Data-Tutorial">
+<h1>Synthetic Data Tutorial<a class="headerlink" href="#Synthetic-Data-Tutorial" title="Permalink to this heading">¶</a></h1>
+<p>This notebook shows how to process MTH5 data from a synthetic dataset.</p>
+<p>It also shows how to modify processing so that Fourier coefficients are saved in the mth5. These FCs can be used to perform TF estimation using different regression settings. The same FCs will be used for feature extraction in future (This section is a work in Progress).</p>
+<section id="Contents:">
+<h2>Contents:<a class="headerlink" href="#Contents:" title="Permalink to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="#Process-Synthetic-Data-with-Aurora"><span class="std std-ref">Process Synthetic Data with Aurora</span></a></p></li>
+<li><p><a class="reference internal" href="#Fourier-coefficient-storage-in-MTH5"><span class="std std-ref">Fourier coefficient storage in MTH5</span></a></p></li>
+</ol>
+</section>
+<section id="Process-Synthetic-Data-with-Aurora">
+<h2>Process Synthetic Data with Aurora<a class="headerlink" href="#Process-Synthetic-Data-with-Aurora" title="Permalink to this heading">¶</a></h2>
+<p>Here is a minimal example of running aurora processing on an mth5 populated with synthetic time series.</p>
+<p>Steps:</p>
+<ol class="arabic simple">
+<li><p>Create the synthetic mth5</p></li>
+<li><p>Get a Run Summary from the mth5</p></li>
+<li><p>Select the station to process and optionally the remote reference station</p></li>
+<li><p>Create a processing config</p></li>
+<li><p>Generate TFs</p></li>
+<li><p>Archive the TFs (in emtf_xml or z-file)</p></li>
+</ol>
+<section id="Here-are-the-modules-we-will-need-to-import">
+<h3>Here are the modules we will need to import<a class="headerlink" href="#Here-are-the-modules-we-will-need-to-import" title="Permalink to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.config.config_creator</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigCreator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.pipelines.process_mth5</span><span class="w"> </span><span class="kn">import</span> <span class="n">process_mth5</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mth5.data.make_mth5_from_asc</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_test12rr_h5</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mth5.data.paths</span><span class="w"> </span><span class="kn">import</span> <span class="n">SyntheticTestPaths</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mth5.processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunSummary</span><span class="p">,</span> <span class="n">KernelDataset</span>
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/kkappler/software/irismt/mtpy-v2/mtpy/modeling/simpeg/recipes/inversion_2d.py:39: UserWarning: Pardiso not installed see https://github.com/simpeg/pydiso/blob/main/README.md.
+  warnings.warn(
+</pre></div></div>
+</div>
+</section>
+<section id="Define-target-folder-and-mth5-path">
+<h3>Define target folder and mth5 path<a class="headerlink" href="#Define-target-folder-and-mth5-path" title="Permalink to this heading">¶</a></h3>
+<p>By default, the synthetic mth5 file is used for testing in <code class="docutils literal notranslate"><span class="pre">aurora/tests/synthetic/</span></code> and probably already exists on your system if you have run the tests. In the code below, we check if the file exists already, and if not we make it.</p>
+<p><strong>NOTE:</strong> If using a read-only HPC installation, you may not be able to write to the directory where aurora is installed. In that case, defining your target path as somewhere you have write permission. In that case, uncommment the READ ONLY INSTALLATION block below.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">synthetic_test_paths</span> <span class="o">=</span> <span class="n">SyntheticTestPaths</span><span class="p">()</span>
+<span class="n">target_folder</span> <span class="o">=</span> <span class="n">synthetic_test_paths</span><span class="o">.</span><span class="n">mth5_path</span>
+
+<span class="c1">## READ ONLY INSTALLATION</span>
+<span class="c1"># home = pathlib.Path.home()</span>
+<span class="c1"># target_folder = home.joinpath(&quot;aurora_test_folder&quot;)</span>
+<span class="c1"># target_folder.mkdir(parents=True, exist_ok=True)</span>
+
+<span class="n">mth5_path</span> <span class="o">=</span> <span class="n">target_folder</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;test12rr.h5&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>If the mth5 doesn’t already exist, or you want to re-make it, call <code class="docutils literal notranslate"><span class="pre">create_test12rr_h5()</span></code></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Uncomment this to start with a fresh mth5 file</span>
+
+<span class="c1"># mth5_path.unlink()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="ow">not</span> <span class="n">mth5_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">create_test12rr_h5</span><span class="p">(</span><span class="n">target_folder</span><span class="o">=</span><span class="n">target_folder</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Get-a-Run-Summary">
+<h3>Get a Run Summary<a class="headerlink" href="#Get-a-Run-Summary" title="Permalink to this heading">¶</a></h3>
+<p>Note that we didn’t need to explicitly open the mth5 to do that, we can pass the path if we want. Run summary takes a list of mth5 paths as input argument.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mth5_run_summary</span> <span class="o">=</span> <span class="n">RunSummary</span><span class="p">()</span>
+<span class="n">mth5_run_summary</span><span class="o">.</span><span class="n">from_mth5s</span><span class="p">([</span><span class="n">mth5_path</span><span class="p">,])</span>
+<span class="n">run_summary</span> <span class="o">=</span> <span class="n">mth5_run_summary</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+<span class="n">run_summary</span><span class="o">.</span><span class="n">mini_summary</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">25:03:08T12:58:52 | INFO | line:777 |mth5.mth5 | close_mth5 | Flushing and closing /home/kkappler/software/irismt/mth5/mth5/data/mth5/test12rr.h5</span>
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survey</th>
+      <th>station</th>
+      <th>run</th>
+      <th>start</th>
+      <th>end</th>
+      <th>duration</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>EMTF Synthetic</td>
+      <td>test1</td>
+      <td>001</td>
+      <td>1980-01-01 00:00:00+00:00</td>
+      <td>1980-01-01 11:06:39+00:00</td>
+      <td>39999.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>EMTF Synthetic</td>
+      <td>test2</td>
+      <td>001</td>
+      <td>1980-01-01 00:00:00+00:00</td>
+      <td>1980-01-01 11:06:39+00:00</td>
+      <td>39999.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Define-a-Kernel-Dataset">
+<h3>Define a Kernel Dataset<a class="headerlink" href="#Define-a-Kernel-Dataset" title="Permalink to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">kernel_dataset</span> <span class="o">=</span> <span class="n">KernelDataset</span><span class="p">()</span>
+<span class="n">kernel_dataset</span><span class="o">.</span><span class="n">from_run_summary</span><span class="p">(</span><span class="n">run_summary</span><span class="p">,</span> <span class="s2">&quot;test1&quot;</span><span class="p">,</span> <span class="s2">&quot;test2&quot;</span><span class="p">)</span>
+<span class="n">kernel_dataset</span><span class="o">.</span><span class="n">mini_summary</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">25:03:08T12:58:52 | INFO | line:262 |mtpy.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column fc, adding and setting dtype to &lt;class &#39;pandas._libs.missing.NAType&#39;&gt;.</span>
+<span class="ansi-bold">25:03:08T12:58:52 | INFO | line:262 |mtpy.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column remote, adding and setting dtype to &lt;class &#39;bool&#39;&gt;.</span>
+<span class="ansi-bold">25:03:08T12:58:52 | INFO | line:262 |mtpy.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column run_dataarray, adding and setting dtype to &lt;class &#39;NoneType&#39;&gt;.</span>
+<span class="ansi-bold">25:03:08T12:58:52 | INFO | line:262 |mtpy.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column stft, adding and setting dtype to &lt;class &#39;NoneType&#39;&gt;.</span>
+<span class="ansi-bold">25:03:08T12:58:52 | INFO | line:262 |mtpy.processing.kernel_dataset | _add_columns | KernelDataset DataFrame needs column mth5_obj, adding and setting dtype to &lt;class &#39;NoneType&#39;&gt;.</span>
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survey</th>
+      <th>station</th>
+      <th>run</th>
+      <th>start</th>
+      <th>end</th>
+      <th>duration</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>EMTF Synthetic</td>
+      <td>test1</td>
+      <td>001</td>
+      <td>1980-01-01 00:00:00+00:00</td>
+      <td>1980-01-01 11:06:39+00:00</td>
+      <td>39999.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>EMTF Synthetic</td>
+      <td>test2</td>
+      <td>001</td>
+      <td>1980-01-01 00:00:00+00:00</td>
+      <td>1980-01-01 11:06:39+00:00</td>
+      <td>39999.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Now-define-the-processing-Configuration">
+<h3>Now define the processing Configuration<a class="headerlink" href="#Now-define-the-processing-Configuration" title="Permalink to this heading">¶</a></h3>
+<p>The only things we need to provide are our band processing scheme, and the data sample rate to generate a default processing configuration.</p>
+<p>The config will get its information about the specific stations to process via the kernel dataset.</p>
+<p><strong>NOTE:</strong> When doing only single station processing you need to specify RME processing (rather than remote reference processing which expects extra time series from another station)</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cc</span> <span class="o">=</span> <span class="n">ConfigCreator</span><span class="p">()</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">cc</span><span class="o">.</span><span class="n">create_from_kernel_dataset</span><span class="p">(</span><span class="n">kernel_dataset</span><span class="p">)</span>
+
+<span class="c1"># you can export the config to a json by uncommenting the following line</span>
+<span class="c1"># cfg_json = config.to_json()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">25:03:08T12:58:52 | INFO | line:108 |aurora.config.config_creator | determine_band_specification_style | Bands not defined; setting to EMTF BANDS_DEFAULT_FILE</span>
+</pre></div></div>
+</div>
+</section>
+<section id="Take-a-look-at-the-processing-configuration">
+<h3>Take a look at the processing configuration<a class="headerlink" href="#Take-a-look-at-the-processing-configuration" title="Permalink to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">config</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+    &#34;processing&#34;: {
+        &#34;band_setup_file&#34;: &#34;/home/kkappler/software/irismt/aurora/aurora/config/emtf_band_setup/bs_test.cfg&#34;,
+        &#34;band_specification_style&#34;: &#34;EMTF&#34;,
+        &#34;channel_nomenclature.ex&#34;: &#34;ex&#34;,
+        &#34;channel_nomenclature.ey&#34;: &#34;ey&#34;,
+        &#34;channel_nomenclature.hx&#34;: &#34;hx&#34;,
+        &#34;channel_nomenclature.hy&#34;: &#34;hy&#34;,
+        &#34;channel_nomenclature.hz&#34;: &#34;hz&#34;,
+        &#34;decimations&#34;: [
+            {
+                &#34;decimation_level&#34;: {
+                    &#34;bands&#34;: [
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.23828125,
+                                &#34;frequency_min&#34;: 0.19140625,
+                                &#34;index_max&#34;: 30,
+                                &#34;index_min&#34;: 25
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.19140625,
+                                &#34;frequency_min&#34;: 0.15234375,
+                                &#34;index_max&#34;: 24,
+                                &#34;index_min&#34;: 20
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.15234375,
+                                &#34;frequency_min&#34;: 0.12109375,
+                                &#34;index_max&#34;: 19,
+                                &#34;index_min&#34;: 16
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.12109375,
+                                &#34;frequency_min&#34;: 0.09765625,
+                                &#34;index_max&#34;: 15,
+                                &#34;index_min&#34;: 13
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.09765625,
+                                &#34;frequency_min&#34;: 0.07421875,
+                                &#34;index_max&#34;: 12,
+                                &#34;index_min&#34;: 10
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.07421875,
+                                &#34;frequency_min&#34;: 0.05859375,
+                                &#34;index_max&#34;: 9,
+                                &#34;index_min&#34;: 8
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.05859375,
+                                &#34;frequency_min&#34;: 0.04296875,
+                                &#34;index_max&#34;: 7,
+                                &#34;index_min&#34;: 6
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 0,
+                                &#34;frequency_max&#34;: 0.04296875,
+                                &#34;frequency_min&#34;: 0.03515625,
+                                &#34;index_max&#34;: 5,
+                                &#34;index_min&#34;: 5
+                            }
+                        }
+                    ],
+                    &#34;decimation.anti_alias_filter&#34;: &#34;default&#34;,
+                    &#34;decimation.factor&#34;: 1.0,
+                    &#34;decimation.level&#34;: 0,
+                    &#34;decimation.method&#34;: &#34;default&#34;,
+                    &#34;decimation.sample_rate&#34;: 1.0,
+                    &#34;estimator.engine&#34;: &#34;RME_RR&#34;,
+                    &#34;estimator.estimate_per_channel&#34;: true,
+                    &#34;input_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;output_channels&#34;: [
+                        &#34;ex&#34;,
+                        &#34;ey&#34;,
+                        &#34;hz&#34;
+                    ],
+                    &#34;reference_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;regression.max_iterations&#34;: 10,
+                    &#34;regression.max_redescending_iterations&#34;: 2,
+                    &#34;regression.minimum_cycles&#34;: 10,
+                    &#34;regression.r0&#34;: 1.5,
+                    &#34;regression.tolerance&#34;: 0.005,
+                    &#34;regression.u0&#34;: 2.8,
+                    &#34;regression.verbosity&#34;: 0,
+                    &#34;save_fcs&#34;: false,
+                    &#34;stft.harmonic_indices&#34;: [
+                        -1
+                    ],
+                    &#34;stft.method&#34;: &#34;fft&#34;,
+                    &#34;stft.min_num_stft_windows&#34;: 2,
+                    &#34;stft.per_window_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;stft.pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;stft.prewhitening_type&#34;: &#34;first difference&#34;,
+                    &#34;stft.recoloring&#34;: true,
+                    &#34;stft.window.clock_zero_type&#34;: &#34;ignore&#34;,
+                    &#34;stft.window.normalized&#34;: true,
+                    &#34;stft.window.num_samples&#34;: 128,
+                    &#34;stft.window.overlap&#34;: 32,
+                    &#34;stft.window.type&#34;: &#34;boxcar&#34;
+                }
+            },
+            {
+                &#34;decimation_level&#34;: {
+                    &#34;bands&#34;: [
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0.0341796875,
+                                &#34;frequency_min&#34;: 0.0263671875,
+                                &#34;index_max&#34;: 17,
+                                &#34;index_min&#34;: 14
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0.0263671875,
+                                &#34;frequency_min&#34;: 0.0205078125,
+                                &#34;index_max&#34;: 13,
+                                &#34;index_min&#34;: 11
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0.0205078125,
+                                &#34;frequency_min&#34;: 0.0166015625,
+                                &#34;index_max&#34;: 10,
+                                &#34;index_min&#34;: 9
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0.0166015625,
+                                &#34;frequency_min&#34;: 0.0126953125,
+                                &#34;index_max&#34;: 8,
+                                &#34;index_min&#34;: 7
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0.0126953125,
+                                &#34;frequency_min&#34;: 0.0107421875,
+                                &#34;index_max&#34;: 6,
+                                &#34;index_min&#34;: 6
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 1,
+                                &#34;frequency_max&#34;: 0.0107421875,
+                                &#34;frequency_min&#34;: 0.0087890625,
+                                &#34;index_max&#34;: 5,
+                                &#34;index_min&#34;: 5
+                            }
+                        }
+                    ],
+                    &#34;decimation.anti_alias_filter&#34;: &#34;default&#34;,
+                    &#34;decimation.factor&#34;: 4.0,
+                    &#34;decimation.level&#34;: 1,
+                    &#34;decimation.method&#34;: &#34;default&#34;,
+                    &#34;decimation.sample_rate&#34;: 0.25,
+                    &#34;estimator.engine&#34;: &#34;RME_RR&#34;,
+                    &#34;estimator.estimate_per_channel&#34;: true,
+                    &#34;input_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;output_channels&#34;: [
+                        &#34;ex&#34;,
+                        &#34;ey&#34;,
+                        &#34;hz&#34;
+                    ],
+                    &#34;reference_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;regression.max_iterations&#34;: 10,
+                    &#34;regression.max_redescending_iterations&#34;: 2,
+                    &#34;regression.minimum_cycles&#34;: 10,
+                    &#34;regression.r0&#34;: 1.5,
+                    &#34;regression.tolerance&#34;: 0.005,
+                    &#34;regression.u0&#34;: 2.8,
+                    &#34;regression.verbosity&#34;: 0,
+                    &#34;save_fcs&#34;: false,
+                    &#34;stft.harmonic_indices&#34;: [
+                        -1
+                    ],
+                    &#34;stft.method&#34;: &#34;fft&#34;,
+                    &#34;stft.min_num_stft_windows&#34;: 2,
+                    &#34;stft.per_window_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;stft.pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;stft.prewhitening_type&#34;: &#34;first difference&#34;,
+                    &#34;stft.recoloring&#34;: true,
+                    &#34;stft.window.clock_zero_type&#34;: &#34;ignore&#34;,
+                    &#34;stft.window.normalized&#34;: true,
+                    &#34;stft.window.num_samples&#34;: 128,
+                    &#34;stft.window.overlap&#34;: 32,
+                    &#34;stft.window.type&#34;: &#34;boxcar&#34;
+                }
+            },
+            {
+                &#34;decimation_level&#34;: {
+                    &#34;bands&#34;: [
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0.008544921875,
+                                &#34;frequency_min&#34;: 0.006591796875,
+                                &#34;index_max&#34;: 17,
+                                &#34;index_min&#34;: 14
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0.006591796875,
+                                &#34;frequency_min&#34;: 0.005126953125,
+                                &#34;index_max&#34;: 13,
+                                &#34;index_min&#34;: 11
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0.005126953125,
+                                &#34;frequency_min&#34;: 0.004150390625,
+                                &#34;index_max&#34;: 10,
+                                &#34;index_min&#34;: 9
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0.004150390625,
+                                &#34;frequency_min&#34;: 0.003173828125,
+                                &#34;index_max&#34;: 8,
+                                &#34;index_min&#34;: 7
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0.003173828125,
+                                &#34;frequency_min&#34;: 0.002685546875,
+                                &#34;index_max&#34;: 6,
+                                &#34;index_min&#34;: 6
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 2,
+                                &#34;frequency_max&#34;: 0.002685546875,
+                                &#34;frequency_min&#34;: 0.002197265625,
+                                &#34;index_max&#34;: 5,
+                                &#34;index_min&#34;: 5
+                            }
+                        }
+                    ],
+                    &#34;decimation.anti_alias_filter&#34;: &#34;default&#34;,
+                    &#34;decimation.factor&#34;: 4.0,
+                    &#34;decimation.level&#34;: 2,
+                    &#34;decimation.method&#34;: &#34;default&#34;,
+                    &#34;decimation.sample_rate&#34;: 0.0625,
+                    &#34;estimator.engine&#34;: &#34;RME_RR&#34;,
+                    &#34;estimator.estimate_per_channel&#34;: true,
+                    &#34;input_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;output_channels&#34;: [
+                        &#34;ex&#34;,
+                        &#34;ey&#34;,
+                        &#34;hz&#34;
+                    ],
+                    &#34;reference_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;regression.max_iterations&#34;: 10,
+                    &#34;regression.max_redescending_iterations&#34;: 2,
+                    &#34;regression.minimum_cycles&#34;: 10,
+                    &#34;regression.r0&#34;: 1.5,
+                    &#34;regression.tolerance&#34;: 0.005,
+                    &#34;regression.u0&#34;: 2.8,
+                    &#34;regression.verbosity&#34;: 0,
+                    &#34;save_fcs&#34;: false,
+                    &#34;stft.harmonic_indices&#34;: [
+                        -1
+                    ],
+                    &#34;stft.method&#34;: &#34;fft&#34;,
+                    &#34;stft.min_num_stft_windows&#34;: 2,
+                    &#34;stft.per_window_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;stft.pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;stft.prewhitening_type&#34;: &#34;first difference&#34;,
+                    &#34;stft.recoloring&#34;: true,
+                    &#34;stft.window.clock_zero_type&#34;: &#34;ignore&#34;,
+                    &#34;stft.window.normalized&#34;: true,
+                    &#34;stft.window.num_samples&#34;: 128,
+                    &#34;stft.window.overlap&#34;: 32,
+                    &#34;stft.window.type&#34;: &#34;boxcar&#34;
+                }
+            },
+            {
+                &#34;decimation_level&#34;: {
+                    &#34;bands&#34;: [
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0.00274658203125,
+                                &#34;frequency_min&#34;: 0.00213623046875,
+                                &#34;index_max&#34;: 22,
+                                &#34;index_min&#34;: 18
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0.00213623046875,
+                                &#34;frequency_min&#34;: 0.00164794921875,
+                                &#34;index_max&#34;: 17,
+                                &#34;index_min&#34;: 14
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0.00164794921875,
+                                &#34;frequency_min&#34;: 0.00115966796875,
+                                &#34;index_max&#34;: 13,
+                                &#34;index_min&#34;: 10
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0.00115966796875,
+                                &#34;frequency_min&#34;: 0.00079345703125,
+                                &#34;index_max&#34;: 9,
+                                &#34;index_min&#34;: 7
+                            }
+                        },
+                        {
+                            &#34;band&#34;: {
+                                &#34;center_averaging_type&#34;: &#34;geometric&#34;,
+                                &#34;closed&#34;: &#34;left&#34;,
+                                &#34;decimation_level&#34;: 3,
+                                &#34;frequency_max&#34;: 0.00079345703125,
+                                &#34;frequency_min&#34;: 0.00054931640625,
+                                &#34;index_max&#34;: 6,
+                                &#34;index_min&#34;: 5
+                            }
+                        }
+                    ],
+                    &#34;decimation.anti_alias_filter&#34;: &#34;default&#34;,
+                    &#34;decimation.factor&#34;: 4.0,
+                    &#34;decimation.level&#34;: 3,
+                    &#34;decimation.method&#34;: &#34;default&#34;,
+                    &#34;decimation.sample_rate&#34;: 0.015625,
+                    &#34;estimator.engine&#34;: &#34;RME_RR&#34;,
+                    &#34;estimator.estimate_per_channel&#34;: true,
+                    &#34;input_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;output_channels&#34;: [
+                        &#34;ex&#34;,
+                        &#34;ey&#34;,
+                        &#34;hz&#34;
+                    ],
+                    &#34;reference_channels&#34;: [
+                        &#34;hx&#34;,
+                        &#34;hy&#34;
+                    ],
+                    &#34;regression.max_iterations&#34;: 10,
+                    &#34;regression.max_redescending_iterations&#34;: 2,
+                    &#34;regression.minimum_cycles&#34;: 10,
+                    &#34;regression.r0&#34;: 1.5,
+                    &#34;regression.tolerance&#34;: 0.005,
+                    &#34;regression.u0&#34;: 2.8,
+                    &#34;regression.verbosity&#34;: 0,
+                    &#34;save_fcs&#34;: false,
+                    &#34;stft.harmonic_indices&#34;: [
+                        -1
+                    ],
+                    &#34;stft.method&#34;: &#34;fft&#34;,
+                    &#34;stft.min_num_stft_windows&#34;: 2,
+                    &#34;stft.per_window_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;stft.pre_fft_detrend_type&#34;: &#34;linear&#34;,
+                    &#34;stft.prewhitening_type&#34;: &#34;first difference&#34;,
+                    &#34;stft.recoloring&#34;: true,
+                    &#34;stft.window.clock_zero_type&#34;: &#34;ignore&#34;,
+                    &#34;stft.window.normalized&#34;: true,
+                    &#34;stft.window.num_samples&#34;: 128,
+                    &#34;stft.window.overlap&#34;: 32,
+                    &#34;stft.window.type&#34;: &#34;boxcar&#34;
+                }
+            }
+        ],
+        &#34;id&#34;: &#34;test1_rr_test2_sr1&#34;,
+        &#34;stations.local.id&#34;: &#34;test1&#34;,
+        &#34;stations.local.mth5_path&#34;: &#34;/home/kkappler/software/irismt/mth5/mth5/data/mth5/test12rr.h5&#34;,
+        &#34;stations.local.remote&#34;: false,
+        &#34;stations.local.runs&#34;: [
+            {
+                &#34;run&#34;: {
+                    &#34;id&#34;: &#34;001&#34;,
+                    &#34;input_channels&#34;: [
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hx&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hy&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        }
+                    ],
+                    &#34;output_channels&#34;: [
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;ex&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;ey&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        },
+                        {
+                            &#34;channel&#34;: {
+                                &#34;id&#34;: &#34;hz&#34;,
+                                &#34;scale_factor&#34;: 1.0
+                            }
+                        }
+                    ],
+                    &#34;sample_rate&#34;: 1.0,
+                    &#34;time_periods&#34;: [
+                        {
+                            &#34;time_period&#34;: {
+                                &#34;end&#34;: &#34;1980-01-01T11:06:39+00:00&#34;,
+                                &#34;start&#34;: &#34;1980-01-01T00:00:00+00:00&#34;
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        &#34;stations.remote&#34;: [
+            {
+                &#34;station&#34;: {
+                    &#34;id&#34;: &#34;test2&#34;,
+                    &#34;mth5_path&#34;: &#34;/home/kkappler/software/irismt/mth5/mth5/data/mth5/test12rr.h5&#34;,
+                    &#34;remote&#34;: true,
+                    &#34;runs&#34;: [
+                        {
+                            &#34;run&#34;: {
+                                &#34;id&#34;: &#34;001&#34;,
+                                &#34;input_channels&#34;: [
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hx&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hy&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    }
+                                ],
+                                &#34;output_channels&#34;: [
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;ex&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;ey&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    },
+                                    {
+                                        &#34;channel&#34;: {
+                                            &#34;id&#34;: &#34;hz&#34;,
+                                            &#34;scale_factor&#34;: 1.0
+                                        }
+                                    }
+                                ],
+                                &#34;sample_rate&#34;: 1.0,
+                                &#34;time_periods&#34;: [
+                                    {
+                                        &#34;time_period&#34;: {
+                                            &#34;end&#34;: &#34;1980-01-01T11:06:39+00:00&#34;,
+                                            &#34;start&#34;: &#34;1980-01-01T00:00:00+00:00&#34;
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
+</pre></div></div>
+</div>
+</section>
+<section id="Call-process_mth5">
+<h3>Call process_mth5<a class="headerlink" href="#Call-process_mth5" title="Permalink to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show_plot</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">tf_cls</span> <span class="o">=</span> <span class="n">process_mth5</span><span class="p">(</span><span class="n">config</span><span class="p">,</span>
+                    <span class="n">kernel_dataset</span><span class="p">,</span>
+                    <span class="n">units</span><span class="o">=</span><span class="s2">&quot;MT&quot;</span><span class="p">,</span>
+                    <span class="n">show_plot</span><span class="o">=</span><span class="n">show_plot</span><span class="p">,</span>
+                    <span class="n">z_file_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">25:03:08T12:58:52 | INFO | line:291 |aurora.pipelines.transfer_function_kernel | show_processing_summary | Processing Summary Dataframe:</span>
+<span class="ansi-bold">25:03:08T12:58:52 | INFO | line:292 |aurora.pipelines.transfer_function_kernel | show_processing_summary |
+   duration  has_data  n_samples  run station          survey       run_hdf5_reference   station_hdf5_reference    fc  remote  stft mth5_obj dec_level  dec_factor  sample_rate  window_duration  num_samples_window  num_samples  num_stft_windows
+0   39999.0      True      40000  001   test1  EMTF Synthetic  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;NA&gt;   False  None     None         0         1.0     1.000000            128.0                 128      39999.0             416.0
+1   39999.0      True      40000  001   test1  EMTF Synthetic  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;NA&gt;   False  None     None         1         4.0     0.250000            512.0                 128       9999.0             103.0
+2   39999.0      True      40000  001   test1  EMTF Synthetic  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;NA&gt;   False  None     None         2         4.0     0.062500           2048.0                 128       2499.0              25.0
+3   39999.0      True      40000  001   test1  EMTF Synthetic  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;NA&gt;   False  None     None         3         4.0     0.015625           8192.0                 128        624.0               6.0
+4   39999.0      True      40000  001   test2  EMTF Synthetic  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;NA&gt;    True  None     None         0         1.0     1.000000            128.0                 128      39999.0             416.0
+5   39999.0      True      40000  001   test2  EMTF Synthetic  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;NA&gt;    True  None     None         1         4.0     0.250000            512.0                 128       9999.0             103.0
+6   39999.0      True      40000  001   test2  EMTF Synthetic  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;NA&gt;    True  None     None         2         4.0     0.062500           2048.0                 128       2499.0              25.0
+7   39999.0      True      40000  001   test2  EMTF Synthetic  &lt;HDF5 object reference&gt;  &lt;HDF5 object reference&gt;  &lt;NA&gt;    True  None     None         3         4.0     0.015625           8192.0                 128        624.0               6.0</span>
+<span class="ansi-bold">25:03:08T12:58:52 | INFO | line:680 |aurora.pipelines.transfer_function_kernel | memory_check | Total memory: 62.74 GB</span>
+<span class="ansi-bold">25:03:08T12:58:52 | INFO | line:684 |aurora.pipelines.transfer_function_kernel | memory_check | Total Bytes of Raw Data: 0.001 GB</span>
+<span class="ansi-bold">25:03:08T12:58:52 | INFO | line:687 |aurora.pipelines.transfer_function_kernel | memory_check | Raw Data will use: 0.001 % of memory</span>
+<span class="ansi-bold">25:03:08T12:58:52 | INFO | line:733 |aurora.pipelines.transfer_function_kernel | mth5_has_fcs | Fourier coefficients not detected for survey: EMTF Synthetic, station: test1, run: 001-- Fourier coefficients will be computed</span>
+<span class="ansi-bold">25:03:08T12:58:52 | INFO | line:777 |mth5.mth5 | close_mth5 | Flushing and closing /home/kkappler/software/irismt/mth5/mth5/data/mth5/test12rr.h5</span>
+<span class="ansi-bold">25:03:08T12:58:52 | INFO | line:733 |aurora.pipelines.transfer_function_kernel | mth5_has_fcs | Fourier coefficients not detected for survey: EMTF Synthetic, station: test2, run: 001-- Fourier coefficients will be computed</span>
+<span class="ansi-bold">25:03:08T12:58:52 | INFO | line:777 |mth5.mth5 | close_mth5 | Flushing and closing /home/kkappler/software/irismt/mth5/mth5/data/mth5/test12rr.h5</span>
+<span class="ansi-bold">25:03:08T12:58:52 | INFO | line:262 |aurora.pipelines.transfer_function_kernel | check_if_fcs_already_exist | FC levels not present</span>
+<span class="ansi-bold">25:03:08T12:58:52 | INFO | line:552 |aurora.pipelines.process_mth5 | process_mth5_legacy | Processing config indicates 4 decimation levels</span>
+<span class="ansi-bold">25:03:08T12:58:52 | INFO | line:463 |aurora.pipelines.transfer_function_kernel | valid_decimations | After validation there are 4 valid decimation levels</span>
+<span class="ansi-bold">25:03:08T12:58:53 | INFO | line:900 |mtpy.processing.kernel_dataset | initialize_dataframe_for_processing | Dataset dataframe initialized successfully</span>
+<span class="ansi-bold">25:03:08T12:58:53 | INFO | line:157 |aurora.pipelines.transfer_function_kernel | update_dataset_df | Dataset Dataframe Updated for decimation level 0 Successfully</span>
+<span class="ansi-bold">25:03:08T12:58:53 | INFO | line:387 |aurora.pipelines.process_mth5 | save_fourier_coefficients | Skip saving FCs. dec_level_config.save_fc =  False</span>
+<span class="ansi-bold">25:03:08T12:58:53 | INFO | line:387 |aurora.pipelines.process_mth5 | save_fourier_coefficients | Skip saving FCs. dec_level_config.save_fc =  False</span>
+<span class="ansi-bold">25:03:08T12:58:53 | INFO | line:46 |aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 25.728968s  (0.038867Hz)</span>
+<span class="ansi-bold">25:03:08T12:58:54 | INFO | line:208 |aurora.time_series.frequency_band_helpers | get_band_for_coherence_sorting | Processing band 25.728968s  (0.038867Hz)</span>
+<span class="ansi-yellow-intense-fg ansi-bold">25:03:08T12:58:54 | WARNING | line:213 |aurora.time_series.frequency_band_helpers | get_band_for_coherence_sorting | Cant evaluate coherence with only 1 harmonic</span>
+<span class="ansi-bold">25:03:08T12:58:54 | INFO | line:214 |aurora.time_series.frequency_band_helpers | get_band_for_coherence_sorting | Widening band according to min3 rule</span>
+<span class="ansi-bold">25:03:08T12:58:54 | INFO | line:46 |aurora.time_series.frequency_band_helpers | get_band_for_tf_estimate | Accessing band 26.836092s  (0.037263Hz)</span>
+<span class="ansi-bold">25:03:08T12:58:54 | INFO | line:116 |mth5.helpers | close_open_files | /home/kkappler/software/irismt/mth5/mth5/data/mth5/test12rr.h5, Closed File</span>
+<span class="ansi-bold">25:03:08T12:58:54 | INFO | line:116 |mth5.helpers | close_open_files | /home/kkappler/software/irismt/mth5/mth5/data/mth5/test12rr.h5, Closed File</span>
+<span class="ansi-red-intense-fg ansi-bold">25:03:08T12:58:54 | ERROR | line:665 |aurora.pipelines.process_mth5 | process_mth5 | Failed to run legacy processing
+closing all open mth5 files and exitingThe encountered exception was &#39;Band&#39; object has no attribute &#39;bands&#39;</span>
+<span class="ansi-red-intense-fg ansi-bold">25:03:08T12:58:54 | ERROR | line:666 |aurora.pipelines.process_mth5 | process_mth5 | Failed to run legacy processing
+closing all open mth5 files and exitingThe encountered exception was &#39;Band&#39; object has no attribute &#39;bands&#39;</span>
+<span class="ansi-yellow-intense-fg ansi-bold">Traceback (most recent call last):</span>
+
+  File &#34;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/runpy.py&#34;, line 197, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+           │         │     └ {&#39;__name__&#39;: &#39;__main__&#39;, &#39;__doc__&#39;: &#39;Entry point for launching an IPython kernel.\n\nThis is separate from the ipykernel pack...
+           │         └ &lt;code object &lt;module&gt; at 0x7cf02c8ee450, file &#34;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/site-packages/ipykernel_lau...
+           └ &lt;function _run_code at 0x7cf02c8e7e50&gt;
+  File &#34;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/runpy.py&#34;, line 87, in _run_code
+    exec(code, run_globals)
+         │     └ {&#39;__name__&#39;: &#39;__main__&#39;, &#39;__doc__&#39;: &#39;Entry point for launching an IPython kernel.\n\nThis is separate from the ipykernel pack...
+         └ &lt;code object &lt;module&gt; at 0x7cf02c8ee450, file &#34;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/site-packages/ipykernel_lau...
+  File &#34;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/site-packages/ipykernel_launcher.py&#34;, line 18, in &lt;module&gt;
+    app.launch_new_instance()
+    │   └ &lt;bound method Application.launch_instance of &lt;class &#39;ipykernel.kernelapp.IPKernelApp&#39;&gt;&gt;
+    └ &lt;module &#39;ipykernel.kernelapp&#39; from &#39;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/site-packages/ipykernel/kernelapp.py&#39;&gt;
+  File &#34;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/site-packages/traitlets/config/application.py&#34;, line 1075, in launch_instance
+    app.start()
+    │   └ &lt;function IPKernelApp.start at 0x7cf0299de670&gt;
+    └ &lt;ipykernel.kernelapp.IPKernelApp object at 0x7cf02cfd3af0&gt;
+  File &#34;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/site-packages/ipykernel/kernelapp.py&#34;, line 739, in start
+    self.io_loop.start()
+    │    │       └ &lt;function BaseAsyncIOLoop.start at 0x7cf029925550&gt;
+    │    └ &lt;tornado.platform.asyncio.AsyncIOMainLoop object at 0x7cf02993c400&gt;
+    └ &lt;ipykernel.kernelapp.IPKernelApp object at 0x7cf02cfd3af0&gt;
+  File &#34;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/site-packages/tornado/platform/asyncio.py&#34;, line 205, in start
+    self.asyncio_loop.run_forever()
+    │    │            └ &lt;function BaseEventLoop.run_forever at 0x7cf02c09e430&gt;
+    │    └ &lt;_UnixSelectorEventLoop running=True closed=False debug=False&gt;
+    └ &lt;tornado.platform.asyncio.AsyncIOMainLoop object at 0x7cf02993c400&gt;
+  File &#34;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/asyncio/base_events.py&#34;, line 601, in run_forever
+    self._run_once()
+    │    └ &lt;function BaseEventLoop._run_once at 0x7cf02c09ff70&gt;
+    └ &lt;_UnixSelectorEventLoop running=True closed=False debug=False&gt;
+  File &#34;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/asyncio/base_events.py&#34;, line 1905, in _run_once
+    handle._run()
+    │      └ &lt;function Handle._run at 0x7cf02c0da5e0&gt;
+    └ &lt;Handle &lt;TaskWakeupMethWrapper object at 0x7cefbdbf6130&gt;(&lt;Future finis...3B)&gt;, ...],))&gt;)&gt;
+  File &#34;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/asyncio/events.py&#34;, line 80, in _run
+    self._context.run(self._callback, *self._args)
+    │    │            │    │           │    └ &lt;member &#39;_args&#39; of &#39;Handle&#39; objects&gt;
+    │    │            │    │           └ &lt;Handle &lt;TaskWakeupMethWrapper object at 0x7cefbdbf6130&gt;(&lt;Future finis...3B)&gt;, ...],))&gt;)&gt;
+    │    │            │    └ &lt;member &#39;_callback&#39; of &#39;Handle&#39; objects&gt;
+    │    │            └ &lt;Handle &lt;TaskWakeupMethWrapper object at 0x7cefbdbf6130&gt;(&lt;Future finis...3B)&gt;, ...],))&gt;)&gt;
+    │    └ &lt;member &#39;_context&#39; of &#39;Handle&#39; objects&gt;
+    └ &lt;Handle &lt;TaskWakeupMethWrapper object at 0x7cefbdbf6130&gt;(&lt;Future finis...3B)&gt;, ...],))&gt;)&gt;
+  File &#34;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/site-packages/ipykernel/kernelbase.py&#34;, line 545, in dispatch_queue
+    await self.process_one()
+          │    └ &lt;function Kernel.process_one at 0x7cf029a17700&gt;
+          └ &lt;ipykernel.ipkernel.IPythonKernel object at 0x7cf02993ca60&gt;
+  File &#34;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/site-packages/ipykernel/kernelbase.py&#34;, line 534, in process_one
+    await dispatch(*args)
+          │         └ ([&lt;zmq.Frame(b&#39;19410a80-f30&#39;...36B)&gt;, &lt;zmq.Frame(b&#39;&lt;IDS|MSG&gt;&#39;)&gt;, &lt;zmq.Frame(b&#39;aea1c3e7b498&#39;...64B)&gt;, &lt;zmq.Frame(b&#39;{&#34;date&#34;:&#34;20...
+          └ &lt;bound method Kernel.dispatch_shell of &lt;ipykernel.ipkernel.IPythonKernel object at 0x7cf02993ca60&gt;&gt;
+  File &#34;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/site-packages/ipykernel/kernelbase.py&#34;, line 437, in dispatch_shell
+    await result
+          └ &lt;coroutine object IPythonKernel.execute_request at 0x7cf02847b7c0&gt;
+  File &#34;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/site-packages/ipykernel/ipkernel.py&#34;, line 362, in execute_request
+    await super().execute_request(stream, ident, parent)
+                                  │       │      └ {&#39;header&#39;: {&#39;date&#39;: datetime.datetime(2025, 3, 8, 20, 58, 47, 601000, tzinfo=tzutc()), &#39;msg_id&#39;: &#39;c417b299-e8a6-4e18-a64c-c08...
+                                  │       └ [b&#39;19410a80-f302-4536-b66f-4b7ff0d5f633&#39;]
+                                  └ &lt;zmq.eventloop.zmqstream.ZMQStream object at 0x7cf02993c160&gt;
+  File &#34;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/site-packages/ipykernel/kernelbase.py&#34;, line 778, in execute_request
+    reply_content = await reply_content
+                          └ &lt;coroutine object IPythonKernel.do_execute at 0x7cf02847b840&gt;
+  File &#34;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/site-packages/ipykernel/ipkernel.py&#34;, line 449, in do_execute
+    res = shell.run_cell(
+          │     └ &lt;function ZMQInteractiveShell.run_cell at 0x7cf0299ccb80&gt;
+          └ &lt;ipykernel.zmqshell.ZMQInteractiveShell object at 0x7cf02847e8b0&gt;
+  File &#34;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/site-packages/ipykernel/zmqshell.py&#34;, line 549, in run_cell
+    return super().run_cell(*args, **kwargs)
+                             │       └ {&#39;store_history&#39;: True, &#39;silent&#39;: False, &#39;cell_id&#39;: &#39;667bf6f1-9faf-4dd7-b7cb-15e65c50ba0f&#39;}
+                             └ (&#39;show_plot = True\ntf_cls = process_mth5(config,\n                    kernel_dataset,\n                    units=&#34;MT&#34;,\n    ...
+  File &#34;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/site-packages/IPython/core/interactiveshell.py&#34;, line 3048, in run_cell
+    result = self._run_cell(
+             │    └ &lt;function InteractiveShell._run_cell at 0x7cf02a530040&gt;
+             └ &lt;ipykernel.zmqshell.ZMQInteractiveShell object at 0x7cf02847e8b0&gt;
+  File &#34;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/site-packages/IPython/core/interactiveshell.py&#34;, line 3103, in _run_cell
+    result = runner(coro)
+             │      └ &lt;coroutine object InteractiveShell.run_cell_async at 0x7cf02847ba40&gt;
+             └ &lt;function _pseudo_sync_runner at 0x7cf02a51d8b0&gt;
+  File &#34;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/site-packages/IPython/core/async_helpers.py&#34;, line 129, in _pseudo_sync_runner
+    coro.send(None)
+    │    └ &lt;method &#39;send&#39; of &#39;coroutine&#39; objects&gt;
+    └ &lt;coroutine object InteractiveShell.run_cell_async at 0x7cf02847ba40&gt;
+  File &#34;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/site-packages/IPython/core/interactiveshell.py&#34;, line 3308, in run_cell_async
+    has_raised = await self.run_ast_nodes(code_ast.body, cell_name,
+                       │    │             │        │     └ &#39;/tmp/ipykernel_2837066/2463673138.py&#39;
+                       │    │             │        └ [&lt;ast.Assign object at 0x7cefbdb1bb50&gt;, &lt;ast.Assign object at 0x7cefbdb1b190&gt;]
+                       │    │             └ &lt;ast.Module object at 0x7cefbdb1b550&gt;
+                       │    └ &lt;function InteractiveShell.run_ast_nodes at 0x7cf02a530310&gt;
+                       └ &lt;ipykernel.zmqshell.ZMQInteractiveShell object at 0x7cf02847e8b0&gt;
+  File &#34;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/site-packages/IPython/core/interactiveshell.py&#34;, line 3490, in run_ast_nodes
+    if await self.run_code(code, result, async_=asy):
+             │    │        │     │              └ False
+             │    │        │     └ &lt;ExecutionResult object at 7cefbdb1bbe0, execution_count=9 error_before_exec=None error_in_exec=None info=&lt;ExecutionInfo obje...
+             │    │        └ &lt;code object &lt;module&gt; at 0x7cefbdb1d9d0, file &#34;/tmp/ipykernel_2837066/2463673138.py&#34;, line 2&gt;
+             │    └ &lt;function InteractiveShell.run_code at 0x7cf02a5303a0&gt;
+             └ &lt;ipykernel.zmqshell.ZMQInteractiveShell object at 0x7cf02847e8b0&gt;
+  File &#34;/home/kkappler/anaconda3/envs/aurora/lib/python3.9/site-packages/IPython/core/interactiveshell.py&#34;, line 3550, in run_code
+    exec(code_obj, self.user_global_ns, self.user_ns)
+         │         │    │               │    └ {&#39;__name__&#39;: &#39;__main__&#39;, &#39;__doc__&#39;: &#39;Automatically created module for IPython interactive environment&#39;, &#39;__package__&#39;: None, ...
+         │         │    │               └ &lt;ipykernel.zmqshell.ZMQInteractiveShell object at 0x7cf02847e8b0&gt;
+         │         │    └ &lt;property object at 0x7cf02a6fcef0&gt;
+         │         └ &lt;ipykernel.zmqshell.ZMQInteractiveShell object at 0x7cf02847e8b0&gt;
+         └ &lt;code object &lt;module&gt; at 0x7cefbdb1d9d0, file &#34;/tmp/ipykernel_2837066/2463673138.py&#34;, line 2&gt;
+
+  File &#34;<span class="ansi-green-fg">/tmp/ipykernel_2837066/</span><span class="ansi-green-intense-fg ansi-bold">2463673138.py</span>&#34;, line <span class="ansi-yellow-fg">2</span>, in <span class="ansi-magenta-fg">&lt;module&gt;</span>
+    <span class="ansi-bold">tf_cls</span> <span class="ansi-magenta-intense-fg ansi-bold">=</span> <span class="ansi-bold">process_mth5</span><span class="ansi-bold">(</span><span class="ansi-bold">config</span><span class="ansi-bold">,</span>
+    <span class="ansi-cyan-fg">         │            └ </span><span class="ansi-cyan-intense-fg ansi-bold">{</span>
+    <span class="ansi-cyan-fg">         │              </span><span class="ansi-cyan-intense-fg ansi-bold">    &#34;processing&#34;: {</span>
+    <span class="ansi-cyan-fg">         │              </span><span class="ansi-cyan-intense-fg ansi-bold">        &#34;band_setup_file&#34;: &#34;/home/kkappler/software/irismt/aurora/aurora/config/emtf_band_setup/bs_test...</span>
+    <span class="ansi-cyan-fg">         └ </span><span class="ansi-cyan-intense-fg ansi-bold">&lt;function process_mth5 at 0x7cefbdbfb5e0&gt;</span>
+
+&gt; File &#34;<span class="ansi-green-fg">/home/kkappler/software/irismt/aurora/aurora/pipelines/</span><span class="ansi-green-intense-fg ansi-bold">process_mth5.py</span>&#34;, line <span class="ansi-yellow-fg">652</span>, in <span class="ansi-magenta-fg">process_mth5</span>
+    <span class="ansi-magenta-intense-fg ansi-bold">return</span> <span class="ansi-bold">process_mth5_legacy</span><span class="ansi-bold">(</span>
+    <span class="ansi-cyan-fg">       └ </span><span class="ansi-cyan-intense-fg ansi-bold">&lt;function process_mth5_legacy at 0x7cefbdbfb550&gt;</span>
+
+  File &#34;<span class="ansi-green-fg">/home/kkappler/software/irismt/aurora/aurora/pipelines/</span><span class="ansi-green-intense-fg ansi-bold">process_mth5.py</span>&#34;, line <span class="ansi-yellow-fg">567</span>, in <span class="ansi-magenta-fg">process_mth5_legacy</span>
+    <span class="ansi-bold">ttfz_obj</span> <span class="ansi-magenta-intense-fg ansi-bold">=</span> <span class="ansi-bold">process_tf_decimation_level</span><span class="ansi-bold">(</span>
+    <span class="ansi-cyan-fg">           └ </span><span class="ansi-cyan-intense-fg ansi-bold">&lt;function process_tf_decimation_level at 0x7cefbdbd95e0&gt;</span>
+
+  File &#34;<span class="ansi-green-fg">/home/kkappler/software/irismt/aurora/aurora/pipelines/</span><span class="ansi-green-intense-fg ansi-bold">process_mth5.py</span>&#34;, line <span class="ansi-yellow-fg">200</span>, in <span class="ansi-magenta-fg">process_tf_decimation_level</span>
+    <span class="ansi-bold">transfer_function_obj</span> <span class="ansi-magenta-intense-fg ansi-bold">=</span> <span class="ansi-bold">process_transfer_functions</span><span class="ansi-bold">(</span>
+    <span class="ansi-cyan-fg">                        └ </span><span class="ansi-cyan-intense-fg ansi-bold">&lt;function process_transfer_functions at 0x7cefd9b75550&gt;</span>
+
+  File &#34;<span class="ansi-green-fg">/home/kkappler/software/irismt/aurora/aurora/pipelines/</span><span class="ansi-green-intense-fg ansi-bold">transfer_function_helpers.py</span>&#34;, line <span class="ansi-yellow-fg">290</span>, in <span class="ansi-magenta-fg">process_transfer_functions</span>
+    <span class="ansi-bold">spgm</span><span class="ansi-magenta-intense-fg ansi-bold">.</span><span class="ansi-bold">cross_powers</span><span class="ansi-bold">(</span><span class="ansi-bold">frequency_bands</span><span class="ansi-magenta-intense-fg ansi-bold">=</span><span class="ansi-bold">(</span><span class="ansi-bold">feature_band</span><span class="ansi-bold">)</span><span class="ansi-bold">)</span>
+    <span class="ansi-cyan-fg">│    │                             └ </span><span class="ansi-cyan-intense-fg ansi-bold">{</span>
+    <span class="ansi-cyan-fg">│    │                               </span><span class="ansi-cyan-intense-fg ansi-bold">    &#34;band&#34;: {</span>
+    <span class="ansi-cyan-fg">│    │                               </span><span class="ansi-cyan-intense-fg ansi-bold">        &#34;center_averaging_type&#34;: &#34;geometric&#34;,</span>
+    <span class="ansi-cyan-fg">│    │                               </span><span class="ansi-cyan-intense-fg ansi-bold">        &#34;closed&#34;: &#34;left&#34;,</span>
+    <span class="ansi-cyan-fg">│    │                               </span><span class="ansi-cyan-intense-fg ansi-bold">        &#34;decimation_level&#34;: 0,</span>
+    <span class="ansi-cyan-fg">│    │                               </span><span class="ansi-cyan-intense-fg ansi-bold">      ...</span>
+    <span class="ansi-cyan-fg">│    └ </span><span class="ansi-cyan-intense-fg ansi-bold">&lt;function Spectrogram.cross_powers at 0x7cefd9bac310&gt;</span>
+    <span class="ansi-cyan-fg">└ </span><span class="ansi-cyan-intense-fg ansi-bold">Spectrogram:</span>
+    <span class="ansi-cyan-fg">  </span><span class="ansi-cyan-intense-fg ansi-bold">3 harmonics, 0.0078125Hz spaced </span>
+    <span class="ansi-cyan-fg">  </span><span class="ansi-cyan-intense-fg ansi-bold"> from 0.03125 to 0.046875 Hz.</span>
+    <span class="ansi-cyan-fg">  </span>
+    <span class="ansi-cyan-fg">  </span><span class="ansi-cyan-intense-fg ansi-bold">416 Time observations </span>
+    <span class="ansi-cyan-fg">  </span><span class="ansi-cyan-intense-fg ansi-bold">Start: 1980-01-01T00:00:0...</span>
+
+  File &#34;<span class="ansi-green-fg">/home/kkappler/software/irismt/mth5/mth5/timeseries/spectre/</span><span class="ansi-green-intense-fg ansi-bold">spectrogram.py</span>&#34;, line <span class="ansi-yellow-fg">265</span>, in <span class="ansi-magenta-fg">cross_powers</span>
+    <span class="ansi-bold">valid_frequency_bands</span> <span class="ansi-magenta-intense-fg ansi-bold">=</span> <span class="ansi-bold">self</span><span class="ansi-magenta-intense-fg ansi-bold">.</span><span class="ansi-bold">_validate_frequency_bands</span><span class="ansi-bold">(</span><span class="ansi-bold">frequency_bands</span><span class="ansi-bold">)</span>
+    <span class="ansi-cyan-fg">                        │    │                         └ </span><span class="ansi-cyan-intense-fg ansi-bold">{</span>
+    <span class="ansi-cyan-fg">                        │    │                           </span><span class="ansi-cyan-intense-fg ansi-bold">    &#34;band&#34;: {</span>
+    <span class="ansi-cyan-fg">                        │    │                           </span><span class="ansi-cyan-intense-fg ansi-bold">        &#34;center_averaging_type&#34;: &#34;geometric&#34;,</span>
+    <span class="ansi-cyan-fg">                        │    │                           </span><span class="ansi-cyan-intense-fg ansi-bold">        &#34;closed&#34;: &#34;left&#34;,</span>
+    <span class="ansi-cyan-fg">                        │    │                           </span><span class="ansi-cyan-intense-fg ansi-bold">        &#34;decimation_level&#34;: 0,</span>
+    <span class="ansi-cyan-fg">                        │    │                           </span><span class="ansi-cyan-intense-fg ansi-bold">      ...</span>
+    <span class="ansi-cyan-fg">                        │    └ </span><span class="ansi-cyan-intense-fg ansi-bold">&lt;function Spectrogram._validate_frequency_bands at 0x7cefd9bac280&gt;</span>
+    <span class="ansi-cyan-fg">                        └ </span><span class="ansi-cyan-intense-fg ansi-bold">Spectrogram:</span>
+    <span class="ansi-cyan-fg">                          </span><span class="ansi-cyan-intense-fg ansi-bold">3 harmonics, 0.0078125Hz spaced </span>
+    <span class="ansi-cyan-fg">                          </span><span class="ansi-cyan-intense-fg ansi-bold"> from 0.03125 to 0.046875 Hz.</span>
+    <span class="ansi-cyan-fg">                          </span>
+    <span class="ansi-cyan-fg">                          </span><span class="ansi-cyan-intense-fg ansi-bold">416 Time observations </span>
+    <span class="ansi-cyan-fg">                          </span><span class="ansi-cyan-intense-fg ansi-bold">Start: 1980-01-01T00:00:0...</span>
+
+  File &#34;<span class="ansi-green-fg">/home/kkappler/software/irismt/mth5/mth5/timeseries/spectre/</span><span class="ansi-green-intense-fg ansi-bold">spectrogram.py</span>&#34;, line <span class="ansi-yellow-fg">219</span>, in <span class="ansi-magenta-fg">_validate_frequency_bands</span>
+    <span class="ansi-bold">valid_bands</span> <span class="ansi-magenta-intense-fg ansi-bold">=</span> <span class="ansi-bold">[</span><span class="ansi-bold">x</span> <span class="ansi-magenta-intense-fg ansi-bold">for</span> <span class="ansi-bold">x</span> <span class="ansi-magenta-intense-fg ansi-bold">in</span> <span class="ansi-bold">frequency_bands</span><span class="ansi-magenta-intense-fg ansi-bold">.</span><span class="ansi-bold">bands</span><span class="ansi-bold">(</span><span class="ansi-bold">)</span> <span class="ansi-magenta-intense-fg ansi-bold">if</span> <span class="ansi-bold">self</span><span class="ansi-magenta-intense-fg ansi-bold">.</span><span class="ansi-bold">frequency_band</span><span class="ansi-magenta-intense-fg ansi-bold">.</span><span class="ansi-bold">contains</span><span class="ansi-bold">(</span><span class="ansi-bold">x</span><span class="ansi-bold">)</span><span class="ansi-bold">]</span>
+    <span class="ansi-cyan-fg">                          │                          │    └ </span><span class="ansi-cyan-intense-fg ansi-bold">&lt;property object at 0x7cefd9ba3e50&gt;</span>
+    <span class="ansi-cyan-fg">                          │                          └ </span><span class="ansi-cyan-intense-fg ansi-bold">Spectrogram:</span>
+    <span class="ansi-cyan-fg">                          │                            </span><span class="ansi-cyan-intense-fg ansi-bold">3 harmonics, 0.0078125Hz spaced </span>
+    <span class="ansi-cyan-fg">                          │                            </span><span class="ansi-cyan-intense-fg ansi-bold"> from 0.03125 to 0.046875 Hz.</span>
+    <span class="ansi-cyan-fg">                          │                            </span>
+    <span class="ansi-cyan-fg">                          │                            </span><span class="ansi-cyan-intense-fg ansi-bold">416 Time observations </span>
+    <span class="ansi-cyan-fg">                          │                            </span><span class="ansi-cyan-intense-fg ansi-bold">Start: 1980-01-01T00:00:0...</span>
+    <span class="ansi-cyan-fg">                          └ </span><span class="ansi-cyan-intense-fg ansi-bold">{</span>
+    <span class="ansi-cyan-fg">                            </span><span class="ansi-cyan-intense-fg ansi-bold">    &#34;band&#34;: {</span>
+    <span class="ansi-cyan-fg">                            </span><span class="ansi-cyan-intense-fg ansi-bold">        &#34;center_averaging_type&#34;: &#34;geometric&#34;,</span>
+    <span class="ansi-cyan-fg">                            </span><span class="ansi-cyan-intense-fg ansi-bold">        &#34;closed&#34;: &#34;left&#34;,</span>
+    <span class="ansi-cyan-fg">                            </span><span class="ansi-cyan-intense-fg ansi-bold">        &#34;decimation_level&#34;: 0,</span>
+    <span class="ansi-cyan-fg">                            </span><span class="ansi-cyan-intense-fg ansi-bold">      ...</span>
+
+<span class="ansi-red-intense-fg ansi-bold">AttributeError</span>:<span class="ansi-bold"> &#39;Band&#39; object has no attribute &#39;bands&#39;</span>
+</pre></div></div>
+</div>
+</section>
+<section id="Export-TF-to-a-file">
+<h3>Export TF to a file<a class="headerlink" href="#Export-TF-to-a-file" title="Permalink to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">xml_file_base</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;synthetic_test1.xml&quot;</span>
+<span class="n">tf_cls</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fn</span><span class="o">=</span><span class="n">xml_file_base</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="s2">&quot;emtfxml&quot;</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">AttributeError</span>                            Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[10], line 2</span>
+<span class="ansi-green-intense-fg ansi-bold">      1</span> xml_file_base <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(175,0,0)">f</span><span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">synthetic_test1.xml</span><span style="color: rgb(175,0,0)">&#34;</span>
+<span class="ansi-green-fg">----&gt; 2</span> <span class="ansi-yellow-bg">tf_cls</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">write</span>(fn<span style="color: rgb(98,98,98)">=</span>xml_file_base, file_type<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">emtfxml</span><span style="color: rgb(175,0,0)">&#34;</span>)
+
+<span class="ansi-red-fg">AttributeError</span>: &#39;NoneType&#39; object has no attribute &#39;write&#39;
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">edi_file_base</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;synthetic_test1.edi&quot;</span>
+<span class="n">tf_cls</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fn</span><span class="o">=</span><span class="n">edi_file_base</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="s2">&quot;edi&quot;</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="alert alert-block alert-info"><p>NOTE Fourier coefficient section below here is a work in progress.</p>
+</div></section>
+</section>
+<section id="Fourier-coefficient-storage-in-MTH5">
+<h2>Fourier coefficient storage in MTH5<a class="headerlink" href="#Fourier-coefficient-storage-in-MTH5" title="Permalink to this heading">¶</a></h2>
+<p>The capability to store Fourier coeffficients (FCs) in MTH5 is now available. This will enable some different approaches to processing and data quality control (QC). The data QC tools are a work in progress. The following examples show how to add some FC levels to an MTH5, providing a starting point for processing or feature extraction from these data.</p>
+<p>There are currently two main ways to add FCs to the MTH5.</p>
+<ol class="arabic simple">
+<li><p>Store on the fly while processing with Aurora</p></li>
+<li><p>Use a dedicated method to make FCs only.</p></li>
+</ol>
+<section id="Storing-while-processing-with-Aurora">
+<h3>Storing while processing with Aurora<a class="headerlink" href="#Storing-while-processing-with-Aurora" title="Permalink to this heading">¶</a></h3>
+<p>We can store FCs while processing by changing the processing config’s <code class="docutils literal notranslate"><span class="pre">save_fcs</span></code> attribute to True</p>
+<p>If we do that with the current processing config however we encouter a warning:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Saving FCs for remote reference processing is not supported
+ - To save FCs, process as single station, then you can use the FCs for RR processing
+ - See issue #319 for details
+ - forcing processing config save_fcs = False
+</pre></div>
+</div>
+<p>There are two workarounds for this:</p>
+<ol class="arabic simple">
+<li><p>Process each station as a single station, and then the FCs (TODO: Add an example of this)</p></li>
+<li><p>Explicitly call <code class="docutils literal notranslate"><span class="pre">add_fcs</span></code> function.</p></li>
+</ol>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">file_size_before_adding_fcs</span> <span class="o">=</span> <span class="n">mth5_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;file_size_before_adding_fcs: </span><span class="si">{</span><span class="n">file_size_before_adding_fcs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Using-the-%22single-station-processing-method%22-of-FC-generation">
+<h3>Using the “single-station processing method” of FC generation<a class="headerlink" href="#Using-the-%22single-station-processing-method%22-of-FC-generation" title="Permalink to this heading">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># set  kernel_dataset to work on one station only</span>
+<span class="n">kernel_dataset</span> <span class="o">=</span> <span class="n">KernelDataset</span><span class="p">()</span>
+<span class="n">kernel_dataset</span><span class="o">.</span><span class="n">from_run_summary</span><span class="p">(</span><span class="n">run_summary</span><span class="p">,</span> <span class="s2">&quot;test1&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<span class="c1"># Update the processing config</span>
+
+<span class="n">cc</span> <span class="o">=</span> <span class="n">ConfigCreator</span><span class="p">()</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">cc</span><span class="o">.</span><span class="n">create_from_kernel_dataset</span><span class="p">(</span><span class="n">kernel_dataset</span><span class="p">)</span>
+
+<span class="c1"># tell the config to save the FCs</span>
+<span class="k">for</span> <span class="n">dec</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">decimations</span><span class="p">:</span>
+    <span class="n">dec</span><span class="o">.</span><span class="n">save_fcs</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">dec</span><span class="o">.</span><span class="n">save_fcs_type</span> <span class="o">=</span> <span class="s2">&quot;h5&quot;</span>
+
+<span class="c1"># you can export the config to a json by uncommenting the following line</span>
+<span class="c1"># cfg_json = config.to_json()</span>
+<span class="n">kernel_dataset</span><span class="o">.</span><span class="n">mini_summary</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show_plot</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">tf_cls</span> <span class="o">=</span> <span class="n">process_mth5</span><span class="p">(</span><span class="n">config</span><span class="p">,</span>
+                    <span class="n">kernel_dataset</span><span class="p">,</span>
+                    <span class="n">units</span><span class="o">=</span><span class="s2">&quot;MT&quot;</span><span class="p">,</span>
+                    <span class="n">show_plot</span><span class="o">=</span><span class="n">show_plot</span><span class="p">,</span>
+                    <span class="n">z_file_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">file_size_after_adding_fcs_station_1</span> <span class="o">=</span> <span class="n">mth5_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;file_size_after_adding_fcs_station_1: </span><span class="si">{</span><span class="n">file_size_after_adding_fcs_station_1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Now the other station</span>
+
+<span class="c1"># set  kernel_dataset to work on one station only</span>
+<span class="n">kernel_dataset</span> <span class="o">=</span> <span class="n">KernelDataset</span><span class="p">()</span>
+<span class="n">kernel_dataset</span><span class="o">.</span><span class="n">from_run_summary</span><span class="p">(</span><span class="n">run_summary</span><span class="p">,</span> <span class="s2">&quot;test2&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<span class="c1"># Update the processing config</span>
+
+<span class="n">cc</span> <span class="o">=</span> <span class="n">ConfigCreator</span><span class="p">()</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">cc</span><span class="o">.</span><span class="n">create_from_kernel_dataset</span><span class="p">(</span><span class="n">kernel_dataset</span><span class="p">)</span>
+
+<span class="c1"># tell the config to save the FCs</span>
+<span class="k">for</span> <span class="n">dec</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">decimations</span><span class="p">:</span>
+    <span class="n">dec</span><span class="o">.</span><span class="n">save_fcs</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">dec</span><span class="o">.</span><span class="n">save_fcs_type</span> <span class="o">=</span> <span class="s2">&quot;h5&quot;</span>
+<br/><br/></pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show_plot</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">tf_cls</span> <span class="o">=</span> <span class="n">process_mth5</span><span class="p">(</span><span class="n">config</span><span class="p">,</span>
+                    <span class="n">kernel_dataset</span><span class="p">,</span>
+                    <span class="n">units</span><span class="o">=</span><span class="s2">&quot;MT&quot;</span><span class="p">,</span>
+                    <span class="n">show_plot</span><span class="o">=</span><span class="n">show_plot</span><span class="p">,</span>
+                    <span class="n">z_file_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Now, the FCs are there (for the specific processing configuration).</p>
+<p>If you were to re-process the data, the FCs are already there,</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">file_size_after_adding_fcs_station_2</span> <span class="o">=</span> <span class="n">mth5_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;file_size_after_adding_fcs_station_2: </span><span class="si">{</span><span class="n">file_size_after_adding_fcs_station_2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># set  kernel_dataset to work on both stations again</span>
+<span class="n">kernel_dataset</span> <span class="o">=</span> <span class="n">KernelDataset</span><span class="p">()</span>
+<span class="n">kernel_dataset</span><span class="o">.</span><span class="n">from_run_summary</span><span class="p">(</span><span class="n">run_summary</span><span class="p">,</span> <span class="s2">&quot;test1&quot;</span><span class="p">,</span> <span class="s2">&quot;test2&quot;</span><span class="p">)</span>
+
+<span class="c1"># Update the processing config</span>
+
+<span class="n">cc</span> <span class="o">=</span> <span class="n">ConfigCreator</span><span class="p">()</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">cc</span><span class="o">.</span><span class="n">create_from_kernel_dataset</span><span class="p">(</span><span class="n">kernel_dataset</span><span class="p">)</span>
+<br/><br/><br/></pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">aurora.pipelines.transfer_function_kernel</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransferFunctionKernel</span>
+<span class="n">tfk</span> <span class="o">=</span> <span class="n">TransferFunctionKernel</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">kernel_dataset</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+<span class="n">tfk</span><span class="o">.</span><span class="n">update_processing_summary</span><span class="p">()</span>
+<span class="n">tfk</span><span class="o">.</span><span class="n">check_if_fcs_already_exist</span><span class="p">()</span>
+<span class="n">tfk</span><span class="o">.</span><span class="n">dataset_df</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show_plot</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">tf_cls</span> <span class="o">=</span> <span class="n">process_mth5</span><span class="p">(</span><span class="n">config</span><span class="p">,</span>
+                    <span class="n">kernel_dataset</span><span class="p">,</span>
+                    <span class="n">units</span><span class="o">=</span><span class="s2">&quot;MT&quot;</span><span class="p">,</span>
+                    <span class="n">show_plot</span><span class="o">=</span><span class="n">show_plot</span><span class="p">,</span>
+                    <span class="n">z_file_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Using-Dedicated-FC-Generation-(add_fcs-function)">
+<h3>Using Dedicated FC Generation (<code class="docutils literal notranslate"><span class="pre">add_fcs</span></code> function)<a class="headerlink" href="#Using-Dedicated-FC-Generation-(add_fcs-function)" title="Permalink to this heading">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mth5.timeseries.spectre.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_fcs_to_mth5</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mth5.timeseries.spectre.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">fc_decimations_creator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mth5.timeseries.spectre.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_back_fcs</span>
+</pre></div>
+</div>
+</div>
+<p>Build a fresh copy of the synthetic data file</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mth5_path</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+<span class="n">create_test12rr_h5</span><span class="p">(</span><span class="n">target_folder</span><span class="o">=</span><span class="n">target_folder</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>In this case we need to prescribe the decimation configuration.</p>
+<p>If we dont want to decimate, we can just pass <code class="docutils literal notranslate"><span class="pre">fc_decimations</span> <span class="pre">==</span> <span class="pre">&quot;degenerate&quot;</span></code> to add_fcs</p>
+<p>Here is how the decimations can be created</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sample_rate</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">fc_decimations</span> <span class="o">=</span> <span class="n">fc_decimations_creator</span><span class="p">(</span><span class="n">initial_sample_rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">time_period</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>And here is what they look like, … a list, with each element specifying the needed info for decimation and FFT.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fc_decimations</span>
+<br/></pre></div>
+</div>
+</div>
+<p>Now add the decimation levels:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">add_fcs_to_mth5</span><span class="p">(</span><span class="n">mth5_path</span><span class="p">,</span> <span class="n">fc_decimations</span><span class="o">=</span><span class="n">fc_decimations</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Now take a look at the mth5</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mth5</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">mth5</span><span class="o">.</span><span class="n">mth5</span><span class="o">.</span><span class="n">MTH5</span><span class="p">(</span><span class="n">mth5_path</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">open_mth5</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">close_mth5</span><span class="p">()</span>
+<br/></pre></div>
+</div>
+</div>
+<p>Alternatively, we could have translated the Aurora processing config to an mt_metadata FC decimation and gnerated FCs with the same function.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mth5_path</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+<span class="n">create_test12rr_h5</span><span class="p">(</span><span class="n">target_folder</span><span class="o">=</span><span class="n">target_folder</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Extract FC decimations from processing config and build the layer</span>
+
+<span class="n">fc_decimations</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">x</span><span class="o">.</span><span class="n">to_fc_decimation</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">decimations</span>
+<span class="p">]</span>
+
+<span class="n">add_fcs_to_mth5</span><span class="p">(</span><span class="n">mth5_path</span><span class="p">,</span> <span class="n">fc_decimations</span><span class="o">=</span><span class="n">fc_decimations</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">read_back_fcs</span><span class="p">(</span><span class="n">mth5_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>And we can see that when processing, aurora detects that the FC layer is already there, and skips creating it.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show_plot</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">tf_cls</span> <span class="o">=</span> <span class="n">process_mth5</span><span class="p">(</span><span class="n">config</span><span class="p">,</span>
+                    <span class="n">kernel_dataset</span><span class="p">,</span>
+                    <span class="n">units</span><span class="o">=</span><span class="s2">&quot;MT&quot;</span><span class="p">,</span>
+                    <span class="n">show_plot</span><span class="o">=</span><span class="n">show_plot</span><span class="p">,</span>
+                    <span class="n">z_file_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="alert alert-block alert-info"><p>NOTE Feature storage section below is a work in progress.</p>
+</div></section>
+</section>
+</section>
+<section id="Feature-Storage-Experimental-work-in-progress">
+<h1>Feature Storage <strong>Experimental work in progress</strong><a class="headerlink" href="#Feature-Storage-Experimental-work-in-progress" title="Permalink to this heading">¶</a></h1>
+<p>Any spectrogram (FC array at some decimation level) can be passed to a feature extraction method. These features can, in turn be stored in the mth5.</p>
+<p>This will have the following steps:</p>
+<ol class="arabic simple" start="0">
+<li><p>select the source FC decimation level (Will use “0” to start, but also test with “1”,)</p></li>
+<li><p>Select the frequency bands (probably make these wider than normal so we have plenty of FCs per time window)</p></li>
+</ol>
+<ul class="simple">
+<li><p>Note these are <code class="docutils literal notranslate"><span class="pre">feature_extraction_bands</span></code>, which are possibly different from TF estimation bands.</p></li>
+</ul>
+<p>To do this we will want to look at the frequencies associated with each FCGroup, and each decimation level.</p>
+<ul class="simple">
+<li><p>Group Runs on Sample Rate</p>
+<ul>
+<li><p>tabulate decimation levels</p></li>
+<li><p>group decimation levels by id (and validate that the decimation_level.metadata.sample_rate_decimations agree)</p></li>
+<li><p>for each decimation level, we should get the frequencies associated – this can be deduced from the shape of the dataset, and the min/max frequecies of the metadata, but for now we can just unpack the xarray and take the frequncey axis)</p></li>
+</ul>
+</li>
+</ul>
+<ol class="arabic simple" start="2">
+<li><p>loop over the bands (for each band:)</p></li>
+</ol>
+<ul class="simple">
+<li><p>2a. extract the band from the FClayer in the mth5 (shape will be nch x ntime x nharmonics)</p></li>
+</ul>
+<ol class="arabic simple" start="3">
+<li><p>loop over time window (for each time):</p></li>
+</ol>
+<ul class="simple">
+<li><p>3a) extract feature</p></li>
+</ul>
+<p>As a placeholder, we will compute the channel crosspowers, and or channel energy.</p>
+<ul class="simple">
+<li><p>3b) place the feature into an xarray</p></li>
+</ul>
+<ol class="arabic simple" start="4">
+<li><p>save teh xarray as “feature_cross_power”</p></li>
+</ol>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Imports</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">mth5.mth5</span><span class="w"> </span><span class="kn">import</span> <span class="n">MTH5</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># # Selection of frequency bands</span>
+
+<span class="c1"># active_decimation_level = &quot;0&quot;</span>
+
+<span class="c1"># m = MTH5(mth5_path)</span>
+<span class="c1"># m.open_mth5()</span>
+<span class="c1"># run_summary_df = m.run_summary  # This fails on current main but works on add_aurora_tools branch.</span>
+<span class="c1"># run_summary_df</span>
+</pre></div>
+</div>
+</div>
+<p>It would be nice if we could get a summary of the fcs available in the mth5. here is a prototype for how that could be done.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># # Prototype for fc_summary</span>
+
+<span class="c1"># fc_summary = None</span>
+
+<span class="c1"># for i, row in run_summary_df.iterrows():</span>
+<span class="c1">#     print(row.station, row.run)</span>
+<span class="c1">#     station_obj = m.get_station(row.station)</span>
+<span class="c1">#     run_fc_group = station_obj.fourier_coefficients_group.get_fc_group(row.run)</span>
+<span class="c1">#     if fc_summary is None:</span>
+<span class="c1">#         fc_summary = run_fc_group.decimation_level_summary</span>
+<span class="c1">#         fc_summary[&quot;station&quot;] = row.station</span>
+<span class="c1">#         fc_summary[&quot;run&quot;] = row.run</span>
+<span class="c1">#         fc_summary[&quot;sample_rate_time_series&quot;] = 0.0</span>
+<span class="c1">#         fc_summary[&quot;window_num_samples&quot;] = 0</span>
+<span class="c1">#         fc_summary[&quot;harmonic_indices&quot;] = None</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         tmp = run_fc_group.decimation_level_summary</span>
+<span class="c1">#         tmp[&quot;station&quot;] = row.station</span>
+<span class="c1">#         tmp[&quot;run&quot;] = row.run</span>
+<span class="c1">#         tmp[&quot;sample_rate_time_series&quot;] = 0.0</span>
+<span class="c1">#         tmp[&quot;window_num_samples&quot;] = 0</span>
+<span class="c1">#         tmp[&quot;harmonic_indices&quot;] = None</span>
+<span class="c1">#         fc_summary = pd.concat([fc_summary, tmp], ignore_index=True)</span>
+
+<span class="c1">#         #print(run_fc_group)</span>
+<span class="c1">#     for dec_level_id in run_fc_group.groups_list:</span>
+<span class="c1">#         dec_level = run_fc_group.get_decimation_level(dec_level_id)</span>
+<span class="c1">#         cond1 = fc_summary.station==row.station</span>
+<span class="c1">#         cond2 = fc_summary.run==row.run</span>
+<span class="c1">#         cond3 = fc_summary.component==dec_level_id</span>
+<span class="c1">#         fc_summary.loc[cond1 &amp; cond2 &amp; cond3]  # this should be a unique row</span>
+<span class="c1">#         ndx = fc_summary.loc[cond1 &amp; cond2 &amp; cond3].index</span>
+<span class="c1">#         assert(len(ndx))==1</span>
+<span class="c1">#         #fc_summary[&quot;sample_rate_time_series&quot;].at[ndx] = dec_level.metadata.i</span>
+<span class="c1">#         fc_summary[&quot;window_num_samples&quot;].at[ndx[0]] = dec_level.metadata.window.num_samples</span>
+<span class="c1">#         fc_summary[&quot;sample_rate_time_series&quot;].at[ndx[0]] = dec_level.metadata.sample_rate</span>
+<span class="c1">#         fc_summary[&quot;harmonic_indices&quot;].at[ndx[0]] = dec_level.metadata.harmonic_indices</span>
+
+
+<span class="c1">#         #print(dec_level_id, dec_level)</span>
+<span class="c1">#         xr_dec_level = dec_level.to_xarray()</span>
+<span class="c1">#         print(&quot;station&quot;, row.station, &quot;run&quot;, row.run, &quot;decimation level&quot;, dec_level_id, &quot;SAMPLE rate&quot;, dec_level.metadata.sample_rate) # xr_dec_level.frequency)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># fc_summary[&quot;delta_f&quot;] = fc_summary[&quot;sample_rate_time_series&quot;] / fc_summary[&quot;window_num_samples&quot;]</span>
+<span class="c1"># fc_summary</span>
+</pre></div>
+</div>
+</div>
+<p>The above table tells us what we need to know to get frequency axes .. and actually, we can make <code class="docutils literal notranslate"><span class="pre">_frequencies()</span></code> a method of <code class="docutils literal notranslate"><span class="pre">FC_dec_level</span></code>.</p>
+<p>Note that when harmonic_indices is [-1,], that means all the (1-sided) FCs are kept.</p>
+<ul class="simple">
+<li><p>this can be sanity checked by asserting that the dataset size is <code class="docutils literal notranslate"><span class="pre">window_num_samples</span></code>//2</p></li>
+</ul>
+<p>So now pick a decimation level, … In this case, the <code class="docutils literal notranslate"><span class="pre">component</span></code> column is telling us the decimation level.</p>
+<ul class="simple">
+<li><p>It would seem sensible to make sure that the sample rates, (and delta_f) values are same as well.</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># cond0 = fc_summary[&quot;component&quot;] == active_decimation_level</span>
+<span class="c1"># fc_runs_to_featureize_df = fc_summary[cond0]</span>
+<span class="c1"># fc_runs_to_featureize_df</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># frqs = np.fft.fftfreq?</span>
+</pre></div>
+</div>
+</div>
+<p>Now pick a scheme for defining the feature frequency bands</p>
+<ul class="simple">
+<li><p>we prefer not to use the lowest few harmonics … this is like setting the minimum number of cycles per window, say 10</p></li>
+<li><p>we also prefer not to take harmonics very close to the Nyquist frequency as these maybe attenuated by AAF, say we go up to 80% Nyq</p></li>
+<li><p>For TF estimation, bands may be only a few FCs wide,but for feature extraction we make them much wider.</p></li>
+<li><p>lets try with around half an octave</p></li>
+<li><p>how about 2 bands per octave, mean</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># min_cycles = 10</span>
+<span class="c1"># nyquist_fraction = 0.8</span>
+<span class="c1"># n_feature_bands_per_octave = 2</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># for i, row in fc_runs_to_featureize_df.iterrows():</span>
+<span class="c1">#     frequencies = np.fft.rfftfreq(row.window_num_samples, row.sample_rate_time_series)</span>
+<span class="c1">#     lower_index = int(min_cycles)</span>
+<span class="c1">#     upper_index = int(nyquist_fraction*(row.window_num_samples//2))</span>
+<span class="c1">#     print(f&quot; lower_index={lower_index}, upper_index={upper_index}&quot;)</span>
+<span class="c1">#     freq_min = frequencies[lower_index]</span>
+<span class="c1">#     freq_max = frequencies[upper_index]</span>
+<span class="c1">#     print(f&quot;Available band: {freq_min:3f} to {freq_max:3f}&quot;)</span>
+<span class="c1">#     frequency_ratio = freq_max/freq_min</span>
+<span class="c1">#     available_decades = np.log10(frequency_ratio)</span>
+<span class="c1">#     available_ocataves = np.log2(frequency_ratio)</span>
+<span class="c1">#     print(f&quot;Available decades: {available_decades:3f}&quot;)</span>
+<span class="c1">#     print(f&quot;Available octaves: {available_ocataves:3f}&quot;)</span>
+<span class="c1">#     num_feature_bands = available_ocataves * n_feature_bands_per_octave</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># dec_level.metadata</span>
+<span class="c1"># dec_level.to_xarray()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># cond1 = fc_summary.station==&quot;test1&quot;</span>
+<span class="c1"># cond2 = fc_summary.run==&quot;001&quot;</span>
+<span class="c1"># cond3 = fc_summary.component==&quot;0&quot;</span>
+<span class="c1"># fc_summary.loc[cond1 &amp; cond2 &amp; cond3].index</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># fc_summary[&quot;sample_rate_time_series&quot;].at[0]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># m.close_mth5()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="process_cas04_multiple_station.html" class="btn btn-neutral float-left" title="Process CAS04 with Remote Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../api/modules.html" class="btn btn-neutral float-right" title="aurora" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

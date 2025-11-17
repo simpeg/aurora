@@ -1,0 +1,414 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.transfer_function.plot.rho_plot &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aurora.transfer_function.plot.rho_plot</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.transfer_function.plot.rho_plot</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This module contains functions for plotting apparent resistivity and phase.</span>
+
+<span class="sd">This is based on Gary&#39;s RhoPlot.m in the matlab EMTF version. iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes</span>
+
+<span class="sd">TODO: replace with calls to mtpy</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.transfer_function.plot.error_bar_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">err_log</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">ioff</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="RhoPlot"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.plot.html#aurora.transfer_function.plot.rho_plot.RhoPlot">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">RhoPlot</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    TF plotting object class; some methods are only relevant to</span>
+<span class="sd">    specific types of TFs (or for derived parameters such as rho/phi)</span>
+
+<span class="sd">    Development Notes:</span>
+<span class="sd">        This should be deprecated and replaced with MTpy</span>
+<span class="sd">        The only place this class is used is in aurora/sandbox/plot_helpers.py in the</span>
+<span class="sd">        plot_tf_obj method.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tf_obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor</span>
+
+<span class="sd">        TODO: Replace tf_obj with mt_metadata tf if this method not replaced with mtpy.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tf_obj: aurora.transfer_function.TTFZ.TTFZ</span>
+<span class="sd">            Object with TF information</span>
+
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tf</span> <span class="o">=</span> <span class="n">tf_obj</span>
+
+<div class="viewcode-block" id="RhoPlot.phase_sub_plot"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.plot.html#aurora.transfer_function.plot.rho_plot.RhoPlot.phase_sub_plot">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">phase_sub_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">ttl_str</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">pred</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        place a phase subplot on given figure axis</span>
+
+<span class="sd">        Development notes:</span>
+<span class="sd">         Originally this took an optional input argument `axRect`</span>
+<span class="sd">         but it was never used. It looks as it it was intended to be able to set the</span>
+<span class="sd">         position of the figure.  There was also some hardcoded control of linewidth</span>
+<span class="sd">         and markersize which has been removed for readability.</span>
+
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ax</span>
+<span class="sd">        pred</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">phi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">phi</span>
+        <span class="c1"># rotate phases so all are positive:</span>
+        <span class="n">negative_phi_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">phi</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">phi</span><span class="p">[</span><span class="n">negative_phi_indices</span><span class="p">]</span> <span class="o">+=</span> <span class="mf">180.0</span>
+
+        <span class="n">Tmin</span><span class="p">,</span> <span class="n">Tmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_period_limits</span><span class="p">()</span>
+        <span class="n">axis_limits</span> <span class="o">=</span> <span class="p">[</span><span class="n">Tmin</span><span class="p">,</span> <span class="n">Tmax</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">90</span><span class="p">]</span>
+
+        <span class="p">[</span><span class="n">xb</span><span class="p">,</span> <span class="n">yb</span><span class="p">]</span> <span class="o">=</span> <span class="n">err_log</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">periods</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">phi</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">phi_se</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="n">axis_limits</span><span class="p">,</span>
+            <span class="n">log_x_axis</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">xb</span><span class="p">,</span> <span class="n">yb</span><span class="p">,</span> <span class="s2">&quot;b-&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">periods</span><span class="p">,</span> <span class="n">phi</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;bo&quot;</span><span class="p">)</span>
+
+        <span class="n">xb</span><span class="p">,</span> <span class="n">yb</span> <span class="o">=</span> <span class="n">err_log</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">periods</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">phi</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">phi_se</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="n">axis_limits</span><span class="p">,</span>
+            <span class="n">log_x_axis</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">xb</span><span class="p">,</span> <span class="n">yb</span><span class="p">,</span> <span class="s2">&quot;r-&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">periods</span><span class="p">,</span> <span class="n">phi</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;ro&quot;</span><span class="p">)</span>
+        <span class="c1"># set(lines, &#39;LineWidth&#39;, 1, &#39;MarkerSize&#39;, 7);</span>
+        <span class="k">if</span> <span class="n">pred</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">pred</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">periods</span><span class="p">,</span> <span class="n">pred</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">phi</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;b-&quot;</span><span class="p">,</span> <span class="s2">&quot;linewidth&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">pred</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">periods</span><span class="p">,</span> <span class="n">pred</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">phi</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;r-&quot;</span><span class="p">,</span> <span class="s2">&quot;linewidth&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="p">)</span>
+
+        <span class="c1"># (lims_ph);</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">axis_limits</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis_limits</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">axis_limits</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">axis_limits</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">title_pos_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">axis_limits</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">axis_limits</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">axis_limits</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="p">)</span>
+        <span class="n">title_pos_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">title_pos_x</span><span class="p">))</span>
+        <span class="n">title_pos_y</span> <span class="o">=</span> <span class="n">axis_limits</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.8</span> <span class="o">*</span> <span class="p">(</span><span class="n">axis_limits</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">axis_limits</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="c1"># ttl_str = f&quot;$\phi$ : {self.tf.header.local_station_id}&quot;\</span>
+        <span class="c1"># + \&quot;PKD&quot;#self.tf.Header.LocalSite.SiteID</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">title_pos_x</span><span class="p">,</span> <span class="n">title_pos_y</span><span class="p">,</span> <span class="n">ttl_str</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">&quot;demi&quot;</span><span class="p">)</span>
+        <span class="c1"># set(gca, &#39;FontWeight&#39;, &#39;bold&#39;, &#39;FontSize&#39;, 11, &#39;Xtick&#39;, xticks);</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Period (s)&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Degrees&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RhoPlot.rho_sub_plot"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.plot.html#aurora.transfer_function.plot.rho_plot.RhoPlot.rho_sub_plot">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">rho_sub_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">ttl_str</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">pred</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Makes an apparent resistivity plot on the input axis.</span>
+
+<span class="sd">        Matlab Documentation:</span>
+<span class="sd">        Calls plotrhom, standard plotting routine; uses some other routines in</span>
+<span class="sd">        EMTF/matlab/Zplt; this version is for putting multiple curves on the</span>
+<span class="sd">        same plot ... set plotting limits now that rho is known</span>
+
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ax: matplotlib.axes._axes.Axes</span>
+<span class="sd">        pred</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lims</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_lims</span><span class="p">()</span>  <span class="c1"># get the axes limits</span>
+        <span class="n">x_axis_limits</span> <span class="o">=</span> <span class="n">lims</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">y_axis_limits</span> <span class="o">=</span> <span class="n">lims</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+
+        <span class="c1"># get and plot error bars:</span>
+        <span class="p">[</span><span class="n">xb</span><span class="p">,</span> <span class="n">yb</span><span class="p">]</span> <span class="o">=</span> <span class="n">err_log</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">periods</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">rho</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">rho_se</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="n">x_axis_limits</span><span class="p">,</span>
+            <span class="n">log_x_axis</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">xb</span><span class="p">,</span> <span class="n">yb</span><span class="p">,</span> <span class="s2">&quot;b-&quot;</span><span class="p">)</span>
+
+        <span class="c1"># plot rho dots</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">periods</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">rho</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;bo&quot;</span><span class="p">)</span>
+
+        <span class="p">[</span><span class="n">xb</span><span class="p">,</span> <span class="n">yb</span><span class="p">]</span> <span class="o">=</span> <span class="n">err_log</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">periods</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">rho</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">rho_se</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="n">x_axis_limits</span><span class="p">,</span>
+            <span class="n">log_x_axis</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">xb</span><span class="p">,</span> <span class="n">yb</span><span class="p">,</span> <span class="s2">&quot;r-&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">periods</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">rho</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;ro&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pred</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">pred</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">periods</span><span class="p">,</span> <span class="n">pred</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">rho</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;b-&quot;</span><span class="p">,</span> <span class="s2">&quot;linewidth&quot;</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">pred</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">periods</span><span class="p">,</span> <span class="n">pred</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">rho</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;r-&quot;</span><span class="p">,</span> <span class="s2">&quot;linewidth&quot;</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
+
+        <span class="c1"># axis(lims_rho);</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">x_axis_limits</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x_axis_limits</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">y_axis_limits</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y_axis_limits</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1">#</span>
+        <span class="n">title_pos_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">x_axis_limits</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">x_axis_limits</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">x_axis_limits</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="p">)</span>
+        <span class="n">title_pos_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">title_pos_x</span><span class="p">))</span>
+        <span class="n">title_pos_y</span> <span class="o">=</span> <span class="n">y_axis_limits</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.8</span> <span class="o">*</span> <span class="p">(</span><span class="n">y_axis_limits</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y_axis_limits</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">ttl_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\u03C1</span><span class="s2">_a : &quot;</span> <span class="o">+</span> <span class="n">ttl_str</span>
+        <span class="c1"># c_title = &quot;$\rho_a$ :&quot; + &quot;PKD&quot;  # obj.tf.Header.LocalSite.SiteID</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">title_pos_x</span><span class="p">,</span> <span class="n">title_pos_y</span><span class="p">,</span> <span class="n">ttl_str</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">&quot;demi&quot;</span><span class="p">)</span>
+        <span class="c1"># set(gca, &#39;FontWeight&#39;, &#39;bold&#39;, &#39;FontSize&#39;, 11, &#39;Xtick&#39;, xticks);</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Period (s)&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;$\Omega$-m&quot;</span><span class="p">)</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="RhoPlot.set_period_limits"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.plot.html#aurora.transfer_function.plot.rho_plot.RhoPlot.set_period_limits">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_period_limits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a set of limits for the x-axis of plots based on periods to display.</span>
+
+<span class="sd">        Original Matlab Notes:</span>
+<span class="sd">            &quot;set nicer period limits for logartihmic period scale plots&quot;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Tmin, Tmax: tuple</span>
+<span class="sd">            The minimum and maximum periods for the x-axis</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">x_min</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">minimum_period</span>
+        <span class="n">x_max</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">maximum_period</span>
+
+        <span class="n">Tmin</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">x_min</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">x_min</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">Tmin</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mf">0.15</span><span class="p">:</span>
+            <span class="n">Tmin</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">Tmin</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.3</span><span class="p">)</span>
+
+        <span class="n">Tmax</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">x_max</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">Tmax</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">x_max</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mf">0.15</span><span class="p">:</span>
+            <span class="n">Tmax</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">Tmax</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.3</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Tmin</span><span class="p">,</span> <span class="n">Tmax</span></div>
+
+<div class="viewcode-block" id="RhoPlot.set_rho_limits"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.plot.html#aurora.transfer_function.plot.rho_plot.RhoPlot.set_rho_limits">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_rho_limits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a set of limits for the x-axis of plots based on periods to display.</span>
+
+<span class="sd">        Original Matlab Notes:</span>
+<span class="sd">            &quot;set nicer period limits for logartihmic period scale plots&quot;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Tmin, Tmax: tuple</span>
+<span class="sd">            The minimum and maximum periods for the x-axis</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">y_min</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">rho</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="mf">1e-20</span><span class="p">)</span>
+        <span class="n">y_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tf</span><span class="o">.</span><span class="n">rho</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mf">1e-20</span><span class="p">)</span>
+
+        <span class="n">yy_min</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">y_min</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">y_min</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">yy_min</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mf">0.15</span><span class="p">:</span>
+            <span class="n">yy_min</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">yy_min</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.3</span><span class="p">)</span>
+
+        <span class="n">yy_max</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">y_max</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">yy_max</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">y_max</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mf">0.15</span><span class="p">:</span>
+            <span class="n">yy_max</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">yy_max</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.3</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">yy_min</span><span class="p">,</span> <span class="n">yy_max</span></div>
+
+<div class="viewcode-block" id="RhoPlot.set_lims"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.plot.html#aurora.transfer_function.plot.rho_plot.RhoPlot.set_lims">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_lims</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set limits for the plotting axes</span>
+
+<span class="sd">        TODO: Add doc or start using MTpy</span>
+
+<span class="sd">        Matlab Notes:</span>
+<span class="sd">        set default limits for plotting; QD, derived from ZPLT use max/min limits of periods, rho to set limits</span>
+
+<span class="sd">        function[lims, orient] = set_lims(obj)</span>
+<span class="sd">        Returns</span>
+<span class="sd">            lims : list</span>
+<span class="sd">            x_max, x_min, y_max, y_min, 0, 90</span>
+<span class="sd">            orient: 0</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        lims: list</span>
+<span class="sd">            The plotting limits for period, rho and phi.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">period_min</span><span class="p">,</span> <span class="n">period_max</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_period_limits</span><span class="p">()</span>  <span class="c1"># get limits for the x-axis</span>
+        <span class="n">rho_min</span><span class="p">,</span> <span class="n">rho_max</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_rho_limits</span><span class="p">()</span>
+        <span class="n">phi_min</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">phi_max</span> <span class="o">=</span> <span class="mi">90</span>
+
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">rho_max</span> <span class="o">-</span> <span class="n">rho_min</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">rho_min</span> <span class="o">=</span> <span class="mf">0.01</span>
+            <span class="n">rho_max</span> <span class="o">=</span> <span class="mf">1e4</span>
+        <span class="n">lims</span> <span class="o">=</span> <span class="p">[</span><span class="n">period_min</span><span class="p">,</span> <span class="n">period_max</span><span class="p">,</span> <span class="n">rho_min</span><span class="p">,</span> <span class="n">rho_max</span><span class="p">,</span> <span class="n">phi_min</span><span class="p">,</span> <span class="n">phi_max</span><span class="p">]</span>
+
+        <span class="c1"># orient = 0.0</span>
+        <span class="k">return</span> <span class="n">lims</span>  <span class="c1"># , orient</span></div></div>
+
+    <span class="c1"># def get_xticks(self):</span>
+    <span class="c1">#     xticks = 10.0 ** np.arange(-5, 6)</span>
+    <span class="c1">#     cond1 = xticks &gt;= self.tf.minimum_period</span>
+    <span class="c1">#     cond2 = xticks &lt;= self.tf.maximum_period</span>
+    <span class="c1">#     xticks = xticks[cond1 &amp; cond2]</span>
+    <span class="c1">#     return xticks</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

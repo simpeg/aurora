@@ -1,0 +1,531 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.transfer_function.regression.m_estimator &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aurora.transfer_function.regression.m_estimator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.transfer_function.regression.m_estimator</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the MEstimator class - an extension of RegressionEstimator.</span>
+
+<span class="sd"> MEstimator has the class methods that are common to both RME and RME_RR.</span>
+<span class="sd"> See Notes in RME, RME_RR for more details.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">aurora.transfer_function.regression.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">RegressionEstimator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+
+
+<div class="viewcode-block" id="MEstimator"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MEstimator</span><span class="p">(</span><span class="n">RegressionEstimator</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kwargs</span>
+<span class="sd">        expectation_psi_prime : numpy array</span>
+<span class="sd">            Same number of entries as there are output channels (columns of Y)</span>
+<span class="sd">            Default is a vector of 1.0&#39;s</span>
+
+<span class="sd">            Expectation value of psi&#39; (derivative of psi) -- ?? OR rho&#39;=psi????</span>
+<span class="sd">            Recall start with the loss function rho. The derivative of the</span>
+<span class="sd">            loss function is the &quot;influence function&quot; psi.</span>
+<span class="sd">            Think about the Huber loss function (quadratic out to r0,</span>
+<span class="sd">            after which it is linear). Psi is -1 until you get to -r0,</span>
+<span class="sd">            then it increases linearly to 1 (r0)</span>
+<span class="sd">            Psi&#39; is something like 1 between -r0, and r0</span>
+<span class="sd">            Psi&#39; is zero outside</span>
+<span class="sd">            So the expectation value of psi&#39; is the number of points outside, (that didn&#39;t get weighted) divided by the total number of points</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MEstimator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expectation_psi_prime</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_channels_out</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Yc</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_Y_hat</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_residual_variance</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">QHYc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the matrix QH @ Yc</span>
+<span class="sd">        This is Q.conj().T from the QR decomposition multiplied with the cleaned data.</span>
+
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        QHYc: np.ndarray</span>
+<span class="sd">            A convenience matrix that makes computing the predicted data (QQHYc) more efficient.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_QHYc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_QHYc</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_QHYc</span>
+
+<div class="viewcode-block" id="MEstimator.update_QHYc"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.update_QHYc">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_QHYc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates the QHYc matrix with the most recent cleaned data&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_QHYc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">QH</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">Yc</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Y_hat</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;returns the most recent predicted data&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Y_hat</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_y_hat</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Y_hat</span>
+
+<div class="viewcode-block" id="MEstimator.update_y_hat"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.update_y_hat">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_y_hat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;updates the predicted data from the most recent cleaned data&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Y_hat update method is not defined for abstract MEstimator class&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Try using RME or RME_RR class instead&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span></div>
+
+<div class="viewcode-block" id="MEstimator.update_residual_variance"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.update_residual_variance">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_residual_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">correction_factor</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;updates residual variance from most recent cleaned and predicted data&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="s2">&quot;update_residual_variance method not defined in abstract MEstimator&quot;</span>
+        <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Try using RME or RME_RR class instead&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">residual_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;returns the residual variance&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_residual_variance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_residual_variance</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_residual_variance</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">r0</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;returns the Huber r0 value&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_control</span><span class="o">.</span><span class="n">r0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u0</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;returns the u0 threshold for redescending regression step&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_control</span><span class="o">.</span><span class="n">u0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">correction_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return teh correction factor for the residual variance.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        correction_factor: float</span>
+<span class="sd">            See doc in iter_control.IterControl.correction_factor()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_control</span><span class="o">.</span><span class="n">correction_factor</span>
+
+<div class="viewcode-block" id="MEstimator.residual_variance_method1"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.residual_variance_method1">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">residual_variance_method1</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        returns the residual variance of the output channels.</span>
+
+<span class="sd">        This is the method that was originally in RME_RR.m.  It seems more correct</span>
+<span class="sd">        than the one in RME, but also has more computational overhead.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Yc</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y_hat</span>  <span class="c1"># initial estimate of error variance</span>
+        <span class="n">residual_variance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">res</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">res</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_data</span>
+        <span class="k">return</span> <span class="n">residual_variance</span></div>
+
+<div class="viewcode-block" id="MEstimator.residual_variance_method2"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.residual_variance_method2">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">residual_variance_method2</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the residual variance of the output channels (error variances).</span>
+
+<span class="sd">        Computes the squared norms difference of the output channels from the</span>
+<span class="sd">        &quot;output channels inner-product with QQH&quot;</span>
+
+<span class="sd">        This method used to take either QHY, Y as arguments or QHYc, Yc</span>
+<span class="sd">        But now that Yc initializes to Y, we can just use with QHYc, Yc always</span>
+<span class="sd">        (Note QHYc is updated everytime Yc is updated)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        QHY : numpy array</span>
+<span class="sd">            QHY[i,j] = Q.H * Y[i,j] = &lt;Q[:,i], Y[:,j]&gt;</span>
+<span class="sd">            So when we sum columns of norm(QHY) we are get in the zeroth position</span>
+<span class="sd">            &lt;Q[:,0], Y[:,0]&gt; +  &lt;Q[:,1], Y[:,0]&gt;, that is the 0th channel of Y</span>
+<span class="sd">            projected onto each of the Q-basis vectors</span>
+<span class="sd">        Y_or_Yc : numpy array</span>
+<span class="sd">            The output channels (self.Y) or the cleaned output channels self.Yc</span>
+<span class="sd">        correction_factor : float</span>
+<span class="sd">            See doc in IterControl.correction_factor</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual_variance : numpy array</span>
+<span class="sd">            One entry per output channel.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Y2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Yc</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>  <span class="c1"># variance?</span>
+        <span class="n">QHY2</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">QHYc</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="p">)</span>  <span class="c1"># note this is the same as QQHYc=Y_hat</span>
+        <span class="n">residual_variance</span> <span class="o">=</span> <span class="p">(</span><span class="n">Y2</span> <span class="o">-</span> <span class="n">QHY2</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_data</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span><span class="n">residual_variance</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;WARNING - Negative error variances observed&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">residual_variance</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Setting residual_variance to zero - Negative values observed&quot;</span>
+            <span class="p">)</span>
+            <span class="n">residual_variance</span> <span class="o">*=</span> <span class="mi">0</span>
+
+        <span class="k">return</span> <span class="n">residual_variance</span></div>
+
+<div class="viewcode-block" id="MEstimator.update_y_cleaned_via_huber_weights"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.update_y_cleaned_via_huber_weights">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_y_cleaned_via_huber_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the values of self.Yc and self.expectation_psi_prime</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        residual_variance : numpy array</span>
+<span class="sd">            1D array, the same length as the number of output channels</span>
+<span class="sd">            see self.residual_variance() method for its calculation</span>
+<span class="sd">        Y_hat : numpy array</span>
+<span class="sd">            The predicted data, usually from QQHY</span>
+
+
+<span class="sd">        Original matlab documenation:</span>
+<span class="sd">        function [YC,E_psiPrime] = HuberWt(Y,YP,sig,r0)</span>
+<span class="sd">        inputs are data (Y) and predicted (YP), estiamted</span>
+<span class="sd">        error variances (for each column) and Huber parameter r0</span>
+<span class="sd">        allows for multiple columns of data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_channels_out</span><span class="p">):</span>
+            <span class="n">r0s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">r0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residual_variance</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+            <span class="n">residuals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y_hat</span><span class="p">[:,</span> <span class="n">k</span><span class="p">])</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">r0s</span> <span class="o">/</span> <span class="n">residuals</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Yc</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">w</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">w</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y_hat</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">expectation_psi_prime</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">w</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_QHYc</span><span class="p">()</span>  <span class="c1"># note the QH is different in RME_RR vs RME</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="MEstimator.initial_estimate"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.initial_estimate">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">initial_estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Make first estimate of TF (b), Y_hat, and residual_variance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qr_decomposition</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_b</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_y_hat</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_residual_variance</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MEstimator.apply_huber_regression"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.apply_huber_regression">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">apply_huber_regression</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            This is the &#39;convergence loop&#39; from RME, RME_RR</span>
+
+<span class="sd">        TODO: Consider not setting iter_control.number_of_iterations</span>
+<span class="sd">         - Instead, Initialize a new iter_control object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">converged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_control</span><span class="o">.</span><span class="n">max_iterations_reached</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_control</span><span class="o">.</span><span class="n">number_of_iterations</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">iter_control</span><span class="o">.</span><span class="n">reset_number_of_iterations</span><span class="p">()</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">converged</span><span class="p">:</span>
+            <span class="n">b0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">iter_control</span><span class="o">.</span><span class="n">increment_iteration_number</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_y_cleaned_via_huber_weights</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_b</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_y_hat</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_residual_variance</span><span class="p">(</span><span class="n">correction_factor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">correction_factor</span><span class="p">)</span>
+            <span class="n">converged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_control</span><span class="o">.</span><span class="n">converged</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">b0</span><span class="p">)</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="MEstimator.apply_redecending_influence_function"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.apply_redecending_influence_function">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">apply_redecending_influence_function</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs one or two iterations with re-descending influence curve cleaned data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_control</span><span class="o">.</span><span class="n">max_number_of_redescending_iterations</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">iter_control</span><span class="o">.</span><span class="n">reset_number_of_redescending_iterations</span><span class="p">()</span>  <span class="c1"># reset per channel</span>
+            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_control</span><span class="o">.</span><span class="n">continue_redescending</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">iter_control</span><span class="o">.</span><span class="n">increment_redescending_iteration_number</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update_y_cleaned_via_redescend_weights</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update_b</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update_y_hat</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update_residual_variance</span><span class="p">()</span>
+            <span class="c1"># crude estimate of expectation of psi</span>
+            <span class="c1"># accounts for redescending influence curve</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">expectation_psi_prime</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">expectation_psi_prime</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="MEstimator.estimate"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.estimate">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes the regression</span>
+
+<span class="sd">        Development Notes:</span>
+<span class="sd">        Here is a comment from the matlab codes:</span>
+<span class="sd">        &quot;need to look at how we should compute adjusted residual cov to make</span>
+<span class="sd">         consistent with tranmt&quot;</span>
+<span class="sd">        See issue#69 aurora github repo addresses this</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_underdetermined</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">solve_underdetermined</span><span class="p">()</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_estimate</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_huber_regression</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_redecending_influence_function</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_control</span><span class="o">.</span><span class="n">return_covariance</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">compute_inverse_signal_covariance</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">compute_noise_covariance</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">compute_squared_coherence</span><span class="p">()</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="MEstimator.update_y_cleaned_via_redescend_weights"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.update_y_cleaned_via_redescend_weights">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_y_cleaned_via_redescend_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates estimate for self.Yc as a match-filtered sum of Y and Y_hat.</span>
+
+<span class="sd">        Note: It is not unheard of to observe RuntimeWarning: overflow encountered in exp in the calculation of t.</span>
+<span class="sd">        This can happen when large residuals are present.  In that case, t goes to -inf, and w goes to zero,</span>
+<span class="sd">        -- the desired behaviour.  When this happens an &quot;invalid value&quot; will also occur  in the calculation</span>
+<span class="sd">        of t, but this does not propagate into self.expectation_psi_prime.</span>
+
+<span class="sd">        Matlab documentation:</span>
+<span class="sd">        function[YC, E_psiPrime] = RedescendWt(Y, YP, sig, u0):</span>
+<span class="sd">        inputs are data(Y) and predicted(YP), estimated error variances (for each</span>
+<span class="sd">        column) and Huber parameter u0.  Allows for multiple columns of data</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        Y_hat: numpy array</span>
+<span class="sd">            An estimate of the output data Y obtained by</span>
+<span class="sd">            self.Q @ self.QHY</span>
+<span class="sd">            or</span>
+<span class="sd">            self.Q @ self.QHYc</span>
+<span class="sd">        residual_variance</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_channels_out</span><span class="p">):</span>
+            <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residual_variance</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y_hat</span><span class="p">[:,</span> <span class="n">k</span><span class="p">])</span> <span class="o">/</span> <span class="n">sigma</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">u0</span> <span class="o">*</span> <span class="p">(</span><span class="n">r</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">u0</span><span class="p">))</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+
+            <span class="c1"># cleaned data</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Yc</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">w</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">w</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y_hat</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span>
+
+            <span class="c1"># computation of E(psi&#39;)</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u0</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span> <span class="o">*</span> <span class="n">r</span><span class="p">)</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">w</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">t</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">expectation_psi_prime</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">t</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_QHYc</span><span class="p">()</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="MEstimator.compute_squared_coherence"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.compute_squared_coherence">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">compute_squared_coherence</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the array self.R2</span>
+
+<span class="sd">        Here is taken the ratio of the energy in the residuals with the energy in the cleaned data.</span>
+<span class="sd">        This metric can be interpreted as how much of the signal (Y) is &quot;explained&quot; by the regression.</span>
+
+<span class="sd">        Development Notes:</span>
+<span class="sd">        The matlab code (TRME_RR) claimed:</span>
+<span class="sd">            %  R2 is squared coherence (top row is using raw data, bottom</span>
+<span class="sd">            %    cleaned, with crude correction for amount of down-weighted data)</span>
+
+<span class="sd">        TODO: There seem to be other valid metrics for this sort of quantity.  In particular, we may want to</span>
+<span class="sd">         consider SSY (the sum of squares of the observed data) over SSR.</span>
+
+<span class="sd">        TODO: consider renaming self.R2.  That name invokes the idea of the squared residuals.  That is not what</span>
+<span class="sd">         is being stored in self.R2.  This is more like a CMRR.</span>
+
+<span class="sd">        res: Residuals, the original data minus the predicted data.</span>
+<span class="sd">        SSR : Sum of squares of the residuals, per channel</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y_hat</span>
+        <span class="n">SSR</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span>
+            <span class="s2">&quot;ij,ji-&gt;i&quot;</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">res</span>
+        <span class="p">)</span>  <span class="c1"># takes the diagonal of the matrix product</span>
+        <span class="n">SSR</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">SSR</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">Yc2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Yc</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">SSYC</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Yc2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">R2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">SSR</span> <span class="o">/</span> <span class="n">SSYC</span>
+        <span class="n">R2</span><span class="p">[</span><span class="n">R2</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">R2</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">R2</span><span class="p">,</span>
+            <span class="n">dims</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;output_channel&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;output_channel&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_channel_names</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_control</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;squared coherence </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">R2</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s1">&#39;output_channel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">R2</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="MEstimator.compute_noise_covariance"><a class="viewcode-back" href="../../../../api/aurora.transfer_function.regression.html#aurora.transfer_function.regression.m_estimator.MEstimator.compute_noise_covariance">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">compute_noise_covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes the noise covariance (covariance of the residuals)</span>
+
+<span class="sd">        res_clean: The cleaned data minus the predicted data. The residuals</span>
+<span class="sd">        SSR_clean: Sum of squares of the residuals.  Diagonal is real</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        Y_hat</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">res_clean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Yc</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y_hat</span>
+        <span class="n">SSR_clean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">res_clean</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">res_clean</span><span class="p">)</span>
+        <span class="n">inv_psi_prime2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expectation_psi_prime</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+        <span class="n">cov_nn</span> <span class="o">=</span> <span class="n">inv_psi_prime2</span> <span class="o">@</span> <span class="n">SSR_clean</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">degrees_of_freedom</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cov_nn</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">cov_nn</span><span class="p">,</span>
+            <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;output_channel_1&quot;</span><span class="p">,</span> <span class="s2">&quot;output_channel_2&quot;</span><span class="p">],</span>
+            <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;output_channel_1&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_channel_names</span><span class="p">,</span>
+                <span class="s2">&quot;output_channel_2&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_channel_names</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+        <span class="k">return</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

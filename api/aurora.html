@@ -1,0 +1,716 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora package &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css?v=7f9a90b1" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="aurora.config package" href="aurora.config.html" />
+    <link rel="prev" title="aurora" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">aurora</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">aurora package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.config.html">aurora.config package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html">aurora.pipelines package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.html">aurora.sandbox package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.html">aurora.test_utils package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html">aurora.time_series package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html">aurora.transfer_function package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-aurora.general_helper_functions">aurora.general_helper_functions module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.general_helper_functions.DotDict"><code class="docutils literal notranslate"><span class="pre">DotDict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.general_helper_functions.count_lines"><code class="docutils literal notranslate"><span class="pre">count_lines()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.general_helper_functions.execute_subprocess"><code class="docutils literal notranslate"><span class="pre">execute_subprocess()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.general_helper_functions.get_test_path"><code class="docutils literal notranslate"><span class="pre">get_test_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.general_helper_functions.replace_in_file"><code class="docutils literal notranslate"><span class="pre">replace_in_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aurora.general_helper_functions.save_to_mat"><code class="docutils literal notranslate"><span class="pre">save_to_mat()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-aurora">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">aurora</a></li>
+      <li class="breadcrumb-item active">aurora package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/aurora.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="aurora-package">
+<h1>aurora package<a class="headerlink" href="#aurora-package" title="Permalink to this heading">¶</a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="aurora.config.html">aurora.config package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aurora.config.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.config.emtf_band_setup.html">aurora.config.emtf_band_setup package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.config.emtf_band_setup.html#module-aurora.config.emtf_band_setup">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.config.metadata.html">aurora.config.metadata package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.config.metadata.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.config.metadata.html#module-aurora.config.metadata.processing">aurora.config.metadata.processing module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.config.metadata.html#module-aurora.config.metadata">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.config.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.config.html#module-aurora.config.config_creator">aurora.config.config_creator module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.config.html#aurora.config.config_creator.ConfigCreator"><code class="docutils literal notranslate"><span class="pre">ConfigCreator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.config.html#aurora.config.config_creator.ConfigCreator.band_specification_style"><code class="docutils literal notranslate"><span class="pre">ConfigCreator.band_specification_style</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.config.html#aurora.config.config_creator.ConfigCreator.create_from_kernel_dataset"><code class="docutils literal notranslate"><span class="pre">ConfigCreator.create_from_kernel_dataset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.config.html#aurora.config.config_creator.ConfigCreator.determine_band_specification_style"><code class="docutils literal notranslate"><span class="pre">ConfigCreator.determine_band_specification_style()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.config.html#module-aurora.config">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="aurora.pipelines.html">aurora.pipelines package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aurora.pipelines.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.pipelines.html#aurora-pipelines-fourier-coefficients-module">aurora.pipelines.fourier_coefficients module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.pipelines.html#module-aurora.pipelines.helpers">aurora.pipelines.helpers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.helpers.initialize_config"><code class="docutils literal notranslate"><span class="pre">initialize_config()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.pipelines.html#module-aurora.pipelines.process_mth5">aurora.pipelines.process_mth5 module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.process_mth5.process_mth5"><code class="docutils literal notranslate"><span class="pre">process_mth5()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.process_mth5.process_mth5_legacy"><code class="docutils literal notranslate"><span class="pre">process_mth5_legacy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.process_mth5.process_tf_decimation_level"><code class="docutils literal notranslate"><span class="pre">process_tf_decimation_level()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.pipelines.html#module-aurora.pipelines.run_summary">aurora.pipelines.run_summary module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.run_summary.RunSummary"><code class="docutils literal notranslate"><span class="pre">RunSummary</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.run_summary.RunSummary.add_duration"><code class="docutils literal notranslate"><span class="pre">RunSummary.add_duration()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.run_summary.RunSummary.check_runs_are_valid"><code class="docutils literal notranslate"><span class="pre">RunSummary.check_runs_are_valid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.run_summary.RunSummary.clone"><code class="docutils literal notranslate"><span class="pre">RunSummary.clone()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.run_summary.RunSummary.drop_invalid_rows"><code class="docutils literal notranslate"><span class="pre">RunSummary.drop_invalid_rows()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.run_summary.RunSummary.from_mth5s"><code class="docutils literal notranslate"><span class="pre">RunSummary.from_mth5s()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.run_summary.RunSummary.mini_summary"><code class="docutils literal notranslate"><span class="pre">RunSummary.mini_summary</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.run_summary.RunSummary.print_mini_summary"><code class="docutils literal notranslate"><span class="pre">RunSummary.print_mini_summary</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.run_summary.channel_summary_to_run_summary"><code class="docutils literal notranslate"><span class="pre">channel_summary_to_run_summary()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.run_summary.extract_run_summaries_from_mth5s"><code class="docutils literal notranslate"><span class="pre">extract_run_summaries_from_mth5s()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.run_summary.extract_run_summary_from_mth5"><code class="docutils literal notranslate"><span class="pre">extract_run_summary_from_mth5()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.pipelines.html#module-aurora.pipelines.time_series_helpers">aurora.pipelines.time_series_helpers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.time_series_helpers.prototype_decimate"><code class="docutils literal notranslate"><span class="pre">prototype_decimate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.time_series_helpers.truncate_to_clock_zero"><code class="docutils literal notranslate"><span class="pre">truncate_to_clock_zero()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.pipelines.html#module-aurora.pipelines.transfer_function_helpers">aurora.pipelines.transfer_function_helpers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_helpers.apply_weights"><code class="docutils literal notranslate"><span class="pre">apply_weights()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_helpers.drop_nans"><code class="docutils literal notranslate"><span class="pre">drop_nans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_helpers.get_estimator_class"><code class="docutils literal notranslate"><span class="pre">get_estimator_class()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_helpers.process_transfer_functions"><code class="docutils literal notranslate"><span class="pre">process_transfer_functions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_helpers.process_transfer_functions_with_weights"><code class="docutils literal notranslate"><span class="pre">process_transfer_functions_with_weights()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_helpers.set_up_iter_control"><code class="docutils literal notranslate"><span class="pre">set_up_iter_control()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_helpers.stack_fcs"><code class="docutils literal notranslate"><span class="pre">stack_fcs()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.pipelines.html#module-aurora.pipelines.transfer_function_kernel">aurora.pipelines.transfer_function_kernel module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.all_fcs_already_exist"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel.all_fcs_already_exist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.apply_clock_zero"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel.apply_clock_zero()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.check_if_fcs_already_exist"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel.check_if_fcs_already_exist()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.config"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel.config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.dataset"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel.dataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.dataset_df"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel.dataset_df</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.export_tf_collection"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel.export_tf_collection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.get_mth5_file_open_mode"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel.get_mth5_file_open_mode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.initialize_mth5s"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel.initialize_mth5s()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.is_valid_dataset"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel.is_valid_dataset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.kernel_dataset"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel.kernel_dataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.memory_check"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel.memory_check()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.mth5_objs"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel.mth5_objs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.processing_config"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel.processing_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.processing_summary"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel.processing_summary</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.processing_type"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel.processing_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.show_processing_summary"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel.show_processing_summary()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.update_dataset_df"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel.update_dataset_df()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.update_processing_summary"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel.update_processing_summary()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.valid_decimations"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel.valid_decimations()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.validate"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel.validate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.validate_decimation_scheme_and_dataset_compatability"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel.validate_decimation_scheme_and_dataset_compatability()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.validate_processing"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel.validate_processing()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.TransferFunctionKernel.validate_save_fc_settings"><code class="docutils literal notranslate"><span class="pre">TransferFunctionKernel.validate_save_fc_settings()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.mth5_has_fcs"><code class="docutils literal notranslate"><span class="pre">mth5_has_fcs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.pipelines.html#aurora.pipelines.transfer_function_kernel.station_obj_from_row"><code class="docutils literal notranslate"><span class="pre">station_obj_from_row()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.pipelines.html#module-aurora.pipelines">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="aurora.sandbox.html">aurora.sandbox package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aurora.sandbox.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.io_helpers.html">aurora.sandbox.io_helpers package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#module-aurora.sandbox.io_helpers.emtf_band_setup">aurora.sandbox.io_helpers.emtf_band_setup module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#module-aurora.sandbox.io_helpers.fdsn_dataset">aurora.sandbox.io_helpers.fdsn_dataset module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#module-aurora.sandbox.io_helpers.inventory_review">aurora.sandbox.io_helpers.inventory_review module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#module-aurora.sandbox.io_helpers.make_mth5_helpers">aurora.sandbox.io_helpers.make_mth5_helpers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#module-aurora.sandbox.io_helpers.zfile_murphy">aurora.sandbox.io_helpers.zfile_murphy module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.sandbox.io_helpers.html#module-aurora.sandbox.io_helpers">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.sandbox.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.sandbox.html#module-aurora.sandbox.debug_mt_metadata_issue_85">aurora.sandbox.debug_mt_metadata_issue_85 module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.html#aurora.sandbox.debug_mt_metadata_issue_85.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.html#aurora.sandbox.debug_mt_metadata_issue_85.test_can_add_location"><code class="docutils literal notranslate"><span class="pre">test_can_add_location()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.sandbox.html#module-aurora.sandbox.mth5_channel_summary_helpers">aurora.sandbox.mth5_channel_summary_helpers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.html#aurora.sandbox.mth5_channel_summary_helpers.channel_summary_to_make_mth5"><code class="docutils literal notranslate"><span class="pre">channel_summary_to_make_mth5()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.sandbox.html#module-aurora.sandbox.mth5_helpers">aurora.sandbox.mth5_helpers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.html#aurora.sandbox.mth5_helpers.augmented_channel_summary"><code class="docutils literal notranslate"><span class="pre">augmented_channel_summary()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.html#aurora.sandbox.mth5_helpers.build_request_df"><code class="docutils literal notranslate"><span class="pre">build_request_df()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.html#aurora.sandbox.mth5_helpers.enrich_channel_summary"><code class="docutils literal notranslate"><span class="pre">enrich_channel_summary()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.html#aurora.sandbox.mth5_helpers.get_channel_summary"><code class="docutils literal notranslate"><span class="pre">get_channel_summary()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.html#aurora.sandbox.mth5_helpers.get_experiment_from_obspy_inventory"><code class="docutils literal notranslate"><span class="pre">get_experiment_from_obspy_inventory()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.html#aurora.sandbox.mth5_helpers.mth5_from_experiment"><code class="docutils literal notranslate"><span class="pre">mth5_from_experiment()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.sandbox.html#module-aurora.sandbox.obspy_helpers">aurora.sandbox.obspy_helpers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.html#aurora.sandbox.obspy_helpers.align_streams"><code class="docutils literal notranslate"><span class="pre">align_streams()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.html#aurora.sandbox.obspy_helpers.make_channel_labels_fdsn_compliant"><code class="docutils literal notranslate"><span class="pre">make_channel_labels_fdsn_compliant()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.html#aurora.sandbox.obspy_helpers.trim_streams_to_common_timestamps"><code class="docutils literal notranslate"><span class="pre">trim_streams_to_common_timestamps()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.sandbox.html#module-aurora.sandbox.plot_helpers">aurora.sandbox.plot_helpers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.html#aurora.sandbox.plot_helpers.cast_angular_frequency_to_period_or_hertz"><code class="docutils literal notranslate"><span class="pre">cast_angular_frequency_to_period_or_hertz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.html#aurora.sandbox.plot_helpers.plot_complex_response"><code class="docutils literal notranslate"><span class="pre">plot_complex_response()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.html#aurora.sandbox.plot_helpers.plot_response_pz"><code class="docutils literal notranslate"><span class="pre">plot_response_pz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.html#aurora.sandbox.plot_helpers.plot_tf_obj"><code class="docutils literal notranslate"><span class="pre">plot_tf_obj()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.sandbox.html#module-aurora.sandbox.triage_metadata">aurora.sandbox.triage_metadata module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.html#aurora.sandbox.triage_metadata.triage_missing_coil_hollister"><code class="docutils literal notranslate"><span class="pre">triage_missing_coil_hollister()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.html#aurora.sandbox.triage_metadata.triage_mt_units_electric_field"><code class="docutils literal notranslate"><span class="pre">triage_mt_units_electric_field()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.html#aurora.sandbox.triage_metadata.triage_mt_units_magnetic_field"><code class="docutils literal notranslate"><span class="pre">triage_mt_units_magnetic_field()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.sandbox.html#aurora.sandbox.triage_metadata.triage_run_id"><code class="docutils literal notranslate"><span class="pre">triage_run_id()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.sandbox.html#module-aurora.sandbox">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="aurora.test_utils.html">aurora.test_utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aurora.test_utils.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.mth5.html">aurora.test_utils.mth5 package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.mth5.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.mth5.html#module-aurora.test_utils.mth5.fc_helpers">aurora.test_utils.mth5.fc_helpers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.mth5.html#module-aurora.test_utils.mth5">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.parkfield.html">aurora.test_utils.parkfield package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.parkfield.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.parkfield.html#module-aurora.test_utils.parkfield.calibration_helpers">aurora.test_utils.parkfield.calibration_helpers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.parkfield.html#module-aurora.test_utils.parkfield.make_parkfield_mth5">aurora.test_utils.parkfield.make_parkfield_mth5 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.parkfield.html#module-aurora.test_utils.parkfield.path_helpers">aurora.test_utils.parkfield.path_helpers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.parkfield.html#module-aurora.test_utils.parkfield">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.synthetic.html">aurora.test_utils.synthetic package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.synthetic.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.synthetic.html#aurora-test-utils-synthetic-make-mth5-from-asc-module">aurora.test_utils.synthetic.make_mth5_from_asc module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.synthetic.html#module-aurora.test_utils.synthetic.make_processing_configs">aurora.test_utils.synthetic.make_processing_configs module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.synthetic.html#module-aurora.test_utils.synthetic.paths">aurora.test_utils.synthetic.paths module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.synthetic.html#module-aurora.test_utils.synthetic.processing_helpers">aurora.test_utils.synthetic.processing_helpers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.synthetic.html#module-aurora.test_utils.synthetic.rms_helpers">aurora.test_utils.synthetic.rms_helpers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.synthetic.html#aurora-test-utils-synthetic-station-config-module">aurora.test_utils.synthetic.station_config module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.test_utils.synthetic.html#module-aurora.test_utils.synthetic">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.test_utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.test_utils.html#module-aurora.test_utils.dataset_definitions">aurora.test_utils.dataset_definitions module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.html#aurora.test_utils.dataset_definitions.make_cas04_nvr08_test_00_config"><code class="docutils literal notranslate"><span class="pre">make_cas04_nvr08_test_00_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.html#aurora.test_utils.dataset_definitions.make_iak34_test_00_config"><code class="docutils literal notranslate"><span class="pre">make_iak34_test_00_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.html#aurora.test_utils.dataset_definitions.make_iak34_test_01_config"><code class="docutils literal notranslate"><span class="pre">make_iak34_test_01_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.html#aurora.test_utils.dataset_definitions.make_iak34_test_02_config"><code class="docutils literal notranslate"><span class="pre">make_iak34_test_02_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.html#aurora.test_utils.dataset_definitions.make_iak34_test_03_config"><code class="docutils literal notranslate"><span class="pre">make_iak34_test_03_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.html#aurora.test_utils.dataset_definitions.make_iak34_test_04_config"><code class="docutils literal notranslate"><span class="pre">make_iak34_test_04_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.html#aurora.test_utils.dataset_definitions.make_pkdsao_test_00_config"><code class="docutils literal notranslate"><span class="pre">make_pkdsao_test_00_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.test_utils.html#aurora.test_utils.dataset_definitions.make_test_configs"><code class="docutils literal notranslate"><span class="pre">make_test_configs()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.test_utils.html#module-aurora.test_utils">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="aurora.time_series.html">aurora.time_series package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aurora.time_series.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.time_series.html#module-aurora.time_series.apodization_window">aurora.time_series.apodization_window module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.apodization_window.ApodizationWindow"><code class="docutils literal notranslate"><span class="pre">ApodizationWindow</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.apodization_window.ApodizationWindow.S1"><code class="docutils literal notranslate"><span class="pre">ApodizationWindow.S1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.apodization_window.ApodizationWindow.S2"><code class="docutils literal notranslate"><span class="pre">ApodizationWindow.S2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.apodization_window.ApodizationWindow.apodization_factor"><code class="docutils literal notranslate"><span class="pre">ApodizationWindow.apodization_factor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.apodization_window.ApodizationWindow.coherent_gain"><code class="docutils literal notranslate"><span class="pre">ApodizationWindow.coherent_gain</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.apodization_window.ApodizationWindow.enbw"><code class="docutils literal notranslate"><span class="pre">ApodizationWindow.enbw()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.apodization_window.ApodizationWindow.make"><code class="docutils literal notranslate"><span class="pre">ApodizationWindow.make()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.apodization_window.ApodizationWindow.nenbw"><code class="docutils literal notranslate"><span class="pre">ApodizationWindow.nenbw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.apodization_window.ApodizationWindow.num_samples_window"><code class="docutils literal notranslate"><span class="pre">ApodizationWindow.num_samples_window</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.apodization_window.ApodizationWindow.summary"><code class="docutils literal notranslate"><span class="pre">ApodizationWindow.summary</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.apodization_window.ApodizationWindow.taper"><code class="docutils literal notranslate"><span class="pre">ApodizationWindow.taper</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.apodization_window.ApodizationWindow.test_linear_spectral_density_factor"><code class="docutils literal notranslate"><span class="pre">ApodizationWindow.test_linear_spectral_density_factor()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.time_series.html#module-aurora.time_series.decorators">aurora.time_series.decorators module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.decorators.can_use_xr_dataarray"><code class="docutils literal notranslate"><span class="pre">can_use_xr_dataarray()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.time_series.html#module-aurora.time_series.frequency_band_helpers">aurora.time_series.frequency_band_helpers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.frequency_band_helpers.adjust_band_for_coherence_sorting"><code class="docutils literal notranslate"><span class="pre">adjust_band_for_coherence_sorting()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.frequency_band_helpers.check_time_axes_synched"><code class="docutils literal notranslate"><span class="pre">check_time_axes_synched()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.frequency_band_helpers.cross_spectra"><code class="docutils literal notranslate"><span class="pre">cross_spectra()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.frequency_band_helpers.get_band_for_coherence_sorting"><code class="docutils literal notranslate"><span class="pre">get_band_for_coherence_sorting()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.frequency_band_helpers.get_band_for_tf_estimate"><code class="docutils literal notranslate"><span class="pre">get_band_for_tf_estimate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.time_series.html#aurora-time-series-spectrogram-module">aurora.time_series.spectrogram module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.time_series.html#module-aurora.time_series.time_axis_helpers">aurora.time_series.time_axis_helpers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.time_axis_helpers.decide_time_axis_method"><code class="docutils literal notranslate"><span class="pre">decide_time_axis_method()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.time_axis_helpers.do_some_tests"><code class="docutils literal notranslate"><span class="pre">do_some_tests()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.time_axis_helpers.fast_arange"><code class="docutils literal notranslate"><span class="pre">fast_arange()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.time_axis_helpers.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.time_axis_helpers.make_time_axis"><code class="docutils literal notranslate"><span class="pre">make_time_axis()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.time_axis_helpers.slow_comprehension"><code class="docutils literal notranslate"><span class="pre">slow_comprehension()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.time_axis_helpers.test_generate_time_axis"><code class="docutils literal notranslate"><span class="pre">test_generate_time_axis()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.time_series.html#module-aurora.time_series.window_helpers">aurora.time_series.window_helpers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.window_helpers.available_number_of_windows_in_array"><code class="docutils literal notranslate"><span class="pre">available_number_of_windows_in_array()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.window_helpers.check_all_sliding_window_functions_are_equivalent"><code class="docutils literal notranslate"><span class="pre">check_all_sliding_window_functions_are_equivalent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.window_helpers.do_some_tests"><code class="docutils literal notranslate"><span class="pre">do_some_tests()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.window_helpers.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.window_helpers.sliding_window_crude"><code class="docutils literal notranslate"><span class="pre">sliding_window_crude()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.window_helpers.sliding_window_numba"><code class="docutils literal notranslate"><span class="pre">sliding_window_numba()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.window_helpers.striding_window"><code class="docutils literal notranslate"><span class="pre">striding_window()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.window_helpers.test_apply_taper"><code class="docutils literal notranslate"><span class="pre">test_apply_taper()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.time_series.html#module-aurora.time_series.windowed_time_series">aurora.time_series.windowed_time_series module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.windowed_time_series.WindowedTimeSeries"><code class="docutils literal notranslate"><span class="pre">WindowedTimeSeries</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.windowed_time_series.WindowedTimeSeries.apply_fft"><code class="docutils literal notranslate"><span class="pre">WindowedTimeSeries.apply_fft()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.windowed_time_series.WindowedTimeSeries.apply_taper"><code class="docutils literal notranslate"><span class="pre">WindowedTimeSeries.apply_taper()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.windowed_time_series.WindowedTimeSeries.detrend"><code class="docutils literal notranslate"><span class="pre">WindowedTimeSeries.detrend()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.windowed_time_series.fft_xr_ds"><code class="docutils literal notranslate"><span class="pre">fft_xr_ds()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.time_series.html#module-aurora.time_series.windowing_scheme">aurora.time_series.windowing_scheme module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.windowing_scheme.WindowingScheme"><code class="docutils literal notranslate"><span class="pre">WindowingScheme</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.windowing_scheme.WindowingScheme.apply_fft"><code class="docutils literal notranslate"><span class="pre">WindowingScheme.apply_fft()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.windowing_scheme.WindowingScheme.apply_sliding_window"><code class="docutils literal notranslate"><span class="pre">WindowingScheme.apply_sliding_window()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.windowing_scheme.WindowingScheme.apply_taper"><code class="docutils literal notranslate"><span class="pre">WindowingScheme.apply_taper()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.windowing_scheme.WindowingScheme.available_number_of_windows"><code class="docutils literal notranslate"><span class="pre">WindowingScheme.available_number_of_windows()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.windowing_scheme.WindowingScheme.cast_windowed_data_to_xarray"><code class="docutils literal notranslate"><span class="pre">WindowingScheme.cast_windowed_data_to_xarray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.windowing_scheme.WindowingScheme.clone"><code class="docutils literal notranslate"><span class="pre">WindowingScheme.clone()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.windowing_scheme.WindowingScheme.downsample_time_axis"><code class="docutils literal notranslate"><span class="pre">WindowingScheme.downsample_time_axis()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.windowing_scheme.WindowingScheme.dt"><code class="docutils literal notranslate"><span class="pre">WindowingScheme.dt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.windowing_scheme.WindowingScheme.duration_advance"><code class="docutils literal notranslate"><span class="pre">WindowingScheme.duration_advance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.windowing_scheme.WindowingScheme.frequency_axis"><code class="docutils literal notranslate"><span class="pre">WindowingScheme.frequency_axis()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.windowing_scheme.WindowingScheme.left_hand_window_edge_indices"><code class="docutils literal notranslate"><span class="pre">WindowingScheme.left_hand_window_edge_indices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.windowing_scheme.WindowingScheme.linear_spectral_density_calibration_factor"><code class="docutils literal notranslate"><span class="pre">WindowingScheme.linear_spectral_density_calibration_factor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.windowing_scheme.WindowingScheme.num_samples_advance"><code class="docutils literal notranslate"><span class="pre">WindowingScheme.num_samples_advance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.windowing_scheme.WindowingScheme.window_duration"><code class="docutils literal notranslate"><span class="pre">WindowingScheme.window_duration</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.windowing_scheme.window_scheme_from_decimation"><code class="docutils literal notranslate"><span class="pre">window_scheme_from_decimation()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.time_series.html#module-aurora.time_series.xarray_helpers">aurora.time_series.xarray_helpers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.xarray_helpers.handle_nan"><code class="docutils literal notranslate"><span class="pre">handle_nan()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.xarray_helpers.nan_to_mean"><code class="docutils literal notranslate"><span class="pre">nan_to_mean()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.time_series.html#aurora.time_series.xarray_helpers.time_axis_match"><code class="docutils literal notranslate"><span class="pre">time_axis_match()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.time_series.html#module-aurora.time_series">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="aurora.transfer_function.html">aurora.transfer_function package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.plot.html">aurora.transfer_function.plot package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.plot.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.plot.html#module-aurora.transfer_function.plot.comparison_plots">aurora.transfer_function.plot.comparison_plots module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.plot.html#module-aurora.transfer_function.plot.error_bar_helpers">aurora.transfer_function.plot.error_bar_helpers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.plot.html#module-aurora.transfer_function.plot.rho_phi_helpers">aurora.transfer_function.plot.rho_phi_helpers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.plot.html#module-aurora.transfer_function.plot.rho_plot">aurora.transfer_function.plot.rho_plot module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.plot.html#module-aurora.transfer_function.plot">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.regression.html">aurora.transfer_function.regression package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#module-aurora.transfer_function.regression.RME">aurora.transfer_function.regression.RME module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#module-aurora.transfer_function.regression.RME_RR">aurora.transfer_function.regression.RME_RR module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#module-aurora.transfer_function.regression.base">aurora.transfer_function.regression.base module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#module-aurora.transfer_function.regression.helper_functions">aurora.transfer_function.regression.helper_functions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#module-aurora.transfer_function.regression.iter_control">aurora.transfer_function.regression.iter_control module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#module-aurora.transfer_function.regression.m_estimator">aurora.transfer_function.regression.m_estimator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.regression.html#module-aurora.transfer_function.regression">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.weights.html">aurora.transfer_function.weights package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.weights.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.weights.html#module-aurora.transfer_function.weights.edf_weights">aurora.transfer_function.weights.edf_weights module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.weights.html#module-aurora.transfer_function.weights">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.html#module-aurora.transfer_function.TTFZ">aurora.transfer_function.TTFZ module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.TTFZ.TTFZ"><code class="docutils literal notranslate"><span class="pre">TTFZ</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.TTFZ.TTFZ.apparent_resistivity"><code class="docutils literal notranslate"><span class="pre">TTFZ.apparent_resistivity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.TTFZ.TTFZ.standard_error"><code class="docutils literal notranslate"><span class="pre">TTFZ.standard_error()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.html#module-aurora.transfer_function.base">aurora.transfer_function.base module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.base.TransferFunction"><code class="docutils literal notranslate"><span class="pre">TransferFunction</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.base.TransferFunction.emtf_tf_header"><code class="docutils literal notranslate"><span class="pre">TransferFunction.emtf_tf_header</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.base.TransferFunction.frequency_index"><code class="docutils literal notranslate"><span class="pre">TransferFunction.frequency_index()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.base.TransferFunction.maximum_period"><code class="docutils literal notranslate"><span class="pre">TransferFunction.maximum_period</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.base.TransferFunction.minimum_period"><code class="docutils literal notranslate"><span class="pre">TransferFunction.minimum_period</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.base.TransferFunction.num_bands"><code class="docutils literal notranslate"><span class="pre">TransferFunction.num_bands</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.base.TransferFunction.num_channels_in"><code class="docutils literal notranslate"><span class="pre">TransferFunction.num_channels_in</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.base.TransferFunction.num_channels_out"><code class="docutils literal notranslate"><span class="pre">TransferFunction.num_channels_out</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.base.TransferFunction.period_index"><code class="docutils literal notranslate"><span class="pre">TransferFunction.period_index()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.base.TransferFunction.periods"><code class="docutils literal notranslate"><span class="pre">TransferFunction.periods</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.base.TransferFunction.set_tf"><code class="docutils literal notranslate"><span class="pre">TransferFunction.set_tf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.base.TransferFunction.tf"><code class="docutils literal notranslate"><span class="pre">TransferFunction.tf</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.base.TransferFunction.tf_header"><code class="docutils literal notranslate"><span class="pre">TransferFunction.tf_header</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.html#module-aurora.transfer_function.emtf_z_file_helpers">aurora.transfer_function.emtf_z_file_helpers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.emtf_z_file_helpers.clip_bands_from_z_file"><code class="docutils literal notranslate"><span class="pre">clip_bands_from_z_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.emtf_z_file_helpers.get_default_orientation_block"><code class="docutils literal notranslate"><span class="pre">get_default_orientation_block()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.emtf_z_file_helpers.merge_tf_collection_to_match_z_file"><code class="docutils literal notranslate"><span class="pre">merge_tf_collection_to_match_z_file()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.html#aurora-transfer-function-kernel-dataset-module">aurora.transfer_function.kernel_dataset module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.html#module-aurora.transfer_function.transfer_function_collection">aurora.transfer_function.transfer_function_collection module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection"><code class="docutils literal notranslate"><span class="pre">TransferFunctionCollection</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.channel_list"><code class="docutils literal notranslate"><span class="pre">TransferFunctionCollection.channel_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.check_all_channels_present"><code class="docutils literal notranslate"><span class="pre">TransferFunctionCollection.check_all_channels_present()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.get_merged_dict"><code class="docutils literal notranslate"><span class="pre">TransferFunctionCollection.get_merged_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.header"><code class="docutils literal notranslate"><span class="pre">TransferFunctionCollection.header</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.local_station_id"><code class="docutils literal notranslate"><span class="pre">TransferFunctionCollection.local_station_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.number_of_decimation_levels"><code class="docutils literal notranslate"><span class="pre">TransferFunctionCollection.number_of_decimation_levels</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.remote_station_id"><code class="docutils literal notranslate"><span class="pre">TransferFunctionCollection.remote_station_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.rho_phi_plot"><code class="docutils literal notranslate"><span class="pre">TransferFunctionCollection.rho_phi_plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.total_number_of_channels"><code class="docutils literal notranslate"><span class="pre">TransferFunctionCollection.total_number_of_channels</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.transfer_function_collection.TransferFunctionCollection.total_number_of_frequencies"><code class="docutils literal notranslate"><span class="pre">TransferFunctionCollection.total_number_of_frequencies</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aurora.transfer_function.html#module-aurora.transfer_function">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.TransferFunctionCollection"><code class="docutils literal notranslate"><span class="pre">TransferFunctionCollection</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.TransferFunctionCollection.channel_list"><code class="docutils literal notranslate"><span class="pre">TransferFunctionCollection.channel_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.TransferFunctionCollection.check_all_channels_present"><code class="docutils literal notranslate"><span class="pre">TransferFunctionCollection.check_all_channels_present()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.TransferFunctionCollection.get_merged_dict"><code class="docutils literal notranslate"><span class="pre">TransferFunctionCollection.get_merged_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.TransferFunctionCollection.header"><code class="docutils literal notranslate"><span class="pre">TransferFunctionCollection.header</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.TransferFunctionCollection.local_station_id"><code class="docutils literal notranslate"><span class="pre">TransferFunctionCollection.local_station_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.TransferFunctionCollection.number_of_decimation_levels"><code class="docutils literal notranslate"><span class="pre">TransferFunctionCollection.number_of_decimation_levels</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.TransferFunctionCollection.remote_station_id"><code class="docutils literal notranslate"><span class="pre">TransferFunctionCollection.remote_station_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.TransferFunctionCollection.rho_phi_plot"><code class="docutils literal notranslate"><span class="pre">TransferFunctionCollection.rho_phi_plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.TransferFunctionCollection.total_number_of_channels"><code class="docutils literal notranslate"><span class="pre">TransferFunctionCollection.total_number_of_channels</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aurora.transfer_function.html#aurora.transfer_function.TransferFunctionCollection.total_number_of_frequencies"><code class="docutils literal notranslate"><span class="pre">TransferFunctionCollection.total_number_of_frequencies</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-aurora.general_helper_functions">
+<span id="aurora-general-helper-functions-module"></span><h2>aurora.general_helper_functions module<a class="headerlink" href="#module-aurora.general_helper_functions" title="Permalink to this heading">¶</a></h2>
+<p>This module contains from miscellaneous functions and some global paths.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="aurora.general_helper_functions.DotDict">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aurora.general_helper_functions.</span></span><span class="sig-name descname"><span class="pre">DotDict</span></span><a class="reference internal" href="../_modules/aurora/general_helper_functions.html#DotDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.general_helper_functions.DotDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></p>
+<p>Helper function for debugging, casts a dict so that its values
+can be accessed via dict.key as well as dict[“key”]</p>
+<p>Usage:
+dot_dict = DotDict(basic_dict)</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fromkeys</span></code>(iterable[, value])</p></td>
+<td><p>Create a new dictionary with keys from iterable and values set to value.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get</span></code>(key[, default])</p></td>
+<td><p>Return the value for key if key is in the dictionary, else default.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">items</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">keys</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code>(k[,d])</p></td>
+<td><p>If key is not found, d is returned if given, otherwise KeyError is raised</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">popitem</span></code>(/)</p></td>
+<td><p>Remove and return a (key, value) pair as a 2-tuple.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">setdefault</span></code>(key[, default])</p></td>
+<td><p>Insert key with a value of default if key is not in the dictionary.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>([E, ]**F)</p></td>
+<td><p>If E is present and has a .keys() method, then does:  for k in E: D[k] = E[k] If E is present and lacks a .keys() method, then does:  for k, v in E: D[k] = v In either case, this is followed by: for k in F:  D[k] = F[k]</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.general_helper_functions.count_lines">
+<span class="sig-prename descclassname"><span class="pre">aurora.general_helper_functions.</span></span><span class="sig-name descname"><span class="pre">count_lines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/general_helper_functions.html#count_lines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.general_helper_functions.count_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>acts like wc -l in unix,
+raise FileNotFoundError: if file_name does not exist.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>pathlib.Path</em></a>) – The file to apply line counting to</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>num_lines</strong> – Number of lines present in fileName or -1 if file does not exist</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.general_helper_functions.execute_subprocess">
+<span class="sig-prename descclassname"><span class="pre">aurora.general_helper_functions.</span></span><span class="sig-name descname"><span class="pre">execute_subprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/general_helper_functions.html#execute_subprocess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.general_helper_functions.execute_subprocess" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for subprocess.call</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cmd</strong> (<em>string</em>) – command as it would be typed in a terminal</p></li>
+<li><p><strong>kwargs</strong> (<em>denotes keyword arguments that would be passed to subprocess</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.general_helper_functions.get_test_path">
+<span class="sig-prename descclassname"><span class="pre">aurora.general_helper_functions.</span></span><span class="sig-name descname"><span class="pre">get_test_path</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><span class="pre">Path</span></a></span></span><a class="reference internal" href="../_modules/aurora/general_helper_functions.html#get_test_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.general_helper_functions.get_test_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the path to where the test are.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>test_path</strong> – Object that points to where aurora’s tests are.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)">pathlib.Path</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.general_helper_functions.replace_in_file">
+<span class="sig-prename descclassname"><span class="pre">aurora.general_helper_functions.</span></span><span class="sig-name descname"><span class="pre">replace_in_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><span class="pre">Path</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">old</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/aurora/general_helper_functions.html#replace_in_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.general_helper_functions.replace_in_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace all instances of ‘old’ with ‘new’ in the given file.
+:param file_path: Path to the file where replacements should be made.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aurora.general_helper_functions.save_to_mat">
+<span class="sig-prename descclassname"><span class="pre">aurora.general_helper_functions.</span></span><span class="sig-name descname"><span class="pre">save_to_mat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aurora/general_helper_functions.html#save_to_mat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aurora.general_helper_functions.save_to_mat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves numpy array in matlab format.</p>
+<p>Example Usage:
+x = X.to_array(dim=”channel”)
+save_to_mat(x.data, “x”, “x.mat”)</p>
+<p>Reading into matlab or Octave:
+tmp = load(“x.mat”);
+data = tmp.x;</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>numpy array</em>) – the data to save to file.  its fine if this is complex-valued.</p></li>
+<li><p><strong>variable_name</strong> (<em>string</em>) – The name that we use to reference the variable within the struct in the matfile.</p></li>
+<li><p><strong>filename</strong> (<em>string</em>) – The filepath to output</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-aurora">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-aurora" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="aurora" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="aurora.config.html" class="btn btn-neutral float-right" title="aurora.config package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

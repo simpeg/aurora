@@ -1,0 +1,285 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aurora.sandbox.triage_metadata &mdash; aurora 0.3.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=d0ab9f1a"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            aurora
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user-docs/installing.html">Installing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html">Build an MTH5 and Operate the Aurora Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#1.-Build-an-MTH5-file-from-Earthscope-archives">1. Build an MTH5 file from Earthscope archives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#2:-Process-Data">2: Process Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Here-is-one-way-to-select-a-single-run:">Here is one way to select a single run:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-discard-runs-that-are-not-very-long">To discard runs that are not very long</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#To-process-only-a-segment-of-data">To process only a segment of data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#Exercise:">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/operate_aurora.html#id1">Exercise:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/dataset_definition.html">Dataset Definition DataFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/dataset_definition.html#Excercise:">Excercise:</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html">Processing Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html#Example-of-making-a-KernelDataset-from-an-mth5">Example of making a KernelDataset from an mth5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/processing_configuration.html#EMTF-Band-Setup-File">EMTF Band Setup File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html">Accessing Magnetic Field Data from EarthScope Using MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#0.-Getting-started">0. Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#1.-Exploring-the-data-at-EarthScope">1. Exploring the data at EarthScope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#2.-Case-Study:">2. Case Study:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#3.-Define-request-dataframe">3. Define request dataframe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#4.-Build-MTH5">4. Build MTH5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#5.-Build-MTH5-(with-data)">5. Build MTH5 (with data)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#6.-Calibrating-time-series">6. Calibrating time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#7.-Comparison-of-time-series">7. Comparison of time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/earthscope_magnetic_data_tutorial.html#TODO:-9.-Access-USGS-data-directly">TODO: 9. Access USGS data directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html">Process CAS04 with Remote Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Make-MTH5-from-IRIS-Data-Managment-Center-v0.2.0">Make MTH5 from IRIS Data Managment Center v0.2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#To-compare-with-the-archived-file,-we-need-to-set-the-coordinate-system-to-geographic">To compare with the archived file, we need to set the coordinate system to geographic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Part-II:-Logic-to-save-FCs">Part II: Logic to save FCs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Now-that-the-FCs-are-saved-we-can-access-them:|">Now that the FCs are saved we can access them:|</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/process_cas04_multiple_station.html#Absolute-Minimal-Example">Absolute Minimal Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/synthetic_data_processing.html">Synthetic Data Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/synthetic_data_processing.html#Feature-Storage-Experimental-work-in-progress">Feature Storage <strong>Experimental work in progress</strong></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">aurora</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">aurora</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aurora.sandbox.triage_metadata</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aurora.sandbox.triage_metadata</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This module contains various helper functions that were used to fix errors in metadata.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">mt_metadata.timeseries</span><span class="w"> </span><span class="kn">import</span> <span class="n">Experiment</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mt_metadata.timeseries.filters.helper_functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">MT2SI_ELECTRIC_FIELD_FILTER</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mt_metadata.timeseries.filters.helper_functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">MT2SI_MAGNETIC_FIELD_FILTER</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mth5.groups</span>
+
+
+<div class="viewcode-block" id="triage_mt_units_electric_field"><a class="viewcode-back" href="../../../api/aurora.sandbox.html#aurora.sandbox.triage_metadata.triage_mt_units_electric_field">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">triage_mt_units_electric_field</span><span class="p">(</span><span class="n">experiment</span><span class="p">:</span> <span class="n">Experiment</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Experiment</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Updates an mth5 experiment with filter information</span>
+
+<span class="sd">    One-off example of adding a filter to an mth5 in the case where the electric</span>
+<span class="sd">    field data are given in V/m, but they were expected in mV/km.  This adds the</span>
+<span class="sd">    correct filter to the metadata so that the calibrated data have units of</span>
+<span class="sd">    mV/km.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    experiment: mt_metadata.timeseries.Experiment</span>
+<span class="sd">        mt_metadata representation of station XML</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    experiment: mt_metadata.timeseries.Experiment</span>
+<span class="sd">        Updated experiment with additional filter to make electric field into MT Units (mV/km)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Add MT2SI_ELECTRIC_FIELD_FILTER to electric channels for parkfield here&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">MT2SI_ELECTRIC_FIELD_FILTER</span><span class="si">}</span><span class="s2"> &quot;</span>
+    <span class="p">)</span>
+    <span class="n">filter_name</span> <span class="o">=</span> <span class="n">MT2SI_ELECTRIC_FIELD_FILTER</span><span class="o">.</span><span class="n">name</span>
+    <span class="n">survey</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">surveys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">survey</span><span class="o">.</span><span class="n">filters</span><span class="p">[</span><span class="n">filter_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">MT2SI_ELECTRIC_FIELD_FILTER</span>
+    <span class="n">stations</span> <span class="o">=</span> <span class="n">survey</span><span class="o">.</span><span class="n">stations</span>
+    <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">stations</span><span class="p">:</span>
+        <span class="n">channels</span> <span class="o">=</span> <span class="n">station</span><span class="o">.</span><span class="n">runs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">channels</span>
+        <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">channel</span><span class="o">.</span><span class="n">component</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;e&quot;</span><span class="p">:</span>
+                <span class="n">channel</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">filter_name</span><span class="p">)</span>
+                <span class="n">channel</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">applied</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">experiment</span></div>
+
+
+<div class="viewcode-block" id="triage_mt_units_magnetic_field"><a class="viewcode-back" href="../../../api/aurora.sandbox.html#aurora.sandbox.triage_metadata.triage_mt_units_magnetic_field">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">triage_mt_units_magnetic_field</span><span class="p">(</span><span class="n">experiment</span><span class="p">:</span> <span class="n">Experiment</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Experiment</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Updates an mth5 experiment with filter information</span>
+
+<span class="sd">    One-off example of adding a filter to an mth5 in the case where the magnetic</span>
+<span class="sd">    field data are given in T, but they were expected in nT.  This adds the</span>
+<span class="sd">    correct filter to the metadata so that the calibrated data have units of nT.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    experiment: mt_metadata.timeseries.Experiment</span>
+<span class="sd">        mt_metadata representation of station XML</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    experiment: mt_metadata.timeseries.Experiment</span>
+<span class="sd">        Updated experiment with additional filter to make magnetic field into MT Units (nT)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Add MT2SI_MAGNETIC_FIELD_FILTER to magnetic channels for parkfield&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">MT2SI_MAGNETIC_FIELD_FILTER</span><span class="si">}</span><span class="s2"> &quot;</span>
+    <span class="p">)</span>
+    <span class="n">filter_name</span> <span class="o">=</span> <span class="n">MT2SI_MAGNETIC_FIELD_FILTER</span><span class="o">.</span><span class="n">name</span>
+    <span class="n">survey</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">surveys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">survey</span><span class="o">.</span><span class="n">filters</span><span class="p">[</span><span class="n">filter_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">MT2SI_MAGNETIC_FIELD_FILTER</span>
+    <span class="n">stations</span> <span class="o">=</span> <span class="n">survey</span><span class="o">.</span><span class="n">stations</span>
+    <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">stations</span><span class="p">:</span>
+        <span class="n">channels</span> <span class="o">=</span> <span class="n">station</span><span class="o">.</span><span class="n">runs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">channels</span>
+        <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">channel</span><span class="o">.</span><span class="n">component</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;h&quot;</span><span class="p">:</span>
+                <span class="n">channel</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">filter_name</span><span class="p">)</span>
+                <span class="n">channel</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">applied</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">experiment</span></div>
+
+
+<div class="viewcode-block" id="triage_missing_coil_hollister"><a class="viewcode-back" href="../../../api/aurora.sandbox.html#aurora.sandbox.triage_metadata.triage_missing_coil_hollister">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">triage_missing_coil_hollister</span><span class="p">(</span><span class="n">experiment</span><span class="p">:</span> <span class="n">Experiment</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Experiment</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fixes missing metadata for Hollister station</span>
+
+<span class="sd">    One-off for hollister missing hy metadata in NCEDC archive.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    experiment</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;missing coil not fixed in metadata&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+    <span class="c1"># survey = experiment.surveys[0]</span>
+    <span class="c1"># stations = survey.stations</span>
+    <span class="c1"># for station in stations:</span>
+    <span class="c1">#     if station.id == &quot;SAO&quot;:</span>
+    <span class="c1">#         runs = station.runs</span>
+    <span class="c1">#         for run in runs:</span>
+    <span class="c1">#             channels = run.channels</span>
+    <span class="c1">#             logger.info(channels)</span>
+    <span class="c1">#             for channel in channels:</span>
+    <span class="c1">#                 logger.info(channel.id)</span>
+    <span class="c1">#</span>
+    <span class="c1">#     # station = stations[i_station]</span>
+    <span class="c1">#     runs = station.runs[0]</span>
+    <span class="c1">#     logger.info(&quot;help&quot;)</span>
+
+
+<div class="viewcode-block" id="triage_run_id"><a class="viewcode-back" href="../../../api/aurora.sandbox.html#aurora.sandbox.triage_metadata.triage_run_id">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">triage_run_id</span><span class="p">(</span><span class="n">expected_run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">run_obj</span><span class="p">:</span> <span class="n">mth5</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">RunGroup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fixes metadata from an old version of MTH5.</span>
+
+<span class="sd">    This situation was encountered during the Musgraves processing for 2023 HPC workshop.</span>
+<span class="sd">    The MTH5 files being used were from a previous era, and the run_object metadata did not</span>
+<span class="sd">    contain the expected value for run_id.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    expected_run_id: string</span>
+<span class="sd">        The expected name of the run</span>
+<span class="sd">    run_obj: mth5.groups.run.RunGroup</span>
+<span class="sd">        The run object that should have correct name.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">expected_run_id</span> <span class="o">==</span> <span class="n">run_obj</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">id</span>
+    <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;WARNING Run ID in dataset_df does not match run_obj&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;WARNING Forcing run metadata to match dataset_df&quot;</span><span class="p">)</span>
+        <span class="n">run_obj</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">expected_run_id</span>
+    <span class="k">return</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Karl Kappler, Jared Peacock, Andy Frassetto, Tim Ronan, Lindsey Heagy, Douglas Oldenburg.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
