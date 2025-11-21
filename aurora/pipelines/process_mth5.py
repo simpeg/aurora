@@ -140,7 +140,7 @@ def process_mth5_legacy(
 
     Parameters
     ----------
-    config: mt_metadata.transfer_functions.processing.aurora.Processing or path to json
+    config: mt_metadata.processing.aurora.Processing or path to json
         All processing parameters
     tfk_dataset: aurora.tf_kernel.dataset.Dataset or None
         Specifies what datasets to process according to config
@@ -252,7 +252,7 @@ def process_mth5(
 
     Parameters
     ----------
-    config: mt_metadata.transfer_functions.processing.aurora.Processing or path to json
+    config: mt_metadata.processing.aurora.Processing or path to json
         All processing parameters
     tfk_dataset: aurora.tf_kernel.dataset.Dataset or None
         Specifies what datasets to process according to config

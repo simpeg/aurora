@@ -38,7 +38,7 @@ def test_stft_methods_agree():
     Because run_ts_to_stft_scipy will be used in mth5, we can port the aurora
     processing config to a mth5 FC processing config.  I.e. the dec_config argument to
     run_ts_to_stft can be reformatted so that it is an instance of
-    mt_metadata.transfer_functions.processing.fourier_coefficients.decimation.Decimation
+    mt_metadata.processing.fourier_coefficients.decimation.Decimation
 
     """
     close_open_files()

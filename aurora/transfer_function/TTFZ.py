@@ -86,7 +86,7 @@ class TTFZ(TransferFunction):
         units: str
             one of ["MT","SI"]
         channel_nomenclature:
-        mt_metadata.transfer_functions.processing.aurora.channel_nomenclature.ChannelNomenclature
+        mt_metadata.processing.aurora.channel_nomenclature.ChannelNomenclature
             has a dict that maps the channel names in TF to the standard channel labellings.
 
         """

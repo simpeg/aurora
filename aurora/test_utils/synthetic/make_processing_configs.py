@@ -214,7 +214,7 @@ def test_to_from_json():
 
     """
     # import pandas as pd
-    from mt_metadata.transfer_functions.processing.aurora import Processing
+    from mt_metadata.processing.aurora import Processing
     from mth5.processing import RunSummary, KernelDataset
 
     # Specify path to mth5

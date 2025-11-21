@@ -16,6 +16,7 @@ from mth5.data.make_mth5_from_asc import create_test12rr_h5
 
 from typing import Optional, Union
 
+
 def get_example_kernel_dataset(num_stations: int = 1):
     """
     Creates a kernel dataset object from the synthetic data
@@ -150,7 +151,7 @@ def process_synthetic_1(
     # Relates to issue #172
     # reload_config = True
     # if reload_config:
-    #     from mt_metadata.transfer_functions.processing.aurora import Processing
+    #     from mt_metadata.processing.aurora import Processing
     #     p = Processing()
     #     config_path = pathlib.Path("config")
     #     json_fn = config_path.joinpath(processing_config.json_fn())
@@ -177,9 +178,10 @@ def process_synthetic_1(
                 ttl_str=ttl_str,
                 show=False,
                 figure_basename=out_png_name,
-                figures_path=AURORA_RESULTS_PATH,
+                figures_path=z_file_path.parent,  # TODO: check this works
             )
     return tf_result
+
 
 def process_synthetic_2(
     force_make_mth5: Optional[bool] = True,
@@ -216,6 +218,7 @@ def process_synthetic_2(
         z_file_path=z_file_path,
     )
     return tfc
+
 
 def process_synthetic_1r2(
     config_keyword="test1r2",

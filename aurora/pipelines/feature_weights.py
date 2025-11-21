@@ -1,5 +1,5 @@
 from loguru import logger
-from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
+from mt_metadata.processing.aurora.decimation_level import (
     DecimationLevel as AuroraDecimationLevel,
 )
 from mth5.processing import KernelDataset

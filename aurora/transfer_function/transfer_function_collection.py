@@ -29,6 +29,9 @@ from aurora.sandbox.io_helpers.zfile_murphy import ZFile
 from aurora.transfer_function.plot.rho_phi_helpers import plot_phi
 from aurora.transfer_function.plot.rho_phi_helpers import plot_rho
 from aurora.general_helper_functions import FIGURES_PATH
+from mt_metadata.processing.aurora.channel_nomenclature import (
+    ChannelNomenclature,
+)
 from loguru import logger
 from typing import Optional, Union
 
@@ -190,7 +193,9 @@ class TransferFunctionCollection(object):
 
         return
 
-    def check_all_channels_present(self, channel_nomenclature) -> None:
+    def check_all_channels_present(
+        self, channel_nomenclature: ChannelNomenclature
+    ) -> None:
         """
         Checks if TF has tipper.  If not, fill in the tipper data with NaN and also
          update the noise covariance matrix so shape is as expected by mt_metadata.
@@ -201,7 +206,7 @@ class TransferFunctionCollection(object):
 
         Parameters
         ----------
-        channel_nomenclature: mt_metadata.transfer_functions.processing.aurora.channel_nomenclature.ChannelNomenclature
+        channel_nomenclature: ChannelNomenclature
             Scheme according to how channels are named
 
         """

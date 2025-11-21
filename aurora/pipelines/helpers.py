@@ -5,7 +5,7 @@
 
 """
 
-from mt_metadata.transfer_functions.processing.aurora import Processing
+from mt_metadata.processing.aurora import Processing
 from typing import Union
 import pathlib
 
@@ -24,7 +24,7 @@ def initialize_config(
 
     Returns
     -------
-    config: mt_metadata.transfer_functions.processing.aurora.Processing
+    config: mt_metadata.processing.aurora.Processing
         Object that contains the processing parameters
     """
     if isinstance(processing_config, (pathlib.Path, str)):

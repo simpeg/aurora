@@ -13,7 +13,7 @@ from loguru import logger
 from mth5.utils.exceptions import MTH5Error
 from mth5.utils.helpers import path_or_mth5_object
 from mt_metadata.transfer_functions.core import TF
-from mt_metadata.transfer_functions.processing.aurora import (
+from mt_metadata.processing.aurora import (
     DecimationLevel as AuroraDecimationLevel,
 )
 from mth5.processing.kernel_dataset import KernelDataset

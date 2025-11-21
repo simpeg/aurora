@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Extend the mt_metadata.transfer_functions.processing.aurora.processing.Processing class
+Extend the mt_metadata.processing.aurora.processing.Processing class
 with some aurora-specific methods.
 """
 
@@ -10,10 +10,10 @@ with some aurora-specific methods.
 
 from aurora.time_series.windowing_scheme import window_scheme_from_decimation
 from loguru import logger
-from mt_metadata.transfer_functions.processing.aurora.processing import (
+from mt_metadata.processing.aurora.processing import (
     Processing as AuroraProcessing,
 )
-from mt_metadata.utils.list_dict import ListDict
+from mt_metadata.common.list_dict import ListDict
 from typing import Optional, Union
 
 import json
@@ -192,7 +192,7 @@ class EMTFTFHeader(ListDict):
     def __init__(self, **kwargs):
         """
         Parameters
-        _local_station : mt_metadata.transfer_functions.tf.station.Station()
+        _local_station : mt_metadata.processing.tf.station.Station()
             Station metadata object for the station to be estimated (
             location, channel_azimuths, etc.)
         _remote_station: same object type as local station

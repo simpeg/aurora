@@ -14,9 +14,7 @@ from aurora.time_series.xarray_helpers import time_axis_match
 from aurora.time_series.windowed_time_series import WindowedTimeSeries
 from aurora.time_series.windowing_scheme import window_scheme_from_decimation
 from loguru import logger
-from mt_metadata.transfer_functions.processing.aurora import (
-    DecimationLevel as AuroraDecimationLevel,
-)
+from mt_metadata.processing.aurora import DecimationLevel as AuroraDecimationLevel
 from mth5.groups import RunGroup
 from mth5.processing.spectre.prewhitening import apply_prewhitening
 from mth5.processing.spectre.prewhitening import apply_recoloring
@@ -45,7 +43,7 @@ def make_stft_objects(
 
     Parameters
     ----------
-    processing_config: mt_metadata.transfer_functions.processing.aurora.Processing
+    processing_config: mt_metadata.processing.aurora.Processing
         Metadata about the processing to be applied
     i_dec_level: int
         The decimation level to process
@@ -327,7 +325,7 @@ def save_fourier_coefficients(
 
     Parameters
     ----------
-    dec_level_config: mt_metadata.transfer_functions.processing.aurora.decimation_level.DecimationLevel
+    dec_level_config: mt_metadata.processing.aurora.decimation_level.DecimationLevel
         The information about decimation level associated with row, run, stft_obj
     row: pd.Series
          A row of the TFK.dataset_df

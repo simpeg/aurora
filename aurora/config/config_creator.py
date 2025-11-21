@@ -16,7 +16,7 @@ from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config.metadata import Processing
 from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
 from mth5.processing.kernel_dataset import KernelDataset
-from mt_metadata.transfer_functions.processing.window import Window
+from mt_metadata.processing.window import Window
 
 import pathlib
 
