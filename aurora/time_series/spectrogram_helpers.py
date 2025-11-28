@@ -1,7 +1,7 @@
 """
-    This module contains aurora methods associated with spectrograms or "STFTs".
-    In future these tools should be moved to MTH5 and made methods of the Spectrogram class.
-    For now, we can use this module as a place to aggregate functions to migrate.
+This module contains aurora methods associated with spectrograms or "STFTs".
+In future these tools should be moved to MTH5 and made methods of the Spectrogram class.
+For now, we can use this module as a place to aggregate functions to migrate.
 """
 
 from aurora.config.metadata.processing import Processing as AuroraProcessing
@@ -33,7 +33,6 @@ def make_stft_objects(
     run_xrds: xr.Dataset,
     units: Literal["MT", "SI"] = "MT",
 ) -> xr.Dataset:
-
     """
     Applies STFT to all channel time series in the input run.
 
@@ -559,7 +558,7 @@ def calibrate_stft_obj(
             include_decimation=False, include_delay=False
         )
         indices_to_flip = [
-            i for i in indices_to_flip if channel.metadata.filter.applied[i]
+            i for i in indices_to_flip if channel.metadata.filters[i].applied
         ]
         filters_to_remove = [channel_response.filters_list[i] for i in indices_to_flip]
         if not filters_to_remove:
