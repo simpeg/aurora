@@ -11,17 +11,17 @@ ToDo: consider adding zss and zmm checks
         # tf_cls.write(fn=zss_file_base, file_type="zss")
 """
 
-import numpy as np
 import pathlib
 import unittest
 import warnings
 
-from aurora.test_utils.synthetic.paths import SyntheticTestPaths
-from aurora.test_utils.synthetic.processing_helpers import (
-    tf_obj_from_synthetic_data,
-)
+import numpy as np
 from mt_metadata.transfer_functions.core import TF
 from mth5.data.make_mth5_from_asc import create_test12rr_h5
+
+from aurora.test_utils.synthetic.paths import SyntheticTestPaths
+from aurora.test_utils.synthetic.processing_helpers import tf_obj_from_synthetic_data
+
 
 warnings.filterwarnings("ignore")
 
@@ -58,6 +58,14 @@ class TestZFileReadWrite(unittest.TestCase):
         return self._tf_z_obj
 
     def test_tf_obj_from_zrr(self):
+        """
+        test create TF object
+
+        Returns
+        -------
+        _type_
+            _description_
+        """
         tf_z = self.tf_z_obj
         tf = self.tf_obj
         # check numeric values
