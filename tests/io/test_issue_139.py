@@ -36,18 +36,18 @@ class TestZFileReadWrite(unittest.TestCase):
     """ """
 
     @classmethod
-    def setUpClass(self):
-        self.xml_file_base = pathlib.Path("synthetic_test1.xml")
-        self.mth5_path = synthetic_test_paths.mth5_path.joinpath("test12rr.h5")
-        self.zrr_file_base = pathlib.Path("synthetic_test1.zrr")
+    def setUpClass(cls):
+        cls.xml_file_base = pathlib.Path("synthetic_test1.xml")
+        cls.mth5_path = synthetic_test_paths.mth5_path.joinpath("test12rr.h5")
+        cls.zrr_file_base = pathlib.Path("synthetic_test1.zrr")
 
-        #if not self.mth5_path.exists():
-        create_test12rr_h5(target_folder=self.mth5_path.parent)
+        # if not cls.mth5_path.exists():
+        create_test12rr_h5(target_folder=cls.mth5_path.parent)
 
-        self._tf_obj = tf_obj_from_synthetic_data(self.mth5_path)
-        write_zrr(self._tf_obj, self.zrr_file_base)
-        self._tf_z_obj = TF()
-        self._tf_z_obj.read(self.zrr_file_base)
+        cls._tf_obj = tf_obj_from_synthetic_data(cls.mth5_path)
+        write_zrr(cls._tf_obj, cls.zrr_file_base)
+        cls._tf_z_obj = TF()
+        cls._tf_z_obj.read(cls.zrr_file_base)
 
     @property
     def tf_obj(self):
