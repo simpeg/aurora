@@ -127,6 +127,7 @@ class ConfigCreator:
         kernel_dataset: KernelDataset,
         input_channels: Optional[list] = None,
         output_channels: Optional[list] = None,
+        remote_channels: Optional[list] = None,
         estimator: Optional[str] = None,
         emtf_band_file: Optional[Union[str, pathlib.Path]] = None,
         band_edges: Optional[dict] = None,
@@ -166,6 +167,8 @@ class ConfigCreator:
             List of the input channels that will be used in TF estimation (usually "hx", "hy")
         output_channels: list
             List of the output channels that will be estimated by TF (usually "ex", "ey", "hz")
+        remote_channels: list
+            List of the remote reference channels (usually "hx", "hy" at remote site)
         estimator:  Optional[Union[str, None]]
             The name of the regression estimator to use for TF estimation.
         emtf_band_file: Optional[Union[str, pathlib.Path, None]]
@@ -240,6 +243,10 @@ class ConfigCreator:
                 decimation_obj.output_channels = kernel_dataset.output_channels
             else:
                 decimation_obj.output_channels = output_channels
+
+            if remote_channels is None:
+                if kernel_dataset.remote_channels is not None:
+                    decimation_obj.reference_channels = kernel_dataset.remote_channels
 
             if num_samples_window is not None:
                 decimation_obj.stft.window.num_samples = num_samples_window[key]
