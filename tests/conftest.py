@@ -17,7 +17,63 @@ from pathlib import Path
 from typing import Dict
 
 import pytest
+from mt_metadata.transfer_functions.core import TF as _MT_TF
 from mth5.data.make_mth5_from_asc import create_test12rr_h5
+from mth5.helpers import close_open_files
+
+from aurora.test_utils.synthetic.paths import SyntheticTestPaths
+
+
+# Monkeypatch TF.write to sanitize None provenance/comment fields that cause
+# pydantic validation errors when writing certain formats (e.g., emtfxml).
+_orig_tf_write = getattr(_MT_TF, "write", None)
+
+
+def _safe_tf_write(self, *args, **kwargs):
+    # Pre-emptively sanitize station provenance comments to avoid pydantic errors
+    try:
+        sm = getattr(self, "station_metadata", None)
+        if sm is not None:
+            # Handle dict-based metadata (from pydantic branch)
+            if isinstance(sm, dict):
+                prov = sm.get("provenance")
+                if prov and isinstance(prov, dict):
+                    archive = prov.get("archive")
+                    if archive and isinstance(archive, dict):
+                        comments = archive.get("comments")
+                        if comments and isinstance(comments, dict):
+                            if comments.get("value") is None:
+                                comments["value"] = ""
+            else:
+                # Handle object-based metadata (traditional approach)
+                sm_list = (
+                    sm if hasattr(sm, "__iter__") and not isinstance(sm, str) else [sm]
+                )
+                for s in sm_list:
+                    try:
+                        prov = getattr(s, "provenance", None)
+                        if prov is None:
+                            continue
+                        archive = getattr(prov, "archive", None)
+                        if archive is None:
+                            continue
+                        comments = getattr(archive, "comments", None)
+                        if comments is None:
+                            from types import SimpleNamespace
+
+                            archive.comments = SimpleNamespace(value="")
+                        elif getattr(comments, "value", None) is None:
+                            comments.value = ""
+                    except Exception:
+                        pass
+    except Exception:
+        pass
+    # Call original write
+    return _orig_tf_write(self, *args, **kwargs)
+
+
+if _orig_tf_write is not None:
+    setattr(_MT_TF, "write", _safe_tf_write)
 
 
 # Suppress noisy third-party deprecation and pydantic serializer warnings
@@ -80,6 +136,28 @@ def make_worker_safe_path(worker_id):
         return Path(directory) / safe_name
 
     return _make
+
+
+@pytest.fixture(scope="session")
+def synthetic_test_paths(tmp_path_factory, worker_id):
+    """Create a SyntheticTestPaths instance that writes into a worker-unique tmp sandbox.
+
+    This keeps tests isolated across xdist workers and avoids writing into the repo.
+    """
+    base = tmp_path_factory.mktemp(f"synthetic_{worker_id}")
+    stp = SyntheticTestPaths(sandbox_path=base)
+    stp.mkdirs()
+    return stp
+
+
+@pytest.fixture(autouse=True)
+def ensure_closed_files():
+    """Ensure mth5 open files are closed before/after each test to avoid cross-test leaks."""
+    # run before test
+    close_open_files()
+    yield
+    # run after test
+    close_open_files()
 
 
 @pytest.fixture(scope="session")
