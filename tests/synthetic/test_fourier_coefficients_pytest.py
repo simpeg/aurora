@@ -97,9 +97,6 @@ def test_fc_decimations_creator():
         fc_decimations_creator(1.0, time_period=time_period)
 
 
-@pytest.mark.xfail(
-    reason="TypeError in mt_metadata decimation_level.py line 535 - harmonic_indices is None on pydantic branch"
-)
 def test_create_then_use_stored_fcs_for_processing(
     mth5_test_files, synthetic_test_paths
 ):

@@ -1,6 +1,5 @@
 """Pytest translation of test_define_frequency_bands.py"""
 
-import pytest
 
 from aurora.config.config_creator import ConfigCreator
 from aurora.pipelines.process_mth5 import process_mth5
@@ -8,20 +7,30 @@ from aurora.test_utils.synthetic.processing_helpers import get_example_kernel_da
 from aurora.test_utils.synthetic.triage import tfs_nearly_equal
 
 
-@pytest.mark.skip(reason="Original test also fails - IndexError in mt_metadata band.py")
 def test_can_declare_frequencies_directly_in_config(synthetic_test_paths):
-    """Test that manually declared frequency bands produce same results as defaults."""
+    """Test that manually declared frequency bands produce same results as defaults.
+
+    This test verifies that explicitly passing band_edges to create_from_kernel_dataset
+    produces the same transfer function as using the default band setup. The key is to
+    use the same num_samples_window in both configs, since band edges are calculated
+    based on FFT harmonics which depend on the window size.
+    """
     kernel_dataset = get_example_kernel_dataset()
     cc = ConfigCreator()
     cfg1 = cc.create_from_kernel_dataset(kernel_dataset, estimator={"engine": "RME"})
     decimation_factors = list(cfg1.decimation_info.values())
     band_edges = cfg1.band_edges_dict
+
+    # Use the same num_samples_window as cfg1 (default is 256)
+    # to ensure band_edges align with FFT harmonics
+    num_samples_window = cfg1.decimations[0].stft.window.num_samples
+
     cfg2 = cc.create_from_kernel_dataset(
         kernel_dataset,
         estimator={"engine": "RME"},
         band_edges=band_edges,
         decimation_factors=decimation_factors,
-        num_samples_window=len(band_edges) * [128],
+        num_samples_window=len(band_edges) * [num_samples_window],
     )
 
     cfg1_path = synthetic_test_paths.aurora_results_path.joinpath("cfg1.xml")
