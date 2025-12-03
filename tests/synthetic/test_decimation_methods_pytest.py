@@ -5,7 +5,6 @@ default values as aurora's prototype decimate.
 """
 
 import numpy as np
-from mth5.data.make_mth5_from_asc import create_test1_h5
 from mth5.helpers import close_open_files
 from mth5.mth5 import MTH5
 from mth5.processing import KernelDataset, RunSummary
@@ -14,10 +13,10 @@ from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.test_utils.synthetic.make_processing_configs import create_test_run_config
 
 
-def test_decimation_methods_agree():
+def test_decimation_methods_agree(worker_safe_test1_h5):
     """Test that aurora and mth5 decimation methods produce identical results."""
     close_open_files()
-    mth5_path = create_test1_h5()
+    mth5_path = worker_safe_test1_h5
 
     run_summary = RunSummary()
     run_summary.from_mth5s([mth5_path])

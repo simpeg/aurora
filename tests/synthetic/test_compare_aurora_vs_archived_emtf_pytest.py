@@ -1,9 +1,4 @@
 from loguru import logger
-from mth5.data.make_mth5_from_asc import (
-    create_test1_h5,
-    create_test2_h5,
-    create_test12rr_h5,
-)
 from mth5.helpers import close_open_files
 from mth5.processing import KernelDataset, RunSummary
 
@@ -112,12 +107,12 @@ def aurora_vs_emtf(
             )
 
 
-def test_pipeline_merged(synthetic_test_paths, subtests):
+def test_pipeline_merged(synthetic_test_paths, subtests, worker_safe_test12rr_h5):
     """Test aurora vs EMTF comparison with merged mth5."""
     close_open_files()
 
     # Create merged mth5
-    mth5_path = create_test12rr_h5()
+    mth5_path = worker_safe_test12rr_h5
     mth5_paths = [mth5_path]
 
     run_summary = RunSummary()
@@ -172,13 +167,15 @@ def test_pipeline_merged(synthetic_test_paths, subtests):
         )
 
 
-def test_pipeline_separate(synthetic_test_paths, subtests):
+def test_pipeline_separate(
+    synthetic_test_paths, subtests, worker_safe_test1_h5, worker_safe_test2_h5
+):
     """Test aurora vs EMTF comparison with separate mth5 files."""
     close_open_files()
 
     # Create separate mth5 files
-    mth5_path_1 = create_test1_h5()
-    mth5_path_2 = create_test2_h5()
+    mth5_path_1 = worker_safe_test1_h5
+    mth5_path_2 = worker_safe_test2_h5
     mth5_paths = [mth5_path_1, mth5_path_2]
 
     run_summary = RunSummary()

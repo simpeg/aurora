@@ -1,11 +1,5 @@
 import pytest
 from loguru import logger
-from mth5.data.make_mth5_from_asc import (
-    create_test1_h5,
-    create_test2_h5,
-    create_test3_h5,
-    create_test12rr_h5,
-)
 from mth5.helpers import close_open_files
 from mth5.processing import KernelDataset, RunSummary
 from mth5.timeseries.spectre.helpers import (
@@ -26,19 +20,24 @@ from aurora.test_utils.synthetic.triage import tfs_nearly_equal
 
 
 @pytest.fixture(scope="module")
-def mth5_test_files():
+def mth5_test_files(
+    worker_safe_test1_h5,
+    worker_safe_test2_h5,
+    worker_safe_test3_h5,
+    worker_safe_test12rr_h5,
+):
     """Create synthetic MTH5 test files."""
     logger.info("Making synthetic data")
     close_open_files()
-    file_version = "0.1.0"
-    mth5_path_1 = create_test1_h5(file_version=file_version)
-    mth5_path_2 = create_test2_h5(file_version=file_version)
-    mth5_path_3 = create_test3_h5(file_version=file_version)
-    mth5_path_12rr = create_test12rr_h5(file_version=file_version)
 
     return {
-        "paths": [mth5_path_1, mth5_path_2, mth5_path_3, mth5_path_12rr],
-        "path_2": mth5_path_2,
+        "paths": [
+            worker_safe_test1_h5,
+            worker_safe_test2_h5,
+            worker_safe_test3_h5,
+            worker_safe_test12rr_h5,
+        ],
+        "path_2": worker_safe_test2_h5,
     }
 
 
@@ -107,7 +106,10 @@ def test_create_then_use_stored_fcs_for_processing(
     z_file_path_1 = AURORA_RESULTS_PATH.joinpath("test2.zss")
     z_file_path_2 = AURORA_RESULTS_PATH.joinpath("test2_from_stored_fc.zss")
     tf1 = process_synthetic_2(
-        force_make_mth5=True, z_file_path=z_file_path_1, save_fc=True
+        force_make_mth5=True,
+        z_file_path=z_file_path_1,
+        save_fc=True,
+        mth5_path=mth5_path_2,
     )
     tfk_dataset, processing_config = make_processing_config_and_kernel_dataset(
         config_keyword="test2",
@@ -147,5 +149,7 @@ def test_create_then_use_stored_fcs_for_processing(
         tfk.dataset_df.fc.all()
     )  # assert fcs True in dataframe -- i.e. they were detected.
 
-    tf2 = process_synthetic_2(force_make_mth5=False, z_file_path=z_file_path_2)
+    tf2 = process_synthetic_2(
+        force_make_mth5=False, z_file_path=z_file_path_2, mth5_path=mth5_path_2
+    )
     assert tfs_nearly_equal(tf1, tf2)

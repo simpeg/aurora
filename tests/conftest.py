@@ -18,7 +18,12 @@ from typing import Dict
 
 import pytest
 from mt_metadata.transfer_functions.core import TF as _MT_TF
-from mth5.data.make_mth5_from_asc import create_test12rr_h5
+from mth5.data.make_mth5_from_asc import (
+    create_test1_h5,
+    create_test2_h5,
+    create_test3_h5,
+    create_test12rr_h5,
+)
 from mth5.helpers import close_open_files
 
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
@@ -210,3 +215,104 @@ def fresh_test12rr_mth5(tmp_path: Path, worker_id, cleanup_test_files):
     _MTH5_GLOBAL_CACHE[cache_key] = str(ppath)
 
     return ppath
+
+
+@pytest.fixture(scope="session")
+def mth5_target_dir(tmp_path_factory, worker_id):
+    """Create a worker-safe directory for MTH5 file creation.
+
+    This directory is shared across all tests in a worker session,
+    allowing MTH5 files to be cached and reused within a worker.
+    """
+    base_dir = tmp_path_factory.mktemp(f"mth5_files_{worker_id}")
+    return base_dir
+
+
+def _create_worker_safe_mth5(
+    mth5_name: str,
+    create_func,
+    target_dir: Path,
+    worker_id: str,
+    file_version: str = "0.1.0",
+    channel_nomenclature: str = "default",
+    **kwargs,
+) -> Path:
+    """Helper to create worker-safe MTH5 files with caching.
+
+    Parameters
+    ----------
+    mth5_name : str
+        Base name for the MTH5 file (e.g., "test1", "test2")
+    create_func : callable
+        Function to create the MTH5 file (e.g., create_test1_h5)
+    target_dir : Path
+        Directory where the MTH5 file should be created
+    worker_id : str
+        Worker ID for pytest-xdist
+    file_version : str
+        MTH5 file version
+    channel_nomenclature : str
+        Channel nomenclature to use
+    **kwargs
+        Additional arguments to pass to create_func
+
+    Returns
+    -------
+    Path
+        Path to the created MTH5 file
+    """
+    cache_key = f"{mth5_name}_{worker_id}_{file_version}_{channel_nomenclature}"
+
+    # Return cached file if present and still exists
+    cached = _MTH5_GLOBAL_CACHE.get(cache_key)
+    if cached:
+        p = Path(cached)
+        if p.exists():
+            return p
+
+    # Create the MTH5 file in the worker-safe directory
+    file_path = create_func(
+        file_version=file_version,
+        channel_nomenclature=channel_nomenclature,
+        target_folder=target_dir,
+        force_make_mth5=True,
+        **kwargs,
+    )
+
+    # Cache the path
+    ppath = Path(file_path)
+    _MTH5_GLOBAL_CACHE[cache_key] = str(ppath)
+
+    return ppath
+
+
+@pytest.fixture(scope="session")
+def worker_safe_test1_h5(mth5_target_dir, worker_id):
+    """Create test1.h5 in a worker-safe directory."""
+    return _create_worker_safe_mth5(
+        "test1", create_test1_h5, mth5_target_dir, worker_id
+    )
+
+
+@pytest.fixture(scope="session")
+def worker_safe_test2_h5(mth5_target_dir, worker_id):
+    """Create test2.h5 in a worker-safe directory."""
+    return _create_worker_safe_mth5(
+        "test2", create_test2_h5, mth5_target_dir, worker_id
+    )
+
+
+@pytest.fixture(scope="session")
+def worker_safe_test3_h5(mth5_target_dir, worker_id):
+    """Create test3.h5 in a worker-safe directory."""
+    return _create_worker_safe_mth5(
+        "test3", create_test3_h5, mth5_target_dir, worker_id
+    )
+
+
+@pytest.fixture(scope="session")
+def worker_safe_test12rr_h5(mth5_target_dir, worker_id):
+    """Create test12rr.h5 in a worker-safe directory."""
+    return _create_worker_safe_mth5(
+        "test12rr", create_test12rr_h5, mth5_target_dir, worker_id
+    )

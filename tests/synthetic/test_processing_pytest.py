@@ -40,18 +40,29 @@ def test_no_crash_with_too_many_decimations(synthetic_test_paths):
     tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
 
-def test_can_output_tf_class_and_write_tf_xml(synthetic_test_paths):
+def test_can_output_tf_class_and_write_tf_xml(
+    synthetic_test_paths, worker_safe_test1_h5
+):
     """Test basic TF processing and XML output."""
-    tf_cls = process_synthetic_1(file_version="0.1.0")
+    tf_cls = process_synthetic_1(file_version="0.1.0", mth5_path=worker_safe_test1_h5)
     xml_file_name = synthetic_test_paths.aurora_results_path.joinpath(
         "syn1_mth5-010.xml"
     )
     tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
 
-def test_can_use_channel_nomenclature(synthetic_test_paths):
+def test_can_use_channel_nomenclature(synthetic_test_paths, mth5_target_dir, worker_id):
     """Test processing with custom channel nomenclature."""
+    from mth5.data.make_mth5_from_asc import create_test1_h5
+
     channel_nomenclature = "LEMI12"
+    # Create MTH5 with specific nomenclature in worker-safe directory
+    mth5_path = create_test1_h5(
+        file_version="0.1.0",
+        channel_nomenclature=channel_nomenclature,
+        target_folder=mth5_target_dir,
+    )
+
     z_file_path = synthetic_test_paths.aurora_results_path.joinpath(
         f"syn1-{channel_nomenclature}.zss"
     )
@@ -59,6 +70,7 @@ def test_can_use_channel_nomenclature(synthetic_test_paths):
         z_file_path=z_file_path,
         file_version="0.1.0",
         channel_nomenclature=channel_nomenclature,
+        mth5_path=mth5_path,
     )
     xml_file_name = synthetic_test_paths.aurora_results_path.joinpath(
         f"syn1_mth5-0.1.0_{channel_nomenclature}.xml"
@@ -66,13 +78,17 @@ def test_can_use_channel_nomenclature(synthetic_test_paths):
     tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
 
-def test_can_use_mth5_file_version_020(synthetic_test_paths):
+def test_can_use_mth5_file_version_020(synthetic_test_paths, worker_safe_test1_h5):
     """Test processing with MTH5 file version 0.2.0."""
     file_version = "0.2.0"
     z_file_path = synthetic_test_paths.aurora_results_path.joinpath(
         f"syn1-{file_version}.zss"
     )
-    tf_cls = process_synthetic_1(z_file_path=z_file_path, file_version=file_version)
+    tf_cls = process_synthetic_1(
+        z_file_path=z_file_path,
+        file_version=file_version,
+        mth5_path=worker_safe_test1_h5,
+    )
     xml_file_name = synthetic_test_paths.aurora_results_path.joinpath(
         f"syn1_mth5v{file_version}.xml"
     )
@@ -83,7 +99,7 @@ def test_can_use_mth5_file_version_020(synthetic_test_paths):
     )
 
 
-def test_can_use_scale_factor_dictionary(synthetic_test_paths):
+def test_can_use_scale_factor_dictionary(synthetic_test_paths, worker_safe_test1_h5):
     """Test channel scale factors in mt_metadata processing class.
 
     Expected outputs are four .png:
@@ -93,19 +109,25 @@ def test_can_use_scale_factor_dictionary(synthetic_test_paths):
     - yx_syn1-scaled.png: Underestimates by 4x for 25 Ohm-m resistivity
     """
     z_file_path = synthetic_test_paths.aurora_results_path.joinpath("syn1-scaled.zss")
-    tf_cls = process_synthetic_1(z_file_path=z_file_path, test_scale_factor=True)
+    tf_cls = process_synthetic_1(
+        z_file_path=z_file_path, test_scale_factor=True, mth5_path=worker_safe_test1_h5
+    )
     tf_cls.write(
         fn=z_file_path.parent.joinpath(f"{z_file_path.stem}_from_tf.zss"),
         file_type="zss",
     )
 
 
-def test_simultaneous_regression(synthetic_test_paths):
+def test_simultaneous_regression(synthetic_test_paths, worker_safe_test1_h5):
     """Test simultaneous regression processing."""
     z_file_path = synthetic_test_paths.aurora_results_path.joinpath(
         "syn1_simultaneous_estimate.zss"
     )
-    tf_cls = process_synthetic_1(z_file_path=z_file_path, simultaneous_regression=True)
+    tf_cls = process_synthetic_1(
+        z_file_path=z_file_path,
+        simultaneous_regression=True,
+        mth5_path=worker_safe_test1_h5,
+    )
     xml_file_name = synthetic_test_paths.aurora_results_path.joinpath(
         "syn1_simultaneous_estimate.xml"
     )
@@ -116,16 +138,20 @@ def test_simultaneous_regression(synthetic_test_paths):
     )
 
 
-def test_can_process_other_station(synthetic_test_paths):
+def test_can_process_other_station(synthetic_test_paths, worker_safe_test2_h5):
     """Test processing a different synthetic station."""
-    tf_cls = process_synthetic_2(force_make_mth5=True)
+    tf_cls = process_synthetic_2(force_make_mth5=True, mth5_path=worker_safe_test2_h5)
     xml_file_name = synthetic_test_paths.aurora_results_path.joinpath("syn2.xml")
     tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
 
-def test_can_process_remote_reference_data(synthetic_test_paths):
+def test_can_process_remote_reference_data(
+    synthetic_test_paths, worker_safe_test12rr_h5
+):
     """Test remote reference processing with default channel nomenclature."""
-    tf_cls = process_synthetic_1r2(channel_nomenclature="default")
+    tf_cls = process_synthetic_1r2(
+        channel_nomenclature="default", mth5_path=worker_safe_test12rr_h5
+    )
     xml_file_name = synthetic_test_paths.aurora_results_path.joinpath(
         "syn12rr_mth5-010.xml"
     )
@@ -134,9 +160,22 @@ def test_can_process_remote_reference_data(synthetic_test_paths):
 
 def test_can_process_remote_reference_data_with_channel_nomenclature(
     synthetic_test_paths,
+    mth5_target_dir,
+    worker_id,
 ):
     """Test remote reference processing with custom channel nomenclature."""
-    tf_cls = process_synthetic_1r2(channel_nomenclature="LEMI34")
+    from mth5.data.make_mth5_from_asc import create_test12rr_h5
+
+    channel_nomenclature = "LEMI34"
+    # Create MTH5 with specific nomenclature in worker-safe directory
+    mth5_path = create_test12rr_h5(
+        channel_nomenclature=channel_nomenclature,
+        target_folder=mth5_target_dir,
+    )
+
+    tf_cls = process_synthetic_1r2(
+        channel_nomenclature=channel_nomenclature, mth5_path=mth5_path
+    )
     xml_file_name = synthetic_test_paths.aurora_results_path.joinpath(
         "syn12rr_mth5-010_LEMI34.xml"
     )

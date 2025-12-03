@@ -27,7 +27,6 @@ import pytest
 from loguru import logger
 from mt_metadata.features.weights.channel_weight_spec import ChannelWeightSpec
 from mt_metadata.transfer_functions import TF
-from mth5.data.make_mth5_from_asc import create_test1_h5
 from mth5.mth5 import MTH5
 from mth5.processing import KernelDataset, RunSummary
 from mth5.timeseries import RunTS
@@ -43,7 +42,7 @@ from aurora.pipelines.process_mth5 import process_mth5
 
 
 def create_synthetic_mth5_with_noise(
-    source_file: Optional[pathlib.Path] = None,
+    source_file: pathlib.Path,
     target_file: Optional[pathlib.Path] = None,
     noise_channels=("ex", "hy"),
     frac=0.5,
@@ -53,13 +52,6 @@ def create_synthetic_mth5_with_noise(
     """
     Copy a synthetic MTH5, injecting noise into specified channels for a fraction of the data.
     """
-    if source_file is None:
-        source_file = create_test1_h5(
-            file_version="0.1.0",
-            channel_nomenclature="default",
-            force_make_mth5=True,
-            target_folder=TEST_PATH.joinpath("synthetic"),
-        )
     if target_file is None:
         target_file = TEST_PATH.joinpath("synthetic", "test1_noisy.h5")
         if target_file.exists():
@@ -280,12 +272,12 @@ def print_apparent_resistivity(tf, label="TF"):
 @pytest.mark.xfail(
     reason="Feature weighting does not currently affect TF results - known issue in original test"
 )
-def test_feature_weighting(synthetic_test_paths):
+def test_feature_weighting(synthetic_test_paths, worker_safe_test1_h5):
     """Test that feature weighting affects TF processing results."""
     SYNTHETIC_FOLDER = synthetic_test_paths.aurora_results_path.parent
 
     # Create a synthetic mth5 file for testing
-    mth5_path = create_synthetic_mth5_with_noise()
+    mth5_path = create_synthetic_mth5_with_noise(source_file=worker_safe_test1_h5)
 
     processing_objects = load_processing_objects()
     z_path1 = SYNTHETIC_FOLDER.joinpath("test1_default.zss")

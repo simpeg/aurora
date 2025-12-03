@@ -3,18 +3,20 @@ This module contains some helper functions that are called during the
 execution of aurora's tests of processing on synthetic data.
 """
 
-import mt_metadata.transfer_functions
 import pathlib
+from typing import Optional, Union
+
+import mt_metadata.transfer_functions
+from mth5.data.make_mth5_from_asc import (
+    create_test1_h5,
+    create_test2_h5,
+    create_test12rr_h5,
+)
+
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.test_utils.synthetic.make_processing_configs import (
     make_processing_config_and_kernel_dataset,
 )
-
-from mth5.data.make_mth5_from_asc import create_test1_h5
-from mth5.data.make_mth5_from_asc import create_test2_h5
-from mth5.data.make_mth5_from_asc import create_test12rr_h5
-
-from typing import Optional, Union
 
 
 def get_example_kernel_dataset(num_stations: int = 1):
@@ -28,7 +30,7 @@ def get_example_kernel_dataset(num_stations: int = 1):
         The kernel dataset from a synthetic, single station mth5
     """
 
-    from mth5.processing import RunSummary, KernelDataset
+    from mth5.processing import KernelDataset, RunSummary
 
     if num_stations == 1:
         mth5_path = create_test1_h5(force_make_mth5=False)
@@ -66,8 +68,9 @@ def tf_obj_from_synthetic_data(
     - Helper function for test_issue_139
 
     """
+    from mth5.processing import KernelDataset, RunSummary
+
     from aurora.config.config_creator import ConfigCreator
-    from mth5.processing import RunSummary, KernelDataset
 
     run_summary = RunSummary()
     run_summary.from_mth5s(list((mth5_path,)))
@@ -97,6 +100,7 @@ def process_synthetic_1(
     return_collection: Optional[bool] = False,
     channel_nomenclature: Optional[str] = "default",
     reload_config: Optional[bool] = False,
+    mth5_path: Optional[Union[str, pathlib.Path]] = None,
 ):
     """
 
@@ -114,15 +118,18 @@ def process_synthetic_1(
         usual, channel-by-channel method
     file_version: str
         one of ["0.1.0", "0.2.0"]
+    mth5_path: str or path, optional
+        Path to an existing test1.h5 MTH5 file. If None, will create one.
 
     Returns
     -------
     tf_result: TransferFunctionCollection or mt_metadata.transfer_functions.TF
         Should change so that it is mt_metadata.TF (see Issue #143)
     """
-    mth5_path = create_test1_h5(
-        file_version=file_version, channel_nomenclature=channel_nomenclature
-    )
+    if mth5_path is None:
+        mth5_path = create_test1_h5(
+            file_version=file_version, channel_nomenclature=channel_nomenclature
+        )
     mth5_paths = [
         mth5_path,
     ]
@@ -189,12 +196,14 @@ def process_synthetic_2(
     save_fc: Optional[bool] = False,
     file_version: Optional[str] = "0.2.0",
     channel_nomenclature: Optional[str] = "default",
+    mth5_path: Optional[Union[str, pathlib.Path]] = None,
 ):
     """"""
     station_id = "test2"
-    mth5_path = create_test2_h5(
-        force_make_mth5=force_make_mth5, file_version=file_version
-    )
+    if mth5_path is None:
+        mth5_path = create_test2_h5(
+            force_make_mth5=force_make_mth5, file_version=file_version
+        )
     mth5_paths = [
         mth5_path,
     ]
@@ -224,8 +233,10 @@ def process_synthetic_1r2(
     config_keyword="test1r2",
     channel_nomenclature="default",
     return_collection=False,
+    mth5_path: Optional[Union[str, pathlib.Path]] = None,
 ):
-    mth5_path = create_test12rr_h5(channel_nomenclature=channel_nomenclature)
+    if mth5_path is None:
+        mth5_path = create_test12rr_h5(channel_nomenclature=channel_nomenclature)
     mth5_paths = [
         mth5_path,
     ]

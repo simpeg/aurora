@@ -5,7 +5,6 @@ array as scipy.signal.spectrogram
 """
 
 import numpy as np
-from mth5.data.make_mth5_from_asc import create_test1_h5
 from mth5.helpers import close_open_files
 from mth5.mth5 import MTH5
 from mth5.processing import KernelDataset, RunSummary
@@ -16,7 +15,7 @@ from aurora.test_utils.synthetic.make_processing_configs import create_test_run_
 from aurora.time_series.spectrogram_helpers import run_ts_to_stft
 
 
-def test_stft_methods_agree():
+def test_stft_methods_agree(worker_safe_test1_h5):
     """Test that aurora STFT and scipy STFT produce identical results.
 
     The answer is "mostly yes", under two conditions:
@@ -28,7 +27,7 @@ def test_stft_methods_agree():
     Excluding these, we get numerically identical results.
     """
     close_open_files()
-    mth5_path = create_test1_h5()
+    mth5_path = worker_safe_test1_h5
 
     run_summary = RunSummary()
     run_summary.from_mth5s([mth5_path])
