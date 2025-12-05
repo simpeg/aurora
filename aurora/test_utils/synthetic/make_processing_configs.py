@@ -3,13 +3,14 @@ This module contains methods for generating processing config objects that are
 used in aurora's tests of processing synthetic data.
 """
 
-from aurora.config import BANDS_DEFAULT_FILE
-from aurora.config import BANDS_256_26_FILE
+from typing import Optional, Union
+
+from loguru import logger
+from mth5.processing import KernelDataset, RunSummary
+
+from aurora.config import BANDS_256_26_FILE, BANDS_DEFAULT_FILE
 from aurora.config.config_creator import ConfigCreator
 from aurora.test_utils.synthetic.paths import SyntheticTestPaths
-from loguru import logger
-from mth5.processing import RunSummary, KernelDataset
-from typing import Optional, Union
 
 
 synthetic_test_paths = SyntheticTestPaths()
@@ -138,6 +139,7 @@ def create_test_run_config(
             decimation.stft.window.type = "boxcar"
 
     if save == "json":
+        CONFIG_PATH.mkdir(parents=True, exist_ok=True)
         filename = CONFIG_PATH.joinpath(p.json_fn())
         p.save_as_json(filename=filename)
 
@@ -215,7 +217,7 @@ def test_to_from_json():
     """
     # import pandas as pd
     from mt_metadata.processing.aurora import Processing
-    from mth5.processing import RunSummary, KernelDataset
+    from mth5.processing import KernelDataset, RunSummary
 
     # Specify path to mth5
     data_path = MTH5_PATH.joinpath("test1.h5")
@@ -263,7 +265,6 @@ def test_to_from_json():
 
 def main():
     """Allow the module to be called from the command line"""
-    pass
     # TODO: fix test_to_from_json and put in tests.
     #  - see issue #222 in mt_metadata.
     test_to_from_json()

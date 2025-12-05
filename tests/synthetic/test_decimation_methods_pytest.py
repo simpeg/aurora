@@ -13,7 +13,7 @@ from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.test_utils.synthetic.make_processing_configs import create_test_run_config
 
 
-def test_decimation_methods_agree(worker_safe_test1_h5):
+def test_decimation_methods_agree(worker_safe_test1_h5, synthetic_test_paths):
     """Test that aurora and mth5 decimation methods produce identical results."""
     close_open_files()
     mth5_path = worker_safe_test1_h5

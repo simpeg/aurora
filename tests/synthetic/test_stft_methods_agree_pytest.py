@@ -15,7 +15,7 @@ from aurora.test_utils.synthetic.make_processing_configs import create_test_run_
 from aurora.time_series.spectrogram_helpers import run_ts_to_stft
 
 
-def test_stft_methods_agree(worker_safe_test1_h5):
+def test_stft_methods_agree(worker_safe_test1_h5, synthetic_test_paths):
     """Test that aurora STFT and scipy STFT produce identical results.
 
     The answer is "mostly yes", under two conditions:
