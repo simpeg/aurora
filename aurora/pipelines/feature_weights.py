@@ -1,17 +1,15 @@
+import pandas as pd
+import xarray as xr
 from loguru import logger
 from mt_metadata.processing.aurora.decimation_level import (
     DecimationLevel as AuroraDecimationLevel,
 )
 from mth5.processing import KernelDataset
 
-import pandas as pd
-import xarray as xr
-
 
 def extract_features(
     dec_level_config: AuroraDecimationLevel, tfk_dataset: KernelDataset
 ) -> pd.DataFrame:
-
     """
         Temporal place holder.
 
@@ -56,6 +54,8 @@ def extract_features(
             feature = fws.feature
             msg = f"feature: {feature}"
             logger.info(msg)
+            msg = f"feature type: {type(feature).__name__}, has validate_station_ids: {hasattr(feature, 'validate_station_ids')}"
+            logger.info(msg)
             feature_chunks = []
             if feature.name == "coherence":
                 msg = f"{feature.name} is not supported as a data weighting feature"
@@ -81,9 +81,9 @@ def extract_features(
                 # Loop the runs (or run-pairs) ... this should be equivalent to grouping on start time.
                 # TODO: consider mixing in valid run info from processing_summary here, (avoid window too long for data)
                 #  Desirable to have some "processing_run" iterator supplied by KernelDataset.
-                from aurora.pipelines.time_series_helpers import (
+                from aurora.pipelines.time_series_helpers import (  # TODO: consider storing clock-zero-truncated data
                     truncate_to_clock_zero,
-                )  # TODO: consider storing clock-zero-truncated data
+                )
 
                 tmp = tfk_dataset.df.copy(deep=True)
                 group_by = [
@@ -95,13 +95,17 @@ def extract_features(
                 for start, df in grouper:
                     end = df.end.unique()[0]  # nice to have this for info log
                     logger.debug("Access ch1 and ch2 ")
-                    ch1_row = df[df.station == feature.station1].iloc[0]
-                    ch1_data = ch1_row.run_dataarray.to_dataset("channel")[feature.ch1]
+                    ch1_row = df[df.station == feature.station_1].iloc[0]
+                    ch1_data = ch1_row.run_dataarray.to_dataset("channel")[
+                        feature.channel_1
+                    ]
                     ch1_data = truncate_to_clock_zero(
                         decimation_obj=dec_level_config, run_xrds=ch1_data
                     )
-                    ch2_row = df[df.station == feature.station2].iloc[0]
-                    ch2_data = ch2_row.run_dataarray.to_dataset("channel")[feature.ch2]
+                    ch2_row = df[df.station == feature.station_2].iloc[0]
+                    ch2_data = ch2_row.run_dataarray.to_dataset("channel")[
+                        feature.channel_2
+                    ]
                     ch2_data = truncate_to_clock_zero(
                         decimation_obj=dec_level_config, run_xrds=ch2_data
                     )
@@ -189,7 +193,6 @@ def calculate_weights(
 
     # loop the channel weight specs
     for chws in dec_level_config.channel_weight_specs:
-
         msg = f"{chws}"
         logger.info(msg)
         # TODO: Consider calculating all the weight kernels in advance, case switching on the combination style.

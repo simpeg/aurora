@@ -23,7 +23,6 @@ import pathlib
 from typing import Optional
 
 import numpy as np
-import pytest
 from loguru import logger
 from mt_metadata.features.weights.channel_weight_spec import ChannelWeightSpec
 from mt_metadata.transfer_functions import TF
@@ -128,8 +127,19 @@ def _load_example_channel_weight_specs(
     output = []
     channel_weight_specs = data.get("channel_weight_specs", data)
     for cws_dict in channel_weight_specs:
-        cws = ChannelWeightSpec()
-        cws.from_dict(cws_dict)
+        # Unwrap the nested structure
+        cws_data = cws_dict.get("channel_weight_spec", cws_dict)
+
+        # Process feature_weight_specs to unwrap nested dicts
+        if "feature_weight_specs" in cws_data:
+            fws_list = []
+            for fws_item in cws_data["feature_weight_specs"]:
+                fws_data = fws_item.get("feature_weight_spec", fws_item)
+                fws_list.append(fws_data)
+            cws_data["feature_weight_specs"] = fws_list
+
+        # Construct directly from dict to ensure proper deserialization
+        cws = ChannelWeightSpec(**cws_data)
 
         # Modify the feature_weight_specs to only include striding_window_coherence
         if keep_only:
@@ -138,10 +148,10 @@ def _load_example_channel_weight_specs(
             ]
             # get rid of Remote reference channels (work in progress)
             cws.feature_weight_specs = [
-                fws for fws in cws.feature_weight_specs if fws.feature.ch2 != "rx"
+                fws for fws in cws.feature_weight_specs if fws.feature.channel_2 != "rx"
             ]
             cws.feature_weight_specs = [
-                fws for fws in cws.feature_weight_specs if fws.feature.ch2 != "ry"
+                fws for fws in cws.feature_weight_specs if fws.feature.channel_2 != "ry"
             ]
 
         # Ensure that the feature_weight_specs is not empty
@@ -269,9 +279,6 @@ def print_apparent_resistivity(tf, label="TF"):
     return mean_rho
 
 
-@pytest.mark.xfail(
-    reason="Feature weighting does not currently affect TF results - known issue in original test"
-)
 def test_feature_weighting(synthetic_test_paths, worker_safe_test1_h5):
     """Test that feature weighting affects TF processing results."""
     SYNTHETIC_FOLDER = synthetic_test_paths.aurora_results_path.parent
