@@ -316,3 +316,129 @@ def worker_safe_test12rr_h5(mth5_target_dir, worker_id):
     return _create_worker_safe_mth5(
         "test12rr", create_test12rr_h5, mth5_target_dir, worker_id
     )
+
+
+# ============================================================================
+# Parkfield Test Fixtures
+# ============================================================================
+
+
+@pytest.fixture(scope="session")
+def parkfield_paths():
+    """Provide Parkfield test data paths."""
+    from aurora.test_utils.parkfield.path_helpers import PARKFIELD_PATHS
+
+    return PARKFIELD_PATHS
+
+
+@pytest.fixture(scope="session")
+def parkfield_h5_path(tmp_path_factory, worker_id):
+    """Create or return cached Parkfield MTH5 file for testing.
+
+    This fixture ensures the Parkfield MTH5 file exists and is cached
+    per worker to avoid conflicts in pytest-xdist parallel execution.
+    """
+    from aurora.test_utils.parkfield.make_parkfield_mth5 import ensure_h5_exists
+
+    cache_key = f"parkfield_h5_{worker_id}"
+
+    # Check cache first
+    cached = _MTH5_GLOBAL_CACHE.get(cache_key)
+    if cached:
+        p = Path(cached)
+        if p.exists():
+            return p
+
+    # Create worker-safe directory for Parkfield data
+    target_dir = tmp_path_factory.mktemp(f"parkfield_{worker_id}")
+
+    try:
+        h5_path = ensure_h5_exists(target_folder=target_dir)
+        _MTH5_GLOBAL_CACHE[cache_key] = str(h5_path)
+        return h5_path
+    except IOError:
+        pytest.skip("NCEDC data server not available")
+
+
+@pytest.fixture
+def parkfield_mth5(parkfield_h5_path):
+    """Open and close MTH5 object for Parkfield data.
+
+    This is a function-scoped fixture that ensures proper cleanup
+    of MTH5 file handles after each test.
+    """
+    from mth5.helpers import close_open_files
+    from mth5.mth5 import MTH5
+
+    close_open_files()
+    mth5_obj = MTH5(file_version="0.1.0")
+    mth5_obj.open_mth5(parkfield_h5_path, mode="r")
+    yield mth5_obj
+    mth5_obj.close_mth5()
+    close_open_files()
+
+
+@pytest.fixture
+def parkfield_run_pkd(parkfield_mth5):
+    """Get PKD station run 001 from Parkfield MTH5."""
+    run_obj = parkfield_mth5.get_run("PKD", "001")
+    return run_obj
+
+
+@pytest.fixture
+def parkfield_run_ts_pkd(parkfield_run_pkd):
+    """Get RunTS object for PKD station."""
+    return parkfield_run_pkd.to_runts()
+
+
+@pytest.fixture
+def parkfield_kernel_dataset_ss(parkfield_h5_path):
+    """Create single-station KernelDataset for PKD."""
+    from mth5.helpers import close_open_files
+    from mth5.processing import KernelDataset, RunSummary
+
+    close_open_files()
+    run_summary = RunSummary()
+    run_summary.from_mth5s([parkfield_h5_path])
+    tfk_dataset = KernelDataset()
+    tfk_dataset.from_run_summary(run_summary, "PKD")
+    close_open_files()
+    return tfk_dataset
+
+
+@pytest.fixture
+def parkfield_kernel_dataset_rr(parkfield_h5_path):
+    """Create remote-reference KernelDataset for PKD with SAO as RR."""
+    from mth5.helpers import close_open_files
+    from mth5.processing import KernelDataset, RunSummary
+
+    close_open_files()
+    run_summary = RunSummary()
+    run_summary.from_mth5s([parkfield_h5_path])
+    tfk_dataset = KernelDataset()
+    tfk_dataset.from_run_summary(run_summary, "PKD", "SAO")
+    close_open_files()
+    return tfk_dataset
+
+
+@pytest.fixture
+def disable_matplotlib_logging(request):
+    """Disable noisy matplotlib logging for cleaner test output."""
+    import logging
+
+    loggers_to_disable = [
+        "matplotlib.font_manager",
+        "matplotlib.ticker",
+    ]
+
+    original_states = {}
+    for logger_name in loggers_to_disable:
+        logger_obj = logging.getLogger(logger_name)
+        original_states[logger_name] = logger_obj.disabled
+        logger_obj.disabled = True
+
+    yield
+
+    # Restore original states
+    for logger_name, original_state in original_states.items():
+        logging.getLogger(logger_name).disabled = original_state
