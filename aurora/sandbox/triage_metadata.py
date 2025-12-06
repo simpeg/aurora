@@ -2,11 +2,13 @@
     This module contains various helper functions that were used to fix errors in metadata.
 """
 
-from mt_metadata.timeseries import Experiment
-from mt_metadata.timeseries.filters.helper_functions import MT2SI_ELECTRIC_FIELD_FILTER
-from mt_metadata.timeseries.filters.helper_functions import MT2SI_MAGNETIC_FIELD_FILTER
-from loguru import logger
 import mth5.groups
+from loguru import logger
+from mt_metadata.timeseries import Experiment
+from mt_metadata.timeseries.filters.helper_functions import (
+    MT2SI_ELECTRIC_FIELD_FILTER,
+    MT2SI_MAGNETIC_FIELD_FILTER,
+)
 
 
 def triage_mt_units_electric_field(experiment: Experiment) -> Experiment:
@@ -41,8 +43,8 @@ def triage_mt_units_electric_field(experiment: Experiment) -> Experiment:
         channels = station.runs[0].channels
         for channel in channels:
             if channel.component[0] == "e":
-                channel.filter.name.insert(0, filter_name)
-                channel.filter.applied.insert(0, True)
+                channel.add_filter(name=filter_name, applied=True, stage=0)
+
     return experiment
 
 
@@ -77,8 +79,8 @@ def triage_mt_units_magnetic_field(experiment: Experiment) -> Experiment:
         channels = station.runs[0].channels
         for channel in channels:
             if channel.component[0] == "h":
-                channel.filter.name.insert(0, filter_name)
-                channel.filter.applied.insert(0, True)
+                channel.add_filter(name=filter_name, applied=True, stage=0)
+
     return experiment
 
 
