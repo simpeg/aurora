@@ -257,6 +257,8 @@ class TestParkfieldSingleStation:
         if not auxiliary_z_file.exists():
             pytest.skip("EMTF reference file not available")
 
+        ## need a to tests the impedances to make sure they are close.
+
         output_png = tmp_path / "SS_processing_comparison.png"
         compare_two_z_files(
             z_file_path,

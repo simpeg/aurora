@@ -1,16 +1,17 @@
 """
-    This module contains a function to for comparing legacy "z-file"
-     transfer function files.
+This module contains a function to for comparing legacy "z-file"
+ transfer function files.
 
 """
-import pathlib
 
-from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
-from aurora.transfer_function.plot.rho_phi_helpers import plot_phi
-from aurora.transfer_function.plot.rho_phi_helpers import plot_rho
+import pathlib
+from typing import Optional, Union
+
 from loguru import logger
 from matplotlib import pyplot as plt
-from typing import Optional, Union
+
+from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
+from aurora.transfer_function.plot.rho_phi_helpers import plot_phi, plot_rho
 
 
 def compare_two_z_files(
@@ -175,8 +176,9 @@ def compare_two_z_files(
         plt.suptitle(title_string, fontsize=15)
     if subtitle_string:
         axs[0].set_title(subtitle_string, fontsize=8)
+
+    plt.show()
     if out_file:
         plt.savefig(f"{out_file}")
-
-    if show_plot:
-        plt.show()
+        logger.info(f"Saved comparison plot to {out_file}")
+        plt.close(fig)

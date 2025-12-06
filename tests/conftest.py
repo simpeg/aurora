@@ -12,7 +12,6 @@ Fixtures provided:
 """
 
 import uuid
-import warnings
 from pathlib import Path
 from typing import Dict
 
@@ -86,26 +85,26 @@ if _orig_tf_write is not None:
 # dependencies (jupyter_client, obspy/pkg_resources) and from pydantic when
 # receiving plain strings where enums are expected. Filtering here keeps test
 # output focused on real failures.
-warnings.filterwarnings(
-    "ignore",
-    category=UserWarning,
-    message=r"Pydantic serializer warnings:.*",
-)
-warnings.filterwarnings(
-    "ignore",
-    category=DeprecationWarning,
-    message=r"Jupyter is migrating its paths to use standard platformdirs",
-)
-warnings.filterwarnings(
-    "ignore",
-    category=DeprecationWarning,
-    message=r"pkg_resources",
-)
-warnings.filterwarnings(
-    "ignore",
-    category=DeprecationWarning,
-    message=r"np\.bool",
-)
+# warnings.filterwarnings(
+#     "ignore",
+#     category=UserWarning,
+#     message=r"Pydantic serializer warnings:.*",
+# )
+# warnings.filterwarnings(
+#     "ignore",
+#     category=DeprecationWarning,
+#     message=r"Jupyter is migrating its paths to use standard platformdirs",
+# )
+# warnings.filterwarnings(
+#     "ignore",
+#     category=DeprecationWarning,
+#     message=r"pkg_resources",
+# )
+# warnings.filterwarnings(
+#     "ignore",
+#     category=DeprecationWarning,
+#     message=r"np\.bool",
+# )
 
 
 # Process-wide cache for heavyweight test artifacts (keyed by worker id)
