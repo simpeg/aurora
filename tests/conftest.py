@@ -367,15 +367,12 @@ def parkfield_mth5(parkfield_h5_path):
     This is a function-scoped fixture that ensures proper cleanup
     of MTH5 file handles after each test.
     """
-    from mth5.helpers import close_open_files
     from mth5.mth5 import MTH5
 
-    close_open_files()
     mth5_obj = MTH5(file_version="0.1.0")
     mth5_obj.open_mth5(parkfield_h5_path, mode="r")
     yield mth5_obj
     mth5_obj.close_mth5()
-    close_open_files()
 
 
 @pytest.fixture
@@ -394,30 +391,24 @@ def parkfield_run_ts_pkd(parkfield_run_pkd):
 @pytest.fixture
 def parkfield_kernel_dataset_ss(parkfield_h5_path):
     """Create single-station KernelDataset for PKD."""
-    from mth5.helpers import close_open_files
     from mth5.processing import KernelDataset, RunSummary
 
-    close_open_files()
     run_summary = RunSummary()
     run_summary.from_mth5s([parkfield_h5_path])
     tfk_dataset = KernelDataset()
     tfk_dataset.from_run_summary(run_summary, "PKD")
-    close_open_files()
     return tfk_dataset
 
 
 @pytest.fixture
 def parkfield_kernel_dataset_rr(parkfield_h5_path):
     """Create remote-reference KernelDataset for PKD with SAO as RR."""
-    from mth5.helpers import close_open_files
     from mth5.processing import KernelDataset, RunSummary
 
-    close_open_files()
     run_summary = RunSummary()
     run_summary.from_mth5s([parkfield_h5_path])
     tfk_dataset = KernelDataset()
     tfk_dataset.from_run_summary(run_summary, "PKD", "SAO")
-    close_open_files()
     return tfk_dataset
 
 
