@@ -3,21 +3,25 @@
 
 """
 import pathlib
+from pathlib import Path
+from typing import Optional, Union
 
 import obspy
-from pathlib import Path
-
-from aurora.sandbox.obspy_helpers import align_streams
-from aurora.sandbox.obspy_helpers import make_channel_labels_fdsn_compliant
-from aurora.sandbox.obspy_helpers import trim_streams_to_common_timestamps
-from aurora.sandbox.triage_metadata import triage_missing_coil_hollister
-from aurora.sandbox.triage_metadata import triage_mt_units_electric_field
-from aurora.sandbox.triage_metadata import triage_mt_units_magnetic_field
-from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
-from mth5.utils.helpers import initialize_mth5
-from mth5.timeseries import RunTS
 from loguru import logger
-from typing import Optional, Union
+from mt_metadata.timeseries.stationxml import XMLInventoryMTExperiment
+from mth5.timeseries import RunTS
+from mth5.utils.helpers import initialize_mth5
+
+from aurora.sandbox.obspy_helpers import (
+    align_streams,
+    make_channel_labels_fdsn_compliant,
+    trim_streams_to_common_timestamps,
+)
+from aurora.sandbox.triage_metadata import (
+    triage_missing_coil_hollister,
+    triage_mt_units_electric_field,
+    triage_mt_units_magnetic_field,
+)
 
 
 def create_from_server_multistation(
@@ -110,9 +114,12 @@ def create_from_server_multistation(
         streams_dict[station_id] = obspy.core.Stream(station_traces)
         station_groups[station_id] = mth5_obj.get_station(station_id)
         run_metadata = experiment.surveys[0].stations[i_station].runs[0]
-        run_metadata.id = run_id
+        run_metadata.id = (
+            run_id  #  This seems to get ignored by the call to from_obspy_stream below
+        )
         run_ts_obj = RunTS()
         run_ts_obj.from_obspy_stream(streams_dict[station_id], run_metadata)
+        run_ts_obj.run_metadata.id = run_id  # Force setting run id
         run_group = station_groups[station_id].add_run(run_id)
         run_group.from_runts(run_ts_obj)
     mth5_obj.close_mth5()
