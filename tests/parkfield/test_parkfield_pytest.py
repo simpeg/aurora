@@ -203,9 +203,6 @@ class TestParkfieldSingleStation:
                 except Exception as e:
                     pytest.fail(f"Processing failed: {e}")
 
-    @pytest.mark.skip(
-        reason="EMTFXML writer has bug with empty tipper arrays (mt_metadata issue)"
-    )
     def test_single_station_emtfxml_export(
         self,
         parkfield_kernel_dataset_ss,
