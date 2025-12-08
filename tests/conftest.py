@@ -423,7 +423,7 @@ def parkfield_run_ts_pkd(parkfield_run_pkd):
     return parkfield_run_pkd.to_runts()
 
 
-@pytest.fixture
+@pytest.fixture(scope="class")
 def parkfield_kernel_dataset_ss(parkfield_h5_path):
     """Create single-station KernelDataset for PKD."""
     from mth5.processing import KernelDataset, RunSummary
@@ -435,7 +435,7 @@ def parkfield_kernel_dataset_ss(parkfield_h5_path):
     return tfk_dataset
 
 
-@pytest.fixture
+@pytest.fixture(scope="class")
 def parkfield_kernel_dataset_rr(parkfield_h5_path):
     """Create remote-reference KernelDataset for PKD with SAO as RR."""
     from mth5.processing import KernelDataset, RunSummary
