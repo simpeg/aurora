@@ -132,7 +132,10 @@
                         "ey",
                         "hz"
                     ],
-                    "reference_channels": [],
+                    "reference_channels": [
+                        "hx",
+                        "hy"
+                    ],
                     "regression": {
                         "max_iterations": 10,
                         "max_redescending_iterations": 2,
@@ -261,7 +264,10 @@
                         "ey",
                         "hz"
                     ],
-                    "reference_channels": [],
+                    "reference_channels": [
+                        "hx",
+                        "hy"
+                    ],
                     "regression": {
                         "max_iterations": 10,
                         "max_redescending_iterations": 2,
@@ -390,7 +396,10 @@
                         "ey",
                         "hz"
                     ],
-                    "reference_channels": [],
+                    "reference_channels": [
+                        "hx",
+                        "hy"
+                    ],
                     "regression": {
                         "max_iterations": 10,
                         "max_redescending_iterations": 2,
@@ -507,7 +516,10 @@
                         "ey",
                         "hz"
                     ],
-                    "reference_channels": [],
+                    "reference_channels": [
+                        "hx",
+                        "hy"
+                    ],
                     "regression": {
                         "max_iterations": 10,
                         "max_redescending_iterations": 2,
