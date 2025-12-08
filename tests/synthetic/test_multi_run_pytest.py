@@ -32,8 +32,53 @@ def run_summary_test3(worker_safe_test3_h5):
     return run_summary
 
 
+class TestMultiRunProcessing:
+    """Tests for multi-run processing scenarios - cache expensive process_mth5 calls."""
+
+    @pytest.fixture(scope="class")
+    def kernel_dataset_test3(self, run_summary_test3):
+        """Create kernel dataset for test3."""
+        kernel_dataset = KernelDataset()
+        kernel_dataset.from_run_summary(run_summary_test3, "test3")
+        return kernel_dataset
+
+    @pytest.fixture(scope="class")
+    def config_test3(self, kernel_dataset_test3):
+        """Create config for test3 with RME estimator."""
+        cc = ConfigCreator()
+        return cc.create_from_kernel_dataset(
+            kernel_dataset_test3, estimator={"engine": "RME"}
+        )
+
+    @pytest.fixture(scope="class")
+    def processed_tf_all_runs(
+        self, kernel_dataset_test3, config_test3, synthetic_test_paths
+    ):
+        """Process all runs together - expensive operation, done once."""
+        close_open_files()
+        z_file_path = synthetic_test_paths.aurora_results_path.joinpath("syn3_all.zss")
+        return process_mth5(
+            config_test3,
+            kernel_dataset_test3,
+            units="MT",
+            show_plot=False,
+            z_file_path=z_file_path,
+        )
+
+    def test_all_runs(self, processed_tf_all_runs, synthetic_test_paths):
+        """Test processing all runs together."""
+        xml_file_name = synthetic_test_paths.aurora_results_path.joinpath(
+            "syn3_all.xml"
+        )
+        processed_tf_all_runs.write(fn=xml_file_name, file_type="emtfxml")
+
+
 def test_each_run_individually(run_summary_test3, synthetic_test_paths, subtests):
-    """Test processing each run individually."""
+    """Test processing each run individually.
+
+    Note: This test must process each run separately, so it cannot use class fixtures.
+    It processes 4 runs individually which is inherently expensive.
+    """
     close_open_files()
 
     for run_id in run_summary_test3.df.run.unique():
@@ -70,36 +115,14 @@ def test_each_run_individually(run_summary_test3, synthetic_test_paths, subtests
             tf_cls.write(fn=xml_file_name, file_type="emtfxml")
 
 
-def test_all_runs(run_summary_test3, synthetic_test_paths):
-    """Test processing all runs together."""
-    close_open_files()
-
-    kernel_dataset = KernelDataset()
-    kernel_dataset.from_run_summary(run_summary_test3, "test3")
-
-    cc = ConfigCreator()
-    config = cc.create_from_kernel_dataset(kernel_dataset, estimator={"engine": "RME"})
-
-    show_plot = False
-    z_file_path = synthetic_test_paths.aurora_results_path.joinpath("syn3_all.zss")
-    tf_cls = process_mth5(
-        config,
-        kernel_dataset,
-        units="MT",
-        show_plot=show_plot,
-        z_file_path=z_file_path,
-    )
-
-    xml_file_name = synthetic_test_paths.aurora_results_path.joinpath("syn3_all.xml")
-    tf_cls.write(fn=xml_file_name, file_type="emtfxml")
-
-
 def test_works_with_truncated_run(run_summary_test3, synthetic_test_paths):
     """Test processing with a truncated run.
 
     Synthetic runs are 40000s long. By truncating one of the runs to 10000s,
     we make the 4th decimation invalid for that run. By truncating to 2000s
     long we make the 3rd and 4th decimation levels invalid.
+
+    Note: This test modifies run_summary, so it cannot use class fixtures.
     """
     # Make a copy of the run summary to avoid modifying the fixture
     import copy
