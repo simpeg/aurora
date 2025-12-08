@@ -11,6 +11,13 @@ Fixtures provided:
 - `cleanup_test_files` : register files to be removed at session end
 """
 
+# Set non-interactive matplotlib backend before any other imports
+# This prevents tests from blocking on figure windows
+import matplotlib
+
+
+matplotlib.use("Agg")
+
 import uuid
 from pathlib import Path
 from typing import Dict
@@ -331,13 +338,44 @@ def parkfield_paths():
 
 
 @pytest.fixture(scope="session")
-def parkfield_h5_path(tmp_path_factory, worker_id):
-    """Create or return cached Parkfield MTH5 file for testing.
+def parkfield_h5_master(tmp_path_factory):
+    """Create the master Parkfield MTH5 file once per test session.
 
-    This fixture ensures the Parkfield MTH5 file exists and is cached
-    per worker to avoid conflicts in pytest-xdist parallel execution.
+    This downloads data from NCEDC only once and caches it for the entire
+    test session. Individual workers will copy this file to their own
+    isolated directories.
     """
     from aurora.test_utils.parkfield.make_parkfield_mth5 import ensure_h5_exists
+
+    cache_key = "parkfield_master"
+
+    # Check global cache first (shared across workers via filesystem)
+    cached = _MTH5_GLOBAL_CACHE.get(cache_key)
+    if cached:
+        p = Path(cached)
+        if p.exists():
+            return p
+
+    # Create master directory in temp (shared across workers)
+    master_dir = tmp_path_factory.getbasetemp() / "parkfield_master"
+    master_dir.mkdir(exist_ok=True)
+
+    try:
+        h5_path = ensure_h5_exists(target_folder=master_dir)
+        _MTH5_GLOBAL_CACHE[cache_key] = str(h5_path)
+        return h5_path
+    except IOError:
+        pytest.skip("NCEDC data server not available")
+
+
+@pytest.fixture(scope="session")
+def parkfield_h5_path(parkfield_h5_master, tmp_path_factory, worker_id):
+    """Copy master Parkfield MTH5 to worker-safe location.
+
+    This fixture copies the master MTH5 file (created once) to a worker-specific
+    temp directory to avoid file handle conflicts in pytest-xdist parallel execution.
+    """
+    import shutil
 
     cache_key = f"parkfield_h5_{worker_id}"
 
@@ -348,15 +386,13 @@ def parkfield_h5_path(tmp_path_factory, worker_id):
         if p.exists():
             return p
 
-    # Create worker-safe directory for Parkfield data
+    # Create worker-safe directory and copy the master file
     target_dir = tmp_path_factory.mktemp(f"parkfield_{worker_id}")
+    worker_h5_path = target_dir / parkfield_h5_master.name
 
-    try:
-        h5_path = ensure_h5_exists(target_folder=target_dir)
-        _MTH5_GLOBAL_CACHE[cache_key] = str(h5_path)
-        return h5_path
-    except IOError:
-        pytest.skip("NCEDC data server not available")
+    shutil.copy2(parkfield_h5_master, worker_h5_path)
+    _MTH5_GLOBAL_CACHE[cache_key] = str(worker_h5_path)
+    return worker_h5_path
 
 
 @pytest.fixture

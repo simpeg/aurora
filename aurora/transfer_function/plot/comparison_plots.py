@@ -177,8 +177,9 @@ def compare_two_z_files(
     if subtitle_string:
         axs[0].set_title(subtitle_string, fontsize=8)
 
-    plt.show()
     if out_file:
         plt.savefig(f"{out_file}")
         logger.info(f"Saved comparison plot to {out_file}")
         plt.close(fig)
+    else:
+        plt.show()
