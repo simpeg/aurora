@@ -131,7 +131,7 @@ class TestParkfieldSingleStation:
         """Generate worker-safe path for z-file output."""
         return make_worker_safe_path("pkd_ss.zss", tmp_path)
 
-    @pytest.fixture
+    @pytest.fixture(scope="class")
     def config_ss(self, parkfield_kernel_dataset_ss):
         """Create single-station processing config."""
         cc = ConfigCreator()
@@ -291,7 +291,7 @@ class TestParkfieldRemoteReference:
         """Generate worker-safe path for RR z-file output."""
         return make_worker_safe_path("pkd_rr.zrr", tmp_path)
 
-    @pytest.fixture
+    @pytest.fixture(scope="class")
     def config_rr(self, parkfield_kernel_dataset_rr):
         """Create remote-reference processing config."""
         cc = ConfigCreator()
