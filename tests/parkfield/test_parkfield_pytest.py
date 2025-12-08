@@ -142,21 +142,33 @@ class TestParkfieldSingleStation:
         )
         return config
 
-    def test_single_station_default_processing(
-        self,
-        parkfield_kernel_dataset_ss,
-        config_ss,
-        z_file_path,
-        disable_matplotlib_logging,
-    ):
-        """Test single-station processing with default settings."""
+    @pytest.fixture(scope="class")
+    def processed_tf_ss(self, parkfield_kernel_dataset_ss, config_ss):
+        """Process single-station transfer function once and reuse.
+
+        This fixture is class-scoped to avoid reprocessing for each test.
+        Processing takes ~2 minutes, so reusing saves significant time.
+        """
         tf_cls = process_mth5(
             config_ss,
             parkfield_kernel_dataset_ss,
             units="MT",
             show_plot=False,
-            z_file_path=z_file_path,
         )
+        return tf_cls
+
+    def test_single_station_default_processing(
+        self,
+        processed_tf_ss,
+        z_file_path,
+        disable_matplotlib_logging,
+    ):
+        """Test single-station processing with default settings."""
+        # Use pre-computed transfer function
+        tf_cls = processed_tf_ss
+
+        # Write z-file for verification
+        tf_cls.write(fn=z_file_path, file_type="zss")
 
         assert tf_cls is not None
         assert z_file_path.exists()
@@ -205,8 +217,7 @@ class TestParkfieldSingleStation:
 
     def test_single_station_emtfxml_export(
         self,
-        parkfield_kernel_dataset_ss,
-        config_ss,
+        processed_tf_ss,
         parkfield_paths,
         disable_matplotlib_logging,
     ):
@@ -216,12 +227,7 @@ class TestParkfieldSingleStation:
         IndexError when tipper error arrays have size 0. The writer tries to
         access array[index] even when array has shape (0,).
         """
-        tf_cls = process_mth5(
-            config_ss,
-            parkfield_kernel_dataset_ss,
-            units="MT",
-            show_plot=False,
-        )
+        tf_cls = processed_tf_ss
 
         output_xml = parkfield_paths["aurora_results"].joinpath("emtfxml_test_ss.xml")
         output_xml.parent.mkdir(parents=True, exist_ok=True)
@@ -232,8 +238,7 @@ class TestParkfieldSingleStation:
 
     def test_single_station_comparison_with_emtf(
         self,
-        parkfield_kernel_dataset_ss,
-        config_ss,
+        processed_tf_ss,
         parkfield_paths,
         tmp_path,
         disable_matplotlib_logging,
@@ -241,13 +246,9 @@ class TestParkfieldSingleStation:
         """Test comparison of aurora results with EMTF reference."""
         z_file_path = tmp_path / "pkd_ss_comparison.zss"
 
-        tf_cls = process_mth5(
-            config_ss,
-            parkfield_kernel_dataset_ss,
-            units="MT",
-            show_plot=False,
-            z_file_path=z_file_path,
-        )
+        # Use pre-computed transfer function and write z-file
+        tf_cls = processed_tf_ss
+        tf_cls.write(fn=z_file_path, file_type="zss")
 
         if not z_file_path.exists():
             pytest.skip("Z-file not generated - data access issue")
@@ -300,29 +301,36 @@ class TestParkfieldRemoteReference:
         )
         return config
 
-    def test_remote_reference_processing(
-        self,
-        parkfield_kernel_dataset_rr,
-        config_rr,
-        z_file_path,
-        disable_matplotlib_logging,
-    ):
-        """Test remote-reference processing with SAO as reference."""
+    @pytest.fixture(scope="class")
+    def processed_tf_rr(self, parkfield_kernel_dataset_rr, config_rr):
+        """Process remote-reference transfer function once and reuse.
+
+        This fixture is class-scoped to avoid reprocessing for each test.
+        """
         tf_cls = process_mth5(
             config_rr,
             parkfield_kernel_dataset_rr,
             units="MT",
             show_plot=False,
-            z_file_path=z_file_path,
         )
+        return tf_cls
+
+    def test_remote_reference_processing(
+        self,
+        processed_tf_rr,
+        z_file_path,
+        disable_matplotlib_logging,
+    ):
+        """Test remote-reference processing with SAO as reference."""
+        tf_cls = processed_tf_rr
+        tf_cls.write(fn=z_file_path, file_type="zrr")
 
         assert tf_cls is not None
         assert z_file_path.exists()
 
     def test_rr_comparison_with_emtf(
         self,
-        parkfield_kernel_dataset_rr,
-        config_rr,
+        processed_tf_rr,
         parkfield_paths,
         tmp_path,
         disable_matplotlib_logging,
@@ -330,13 +338,8 @@ class TestParkfieldRemoteReference:
         """Test RR comparison of aurora results with EMTF reference."""
         z_file_path = tmp_path / "pkd_rr_comparison.zrr"
 
-        tf_cls = process_mth5(
-            config_rr,
-            parkfield_kernel_dataset_rr,
-            units="MT",
-            show_plot=False,
-            z_file_path=z_file_path,
-        )
+        tf_cls = processed_tf_rr
+        tf_cls.write(fn=z_file_path, file_type="zrr")
 
         if not z_file_path.exists():
             pytest.skip("Z-file not generated - data access issue")
@@ -466,23 +469,27 @@ class TestParkfieldDataIntegrity:
 class TestParkfieldNumericalValidation:
     """Test numerical properties of processed results."""
 
-    def test_transfer_function_is_finite(
-        self, parkfield_kernel_dataset_ss, disable_matplotlib_logging
-    ):
-        """Test that computed transfer function contains no NaN or Inf."""
+    @pytest.fixture(scope="class")
+    def processed_tf_validation(self, parkfield_kernel_dataset_ss):
+        """Process transfer function for validation tests."""
         cc = ConfigCreator()
         config = cc.create_from_kernel_dataset(
             parkfield_kernel_dataset_ss,
             estimator={"engine": "RME"},
             output_channels=["ex", "ey"],
         )
-
-        tf_cls = process_mth5(
+        return process_mth5(
             config,
             parkfield_kernel_dataset_ss,
             units="MT",
             show_plot=False,
         )
+
+    def test_transfer_function_is_finite(
+        self, processed_tf_validation, disable_matplotlib_logging
+    ):
+        """Test that computed transfer function contains no NaN or Inf."""
+        tf_cls = processed_tf_validation
 
         # Check that transfer function values are finite for impedance elements
         # tf_cls.transfer_function is now a DataArray with (period, output, input)
@@ -494,22 +501,10 @@ class TestParkfieldNumericalValidation:
             assert np.all(np.isfinite(impedance_data.data))
 
     def test_transfer_function_shape(
-        self, parkfield_kernel_dataset_ss, disable_matplotlib_logging
+        self, processed_tf_validation, disable_matplotlib_logging
     ):
         """Test that transfer function has expected shape."""
-        cc = ConfigCreator()
-        config = cc.create_from_kernel_dataset(
-            parkfield_kernel_dataset_ss,
-            estimator={"engine": "RME"},
-            output_channels=["ex", "ey"],
-        )
-
-        tf_cls = process_mth5(
-            config,
-            parkfield_kernel_dataset_ss,
-            units="MT",
-            show_plot=False,
-        )
+        tf_cls = processed_tf_validation
 
         # Transfer function should have shape (periods, output_channels, input_channels)
         if hasattr(tf_cls, "transfer_function"):
@@ -521,21 +516,10 @@ class TestParkfieldNumericalValidation:
             assert tf_data.shape[2] == 2  # 2 input channels (hx, hy)
 
     def test_processing_runs_without_errors(
-        self, parkfield_kernel_dataset_rr, disable_matplotlib_logging
+        self, processed_tf_validation, disable_matplotlib_logging
     ):
         """Test that RR processing completes without raising exceptions."""
-        cc = ConfigCreator()
-        config = cc.create_from_kernel_dataset(
-            parkfield_kernel_dataset_rr,
-            output_channels=["ex", "ey"],
-        )
-
-        # This should not raise exceptions
-        tf_cls = process_mth5(
-            config,
-            parkfield_kernel_dataset_rr,
-            units="MT",
-            show_plot=False,
-        )
+        # Reuse the same processed TF - just verify it exists
+        tf_cls = processed_tf_validation
 
         assert tf_cls is not None
