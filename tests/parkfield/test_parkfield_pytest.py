@@ -19,6 +19,7 @@ from mth5.mth5 import MTH5
 
 from aurora.config.config_creator import ConfigCreator
 from aurora.pipelines.process_mth5 import process_mth5
+from aurora.sandbox.io_helpers.zfile_murphy import compare_z_files
 from aurora.sandbox.mth5_channel_summary_helpers import channel_summary_to_make_mth5
 from aurora.time_series.windowing_scheme import WindowingScheme
 from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
@@ -258,8 +259,22 @@ class TestParkfieldSingleStation:
         if not auxiliary_z_file.exists():
             pytest.skip("EMTF reference file not available")
 
-        ## need a to tests the impedances to make sure they are close.
+        # Compare transfer functions numerically
+        comparison = compare_z_files(
+            z_file_path,
+            auxiliary_z_file,
+            interpolate_to="self",  # Interpolate EMTF to Aurora periods
+            rtol=1e-2,  # Allow 1% relative difference
+            atol=1e-6,  # Small absolute tolerance
+        )
 
+        # Assert that transfer functions are reasonably close
+        # Note: Some difference is expected due to different processing algorithms
+        assert (
+            comparison["max_tf_diff"] < 1.0
+        ), f"Transfer functions differ too much: max diff = {comparison['max_tf_diff']}"
+
+        # Create comparison plot
         output_png = tmp_path / "SS_processing_comparison.png"
         compare_two_z_files(
             z_file_path,

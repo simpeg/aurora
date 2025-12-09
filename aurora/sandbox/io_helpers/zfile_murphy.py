@@ -1,9 +1,11 @@
 """
-    This module contains a class that was contributed by Ben Murphy for working with EMTF "Z-files"
+This module contains a class that was contributed by Ben Murphy for working with EMTF "Z-files"
 """
+
 import pathlib
-from typing import Optional, Union
 import re
+from typing import Optional, Union
+
 import numpy as np
 
 
@@ -138,7 +140,6 @@ class ZFile:
 
         # now read data for each period
         for i in range(self.nfreqs):
-
             # extract period
             line = f.readline().strip()
             match = re.match(
@@ -412,6 +413,232 @@ class ZFile:
             return self.pxy
         if mode == "yx":
             return self.pyx
+
+    def compare_transfer_functions(
+        self,
+        other: "ZFile",
+        interpolate_to: str = "self",
+        rtol: float = 1e-5,
+        atol: float = 1e-8,
+    ) -> dict:
+        """
+        Compare transfer functions between two ZFile objects.
+
+        Compares transfer_functions, sigma_e, and sigma_s arrays. If periods
+        don't match, interpolates one onto the other.
+
+        Parameters
+        ----------
+        other: ZFile
+            The other ZFile object to compare against
+        interpolate_to: str
+            Which periods to interpolate to: "self", "other", or "common"
+            - "self": interpolate other to self's periods
+            - "other": interpolate self to other's periods
+            - "common": use only common periods (no interpolation)
+        rtol: float
+            Relative tolerance for np.allclose, defaults to 1e-5
+        atol: float
+            Absolute tolerance for np.allclose, defaults to 1e-8
+
+        Returns
+        -------
+        comparison: dict
+            Dictionary containing:
+            - "periods_match": bool, whether periods are identical
+            - "transfer_functions_close": bool
+            - "sigma_e_close": bool
+            - "sigma_s_close": bool
+            - "max_tf_diff": float, max absolute difference in transfer functions
+            - "max_sigma_e_diff": float
+            - "max_sigma_s_diff": float
+            - "periods_used": np.ndarray of periods used for comparison
+        """
+        result = {}
+
+        # Check if periods match
+        periods_match = np.allclose(self.periods, other.periods, rtol=rtol, atol=atol)
+        result["periods_match"] = periods_match
+
+        if periods_match:
+            # Direct comparison
+            periods_used = self.periods
+            tf1 = self.transfer_functions
+            tf2 = other.transfer_functions
+            se1 = self.sigma_e
+            se2 = other.sigma_e
+            ss1 = self.sigma_s
+            ss2 = other.sigma_s
+        else:
+            # Need to interpolate
+            if interpolate_to == "self":
+                periods_used = self.periods
+                tf1 = self.transfer_functions
+                se1 = self.sigma_e
+                ss1 = self.sigma_s
+                tf2 = _interpolate_complex_array(
+                    other.periods, other.transfer_functions, periods_used
+                )
+                se2 = _interpolate_complex_array(
+                    other.periods, other.sigma_e, periods_used
+                )
+                ss2 = _interpolate_complex_array(
+                    other.periods, other.sigma_s, periods_used
+                )
+            elif interpolate_to == "other":
+                periods_used = other.periods
+                tf2 = other.transfer_functions
+                se2 = other.sigma_e
+                ss2 = other.sigma_s
+                tf1 = _interpolate_complex_array(
+                    self.periods, self.transfer_functions, periods_used
+                )
+                se1 = _interpolate_complex_array(
+                    self.periods, self.sigma_e, periods_used
+                )
+                ss1 = _interpolate_complex_array(
+                    self.periods, self.sigma_s, periods_used
+                )
+            elif interpolate_to == "common":
+                # Find common periods
+                common_mask_self = np.isin(self.periods, other.periods)
+                common_mask_other = np.isin(other.periods, self.periods)
+                if not np.any(common_mask_self):
+                    raise ValueError("No common periods found between the two ZFiles")
+                periods_used = self.periods[common_mask_self]
+                tf1 = self.transfer_functions[common_mask_self]
+                se1 = self.sigma_e[common_mask_self]
+                ss1 = self.sigma_s[common_mask_self]
+                tf2 = other.transfer_functions[common_mask_other]
+                se2 = other.sigma_e[common_mask_other]
+                ss2 = other.sigma_s[common_mask_other]
+            else:
+                raise ValueError(
+                    f"interpolate_to must be 'self', 'other', or 'common', got {interpolate_to}"
+                )
+
+        result["periods_used"] = periods_used
+
+        # Compare arrays
+        result["transfer_functions_close"] = np.allclose(tf1, tf2, rtol=rtol, atol=atol)
+        result["sigma_e_close"] = np.allclose(se1, se2, rtol=rtol, atol=atol)
+        result["sigma_s_close"] = np.allclose(ss1, ss2, rtol=rtol, atol=atol)
+
+        # Calculate max differences
+        result["max_tf_diff"] = np.max(np.abs(tf1 - tf2))
+        result["max_sigma_e_diff"] = np.max(np.abs(se1 - se2))
+        result["max_sigma_s_diff"] = np.max(np.abs(ss1 - ss2))
+
+        return result
+
+
+def _interpolate_complex_array(
+    periods_from: np.ndarray, array_from: np.ndarray, periods_to: np.ndarray
+) -> np.ndarray:
+    """
+    Interpolate complex array from one period axis to another.
+
+    Uses linear interpolation on real and imaginary parts separately.
+
+    Parameters
+    ----------
+    periods_from: np.ndarray
+        Original periods (1D)
+    array_from: np.ndarray
+        Original array (can be multi-dimensional, first axis is periods)
+    periods_to: np.ndarray
+        Target periods (1D)
+
+    Returns
+    -------
+    array_to: np.ndarray
+        Interpolated array with shape (len(periods_to), ...)
+    """
+    # Handle multi-dimensional arrays
+    shape_to = (len(periods_to),) + array_from.shape[1:]
+    array_to = np.zeros(shape_to, dtype=array_from.dtype)
+
+    # Flatten all dimensions except the first (periods)
+    original_shape = array_from.shape
+    array_from_flat = array_from.reshape(original_shape[0], -1)
+    array_to_flat = array_to.reshape(shape_to[0], -1)
+
+    # Interpolate each component
+    for i in range(array_from_flat.shape[1]):
+        # Interpolate real part
+        array_to_flat[:, i].real = np.interp(
+            periods_to, periods_from, array_from_flat[:, i].real
+        )
+        # Interpolate imaginary part
+        if np.iscomplexobj(array_from):
+            array_to_flat[:, i].imag = np.interp(
+                periods_to, periods_from, array_from_flat[:, i].imag
+            )
+
+    # Reshape back
+    array_to = array_to_flat.reshape(shape_to)
+
+    return array_to
+
+
+def compare_z_files(
+    z_file_path1: Union[str, pathlib.Path],
+    z_file_path2: Union[str, pathlib.Path],
+    angle1: float = 0.0,
+    angle2: float = 0.0,
+    interpolate_to: str = "self",
+    rtol: float = 1e-5,
+    atol: float = 1e-8,
+) -> dict:
+    """
+    Compare two z-files numerically.
+
+    Loads both z-files and compares their transfer functions, sigma_e, and
+    sigma_s arrays. If periods don't match, interpolates one onto the other.
+
+    Parameters
+    ----------
+    z_file_path1: Union[str, pathlib.Path]
+        Path to first z-file
+    z_file_path2: Union[str, pathlib.Path]
+        Path to second z-file
+    angle1: float
+        Rotation angle for first z-file, defaults to 0.0
+    angle2: float
+        Rotation angle for second z-file, defaults to 0.0
+    interpolate_to: str
+        Which periods to interpolate to: "self" (file1), "other" (file2), or "common"
+    rtol: float
+        Relative tolerance for comparison, defaults to 1e-5
+    atol: float
+        Absolute tolerance for comparison, defaults to 1e-8
+
+    Returns
+    -------
+    comparison: dict
+        Dictionary with comparison results including:
+        - "periods_match": bool
+        - "transfer_functions_close": bool
+        - "sigma_e_close": bool
+        - "sigma_s_close": bool
+        - "max_tf_diff": float
+        - "max_sigma_e_diff": float
+        - "max_sigma_s_diff": float
+        - "periods_used": np.ndarray
+
+    Examples
+    --------
+    >>> result = compare_z_files("file1.zss", "file2.zss")
+    >>> if result["transfer_functions_close"]:
+    ...     print("Transfer functions match!")
+    >>> print(f"Max difference: {result['max_tf_diff']}")
+    """
+    zfile1 = read_z_file(z_file_path1, angle=angle1)
+    zfile2 = read_z_file(z_file_path2, angle=angle2)
+
+    return zfile1.compare_transfer_functions(
+        zfile2, interpolate_to=interpolate_to, rtol=rtol, atol=atol
+    )
 
 
 def read_z_file(z_file_path, angle=0.0) -> ZFile:
