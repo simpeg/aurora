@@ -1,6 +1,6 @@
 """
-    This module contains the TrasnferFunctionKernel class which is the main object that
-    links the KernelDataset to Processing configuration.
+This module contains the TrasnferFunctionKernel class which is the main object that
+links the KernelDataset to Processing configuration.
 
 """
 
@@ -601,6 +601,17 @@ class TransferFunctionKernel(object):
 
         # Set key as first el't of dict, nor currently supporting mixed surveys in TF
         tf_cls.survey_metadata = self.dataset.local_survey_metadata
+
+        # Explicitly set station_metadata to ensure station ID is correct
+        # (TF.__init__ creates a default station with ID '0', we need to replace it)
+        # Convert timeseries.Station to dict, which TF._validate_station_metadata will convert to tf.Station
+        if (
+            hasattr(self.dataset.local_survey_metadata, "stations")
+            and len(self.dataset.local_survey_metadata.stations) > 0
+        ):
+            tf_cls.station_metadata = self.dataset.local_survey_metadata.stations[
+                0
+            ].to_dict()
 
         # pack the station metadata into the TF object
         # station_id = self.processing_config.stations.local.id
