@@ -316,7 +316,7 @@ class TransferFunctionKernel(object):
             raise ValueError(msg)
 
     def validate_decimation_scheme_and_dataset_compatability(
-        self, min_num_stft_windows=None
+        self, min_num_stft_windows=1
     ):
         """
         Checks that the decimation_scheme and dataset are compatable.
