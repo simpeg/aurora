@@ -4,6 +4,7 @@
 
 """
 
+from aurora import __version__ as aurora_version
 from aurora.config.metadata.processing import Processing
 from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.time_series_helpers import prototype_decimate
@@ -600,13 +601,16 @@ class TransferFunctionKernel(object):
         tf_cls.residual_covariance = res_cov
 
         # Set key as first el't of dict, nor currently supporting mixed surveys in TF
-        tf_cls.survey_metadata = self.dataset.local_survey_metadata
+        tf_cls.survey_metadata = self.dataset.survey_metadata
+        tf_cls.station_metadata.provenance.creation_time = pd.Timestamp.now()
+        tf_cls.station_metadata.provenance.processing_type = self.processing_type
+        tf_cls.station_metadata.transfer_function.processed_date = pd.Timestamp.now()
+        tf_cls.station_metadata.transfer_function.runs_processed = list(self.dataset.survey_metadata.stations[0].runs.keys())
+        #TODO: tf_cls.station_metadata.transfer_function.processing_config = self.processing_config
 
-        # pack the station metadata into the TF object
-        # station_id = self.processing_config.stations.local.id
-        # station_sub_df = self.dataset_df[self.dataset_df["station"] == station_id]
-        # station_row = station_sub_df.iloc[0]
-        # station_obj = station_obj_from_row(station_row)
+        tf_cls.station_metadata.transfer_function.software.author = "K. Kappler"
+        tf_cls.station_metadata.transfer_function.software.name = "Aurora"
+        tf_cls.station_metadata.transfer_function.software.version = aurora_version
 
         # modify the run metadata to match the channel nomenclature
         # TODO: this should be done inside the TF initialization
@@ -619,12 +623,6 @@ class TransferFunctionKernel(object):
                 tf_cls.station_metadata.runs[i_run].remove_channel(default_component)
                 tf_cls.station_metadata.runs[i_run].add_channel(new_ch)
 
-        # set processing type
-        tf_cls.station_metadata.transfer_function.processing_type = self.processing_type
-
-        # tf_cls.station_metadata.transfer_function.processing_config = (
-        #     self.processing_config
-        # )
         return tf_cls
 
     def memory_check(self) -> None:
