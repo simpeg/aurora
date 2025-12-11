@@ -279,6 +279,8 @@ def effective_degrees_of_freedom_weights(
     """
     # Initialize the weights
     n_observations_initial = len(X.observation)
+    if n_observations_initial == 0:
+        raise ValueError("Zero observations in the input data.")
     weights = np.ones(n_observations_initial)
 
     # validate num channels
