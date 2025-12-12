@@ -40,22 +40,22 @@ def extract_features(
     except Exception as e:
         msg = f"Features could not be accessed from MTH5 -- {e}\n"
         msg += "Calculating features on the fly (development only)"
-        logger.warning(msg)
+        logger.info(msg)
 
     for (
         chws
     ) in dec_level_config.channel_weight_specs:  # This refers to solving a TF equation
         # Loop over features and compute them
         msg = f"channel weight spec:\n {chws}"
-        logger.info(msg)
+        logger.debug(msg)
         for fws in chws.feature_weight_specs:
             msg = f"feature weight spec: {fws}"
-            logger.info(msg)
+            logger.debug(msg)
             feature = fws.feature
             msg = f"feature: {feature}"
-            logger.info(msg)
+            logger.debug(msg)
             msg = f"feature type: {type(feature).__name__}, has validate_station_ids: {hasattr(feature, 'validate_station_ids')}"
-            logger.info(msg)
+            logger.debug(msg)
             feature_chunks = []
             if feature.name == "coherence":
                 msg = f"{feature.name} is not supported as a data weighting feature"
@@ -110,7 +110,7 @@ def extract_features(
                         decimation_obj=dec_level_config, run_xrds=ch2_data
                     )
                     msg = f"Data for computing {feature.name} on {start} -- {end} ready"
-                    logger.info(msg)
+                    logger.debug(msg)
                     # Compute the feature.
                     freqs, coherence_spectrogram = feature.compute(ch1_data, ch2_data)
                     # TODO: consider making get_time_axis() a method of the feature class
@@ -194,7 +194,7 @@ def calculate_weights(
     # loop the channel weight specs
     for chws in dec_level_config.channel_weight_specs:
         msg = f"{chws}"
-        logger.info(msg)
+        logger.debug(msg)
         # TODO: Consider calculating all the weight kernels in advance, case switching on the combination style.
         if chws.combination_style == "multiplication":
             print(f"chws.combination_style {chws.combination_style}")
@@ -203,10 +203,10 @@ def calculate_weights(
             # loop the feature weight specs
             for fws in chws.feature_weight_specs:
                 msg = f"feature weight spec: {fws}"
-                logger.info(msg)
+                logger.debug(msg)
                 feature = fws.feature
                 msg = f"feature: {feature}"
-                logger.info(msg)
+                logger.debug(msg)
                 # TODO: confirm that the feature object has its data
                 print("feature.data", feature.data, len(feature.data))
 
