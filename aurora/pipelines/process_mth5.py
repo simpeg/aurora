@@ -193,7 +193,8 @@ def process_mth5_legacy(
             calculate_weights(dec_level_config, tfk_dataset)
         except Exception as e:
             msg = f"Feature weights calculation Failed -- procesing without weights -- {e}"
-            logger.warning(msg)
+            #logger.warning(msg)
+            logger.exception(msg)
 
         ttfz_obj = process_tf_decimation_level(
             tfk.config,

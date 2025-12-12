@@ -206,6 +206,10 @@ def calculate_weights(
             weights = None
             # loop the feature weight specs
             for fws in chws.feature_weight_specs:
+                if fws.weight_kernels is None:
+                    msg = f"Feature weight spec {fws} has no weight kernels defined, skipping"
+                    logger.warning(msg)
+                    continue  # skip this feature weight spec
                 msg = f"feature weight spec: {fws}"
                 logger.debug(msg)
                 feature = fws.feature
@@ -224,10 +228,10 @@ def calculate_weights(
                         weights *= wk.evaluate(feature.data)
                 # chws.weights[fws.feature.name] = weights
             chws.weights = weights
-            logger.info(f"Computed weights for {chws.output_channels} using {chws.combination_style} combination style.")
+            logger.info(f"Computed weights for {str(chws.output_channels)} using {str(chws.combination_style)} combination style.")
 
         else:
-            msg = f"chws.combination_style {chws.combination_style} not implemented"
+            msg = f"chws.combination_style {str(chws.combination_style)} not implemented"
             raise ValueError(msg)
 
     return
