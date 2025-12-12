@@ -137,7 +137,11 @@ def extract_features(
                     )
                     feature_chunks.append(coherence_spectrogram_xr)
                 feature_data = xr.concat(feature_chunks, "time")
+                # should fill NaNs with 0s, otherwise thing break downstream.
+                feature_data = feature_data.fillna(0)
                 feature.data = feature_data  # bind feature data to feature instance (maybe temporal workaround)
+
+                logger.info(f"Feature {feature.name} computed. Data has shape {feature_data.shape}")
 
     return
 
@@ -208,7 +212,7 @@ def calculate_weights(
                 msg = f"feature: {feature}"
                 logger.debug(msg)
                 # TODO: confirm that the feature object has its data
-                print("feature.data", feature.data, len(feature.data))
+                #print("feature.data", feature.data, len(feature.data))
 
                 # TODO: Now apply the fws weighting to the feature data
                 #  Hopefully this is independent of the feature.
@@ -220,6 +224,7 @@ def calculate_weights(
                         weights *= wk.evaluate(feature.data)
                 # chws.weights[fws.feature.name] = weights
             chws.weights = weights
+            logger.info(f"Computed weights for {chws.output_channels} using {chws.combination_style} combination style.")
 
         else:
             msg = f"chws.combination_style {chws.combination_style} not implemented"
