@@ -327,6 +327,7 @@ class TestParkfieldRemoteReference:
             parkfield_kernel_dataset_rr,
             units="MT",
             show_plot=False,
+            return_collection=False,
         )
         return tf_cls
 
