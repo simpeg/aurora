@@ -341,27 +341,32 @@ def parkfield_paths():
 def parkfield_h5_master(tmp_path_factory):
     """Create the master Parkfield MTH5 file once per test session.
 
-    This downloads data from NCEDC only once and caches it for the entire
-    test session. Individual workers will copy this file to their own
-    isolated directories.
+    This downloads data from NCEDC and caches it in a persistent directory
+    (.cache/aurora/parkfield) so it doesn't need to be re-downloaded for
+    subsequent test runs. Only created once across all sessions.
     """
     from aurora.test_utils.parkfield.make_parkfield_mth5 import ensure_h5_exists
 
-    cache_key = "parkfield_master"
+    # Use a persistent cache directory instead of temp
+    # This way the file survives across test sessions
+    cache_dir = Path.home() / ".cache" / "aurora" / "parkfield"
+    cache_dir.mkdir(parents=True, exist_ok=True)
 
-    # Check global cache first (shared across workers via filesystem)
+    # Check if file already exists in persistent cache
+    cached_file = cache_dir / "parkfield.h5"
+    if cached_file.exists():
+        return cached_file
+
+    # Check global cache first (for current session)
+    cache_key = "parkfield_master"
     cached = _MTH5_GLOBAL_CACHE.get(cache_key)
     if cached:
         p = Path(cached)
         if p.exists():
             return p
 
-    # Create master directory in temp (shared across workers)
-    master_dir = tmp_path_factory.getbasetemp() / "parkfield_master"
-    master_dir.mkdir(exist_ok=True)
-
     try:
-        h5_path = ensure_h5_exists(target_folder=master_dir)
+        h5_path = ensure_h5_exists(target_folder=cache_dir)
         _MTH5_GLOBAL_CACHE[cache_key] = str(h5_path)
         return h5_path
     except IOError:
@@ -372,8 +377,10 @@ def parkfield_h5_master(tmp_path_factory):
 def parkfield_h5_path(parkfield_h5_master, tmp_path_factory, worker_id):
     """Copy master Parkfield MTH5 to worker-safe location.
 
-    This fixture copies the master MTH5 file (created once) to a worker-specific
-    temp directory to avoid file handle conflicts in pytest-xdist parallel execution.
+    The master file is created once and cached persistently in
+    ~/.cache/aurora/parkfield/ so it doesn't need to be re-downloaded.
+    This fixture copies that cached file to a worker-specific temp
+    directory to avoid file handle conflicts in pytest-xdist parallel execution.
     """
     import shutil
 
