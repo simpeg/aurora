@@ -27,33 +27,29 @@ Note 3: This point in the loop marks the interface between _generation_ of the F
 
 """
 
-import mth5.groups
+from typing import Optional, Tuple, Union
+
+import xarray as xr
+from loguru import logger
+from mth5.helpers import close_open_files
+
+import aurora.config.metadata.processing
 
 # =============================================================================
 # Imports
 # =============================================================================
-from aurora.pipelines.feature_weights import calculate_weights
-from aurora.pipelines.feature_weights import extract_features
+from aurora.pipelines.feature_weights import calculate_weights, extract_features
 from aurora.pipelines.transfer_function_helpers import (
     process_transfer_functions,
     process_transfer_functions_with_weights,
 )
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
-from aurora.time_series.spectrogram_helpers import get_spectrograms
-from aurora.time_series.spectrogram_helpers import merge_stfts
+from aurora.time_series.spectrogram_helpers import get_spectrograms, merge_stfts
 from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
 )
 from aurora.transfer_function.TTFZ import TTFZ
 
-from loguru import logger
-from mth5.helpers import close_open_files
-from mth5.processing import KernelDataset
-from typing import Literal, Optional, Tuple, Union
-
-import aurora.config.metadata.processing
-import pandas as pd
-import xarray as xr
 
 SUPPORTED_PROCESSINGS = [
     "legacy",
@@ -193,7 +189,7 @@ def process_mth5_legacy(
             calculate_weights(dec_level_config, tfk_dataset)
         except Exception as e:
             msg = f"Feature weights calculation Failed -- procesing without weights -- {e}"
-            #logger.warning(msg)
+            # logger.warning(msg)
             logger.exception(msg)
 
         ttfz_obj = process_tf_decimation_level(
