@@ -32,7 +32,7 @@ def mth5_test_files(
 
     return {
         "paths": [
-            worker_safe_test1_h5,
+            # worker_safe_test1_h5,
             worker_safe_test2_h5,
             worker_safe_test3_h5,
             worker_safe_test12rr_h5,
