@@ -627,6 +627,16 @@ class TransferFunctionKernel(object):
             for i_ch, channel in enumerate(run.channels):
                 new_ch = channel.copy()
                 default_component = channel.component
+                if default_component not in channel_nomenclature_dict:
+                    logger.error(
+                        f"Component '{default_component}' not found in channel_nomenclature_dict"
+                    )
+                    logger.error(
+                        f"Available keys: {list(channel_nomenclature_dict.keys())}"
+                    )
+                    raise KeyError(
+                        f"Component '{default_component}' not found in channel_nomenclature_dict. Available: {list(channel_nomenclature_dict.keys())}"
+                    )
                 new_component = channel_nomenclature_dict[default_component]
                 new_ch.component = new_component
                 tf_cls.station_metadata.runs[i_run].remove_channel(default_component)

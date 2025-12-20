@@ -32,7 +32,7 @@ def mth5_test_files(
 
     return {
         "paths": [
-            # worker_safe_test1_h5,
+            worker_safe_test1_h5,
             worker_safe_test2_h5,
             worker_safe_test3_h5,
             worker_safe_test12rr_h5,
@@ -45,44 +45,215 @@ def test_add_fcs_to_all_synthetic_files(mth5_test_files, subtests):
     """Test adding Fourier Coefficients to each synthetic file.
 
     Uses the to_fc_decimation() method of AuroraDecimationLevel.
+    Tests each step of the workflow with detailed validation:
+    1. File validation (exists, can open, has structure)
+    2. RunSummary creation and validation
+    3. KernelDataset creation and validation
+    4. Processing config creation and validation
+    5. FC addition and validation
+    6. FC readback validation
+    7. Processing with FCs
     """
+    from mth5 import mth5
+
     for mth5_path in mth5_test_files["paths"]:
+        subtest_name = mth5_path.stem
         with subtests.test(file=mth5_path.stem):
-            mth5_paths = [mth5_path]
-            run_summary = RunSummary()
-            run_summary.from_mth5s(mth5_paths)
-            tfk_dataset = KernelDataset()
+            logger.info(f"\n{'='*80}\nTesting {mth5_path.stem}\n{'='*80}")
 
-            # Get Processing Config
-            if mth5_path.stem in ["test1", "test2"]:
-                station_id = mth5_path.stem
-                tfk_dataset.from_run_summary(run_summary, station_id)
-                processing_config = create_test_run_config(station_id, tfk_dataset)
-            elif mth5_path.stem in ["test3"]:
-                station_id = "test3"
-                tfk_dataset.from_run_summary(run_summary, station_id)
-                cc = ConfigCreator()
-                processing_config = cc.create_from_kernel_dataset(tfk_dataset)
-            elif mth5_path.stem in ["test12rr"]:
-                tfk_dataset.from_run_summary(run_summary, "test1", "test2")
-                cc = ConfigCreator()
-                processing_config = cc.create_from_kernel_dataset(tfk_dataset)
+            # Step 1: File validation
+            with subtests.test(step=f"{subtest_name}_file_exists"):
+                assert mth5_path.exists(), f"{mth5_path.stem} not found at {mth5_path}"
+                logger.info(f"✓ File exists: {mth5_path}")
 
-            # Extract FC decimations from processing config and build the layer
-            fc_decimations = [
-                x.to_fc_decimation() for x in processing_config.decimations
-            ]
-            # For code coverage, have a case where fc_decimations is None
-            # This also (indirectly) tests a different FCDecimation object.
-            if mth5_path.stem == "test1":
-                fc_decimations = None
+            with subtests.test(step=f"{subtest_name}_file_opens"):
+                with mth5.MTH5(file_version="0.1.0") as m:
+                    m.open_mth5(mth5_path, mode="r")
+                    stations = m.stations_group.groups_list
+                    assert len(stations) > 0, f"No stations found in {mth5_path.stem}"
+                    logger.info(f"✓ File opens, stations: {stations}")
 
-            add_fcs_to_mth5(mth5_path, fc_decimations=fc_decimations)
-            read_back_fcs(mth5_path)
+            with subtests.test(step=f"{subtest_name}_has_runs_and_channels"):
+                with mth5.MTH5(file_version="0.1.0") as m:
+                    m.open_mth5(mth5_path, mode="r")
+                    for station_id in m.stations_group.groups_list:
+                        station = m.get_station(station_id)
+                        runs = [
+                            r
+                            for r in station.groups_list
+                            if r
+                            not in [
+                                "Transfer_Functions",
+                                "Fourier_Coefficients",
+                                "Features",
+                            ]
+                        ]
+                        assert len(runs) > 0, f"Station {station_id} has no runs"
 
-            # Confirm the file still processes fine with the fcs inside
-            tfc = process_mth5(processing_config, tfk_dataset=tfk_dataset)
-            assert tfc is not None
+                        for run_id in runs:
+                            run = station.get_run(run_id)
+                            channels = run.groups_list
+                            assert len(channels) > 0, f"Run {run_id} has no channels"
+
+                            # Verify channels have data
+                            for ch_name in channels:
+                                ch = run.get_channel(ch_name)
+                                assert (
+                                    ch.n_samples > 0
+                                ), f"Channel {ch_name} has no data"
+
+                        logger.info(
+                            f"✓ Station {station_id}: {len(runs)} run(s), channels validated"
+                        )
+
+            # Step 2: RunSummary creation and validation
+            with subtests.test(step=f"{subtest_name}_run_summary"):
+                mth5_paths = [mth5_path]
+                run_summary = RunSummary()
+                run_summary.from_mth5s(mth5_paths)
+
+                assert (
+                    len(run_summary.df) > 0
+                ), f"RunSummary is empty for {mth5_path.stem}"
+
+                # Validate sample rates are positive
+                invalid_rates = run_summary.df[run_summary.df.sample_rate <= 0]
+                assert len(invalid_rates) == 0, (
+                    f"RunSummary has {len(invalid_rates)} entries with invalid sample_rate:\n"
+                    f"{invalid_rates[['station', 'run', 'sample_rate']]}"
+                )
+
+                logger.info(
+                    f"✓ RunSummary: {len(run_summary.df)} entries, "
+                    f"sample_rates={run_summary.df.sample_rate.unique()}"
+                )
+
+            # Step 3: KernelDataset creation and validation
+            with subtests.test(step=f"{subtest_name}_kernel_dataset"):
+                tfk_dataset = KernelDataset()
+
+                # Get Processing Config - determine station IDs
+                if mth5_path.stem in ["test1", "test2"]:
+                    station_id = mth5_path.stem
+                    tfk_dataset.from_run_summary(run_summary, station_id)
+                elif mth5_path.stem in ["test3"]:
+                    station_id = "test3"
+                    tfk_dataset.from_run_summary(run_summary, station_id)
+                elif mth5_path.stem in ["test12rr"]:
+                    tfk_dataset.from_run_summary(run_summary, "test1", "test2")
+
+                assert (
+                    len(tfk_dataset.df) > 0
+                ), f"KernelDataset is empty for {mth5_path.stem}"
+                assert (
+                    "station" in tfk_dataset.df.columns
+                ), "KernelDataset missing 'station' column"
+                assert (
+                    "run" in tfk_dataset.df.columns
+                ), "KernelDataset missing 'run' column"
+
+                logger.info(
+                    f"✓ KernelDataset: {len(tfk_dataset.df)} entries, "
+                    f"stations={tfk_dataset.df.station.unique()}"
+                )
+
+            # Step 4: Processing config creation and validation
+            with subtests.test(step=f"{subtest_name}_processing_config"):
+                if mth5_path.stem in ["test1", "test2"]:
+                    processing_config = create_test_run_config(station_id, tfk_dataset)
+                elif mth5_path.stem in ["test3", "test12rr"]:
+                    cc = ConfigCreator()
+                    processing_config = cc.create_from_kernel_dataset(tfk_dataset)
+
+                assert processing_config is not None, "Processing config is None"
+                assert (
+                    len(processing_config.decimations) > 0
+                ), "No decimations in processing config"
+                assert (
+                    processing_config.channel_nomenclature is not None
+                ), "No channel nomenclature"
+
+                logger.info(
+                    f"✓ Processing config: {len(processing_config.decimations)} decimations"
+                )
+
+            # Step 5: FC addition and validation
+            with subtests.test(step=f"{subtest_name}_add_fcs"):
+                # Extract FC decimations from processing config
+                fc_decimations = [
+                    x.to_fc_decimation() for x in processing_config.decimations
+                ]
+                # For code coverage, test with fc_decimations=None for test1
+                if mth5_path.stem == "test1":
+                    fc_decimations = None
+
+                # Verify no FC group before adding
+                with mth5.MTH5(file_version="0.1.0") as m:
+                    m.open_mth5(mth5_path, mode="r")
+                    for station_id in m.stations_group.groups_list:
+                        station = m.get_station(station_id)
+                        groups_before = station.groups_list
+                        # FC group might already exist from previous runs, but should be empty or absent
+
+                add_fcs_to_mth5(mth5_path, fc_decimations=fc_decimations)
+
+                # Validate FC group exists and has content
+                with mth5.MTH5(file_version="0.1.0") as m:
+                    m.open_mth5(mth5_path, mode="r")
+                    for station_id in m.stations_group.groups_list:
+                        station = m.get_station(station_id)
+                        groups_after = station.groups_list
+
+                        assert "Fourier_Coefficients" in groups_after, (
+                            f"Fourier_Coefficients group not found in station {station_id} "
+                            f"after adding FCs. Groups: {groups_after}"
+                        )
+
+                        fc_group = station.fourier_coefficients_group
+                        fc_runs = fc_group.groups_list
+                        assert (
+                            len(fc_runs) > 0
+                        ), f"No FC runs found in station {station_id} after adding FCs"
+
+                        # Validate each FC run has decimation levels
+                        for fc_run_id in fc_runs:
+                            fc_run = fc_group.get_fc_group(fc_run_id)
+                            dec_levels = fc_run.groups_list
+                            assert (
+                                len(dec_levels) > 0
+                            ), f"No decimation levels in FC run {fc_run_id}"
+
+                        logger.info(
+                            f"✓ FCs added to station {station_id}: "
+                            f"{len(fc_runs)} run(s), {len(dec_levels)} decimation level(s)"
+                        )
+
+            # Step 6: FC readback validation
+            with subtests.test(step=f"{subtest_name}_read_back_fcs"):
+                # This tests that FCs can be read back from the file
+                read_back_fcs(mth5_path)
+                logger.info(f"✓ FCs read back successfully")
+
+            # Step 7: Processing with FCs
+            with subtests.test(step=f"{subtest_name}_process_with_fcs"):
+                tfc = process_mth5(processing_config, tfk_dataset=tfk_dataset)
+
+                assert (
+                    tfc is not None
+                ), f"process_mth5 returned None for {mth5_path.stem}"
+                assert hasattr(
+                    tfc, "station_metadata"
+                ), "TF object missing station_metadata"
+                assert (
+                    len(tfc.station_metadata.runs) > 0
+                ), "TF object has no runs in metadata"
+
+                logger.info(
+                    f"✓ Processing completed: {type(tfc).__name__}, "
+                    f"{len(tfc.station_metadata.runs)} run(s) processed"
+                )
+
+            logger.info(f"✓ All tests passed for {mth5_path.stem}\n")
 
 
 def test_fc_decimations_creator():
