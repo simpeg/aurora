@@ -51,6 +51,9 @@ addopts = ["--import-mode=importlib"]
 test = [
     "pytest>=3",
     "pytest-runner",
+    "pytest-xdist",
+    "pytest-subtests",
+    "pytest-benchmark",
 ]
 dev = [
     "black",
