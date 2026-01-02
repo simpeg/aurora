@@ -599,13 +599,13 @@ class TransferFunctionKernel(object):
         # Set survey metadata from the dataset
         # self.dataset.survey_metadata now returns a Survey object (not a dict)
         # Only set it if the TF object doesn't already have survey metadata
-        if tf_cls.survey_metadata is None or (
-            hasattr(tf_cls.survey_metadata, "__len__")
-            and len(tf_cls.survey_metadata) == 0
-        ):
-            survey_obj = self.dataset.survey_metadata
-            if survey_obj is not None:
-                tf_cls.survey_metadata = survey_obj
+        # if tf_cls.survey_metadata is None or (
+        #     hasattr(tf_cls.survey_metadata, "__len__")
+        #     and len(tf_cls.survey_metadata) == 0
+        # ):
+        survey_obj = self.dataset.survey_metadata
+        if survey_obj is not None:
+            tf_cls.survey_metadata = survey_obj
 
         # Set station metadata and processing info
         tf_cls.station_metadata.provenance.creation_time = pd.Timestamp.now()
