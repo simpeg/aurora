@@ -621,26 +621,45 @@ class TransferFunctionKernel(object):
         tf_cls.station_metadata.transfer_function.software.name = "Aurora"
         tf_cls.station_metadata.transfer_function.software.version = aurora_version
 
-        # modify the run metadata to match the channel nomenclature
-        # TODO: this should be done inside the TF initialization
-        for i_run, run in enumerate(tf_cls.station_metadata.runs):
-            for i_ch, channel in enumerate(run.channels):
-                new_ch = channel.copy()
-                default_component = channel.component
-                if default_component not in channel_nomenclature_dict:
-                    logger.error(
-                        f"Component '{default_component}' not found in channel_nomenclature_dict"
+        # modify the run metadata to match the channel nomenclature, this should only be done if the
+        # channels are different than the expected channel_nomenclature
+        channels_named_incorrectly = False
+        for ch in tf_cls.station_metadata.channels_recorded:
+            if ch not in channel_nomenclature_dict.values():
+                logger.warning(
+                    f"Channel '{ch}' not found in channel_nomenclature_dict values"
+                )
+                logger.warning(
+                    f"Available values: {list(channel_nomenclature_dict.values())}"
+                )
+                channels_named_incorrectly = True
+
+        # This should be a last ditch effor to rename channels, the nomenclature should
+        # propagate from the MTH5 through the processing to the TF object
+        if channels_named_incorrectly:
+            logger.info(
+                "Modifying channel nomenclature in station metadata to match specified channel_nomenclature"
+            )
+            for i_run, run in enumerate(tf_cls.station_metadata.runs):
+                for channel in run.channels:
+                    new_ch = channel.copy()
+                    default_component = channel.component
+                    if default_component not in channel_nomenclature_dict:
+                        logger.error(
+                            f"Component '{default_component}' not found in channel_nomenclature_dict"
+                        )
+                        logger.error(
+                            f"Available keys: {list(channel_nomenclature_dict.keys())}"
+                        )
+                        raise KeyError(
+                            f"Component '{default_component}' not found in channel_nomenclature_dict. Available: {list(channel_nomenclature_dict.keys())}"
+                        )
+                    new_component = channel_nomenclature_dict[default_component]
+                    new_ch.component = new_component
+                    tf_cls.station_metadata.runs[i_run].remove_channel(
+                        default_component
                     )
-                    logger.error(
-                        f"Available keys: {list(channel_nomenclature_dict.keys())}"
-                    )
-                    raise KeyError(
-                        f"Component '{default_component}' not found in channel_nomenclature_dict. Available: {list(channel_nomenclature_dict.keys())}"
-                    )
-                new_component = channel_nomenclature_dict[default_component]
-                new_ch.component = new_component
-                tf_cls.station_metadata.runs[i_run].remove_channel(default_component)
-                tf_cls.station_metadata.runs[i_run].add_channel(new_ch)
+                    tf_cls.station_metadata.runs[i_run].add_channel(new_ch)
 
         return tf_cls
 
