@@ -149,7 +149,7 @@ class TransferFunctionKernel(object):
                 run_xrds = row["run_dataarray"].to_dataset("channel")
                 decimation = self.config.decimations[i_dec_level].decimation
                 decimated_xrds = prototype_decimate(decimation, run_xrds)
-                self.dataset_df["run_dataarray"].at[i] = decimated_xrds.to_array(
+                self.dataset_df.loc[i, "run_dataarray"] = decimated_xrds.to_array(
                     "channel"
                 )  # See Note 1 above
 
