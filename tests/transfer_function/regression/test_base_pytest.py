@@ -51,7 +51,7 @@ def mini_dataset_full():
         ]
     )
     timestamps = pd.date_range(
-        start=pd.Timestamp("1977-03-02T06:00:00"), periods=len(ex_data), freq="S"
+        start=pd.Timestamp("1977-03-02T06:00:00"), periods=len(ex_data), freq="s"
     )
     frequency = 0.666 * np.ones(len(ex_data))
 
@@ -76,7 +76,7 @@ def mini_dataset_single():
     hy_data = np.array([1.94321684e-07 + 3.71934877e-07j])
 
     timestamps = pd.date_range(
-        start=pd.Timestamp("1977-03-02T06:00:00"), periods=len(ex_data), freq="S"
+        start=pd.Timestamp("1977-03-02T06:00:00"), periods=len(ex_data), freq="s"
     )
     frequency = 0.666 * np.ones(len(ex_data))
 
