@@ -438,7 +438,7 @@ def parkfield_kernel_dataset_ss(parkfield_h5_path):
     run_summary = RunSummary()
     run_summary.from_mth5s([parkfield_h5_path])
     tfk_dataset = KernelDataset()
-    tfk_dataset.from_run_summary(run_summary, "PKD")
+    tfk_dataset.from_run_summary(run_summary=run_summary, local_station_id="PKD")
     return tfk_dataset
 
 
@@ -450,7 +450,9 @@ def parkfield_kernel_dataset_rr(parkfield_h5_path):
     run_summary = RunSummary()
     run_summary.from_mth5s([parkfield_h5_path])
     tfk_dataset = KernelDataset()
-    tfk_dataset.from_run_summary(run_summary, "PKD", "SAO")
+    tfk_dataset.from_run_summary(
+        run_summary=run_summary, local_station_id="PKD", remote_station_id="SAO"
+    )
     return tfk_dataset
 
 
