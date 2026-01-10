@@ -151,7 +151,7 @@ def process_synthetic_1(
             "hy": 5.0,
             "hz": 100.0,
         }
-        tfk_dataset.df.loc[0, "channel_scale_factors"] = scale_factors
+        tfk_dataset.df.at[0, "channel_scale_factors"] = scale_factors
     else:
         tfk_dataset.df.drop(columns=["channel_scale_factors"], inplace=True)
 
