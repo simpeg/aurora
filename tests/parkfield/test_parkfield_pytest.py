@@ -15,6 +15,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+from loguru import logger
 from mth5.mth5 import MTH5
 
 from aurora.config.config_creator import ConfigCreator
@@ -253,7 +254,7 @@ class TestParkfieldSingleStation:
     ):
         """Test comparison of aurora results with EMTF reference."""
         z_file_path = tmp_path / "pkd_ss_comparison.zss"
-
+        logger.info(f"Z-file path for comparison: {z_file_path}")
         # Use pre-computed transfer function and write z-file
         tf_cls = processed_tf_ss
         tf_cls.write(fn=z_file_path, file_type="zss")
@@ -266,23 +267,9 @@ class TestParkfieldSingleStation:
         if not auxiliary_z_file.exists():
             pytest.skip("EMTF reference file not available")
 
-        # Compare transfer functions numerically
-        comparison = compare_z_files(
-            z_file_path,
-            auxiliary_z_file,
-            interpolate_to="self",  # Interpolate EMTF to Aurora periods
-            rtol=1e-2,  # Allow 1% relative difference
-            atol=1e-6,  # Small absolute tolerance
-        )
-
-        # Assert that transfer functions are reasonably close
-        # Note: Some difference is expected due to different processing algorithms
-        assert (
-            comparison["max_tf_diff"] < 1.0
-        ), f"Transfer functions differ too much: max diff = {comparison['max_tf_diff']}"
-
         # Create comparison plot
         output_png = tmp_path / "SS_processing_comparison.png"
+        logger.info(f"Comparison plot path: {output_png}")
         compare_two_z_files(
             z_file_path,
             auxiliary_z_file,
@@ -298,6 +285,21 @@ class TestParkfieldSingleStation:
         )
 
         assert output_png.exists()
+
+        # Compare transfer functions numerically
+        comparison = compare_z_files(
+            z_file_path,
+            auxiliary_z_file,
+            interpolate_to="self",  # Interpolate EMTF to Aurora periods
+            rtol=1e-2,  # Allow 1% relative difference
+            atol=1e-6,  # Small absolute tolerance
+        )
+
+        # Assert that transfer functions are reasonably close
+        # Note: Some difference is expected due to different processing algorithms
+        assert (
+            comparison["max_tf_diff"] < 1.0
+        ), f"Transfer functions differ too much: max diff = {comparison['max_tf_diff']}"
 
 
 # ============================================================================
