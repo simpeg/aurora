@@ -10,8 +10,10 @@
       to ensure that the user has write permissions.
 """
 
-# from aurora.general_helper_functions import DATA_PATH
-import pathlib
+from aurora.general_helper_functions import DATA_PATH
+
+
+# import pathlib
 
 
 def make_parkfield_paths() -> dict:
@@ -23,8 +25,8 @@ def make_parkfield_paths() -> dict:
     parkfield_paths: dict
         Dict containing paths to "data", "aurora_results", "config", "emtf_results"
     """
-    # base_path = DATA_PATH.joinpath("parkfield")
-    base_path = pathlib.Path.home().joinpath(".cache", "aurora", "parkfield")
+    base_path = DATA_PATH.joinpath("parkfield")
+    # base_path = pathlib.Path.home().joinpath(".cache", "aurora", "parkfield")
 
     parkfield_paths = {}
     parkfield_paths["data"] = base_path
