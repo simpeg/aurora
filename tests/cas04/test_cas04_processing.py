@@ -158,76 +158,131 @@ def cas04_emtf_reference():
         pytest.skip(f"Could not read EMTF file (pydantic validation issue): {e}")
 
 
-@pytest.fixture(scope="session", params=["v010", "v020"])
-def cas04_mth5_path(request, global_fdsn_miniseed_v010, global_fdsn_miniseed_v020):
-    """Parameterized fixture providing both v0.1.0 and v0.2.0 CAS04 MTH5 files."""
-    if request.param == "v010":
-        return global_fdsn_miniseed_v010
-    else:
-        return global_fdsn_miniseed_v020
-
-
+# Separate session fixtures for v010 and v020 to enable better parallelization
 @pytest.fixture(scope="session")
-def session_cas04_run_summary(cas04_mth5_path):
-    """Session-scoped RunSummary from CAS04 MTH5 file."""
+def session_cas04_run_summary_v010(global_fdsn_miniseed_v010):
+    """Session-scoped RunSummary for v0.1.0."""
     run_summary = RunSummary()
-    run_summary.from_mth5s([cas04_mth5_path])
+    run_summary.from_mth5s([global_fdsn_miniseed_v010])
     return run_summary
 
 
 @pytest.fixture(scope="session")
-def session_cas04_kernel_dataset(session_cas04_run_summary):
-    """Session-scoped KernelDataset - expensive to create, shared across tests."""
+def session_cas04_run_summary_v020(global_fdsn_miniseed_v020):
+    """Session-scoped RunSummary for v0.2.0."""
+    run_summary = RunSummary()
+    run_summary.from_mth5s([global_fdsn_miniseed_v020])
+    return run_summary
+
+
+@pytest.fixture(scope="session")
+def session_cas04_kernel_dataset_v010(session_cas04_run_summary_v010):
+    """Session-scoped KernelDataset for v0.1.0."""
     kd = KernelDataset()
-    kd.from_run_summary(session_cas04_run_summary, "CAS04")
+    kd.from_run_summary(session_cas04_run_summary_v010, "CAS04")
     return kd
 
 
 @pytest.fixture(scope="session")
-def session_cas04_config(session_cas04_kernel_dataset):
-    """Session-scoped processing config - expensive to create, shared across tests."""
+def session_cas04_kernel_dataset_v020(session_cas04_run_summary_v020):
+    """Session-scoped KernelDataset for v0.2.0."""
+    kd = KernelDataset()
+    kd.from_run_summary(session_cas04_run_summary_v020, "CAS04")
+    return kd
+
+
+@pytest.fixture(scope="session")
+def session_cas04_config_v010(session_cas04_kernel_dataset_v010):
+    """Session-scoped processing config for v0.1.0."""
     cc = ConfigCreator()
-    config = cc.create_from_kernel_dataset(session_cas04_kernel_dataset)
+    config = cc.create_from_kernel_dataset(session_cas04_kernel_dataset_v010)
     return config
 
 
 @pytest.fixture(scope="session")
-def session_cas04_tf_result(
-    session_cas04_kernel_dataset, session_cas04_config, tmp_path_factory
-):
-    """Session-scoped processed TF result - very expensive, only run once per version."""
-    # Create temp directory for output
-    temp_dir = tmp_path_factory.mktemp("cas04_processing")
-    z_file_path = temp_dir / "CAS04_session.zss"
+def session_cas04_config_v020(session_cas04_kernel_dataset_v020):
+    """Session-scoped processing config for v0.2.0."""
+    cc = ConfigCreator()
+    config = cc.create_from_kernel_dataset(session_cas04_kernel_dataset_v020)
+    return config
 
-    # Process - this is the slowest operation, do it once per session
+
+@pytest.fixture(scope="session")
+def session_cas04_tf_result_v010(
+    session_cas04_kernel_dataset_v010, session_cas04_config_v010, tmp_path_factory
+):
+    """Session-scoped processed TF result for v0.1.0."""
+    temp_dir = tmp_path_factory.mktemp("cas04_processing_v010")
+    z_file_path = temp_dir / "CAS04_v010.zss"
+
     tf_result = process_mth5(
-        session_cas04_config,
-        session_cas04_kernel_dataset,
+        session_cas04_config_v010,
+        session_cas04_kernel_dataset_v010,
         units="MT",
         show_plot=False,
         z_file_path=z_file_path,
     )
-
     return tf_result
 
 
+@pytest.fixture(scope="session")
+def session_cas04_tf_result_v020(
+    session_cas04_kernel_dataset_v020, session_cas04_config_v020, tmp_path_factory
+):
+    """Session-scoped processed TF result for v0.2.0."""
+    temp_dir = tmp_path_factory.mktemp("cas04_processing_v020")
+    z_file_path = temp_dir / "CAS04_v020.zss"
+
+    tf_result = process_mth5(
+        session_cas04_config_v020,
+        session_cas04_kernel_dataset_v020,
+        units="MT",
+        show_plot=False,
+        z_file_path=z_file_path,
+    )
+    return tf_result
+
+
+# Selector fixtures that choose based on version parameter
 @pytest.fixture
-def cas04_run_summary(session_cas04_run_summary):
-    """Fresh clone of RunSummary for each test."""
-    return session_cas04_run_summary.clone()
+def cas04_run_summary(request):
+    """Select appropriate RunSummary based on version."""
+    version = request.param if hasattr(request, "param") else "v010"
+    if version == "v010":
+        fixture = request.getfixturevalue("session_cas04_run_summary_v010")
+    else:
+        fixture = request.getfixturevalue("session_cas04_run_summary_v020")
+    return fixture.clone()
 
 
 @pytest.fixture
-def cas04_kernel_dataset(session_cas04_kernel_dataset):
-    """Reuse session KernelDataset - most tests just read from it."""
-    return session_cas04_kernel_dataset
+def cas04_kernel_dataset(request):
+    """Select appropriate KernelDataset based on version."""
+    version = request.param if hasattr(request, "param") else "v010"
+    if version == "v010":
+        return request.getfixturevalue("session_cas04_kernel_dataset_v010")
+    else:
+        return request.getfixturevalue("session_cas04_kernel_dataset_v020")
 
 
 @pytest.fixture
-def cas04_config(session_cas04_config):
-    """Reuse session config - most tests just read from it."""
-    return session_cas04_config
+def cas04_config(request):
+    """Select appropriate config based on version."""
+    version = request.param if hasattr(request, "param") else "v010"
+    if version == "v010":
+        return request.getfixturevalue("session_cas04_config_v010")
+    else:
+        return request.getfixturevalue("session_cas04_config_v020")
+
+
+@pytest.fixture
+def session_cas04_tf_result(request):
+    """Select appropriate TF result based on version."""
+    version = request.param if hasattr(request, "param") else "v010"
+    if version == "v010":
+        return request.getfixturevalue("session_cas04_tf_result_v010")
+    else:
+        return request.getfixturevalue("session_cas04_tf_result_v020")
 
 
 @pytest.fixture
@@ -237,29 +292,43 @@ def temp_output_dir(tmp_path):
 
 
 @pytest.fixture(scope="session")
-def session_interpolated_comparison(session_cas04_tf_result, cas04_emtf_reference):
-    """
-    Session-scoped interpolated TF comparison.
-
-    Interpolation is expensive and only needs to be done once per session.
-    Multiple tests use the same interpolated data.
-
-    Returns
-    -------
-    tuple
-        (periods, z_aurora, z_emtf, err_aurora, err_emtf)
-    """
+def session_interpolated_comparison_v010(
+    session_cas04_tf_result_v010, cas04_emtf_reference
+):
+    """Session-scoped interpolated TF comparison for v0.1.0."""
     if cas04_emtf_reference is None:
         pytest.skip("EMTF reference not available")
-
     return interpolate_tf_to_common_periods(
-        session_cas04_tf_result, cas04_emtf_reference
+        session_cas04_tf_result_v010, cas04_emtf_reference
     )
+
+
+@pytest.fixture(scope="session")
+def session_interpolated_comparison_v020(
+    session_cas04_tf_result_v020, cas04_emtf_reference
+):
+    """Session-scoped interpolated TF comparison for v0.2.0."""
+    if cas04_emtf_reference is None:
+        pytest.skip("EMTF reference not available")
+    return interpolate_tf_to_common_periods(
+        session_cas04_tf_result_v020, cas04_emtf_reference
+    )
+
+
+@pytest.fixture
+def session_interpolated_comparison(request):
+    """Select appropriate interpolated comparison based on version."""
+    version = request.param if hasattr(request, "param") else "v010"
+    if version == "v010":
+        return request.getfixturevalue("session_interpolated_comparison_v010")
+    else:
+        return request.getfixturevalue("session_interpolated_comparison_v020")
 
 
 # Test Classes
 
 
+@pytest.mark.parametrize("cas04_config", ["v010", "v020"], indirect=True)
 class TestConfigCreation:
     """Test configuration creation from KernelDataset."""
 
@@ -293,6 +362,7 @@ class TestConfigCreation:
         assert cas04_kernel_dataset.df is not None
 
 
+@pytest.mark.parametrize("session_cas04_tf_result", ["v010", "v020"], indirect=True)
 class TestProcessingWorkflow:
     """Test the complete processing workflow using process_mth5."""
 
@@ -333,6 +403,7 @@ class TestEMTFComparison:
         assert len(periods) > 0
         assert np.all(periods > 0)
 
+    @pytest.mark.parametrize("session_cas04_tf_result", ["v010", "v020"], indirect=True)
     def test_aurora_emtf_frequency_overlap(
         self, session_cas04_tf_result, cas04_emtf_reference
     ):
@@ -348,6 +419,9 @@ class TestEMTFComparison:
             p_max_overlap > p_min_overlap
         ), "No overlapping period range between Aurora and EMTF"
 
+    @pytest.mark.parametrize(
+        "session_interpolated_comparison", ["v010", "v020"], indirect=True
+    )
     def test_impedance_magnitude_comparison(self, session_interpolated_comparison):
         """Test that impedance magnitudes are comparable between Aurora and EMTF."""
         # Use pre-computed interpolated data from session fixture
@@ -378,6 +452,9 @@ class TestEMTFComparison:
             within_factor_2 > 0.7
         ), f"Only {within_factor_2*100:.1f}% of impedances within factor of 2"
 
+    @pytest.mark.parametrize(
+        "session_interpolated_comparison", ["v010", "v020"], indirect=True
+    )
     def test_impedance_phase_comparison(self, session_interpolated_comparison):
         """Test that impedance phases are comparable between Aurora and EMTF."""
         # Use pre-computed interpolated data from session fixture
@@ -409,6 +486,9 @@ class TestEMTFComparison:
             within_30deg > 0.7
         ), f"Only {within_30deg*100:.1f}% of phases within 30 degrees"
 
+    @pytest.mark.parametrize(
+        "session_interpolated_comparison", ["v010", "v020"], indirect=True
+    )
     def test_impedance_components_correlation(self, session_interpolated_comparison):
         """Test that key impedance components show correlation between Aurora and EMTF."""
         # Use pre-computed interpolated data from session fixture
@@ -530,6 +610,7 @@ class TestEMTFComparison:
             ), f"{name} median magnitude ratio out of range: {median_ratio:.3f}"
 
 
+@pytest.mark.parametrize("session_cas04_tf_result", ["v010", "v020"], indirect=True)
 class TestDataQuality:
     """Test data quality metrics from processing."""
 
@@ -552,10 +633,18 @@ class TestDataQuality:
 class TestEndToEndIntegration:
     """End-to-end integration tests."""
 
+    @pytest.mark.slow
+    @pytest.mark.parametrize("cas04_run_summary", ["v010", "v020"], indirect=True)
     def test_complete_pipeline_from_run_summary(
         self, cas04_run_summary, temp_output_dir
     ):
-        """Test complete pipeline from RunSummary to TF."""
+        """
+        Test complete pipeline from RunSummary to TF.
+
+        This test is marked as 'slow' because it re-runs process_mth5() which
+        takes ~40 seconds per MTH5 version. Run with: pytest -m slow
+        Skip with: pytest -m "not slow"
+        """
         # Create KernelDataset
         kd = KernelDataset()
         kd.from_run_summary(cas04_run_summary, "CAS04")
@@ -580,6 +669,7 @@ class TestEndToEndIntegration:
         assert len(tf_result.period) > 0
         assert z_file_path.exists()
 
+    @pytest.mark.parametrize("session_cas04_tf_result", ["v010", "v020"], indirect=True)
     def test_can_read_written_file(self, session_cas04_tf_result, temp_output_dir):
         """Test that written z-file can be read back."""
         # Write to new file
@@ -601,6 +691,7 @@ class TestEndToEndIntegration:
 class TestEdgeCases:
     """Test edge cases and error handling."""
 
+    @pytest.mark.parametrize("cas04_run_summary", ["v010", "v020"], indirect=True)
     def test_invalid_station_id_handling(self, cas04_run_summary):
         """Test handling of invalid station IDs."""
         # This should work even if station IDs don't match expected patterns
@@ -610,6 +701,7 @@ class TestEdgeCases:
         assert kd is not None
         assert kd.df is not None
 
+    @pytest.mark.parametrize("cas04_kernel_dataset", ["v010", "v020"], indirect=True)
     def test_missing_channels_handling(self, cas04_kernel_dataset):
         """Test that processing handles missing channels gracefully."""
         # Even with limited channels, config creation should work
