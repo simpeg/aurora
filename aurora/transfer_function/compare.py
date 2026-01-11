@@ -263,7 +263,7 @@ class CompareTF:
         atol: float = 1e-2,
     ) -> dict:
         """
-        Compare transfer functions between two ZFile objects.
+        Compare transfer functions between two transfer_functions objects.
 
         Compares transfer_functions, sigma_e, and sigma_s arrays. If periods
         don't match, interpolates one onto the other.
