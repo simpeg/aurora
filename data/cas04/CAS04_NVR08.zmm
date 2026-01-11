@@ -1,7 +1,7 @@
 TRANSFER FUNCTIONS IN MEASUREMENT COORDINATES
 ********* WITH FULL ERROR COVARIANCE*********
 Robust Remote Reference                                                         
-station    :CAS04_CAS04bcd_REV06_CAS04bcd_NVR08     
+station    :CAS04-CAS04bcd_REV06-CAS04bcd_NVR08     
 coordinate    37.633   238.532  declination    13.17
 number of channels   5   number of frequencies   33
  orientations and tilts of each channel 

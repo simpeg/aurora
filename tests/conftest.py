@@ -477,3 +477,88 @@ def disable_matplotlib_logging(request):
     # Restore original states
     for logger_name, original_state in original_states.items():
         logging.getLogger(logger_name).disabled = original_state
+
+
+# =============================================================================
+# CAS04 FDSN Fixtures
+# =============================================================================
+
+
+@pytest.fixture(scope="session")
+def global_fdsn_miniseed_v010(tmp_path_factory):
+    """Session-scoped CAS04 FDSN MTH5 file (v0.1.0) from mth5_test_data."""
+    import obspy
+    from mth5.clients.fdsn import FDSN
+    from mth5_test_data import get_test_data_path
+
+    # Get test data paths
+    miniseed_path = get_test_data_path("miniseed")
+    inventory_file = miniseed_path / "cas04_stationxml.xml"
+    streams_file = miniseed_path / "cas_04_streams.mseed"
+
+    # Verify files exist
+    if not inventory_file.exists() or not streams_file.exists():
+        pytest.skip(
+            f"CAS04 test data not found in mth5_test_data. Expected:\n"
+            f"  {inventory_file}\n"
+            f"  {streams_file}"
+        )
+
+    # Load inventory and streams
+    inventory = obspy.read_inventory(str(inventory_file))
+    streams = obspy.read(str(streams_file))
+
+    # Create temporary directory for this session
+    session_dir = tmp_path_factory.mktemp("cas04_v010")
+
+    # Create MTH5 from inventory and streams
+    fdsn_client = FDSN(mth5_version="0.1.0")
+    created_file = fdsn_client.make_mth5_from_inventory_and_streams(
+        inventory, streams, save_path=session_dir
+    )
+
+    yield created_file
+
+    # Cleanup
+    if created_file.exists():
+        created_file.unlink()
+
+
+@pytest.fixture(scope="session")
+def global_fdsn_miniseed_v020(tmp_path_factory):
+    """Session-scoped CAS04 FDSN MTH5 file (v0.2.0) from mth5_test_data."""
+    import obspy
+    from mth5.clients.fdsn import FDSN
+    from mth5_test_data import get_test_data_path
+
+    # Get test data paths
+    miniseed_path = get_test_data_path("miniseed")
+    inventory_file = miniseed_path / "cas04_stationxml.xml"
+    streams_file = miniseed_path / "cas_04_streams.mseed"
+
+    # Verify files exist
+    if not inventory_file.exists() or not streams_file.exists():
+        pytest.skip(
+            f"CAS04 test data not found in mth5_test_data. Expected:\n"
+            f"  {inventory_file}\n"
+            f"  {streams_file}"
+        )
+
+    # Load inventory and streams
+    inventory = obspy.read_inventory(str(inventory_file))
+    streams = obspy.read(str(streams_file))
+
+    # Create temporary directory for this session
+    session_dir = tmp_path_factory.mktemp("cas04_v020")
+
+    # Create MTH5 from inventory and streams
+    fdsn_client = FDSN(mth5_version="0.2.0")
+    created_file = fdsn_client.make_mth5_from_inventory_and_streams(
+        inventory, streams, save_path=session_dir
+    )
+
+    yield created_file
+
+    # Cleanup
+    if created_file.exists():
+        created_file.unlink()
