@@ -381,6 +381,7 @@ class TestParkfieldRemoteReference:
         parkfield_paths,
         tmp_path,
         disable_matplotlib_logging,
+        subtests,
     ):
         """Test RR comparison of aurora results with EMTF reference."""
         z_file_path = tmp_path / "pkd_rr_comparison.zrr"
@@ -396,22 +397,59 @@ class TestParkfieldRemoteReference:
         if not auxiliary_z_file.exists():
             pytest.skip("EMTF reference file not available")
 
+        compare = CompareTF(z_file_path, auxiliary_z_file)
+        # Create comparison plot
         output_png = tmp_path / "RR_processing_comparison.png"
-        compare_two_z_files(
-            z_file_path,
-            auxiliary_z_file,
-            label1="aurora",
-            label2="emtf",
-            scale_factor1=1,
-            out_file=output_png,
-            markersize=3,
-            rho_ylims=(1e0, 1e3),
-            xlims=(0.05, 500),
-            title_string="Apparent Resistivity and Phase at Parkfield, CA",
-            subtitle_string="(Aurora vs EMTF, both Remote Reference)",
-        )
+        compare.plot_two_transfer_functions(save_plot_path=output_png)
 
         assert output_png.exists()
+
+        # Compare transfer functions numerically
+        result = compare.compare_transfer_functions()
+
+        # Assert that transfer functions are reasonably close
+        # Note: Some difference is expected due to different processing algorithms
+
+        # Check impedance if present
+        z_ratio = (0.8, 1.2)
+        z_std_limit = 6.5  # Allow higher std dev due to processing differences
+        if result["impedance_ratio"] is not None:
+            for ii in range(2):
+                for jj in range(2):
+                    if ii != jj:
+                        key = f"Z_{ii}{jj}"
+                        with subtests.test(
+                            msg=f"Checking impedance magnitude ratio for {key}"
+                        ):
+                            assert (
+                                z_ratio[0] < result["impedance_ratio"][key] < z_ratio[1]
+                            ), f"{key} impedance magnitudes differ significantly. Median ratio: {result['impedance_ratio'][key]:.3f}"
+
+                        with subtests.test(msg=f"Checking impedance std for {key}"):
+                            assert (
+                                result["impedance_std"][key] < z_std_limit
+                            ), f"{key} impedance magnitudes have high standard deviation: {result['impedance_std'][key]:.3f}"
+
+        # tipper if present
+        t_ratio = (0.8, 1.2)
+        t_std_limit = 0.5
+
+        if result["tipper_ratio"] is not None:
+            for ii in range(2):
+                for jj in range(2):
+                    if ii != jj:
+                        key = f"T_{ii}{jj}"
+                        with subtests.test(
+                            msg=f"Checking tipper magnitude ratio for {key}"
+                        ):
+                            assert (
+                                t_ratio[0] < result["tipper_ratio"][key] < t_ratio[1]
+                            ), f"{key} tipper magnitudes differ significantly. Median ratio: {result['tipper_ratio'][key]:.3f}"
+
+                        with subtests.test(msg=f"Checking tipper std for {key}"):
+                            assert (
+                                result["tipper_std"][key] < t_std_limit
+                            ), f"{key} tipper magnitudes have high standard deviation: {result['tipper_std'][key]:.3f}"
 
 
 # ============================================================================
