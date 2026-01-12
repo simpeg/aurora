@@ -20,10 +20,9 @@ from mth5.mth5 import MTH5
 
 from aurora.config.config_creator import ConfigCreator
 from aurora.pipelines.process_mth5 import process_mth5
-from aurora.sandbox.io_helpers.zfile_murphy import compare_z_files
 from aurora.sandbox.mth5_channel_summary_helpers import channel_summary_to_make_mth5
 from aurora.time_series.windowing_scheme import WindowingScheme
-from aurora.transfer_function.plot.comparison_plots import compare_two_z_files
+from aurora.transfer_function.compare import CompareTF
 
 
 # ============================================================================
@@ -238,19 +237,20 @@ class TestParkfieldSingleStation:
         tf_cls.write(fn=output_xml, file_type="xml")
         assert output_xml.exists()
 
-    @pytest.mark.skip(
-        reason=(
-            "Archived results seem to have a different coordinate system or a minus "
-            "sign floating around.  The apparent resistivities are close but the phases "
-            "are not.  Skipping test for now until a more robust test is created."
-        )
-    )
+    # @pytest.mark.skip(
+    #     reason=(
+    #         "Archived results seem to have a different coordinate system or a minus "
+    #         "sign floating around.  The apparent resistivities are close but the phases "
+    #         "are not.  Skipping test for now until a more robust test is created."
+    #     )
+    # )
     def test_single_station_comparison_with_emtf(
         self,
         processed_tf_ss,
         parkfield_paths,
         tmp_path,
         disable_matplotlib_logging,
+        subtests,
     ):
         """Test comparison of aurora results with EMTF reference."""
         z_file_path = tmp_path / "pkd_ss_comparison.zss"
@@ -267,39 +267,61 @@ class TestParkfieldSingleStation:
         if not auxiliary_z_file.exists():
             pytest.skip("EMTF reference file not available")
 
+        compare = CompareTF(z_file_path, auxiliary_z_file)
+
         # Create comparison plot
         output_png = tmp_path / "SS_processing_comparison.png"
         logger.info(f"Comparison plot path: {output_png}")
-        compare_two_z_files(
-            z_file_path,
-            auxiliary_z_file,
-            label1="aurora",
-            label2="emtf",
-            scale_factor1=1,
-            out_file=output_png,
-            markersize=3,
-            rho_ylims=[1e0, 1e3],
-            xlims=[0.05, 500],
-            title_string="Apparent Resistivity and Phase at Parkfield, CA",
-            subtitle_string="(Aurora Single Station vs EMTF Remote Reference)",
-        )
+        compare.plot_two_transfer_functions(save_plot_path=output_png)
 
         assert output_png.exists()
 
         # Compare transfer functions numerically
-        comparison = compare_z_files(
-            z_file_path,
-            auxiliary_z_file,
-            interpolate_to="self",  # Interpolate EMTF to Aurora periods
-            rtol=1e-2,  # Allow 1% relative difference
-            atol=1e-6,  # Small absolute tolerance
-        )
+        result = compare.compare_transfer_functions()
 
         # Assert that transfer functions are reasonably close
         # Note: Some difference is expected due to different processing algorithms
-        assert (
-            comparison["max_tf_diff"] < 1.0
-        ), f"Transfer functions differ too much: max diff = {comparison['max_tf_diff']}"
+
+        # Check that magnitudes are within 50% on average (reasonable for different processing)
+        z_ratio = (0.8, 1.2)
+        z_std_limit = 1.5
+        if result["impedance_ratio"] is not None:
+            for ii in range(2):
+                for jj in range(2):
+                    if ii != jj:
+                        key = f"Z_{ii}{jj}"
+                        with subtests.test(
+                            msg=f"Checking impedance magnitude ratio for {key}"
+                        ):
+                            assert (
+                                z_ratio[0] < result["impedance_ratio"][key] < z_ratio[1]
+                            ), f"{key} impedance magnitudes differ significantly. Median ratio: {result['impedance_ratio'][key]:.3f}"
+
+                        with subtests.test(msg=f"Checking impedance std for {key}"):
+                            assert (
+                                result["impedance_std"][key] < z_std_limit
+                            ), f"{key} impedance magnitudes have high standard deviation: {result['impedance_std'][key]:.3f}"
+
+        # tipper if present
+        t_ratio = (0.8, 1.2)
+        t_std_limit = 0.5
+
+        if result["tipper_ratio"] is not None:
+            for ii in range(2):
+                for jj in range(2):
+                    if ii != jj:
+                        key = f"T_{ii}{jj}"
+                        with subtests.test(
+                            msg=f"Checking tipper magnitude ratio for {key}"
+                        ):
+                            assert (
+                                t_ratio[0] < result["tipper_ratio"][key] < t_ratio[1]
+                            ), f"{key} tipper magnitudes differ significantly. Median ratio: {result['tipper_ratio'][key]:.3f}"
+
+                        with subtests.test(msg=f"Checking tipper std for {key}"):
+                            assert (
+                                result["tipper_std"][key] < t_std_limit
+                            ), f"{key} tipper magnitudes have high standard deviation: {result['tipper_std'][key]:.3f}"
 
 
 # ============================================================================
