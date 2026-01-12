@@ -202,9 +202,7 @@ def process_mth5_legacy(
         tf_dict[i_dec_level] = ttfz_obj
 
         if show_plot:
-            from aurora.sandbox.plot_helpers import plot_tf_obj
-
-            plot_tf_obj(ttfz_obj, out_filename="")
+            fig = ttfz_obj.plot()
 
     tf_collection = TransferFunctionCollection(
         tf_dict=tf_dict, processing_config=tfk.config
