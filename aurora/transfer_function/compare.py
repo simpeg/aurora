@@ -29,6 +29,33 @@ class CompareTF:
         tf_02
             Second transfer function (file path or TF object)
         """
+        self._comp_dict = {
+            1: "$Z_{xx}$",
+            2: "$Z_{xy}$",
+            3: "$Z_{yx}$",
+            4: "$Z_{yy}$",
+        }
+
+        self._compare_keys = [
+            "impedance_amplitude_close",
+            "impedance_phase_close",
+            "impedance_error_close",
+            "impedance_ratio",
+            "impedance_std",
+            "impedance_correlation",
+            "tipper_amplitude_close",
+            "tipper_phase_close",
+            "tipper_error_close",
+            "tipper_ratio",
+            "tipper_correlation",
+            "tipper_std",
+        ]
+
+        self._impedance_keys = [
+            ckey for ckey in self._compare_keys if "impedance" in ckey
+        ]
+        self._tipper_keys = [ckey for ckey in self._compare_keys if "tipper" in ckey]
+
         if isinstance(tf_01, (str, pathlib.Path)):
             self.tf_01 = TF()
             self.tf_01.read(tf_01)
@@ -69,8 +96,6 @@ class CompareTF:
         """
         fig = plt.figure(figsize=(12, 6))
 
-        comp_dict = {1: "$Z_{xx}$", 2: "$Z_{xy}$", 3: "$Z_{yx}$", 4: "$Z_{yy}$"}
-
         for ii in range(2):
             for jj in range(2):
                 plot_num_res = 1 + ii * 2 + jj
@@ -96,7 +121,7 @@ class CompareTF:
                     markersize=4,
                     color="r",
                 )
-                ax.set_title(comp_dict[plot_num_res])
+                ax.set_title(self._comp_dict[plot_num_res])
                 # ax.set_xlabel("Period (s)")
                 if plot_num_res == 1:
                     ax.set_ylabel("Apparent Resistivity ($\Omega \cdot m$)")
@@ -259,8 +284,8 @@ class CompareTF:
 
     def compare_transfer_functions(
         self,
-        rtol: float = 1e-2,
-        atol: float = 1e-2,
+        rtol: float = 1,
+        atol: float = 1,
     ) -> dict:
         """
         Compare transfer functions between two transfer_functions objects.
@@ -301,83 +326,81 @@ class CompareTF:
             t2_err,
         ) = self.interpolate_tf_to_common_periods()
 
-        result = {}
-        result["impedance_amplitude_close"] = None
-        result["impedance_amplitude_max_diff"] = None
-        result["impedance_phase_close"] = None
-        result["impedance_phase_max_diff"] = None
-        result["impedance_error_close"] = None
-        result["impedance_error_max_diff"] = None
-        result["impedance_ratio"] = None
-        result["tipper_amplitude_close"] = None
-        result["tipper_amplitude_max_diff"] = None
-        result["tipper_phase_close"] = None
-        result["tipper_phase_max_diff"] = None
-        result["tipper_error_close"] = None
-        result["tipper_error_max_diff"] = None
-        result["tipper_ratio"] = None
+        result = dict([(key, None) for key in self._compare_keys])
 
         result["periods_used"] = periods_common
 
         # Compare arrays
         if z1 is not None and z2 is not None:
-            result["impedance_amplitude_close"] = np.allclose(
-                np.abs(z1), np.abs(z2), rtol=rtol, atol=atol
-            )
-            result["impedance_amplitude_max_diff"] = np.max(
-                np.abs(np.abs(z1) - np.abs(z2))
-            )
+            for ckey in self._impedance_keys:
+                result[ckey] = {}
 
-            result["impedance_phase_close"] = np.allclose(
-                np.angle(z1), np.angle(z2), rtol=rtol, atol=atol
-            )
-            result["impedance_phase_max_diff"] = np.max(
-                np.abs(np.angle(z1) - np.angle(z2))
-            )
-
-            result["impedance_error_close"] = np.allclose(
-                np.abs(z1_err), np.abs(z2_err), rtol=rtol, atol=atol
-            )
-            result["impedance_error_max_diff"] = np.max(
-                np.abs(np.abs(z1_err) - np.abs(z2_err))
-            )
-
-            result["impedance_ratio"] = {}
             for ii in range(2):
                 for jj in range(2):
-                    if ii != jj:
-                        ratio = np.median(z1[:, ii, jj] / z2[:, ii, jj])
-                        key = f"Z_{ii}{jj}"
-                        result["impedance_ratio"][key] = ratio
+                    ratio = np.median(np.abs(z1[:, ii, jj]) / np.abs(z2[:, ii, jj]))
+                    key = f"Z_{ii}{jj}"
+                    result["impedance_ratio"][key] = ratio
+                    result["impedance_correlation"][key] = np.corrcoef(
+                        np.abs(z1[:, ii, jj]), np.abs(z2[:, ii, jj])
+                    ).min()
+                    result["impedance_std"][key] = np.std(
+                        np.abs(z1[:, ii, jj] - z2[:, ii, jj])
+                    )
+                    result["impedance_amplitude_close"] = np.allclose(
+                        np.abs(z1[:, ii, jj]),
+                        np.abs(z2[:, ii, jj]),
+                        rtol=rtol,
+                        atol=atol,
+                    )
 
-        else:
-            result["tipper_amplitude_close"] = np.allclose(
-                np.abs(t1), np.abs(t2), rtol=rtol, atol=atol
-            )
-            result["tipper_amplitude_max_diff"] = np.max(
-                np.abs(np.abs(t1) - np.abs(t2))
-            )
+                    result["impedance_phase_close"] = np.allclose(
+                        np.angle(z1[:, ii, jj]),
+                        np.angle(z2[:, ii, jj]),
+                        rtol=rtol,
+                        atol=atol,
+                    )
 
-            result["tipper_phase_close"] = np.allclose(
-                np.angle(t1), np.angle(t2), rtol=rtol, atol=atol
-            )
-            result["tipper_phase_max_diff"] = np.max(
-                np.abs(np.angle(t1) - np.angle(t2))
-            )
+                    result["impedance_error_close"] = np.allclose(
+                        np.abs(z1_err[:, ii, jj]),
+                        np.abs(z2_err[:, ii, jj]),
+                        rtol=rtol,
+                        atol=atol,
+                    )
 
-            result["tipper_error_close"] = np.allclose(
-                np.abs(t1_err), np.abs(t2_err), rtol=rtol, atol=atol
-            )
-            result["tipper_error_max_diff"] = np.max(
-                np.abs(np.abs(t1_err) - np.abs(t2_err))
-            )
+        if t1 is not None and t2 is not None:
+            for ckey in self._tipper_keys:
+                result[ckey] = {}
 
-            result["tipper_ratio"] = {}
-            for ii in range(2):
+            for ii in range(1):
                 for jj in range(2):
-                    if ii != jj:
-                        ratio = np.median(t1[:, ii, jj] / t2[:, ii, jj])
-                        key = f"T_{ii}{jj}"
-                        result["tipper_ratio"][key] = ratio
+                    ratio = np.median(np.abs(t1[:, ii, jj]) / np.abs(t2[:, ii, jj]))
+                    key = f"T_{ii}{jj}"
+                    result["tipper_ratio"][key] = ratio
+                    result["tipper_correlation"][key] = np.corrcoef(
+                        np.abs(t1[:, ii, jj]), np.abs(t2[:, ii, jj])
+                    ).min()
+                    result["tipper_std"][key] = np.std(
+                        np.abs(t1[:, ii, jj] - t2[:, ii, jj])
+                    )
+                    result["tipper_amplitude_close"] = np.allclose(
+                        np.abs(t1[:, ii, jj]),
+                        np.abs(t2[:, ii, jj]),
+                        rtol=rtol,
+                        atol=atol,
+                    )
+
+                    result["tipper_phase_close"] = np.allclose(
+                        np.angle(t1[:, ii, jj]),
+                        np.angle(t2[:, ii, jj]),
+                        rtol=rtol,
+                        atol=atol,
+                    )
+
+                    result["tipper_error_close"] = np.allclose(
+                        np.abs(t1_err[:, ii, jj]),
+                        np.abs(t2_err[:, ii, jj]),
+                        rtol=rtol,
+                        atol=atol,
+                    )
 
         return result

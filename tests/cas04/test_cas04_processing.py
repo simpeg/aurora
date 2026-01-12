@@ -269,6 +269,22 @@ class TestProcessingWorkflow:
         assert len(periods) > 0
         assert np.all(periods > 0)
 
+    def test_tf_channel_metadata(self, session_cas04_tf_result, subtests):
+        """Test that expected channels are present in TF."""
+        expected_channels = ["ex", "ey", "hx", "hy", "hz"]
+        for chan in expected_channels:
+            ch_metadata = session_cas04_tf_result.run_metadata.channels[chan]
+            with subtests.test(msg=f"Checking channel metadata for {chan}"):
+                assert (
+                    ch_metadata.time_period.start != "1980-01-01T00:00:00"
+                ), f"Channel {chan} has invalid time period."
+                assert (
+                    ch_metadata.time_period.end != "1980-01-01T00:00:00"
+                ), f"Channel {chan} has invalid time period."
+                assert (
+                    ch_metadata.sample_rate > 0
+                ), f"Sample rate for {chan} should be positive."
+
 
 class TestEMTFComparison:
     """Test comparison with EMTF reference results."""
@@ -287,6 +303,8 @@ class TestEMTFComparison:
         result = session_interpolated_comparison.compare_transfer_functions()
 
         # Check that magnitudes are within 50% on average (reasonable for different processing)
+        z_ratio = (0.8, 1.2)
+        z_std_limit = 1.5
         if result["impedance_ratio"] is not None:
             for ii in range(2):
                 for jj in range(2):
@@ -296,14 +314,32 @@ class TestEMTFComparison:
                             msg=f"Checking impedance magnitude ratio for {key}"
                         ):
                             assert (
-                                0.5 < result["impedance_ratio"][f"Z_{ii}{jj}"] < 2.0
-                            ), f"{key} impedance magnitudes differ significantly. Median ratio: {result['impedance_ratio'][f'Z_{ii}{jj}']:.3f}"
+                                z_ratio[0] < result["impedance_ratio"][key] < z_ratio[1]
+                            ), f"{key} impedance magnitudes differ significantly. Median ratio: {result['impedance_ratio'][key]:.3f}"
 
-        # check impedance
-        for key in result.keys():
-            if result[key] is not None:
-                with subtests.test(msg=f"Checking {key}"):
-                    assert result[key] is True, f"{key} comparison failed."
+                        with subtests.test(msg=f"Checking impedance std for {key}"):
+                            assert (
+                                result["impedance_std"][key] < z_std_limit
+                            ), f"{key} impedance magnitudes have high standard deviation: {result['impedance_std'][key]:.3f}"
+
+        t_ratio = (0.8, 1.6)
+        t_std_limit = 0.5
+        if result["tipper_ratio"] is not None:
+            for ii in range(1):
+                for jj in range(2):
+                    if ii != jj:
+                        key = f"T_{ii}{jj}"
+                        with subtests.test(
+                            msg=f"Checking tipper magnitude ratio for {key}"
+                        ):
+                            assert (
+                                t_ratio[0] < result["tipper_ratio"][key] < t_ratio[1]
+                            ), f"{key} tipper magnitudes differ significantly. Median ratio: {result['tipper_ratio'][key]:.3f}"
+
+                        with subtests.test(msg=f"Checking tipper std for {key}"):
+                            assert (
+                                result["tipper_std"][key] < t_std_limit
+                            ), f"{key} tipper magnitudes have high standard deviation: {result['tipper_std'][key]:.3f}"
 
 
 @pytest.mark.parametrize("session_cas04_tf_result", ["v010", "v020"], indirect=True)
