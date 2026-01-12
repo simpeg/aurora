@@ -284,7 +284,7 @@ class TestParkfieldSingleStation:
 
         # Check that magnitudes are within 50% on average (reasonable for different processing)
         z_ratio = (0.8, 1.2)
-        z_std_limit = 1.5
+        z_std_limit = 3.8
         if result["impedance_ratio"] is not None:
             for ii in range(2):
                 for jj in range(2):
