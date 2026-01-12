@@ -60,7 +60,7 @@ jobs:
     - name: Run Tests
       run: |
         source .venv/bin/activate
-        pytest -s -v --cov=./ --cov-report=xml --cov=aurora -n auto tests
+        pytest -s -v --cov=./ --cov-report=xml --cov=aurora -n 4 --durations=20 --durations-min=1.0 tests
         # pytest -s -v tests/synthetic/test_fourier_coefficients.py
         # pytest -s -v tests/config/test_config_creator.py 
 

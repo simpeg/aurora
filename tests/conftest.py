@@ -18,7 +18,6 @@ import matplotlib
 
 matplotlib.use("Agg")
 
-import uuid
 from pathlib import Path
 from typing import Dict
 
@@ -192,12 +191,13 @@ def cleanup_test_files(request):
     return _register
 
 
-@pytest.fixture
-def fresh_test12rr_mth5(tmp_path: Path, worker_id, cleanup_test_files):
-    """Create a fresh `test12rr` MTH5 file in tmp_path and return its Path.
+@pytest.fixture(scope="session")
+def fresh_test12rr_mth5(mth5_target_dir: Path, worker_id, cleanup_test_files):
+    """Create a fresh `test12rr` MTH5 file in mth5_target_dir and return its Path.
 
     This is intentionally simple: it calls `create_test12rr_h5` with a
     temporary target folder. The resulting file is registered for cleanup.
+    Session-scoped for efficiency.
     """
     cache_key = f"test12rr_{worker_id}"
 
@@ -208,12 +208,9 @@ def fresh_test12rr_mth5(tmp_path: Path, worker_id, cleanup_test_files):
         if p.exists():
             return p
 
-    # create a unique folder for this worker/test
-    unique_dir = tmp_path / f"mth5_test12rr_{worker_id}_{uuid.uuid4().hex[:8]}"
-    unique_dir.mkdir(parents=True, exist_ok=True)
-
     # create_test12rr_h5 returns the path to the file it created
-    file_path = create_test12rr_h5(target_folder=unique_dir)
+    # Use the session-scoped mth5_target_dir
+    file_path = create_test12rr_h5(target_folder=mth5_target_dir)
 
     # register cleanup and cache
     ppath = Path(file_path)
