@@ -1,3 +1,4 @@
+import pytest
 from loguru import logger
 from mth5.helpers import close_open_files
 from mth5.processing import KernelDataset, RunSummary
@@ -107,6 +108,7 @@ def aurora_vs_emtf(
             )
 
 
+@pytest.mark.slow
 def test_pipeline_merged(synthetic_test_paths, subtests, worker_safe_test12rr_h5):
     """Test aurora vs EMTF comparison with merged mth5."""
     close_open_files()
@@ -167,6 +169,7 @@ def test_pipeline_merged(synthetic_test_paths, subtests, worker_safe_test12rr_h5
         )
 
 
+@pytest.mark.slow
 def test_pipeline_separate(
     synthetic_test_paths, subtests, worker_safe_test1_h5, worker_safe_test2_h5
 ):
