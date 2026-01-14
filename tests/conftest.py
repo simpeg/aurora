@@ -498,7 +498,7 @@ def disable_matplotlib_logging(request):
 def _master_fdsn_miniseed_v010():
     """Master CAS04 FDSN MTH5 file (v0.1.0) - created once, copied per worker.
 
-    Uses persistent cache in ~/.cache/aurora/cas04/ to avoid recreating
+    Uses persistent cache in ~/.cache/aurora/cas04/v010/ to avoid recreating
     the file across test sessions and CI runs.
     """
     import obspy
@@ -507,7 +507,8 @@ def _master_fdsn_miniseed_v010():
     from mth5_test_data import get_test_data_path
 
     # Use a persistent cache directory instead of temp
-    cache_dir = Path.home() / ".cache" / "aurora" / "cas04"
+    # Use version-specific subdirectory to avoid file collisions
+    cache_dir = Path.home() / ".cache" / "aurora" / "cas04" / "v010"
     cache_dir.mkdir(parents=True, exist_ok=True)
 
     # Check if file already exists in persistent cache
@@ -606,8 +607,9 @@ def global_fdsn_miniseed_v010(_master_fdsn_miniseed_v010, mth5_target_dir, worke
 def _master_fdsn_miniseed_v020():
     """Master CAS04 FDSN MTH5 file (v0.2.0) - created once, copied per worker.
 
-    Uses persistent cache in ~/.cache/aurora/cas04/ to avoid recreating
-    the file across test sessions and CI runs.
+    Uses persistent cache in ~/.cache/aurora/cas04/v020/ to avoid recreating
+    the file across test sessions and CI runs. Uses separate directory from v010
+    to prevent file locking conflicts when both versions are created in parallel.
     """
     import obspy
     from filelock import FileLock
@@ -615,7 +617,8 @@ def _master_fdsn_miniseed_v020():
     from mth5_test_data import get_test_data_path
 
     # Use a persistent cache directory instead of temp
-    cache_dir = Path.home() / ".cache" / "aurora" / "cas04"
+    # Use version-specific subdirectory to avoid file collisions with v010
+    cache_dir = Path.home() / ".cache" / "aurora" / "cas04" / "v020"
     cache_dir.mkdir(parents=True, exist_ok=True)
 
     # Check if file already exists in persistent cache
