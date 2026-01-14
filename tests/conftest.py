@@ -483,10 +483,31 @@ def disable_matplotlib_logging(request):
 
 @pytest.fixture(scope="session")
 def global_fdsn_miniseed_v010(tmp_path_factory):
-    """Session-scoped CAS04 FDSN MTH5 file (v0.1.0) from mth5_test_data."""
+    """Session-scoped CAS04 FDSN MTH5 file (v0.1.0) from mth5_test_data.
+
+    Uses persistent cache in ~/.cache/aurora/cas04/ to avoid recreating
+    the file across test sessions and CI runs.
+    """
     import obspy
     from mth5.clients.fdsn import FDSN
     from mth5_test_data import get_test_data_path
+
+    # Use a persistent cache directory instead of temp
+    cache_dir = Path.home() / ".cache" / "aurora" / "cas04"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
+    # Check if file already exists in persistent cache
+    cached_file = cache_dir / "cas04_v010.h5"
+    if cached_file.exists():
+        return cached_file
+
+    # Check global cache first (for current session)
+    cache_key = "cas04_v010"
+    cached = _MTH5_GLOBAL_CACHE.get(cache_key)
+    if cached:
+        p = Path(cached)
+        if p.exists():
+            return p
 
     # Get test data paths
     miniseed_path = get_test_data_path("miniseed")
@@ -505,28 +526,45 @@ def global_fdsn_miniseed_v010(tmp_path_factory):
     inventory = obspy.read_inventory(str(inventory_file))
     streams = obspy.read(str(streams_file))
 
-    # Create temporary directory for this session
-    session_dir = tmp_path_factory.mktemp("cas04_v010")
-
-    # Create MTH5 from inventory and streams
+    # Create MTH5 from inventory and streams in cache directory
     fdsn_client = FDSN(mth5_version="0.1.0")
     created_file = fdsn_client.make_mth5_from_inventory_and_streams(
-        inventory, streams, save_path=session_dir
+        inventory, streams, save_path=cache_dir, path=cached_file
     )
 
-    yield created_file
+    # Cache the path
+    _MTH5_GLOBAL_CACHE[cache_key] = str(created_file)
 
-    # Cleanup
-    if created_file.exists():
-        created_file.unlink()
+    return created_file
 
 
 @pytest.fixture(scope="session")
 def global_fdsn_miniseed_v020(tmp_path_factory):
-    """Session-scoped CAS04 FDSN MTH5 file (v0.2.0) from mth5_test_data."""
+    """Session-scoped CAS04 FDSN MTH5 file (v0.2.0) from mth5_test_data.
+
+    Uses persistent cache in ~/.cache/aurora/cas04/ to avoid recreating
+    the file across test sessions and CI runs.
+    """
     import obspy
     from mth5.clients.fdsn import FDSN
     from mth5_test_data import get_test_data_path
+
+    # Use a persistent cache directory instead of temp
+    cache_dir = Path.home() / ".cache" / "aurora" / "cas04"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
+    # Check if file already exists in persistent cache
+    cached_file = cache_dir / "cas04_v020.h5"
+    if cached_file.exists():
+        return cached_file
+
+    # Check global cache first (for current session)
+    cache_key = "cas04_v020"
+    cached = _MTH5_GLOBAL_CACHE.get(cache_key)
+    if cached:
+        p = Path(cached)
+        if p.exists():
+            return p
 
     # Get test data paths
     miniseed_path = get_test_data_path("miniseed")
@@ -545,17 +583,13 @@ def global_fdsn_miniseed_v020(tmp_path_factory):
     inventory = obspy.read_inventory(str(inventory_file))
     streams = obspy.read(str(streams_file))
 
-    # Create temporary directory for this session
-    session_dir = tmp_path_factory.mktemp("cas04_v020")
-
-    # Create MTH5 from inventory and streams
+    # Create MTH5 from inventory and streams in cache directory
     fdsn_client = FDSN(mth5_version="0.2.0")
     created_file = fdsn_client.make_mth5_from_inventory_and_streams(
-        inventory, streams, save_path=session_dir
+        inventory, streams, save_path=cache_dir, path=cached_file
     )
 
-    yield created_file
+    # Cache the path
+    _MTH5_GLOBAL_CACHE[cache_key] = str(created_file)
 
-    # Cleanup
-    if created_file.exists():
-        created_file.unlink()
+    return created_file

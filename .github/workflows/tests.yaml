@@ -31,6 +31,14 @@ jobs:
     - name: Set up Python ${{ matrix.python-version }}
       run: uv python install ${{ matrix.python-version }}
 
+    - name: Cache MTH5 test files
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/aurora
+        key: mth5-test-files-${{ runner.os }}-${{ hashFiles('tests/conftest.py') }}
+        restore-keys: |
+          mth5-test-files-${{ runner.os }}-
+
     - name: Create virtual environment and install dependencies
       run: |
         uv venv --python ${{ matrix.python-version }}
@@ -57,17 +65,17 @@ jobs:
     #     jupyter nbconvert --to notebook --execute docs/tutorials/process_cas04_multiple_station.ipynb
     #     jupyter nbconvert --to notebook --execute docs/tutorials/synthetic_data_processing.ipynb
 
-    - name: Run Fast Tests
+    - name: Run Tests
       run: |
         source .venv/bin/activate
-        pytest -s -v --cov=./ --cov-report=xml --cov=aurora -n 4 -m "not slow" --durations=20 --durations-min=1.0 tests
+        pytest -s -v --cov=./ --cov-report=xml --cov=aurora -n 4 tests
 
-    - name: Run Slow Tests
-      run: |
-        source .venv/bin/activate
-        pytest -s -v --cov=./ --cov-report=xml --cov-append --cov=aurora -n 4 -m "slow" --durations=20 --durations-min=1.0 tests
-        # pytest -s -v tests/synthetic/test_fourier_coefficients.py
-        # pytest -s -v tests/config/test_config_creator.py 
+    # - name: Run Slow Tests
+    #   run: |
+    #     source .venv/bin/activate
+    #     pytest -s -v --cov=./ --cov-report=xml --cov-append --cov=aurora -n 4 -m "slow" --durations=20 --durations-min=1.0 tests
+    #     # pytest -s -v tests/synthetic/test_fourier_coefficients.py
+    #     # pytest -s -v tests/config/test_config_creator.py 
 
 
     - name: "Upload coverage reports to Codecov"
