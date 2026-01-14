@@ -133,6 +133,7 @@ class ConfigCreator:
         band_edges: Optional[dict] = None,
         decimation_factors: Optional[list] = None,
         num_samples_window: Optional[int] = None,
+        **kwargs,
     ) -> Processing:
         """
         This creates a processing config from a kernel dataset.
@@ -179,6 +180,12 @@ class ConfigCreator:
             List of decimation factors, normally [1, 4, 4, 4, ... 4]
         num_samples_window: Optional[Union[int, None]]
             The size of the window (usually for FFT)
+        **kwargs:
+            Additional keyword arguments passed to Processing constructor. Could contain:
+            - save_fcs: bool
+               - If True, save Fourier coefficients during processing.
+            - save_fcs_type: str
+                - File type for saving Fourier coefficients.  Options are "h5" or "csv".
 
         Returns
         -------
@@ -250,6 +257,11 @@ class ConfigCreator:
 
             if num_samples_window is not None:
                 decimation_obj.stft.window.num_samples = num_samples_window[key]
+
+            if kwargs.get("save_fcs", False):
+                decimation_obj.save_fcs = True
+                decimation_obj.save_fcs_type = kwargs.get("save_fcs_type", "h5")
+
             # set estimator if provided as kwarg
             if estimator:
                 try:
