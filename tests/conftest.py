@@ -548,30 +548,12 @@ def _master_fdsn_miniseed_v010():
             inventory, streams, save_path=cache_dir
         )
 
-        # Explicitly close any open MTH5 objects before renaming
-        # This ensures no file handles are left open
-        if hasattr(fdsn_client, "m") and fdsn_client.m is not None:
-            try:
-                fdsn_client.m.close_mth5()
-            except:
-                pass
-
         # Rename to version-specific master file
         created_path = Path(created_file)
         if created_path != master_file:
             import shutil
 
             shutil.move(str(created_path), str(master_file))
-
-        # Extra safety: ensure the file is fully written and closed
-        # by opening and immediately closing it
-        import h5py
-
-        try:
-            with h5py.File(master_file, "r") as f:
-                pass  # Just open and close to ensure file integrity
-        except:
-            pass
 
     return master_file
 
@@ -656,30 +638,12 @@ def _master_fdsn_miniseed_v020():
             inventory, streams, save_path=cache_dir
         )
 
-        # Explicitly close any open MTH5 objects before renaming
-        # This ensures no file handles are left open
-        if hasattr(fdsn_client, "m") and fdsn_client.m is not None:
-            try:
-                fdsn_client.m.close_mth5()
-            except:
-                pass
-
         # Rename to version-specific master file
         created_path = Path(created_file)
         if created_path != master_file:
             import shutil
 
             shutil.move(str(created_path), str(master_file))
-
-        # Extra safety: ensure the file is fully written and closed
-        # by opening and immediately closing it
-        import h5py
-
-        try:
-            with h5py.File(master_file, "r") as f:
-                pass  # Just open and close to ensure file integrity
-        except:
-            pass
 
     return master_file
 
