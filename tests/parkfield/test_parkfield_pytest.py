@@ -11,6 +11,7 @@ Tests are organized into classes and use fixtures from conftest.py for efficient
 resource sharing and pytest-xdist compatibility.
 """
 
+import tempfile
 from pathlib import Path
 
 import numpy as np
@@ -21,8 +22,99 @@ from mth5.mth5 import MTH5
 from aurora.config.config_creator import ConfigCreator
 from aurora.pipelines.process_mth5 import process_mth5
 from aurora.sandbox.mth5_channel_summary_helpers import channel_summary_to_make_mth5
+from aurora.test_utils.parkfield.calibration_helpers import parkfield_sanity_check
 from aurora.time_series.windowing_scheme import WindowingScheme
 from aurora.transfer_function.compare import CompareTF
+
+
+# ============================================================================
+# Helper Functions
+# ============================================================================
+
+
+def _compare_transfer_functions_with_emtf(
+    processed_tf,
+    z_file_path,
+    parkfield_paths,
+    tmp_path,
+    subtests,
+    file_type="zss",
+    plot_name="comparison.png",
+    z_std_limit=6.8,
+):
+    """Helper function to compare aurora results with EMTF reference.
+
+    Args:
+        processed_tf: Processed transfer function object
+        z_file_path: Path to write z-file
+        parkfield_paths: Dictionary with paths to test data
+        tmp_path: Temporary directory path
+        subtests: pytest subtests fixture
+        file_type: Type of z-file ("zss" or "zrr")
+        plot_name: Name for comparison plot
+        z_std_limit: Threshold for impedance standard deviation
+    """
+    tf_cls = processed_tf
+    tf_cls.write(fn=z_file_path, file_type=file_type)
+
+    if not z_file_path.exists():
+        pytest.skip("Z-file not generated - data access issue")
+
+    # Compare with archived EMTF results
+    auxiliary_z_file = parkfield_paths["emtf_results"].joinpath("PKD_272_00.zrr")
+    if not auxiliary_z_file.exists():
+        pytest.skip("EMTF reference file not available")
+
+    compare = CompareTF(z_file_path, auxiliary_z_file)
+
+    # Create comparison plot
+    output_png = tmp_path / plot_name
+    logger.info(f"Comparison plot path: {output_png}")
+    compare.plot_two_transfer_functions(save_plot_path=output_png)
+
+    assert output_png.exists()
+
+    # Compare transfer functions numerically
+    result = compare.compare_transfer_functions()
+
+    # Check impedance if present
+    z_ratio = (0.8, 1.2)
+    if result["impedance_ratio"] is not None:
+        for ii in range(2):
+            for jj in range(2):
+                if ii != jj:
+                    key = f"Z_{ii}{jj}"
+                    with subtests.test(
+                        msg=f"Checking impedance magnitude ratio for {key}"
+                    ):
+                        assert (
+                            z_ratio[0] < result["impedance_ratio"][key] < z_ratio[1]
+                        ), f"{key} impedance magnitudes differ significantly. Median ratio: {result['impedance_ratio'][key]:.3f}"
+
+                    with subtests.test(msg=f"Checking impedance std for {key}"):
+                        assert (
+                            result["impedance_std"][key] < z_std_limit
+                        ), f"{key} impedance magnitudes have high standard deviation: {result['impedance_std'][key]:.3f}"
+
+    # Check tipper if present
+    t_ratio = (0.8, 1.2)
+    t_std_limit = 0.5
+    if result["tipper_ratio"] is not None:
+        for ii in range(2):
+            for jj in range(2):
+                if ii != jj:
+                    key = f"T_{ii}{jj}"
+                    with subtests.test(
+                        msg=f"Checking tipper magnitude ratio for {key}"
+                    ):
+                        assert (
+                            t_ratio[0] < result["tipper_ratio"][key] < t_ratio[1]
+                        ), f"{key} tipper magnitudes differ significantly. Median ratio: {result['tipper_ratio'][key]:.3f}"
+
+                    with subtests.test(msg=f"Checking tipper std for {key}"):
+                        assert (
+                            result["tipper_std"][key] < t_std_limit
+                        ), f"{key} tipper magnitudes have high standard deviation: {result['tipper_std'][key]:.3f}"
 
 
 # ============================================================================
@@ -82,10 +174,6 @@ class TestParkfieldCalibration:
         self, fft_obj, parkfield_run_pkd, parkfield_paths, disable_matplotlib_logging
     ):
         """Test calibration produces valid results."""
-        from aurora.test_utils.parkfield.calibration_helpers import (
-            parkfield_sanity_check,
-        )
-
         # This should not raise exceptions
         parkfield_sanity_check(
             fft_obj,
@@ -98,12 +186,6 @@ class TestParkfieldCalibration:
 
     def test_calibrated_spectra_are_finite(self, fft_obj, parkfield_run_pkd):
         """Test that calibrated spectra contain no NaN or Inf values."""
-        import tempfile
-
-        from aurora.test_utils.parkfield.calibration_helpers import (
-            parkfield_sanity_check,
-        )
-
         with tempfile.TemporaryDirectory() as tmpdir:
             # Run calibration
             parkfield_sanity_check(
@@ -255,73 +337,16 @@ class TestParkfieldSingleStation:
         """Test comparison of aurora results with EMTF reference."""
         z_file_path = tmp_path / "pkd_ss_comparison.zss"
         logger.info(f"Z-file path for comparison: {z_file_path}")
-        # Use pre-computed transfer function and write z-file
-        tf_cls = processed_tf_ss
-        tf_cls.write(fn=z_file_path, file_type="zss")
-
-        if not z_file_path.exists():
-            pytest.skip("Z-file not generated - data access issue")
-
-        # Compare with archived EMTF results
-        auxiliary_z_file = parkfield_paths["emtf_results"].joinpath("PKD_272_00.zrr")
-        if not auxiliary_z_file.exists():
-            pytest.skip("EMTF reference file not available")
-
-        compare = CompareTF(z_file_path, auxiliary_z_file)
-
-        # Create comparison plot
-        output_png = tmp_path / "SS_processing_comparison.png"
-        logger.info(f"Comparison plot path: {output_png}")
-        compare.plot_two_transfer_functions(save_plot_path=output_png)
-
-        assert output_png.exists()
-
-        # Compare transfer functions numerically
-        result = compare.compare_transfer_functions()
-
-        # Assert that transfer functions are reasonably close
-        # Note: Some difference is expected due to different processing algorithms
-
-        # Check impedance if present
-        z_ratio = (0.8, 1.2)
-        z_std_limit = 6.5  # Allow higher std dev due to processing differences
-        if result["impedance_ratio"] is not None:
-            for ii in range(2):
-                for jj in range(2):
-                    if ii != jj:
-                        key = f"Z_{ii}{jj}"
-                        with subtests.test(
-                            msg=f"Checking impedance magnitude ratio for {key}"
-                        ):
-                            assert (
-                                z_ratio[0] < result["impedance_ratio"][key] < z_ratio[1]
-                            ), f"{key} impedance magnitudes differ significantly. Median ratio: {result['impedance_ratio'][key]:.3f}"
-
-                        with subtests.test(msg=f"Checking impedance std for {key}"):
-                            assert (
-                                result["impedance_std"][key] < z_std_limit
-                            ), f"{key} impedance magnitudes have high standard deviation: {result['impedance_std'][key]:.3f}"
-
-        # tipper if present
-        t_ratio = (0.8, 1.2)
-        t_std_limit = 0.5
-
-        if result["tipper_ratio"] is not None:
-            for ii in range(2):
-                for jj in range(2):
-                    if ii != jj:
-                        key = f"T_{ii}{jj}"
-                        with subtests.test(
-                            msg=f"Checking tipper magnitude ratio for {key}"
-                        ):
-                            assert (
-                                t_ratio[0] < result["tipper_ratio"][key] < t_ratio[1]
-                            ), f"{key} tipper magnitudes differ significantly. Median ratio: {result['tipper_ratio'][key]:.3f}"
-
-                        with subtests.test(msg=f"Checking tipper std for {key}"):
-                            assert (
-                                result["tipper_std"][key] < t_std_limit
-                            ), f"{key} tipper magnitudes have high standard deviation: {result['tipper_std'][key]:.3f}"
+        _compare_transfer_functions_with_emtf(
+            processed_tf_ss,
+            z_file_path,
+            parkfield_paths,
+            tmp_path,
+            subtests,
+            file_type="zss",
+            plot_name="SS_processing_comparison.png",
+            z_std_limit=6.8,
+        )
 
 
 # ============================================================================
@@ -331,11 +356,6 @@ class TestParkfieldSingleStation:
 
 class TestParkfieldRemoteReference:
     """Test remote-reference transfer function processing."""
-
-    @pytest.fixture
-    def z_file_path(self, tmp_path, make_worker_safe_path):
-        """Generate worker-safe path for RR z-file output."""
-        return make_worker_safe_path("pkd_rr.zrr", tmp_path)
 
     @pytest.fixture(scope="class")
     def config_rr(self, parkfield_kernel_dataset_rr):
@@ -365,10 +385,11 @@ class TestParkfieldRemoteReference:
     def test_remote_reference_processing(
         self,
         processed_tf_rr,
-        z_file_path,
+        tmp_path,
         disable_matplotlib_logging,
     ):
         """Test remote-reference processing with SAO as reference."""
+        z_file_path = tmp_path / "pkd_rr.zrr"
         tf_cls = processed_tf_rr
         tf_cls.write(fn=z_file_path, file_type="zrr")
 
@@ -385,71 +406,16 @@ class TestParkfieldRemoteReference:
     ):
         """Test RR comparison of aurora results with EMTF reference."""
         z_file_path = tmp_path / "pkd_rr_comparison.zrr"
-
-        tf_cls = processed_tf_rr
-        tf_cls.write(fn=z_file_path, file_type="zrr")
-
-        if not z_file_path.exists():
-            pytest.skip("Z-file not generated - data access issue")
-
-        # Compare with archived EMTF results
-        auxiliary_z_file = parkfield_paths["emtf_results"].joinpath("PKD_272_00.zrr")
-        if not auxiliary_z_file.exists():
-            pytest.skip("EMTF reference file not available")
-
-        compare = CompareTF(z_file_path, auxiliary_z_file)
-        # Create comparison plot
-        output_png = tmp_path / "RR_processing_comparison.png"
-        compare.plot_two_transfer_functions(save_plot_path=output_png)
-
-        assert output_png.exists()
-
-        # Compare transfer functions numerically
-        result = compare.compare_transfer_functions()
-
-        # Assert that transfer functions are reasonably close
-        # Note: Some difference is expected due to different processing algorithms
-
-        # Check impedance if present
-        z_ratio = (0.8, 1.2)
-        z_std_limit = 6.5  # Allow higher std dev due to processing differences
-        if result["impedance_ratio"] is not None:
-            for ii in range(2):
-                for jj in range(2):
-                    if ii != jj:
-                        key = f"Z_{ii}{jj}"
-                        with subtests.test(
-                            msg=f"Checking impedance magnitude ratio for {key}"
-                        ):
-                            assert (
-                                z_ratio[0] < result["impedance_ratio"][key] < z_ratio[1]
-                            ), f"{key} impedance magnitudes differ significantly. Median ratio: {result['impedance_ratio'][key]:.3f}"
-
-                        with subtests.test(msg=f"Checking impedance std for {key}"):
-                            assert (
-                                result["impedance_std"][key] < z_std_limit
-                            ), f"{key} impedance magnitudes have high standard deviation: {result['impedance_std'][key]:.3f}"
-
-        # tipper if present
-        t_ratio = (0.8, 1.2)
-        t_std_limit = 0.5
-
-        if result["tipper_ratio"] is not None:
-            for ii in range(2):
-                for jj in range(2):
-                    if ii != jj:
-                        key = f"T_{ii}{jj}"
-                        with subtests.test(
-                            msg=f"Checking tipper magnitude ratio for {key}"
-                        ):
-                            assert (
-                                t_ratio[0] < result["tipper_ratio"][key] < t_ratio[1]
-                            ), f"{key} tipper magnitudes differ significantly. Median ratio: {result['tipper_ratio'][key]:.3f}"
-
-                        with subtests.test(msg=f"Checking tipper std for {key}"):
-                            assert (
-                                result["tipper_std"][key] < t_std_limit
-                            ), f"{key} tipper magnitudes have high standard deviation: {result['tipper_std'][key]:.3f}"
+        _compare_transfer_functions_with_emtf(
+            processed_tf_rr,
+            z_file_path,
+            parkfield_paths,
+            tmp_path,
+            subtests,
+            file_type="zrr",
+            plot_name="RR_processing_comparison.png",
+            z_std_limit=6.8,
+        )
 
 
 # ============================================================================

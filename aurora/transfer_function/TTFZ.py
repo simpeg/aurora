@@ -403,7 +403,7 @@ class RhoPlot(object):
         ax.set_xlim(x_axis_limits[0], x_axis_limits[1])
         ax.set_ylim(y_axis_limits[0], y_axis_limits[1])
         ax.legend()
-        ax.set_ylabel("$\Omega$-m")
+        ax.set_ylabel(r"$\Omega$-m")
         return ax
 
     def set_period_limits(self):

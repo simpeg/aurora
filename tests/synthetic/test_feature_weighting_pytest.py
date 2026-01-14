@@ -296,8 +296,9 @@ def test_feature_weighting(synthetic_test_paths, worker_safe_test1_h5):
 
     tf1 = TF(fn=z_path1)
     tf2 = TF(fn=z_path2)
-    tf1.read()
-    tf2.read()
+    tf1.read(**{"rotate_to_measurement_coordinates": False})
+    tf2.read(**{"rotate_to_measurement_coordinates": False})
+
     assert (
         tf1.impedance.data != tf2.impedance.data
     ).any(), "TF1 and TF2 should have different impedance values after processing with weights."

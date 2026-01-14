@@ -29,6 +29,8 @@ def tf_obj_from_mth5(fresh_test12rr_mth5: Path):
 
 def write_and_read_zrr(tf_obj: TF, zrr_path: Path) -> TF:
     """Write `tf_obj` to `zrr_path` as a zrr file and read it back as TF."""
+    tf_obj.run_metadata.channels["hy"].measurement_azimuth = 90
+    tf_obj.run_metadata.channels["ey"].measurement_azimuth = 90
     # write expects a filename; TF.write will create the zrr
     tf_obj.write(fn=str(zrr_path), file_type="zrr")
 
