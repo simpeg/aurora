@@ -113,12 +113,21 @@ def process_tf_decimation_level(
             f"with exception: {e}"
         )
         logger.warning(msg)
-        transfer_function_obj = process_transfer_functions(
-            dec_level_config=dec_level_config,
-            local_stft_obj=local_stft_obj,
-            remote_stft_obj=remote_stft_obj,
-            transfer_function_obj=transfer_function_obj,
-        )
+        try:
+            transfer_function_obj = process_transfer_functions(
+                dec_level_config=dec_level_config,
+                local_stft_obj=local_stft_obj,
+                remote_stft_obj=remote_stft_obj,
+                transfer_function_obj=transfer_function_obj,
+            )
+        except Exception as e:
+            msg = (
+                f"Processing transfer functions without weights also failed for decimation level {i_dec_level} "
+                f"with exception: {e}"
+            )
+            logger.error(msg)
+            logger.exception(msg)
+            raise e
     return transfer_function_obj
 
 
@@ -191,13 +200,21 @@ def process_mth5_legacy(
             msg = f"Feature weights calculation Failed -- procesing without weights -- {e}"
             # logger.warning(msg)
             logger.exception(msg)
-
-        ttfz_obj = process_tf_decimation_level(
-            tfk.config,
-            i_dec_level,
-            local_merged_stft_obj,
-            remote_merged_stft_obj,
-        )
+        try:
+            ttfz_obj = process_tf_decimation_level(
+                tfk.config,
+                i_dec_level,
+                local_merged_stft_obj,
+                remote_merged_stft_obj,
+            )
+        except Exception as e:
+            msg = (
+                f"Processing transfer functions failed for decimation level {i_dec_level} "
+                f"with exception: {e}. Skipping this decimation level."
+            )
+            logger.error(msg)
+            logger.exception(msg)
+            continue
         ttfz_obj.apparent_resistivity(tfk.config.channel_nomenclature, units=units)
         tf_dict[i_dec_level] = ttfz_obj
 
