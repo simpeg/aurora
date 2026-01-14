@@ -342,6 +342,8 @@ def parkfield_h5_master(tmp_path_factory):
     (.cache/aurora/parkfield) so it doesn't need to be re-downloaded for
     subsequent test runs. Only created once across all sessions.
     """
+    from filelock import FileLock
+
     from aurora.test_utils.parkfield.make_parkfield_mth5 import ensure_h5_exists
 
     # Use a persistent cache directory instead of temp
@@ -351,23 +353,27 @@ def parkfield_h5_master(tmp_path_factory):
 
     # Check if file already exists in persistent cache
     cached_file = cache_dir / "parkfield.h5"
-    if cached_file.exists():
-        return cached_file
+    lock_file = cache_dir / "parkfield.h5.lock"
 
-    # Check global cache first (for current session)
-    cache_key = "parkfield_master"
-    cached = _MTH5_GLOBAL_CACHE.get(cache_key)
-    if cached:
-        p = Path(cached)
-        if p.exists():
-            return p
+    # Use filelock to ensure only one worker creates the file
+    with FileLock(str(lock_file), timeout=300):
+        if cached_file.exists():
+            return cached_file
 
-    try:
-        h5_path = ensure_h5_exists(target_folder=cache_dir)
-        _MTH5_GLOBAL_CACHE[cache_key] = str(h5_path)
-        return h5_path
-    except IOError:
-        pytest.skip("NCEDC data server not available")
+        # Check global cache first (for current session)
+        cache_key = "parkfield_master"
+        cached = _MTH5_GLOBAL_CACHE.get(cache_key)
+        if cached:
+            p = Path(cached)
+            if p.exists():
+                return p
+
+        try:
+            h5_path = ensure_h5_exists(target_folder=cache_dir)
+            _MTH5_GLOBAL_CACHE[cache_key] = str(h5_path)
+            return h5_path
+        except IOError:
+            pytest.skip("NCEDC data server not available")
 
 
 @pytest.fixture(scope="session")
