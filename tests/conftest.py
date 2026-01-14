@@ -489,6 +489,7 @@ def _master_fdsn_miniseed_v010():
     the file across test sessions and CI runs.
     """
     import obspy
+    from filelock import FileLock
     from mth5.clients.fdsn import FDSN
     from mth5_test_data import get_test_data_path
 
@@ -498,33 +499,45 @@ def _master_fdsn_miniseed_v010():
 
     # Check if file already exists in persistent cache
     master_file = cache_dir / "cas04_v010_master.h5"
-    if master_file.exists():
-        return master_file
+    lock_file = cache_dir / "cas04_v010_master.h5.lock"
 
-    # Get test data paths
-    miniseed_path = get_test_data_path("miniseed")
-    inventory_file = miniseed_path / "cas04_stationxml.xml"
-    streams_file = miniseed_path / "cas_04_streams.mseed"
+    # Use filelock to ensure only one worker creates the file
+    with FileLock(str(lock_file), timeout=300):
+        if master_file.exists():
+            return master_file
 
-    # Verify files exist
-    if not inventory_file.exists() or not streams_file.exists():
-        pytest.skip(
-            f"CAS04 test data not found in mth5_test_data. Expected:\n"
-            f"  {inventory_file}\n"
-            f"  {streams_file}"
+        # Get test data paths
+        miniseed_path = get_test_data_path("miniseed")
+        inventory_file = miniseed_path / "cas04_stationxml.xml"
+        streams_file = miniseed_path / "cas_04_streams.mseed"
+
+        # Verify files exist
+        if not inventory_file.exists() or not streams_file.exists():
+            pytest.skip(
+                f"CAS04 test data not found in mth5_test_data. Expected:\n"
+                f"  {inventory_file}\n"
+                f"  {streams_file}"
+            )
+
+        # Load inventory and streams
+        inventory = obspy.read_inventory(str(inventory_file))
+        streams = obspy.read(str(streams_file))
+
+        # Create MTH5 from inventory and streams in cache directory
+        # The function creates a file with a default name, we need to rename it
+        fdsn_client = FDSN(mth5_version="0.1.0")
+        created_file = fdsn_client.make_mth5_from_inventory_and_streams(
+            inventory, streams, save_path=cache_dir
         )
 
-    # Load inventory and streams
-    inventory = obspy.read_inventory(str(inventory_file))
-    streams = obspy.read(str(streams_file))
+        # Rename to version-specific master file
+        created_path = Path(created_file)
+        if created_path != master_file:
+            import shutil
 
-    # Create MTH5 from inventory and streams in cache directory
-    fdsn_client = FDSN(mth5_version="0.1.0")
-    created_file = fdsn_client.make_mth5_from_inventory_and_streams(
-        inventory, streams, save_path=cache_dir
-    )
+            shutil.move(str(created_path), str(master_file))
 
-    return created_file
+    return master_file
 
 
 @pytest.fixture(scope="session")
@@ -561,6 +574,7 @@ def _master_fdsn_miniseed_v020():
     the file across test sessions and CI runs.
     """
     import obspy
+    from filelock import FileLock
     from mth5.clients.fdsn import FDSN
     from mth5_test_data import get_test_data_path
 
@@ -570,33 +584,45 @@ def _master_fdsn_miniseed_v020():
 
     # Check if file already exists in persistent cache
     master_file = cache_dir / "cas04_v020_master.h5"
-    if master_file.exists():
-        return master_file
+    lock_file = cache_dir / "cas04_v020_master.h5.lock"
 
-    # Get test data paths
-    miniseed_path = get_test_data_path("miniseed")
-    inventory_file = miniseed_path / "cas04_stationxml.xml"
-    streams_file = miniseed_path / "cas_04_streams.mseed"
+    # Use filelock to ensure only one worker creates the file
+    with FileLock(str(lock_file), timeout=300):
+        if master_file.exists():
+            return master_file
 
-    # Verify files exist
-    if not inventory_file.exists() or not streams_file.exists():
-        pytest.skip(
-            f"CAS04 test data not found in mth5_test_data. Expected:\n"
-            f"  {inventory_file}\n"
-            f"  {streams_file}"
+        # Get test data paths
+        miniseed_path = get_test_data_path("miniseed")
+        inventory_file = miniseed_path / "cas04_stationxml.xml"
+        streams_file = miniseed_path / "cas_04_streams.mseed"
+
+        # Verify files exist
+        if not inventory_file.exists() or not streams_file.exists():
+            pytest.skip(
+                f"CAS04 test data not found in mth5_test_data. Expected:\n"
+                f"  {inventory_file}\n"
+                f"  {streams_file}"
+            )
+
+        # Load inventory and streams
+        inventory = obspy.read_inventory(str(inventory_file))
+        streams = obspy.read(str(streams_file))
+
+        # Create MTH5 from inventory and streams in cache directory
+        # The function creates a file with a default name, we need to rename it
+        fdsn_client = FDSN(mth5_version="0.2.0")
+        created_file = fdsn_client.make_mth5_from_inventory_and_streams(
+            inventory, streams, save_path=cache_dir
         )
 
-    # Load inventory and streams
-    inventory = obspy.read_inventory(str(inventory_file))
-    streams = obspy.read(str(streams_file))
+        # Rename to version-specific master file
+        created_path = Path(created_file)
+        if created_path != master_file:
+            import shutil
 
-    # Create MTH5 from inventory and streams in cache directory
-    fdsn_client = FDSN(mth5_version="0.2.0")
-    created_file = fdsn_client.make_mth5_from_inventory_and_streams(
-        inventory, streams, save_path=cache_dir
-    )
+            shutil.move(str(created_path), str(master_file))
 
-    return created_file
+    return master_file
 
 
 @pytest.fixture(scope="session")
