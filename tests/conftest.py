@@ -529,7 +529,7 @@ def global_fdsn_miniseed_v010(tmp_path_factory):
     # Create MTH5 from inventory and streams in cache directory
     fdsn_client = FDSN(mth5_version="0.1.0")
     created_file = fdsn_client.make_mth5_from_inventory_and_streams(
-        inventory, streams, save_path=cache_dir, path=cached_file
+        inventory, streams, save_path=cache_dir
     )
 
     # Cache the path
@@ -586,7 +586,7 @@ def global_fdsn_miniseed_v020(tmp_path_factory):
     # Create MTH5 from inventory and streams in cache directory
     fdsn_client = FDSN(mth5_version="0.2.0")
     created_file = fdsn_client.make_mth5_from_inventory_and_streams(
-        inventory, streams, save_path=cache_dir, path=cached_file
+        inventory, streams, save_path=cache_dir
     )
 
     # Cache the path
