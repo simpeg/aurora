@@ -355,18 +355,25 @@ def parkfield_h5_master(tmp_path_factory):
     cached_file = cache_dir / "parkfield.h5"
     lock_file = cache_dir / "parkfield.h5.lock"
 
+    # Check global cache first (for current session)
+    cache_key = "parkfield_master"
+    cached = _MTH5_GLOBAL_CACHE.get(cache_key)
+    if cached:
+        p = Path(cached)
+        if p.exists():
+            return p
+
+    # Quick check before acquiring lock - avoid contention if file exists
+    if cached_file.exists():
+        _MTH5_GLOBAL_CACHE[cache_key] = str(cached_file)
+        return cached_file
+
     # Use filelock to ensure only one worker creates the file
     with FileLock(str(lock_file), timeout=300):
+        # Double-check after acquiring lock (another worker may have created it)
         if cached_file.exists():
+            _MTH5_GLOBAL_CACHE[cache_key] = str(cached_file)
             return cached_file
-
-        # Check global cache first (for current session)
-        cache_key = "parkfield_master"
-        cached = _MTH5_GLOBAL_CACHE.get(cache_key)
-        if cached:
-            p = Path(cached)
-            if p.exists():
-                return p
 
         try:
             h5_path = ensure_h5_exists(target_folder=cache_dir)
@@ -507,8 +514,13 @@ def _master_fdsn_miniseed_v010():
     master_file = cache_dir / "cas04_v010_master.h5"
     lock_file = cache_dir / "cas04_v010_master.h5.lock"
 
+    # Quick check before acquiring lock - avoid contention if file exists
+    if master_file.exists():
+        return master_file
+
     # Use filelock to ensure only one worker creates the file
     with FileLock(str(lock_file), timeout=300):
+        # Double-check after acquiring lock (another worker may have created it)
         if master_file.exists():
             return master_file
 
@@ -592,8 +604,13 @@ def _master_fdsn_miniseed_v020():
     master_file = cache_dir / "cas04_v020_master.h5"
     lock_file = cache_dir / "cas04_v020_master.h5.lock"
 
+    # Quick check before acquiring lock - avoid contention if file exists
+    if master_file.exists():
+        return master_file
+
     # Use filelock to ensure only one worker creates the file
     with FileLock(str(lock_file), timeout=300):
+        # Double-check after acquiring lock (another worker may have created it)
         if master_file.exists():
             return master_file
 

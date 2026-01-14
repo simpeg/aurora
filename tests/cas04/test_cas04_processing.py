@@ -23,6 +23,75 @@ from aurora.pipelines.process_mth5 import process_mth5
 from aurora.transfer_function.compare import CompareTF
 
 
+# ============================================================================
+# Helper Functions
+# ============================================================================
+
+
+def _validate_emtf_comparison(
+    comparison_result,
+    subtests,
+    z_ratio=(0.8, 1.2),
+    z_std_limit=1.5,
+    t_ratio=(0.8, 1.6),
+    t_std_limit=0.5,
+):
+    """Helper function to validate transfer function comparison results.
+
+    Args:
+        comparison_result: Result dictionary from compare_transfer_functions()
+        subtests: pytest subtests fixture
+        z_ratio: Tuple of (min, max) acceptable impedance magnitude ratios
+        z_std_limit: Maximum acceptable impedance standard deviation
+        t_ratio: Tuple of (min, max) acceptable tipper magnitude ratios
+        t_std_limit: Maximum acceptable tipper standard deviation
+    """
+    # Check impedance if present
+    if comparison_result["impedance_ratio"] is not None:
+        for ii in range(2):
+            for jj in range(2):
+                if ii != jj:
+                    key = f"Z_{ii}{jj}"
+                    with subtests.test(
+                        msg=f"Checking impedance magnitude ratio for {key}"
+                    ):
+                        assert (
+                            z_ratio[0]
+                            < comparison_result["impedance_ratio"][key]
+                            < z_ratio[1]
+                        ), f"{key} impedance magnitudes differ significantly. Median ratio: {comparison_result['impedance_ratio'][key]:.3f}"
+
+                    with subtests.test(msg=f"Checking impedance std for {key}"):
+                        assert (
+                            comparison_result["impedance_std"][key] < z_std_limit
+                        ), f"{key} impedance magnitudes have high standard deviation: {comparison_result['impedance_std'][key]:.3f}"
+
+    # Check tipper if present
+    if comparison_result["tipper_ratio"] is not None:
+        for ii in range(1):
+            for jj in range(2):
+                if ii != jj:
+                    key = f"T_{ii}{jj}"
+                    with subtests.test(
+                        msg=f"Checking tipper magnitude ratio for {key}"
+                    ):
+                        assert (
+                            t_ratio[0]
+                            < comparison_result["tipper_ratio"][key]
+                            < t_ratio[1]
+                        ), f"{key} tipper magnitudes differ significantly. Median ratio: {comparison_result['tipper_ratio'][key]:.3f}"
+
+                    with subtests.test(msg=f"Checking tipper std for {key}"):
+                        assert (
+                            comparison_result["tipper_std"][key] < t_std_limit
+                        ), f"{key} tipper magnitudes have high standard deviation: {comparison_result['tipper_std'][key]:.3f}"
+
+
+# ============================================================================
+# Fixtures
+# ============================================================================
+
+
 @pytest.fixture(scope="session")
 def cas04_emtf_reference():
     """Load EMTF reference result for CAS04 - skip if validation fails."""
@@ -272,18 +341,20 @@ class TestProcessingWorkflow:
     def test_tf_channel_metadata(self, session_cas04_tf_result, subtests):
         """Test that expected channels are present in TF."""
         expected_channels = ["ex", "ey", "hx", "hy", "hz"]
+        invalid_time = "1980-01-01T00:00:00"
+
         for chan in expected_channels:
             ch_metadata = session_cas04_tf_result.run_metadata.channels[chan]
             with subtests.test(msg=f"Checking channel metadata for {chan}"):
                 assert (
-                    ch_metadata.time_period.start != "1980-01-01T00:00:00"
-                ), f"Channel {chan} has invalid time period."
+                    ch_metadata.time_period.start != invalid_time
+                ), f"Channel {chan} has invalid start time"
                 assert (
-                    ch_metadata.time_period.end != "1980-01-01T00:00:00"
-                ), f"Channel {chan} has invalid time period."
+                    ch_metadata.time_period.end != invalid_time
+                ), f"Channel {chan} has invalid end time"
                 assert (
                     ch_metadata.sample_rate > 0
-                ), f"Sample rate for {chan} should be positive."
+                ), f"Channel {chan} sample rate should be positive"
 
 
 class TestEMTFComparison:
@@ -302,44 +373,15 @@ class TestEMTFComparison:
         # Use pre-computed interpolated data from session fixture
         result = session_interpolated_comparison.compare_transfer_functions()
 
-        # Check that magnitudes are within 50% on average (reasonable for different processing)
-        z_ratio = (0.8, 1.2)
-        z_std_limit = 1.5
-        if result["impedance_ratio"] is not None:
-            for ii in range(2):
-                for jj in range(2):
-                    if ii != jj:
-                        key = f"Z_{ii}{jj}"
-                        with subtests.test(
-                            msg=f"Checking impedance magnitude ratio for {key}"
-                        ):
-                            assert (
-                                z_ratio[0] < result["impedance_ratio"][key] < z_ratio[1]
-                            ), f"{key} impedance magnitudes differ significantly. Median ratio: {result['impedance_ratio'][key]:.3f}"
-
-                        with subtests.test(msg=f"Checking impedance std for {key}"):
-                            assert (
-                                result["impedance_std"][key] < z_std_limit
-                            ), f"{key} impedance magnitudes have high standard deviation: {result['impedance_std'][key]:.3f}"
-
-        t_ratio = (0.8, 1.6)
-        t_std_limit = 0.5
-        if result["tipper_ratio"] is not None:
-            for ii in range(1):
-                for jj in range(2):
-                    if ii != jj:
-                        key = f"T_{ii}{jj}"
-                        with subtests.test(
-                            msg=f"Checking tipper magnitude ratio for {key}"
-                        ):
-                            assert (
-                                t_ratio[0] < result["tipper_ratio"][key] < t_ratio[1]
-                            ), f"{key} tipper magnitudes differ significantly. Median ratio: {result['tipper_ratio'][key]:.3f}"
-
-                        with subtests.test(msg=f"Checking tipper std for {key}"):
-                            assert (
-                                result["tipper_std"][key] < t_std_limit
-                            ), f"{key} tipper magnitudes have high standard deviation: {result['tipper_std'][key]:.3f}"
+        # Validate comparison using helper function
+        _validate_emtf_comparison(
+            result,
+            subtests,
+            z_ratio=(0.8, 1.2),
+            z_std_limit=1.5,
+            t_ratio=(0.8, 1.6),
+            t_std_limit=0.5,
+        )
 
 
 @pytest.mark.parametrize("session_cas04_tf_result", ["v010", "v020"], indirect=True)
@@ -354,12 +396,9 @@ class TestDataQuality:
 
     def test_errors_are_positive(self, session_cas04_tf_result):
         """Test that error estimates are positive."""
-        # Errors should be positive
         errors = session_cas04_tf_result.impedance_error
-        # Convert to numpy if it's an xarray DataArray
-        if hasattr(errors, "values"):
-            errors = errors.values
-        assert np.all(errors[~np.isnan(errors)] >= 0)
+        error_values = errors.values if hasattr(errors, "values") else errors
+        assert np.all(error_values[~np.isnan(error_values)] >= 0)
 
 
 class TestEndToEndIntegration:
@@ -373,9 +412,9 @@ class TestEndToEndIntegration:
         """
         Test complete pipeline from RunSummary to TF.
 
-        This test is marked as 'slow' because it re-runs process_mth5() which
-        takes ~40 seconds per MTH5 version. Run with: pytest -m slow
-        Skip with: pytest -m "not slow"
+        Note: This test validates the integration path independently from
+        session fixtures. Marked 'slow' (~40s per version).
+        Run with: pytest -m slow | Skip with: pytest -m "not slow"
         """
         # Create KernelDataset
         kd = KernelDataset()
