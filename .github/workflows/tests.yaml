@@ -68,7 +68,7 @@ jobs:
     - name: Run Tests
       run: |
         source .venv/bin/activate
-        pytest -s -v --cov=./ --cov-report=xml --cov=aurora -n 4 tests
+        pytest -s -v --cov=./ --cov-report=xml --cov=aurora -n auto tests
 
     # - name: Run Slow Tests
     #   run: |
