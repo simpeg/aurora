@@ -482,8 +482,8 @@ def disable_matplotlib_logging(request):
 
 
 @pytest.fixture(scope="session")
-def global_fdsn_miniseed_v010(tmp_path_factory):
-    """Session-scoped CAS04 FDSN MTH5 file (v0.1.0) from mth5_test_data.
+def _master_fdsn_miniseed_v010():
+    """Master CAS04 FDSN MTH5 file (v0.1.0) - created once, copied per worker.
 
     Uses persistent cache in ~/.cache/aurora/cas04/ to avoid recreating
     the file across test sessions and CI runs.
@@ -497,17 +497,9 @@ def global_fdsn_miniseed_v010(tmp_path_factory):
     cache_dir.mkdir(parents=True, exist_ok=True)
 
     # Check if file already exists in persistent cache
-    cached_file = cache_dir / "cas04_v010.h5"
-    if cached_file.exists():
-        return cached_file
-
-    # Check global cache first (for current session)
-    cache_key = "cas04_v010"
-    cached = _MTH5_GLOBAL_CACHE.get(cache_key)
-    if cached:
-        p = Path(cached)
-        if p.exists():
-            return p
+    master_file = cache_dir / "cas04_v010_master.h5"
+    if master_file.exists():
+        return master_file
 
     # Get test data paths
     miniseed_path = get_test_data_path("miniseed")
@@ -532,15 +524,38 @@ def global_fdsn_miniseed_v010(tmp_path_factory):
         inventory, streams, save_path=cache_dir
     )
 
-    # Cache the path
-    _MTH5_GLOBAL_CACHE[cache_key] = str(created_file)
-
     return created_file
 
 
 @pytest.fixture(scope="session")
-def global_fdsn_miniseed_v020(tmp_path_factory):
-    """Session-scoped CAS04 FDSN MTH5 file (v0.2.0) from mth5_test_data.
+def global_fdsn_miniseed_v010(_master_fdsn_miniseed_v010, mth5_target_dir, worker_id):
+    """Worker-safe copy of CAS04 v0.1.0 MTH5 file for parallel testing.
+
+    Creates a per-worker copy of the master file to avoid concurrent access issues.
+    """
+    import shutil
+
+    # Check worker-specific cache
+    cache_key = f"cas04_v010_{worker_id}"
+    cached = _MTH5_GLOBAL_CACHE.get(cache_key)
+    if cached:
+        p = Path(cached)
+        if p.exists():
+            return p
+
+    # Copy master file to worker-specific location
+    worker_file = mth5_target_dir / f"cas04_v010_{worker_id}.h5"
+    shutil.copy2(_master_fdsn_miniseed_v010, worker_file)
+
+    # Cache the worker-specific path
+    _MTH5_GLOBAL_CACHE[cache_key] = str(worker_file)
+
+    return worker_file
+
+
+@pytest.fixture(scope="session")
+def _master_fdsn_miniseed_v020():
+    """Master CAS04 FDSN MTH5 file (v0.2.0) - created once, copied per worker.
 
     Uses persistent cache in ~/.cache/aurora/cas04/ to avoid recreating
     the file across test sessions and CI runs.
@@ -554,17 +569,9 @@ def global_fdsn_miniseed_v020(tmp_path_factory):
     cache_dir.mkdir(parents=True, exist_ok=True)
 
     # Check if file already exists in persistent cache
-    cached_file = cache_dir / "cas04_v020.h5"
-    if cached_file.exists():
-        return cached_file
-
-    # Check global cache first (for current session)
-    cache_key = "cas04_v020"
-    cached = _MTH5_GLOBAL_CACHE.get(cache_key)
-    if cached:
-        p = Path(cached)
-        if p.exists():
-            return p
+    master_file = cache_dir / "cas04_v020_master.h5"
+    if master_file.exists():
+        return master_file
 
     # Get test data paths
     miniseed_path = get_test_data_path("miniseed")
@@ -589,7 +596,30 @@ def global_fdsn_miniseed_v020(tmp_path_factory):
         inventory, streams, save_path=cache_dir
     )
 
-    # Cache the path
-    _MTH5_GLOBAL_CACHE[cache_key] = str(created_file)
-
     return created_file
+
+
+@pytest.fixture(scope="session")
+def global_fdsn_miniseed_v020(_master_fdsn_miniseed_v020, mth5_target_dir, worker_id):
+    """Worker-safe copy of CAS04 v0.2.0 MTH5 file for parallel testing.
+
+    Creates a per-worker copy of the master file to avoid concurrent access issues.
+    """
+    import shutil
+
+    # Check worker-specific cache
+    cache_key = f"cas04_v020_{worker_id}"
+    cached = _MTH5_GLOBAL_CACHE.get(cache_key)
+    if cached:
+        p = Path(cached)
+        if p.exists():
+            return p
+
+    # Copy master file to worker-specific location
+    worker_file = mth5_target_dir / f"cas04_v020_{worker_id}.h5"
+    shutil.copy2(_master_fdsn_miniseed_v020, worker_file)
+
+    # Cache the worker-specific path
+    _MTH5_GLOBAL_CACHE[cache_key] = str(worker_file)
+
+    return worker_file
