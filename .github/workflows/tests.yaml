@@ -80,7 +80,7 @@ jobs:
           mkdir -p executed
 
           for nb in "${notebooks[@]}"; do
-            out="executed/$(basename "${nb%.ipynb}").executed.ipynb"
+            out="$(basename "${nb%.ipynb}").executed.ipynb"
             echo "Executing: ${nb}"
             # Use uv-managed Python and call nbconvert as a module (no PATH reliance)
             uv run python -m jupyter nbconvert \
@@ -99,10 +99,10 @@ jobs:
 
           # Detect embedded cell errors even if nbconvert returned 0
           errs=()
-          if ls executed/*.executed.ipynb >/dev/null 2>&1; then
+          if ls *.executed.ipynb >/dev/null 2>&1; then
             if uv run python - <<'PY'
               import json, glob
-              for fn in glob.glob("executed/*.executed.ipynb"):
+              for fn in glob.glob("*.executed.ipynb"):
                   with open(fn, "r", encoding="utf-8") as f:
                       nb = json.load(f)
                   for cell in nb.get("cells", []):
@@ -116,7 +116,7 @@ jobs:
               :
             else
               # Only add notebooks that actually have errors
-              for fn in executed/*.executed.ipynb; do
+              for fn in *.executed.ipynb; do
                 if uv run python - <<'PY2'
               import json, sys
               fn = sys.argv[1]
