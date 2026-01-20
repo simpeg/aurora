@@ -63,8 +63,10 @@ jobs:
       shell: bash
       run: |
         #!/usr/bin/env bash
+        source .venv/bin/activate
         set -o pipefail
         # Important: DO NOT use 'set -e' here, because we want to continue on errors.
+        
         
         failures=()
         notebooks=( "docs/examples/dataset_definition.ipynb" "docs/examples/operate_aurora.ipynb" "docs/tutorials/pkd_units_check.ipynb" "docs/tutorials/pole_zero_fitting/lemi_pole_zero_fitting_example.ipynb" "docs/tutorials/processing_configuration.ipynb" "docs/tutorials/process_cas04_multiple_station.ipynb" "docs/tutorials/synthetic_data_processing.ipynb" )
