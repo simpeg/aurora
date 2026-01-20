@@ -61,6 +61,7 @@ jobs:
 
       - name: Set kernel and execute Jupyter Notebooks
         run: |
+          source .venv/bin/activate
           python << 'EOF'
           import nbformat
           import subprocess
