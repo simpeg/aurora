@@ -86,8 +86,8 @@ jobs:
                   with open(nb_path, "r", encoding="utf-8") as f:
                       nb = nbformat.read(f, as_version=4)
                   
-                  nb["metadata"]["kernelspec"]["name"] = "aurora-test"
-                  nb["metadata"]["kernelspec"]["display_name"] = "Python (aurora-test)"
+                  nb["metadata"]["kernelspec"]["name"] = "python3"
+                  nb["metadata"]["kernelspec"]["display_name"] = "Python (python3)"
                   
                   with open(nb_path, "w", encoding="utf-8") as f:
                       nbformat.write(nb, f)
