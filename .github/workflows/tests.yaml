@@ -54,30 +54,84 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y pandoc
 
-    # - name: Execute Jupyter Notebooks
-    #  run: |
-    #    source .venv/bin/activate
-    #    python -m ipykernel install --user --name aurora-test
-    #    jupyter nbconvert --to notebook --execute docs/examples/dataset_definition.ipynb
-    #    jupyter nbconvert --to notebook --execute docs/examples/operate_aurora.ipynb
-    #    jupyter nbconvert --to notebook --execute docs/tutorials/pkd_units_check.ipynb
-    #    jupyter nbconvert --to notebook --execute docs/tutorials/pole_zero_fitting/lemi_pole_zero_fitting_example.ipynb
-    #    jupyter nbconvert --to notebook --execute docs/tutorials/processing_configuration.ipynb
-    #    jupyter nbconvert --to notebook --execute docs/tutorials/process_cas04_multiple_station.ipynb
-    #    jupyter nbconvert --to notebook --execute docs/tutorials/synthetic_data_processing.ipynb
-
     - name: Run Tests
       run: |
         source .venv/bin/activate
         pytest -s -v --cov=./ --cov-report=xml --cov=aurora -n auto tests
 
-    # - name: Run Slow Tests
+    - name: Execute Jupyter Notebooks catching failures
+      shell: bash
+      run: |
+        #!/usr/bin/env bash
+        set -o pipefail
+        # Important: DO NOT use 'set -e' here, because we want to continue on errors.
+        
+        failures=()
+        notebooks=( notebooks/*.ipynb )
+        
+        for nb in "${notebooks[@]}"; do
+          out="executed/$(basename "${nb%.ipynb}").executed.ipynb"
+          mkdir -p executed
+          echo "Executing: ${nb}"
+          jupyter nbconvert \
+            --to notebook \
+            --execute \
+            --ExecutePreprocessor.allow_errors=True \
+            --ExecutePreprocessor.timeout=600 \
+            --output "${out}" \
+            "${nb}"
+          rc=$?
+          if [[ $rc -ne 0 ]]; then
+            echo "⚠️ nbconvert process failed for ${nb} (rc=${rc})."
+            failures+=("${nb}")
+          fi
+        done
+        
+        # Optional: detect embedded cell errors even when nbconvert returned 0.
+        # This lets you continue but fail the job if any notebook captured an error.
+        errs=()
+        for outnb in executed/*.executed.ipynb; do
+          if python - <<'PY'
+        import json, sys, glob
+        has_err = False
+        for fn in glob.glob("executed/*.executed.ipynb"):
+            with open(fn, "r", encoding="utf-8") as f:
+                nb = json.load(f)
+            for cell in nb.get("cells", []):
+                if "outputs" in cell:
+                    for o in cell["outputs"]:
+                        if o.get("output_type") == "error":
+                            print(fn)
+                            has_err = True
+                            raise SystemExit(1)
+        raise SystemExit(0)
+        PY
+          then
+            : # no embedded errors found
+          else
+            errs+=("${outnb}")
+          fi
+        done
+        
+        if (( ${#failures[@]} > 0 || ${#errs[@]} > 0 )); then
+          echo ""
+          echo "======= Summary ======="
+          [[ ${#failures[@]} -gt 0 ]] && echo "nbconvert crashed/timeout for:" "${failures[@]}"
+          [[ ${#errs[@]} -gt 0 ]]     && echo "Cell errors embedded in:" "${errs[@]}"
+          exit 1  # Fail the job overall, but only after running all notebooks
+        fi
+
+    # - name: Execute Jupyter Notebooks
     #   run: |
     #     source .venv/bin/activate
-    #     pytest -s -v --cov=./ --cov-report=xml --cov-append --cov=aurora -n 4 -m "slow" --durations=20 --durations-min=1.0 tests
-    #     # pytest -s -v tests/synthetic/test_fourier_coefficients.py
-    #     # pytest -s -v tests/config/test_config_creator.py 
-
+    #     python -m ipykernel install --user --name aurora-test
+    #     jupyter nbconvert --to notebook --ExecutePreprocessor.allow_errors=True --execute docs/examples/dataset_definition.ipynb
+    #     jupyter nbconvert --to notebook --ExecutePreprocessor.allow_errors=True --execute docs/examples/operate_aurora.ipynb
+    #     jupyter nbconvert --to notebook --ExecutePreprocessor.allow_errors=True --execute docs/tutorials/pkd_units_check.ipynb
+    #     jupyter nbconvert --to notebook --ExecutePreprocessor.allow_errors=True --execute docs/tutorials/pole_zero_fitting/lemi_pole_zero_fitting_example.ipynb
+    #     jupyter nbconvert --to notebook --ExecutePreprocessor.allow_errors=True --execute docs/tutorials/processing_configuration.ipynb
+    #     jupyter nbconvert --to notebook --ExecutePreprocessor.allow_errors=True --execute docs/tutorials/process_cas04_multiple_station.ipynb
+    #     jupyter nbconvert --to notebook --ExecutePreprocessor.allow_errors=True --execute docs/tutorials/synthetic_data_processing.ipynb
 
     - name: "Upload coverage reports to Codecov"
       uses: codecov/codecov-action@v4
