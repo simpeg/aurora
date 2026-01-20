@@ -59,99 +59,65 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y pandoc
 
-      - name: Execute Jupyter Notebooks catching failures
-        shell: bash
+      - name: Set kernel and execute Jupyter Notebooks
         run: |
-          source .venv/bin/activate
-          set -o pipefail
-          # NOTE: Do not set -e; we want to continue through failures.
-
-          failures=()
-          notebooks=(
-            "docs/examples/dataset_definition.ipynb"
-            "docs/examples/operate_aurora.ipynb"
-            "docs/tutorials/pkd_units_check.ipynb"
-            "docs/tutorials/pole_zero_fitting/lemi_pole_zero_fitting_example.ipynb"
-            "docs/tutorials/processing_configuration.ipynb"
-            "docs/tutorials/process_cas04_multiple_station.ipynb"
-            "docs/tutorials/synthetic_data_processing.ipynb"
-          )
-
-          mkdir -p executed
-
-          for nb in "${notebooks[@]}"; do
-            out="$(basename "${nb%.ipynb}").executed.ipynb"
-            echo "Executing: ${nb}"
-            # Use uv-managed Python and call nbconvert as a module (no PATH reliance)
-            uv run python -m jupyter nbconvert \
-              --to notebook \
-              --execute \
-              --ExecutePreprocessor.allow_errors=True \
-              --ExecutePreprocessor.timeout=600 \
-              --output "${out}" \
-              "${nb}"
-            rc=$?
-            if [[ $rc -ne 0 ]]; then
-              echo "⚠️ nbconvert process failed for ${nb} (rc=${rc})."
-              failures+=("${nb}")
-            fi
-          done
-
-          # Detect embedded cell errors even if nbconvert returned 0
-          errs=()
-          if ls *.executed.ipynb >/dev/null 2>&1; then
-            if uv run python - <<'PY'
-              import json, glob
-              for fn in glob.glob("*.executed.ipynb"):
-                  with open(fn, "r", encoding="utf-8") as f:
-                      nb = json.load(f)
-                  for cell in nb.get("cells", []):
-                      for o in cell.get("outputs", []):
-                          if o.get("output_type") == "error":
-                              print(fn)
-                              raise SystemExit(1)
-              raise SystemExit(0)
-              PY
-            then
-              :
-            else
-              # Only add notebooks that actually have errors
-              for fn in *.executed.ipynb; do
-                if uv run python - <<'PY2'
-              import json, sys
-              fn = sys.argv[1]
-              with open(fn, "r", encoding="utf-8") as f:
-                  nb = json.load(f)
-              for cell in nb.get("cells", []):
-                  for o in cell.get("outputs", []):
-                      if o.get("output_type") == "error":
-                          raise SystemExit(1)
-              raise SystemExit(0)
-              PY2
-                "$fn"
-                then
-                  : # no error in this notebook
-                else
-                  errs+=("$fn")
-                fi
-              done
-            fi
-          fi
-
-          if (( ${#failures[@]} > 0 || ${#errs[@]} > 0 )); then
-            echo ""
-            echo "======= Summary ======="
-            [[ ${#failures[@]} -gt 0 ]] && echo "nbconvert crashed/timeout for:" "${failures[@]}"
-            [[ ${#errs[@]} -gt 0 ]] && echo "Cell errors embedded in:" "${errs[@]}"
-            exit 1
-          fi
-
-      - name: Upload executed notebooks as artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: executed-notebooks
-          path: executed/
+          python << 'EOF'
+          import nbformat
+          import subprocess
+          import sys
+          
+          notebooks = [
+              "docs/examples/dataset_definition.ipynb",
+              "docs/examples/operate_aurora.ipynb",
+              "docs/tutorials/pkd_units_check.ipynb",
+              "docs/tutorials/pole_zero_fitting/lemi_pole_zero_fitting_example.ipynb",
+              "docs/tutorials/processing_configuration.ipynb",
+              "docs/tutorials/process_cas04_multiple_station. ipynb",
+              "docs/tutorials/synthetic_data_processing. ipynb"
+          ]
+          
+          failures = []
+          
+          for nb_path in notebooks:
+              # Update kernel spec
+              print(f"Updating kernel in {nb_path}")
+              try:
+                  with open(nb_path, "r", encoding="utf-8") as f:
+                      nb = nbformat.read(f, as_version=4)
+                  
+                  nb["metadata"]["kernelspec"]["name"] = "aurora-test"
+                  nb["metadata"]["kernelspec"]["display_name"] = "Python (aurora-test)"
+                  
+                  with open(nb_path, "w", encoding="utf-8") as f:
+                      nbformat.write(nb, f)
+                  print(f"✓ Updated kernel in {nb_path}")
+              except Exception as e:
+                  print(f"✗ Failed to update kernel in {nb_path}:  {e}")
+                  failures.append(nb_path)
+                  continue
+              
+              # Execute notebook
+              print(f"Executing {nb_path}")
+              result = subprocess.run(
+                  ["jupyter", "nbconvert", "--to", "notebook", "--execute", nb_path],
+                  capture_output=True,
+                  text=True
+              )
+              
+              if result.returncode != 0:
+                  print(f"✗ Failed to execute {nb_path}")
+                  print(result.stderr)
+                  failures.append(nb_path)
+              else:
+                  print(f"✓ Successfully executed {nb_path}")
+          
+          if failures:
+              print("\n======= Summary =======")
+              print(f"Failed notebooks: {failures}")
+              sys.exit(1)
+          else:
+              print("\n✓ All notebooks executed successfully!")
+          EOF
 
       - name: "Upload coverage reports to Codecov"
         uses: codecov/codecov-action@v4
