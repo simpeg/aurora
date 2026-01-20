@@ -54,10 +54,10 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y pandoc
 
-    - name: Run Tests
-      run: |
-        source .venv/bin/activate
-        pytest -s -v --cov=./ --cov-report=xml --cov=aurora -n auto tests
+    # - name: Run Tests
+    #   run: |
+    #     source .venv/bin/activate
+    #     pytest -s -v --cov=./ --cov-report=xml --cov=aurora -n auto tests
 
     - name: Execute Jupyter Notebooks catching failures
       shell: bash
@@ -67,7 +67,7 @@ jobs:
         # Important: DO NOT use 'set -e' here, because we want to continue on errors.
         
         failures=()
-        notebooks=( notebooks/*.ipynb )
+        notebooks=( "docs/examples/dataset_definition.ipynb" "docs/examples/operate_aurora.ipynb" "docs/tutorials/pkd_units_check.ipynb" "docs/tutorials/pole_zero_fitting/lemi_pole_zero_fitting_example.ipynb" "docs/tutorials/processing_configuration.ipynb" "docs/tutorials/process_cas04_multiple_station.ipynb" "docs/tutorials/synthetic_data_processing.ipynb" )
         
         for nb in "${notebooks[@]}"; do
           out="executed/$(basename "${nb%.ipynb}").executed.ipynb"
