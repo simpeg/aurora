@@ -51,7 +51,7 @@ jobs:
           uv pip install mth5
           uv pip install git+https://github.com/kujaku11/mth5_test_data.git
           # Explicitly include nbconvert & ipykernel
-          uv pip install jupyter nbconvert ipykernel pytest pytest-cov pytest-timeout codecov
+          uv pip install jupyter nbconvert nbformat ipykernel pytest pytest-cov pytest-timeout codecov
           python -m ipykernel install --user --name "python3"
 
       - name: Install system dependencies
