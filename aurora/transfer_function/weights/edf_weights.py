@@ -163,9 +163,9 @@ class EffectiveDegreesOfFreedom(object):
         except np.linalg.LinAlgError as le:
             logger.warning(
                 f"In calculating EDF covariance matrix S is a singular matrix: {le}. "
-                "Cannot invert so setting H to zeros."
+                "Cannot invert so setting H to something small."
             )
-            H = np.zeros_like(S)
+            H = np.ones_like(S) * 1e-4
 
         # TODO: why are we not using the `use` boolean to select the data?
         #       This is a bit of a mystery, but it seems to be the way the
