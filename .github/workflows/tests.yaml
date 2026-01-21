@@ -120,6 +120,11 @@ jobs:
               print("\n✓ All notebooks executed successfully!")
           EOF
 
+      - name: Run Tests
+        run: |
+          source .venv/bin/activate
+          pytest -s -v --cov=./ --cov-report=xml --cov=aurora -n auto tests
+          
       - name: "Upload coverage reports to Codecov"
         uses: codecov/codecov-action@v4
         with:
