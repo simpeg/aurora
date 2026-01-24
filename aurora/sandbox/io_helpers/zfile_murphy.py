@@ -237,10 +237,10 @@ class ZFile:
         u[hx_index, hy_index] = np.sin(
             (self.orientation[hx_index, 0] - angle) * np.pi / 180.0
         )
-        u[hy_index, hx_index] = np.sin(
+        u[hy_index, hx_index] = np.cos(
             (self.orientation[hy_index, 0] - angle) * np.pi / 180.0
         )
-        u[hy_index, hy_index] = np.cos(
+        u[hy_index, hy_index] = np.sin(
             (self.orientation[hy_index, 0] - angle) * np.pi / 180.0
         )
         u = np.linalg.inv(u)  # Identity if angle=0
@@ -413,3 +413,28 @@ class ZFile:
             return self.pxy
         if mode == "yx":
             return self.pyx
+
+
+def read_z_file(z_file_path, angle=0.0) -> ZFile:
+    """
+    Reads a zFile and returns a ZFile object.
+
+    Parameters
+    ----------
+    z_file_path: string or pathlib.Path
+        The name of the EMTF-style z-file to operate on
+    angle: float
+        How much rotation to apply.  This is a kludge variable used to help compare
+        legacy SPUD results which are rotated onto a cardinal grid, vs aurora which
+        store the TF in the coordinate system of acquisition
+
+    Returns
+    -------
+    z_obj: ZFile
+        The zFile as an object.
+
+    """
+    z_obj = ZFile(z_file_path)
+    z_obj.load()
+    z_obj.apparent_resistivity(angle=angle)
+    return z_obj
