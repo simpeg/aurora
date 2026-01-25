@@ -1,13 +1,14 @@
 {
     "processing": {
-        "band_setup_file": "/home/kkappler/software/irismt/aurora/aurora/config/emtf_band_setup/bs_test.cfg",
+        "band_setup_file": "C:\\Users\\peaco\\OneDrive\\Documents\\GitHub\\aurora\\aurora\\config\\emtf_band_setup\\bs_test.cfg",
         "band_specification_style": "EMTF",
         "channel_nomenclature": {
             "ex": "ex",
             "ey": "ey",
             "hx": "hx",
             "hy": "hy",
-            "hz": "hz"
+            "hz": "hz",
+            "keyword": "default"
         },
         "decimations": [
             {
@@ -18,10 +19,11 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 0,
-                                "frequency_max": 0.23828125,
-                                "frequency_min": 0.19140625,
+                                "frequency_max": 0.119140625,
+                                "frequency_min": 0.095703125,
                                 "index_max": 30,
-                                "index_min": 25
+                                "index_min": 25,
+                                "name": "0.107422"
                             }
                         },
                         {
@@ -29,10 +31,11 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 0,
-                                "frequency_max": 0.19140625,
-                                "frequency_min": 0.15234375,
+                                "frequency_max": 0.095703125,
+                                "frequency_min": 0.076171875,
                                 "index_max": 24,
-                                "index_min": 20
+                                "index_min": 20,
+                                "name": "0.085938"
                             }
                         },
                         {
@@ -40,10 +43,11 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 0,
-                                "frequency_max": 0.15234375,
-                                "frequency_min": 0.12109375,
+                                "frequency_max": 0.076171875,
+                                "frequency_min": 0.060546875,
                                 "index_max": 19,
-                                "index_min": 16
+                                "index_min": 16,
+                                "name": "0.068359"
                             }
                         },
                         {
@@ -51,10 +55,11 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 0,
-                                "frequency_max": 0.12109375,
-                                "frequency_min": 0.09765625,
+                                "frequency_max": 0.060546875,
+                                "frequency_min": 0.048828125,
                                 "index_max": 15,
-                                "index_min": 13
+                                "index_min": 13,
+                                "name": "0.054688"
                             }
                         },
                         {
@@ -62,10 +67,11 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 0,
-                                "frequency_max": 0.09765625,
-                                "frequency_min": 0.07421875,
+                                "frequency_max": 0.048828125,
+                                "frequency_min": 0.037109375,
                                 "index_max": 12,
-                                "index_min": 10
+                                "index_min": 10,
+                                "name": "0.042969"
                             }
                         },
                         {
@@ -73,10 +79,11 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 0,
-                                "frequency_max": 0.07421875,
-                                "frequency_min": 0.05859375,
+                                "frequency_max": 0.037109375,
+                                "frequency_min": 0.029296875,
                                 "index_max": 9,
-                                "index_min": 8
+                                "index_min": 8,
+                                "name": "0.033203"
                             }
                         },
                         {
@@ -84,10 +91,11 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 0,
-                                "frequency_max": 0.05859375,
-                                "frequency_min": 0.04296875,
+                                "frequency_max": 0.029296875,
+                                "frequency_min": 0.021484375,
                                 "index_max": 7,
-                                "index_min": 6
+                                "index_min": 6,
+                                "name": "0.025391"
                             }
                         },
                         {
@@ -95,19 +103,21 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 0,
-                                "frequency_max": 0.04296875,
-                                "frequency_min": 0.03515625,
+                                "frequency_max": 0.021484375,
+                                "frequency_min": 0.017578125,
                                 "index_max": 5,
-                                "index_min": 5
+                                "index_min": 5,
+                                "name": "0.019531"
                             }
                         }
                     ],
+                    "channel_weight_specs": [],
                     "decimation": {
-                        "level": 0,
+                        "anti_alias_filter": "default",
                         "factor": 1.0,
+                        "level": 0,
                         "method": "default",
-                        "sample_rate": 1.0,
-                        "anti_alias_filter": "default"
+                        "sample_rate": 1.0
                     },
                     "estimator": {
                         "engine": "RME_RR",
@@ -127,33 +137,32 @@
                         "hy"
                     ],
                     "regression": {
-                        "minimum_cycles": 10,
                         "max_iterations": 10,
                         "max_redescending_iterations": 2,
+                        "minimum_cycles": 1,
                         "r0": 1.5,
-                        "u0": 2.8,
                         "tolerance": 0.005,
-                        "verbosity": 0
+                        "u0": 2.8,
+                        "verbosity": 1
                     },
                     "save_fcs": false,
                     "save_fcs_type": null,
                     "stft": {
-                        "harmonic_indices": [
-                            -1
-                        ],
+                        "harmonic_indices": null,
                         "method": "fft",
-                        "min_num_stft_windows": 2,
+                        "min_num_stft_windows": 0,
                         "per_window_detrend_type": "linear",
                         "pre_fft_detrend_type": "linear",
                         "prewhitening_type": "first difference",
                         "recoloring": true,
                         "window": {
-                            "num_samples": 128,
-                            "overlap": 32,
-                            "type": "boxcar",
-                            "clock_zero_type": "ignore",
+                            "additional_args": {},
                             "clock_zero": "1980-01-01T00:00:00+00:00",
-                            "normalized": true
+                            "clock_zero_type": "ignore",
+                            "normalized": true,
+                            "num_samples": 256,
+                            "overlap": 32,
+                            "type": "boxcar"
                         }
                     }
                 }
@@ -166,10 +175,11 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 1,
-                                "frequency_max": 0.0341796875,
-                                "frequency_min": 0.0263671875,
+                                "frequency_max": 0.01708984375,
+                                "frequency_min": 0.01318359375,
                                 "index_max": 17,
-                                "index_min": 14
+                                "index_min": 14,
+                                "name": "0.015137"
                             }
                         },
                         {
@@ -177,10 +187,11 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 1,
-                                "frequency_max": 0.0263671875,
-                                "frequency_min": 0.0205078125,
+                                "frequency_max": 0.01318359375,
+                                "frequency_min": 0.01025390625,
                                 "index_max": 13,
-                                "index_min": 11
+                                "index_min": 11,
+                                "name": "0.011719"
                             }
                         },
                         {
@@ -188,10 +199,11 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 1,
-                                "frequency_max": 0.0205078125,
-                                "frequency_min": 0.0166015625,
+                                "frequency_max": 0.01025390625,
+                                "frequency_min": 0.00830078125,
                                 "index_max": 10,
-                                "index_min": 9
+                                "index_min": 9,
+                                "name": "0.009277"
                             }
                         },
                         {
@@ -199,10 +211,11 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 1,
-                                "frequency_max": 0.0166015625,
-                                "frequency_min": 0.0126953125,
+                                "frequency_max": 0.00830078125,
+                                "frequency_min": 0.00634765625,
                                 "index_max": 8,
-                                "index_min": 7
+                                "index_min": 7,
+                                "name": "0.007324"
                             }
                         },
                         {
@@ -210,10 +223,11 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 1,
-                                "frequency_max": 0.0126953125,
-                                "frequency_min": 0.0107421875,
+                                "frequency_max": 0.00634765625,
+                                "frequency_min": 0.00537109375,
                                 "index_max": 6,
-                                "index_min": 6
+                                "index_min": 6,
+                                "name": "0.005859"
                             }
                         },
                         {
@@ -221,19 +235,21 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 1,
-                                "frequency_max": 0.0107421875,
-                                "frequency_min": 0.0087890625,
+                                "frequency_max": 0.00537109375,
+                                "frequency_min": 0.00439453125,
                                 "index_max": 5,
-                                "index_min": 5
+                                "index_min": 5,
+                                "name": "0.004883"
                             }
                         }
                     ],
+                    "channel_weight_specs": [],
                     "decimation": {
+                        "anti_alias_filter": "default",
+                        "factor": 4.0,
                         "level": 1,
-                        "factor": 4.0,
                         "method": "default",
-                        "sample_rate": 0.25,
-                        "anti_alias_filter": "default"
+                        "sample_rate": 0.25
                     },
                     "estimator": {
                         "engine": "RME_RR",
@@ -253,33 +269,32 @@
                         "hy"
                     ],
                     "regression": {
-                        "minimum_cycles": 10,
                         "max_iterations": 10,
                         "max_redescending_iterations": 2,
+                        "minimum_cycles": 1,
                         "r0": 1.5,
-                        "u0": 2.8,
                         "tolerance": 0.005,
-                        "verbosity": 0
+                        "u0": 2.8,
+                        "verbosity": 1
                     },
                     "save_fcs": false,
                     "save_fcs_type": null,
                     "stft": {
-                        "harmonic_indices": [
-                            -1
-                        ],
+                        "harmonic_indices": null,
                         "method": "fft",
-                        "min_num_stft_windows": 2,
+                        "min_num_stft_windows": 0,
                         "per_window_detrend_type": "linear",
                         "pre_fft_detrend_type": "linear",
                         "prewhitening_type": "first difference",
                         "recoloring": true,
                         "window": {
-                            "num_samples": 128,
-                            "overlap": 32,
-                            "type": "boxcar",
-                            "clock_zero_type": "ignore",
+                            "additional_args": {},
                             "clock_zero": "1980-01-01T00:00:00+00:00",
-                            "normalized": true
+                            "clock_zero_type": "ignore",
+                            "normalized": true,
+                            "num_samples": 256,
+                            "overlap": 32,
+                            "type": "boxcar"
                         }
                     }
                 }
@@ -292,10 +307,11 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 2,
-                                "frequency_max": 0.008544921875,
-                                "frequency_min": 0.006591796875,
+                                "frequency_max": 0.0042724609375,
+                                "frequency_min": 0.0032958984375,
                                 "index_max": 17,
-                                "index_min": 14
+                                "index_min": 14,
+                                "name": "0.003784"
                             }
                         },
                         {
@@ -303,10 +319,11 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 2,
-                                "frequency_max": 0.006591796875,
-                                "frequency_min": 0.005126953125,
+                                "frequency_max": 0.0032958984375,
+                                "frequency_min": 0.0025634765625,
                                 "index_max": 13,
-                                "index_min": 11
+                                "index_min": 11,
+                                "name": "0.002930"
                             }
                         },
                         {
@@ -314,10 +331,11 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 2,
-                                "frequency_max": 0.005126953125,
-                                "frequency_min": 0.004150390625,
+                                "frequency_max": 0.0025634765625,
+                                "frequency_min": 0.0020751953125,
                                 "index_max": 10,
-                                "index_min": 9
+                                "index_min": 9,
+                                "name": "0.002319"
                             }
                         },
                         {
@@ -325,10 +343,11 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 2,
-                                "frequency_max": 0.004150390625,
-                                "frequency_min": 0.003173828125,
+                                "frequency_max": 0.0020751953125,
+                                "frequency_min": 0.0015869140625,
                                 "index_max": 8,
-                                "index_min": 7
+                                "index_min": 7,
+                                "name": "0.001831"
                             }
                         },
                         {
@@ -336,10 +355,11 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 2,
-                                "frequency_max": 0.003173828125,
-                                "frequency_min": 0.002685546875,
+                                "frequency_max": 0.0015869140625,
+                                "frequency_min": 0.0013427734375,
                                 "index_max": 6,
-                                "index_min": 6
+                                "index_min": 6,
+                                "name": "0.001465"
                             }
                         },
                         {
@@ -347,19 +367,21 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 2,
-                                "frequency_max": 0.002685546875,
-                                "frequency_min": 0.002197265625,
+                                "frequency_max": 0.0013427734375,
+                                "frequency_min": 0.0010986328125,
                                 "index_max": 5,
-                                "index_min": 5
+                                "index_min": 5,
+                                "name": "0.001221"
                             }
                         }
                     ],
+                    "channel_weight_specs": [],
                     "decimation": {
-                        "level": 2,
+                        "anti_alias_filter": "default",
                         "factor": 4.0,
+                        "level": 2,
                         "method": "default",
-                        "sample_rate": 0.0625,
-                        "anti_alias_filter": "default"
+                        "sample_rate": 0.0625
                     },
                     "estimator": {
                         "engine": "RME_RR",
@@ -379,33 +401,32 @@
                         "hy"
                     ],
                     "regression": {
-                        "minimum_cycles": 10,
                         "max_iterations": 10,
                         "max_redescending_iterations": 2,
+                        "minimum_cycles": 1,
                         "r0": 1.5,
-                        "u0": 2.8,
                         "tolerance": 0.005,
-                        "verbosity": 0
+                        "u0": 2.8,
+                        "verbosity": 1
                     },
                     "save_fcs": false,
                     "save_fcs_type": null,
                     "stft": {
-                        "harmonic_indices": [
-                            -1
-                        ],
+                        "harmonic_indices": null,
                         "method": "fft",
-                        "min_num_stft_windows": 2,
+                        "min_num_stft_windows": 0,
                         "per_window_detrend_type": "linear",
                         "pre_fft_detrend_type": "linear",
                         "prewhitening_type": "first difference",
                         "recoloring": true,
                         "window": {
-                            "num_samples": 128,
-                            "overlap": 32,
-                            "type": "boxcar",
-                            "clock_zero_type": "ignore",
+                            "additional_args": {},
                             "clock_zero": "1980-01-01T00:00:00+00:00",
-                            "normalized": true
+                            "clock_zero_type": "ignore",
+                            "normalized": true,
+                            "num_samples": 256,
+                            "overlap": 32,
+                            "type": "boxcar"
                         }
                     }
                 }
@@ -418,10 +439,11 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 3,
-                                "frequency_max": 0.00274658203125,
-                                "frequency_min": 0.00213623046875,
+                                "frequency_max": 0.001373291015625,
+                                "frequency_min": 0.001068115234375,
                                 "index_max": 22,
-                                "index_min": 18
+                                "index_min": 18,
+                                "name": "0.001221"
                             }
                         },
                         {
@@ -429,10 +451,11 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 3,
-                                "frequency_max": 0.00213623046875,
-                                "frequency_min": 0.00164794921875,
+                                "frequency_max": 0.001068115234375,
+                                "frequency_min": 0.000823974609375,
                                 "index_max": 17,
-                                "index_min": 14
+                                "index_min": 14,
+                                "name": "0.000946"
                             }
                         },
                         {
@@ -440,10 +463,11 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 3,
-                                "frequency_max": 0.00164794921875,
-                                "frequency_min": 0.00115966796875,
+                                "frequency_max": 0.000823974609375,
+                                "frequency_min": 0.000579833984375,
                                 "index_max": 13,
-                                "index_min": 10
+                                "index_min": 10,
+                                "name": "0.000702"
                             }
                         },
                         {
@@ -451,10 +475,11 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 3,
-                                "frequency_max": 0.00115966796875,
-                                "frequency_min": 0.00079345703125,
+                                "frequency_max": 0.000579833984375,
+                                "frequency_min": 0.000396728515625,
                                 "index_max": 9,
-                                "index_min": 7
+                                "index_min": 7,
+                                "name": "0.000488"
                             }
                         },
                         {
@@ -462,19 +487,21 @@
                                 "center_averaging_type": "geometric",
                                 "closed": "left",
                                 "decimation_level": 3,
-                                "frequency_max": 0.00079345703125,
-                                "frequency_min": 0.00054931640625,
+                                "frequency_max": 0.000396728515625,
+                                "frequency_min": 0.000274658203125,
                                 "index_max": 6,
-                                "index_min": 5
+                                "index_min": 5,
+                                "name": "0.000336"
                             }
                         }
                     ],
+                    "channel_weight_specs": [],
                     "decimation": {
-                        "level": 3,
+                        "anti_alias_filter": "default",
                         "factor": 4.0,
+                        "level": 3,
                         "method": "default",
-                        "sample_rate": 0.015625,
-                        "anti_alias_filter": "default"
+                        "sample_rate": 0.015625
                     },
                     "estimator": {
                         "engine": "RME_RR",
@@ -494,33 +521,32 @@
                         "hy"
                     ],
                     "regression": {
-                        "minimum_cycles": 10,
                         "max_iterations": 10,
                         "max_redescending_iterations": 2,
+                        "minimum_cycles": 1,
                         "r0": 1.5,
-                        "u0": 2.8,
                         "tolerance": 0.005,
-                        "verbosity": 0
+                        "u0": 2.8,
+                        "verbosity": 1
                     },
                     "save_fcs": false,
                     "save_fcs_type": null,
                     "stft": {
-                        "harmonic_indices": [
-                            -1
-                        ],
+                        "harmonic_indices": null,
                         "method": "fft",
-                        "min_num_stft_windows": 2,
+                        "min_num_stft_windows": 0,
                         "per_window_detrend_type": "linear",
                         "pre_fft_detrend_type": "linear",
                         "prewhitening_type": "first difference",
                         "recoloring": true,
                         "window": {
-                            "num_samples": 128,
-                            "overlap": 32,
-                            "type": "boxcar",
-                            "clock_zero_type": "ignore",
+                            "additional_args": {},
                             "clock_zero": "1980-01-01T00:00:00+00:00",
-                            "normalized": true
+                            "clock_zero_type": "ignore",
+                            "normalized": true,
+                            "num_samples": 256,
+                            "overlap": 32,
+                            "type": "boxcar"
                         }
                     }
                 }
@@ -528,11 +554,66 @@
         ],
         "id": "test1_rr_test2_sr1",
         "stations": {
+            "local": {
+                "id": "test1",
+                "mth5_path": "C:\\Users\\peaco\\OneDrive\\Documents\\GitHub\\mth5\\mth5\\data\\mth5\\test12rr.h5",
+                "remote": false,
+                "runs": [
+                    {
+                        "run": {
+                            "id": "001",
+                            "input_channels": [
+                                {
+                                    "channel": {
+                                        "id": "hx",
+                                        "scale_factor": 1.0
+                                    }
+                                },
+                                {
+                                    "channel": {
+                                        "id": "hy",
+                                        "scale_factor": 1.0
+                                    }
+                                }
+                            ],
+                            "output_channels": [
+                                {
+                                    "channel": {
+                                        "id": "ex",
+                                        "scale_factor": 1.0
+                                    }
+                                },
+                                {
+                                    "channel": {
+                                        "id": "ey",
+                                        "scale_factor": 1.0
+                                    }
+                                },
+                                {
+                                    "channel": {
+                                        "id": "hz",
+                                        "scale_factor": 1.0
+                                    }
+                                }
+                            ],
+                            "sample_rate": 1.0,
+                            "time_periods": [
+                                {
+                                    "time_period": {
+                                        "end": "1980-01-01T11:06:39+00:00",
+                                        "start": "1980-01-01T00:00:00+00:00"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
             "remote": [
                 {
                     "station": {
                         "id": "test2",
-                        "mth5_path": "/home/kkappler/software/irismt/mth5/mth5/data/mth5/test12rr.h5",
+                        "mth5_path": "C:\\Users\\peaco\\OneDrive\\Documents\\GitHub\\mth5\\mth5\\data\\mth5\\test12rr.h5",
                         "remote": true,
                         "runs": [
                             {
@@ -586,62 +667,7 @@
                         ]
                     }
                 }
-            ],
-            "local": {
-                "id": "test1",
-                "mth5_path": "/home/kkappler/software/irismt/mth5/mth5/data/mth5/test12rr.h5",
-                "remote": false,
-                "runs": [
-                    {
-                        "run": {
-                            "id": "001",
-                            "input_channels": [
-                                {
-                                    "channel": {
-                                        "id": "hx",
-                                        "scale_factor": 1.0
-                                    }
-                                },
-                                {
-                                    "channel": {
-                                        "id": "hy",
-                                        "scale_factor": 1.0
-                                    }
-                                }
-                            ],
-                            "output_channels": [
-                                {
-                                    "channel": {
-                                        "id": "ex",
-                                        "scale_factor": 1.0
-                                    }
-                                },
-                                {
-                                    "channel": {
-                                        "id": "ey",
-                                        "scale_factor": 1.0
-                                    }
-                                },
-                                {
-                                    "channel": {
-                                        "id": "hz",
-                                        "scale_factor": 1.0
-                                    }
-                                }
-                            ],
-                            "sample_rate": 1.0,
-                            "time_periods": [
-                                {
-                                    "time_period": {
-                                        "end": "1980-01-01T11:06:39+00:00",
-                                        "start": "1980-01-01T00:00:00+00:00"
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                ]
-            }
+            ]
         }
     }
 }

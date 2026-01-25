@@ -1,5 +1,5 @@
 """
-    Helper functions to handle workarounds.
+Helper functions to handle workarounds.
 """
 
 import numpy as np
@@ -32,6 +32,10 @@ def tfs_nearly_equal(tf1: TF, tf2: TF) -> bool:
         # Triage the creation time
         tf2_copy.station_metadata.provenance.creation_time = (
             tf1.station_metadata.provenance.creation_time
+        )
+        # Triage the processed_date
+        tf2_copy.station_metadata.transfer_function.processed_date = (
+            tf1.station_metadata.transfer_function.processed_date
         )
         return tf1 == tf2_copy
 

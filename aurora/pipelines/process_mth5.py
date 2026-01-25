@@ -27,33 +27,29 @@ Note 3: This point in the loop marks the interface between _generation_ of the F
 
 """
 
-import mth5.groups
+from typing import Optional, Tuple, Union
+
+import xarray as xr
+from loguru import logger
+from mth5.helpers import close_open_files
+
+import aurora.config.metadata.processing
 
 # =============================================================================
 # Imports
 # =============================================================================
-from aurora.pipelines.feature_weights import calculate_weights
-from aurora.pipelines.feature_weights import extract_features
+from aurora.pipelines.feature_weights import calculate_weights, extract_features
 from aurora.pipelines.transfer_function_helpers import (
     process_transfer_functions,
     process_transfer_functions_with_weights,
 )
 from aurora.pipelines.transfer_function_kernel import TransferFunctionKernel
-from aurora.time_series.spectrogram_helpers import get_spectrograms
-from aurora.time_series.spectrogram_helpers import merge_stfts
+from aurora.time_series.spectrogram_helpers import get_spectrograms, merge_stfts
 from aurora.transfer_function.transfer_function_collection import (
     TransferFunctionCollection,
 )
 from aurora.transfer_function.TTFZ import TTFZ
 
-from loguru import logger
-from mth5.helpers import close_open_files
-from mth5.processing import KernelDataset
-from typing import Literal, Optional, Tuple, Union
-
-import aurora.config.metadata.processing
-import pandas as pd
-import xarray as xr
 
 SUPPORTED_PROCESSINGS = [
     "legacy",
@@ -117,12 +113,21 @@ def process_tf_decimation_level(
             f"with exception: {e}"
         )
         logger.warning(msg)
-        transfer_function_obj = process_transfer_functions(
-            dec_level_config=dec_level_config,
-            local_stft_obj=local_stft_obj,
-            remote_stft_obj=remote_stft_obj,
-            transfer_function_obj=transfer_function_obj,
-        )
+        try:
+            transfer_function_obj = process_transfer_functions(
+                dec_level_config=dec_level_config,
+                local_stft_obj=local_stft_obj,
+                remote_stft_obj=remote_stft_obj,
+                transfer_function_obj=transfer_function_obj,
+            )
+        except Exception as e:
+            msg = (
+                f"Processing transfer functions without weights also failed for decimation level {i_dec_level} "
+                f"with exception: {e}"
+            )
+            logger.error(msg)
+            logger.exception(msg)
+            raise e
     return transfer_function_obj
 
 
@@ -140,7 +145,7 @@ def process_mth5_legacy(
 
     Parameters
     ----------
-    config: mt_metadata.transfer_functions.processing.aurora.Processing or path to json
+    config: mt_metadata.processing.aurora.Processing or path to json
         All processing parameters
     tfk_dataset: aurora.tf_kernel.dataset.Dataset or None
         Specifies what datasets to process according to config
@@ -193,21 +198,28 @@ def process_mth5_legacy(
             calculate_weights(dec_level_config, tfk_dataset)
         except Exception as e:
             msg = f"Feature weights calculation Failed -- procesing without weights -- {e}"
-            logger.warning(msg)
-
-        ttfz_obj = process_tf_decimation_level(
-            tfk.config,
-            i_dec_level,
-            local_merged_stft_obj,
-            remote_merged_stft_obj,
-        )
+            # logger.warning(msg)
+            logger.exception(msg)
+        try:
+            ttfz_obj = process_tf_decimation_level(
+                tfk.config,
+                i_dec_level,
+                local_merged_stft_obj,
+                remote_merged_stft_obj,
+            )
+        except Exception as e:
+            msg = (
+                f"Processing transfer functions failed for decimation level {i_dec_level} "
+                f"with exception: {e}. Skipping this decimation level."
+            )
+            logger.error(msg)
+            logger.exception(msg)
+            continue
         ttfz_obj.apparent_resistivity(tfk.config.channel_nomenclature, units=units)
         tf_dict[i_dec_level] = ttfz_obj
 
         if show_plot:
-            from aurora.sandbox.plot_helpers import plot_tf_obj
-
-            plot_tf_obj(ttfz_obj, out_filename="")
+            fig = ttfz_obj.plot()
 
     tf_collection = TransferFunctionCollection(
         tf_dict=tf_dict, processing_config=tfk.config
@@ -252,7 +264,7 @@ def process_mth5(
 
     Parameters
     ----------
-    config: mt_metadata.transfer_functions.processing.aurora.Processing or path to json
+    config: mt_metadata.processing.aurora.Processing or path to json
         All processing parameters
     tfk_dataset: aurora.tf_kernel.dataset.Dataset or None
         Specifies what datasets to process according to config

@@ -1,15 +1,16 @@
 """
     This module contains methods that are used in the Parkfield calibration tests.
 """
+import pathlib
+from typing import Optional, Union
+
 import matplotlib.pyplot as plt
 import mth5.groups.run
 import numpy as np
-import pathlib
-
 import xarray
-from scipy.signal import medfilt
 from loguru import logger
-from typing import Optional, Union
+from scipy.signal import medfilt
+
 
 plt.ion()
 
@@ -35,10 +36,11 @@ def load_bf4_fap_for_parkfield_test_using_mt_metadata(frequencies: np.ndarray):
     bf4_resp:  np.ndarray
         Complex response of the filter at the input frequencies
     """
-    from aurora.general_helper_functions import DATA_PATH
     from mt_metadata.timeseries.filters.helper_functions import (
         make_frequency_response_table_filter,
     )
+
+    from aurora.general_helper_functions import DATA_PATH
 
     bf4_file_path = DATA_PATH.joinpath("parkfield", "bf4_9819.csv")
     bf4_obj = make_frequency_response_table_filter(bf4_file_path, case="bf4")
@@ -190,8 +192,8 @@ def parkfield_sanity_check(
         # Do Plotting (can factor this out)
         plt.figure(2)
         plt.clf()
-        bf4_colour = "red"
-        pz_color = "blue"
+        bf4_colour = "firebrick"
+        pz_color = "steelblue"
 
         if show_raw:
             plt.loglog(

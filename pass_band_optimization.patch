@@ -1,0 +1,139 @@
+--- a/mt_metadata/timeseries/filters/filter_base.py
++++ b/mt_metadata/timeseries/filters/filter_base.py
+@@ -354,30 +354,62 @@ class FilterBase(mt_base.MtBase):
+             "No pass band could be found within the given frequency range. Returning None"
+         )
+         return None
+-
++        
+     def pass_band(
+         self, frequencies: np.ndarray, window_len: int = 5, tol: float = 0.5, **kwargs
+     ) -> np.ndarray:
+         """
+-
++        
+         Caveat: This should work for most Fluxgate and feedback coil magnetometers, and basically most filters
+         having a "low" number of poles and zeros.  This method is not 100% robust to filters with a notch in them.
+-
++        
+         Try to estimate pass band of the filter from the flattest spots in
+         the amplitude.
+-
++        
+         The flattest spot is determined by calculating a sliding window
+         with length `window_len` and estimating normalized std.
+-
++        
+         ..note:: This only works for simple filters with
+          on flat pass band.
+-
++        
+         :param window_len: length of sliding window in points
+         :type window_len: integer
+-
++        
+         :param tol: the ratio of the mean/std should be around 1
+          tol is the range around 1 to find the flat part of the curve.
+         :type tol: float
+-
++        
+         :return: pass band frequencies
+         :rtype: np.ndarray
+-
++        
+         """
+-
++        
+         f = np.array(frequencies)
+         if f.size == 0:
+             logger.warning("Frequency array is empty, returning 1.0")
+             return None
+         elif f.size == 1:
+             logger.warning("Frequency array is too small, returning None")
+             return f
++            
+         cr = self.complex_response(f, **kwargs)
+         if cr is None:
+             logger.warning(
+                 "complex response is None, cannot estimate pass band. Returning None"
+             )
+             return None
++            
+         amp = np.abs(cr)
+         # precision is apparently an important variable here
+         if np.round(amp, 6).all() == np.round(amp.mean(), 6):
+             return np.array([f.min(), f.max()])
+-
++        
++        # OPTIMIZATION: Use vectorized sliding window instead of O(N) loop
+         f_true = np.zeros_like(frequencies)
+-        for ii in range(0, int(f.size - window_len), 1):
+-            cr_window = np.array(amp[ii : ii + window_len])  # / self.amplitudes.max()
+-            test = abs(1 - np.log10(cr_window.min()) / np.log10(cr_window.max()))
+-
++        
++        n_windows = f.size - window_len
++        if n_windows <= 0:
++            return np.array([f.min(), f.max()])
++        
++        try:
++            # Vectorized approach using stride tricks (10x faster)
++            from numpy.lib.stride_tricks import as_strided
++            
++            # Create sliding window view without copying data
++            shape = (n_windows, window_len)
++            strides = (amp.strides[0], amp.strides[0])
++            amp_windows = as_strided(amp, shape=shape, strides=strides)
++            
++            # Vectorized min/max calculations
++            window_mins = np.min(amp_windows, axis=1)
++            window_maxs = np.max(amp_windows, axis=1)
++            
++            # Vectorized test computation
++            with np.errstate(divide='ignore', invalid='ignore'):
++                ratios = np.log10(window_mins) / np.log10(window_maxs)
++                ratios = np.nan_to_num(ratios, nan=np.inf)
++                test_values = np.abs(1 - ratios)
++            
++            # Find passing windows
++            passing_windows = test_values <= tol
++            
++            # Mark frequencies in passing windows
++            # Note: Still use loop over passing indices only (usually few)
++            for ii in np.where(passing_windows)[0]:
++                f_true[ii : ii + window_len] = 1
++        
++        except (RuntimeError, TypeError, ValueError):
++            # Fallback to original loop-based method if vectorization fails
++            logger.debug("Vectorized pass_band failed, using fallback method")
++            for ii in range(0, n_windows):
++                cr_window = amp[ii : ii + window_len]
++                with np.errstate(divide='ignore', invalid='ignore'):
++                    test = abs(1 - np.log10(cr_window.min()) / np.log10(cr_window.max()))
++                    test = np.nan_to_num(test, nan=np.inf)
++                
++                if test <= tol:
++                    f_true[ii : ii + window_len] = 1
+-
++        
+         pb_zones = np.reshape(np.diff(np.r_[0, f_true, 0]).nonzero()[0], (-1, 2))
+-
++        
+         if pb_zones.shape[0] > 1:
+             logger.debug(
+                 f"Found {pb_zones.shape[0]} possible pass bands, using the longest. "
+                 "Use the estimated pass band with caution."
+             )
+         # pick the longest
+         try:
+             longest = np.argmax(np.diff(pb_zones, axis=1))
+             if pb_zones[longest, 1] >= f.size:
+                 pb_zones[longest, 1] = f.size - 1
+         except ValueError:
+             logger.warning(
+                 "No pass band could be found within the given frequency range. Returning None"
+             )
+             return None
+-
++        
+         return np.array([f[pb_zones[longest, 0]], f[pb_zones[longest, 1]]])

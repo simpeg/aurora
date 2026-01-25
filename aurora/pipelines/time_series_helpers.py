@@ -9,13 +9,12 @@ import xarray as xr
 
 from loguru import logger
 from aurora.time_series.windowing_scheme import window_scheme_from_decimation
-from mt_metadata.transfer_functions.processing import TimeSeriesDecimation
-from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
+from mt_metadata.processing import TimeSeriesDecimation
+from mt_metadata.processing.aurora.decimation_level import (
     DecimationLevel as AuroraDecimationLevel,
 )
-from mt_metadata.transfer_functions.processing.fourier_coefficients import (
-    Decimation as FCDecimation,
-)
+from mt_metadata.processing.fourier_coefficients import Decimation as FCDecimation
+
 from mth5.groups import RunGroup
 from typing import Union
 
@@ -132,7 +131,7 @@ def prototype_decimate(
 #
 #     Parameters
 #     ----------
-#     config : mt_metadata.transfer_functions.processing.aurora.Decimation
+#     config : mt_metadata.processing.aurora.Decimation
 #     run_xrds: xr.Dataset
 #         Originally from mth5.timeseries.run_ts.RunTS.dataset, but possibly decimated
 #         multiple times
@@ -156,7 +155,7 @@ def prototype_decimate(
 #
 #     Parameters
 #     ----------
-#     config : mt_metadata.transfer_functions.processing.aurora.Decimation
+#     config : mt_metadata.processing.aurora.Decimation
 #     run_xrds: xr.Dataset
 #         Originally from mth5.timeseries.run_ts.RunTS.dataset, but possibly decimated
 #         multiple times

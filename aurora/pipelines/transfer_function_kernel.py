@@ -1,29 +1,28 @@
 """
-    This module contains the TrasnferFunctionKernel class which is the main object that
-    links the KernelDataset to Processing configuration.
+This module contains the TrasnferFunctionKernel class which is the main object that
+links the KernelDataset to Processing configuration.
 
 """
 
+import pathlib
+from typing import List, Union
+
+import numpy as np
+import pandas as pd
+import psutil
+from loguru import logger
+from mt_metadata.processing.aurora import DecimationLevel as AuroraDecimationLevel
+from mt_metadata.transfer_functions.core import TF
+from mth5.processing.kernel_dataset import KernelDataset
+from mth5.utils.exceptions import MTH5Error
+from mth5.utils.helpers import path_or_mth5_object
+
+from aurora import __version__ as aurora_version
 from aurora.config.metadata.processing import Processing
 from aurora.pipelines.helpers import initialize_config
 from aurora.pipelines.time_series_helpers import prototype_decimate
 from aurora.time_series.windowing_scheme import WindowingScheme
 from aurora.transfer_function import TransferFunctionCollection
-from loguru import logger
-from mth5.utils.exceptions import MTH5Error
-from mth5.utils.helpers import path_or_mth5_object
-from mt_metadata.transfer_functions.core import TF
-from mt_metadata.transfer_functions.processing.aurora import (
-    DecimationLevel as AuroraDecimationLevel,
-)
-from mth5.processing.kernel_dataset import KernelDataset
-
-from typing import List, Union
-
-import numpy as np
-import pandas as pd
-import pathlib
-import psutil
 
 
 class TransferFunctionKernel(object):
@@ -150,7 +149,7 @@ class TransferFunctionKernel(object):
                 run_xrds = row["run_dataarray"].to_dataset("channel")
                 decimation = self.config.decimations[i_dec_level].decimation
                 decimated_xrds = prototype_decimate(decimation, run_xrds)
-                self.dataset_df["run_dataarray"].at[i] = decimated_xrds.to_array(
+                self.dataset_df.at[i, "run_dataarray"] = decimated_xrds.to_array(
                     "channel"
                 )  # See Note 1 above
 
@@ -315,7 +314,7 @@ class TransferFunctionKernel(object):
             raise ValueError(msg)
 
     def validate_decimation_scheme_and_dataset_compatability(
-        self, min_num_stft_windows=None
+        self, min_num_stft_windows=1
     ):
         """
         Checks that the decimation_scheme and dataset are compatable.
@@ -545,9 +544,7 @@ class TransferFunctionKernel(object):
                 Keyed by a string representing the period
                 Values are a custom dictionary.
             """
-            from mt_metadata.transfer_functions.io.zfiles.zmm import (
-                PERIOD_FORMAT,
-            )
+            from mt_metadata.transfer_functions.io.zfiles.zmm import PERIOD_FORMAT
 
             decimation_dict = {}
             # dec_level_cfg is an AuroraDecimationLevel
@@ -563,7 +560,9 @@ class TransferFunctionKernel(object):
                             i_dec
                         ].num_segments.data[0, i_band]
                     except KeyError:
-                        logger.warning("Possibly invalid decimation level")
+                        logger.warning(
+                            f"Decimation level {i_dec} band {i_band} is invalid, not enough points."
+                        )
                         period_value["npts"] = 0
                     decimation_dict[period_key] = period_value
 
@@ -599,32 +598,71 @@ class TransferFunctionKernel(object):
         res_cov = res_cov.rename(renamer_dict)
         tf_cls.residual_covariance = res_cov
 
-        # Set key as first el't of dict, nor currently supporting mixed surveys in TF
-        tf_cls.survey_metadata = self.dataset.local_survey_metadata
+        # Set survey metadata from the dataset
+        # self.dataset.survey_metadata now returns a Survey object (not a dict)
+        # Only set it if the TF object doesn't already have survey metadata
+        # if tf_cls.survey_metadata is None or (
+        #     hasattr(tf_cls.survey_metadata, "__len__")
+        #     and len(tf_cls.survey_metadata) == 0
+        # ):
+        survey_obj = self.dataset.survey_metadata
+        if survey_obj is not None:
+            tf_cls.survey_metadata = survey_obj
 
-        # pack the station metadata into the TF object
-        # station_id = self.processing_config.stations.local.id
-        # station_sub_df = self.dataset_df[self.dataset_df["station"] == station_id]
-        # station_row = station_sub_df.iloc[0]
-        # station_obj = station_obj_from_row(station_row)
+        # Set station metadata and processing info
+        tf_cls.station_metadata.provenance.creation_time = pd.Timestamp.now()
+        tf_cls.station_metadata.provenance.processing_type = self.processing_type
+        tf_cls.station_metadata.transfer_function.processed_date = pd.Timestamp.now()
 
-        # modify the run metadata to match the channel nomenclature
-        # TODO: this should be done inside the TF initialization
-        for i_run, run in enumerate(tf_cls.station_metadata.runs):
-            for i_ch, channel in enumerate(run.channels):
-                new_ch = channel.copy()
-                default_component = channel.component
-                new_component = channel_nomenclature_dict[default_component]
-                new_ch.component = new_component
-                tf_cls.station_metadata.runs[i_run].remove_channel(default_component)
-                tf_cls.station_metadata.runs[i_run].add_channel(new_ch)
+        # Get runs processed from the dataset dataframe
+        runs_processed = self.dataset_df.run.unique().tolist()
+        tf_cls.station_metadata.transfer_function.runs_processed = runs_processed
+        # TODO: tf_cls.station_metadata.transfer_function.processing_config = self.processing_config
 
-        # set processing type
-        tf_cls.station_metadata.transfer_function.processing_type = self.processing_type
+        tf_cls.station_metadata.transfer_function.software.author = "K. Kappler"
+        tf_cls.station_metadata.transfer_function.software.name = "Aurora"
+        tf_cls.station_metadata.transfer_function.software.version = aurora_version
 
-        # tf_cls.station_metadata.transfer_function.processing_config = (
-        #     self.processing_config
-        # )
+        # modify the run metadata to match the channel nomenclature, this should only be done if the
+        # channels are different than the expected channel_nomenclature
+        channels_named_incorrectly = False
+        for ch in tf_cls.station_metadata.channels_recorded:
+            if ch not in channel_nomenclature_dict.values():
+                logger.warning(
+                    f"Channel '{ch}' not found in channel_nomenclature_dict values"
+                )
+                logger.warning(
+                    f"Available values: {list(channel_nomenclature_dict.values())}"
+                )
+                channels_named_incorrectly = True
+
+        # This should be a last ditch effor to rename channels, the nomenclature should
+        # propagate from the MTH5 through the processing to the TF object
+        if channels_named_incorrectly:
+            logger.info(
+                "Modifying channel nomenclature in station metadata to match specified channel_nomenclature"
+            )
+            for i_run, run in enumerate(tf_cls.station_metadata.runs):
+                for channel in run.channels:
+                    new_ch = channel.copy()
+                    default_component = channel.component
+                    if default_component not in channel_nomenclature_dict:
+                        logger.error(
+                            f"Component '{default_component}' not found in channel_nomenclature_dict"
+                        )
+                        logger.error(
+                            f"Available keys: {list(channel_nomenclature_dict.keys())}"
+                        )
+                        raise KeyError(
+                            f"Component '{default_component}' not found in channel_nomenclature_dict. Available: {list(channel_nomenclature_dict.keys())}"
+                        )
+                    new_component = channel_nomenclature_dict[default_component]
+                    new_ch.component = new_component
+                    tf_cls.station_metadata.runs[i_run].remove_channel(
+                        default_component
+                    )
+                    tf_cls.station_metadata.runs[i_run].add_channel(new_ch)
+
         return tf_cls
 
     def memory_check(self) -> None:

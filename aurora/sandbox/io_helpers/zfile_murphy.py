@@ -1,9 +1,11 @@
 """
-    This module contains a class that was contributed by Ben Murphy for working with EMTF "Z-files"
+This module contains a class that was contributed by Ben Murphy for working with EMTF "Z-files"
 """
+
 import pathlib
-from typing import Optional, Union
 import re
+from typing import Optional, Union
+
 import numpy as np
 
 
@@ -138,7 +140,6 @@ class ZFile:
 
         # now read data for each period
         for i in range(self.nfreqs):
-
             # extract period
             line = f.readline().strip()
             match = re.match(
@@ -236,10 +237,10 @@ class ZFile:
         u[hx_index, hy_index] = np.sin(
             (self.orientation[hx_index, 0] - angle) * np.pi / 180.0
         )
-        u[hy_index, hx_index] = np.sin(
+        u[hy_index, hx_index] = np.cos(
             (self.orientation[hy_index, 0] - angle) * np.pi / 180.0
         )
-        u[hy_index, hy_index] = np.cos(
+        u[hy_index, hy_index] = np.sin(
             (self.orientation[hy_index, 0] - angle) * np.pi / 180.0
         )
         u = np.linalg.inv(u)  # Identity if angle=0

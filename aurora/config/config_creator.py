@@ -16,7 +16,7 @@ from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config.metadata import Processing
 from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
 from mth5.processing.kernel_dataset import KernelDataset
-from mt_metadata.transfer_functions.processing.window import Window
+from mt_metadata.processing.window import Window
 
 import pathlib
 
@@ -127,11 +127,13 @@ class ConfigCreator:
         kernel_dataset: KernelDataset,
         input_channels: Optional[list] = None,
         output_channels: Optional[list] = None,
+        remote_channels: Optional[list] = None,
         estimator: Optional[str] = None,
         emtf_band_file: Optional[Union[str, pathlib.Path]] = None,
         band_edges: Optional[dict] = None,
         decimation_factors: Optional[list] = None,
         num_samples_window: Optional[int] = None,
+        **kwargs,
     ) -> Processing:
         """
         This creates a processing config from a kernel dataset.
@@ -166,6 +168,8 @@ class ConfigCreator:
             List of the input channels that will be used in TF estimation (usually "hx", "hy")
         output_channels: list
             List of the output channels that will be estimated by TF (usually "ex", "ey", "hz")
+        remote_channels: list
+            List of the remote reference channels (usually "hx", "hy" at remote site)
         estimator:  Optional[Union[str, None]]
             The name of the regression estimator to use for TF estimation.
         emtf_band_file: Optional[Union[str, pathlib.Path, None]]
@@ -176,6 +180,12 @@ class ConfigCreator:
             List of decimation factors, normally [1, 4, 4, 4, ... 4]
         num_samples_window: Optional[Union[int, None]]
             The size of the window (usually for FFT)
+        **kwargs:
+            Additional keyword arguments passed to Processing constructor. Could contain:
+            - save_fcs: bool
+               - If True, save Fourier coefficients during processing.
+            - save_fcs_type: str
+                - File type for saving Fourier coefficients.  Options are "h5" or "csv".
 
         Returns
         -------
@@ -241,8 +251,17 @@ class ConfigCreator:
             else:
                 decimation_obj.output_channels = output_channels
 
+            if remote_channels is None:
+                if kernel_dataset.remote_channels is not None:
+                    decimation_obj.reference_channels = kernel_dataset.remote_channels
+
             if num_samples_window is not None:
                 decimation_obj.stft.window.num_samples = num_samples_window[key]
+
+            if kwargs.get("save_fcs", False):
+                decimation_obj.save_fcs = True
+                decimation_obj.save_fcs_type = kwargs.get("save_fcs_type", "h5")
+
             # set estimator if provided as kwarg
             if estimator:
                 try:

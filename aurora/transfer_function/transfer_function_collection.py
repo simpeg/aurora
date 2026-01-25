@@ -19,22 +19,111 @@ Development Notes:
  the "local_station". In a database of TFs could add a column for
  local_station and one for reference station.
 """
+
 import pathlib
+from typing import Any, Optional, Union
 
 import numpy as np
 import xarray as xr
+from loguru import logger
+from mt_metadata.processing.aurora.channel_nomenclature import ChannelNomenclature
 
 from aurora.config.metadata.processing import Processing
-from aurora.sandbox.io_helpers.zfile_murphy import ZFile
-from aurora.transfer_function.plot.rho_phi_helpers import plot_phi
-from aurora.transfer_function.plot.rho_phi_helpers import plot_rho
 from aurora.general_helper_functions import FIGURES_PATH
-from loguru import logger
-from typing import Optional, Union
+
 
 EMTF_REGRESSION_ENGINE_LABELS = {}
 EMTF_REGRESSION_ENGINE_LABELS["RME"] = "Robust Single Station"
 EMTF_REGRESSION_ENGINE_LABELS["RME_RR"] = "Robust Remote Reference"
+
+
+def plot_rho(
+    ax,
+    periods,
+    rho,
+    marker="o",
+    color="k",
+    linestyle="None",
+    label="",
+    markersize=10,
+    ax_label_size=16,
+):
+    """
+
+    Plots apparent resistivity on the given axis
+
+    Parameters
+    ----------
+    ax
+    periods
+    rho
+    marker
+    color
+    linestyle
+    label
+    markersize
+    ax_label_size
+
+    Returns
+    -------
+
+    """
+    ax.loglog(
+        periods,
+        rho,
+        marker=marker,
+        color=color,
+        linestyle=linestyle,
+        label=label,
+        markersize=markersize,
+    )
+    ax.tick_params(axis="both", which="major", labelsize=ax_label_size)
+    ax.tick_params(axis="x", which="minor", bottom=True)
+    return
+
+
+def plot_phi(
+    ax,
+    periods,
+    phi,
+    marker="o",
+    color="k",
+    linestyle="None",
+    label="",
+    markersize=10,
+    ax_label_size=16,
+):
+    """
+    Plots the phase on the given axis.
+
+    Parameters
+    ----------
+    ax
+    periods
+    phi
+    marker
+    color
+    linestyle
+    label
+    markersize
+    ax_label_size
+
+    Returns
+    -------
+
+    """
+    ax.semilogx(
+        periods,
+        phi,
+        marker=marker,
+        color=color,
+        linestyle=linestyle,
+        label=label,
+        markersize=markersize,
+    )
+    ax.tick_params(axis="both", which="major", labelsize=ax_label_size)
+    ax.minorticks_on()  # (axis="x", which="minor", bottom=True)
+    return
 
 
 class TransferFunctionCollection(object):
@@ -190,7 +279,9 @@ class TransferFunctionCollection(object):
 
         return
 
-    def check_all_channels_present(self, channel_nomenclature) -> None:
+    def check_all_channels_present(
+        self, channel_nomenclature: ChannelNomenclature
+    ) -> None:
         """
         Checks if TF has tipper.  If not, fill in the tipper data with NaN and also
          update the noise covariance matrix so shape is as expected by mt_metadata.
@@ -201,7 +292,7 @@ class TransferFunctionCollection(object):
 
         Parameters
         ----------
-        channel_nomenclature: mt_metadata.transfer_functions.processing.aurora.channel_nomenclature.ChannelNomenclature
+        channel_nomenclature: ChannelNomenclature
             Scheme according to how channels are named
 
         """
@@ -260,7 +351,7 @@ class TransferFunctionCollection(object):
         self,
         xy_or_yx: str,
         show: Optional[bool] = True,
-        aux_data: Optional[Union[ZFile, None]] = None,
+        aux_data: Optional[Union[None, Any]] = None,
         ttl_str: Optional[str] = "",
         x_axis_fontsize: Optional[float] = 25,
         y_axis_fontsize: Optional[float] = 25,
@@ -358,7 +449,6 @@ class TransferFunctionCollection(object):
             axs[0].loglog(axs[0].get_xlim(), 100 * np.ones(2), color="k")
             axs[1].semilogx(axs[1].get_xlim(), 45 * np.ones(2), color="k")
             for i_dec in decimation_levels:
-
                 ndx = np.where(aux_data.decimation_levels == i_dec)[0]
                 axs[0].loglog(
                     aux_data.periods[ndx],

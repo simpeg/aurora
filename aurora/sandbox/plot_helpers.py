@@ -5,11 +5,12 @@
     TODO: review which of these can be replaced with methods in MTpy-v2
 
 """
-from matplotlib.gridspec import GridSpec
 from typing import Optional, Union
+
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.signal as ssig
+from matplotlib.gridspec import GridSpec
 
 
 def _is_flat_amplitude(array) -> bool:
@@ -145,7 +146,6 @@ def plot_response_pz(
 
     # plot observed (lab) response as amplitude and phase
     if w_obs is not None and resp_obs is not None:
-
         response_amplitude = np.absolute(resp_obs)
         if _is_flat_amplitude(resp_obs):
             response_amplitude[:] = response_amplitude[0]
@@ -154,7 +154,7 @@ def plot_response_pz(
         ax_amp.plot(
             x_values,
             response_amplitude,
-            color="tab:blue",
+            color="steelblue",
             linewidth=1.5,
             linestyle="-",
             label="True",
@@ -162,7 +162,7 @@ def plot_response_pz(
         ax_phs.plot(
             x_values,
             np.angle(resp_obs, deg=True),
-            color="tab:blue",
+            color="steelblue",
             linewidth=1.5,
             linestyle="-",
         )
@@ -172,7 +172,7 @@ def plot_response_pz(
         ax_amp.plot(
             x_values,
             np.absolute(resp_obs),
-            color="tab:blue",
+            color="steelblue",
             linewidth=1.5,
             linestyle="-",
             label="True",
@@ -180,7 +180,7 @@ def plot_response_pz(
         ax_phs.plot(
             x_values,
             np.angle(resp_obs, deg=True),
-            color="tab:blue",
+            color="steelblue",
             linewidth=1.5,
             linestyle="-",
         )
@@ -189,7 +189,7 @@ def plot_response_pz(
             np.imag(zpk_obs.zeros),
             s=75,
             marker="o",
-            ec="tab:blue",
+            ec="steelblue",
             fc="w",
             label="True Zeros",
         )
@@ -198,8 +198,8 @@ def plot_response_pz(
             np.imag(zpk_obs.poles),
             s=75,
             marker="x",
-            ec="tab:blue",
-            fc="tab:blue",
+            ec="steelblue",
+            fc="steelblue",
             label="True Poles",
         )
 
@@ -211,7 +211,7 @@ def plot_response_pz(
         ax_amp.plot(
             x_values,
             np.absolute(resp_pred),
-            color="tab:red",
+            color="firebrick",
             linewidth=3,
             linestyle=":",
             label="Fit",
@@ -220,7 +220,7 @@ def plot_response_pz(
         ax_phs.plot(
             x_values,
             np.angle(resp_pred, deg=True),
-            color="tab:red",
+            color="firebrick",
             linewidth=3,
             linestyle=":",
         )
@@ -229,7 +229,7 @@ def plot_response_pz(
             np.imag(zpk_pred.zeros),
             s=35,
             marker="o",
-            ec="tab:red",
+            ec="firebrick",
             fc="w",
             label="Fit Zeros",
         )
@@ -299,8 +299,9 @@ def plot_tf_obj(tf_obj, out_filename=None, show=True):
         Where to save the file.  No png is saved if this is False
 
     """
-    from aurora.transfer_function.plot.rho_plot import RhoPlot
     import matplotlib.pyplot as plt
+
+    from aurora.transfer_function.plot.rho_plot import RhoPlot
 
     plotter = RhoPlot(tf_obj)
     fig, axs = plt.subplots(nrows=2)

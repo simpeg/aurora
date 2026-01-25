@@ -11,7 +11,7 @@
 
 """
 from aurora.time_series.decorators import can_use_xr_dataarray
-from mt_metadata.transfer_functions.processing.window import get_fft_harmonics
+from mt_metadata.processing.window import get_fft_harmonics
 
 from typing import Optional, Union
 from loguru import logger

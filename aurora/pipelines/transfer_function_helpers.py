@@ -18,7 +18,7 @@ from aurora.transfer_function.regression.RME_RR import RME_RR
 from aurora.transfer_function.weights.edf_weights import (
     effective_degrees_of_freedom_weights,
 )
-from mt_metadata.transfer_functions.processing.aurora.decimation_level import (
+from mt_metadata.processing.aurora.decimation_level import (
     DecimationLevel as AuroraDecimationLevel,
 )
 from loguru import logger

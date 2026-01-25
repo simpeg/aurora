@@ -154,7 +154,18 @@ class EffectiveDegreesOfFreedom(object):
         """
         S = X[:, use] @ np.conj(X[:, use]).T  # covariance matrix, 2x2
         S /= sum(use)  # normalize by the number of datapoints
-        H = np.linalg.inv(S)  # inverse covariance matrix
+
+        # if H is singular then set to zeros otherwise an error is raised
+        # and kills the processing.  If we catch it and set to zeros then
+        # the edf will be zero and all weights will be zero.
+        try:
+            H = np.linalg.inv(S)  # inverse covariance matrix
+        except np.linalg.LinAlgError as le:
+            logger.warning(
+                f"In calculating EDF covariance matrix S is a singular matrix: {le}. "
+                "Cannot invert so setting H to something small."
+            )
+            H = np.ones_like(S) * 1e-4
 
         # TODO: why are we not using the `use` boolean to select the data?
         #       This is a bit of a mystery, but it seems to be the way the
@@ -279,6 +290,8 @@ def effective_degrees_of_freedom_weights(
     """
     # Initialize the weights
     n_observations_initial = len(X.observation)
+    if n_observations_initial == 0:
+        raise ValueError("Zero observations in the input data.")
     weights = np.ones(n_observations_initial)
 
     # validate num channels

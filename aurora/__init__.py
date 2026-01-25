@@ -13,7 +13,7 @@ config = {
             "sink": sys.stdout,
             "level": "INFO",
             "colorize": True,
-            "format": "<level>{time} | {level: <3} | {name} | {function} | {message}</level>",
+            "format": "<level>{time} | {level: <3} | {name} | {function} | line: {line} | {message}</level>",
         },
     ],
     "extra": {"user": "someone"},

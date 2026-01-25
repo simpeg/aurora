@@ -1,10 +1,12 @@
 """
-    This module contains methods that are used to define datasets to build from FDSN servers.
+This module contains methods that are used to define datasets to build from FDSN servers.
 
-    These datasets are in turn used for testing.
+These datasets are in turn used for testing.
 
 """
+
 from obspy import UTCDateTime
+
 from aurora.sandbox.io_helpers.fdsn_dataset import FDSNDataset
 
 
@@ -27,7 +29,7 @@ def make_pkdsao_test_00_config(minitest=False) -> FDSNDataset:
     test_data_set.network = "BK"
     test_data_set.station = "PKD,SAO"
     test_data_set.starttime = UTCDateTime("2004-09-28T00:00:00.000000Z")
-    test_data_set.endtime = UTCDateTime("2004-09-28T01:59:59.975000Z")
+    test_data_set.endtime = UTCDateTime("2004-09-28T02:00:00.000000Z")
     if minitest:
         test_data_set.endtime = UTCDateTime("2004-09-28T00:01:00")  # 1 min
     test_data_set.channel_codes = "BQ2,BQ3,BT1,BT2,BT3"

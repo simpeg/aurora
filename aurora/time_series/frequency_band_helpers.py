@@ -3,10 +3,10 @@
     TODO: Move these methods to mth5.processing.spectre.frequency_band_helpers
 """
 from loguru import logger
-from mt_metadata.transfer_functions.processing.aurora import (
+from mt_metadata.processing.aurora import (
     DecimationLevel as AuroraDecimationLevel,
 )
-from mt_metadata.transfer_functions.processing.aurora import Band
+from mt_metadata.processing.aurora import Band
 from mth5.timeseries.spectre.spectrogram import extract_band
 from typing import Optional, Tuple
 import xarray as xr
@@ -23,7 +23,7 @@ def get_band_for_tf_estimate(
 
     Parameters
     ----------
-    band : mt_metadata.transfer_functions.processing.aurora.Band
+    band : mt_metadata.processing.aurora.Band
         object with lower_bound and upper_bound to tell stft object which
         subarray to return
     config : AuroraDecimationLevel
@@ -129,7 +129,7 @@ def get_band_for_coherence_sorting(
 
     Parameters
     ----------
-    band : mt_metadata.transfer_functions.processing.aurora.FrequencyBands
+    band : mt_metadata.processing.aurora.FrequencyBands
         object with lower_bound and upper_bound to tell stft object which
         subarray to return
     config : AuroraDecimationLevel

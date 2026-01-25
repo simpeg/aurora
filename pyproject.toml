@@ -8,7 +8,7 @@ name = "aurora"
 version = "0.5.2"
 description = "Processing Codes for Magnetotelluric Data"
 readme = "README.rst"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 authors = [
   {name = "Karl Kappler", email = "karl.kappler@berkeley.edu"},
 ]
@@ -20,14 +20,13 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "mth5",
-    "numba",
+    "mth5>=0.6.0",
+    "numba>=0.58",
     "obspy",
     "psutil",
 ]
@@ -52,17 +51,24 @@ addopts = ["--import-mode=importlib"]
 test = [
     "pytest>=3",
     "pytest-runner",
+    "pytest-xdist",
+    "pytest-subtests",
+    "pytest-benchmark",
 ]
 dev = [
     "black",
     "flake8",
     "ipython",
+    "ipykernel",
     "nbsphinx",
     "numpydoc",
     "papermill",
     "pre-commit",
     "pytest",
+    "pytest-benchmark",
     "pytest-cov",
+    "pytest-subtests",
+    "pytest-xdist",
     "toml",
     "sphinx_gallery",
     "sphinx_rtd_theme",
