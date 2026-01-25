@@ -598,43 +598,71 @@ class TransferFunctionKernel(object):
         res_cov = res_cov.rename(renamer_dict)
         tf_cls.residual_covariance = res_cov
 
-        # Set key as first el't of dict, nor currently supporting mixed surveys in TF
-        tf_cls.survey_metadata = self.dataset.local_survey_metadata
+        # Set survey metadata from the dataset
+        # self.dataset.survey_metadata now returns a Survey object (not a dict)
+        # Only set it if the TF object doesn't already have survey metadata
+        # if tf_cls.survey_metadata is None or (
+        #     hasattr(tf_cls.survey_metadata, "__len__")
+        #     and len(tf_cls.survey_metadata) == 0
+        # ):
+        survey_obj = self.dataset.survey_metadata
+        if survey_obj is not None:
+            tf_cls.survey_metadata = survey_obj
 
-        # Explicitly set station_metadata to ensure station ID is correct
-        # (TF.__init__ creates a default station with ID '0', we need to replace it)
-        # Convert timeseries.Station to dict, which TF._validate_station_metadata will convert to tf.Station
-        if (
-            hasattr(self.dataset.local_survey_metadata, "stations")
-            and len(self.dataset.local_survey_metadata.stations) > 0
-        ):
-            tf_cls.station_metadata = self.dataset.local_survey_metadata.stations[
-                0
-            ].to_dict()
+        # Set station metadata and processing info
+        tf_cls.station_metadata.provenance.creation_time = pd.Timestamp.now()
+        tf_cls.station_metadata.provenance.processing_type = self.processing_type
+        tf_cls.station_metadata.transfer_function.processed_date = pd.Timestamp.now()
 
-        # pack the station metadata into the TF object
-        # station_id = self.processing_config.stations.local.id
-        # station_sub_df = self.dataset_df[self.dataset_df["station"] == station_id]
-        # station_row = station_sub_df.iloc[0]
-        # station_obj = station_obj_from_row(station_row)
+        # Get runs processed from the dataset dataframe
+        runs_processed = self.dataset_df.run.unique().tolist()
+        tf_cls.station_metadata.transfer_function.runs_processed = runs_processed
+        # TODO: tf_cls.station_metadata.transfer_function.processing_config = self.processing_config
 
-        # modify the run metadata to match the channel nomenclature
-        # TODO: this should be done inside the TF initialization
-        for i_run, run in enumerate(tf_cls.station_metadata.runs):
-            for i_ch, channel in enumerate(run.channels):
-                new_ch = channel.copy()
-                default_component = channel.component
-                new_component = channel_nomenclature_dict[default_component]
-                new_ch.component = new_component
-                tf_cls.station_metadata.runs[i_run].remove_channel(default_component)
-                tf_cls.station_metadata.runs[i_run].add_channel(new_ch)
+        tf_cls.station_metadata.transfer_function.software.author = "K. Kappler"
+        tf_cls.station_metadata.transfer_function.software.name = "Aurora"
+        tf_cls.station_metadata.transfer_function.software.version = aurora_version
 
-        # set processing type
-        tf_cls.station_metadata.transfer_function.processing_type = self.processing_type
+        # modify the run metadata to match the channel nomenclature, this should only be done if the
+        # channels are different than the expected channel_nomenclature
+        channels_named_incorrectly = False
+        for ch in tf_cls.station_metadata.channels_recorded:
+            if ch not in channel_nomenclature_dict.values():
+                logger.warning(
+                    f"Channel '{ch}' not found in channel_nomenclature_dict values"
+                )
+                logger.warning(
+                    f"Available values: {list(channel_nomenclature_dict.values())}"
+                )
+                channels_named_incorrectly = True
 
-        # tf_cls.station_metadata.transfer_function.processing_config = (
-        #     self.processing_config
-        # )
+        # This should be a last ditch effor to rename channels, the nomenclature should
+        # propagate from the MTH5 through the processing to the TF object
+        if channels_named_incorrectly:
+            logger.info(
+                "Modifying channel nomenclature in station metadata to match specified channel_nomenclature"
+            )
+            for i_run, run in enumerate(tf_cls.station_metadata.runs):
+                for channel in run.channels:
+                    new_ch = channel.copy()
+                    default_component = channel.component
+                    if default_component not in channel_nomenclature_dict:
+                        logger.error(
+                            f"Component '{default_component}' not found in channel_nomenclature_dict"
+                        )
+                        logger.error(
+                            f"Available keys: {list(channel_nomenclature_dict.keys())}"
+                        )
+                        raise KeyError(
+                            f"Component '{default_component}' not found in channel_nomenclature_dict. Available: {list(channel_nomenclature_dict.keys())}"
+                        )
+                    new_component = channel_nomenclature_dict[default_component]
+                    new_ch.component = new_component
+                    tf_cls.station_metadata.runs[i_run].remove_channel(
+                        default_component
+                    )
+                    tf_cls.station_metadata.runs[i_run].add_channel(new_ch)
+
         return tf_cls
 
     def memory_check(self) -> None:
