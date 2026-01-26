@@ -8,6 +8,9 @@ def make_subtitle(
 ):
     """
 
+    Development Notes:
+    compute_rms is now deprecated.  If that tool is desired it should be reimplemented
+    in aurora/transfer_function/compare.py
     Parameters
     ----------
     rho_rms_aurora: float
