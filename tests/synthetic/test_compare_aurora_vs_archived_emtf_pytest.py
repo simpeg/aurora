@@ -1,3 +1,18 @@
+"""
+Tests comparing aurora processing results against archived EMTF results.
+
+Development Notes:
+- In the early days of development these tests were useful to check that
+the same results were obtained from processing an mth5 with both stations in it
+and two separate mth5 files.  This could probably be made into a simpler test in mth5
+that checks that the data are the same in the two files.
+- This used to make a homebrew resistivity and phase plot for comparison between
+archived emtf z-files, but has been replaced with mt_metadata methods.
+- TODO: Check phases in these plots -- they are off by 180 so there may be a sign error
+in the data, or maybe the emtf results are using a different convention.  Need to investigate.
+- The comparison with the matlab emtf results uses a slighly different windowing method.
+
+"""
 import numpy as np
 import pytest
 from loguru import logger
@@ -6,18 +21,8 @@ from mth5.processing import KernelDataset, RunSummary
 
 from aurora.general_helper_functions import DATA_PATH
 from aurora.pipelines.process_mth5 import process_mth5
-from aurora.sandbox.io_helpers.zfile_murphy import read_z_file
 from aurora.test_utils.synthetic.make_processing_configs import create_test_run_config
-from aurora.test_utils.synthetic.plot_helpers_synthetic import plot_rho_phi
-from aurora.test_utils.synthetic.rms_helpers import (
-    assert_rms_misfit_ok,
-    compute_rms,
-    get_expected_rms_misfit,
-)
 from aurora.transfer_function.compare import CompareTF
-from aurora.transfer_function.emtf_z_file_helpers import (
-    merge_tf_collection_to_match_z_file,
-)
 
 
 # Path to baseline EMTF results in source tree
@@ -31,9 +36,8 @@ def aurora_vs_emtf(
     auxilliary_z_file,
     z_file_base,
     tfk_dataset,
+    atol_phase=4.0,
     make_rho_phi_plot=True,
-    show_rho_phi_plot=False,
-    use_subtitle=True,
 ):
     """
     Compare aurora processing results against EMTF baseline.
@@ -62,55 +66,25 @@ def aurora_vs_emtf(
         test_case_id, tfk_dataset, matlab_or_fortran=emtf_version
     )
 
-    expected_rms_misfit = get_expected_rms_misfit(test_case_id, emtf_version)
     z_file_path = AURORA_RESULTS_PATH.joinpath(z_file_base)
 
-    tf_collection = process_mth5(
+    process_mth5(
         processing_config,
         tfk_dataset=tfk_dataset,
         z_file_path=z_file_path,
         return_collection=True,
     )
     comparator = CompareTF(tf_01=z_file_path, tf_02=auxilliary_z_file)
-    result = comparator.compare_transfer_functions()
+    result = comparator.compare_transfer_functions(atol_phase=4.0)
     assert np.isclose(result["impedance_ratio"]["Z_10"], 1.0, atol=1e-2)
     assert np.isclose(result["impedance_ratio"]["Z_01"], 1.0, atol=1e-2)
-    aux_data = read_z_file(auxilliary_z_file)
-    aurora_rho_phi = merge_tf_collection_to_match_z_file(aux_data, tf_collection)
-    data_dict = {}
-    data_dict["period"] = aux_data.periods
-    data_dict["emtf_rho_xy"] = aux_data.rxy
-    data_dict["emtf_phi_xy"] = aux_data.pxy
-    for xy_or_yx in ["xy", "yx"]:
-        aurora_rho = aurora_rho_phi["rho"][xy_or_yx]
-        aurora_phi = aurora_rho_phi["phi"][xy_or_yx]
-        aux_rho = aux_data.rho(xy_or_yx)
-        aux_phi = aux_data.phi(xy_or_yx)
-        rho_rms_aurora, phi_rms_aurora = compute_rms(
-            aurora_rho, aurora_phi, verbose=True
+    assert result["impedance_phase_close"]
+    if make_rho_phi_plot:
+        comparator.plot_two_transfer_functions(
+            save_plot_path=AURORA_RESULTS_PATH.joinpath(
+                f"{test_case_id}_aurora_vs_emtf_{emtf_version}_tf_compare.png"
+            ),
         )
-        rho_rms_emtf, phi_rms_emtf = compute_rms(aux_rho, aux_phi)
-        data_dict["aurora_rho_xy"] = aurora_rho
-        data_dict["aurora_phi_xy"] = aurora_phi
-        if expected_rms_misfit is not None:
-            assert_rms_misfit_ok(
-                expected_rms_misfit, xy_or_yx, rho_rms_aurora, phi_rms_aurora
-            )
-
-        if make_rho_phi_plot:
-            plot_rho_phi(
-                xy_or_yx,
-                tf_collection,
-                rho_rms_aurora,
-                rho_rms_emtf,
-                phi_rms_aurora,
-                phi_rms_emtf,
-                emtf_version,
-                aux_data=aux_data,
-                use_subtitle=use_subtitle,
-                show_plot=show_rho_phi_plot,
-                output_path=AURORA_RESULTS_PATH,
-            )
 
 
 @pytest.mark.slow

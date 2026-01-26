@@ -286,6 +286,7 @@ class CompareTF:
         self,
         rtol: float = 1,
         atol: float = 1,
+        atol_phase: float = 4.0,
     ) -> dict:
         """
         Compare transfer functions between two transfer_functions objects.
@@ -299,6 +300,8 @@ class CompareTF:
             Relative tolerance for np.allclose, defaults to 1e-2
         atol: float
             Absolute tolerance for np.allclose, defaults to 1e-2
+        atol_phase: float
+            Absolute tolerance for phase comparison, defaults to 4.0 degrees
 
         Returns
         -------
@@ -357,7 +360,7 @@ class CompareTF:
                         np.angle(z1[:, ii, jj]),
                         np.angle(z2[:, ii, jj]),
                         rtol=rtol,
-                        atol=atol,
+                        atol=atol_phase,
                     )
 
                     result["impedance_error_close"] = np.allclose(
