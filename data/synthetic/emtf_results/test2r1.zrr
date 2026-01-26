@@ -2,7 +2,7 @@
  ********** WITH FULL ERROR COVARINCE**********
 Robust Remote Reference EMAP                                                    
 station    :test2r1             
-coordinate  1007.996   102.190  declination     0.00
+coordinate  37.996   102.190  declination     0.00
 number of channels   5   number of frequencies   25
  orientations and tilts of each channel 
     1     0.00     0.00 tes  Hx
