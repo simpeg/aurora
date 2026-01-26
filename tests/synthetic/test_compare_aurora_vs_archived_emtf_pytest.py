@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 from loguru import logger
 from mth5.helpers import close_open_files
@@ -13,6 +14,7 @@ from aurora.test_utils.synthetic.rms_helpers import (
     compute_rms,
     get_expected_rms_misfit,
 )
+from aurora.transfer_function.compare import CompareTF
 from aurora.transfer_function.emtf_z_file_helpers import (
     merge_tf_collection_to_match_z_file,
 )
@@ -69,7 +71,10 @@ def aurora_vs_emtf(
         z_file_path=z_file_path,
         return_collection=True,
     )
-
+    comparator = CompareTF(tf_01=z_file_path, tf_02=auxilliary_z_file)
+    result = comparator.compare_transfer_functions()
+    assert np.isclose(result["impedance_ratio"]["Z_10"], 1.0, atol=1e-2)
+    assert np.isclose(result["impedance_ratio"]["Z_01"], 1.0, atol=1e-2)
     aux_data = read_z_file(auxilliary_z_file)
     aurora_rho_phi = merge_tf_collection_to_match_z_file(aux_data, tf_collection)
     data_dict = {}
