@@ -8,14 +8,10 @@ These methods can possibly be moved under mt_metadata, or deprecated.
 
 """
 import pathlib
-
-import numpy as np
-from aurora.transfer_function.transfer_function_collection import (
-    TransferFunctionCollection,
-)
-from aurora.sandbox.io_helpers.zfile_murphy import ZFile
-from loguru import logger
 from typing import Optional, Union
+
+from loguru import logger
+
 
 EMTF_CHANNEL_ORDER = ["hx", "hy", "hz", "ex", "ey"]
 
@@ -45,65 +41,6 @@ def get_default_orientation_block(n_ch: int = 5) -> list:
     orientation_strs.append("    4     0.00     0.00 tes  Ex\n")
     orientation_strs.append("    5    90.00     0.00 tes  Ey\n")
     return orientation_strs
-
-
-def merge_tf_collection_to_match_z_file(
-    aux_data: ZFile, tf_collection: TransferFunctionCollection
-) -> dict:
-    """
-    method to merge tf data from a tf_collection with a Z-file when there are potentially
-    multiple estimates of TF at the same periods for different decimation levels.
-
-    Development Notes:
-    Currently this is only used for the the synthetic test where aurora results
-    are compared against a stored legacy Z-file.  Given data from a z_file, and a
-    tf_collection, the tf_collection may have several TF estimates at the same
-    frequency from multiple decimation levels.  This tries to make a single array as
-    a function of period for all rho and phi.
-
-    Parameters
-    ----------
-    aux_data: aurora.sandbox.io_helpers.zfile_murphy.ZFile
-        Object representing a z-file
-    tf_collection: aurora.transfer_function.transfer_function_collection
-    .TransferFunctionCollection
-        Object representing the transfer function returned from the aurora processing
-
-
-    Returns
-    -------
-    result: dict of dicts
-        Keyed by ["rho", "phi"], below each of these is an ["xy", "yx",] entry.  The
-        lowest level entries are numpy arrays.
-    """
-    rxy = np.full(len(aux_data.decimation_levels), np.nan)
-    ryx = np.full(len(aux_data.decimation_levels), np.nan)
-    pxy = np.full(len(aux_data.decimation_levels), np.nan)
-    pyx = np.full(len(aux_data.decimation_levels), np.nan)
-    dec_levels = list(set(aux_data.decimation_levels))
-    dec_levels = [int(x) for x in dec_levels]
-    dec_levels.sort()
-
-    for dec_level in dec_levels:
-        aurora_tf = tf_collection.tf_dict[dec_level - 1]
-        indices = np.where(aux_data.decimation_levels == dec_level)[0]
-        for ndx in indices:
-            period = aux_data.periods[ndx]
-            # find the nearest period in aurora_tf
-            aurora_ndx = np.argmin(np.abs(aurora_tf.periods - period))
-            rxy[ndx] = aurora_tf.rho[aurora_ndx, 0]
-            ryx[ndx] = aurora_tf.rho[aurora_ndx, 1]
-            pxy[ndx] = aurora_tf.phi[aurora_ndx, 0]
-            pyx[ndx] = aurora_tf.phi[aurora_ndx, 1]
-
-    result = {}
-    result["rho"] = {}
-    result["phi"] = {}
-    result["rho"]["xy"] = rxy
-    result["phi"]["xy"] = pxy
-    result["rho"]["yx"] = ryx
-    result["phi"]["yx"] = pyx
-    return result
 
 
 def clip_bands_from_z_file(
