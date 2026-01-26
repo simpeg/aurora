@@ -84,6 +84,8 @@ def aurora_vs_emtf(
             save_plot_path=AURORA_RESULTS_PATH.joinpath(
                 f"{test_case_id}_aurora_vs_emtf_{emtf_version}_tf_compare.png"
             ),
+            rho_xy_ylims=(10.0, 1000.0),
+            rho_yx_ylims=(10.0, 1000.0),
         )
 
 
