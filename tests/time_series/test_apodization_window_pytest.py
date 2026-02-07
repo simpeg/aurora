@@ -215,6 +215,40 @@ class TestApodizationWindowCalculations:
                 assert energy > 0
                 assert np.isfinite(energy)
 
+    def test_linear_spectral_density_factor(self, subtests) -> None:
+        """
+        This is just a test to verify some algebra
+
+        Claim:
+        The lsd_calibration factors
+        A      (1./coherent\_gain)\*np.sqrt((2\*dt)/(nenbw\*N))
+        and
+        B      np.sqrt(2/(sample\_rate\*self.S2))
+
+
+        Note sqrt(2\*dt)==sqrt(2\*sample_rate) so we can cancel these terms and
+        A=B IFF
+
+        (1./coherent_gain) \* np.sqrt(1/(nenbw\*N)) == 1/np.sqrt(S2)
+        which I show in githib aurora issue #3 via .
+        (CG\*\*2) \* NENBW \*N   =  S2
+
+        """
+        taper_families = ["boxcar", "hamming", "hann", "blackman"]
+
+        for family in taper_families:
+            with subtests.test(taper_family=family):
+                window = ApodizationWindow(taper_family=family, num_samples_window=256)
+                lsd_factor1 = (1.0 / window.coherent_gain) * np.sqrt(
+                    1.0 / (window.nenbw * window.num_samples_window)
+                )
+                lsd_factor2 = 1.0 / np.sqrt(window.S2)
+                if not np.isclose(lsd_factor1, lsd_factor2):
+                    msg = f"Linear spectral density factors do not match for {family} window: \n"
+                    msg += f"lsd_factor1 {lsd_factor1} vs lsd_factor2 {lsd_factor2}"
+                    logger.error(msg)
+                    raise Exception(msg)
+
 
 class TestApodizationWindowParameterVariations:
     """Test windows with various parameter combinations."""
