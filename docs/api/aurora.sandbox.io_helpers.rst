@@ -36,14 +36,6 @@ aurora.sandbox.io\_helpers.make\_mth5\_helpers module
    :undoc-members:
    :show-inheritance:
 
-aurora.sandbox.io\_helpers.zfile\_murphy module
------------------------------------------------
-
-.. automodule:: aurora.sandbox.io_helpers.zfile_murphy
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 

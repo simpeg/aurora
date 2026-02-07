@@ -38,14 +38,6 @@ aurora.transfer\_function.emtf\_z\_file\_helpers module
    :undoc-members:
    :show-inheritance:
 
-aurora.transfer\_function.kernel\_dataset module
-------------------------------------------------
-
-.. automodule:: aurora.transfer_function.kernel_dataset
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 aurora.transfer\_function.transfer\_function\_collection module
 ---------------------------------------------------------------
 

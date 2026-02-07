@@ -4,14 +4,6 @@ aurora.pipelines package
 Submodules
 ----------
 
-aurora.pipelines.fourier\_coefficients module
----------------------------------------------
-
-.. automodule:: aurora.pipelines.fourier_coefficients
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 aurora.pipelines.helpers module
 -------------------------------
 
