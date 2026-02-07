@@ -1,22 +1,23 @@
-"""
-This module is a place to put decorators used by methods in aurora.
-It is a work in progress.
+r"""
+    This module is a place to put decorators used by methods in aurora.
+    It is a work in progress.
 
-Development notes:
+    Development notes:
 
-| Here is the decorator pattern
-| def decorator(func):
-|    @functools.wraps(func)
-|    def wrapper_decorator(\*args, \*\*kwargs):
-|        # Do something before
-|        value = func\*args, \*\*kwargs)
-|        # Do something after
-|        return value
-|    return wrapper_decorator
+    | Here is the decorator pattern
+    | def decorator(func):
+    |    @functools.wraps(func)
+    |    def wrapper_decorator(*args, **kwargs):
+    |        # Do something before
+    |        value = func(*args, **kwargs)
+    |        # Do something after
+    |        return value
+    |    return wrapper_decorator
 
 """
 
 import functools
+
 import xarray as xr
 
 
@@ -43,7 +44,6 @@ def can_use_xr_dataarray(func):
 
     @functools.wraps(func)
     def wrapper_decorator(*args, **kwargs):
-
         if isinstance(kwargs["data"], xr.DataArray):
             kwargs["data"] = kwargs["data"].to_dataset("channel")
             input_was_dataarray = True
