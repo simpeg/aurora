@@ -131,7 +131,7 @@ class CompareTF:
                 ax.set_title(self._comp_dict[plot_num_res])
                 # ax.set_xlabel("Period (s)")
                 if plot_num_res == 1:
-                    ax.set_ylabel("Apparent Resistivity ($\Omega \cdot m$)")
+                    ax.set_ylabel("Apparent Resistivity ($\\Omega \cdot m$)")
                     ax.legend()
                 ax.grid(True, which="both", ls="--", lw=0.5, color="gray")
                 if component == "xx" and rho_xx_ylims is not None:
