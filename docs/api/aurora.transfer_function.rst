@@ -7,7 +7,6 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   aurora.transfer_function.plot
    aurora.transfer_function.regression
    aurora.transfer_function.weights
 
