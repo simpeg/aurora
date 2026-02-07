@@ -458,23 +458,13 @@ class RhoPlot(object):
 
     def set_lims(self) -> list:
         """
-        Set limits for the plotting axes
-
-        TODO: Add doc or start using MTpy
-
-        Matlab Notes:
-        set default limits for plotting; QD, derived from ZPLT use max/min limits of periods, rho to set limits
-
-        function[lims, orient] = set_lims(obj)
-        Returns
-            lims : list
-            x_max, x_min, y_max, y_min, 0, 90
-            orient: 0
+        Set limits for the plotting axes - to be depreacted for MTpy plotting functions.
 
         Returns
         -------
         lims: list
             The plotting limits for period, rho and phi.
+            [x_max, x_min, y_max, y_min, 0, 90]
         """
         period_min, period_max = self.set_period_limits()  # get limits for the x-axis
         rho_min, rho_max = self.set_rho_limits()
@@ -486,8 +476,7 @@ class RhoPlot(object):
             rho_max = 1e4
         lims = [period_min, period_max, rho_min, rho_max, phi_min, phi_max]
 
-        # orient = 0.0
-        return lims  # , orient
+        return lims
 
     def plot(self, station_id="Transfer Function", out_filename=None, **kwargs):
         """
