@@ -5,12 +5,13 @@ This module contains the MEstimator class - an extension of RegressionEstimator.
  See Notes in RME, RME_RR for more details.
 
 """
+from copy import deepcopy
+
 import numpy as np
 import xarray as xr
+from loguru import logger
 
 from aurora.transfer_function.regression.base import RegressionEstimator
-from copy import deepcopy
-from loguru import logger
 
 
 class MEstimator(RegressionEstimator):
@@ -310,23 +311,25 @@ class MEstimator(RegressionEstimator):
 
     def compute_squared_coherence(self) -> None:
         """
-        Updates the array self.R2
+        Updates the array self.R2.
 
         Here is taken the ratio of the energy in the residuals with the energy in the cleaned data.
         This metric can be interpreted as how much of the signal (Y) is "explained" by the regression.
 
         Development Notes:
+
         The matlab code (TRME_RR) claimed:
+
             %  R2 is squared coherence (top row is using raw data, bottom
             %    cleaned, with crude correction for amount of down-weighted data)
 
-        TODO: There seem to be other valid metrics for this sort of quantity.  In particular, we may want to
-         consider SSY (the sum of squares of the observed data) over SSR.
+        TODO: There seem to be other valid metrics for this sort of quantity. In particular, we may want to consider SSY (the sum of squares of the observed data) over SSR.
 
-        TODO: consider renaming self.R2.  That name invokes the idea of the squared residuals.  That is not what
-         is being stored in self.R2.  This is more like a CMRR.
+        TODO: consider renaming self.R2. That name invokes the idea of the squared residuals. That is not what is being stored in self.R2. This is more like a CMRR.
 
-        res: Residuals, the original data minus the predicted data.
+        Parameters
+        ----------
+        res : Residuals, the original data minus the predicted data.
         SSR : Sum of squares of the residuals, per channel
 
         """
