@@ -296,8 +296,10 @@ class RegressionEstimator(object):
     @property
     def degrees_of_freedom(self) -> int:
         """
-        gets the number of degress of freedom in the dataset.
+        Gets the number of degrees of freedom in the dataset.
+
         Returns
+        -------
         int
             The total number of multivariate observations minus the number of input channels.
         """
