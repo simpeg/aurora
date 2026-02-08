@@ -1,20 +1,19 @@
 """
 
-This module contains the base class for regression functions.
- It follows Gary Egbert's EMTF Matlab code TRegression.m in
- which can be found in
+This module contains the base class for regression functions. It follows Gary Egbert's EMTF Matlab code TRegression.m in which can be found in
 iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
 
 This class originally used numpy arrays to make adapting the Matlab easier, but
 experimental support for xarray is now added (2024).
 
 """
+from typing import Optional, Union
+
 import numpy as np
 import xarray as xr
+from loguru import logger
 
 from aurora.transfer_function.regression.iter_control import IterControl
-from loguru import logger
-from typing import Optional, Union
 
 
 class RegressionEstimator(object):
@@ -100,10 +99,10 @@ class RegressionEstimator(object):
         iter_control: IterControl = IterControl(),
         input_channel_names: Optional[Union[list, None]] = None,
         output_channel_names: Optional[Union[list, None]] = None,
-        **kwargs,  # n
+        **kwargs,
     ):
         """
-        Constructor
+        Constructor.
 
         Parameters
         ----------
@@ -118,8 +117,6 @@ class RegressionEstimator(object):
         output_channel_names: Optional[Union[list, None]]
             If Y is np.ndarray, this allows associating channel names to Y's columns
 
-        ----------
-        kwargs
         """
         self._X = X
         self._Y = Y
@@ -144,14 +141,10 @@ class RegressionEstimator(object):
         """
         Initialize arrays needed for regression and cast any xarray to numpy
 
-        Development Notes:
+        **Development Notes**:
 
-        When xr.Datasets are X, Y we cast to array (num channels x num observations) and then transpose them
-        When xr.DataArrays are X, Y extract the array -- but how do we know whether or not to transpose?
-        - it would be nice to have a helper function that applies the logic of getting the data from the
-         xarray and transposing or not appropriately.
-        - for now we assume that the input data are organized so that input arrays are (n_ch x n_observations).
-        This assumption is OK for xr.Dataset where the datavars are the MT components ("hx", "hy", etc)
+        When self._X,_Y are xr.Datasets they are cast to arrays (num channels x num observations) and then transposed.
+        When self._X,_Y are xr.DataArrays we extract the array -- but how do we know whether or not to transpose?  It would be nice to have a helper function that applies the logic of getting the data from the xarray and transposing or not appropriately. For now we assume that the input data are organized so that input arrays are (n_ch x n_observations). This assumption is OK for xr.Dataset where the datavars are the MT components ("hx", "hy", etc)
 
         """
         self.X = _input_to_numpy_array(self._X)
