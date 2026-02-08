@@ -1,13 +1,13 @@
-import subprocess
-import unittest
 import os
 import platform
+import subprocess
+import unittest
 
 
 class Doc_Test(unittest.TestCase):
     @property
     def path_to_docs(self):
-        dirname, file_name = os.path.split(os.path.abspath(__file__))
+        dirname, _ = os.path.split(os.path.abspath(__file__))
         return dirname.split(os.path.sep)[:-1] + ["docs"]
 
     def test_html(self):
