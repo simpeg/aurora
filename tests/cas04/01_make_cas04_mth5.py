@@ -25,14 +25,12 @@ CAV07 is the reason the build failed, CAV07 fails metadata pull with IndexError:
 """
 
 import pandas as pd
-
-from aurora.general_helper_functions import get_test_path
-from aurora.general_helper_functions import execute_subprocess
-from aurora.sandbox.mth5_helpers import build_request_df
-
+from loguru import logger
 from mth5.clients import FDSN
 from mth5.utils.helpers import read_back_data
-from loguru import logger
+
+from aurora.general_helper_functions import execute_subprocess, get_test_path
+from aurora.sandbox.mth5_helpers import build_request_df
 
 
 # Define paths
@@ -103,7 +101,6 @@ def make_all_stations_individually(
         mth5_version:
     """
     for station_id in STATION_IDS:
-        # request_df = build_request_df(NETWORK_ID, station_id, channels=["*F*", "*Q*", ], start=None, end=None)
         request_df = build_request_df(
             NETWORK_ID, station_id, channels=CHANNELS, start=None, end=None
         )
