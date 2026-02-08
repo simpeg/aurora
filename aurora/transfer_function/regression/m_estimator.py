@@ -247,13 +247,16 @@ class MEstimator(RegressionEstimator):
 
     def estimate(self) -> None:
         """
-        Executes the regression
+        Executes the regression.
 
         Development Notes:
-        Here is a comment from the matlab codes:
-        "need to look at how we should compute adjusted residual cov to make
-         consistent with tranmt"
-        See issue#69 aurora github repo addresses this
+
+        Here is a comment from the matlab codes::
+
+            need to look at how we should compute adjusted residual cov to make
+            consistent with tranmt
+
+        See issue #69 in the aurora GitHub repo addresses this.
         """
         if self.is_underdetermined:
             self.solve_underdetermined()
