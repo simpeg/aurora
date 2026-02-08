@@ -1,38 +1,30 @@
 """
+Functionality of RunSummary()
 
-Note 1: Functionality of RunSummary()
-1. User can get a list of local_station options, which correspond to unique pairs
-of values: (survey_id,  station_id)
-
+1. User can get a list of local_station options, which correspond to unique pairs: (survey_id, station_id)
 2. User can see all possible ways of processing the data:
-- one list per (survey_id,  station_id) pair in the run_summary
+    - one list per (survey_id, station_id) pair in the run_summary
 
 Some of the following functionalities may end up in KernelDataset:
+
 3. User can select local_station
--this can trigger a reduction of runs to only those that are from the local staion
-and simultaneous runs at other stations
+    - this can trigger a reduction of runs to only those that are from the local station and simultaneous runs at other stations
 4. Given a local station, a list of possible reference stations can be generated
-5. Given a remote reference station, a list of all relevent runs, truncated to
-maximize coverage of the local station runs is generated
+5. Given a remote reference station, a list of all relevant runs, truncated to maximize coverage of the local station runs is generated
 6. Given such a "restricted run list", runs can be dropped
 7. Time interval endpoints can be changed
-
-
 """
 
 import copy
+
+import mth5
 import pandas as pd
-
-
+from loguru import logger
 from mt_metadata.transfer_functions import (
     ALLOWED_INPUT_CHANNELS,
-)
-from mt_metadata.transfer_functions import (
     ALLOWED_OUTPUT_CHANNELS,
 )
-import mth5
 from mth5.utils.helpers import initialize_mth5
-from loguru import logger
 
 
 RUN_SUMMARY_COLUMNS = [
@@ -51,13 +43,12 @@ RUN_SUMMARY_COLUMNS = [
 
 class RunSummary:
     """
-    The dependencies aren't clear yet.
-    Maybe still Dataset:
-        Could have methods
-            "drop_runs_shorter_than"
-            "fill_gaps_by_time_interval"
-            "fill_gaps_by_run_names"
-            "
+    ** Development Notes**
+    The relationship between this class, MTH5's run_summary method, and the KernelDataset aren't clear yet.
+    This could have methods for
+    - "drop_runs_shorter_than"
+    - "fill_gaps_by_time_interval"
+    - "fill_gaps_by_run_names"
 
     For the full MMT case this may need modification to a channel based summary.
 
@@ -126,9 +117,7 @@ class RunSummary:
             run_obj = m.get_run(row.station_id, row.run_id, row.survey)
             runts = run_obj.to_runts()
             if runts.dataset.to_array().data.__abs__().sum() == 0:
-                logger.critical(
-                    "CRITICAL: Detected a run with all zero values"
-                )
+                logger.critical("CRITICAL: Detected a run with all zero values")
                 self.df["valid"].at[i_row] = False
             # load each run, and take the median of the sum of the absolute values
         if drop:
@@ -163,15 +152,12 @@ def channel_summary_to_run_summary(
     """
     TODO: replace station_id with station, and run_id with run
     Note will need to modify: aurora/tests/config$ more test_dataset_dataframe.py
-    TODO: Add logic for handling input and output channels based on channel
-    summary.  Specifically, consider the case where there is no vertical magnetic
-    field, this information is available via ch_summary, and output channels should
-    then not include hz.
-    TODO: Just inherit all the run-level and higher el'ts of the channel_summary,
-    including n_samples?
+    TODO: Add logic for handling input and output channels based on channel summary. Specifically, consider the case where there is no vertical magnetic field, this information is available via ch_summary, and output channels should then not include hz.
+    TODO: Just inherit all the run-level and higher el'ts of the channel_summary, including n_samples?
 
     When creating the dataset dataframe, make it have these columns:
-    [
+
+        [
             "station_id",
             "run_id",
             "start",
@@ -187,29 +173,20 @@ def channel_summary_to_run_summary(
     Parameters
     ----------
     ch_summary: mth5.tables.channel_table.ChannelSummaryTable or pandas DataFrame
-       If its a dataframe it is a representation of an mth5 channel_summary.
-        Maybe restricted to only have certain stations and runs before being passed to
-        this method
+        If it's a dataframe it is a representation of an mth5 channel_summary. Maybe restricted to only have certain stations and runs before being passed to this method.
     allowed_input_channels: list of strings
         Normally ["hx", "hy", ]
-        These are the allowable input channel names for the processing.  See further
-        note under allowed_output_channels.
+        These are the allowable input channel names for the processing. See further note under allowed_output_channels.
     allowed_output_channels: list of strings
         Normally ["ex", "ey", "hz", ]
-        These are the allowable output channel names for the processing.
-        A global list of these is kept at the top of this module.  The purpose of
-        this is to distinguish between runs that have different layouts, for example
-        some runs will have hz and some will not, and we cannot process for hz the
-        runs that do not have it.  By making this a kwarg we sort of prop the door
-        open for more general names (see issue #74).
+        These are the allowable output channel names for the processing. A global list of these is kept at the top of this module. The purpose of this is to distinguish between runs that have different layouts, for example some runs will have hz and some will not, and we cannot process for hz the runs that do not have it. By making this a kwarg we sort of prop the door open for more general names (see issue #74).
     sortby: bool or list
         Default: ["station_id", "start"]
 
     Returns
     -------
-    run_summary_df: pd.Dataframe
-        A table with one row per "acquistion run" that was in the input channel
-        summary table
+    run_summary_df: pd.DataFrame
+        A table with one row per "acquisition run" that was in the input channel summary table.
     """
     if isinstance(ch_summary, mth5.tables.channel_table.ChannelSummaryTable):
         ch_summary_df = ch_summary.to_dataframe()
@@ -229,9 +206,7 @@ def channel_summary_to_run_summary(
     channel_scale_factors = n_station_runs * [None]
     i = 0
     for group_values, group in grouper:
-        group_info = dict(
-            zip(group_by_columns, group_values)
-        )  # handy for debug
+        group_info = dict(zip(group_by_columns, group_values))  # handy for debug
         # for k, v in group_info.items():
         #     print(f"{k} = {v}")
         survey_ids[i] = group_info["survey"]
@@ -242,15 +217,9 @@ def channel_summary_to_run_summary(
         sample_rates[i] = group.sample_rate.iloc[0]
         channels_list = group.component.to_list()
         num_channels = len(channels_list)
-        input_channels[i] = [
-            x for x in channels_list if x in allowed_input_channels
-        ]
-        output_channels[i] = [
-            x for x in channels_list if x in allowed_output_channels
-        ]
-        channel_scale_factors[i] = dict(
-            zip(channels_list, num_channels * [1.0])
-        )
+        input_channels[i] = [x for x in channels_list if x in allowed_input_channels]
+        output_channels[i] = [x for x in channels_list if x in allowed_output_channels]
+        channel_scale_factors[i] = dict(zip(channels_list, num_channels * [1.0]))
         i += 1
 
     data_dict = {}
@@ -302,9 +271,7 @@ def extract_run_summary_from_mth5(mth5_obj, summary_type="run"):
     return out_df
 
 
-def extract_run_summaries_from_mth5s(
-    mth5_list, summary_type="run", deduplicate=True
-):
+def extract_run_summaries_from_mth5s(mth5_list, summary_type="run", deduplicate=True):
     """
     ToDo: Move this method into mth5? or mth5_helpers?
     ToDo: Make this a class so that the __repr__ is a nice visual representation of the
