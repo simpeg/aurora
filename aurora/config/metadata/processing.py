@@ -8,29 +8,27 @@ with some aurora-specific methods.
 # Imports
 # =============================================================================
 
-from aurora.time_series.windowing_scheme import window_scheme_from_decimation
-from loguru import logger
-from mt_metadata.processing.aurora.processing import (
-    Processing as AuroraProcessing,
-)
-from mt_metadata.common.list_dict import ListDict
+import json
+import pathlib
 from typing import Optional, Union
 
-import json
 import pandas as pd
-import pathlib
+from loguru import logger
+from mt_metadata.common.list_dict import ListDict
+from mt_metadata.processing.aurora.processing import Processing as AuroraProcessing
+
+from aurora.time_series.windowing_scheme import window_scheme_from_decimation
 
 
 class Processing(AuroraProcessing):
     def __init__(self, **kwargs):
         """
-        Constructor
+        Constructor.
 
         Parameters
         ----------
         kwargs
         """
-        # super().__init__(attr_dict=attr_dict, **kwargs)
         super().__init__(**kwargs)
 
     def window_scheme(self, as_type="df"):
@@ -192,6 +190,7 @@ class EMTFTFHeader(ListDict):
     def __init__(self, **kwargs):
         """
         Parameters
+        ----------
         _local_station : mt_metadata.processing.tf.station.Station()
             Station metadata object for the station to be estimated (
             location, channel_azimuths, etc.)
