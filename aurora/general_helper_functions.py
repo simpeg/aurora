@@ -2,8 +2,6 @@
 This module contains from miscellaneous functions and some global paths.
 """
 import inspect
-
-# import os
 import pathlib
 import subprocess
 from pathlib import Path
