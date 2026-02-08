@@ -10,8 +10,9 @@ iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_1
 """
 import numpy as np
 import xarray as xr
-from aurora.transfer_function.regression.m_estimator import MEstimator
 from loguru import logger
+
+from aurora.transfer_function.regression.m_estimator import MEstimator
 
 
 class RME_RR(MEstimator):
@@ -59,12 +60,12 @@ class RME_RR(MEstimator):
             raise Exception
 
     def update_y_hat(self) -> None:
-        """updates the predicted data"""
+        """Updates the predicted data."""
         self._Y_hat = self.X @ self.b
 
     def update_b(self) -> None:
-        """
-        Updates the tf estimate data
+        r"""
+        Updates the tf estimate data.
 
         matlab code was: b = QTX\QTY
         """
@@ -87,7 +88,7 @@ class RME_RR(MEstimator):
         return self._residual_variance
 
     def compute_inverse_signal_covariance(self) -> xr.DataArray:
-        """
+        r"""
         Computes the inverse signal covariance matrix of the input channels.
 
         Development Notes:
