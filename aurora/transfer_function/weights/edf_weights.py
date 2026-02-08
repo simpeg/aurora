@@ -9,10 +9,11 @@ The code here is based on the function Edfwts.m from egbert_codes-
 
 """
 
+from typing import Optional
+
 import numpy as np
 import xarray as xr
 from loguru import logger
-from typing import Optional, Union
 
 
 class EffectiveDegreesOfFreedom(object):
@@ -108,8 +109,7 @@ class EffectiveDegreesOfFreedom(object):
         - The covariance matrix `S` is computed as the outer product of the selected data.
         - The covariance matrix is normalized by the number of selected observations.
         - The inverse covariance matrix `H` is computed.
-        - The edf weights are then calculated using the diagonal and off-diagonal elements
-          of the inverse covariance matrix `H` and the selected data.
+        - The edf weights are then calculated using the diagonal and off-diagonal elements of the inverse covariance matrix `H` and the selected data.
 
         ---Statistical Context---
         The inverse covariance matrix (H = S^{-1}) is used here because it "whitens" the data:
