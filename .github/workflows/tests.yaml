@@ -47,6 +47,7 @@ jobs:
           source .venv/bin/activate
           uv pip install --upgrade pip
           uv pip install setuptools wheel
+          python -c "import setuptools; print('setuptools location:', setuptools.file)"
           python -c "import pkg_resources; print('pkg_resources location:', pkg_resources.file)"
           python -c "import setuptools; print('setuptools location:', setuptools.file)"
           uv pip install -e ".[dev,test]"
