@@ -47,6 +47,8 @@ jobs:
           source .venv/bin/activate
           uv pip install --upgrade pip
           uv pip install setuptools wheel
+          python -c "import pkg_resources; print('pkg_resources location:', pkg_resources.file)"
+          python -c "import setuptools; print('setuptools location:', setuptools.file)"
           uv pip install -e ".[dev,test]"
           uv pip install mt_metadata[obspy]
           # uv pip install "mt_metadata[obspy] @ git+https://github.com/kujaku11/mt_metadata.git@patches"
@@ -68,6 +70,9 @@ jobs:
       - name: Set kernel and execute Jupyter Notebooks
         run: |
           source .venv/bin/activate
+          python -c "import pkg_resources; print('pkg_resources location:', pkg_resources.file)"
+          python -c "import setuptools; print('setuptools location:', setuptools.file)"
+          
           python << 'EOF'
           import nbformat
           import subprocess
