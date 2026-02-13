@@ -46,7 +46,7 @@ jobs:
           uv venv --python ${{ matrix.python-version }}
           source .venv/bin/activate
           uv pip install --upgrade pip
-          uv pip install setuptools wheel
+          uv pip install setuptools pkg_resources wheel
           python -c "import setuptools; print('setuptools location:', setuptools.__file__)"
           python -c "import pkg_resources; print('pkg_resources location:', pkg_resources.__file__)"
           python -c "import setuptools; print('setuptools location:', setuptools.__file__)"
