@@ -29,7 +29,6 @@ dependencies = [
     "numba>=0.58",
     "obspy",
     "psutil",
-    "setuptools",
 ]
 
 [project.urls]
