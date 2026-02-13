@@ -47,15 +47,15 @@ jobs:
           source .venv/bin/activate
           uv pip install --upgrade pip
           uv pip install 'setuptools<68'
-          python -c "import setuptools; print('setuptools location:', setuptools.__file__)"
-          python -c "import pkg_resources; print('pkg_resources location:', pkg_resources.__file__)"
-          python -c "import setuptools; print('setuptools location:', setuptools.__file__)"
           uv pip install -e ".[dev,test]"
           uv pip install mt_metadata[obspy]
           # uv pip install "mt_metadata[obspy] @ git+https://github.com/kujaku11/mt_metadata.git@patches"
           # uv pip install git+https://github.com/kujaku11/mth5.git@patches
-          uv pip install "mt_metadata[obspy] @ git+https://github.com/kujaku11/mt_metadata.git"
-          uv pip install git+https://github.com/kujaku11/mth5.git
+          # uv pip install "mt_metadata[obspy] @ git+https://github.com/kujaku11/mt_metadata.git"
+          # uv pip install git+https://github.com/kujaku11/mth5.git
+          uv pip install "mt_metadata[obspy]"
+          uv pip install mth5
+          
           
           # uv pip install mth5
           uv pip install git+https://github.com/kujaku11/mth5_test_data.git
@@ -71,8 +71,9 @@ jobs:
       - name: Set kernel and execute Jupyter Notebooks
         run: |
           source .venv/bin/activate
-          python -c "import pkg_resources; print('pkg_resources location:', pkg_resources.file)"
-          python -c "import setuptools; print('setuptools location:', setuptools.file)"
+          # debugging: print locations of key packages
+          python -c "import pkg_resources; print('pkg_resources location:', pkg_resources.__file__)"
+          python -c "import setuptools; print('setuptools location:', setuptools.__file__)"
           
           python << 'EOF'
           import nbformat
