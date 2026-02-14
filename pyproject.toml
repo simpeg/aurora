@@ -74,6 +74,21 @@ dev = [
     "sphinx_rtd_theme",
 ]
 
+[tool.bumpversion]
+current_version = "0.5.2"
+parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
+serialize = ["{major}.{minor}.{patch}"]
+commit = true
+tag = true
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+search = 'version = "{current_version}"'
+replace = 'version = "{new_version}"'
+
+[[tool.bumpversion.files]]
+filename = "aurora/__init__.py"
+
 
 
 
