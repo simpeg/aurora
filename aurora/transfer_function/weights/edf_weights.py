@@ -128,8 +128,8 @@ class EffectiveDegreesOfFreedom(object):
         the EDF weights reflect true statistical leverage.
 
         A note on usage of real vs complex data:
-        The terms ( X[0, :] * \conj{X[0, :]} ) and ( X[1, :] * \conj{X[1, :]} ) are always real
-        and non-negative (they are squared magnitudes). The cross term ( \conj{X[1, :]} * X[0, :] )
+        The terms ( X[0, :] * \\conj{X[0, :]} ) and ( X[1, :] * \\conj{X[1, :]} ) are always real
+        and non-negative (they are squared magnitudes). The cross term ( \\conj{X[1, :]} * X[0, :] )
         can be complex, but in the context of covariance and quadratic forms you want the real part,
         not the absolute value.
         Why?
