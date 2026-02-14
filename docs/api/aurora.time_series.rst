@@ -28,14 +28,6 @@ aurora.time\_series.frequency\_band\_helpers module
    :undoc-members:
    :show-inheritance:
 
-aurora.time\_series.spectrogram module
---------------------------------------
-
-.. automodule:: aurora.time_series.spectrogram
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 aurora.time\_series.time\_axis\_helpers module
 ----------------------------------------------
 

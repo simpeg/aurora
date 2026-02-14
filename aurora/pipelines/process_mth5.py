@@ -72,7 +72,7 @@ def process_tf_decimation_level(
     Processing pipeline for a single decimation_level
 
     TODO: Add a check that the processing config sample rates agree with the data
-     sampling rates otherwise raise Exception
+    sampling rates otherwise raise Exception
     TODO: Add units to local_stft_obj, remote_stft_obj
     TODO: This is the method that should be accessing weights
     This method can be single station or remote based on the process cfg

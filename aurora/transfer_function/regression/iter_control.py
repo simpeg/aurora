@@ -5,8 +5,8 @@ robust regression including convergence criteria and thresholds.
 Based on Gary's IterControl.m in
 iris_mt_scratch/egbert_codes-20210121T193218Z-001/egbert_codes/matlabPrototype_10-13-20/TF/classes
 """
-from loguru import logger
 import numpy as np
+from loguru import logger
 
 from aurora.transfer_function.regression.helper_functions import rme_beta
 
@@ -14,15 +14,12 @@ from aurora.transfer_function.regression.helper_functions import rme_beta
 class IterControl(object):
     """
     Notes:
-         Here is a class to hold variables that are used to control the regression
-         - currently this is used for variations on RME (Robust M-Estimator)
-         - TODO: in the original matlab code there was a class property called `epsilon`, but
-         it was unused; There was no documentation about it's purpose, except possibly that
-         the abstract base class solved Y = X*b + epsilon for b, complex-valued.
-         Perhaps this was intended as an intrinsic tolerated noise level.  The value of
-         epsilon was set to 1000.
-         - TODO The return covariance boolean just initializes arrays of zeros.  Needs to be
-          made functional or removed
+
+    Here is a class to hold variables that are used to control the regression:
+
+    - currently this is used for variations on RME (Robust M-Estimator)
+    - TODO: in the original matlab code there was a class property called `epsilon`, but it was unused; There was no documentation about its purpose, except possibly that the abstract base class solved Y = X*b + epsilon for b, complex-valued. Perhaps this was intended as an intrinsic tolerated noise level. The value of epsilon was set to 1000.
+    - TODO: The return covariance boolean just initializes arrays of zeros. Needs to be made functional or removed.
     """
 
     def __init__(

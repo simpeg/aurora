@@ -20,13 +20,6 @@ aurora.transfer\_function.regression.RME\_RR module
    :undoc-members:
    :show-inheritance:
 
-aurora.transfer\_function.regression.base module
-------------------------------------------------
-
-.. automodule:: aurora.transfer_function.regression.base
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 aurora.transfer\_function.regression.helper\_functions module
 -------------------------------------------------------------

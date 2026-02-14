@@ -7,7 +7,6 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   aurora.config.emtf_band_setup
    aurora.config.metadata
 
 Submodules

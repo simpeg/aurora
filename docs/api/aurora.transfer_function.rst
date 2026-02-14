@@ -7,7 +7,6 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   aurora.transfer_function.plot
    aurora.transfer_function.regression
    aurora.transfer_function.weights
 
@@ -34,14 +33,6 @@ aurora.transfer\_function.emtf\_z\_file\_helpers module
 -------------------------------------------------------
 
 .. automodule:: aurora.transfer_function.emtf_z_file_helpers
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-aurora.transfer\_function.kernel\_dataset module
-------------------------------------------------
-
-.. automodule:: aurora.transfer_function.kernel_dataset
    :members:
    :undoc-members:
    :show-inheritance:

@@ -17,14 +17,6 @@ Subpackages
 Submodules
 ----------
 
-aurora.general\_helper\_functions module
-----------------------------------------
-
-.. automodule:: aurora.general_helper_functions
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 

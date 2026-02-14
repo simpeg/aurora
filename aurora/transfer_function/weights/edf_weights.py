@@ -9,10 +9,11 @@ The code here is based on the function Edfwts.m from egbert_codes-
 
 """
 
+from typing import Optional
+
 import numpy as np
 import xarray as xr
 from loguru import logger
-from typing import Optional, Union
 
 
 class EffectiveDegreesOfFreedom(object):
@@ -108,8 +109,7 @@ class EffectiveDegreesOfFreedom(object):
         - The covariance matrix `S` is computed as the outer product of the selected data.
         - The covariance matrix is normalized by the number of selected observations.
         - The inverse covariance matrix `H` is computed.
-        - The edf weights are then calculated using the diagonal and off-diagonal elements
-          of the inverse covariance matrix `H` and the selected data.
+        - The edf weights are then calculated using the diagonal and off-diagonal elements of the inverse covariance matrix `H` and the selected data.
 
         ---Statistical Context---
         The inverse covariance matrix (H = S^{-1}) is used here because it "whitens" the data:
@@ -128,8 +128,8 @@ class EffectiveDegreesOfFreedom(object):
         the EDF weights reflect true statistical leverage.
 
         A note on usage of real vs complex data:
-        The terms ( X[0, :] * \conj{X[0, :]} ) and ( X[1, :] * \conj{X[1, :]} ) are always real
-        and non-negative (they are squared magnitudes). The cross term ( \conj{X[1, :]} * X[0, :] )
+        The terms ( X[0, :] * \\conj{X[0, :]} ) and ( X[1, :] * \\conj{X[1, :]} ) are always real
+        and non-negative (they are squared magnitudes). The cross term ( \\conj{X[1, :]} * X[0, :] )
         can be complex, but in the context of covariance and quadratic forms you want the real part,
         not the absolute value.
         Why?

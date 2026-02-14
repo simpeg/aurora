@@ -5,20 +5,21 @@ The processing config is still evolving and this class and its methods may chang
 
 Development Notes:
  - Initially, we only supported EMTF style band specification, but this should be updated
- to allow logarithmically spaced bands of constant Q.
+     to allow logarithmically spaced bands of constant Q.
 
 """
 
+import pathlib
 from typing import Optional, Union
+
 from loguru import logger
+from mt_metadata.processing.window import Window
+from mth5.processing.kernel_dataset import KernelDataset
 
 from aurora.config import BANDS_DEFAULT_FILE
 from aurora.config.metadata import Processing
 from aurora.sandbox.io_helpers.emtf_band_setup import EMTFBandSetupFile
-from mth5.processing.kernel_dataset import KernelDataset
-from mt_metadata.processing.window import Window
 
-import pathlib
 
 SUPPORTED_BAND_SPECIFICATION_STYLES = ["EMTF", "band_edges"]
 
@@ -136,29 +137,22 @@ class ConfigCreator:
         **kwargs,
     ) -> Processing:
         """
-        This creates a processing config from a kernel dataset.
+        Creates a processing config from a kernel dataset.
 
         TODO: Make this a method of kernel_dataset.
 
         **Development Notes:**
 
-         1. 2022-09-10
+        1. The number of decimation levels must be defined either by:
 
-         The reading-in from EMTF band setup file used to be very terse, carried
-         some baked in assumptions about decimation factors, and did not acknowledge
-         specific frequency bands in Hz.  I am adding some complexity to the method
-         that populates bands from EMTF band setup file but am now explict about the
-         assumption of decimation factors, and do provide the frequency bands in Hz.
+        - decimation_factors argument (normally accompanied by a bands_dict)
+        - number of decimations implied by EMTF band setup file.
 
-         2. The number of decimation levels must be defined either by:
+        Theoretically, you could also use the number of decimations implied by bands_dict but this is sloppy, because it would assume the decimation factor.
 
-          - decimation_factors argument (normally accompanied by a bands_dict)
-          - number of decimations implied by EMTF band setup file.
+        2. 2024-12-29 Added setting of decimation_obj.stft.per_window_detrend_type = "linear"
 
-          Theoretically, you could also use the number of decimations implied by bands_dict but this is sloppy, because it would assume the decimation factor.
-
-         3. 2024-12-29 Added setting of decimation_obj.stft.per_window_detrend_type = "linear"
-          This makes tests pass following a refactoring of mt_metadata.  Could use more testing.
+        This makes tests pass following a refactoring of mt_metadata.  Could use more testing.
 
         Parameters
         ----------
@@ -180,12 +174,14 @@ class ConfigCreator:
             List of decimation factors, normally [1, 4, 4, 4, ... 4]
         num_samples_window: Optional[Union[int, None]]
             The size of the window (usually for FFT)
+
         **kwargs:
             Additional keyword arguments passed to Processing constructor. Could contain:
+
             - save_fcs: bool
-               - If True, save Fourier coefficients during processing.
+                If True, save Fourier coefficients during processing.
             - save_fcs_type: str
-                - File type for saving Fourier coefficients.  Options are "h5" or "csv".
+                File type for saving Fourier coefficients. Options are "h5" or "csv".
 
         Returns
         -------
@@ -209,7 +205,6 @@ class ConfigCreator:
 
         # Set Frequency Bands
         if self.band_specification_style == "EMTF":
-            # see note 1
             emtf_band_setup_file = EMTFBandSetupFile(
                 filepath=self._emtf_band_file,
                 sample_rate=kernel_dataset.sample_rate,

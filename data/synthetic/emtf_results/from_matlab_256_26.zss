@@ -2,7 +2,7 @@
  ********** WITH FULL ERROR COVARINCE**********
 Robust Single station                                                           
 station    :test1               
-coordinate  1007.996  0.0  declination  0.0
+coordinate  37.996  0.0  declination  0.0
 number of channels   5   number of frequencies   26
  orientations and tilts of each channel 
     1     0.00     0.00 tes  Hx

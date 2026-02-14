@@ -52,15 +52,6 @@ def create_from_server_multistation(
         the electric or magnetic field channels.
     triage_missing_coil: bool
 
-
-    Returns
-    -------
-
-    target_folder:
-    run_id : string
-        This is a temporary workaround. A more robust program that assigns run
-        numbers, and/or gets run labels from StationXML is needed
-
     Returns
     -------
     h5_path: pathlib.Path

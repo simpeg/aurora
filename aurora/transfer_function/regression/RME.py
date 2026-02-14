@@ -72,8 +72,9 @@ http://matlab.izmiran.ru/help/techdoc/ref/mldivide.html
 
 import numpy as np
 import xarray as xr
-from aurora.transfer_function.regression.m_estimator import MEstimator
 from scipy.linalg import solve_triangular
+
+from aurora.transfer_function.regression.m_estimator import MEstimator
 
 
 class RME(MEstimator):
@@ -96,15 +97,15 @@ class RME(MEstimator):
             Psi' is something like 1 between -r0, and r0
             Psi' is zero outside
             So the expectation value of psi' is the number of points outside
-            Its the number of points that didn't get weighted /total number of points
+            Its the number of points that didn't get weighted divided by the total number of points.
 
         """
         super(RME, self).__init__(**kwargs)
         self.qr_input = "X"
 
     def update_y_hat(self) -> None:
-        """
-        Update the predicted_data $\hat{Y}$
+        r"""
+        Update the predicted_data :math:`\hat{Y}`
         """
         self._Y_hat = self.Q @ self.QHYc
 
@@ -115,9 +116,9 @@ class RME(MEstimator):
         return self._residual_variance
 
     def update_b(self) -> None:
-        """
+        r"""
         Solve the regression problem using the latest cleaned data via QR-decompostion.
-        matlab was: b = R\QTY;
+        The matlab code for this was: b = R\\QTY;
         """
         self.b = solve_triangular(self.R, self.QHYc)
 

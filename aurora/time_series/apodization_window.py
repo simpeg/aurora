@@ -50,10 +50,10 @@ For example
 """
 
 
+from typing import Optional, Union
+
 import numpy as np
 import scipy.signal as ssig
-from loguru import logger
-from typing import Optional, Union
 
 
 class ApodizationWindow(object):
@@ -90,7 +90,6 @@ class ApodizationWindow(object):
         taper_additional_args: Optional[Union[dict, None]] = None,
         **kwargs,  # needed as a passthrough argument to WindowingScheme
     ):
-
         """
         Constructor
 
@@ -137,7 +136,6 @@ class ApodizationWindow(object):
         out_str: str
             String comprised of the taper_family, number_of_samples, and True/False if self.taper is not None
         """
-        self.test_linear_spectral_density_factor()
         string1 = f"{self.taper_family} {self.num_samples_window}"
         string1 += f" taper_exists = {bool(self.taper.any())}"
         string2 = f"NENBW = {self.nenbw:.3f}, CG = {self.coherent_gain:.3f},  "
@@ -230,37 +228,6 @@ class ApodizationWindow(object):
         enbw: float
         """
         return fs * self.S2 / (self.S1**2)
-
-    def test_linear_spectral_density_factor(self) -> None:
-        """T
-        This is just a test to verify some algebra
-
-        TODO Move this into tests
-
-        Claim:
-        The lsd_calibration factors
-        A      (1./coherent\_gain)\*np.sqrt((2\*dt)/(nenbw\*N))
-        and
-        B      np.sqrt(2/(sample\_rate\*self.S2))
-
-        are identical.
-
-        Note sqrt(2\*dt)==sqrt(2\*sample_rate) so we can cancel these terms and
-        A=B IFF
-
-        (1./coherent_gain) \* np.sqrt(1/(nenbw\*N)) == 1/np.sqrt(S2)
-        which I show in githib aurora issue #3 via .
-        (CG\*\*2) \* NENBW \*N   =  S2
-
-        """
-        lsd_factor1 = (1.0 / self.coherent_gain) * np.sqrt(
-            1.0 / (self.nenbw * self.num_samples_window)
-        )
-        lsd_factor2 = 1.0 / np.sqrt(self.S2)
-        if not np.isclose(lsd_factor1, lsd_factor2):
-            logger.error(f"factor1 {lsd_factor1} vs factor2 {lsd_factor2}")
-            logger.error("Incompatible spectral density factors")
-            raise Exception
 
     @property
     def taper(self) -> np.ndarray:

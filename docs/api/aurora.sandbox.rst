@@ -12,14 +12,6 @@ Subpackages
 Submodules
 ----------
 
-aurora.sandbox.debug\_mt\_metadata\_issue\_85 module
-----------------------------------------------------
-
-.. automodule:: aurora.sandbox.debug_mt_metadata_issue_85
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 aurora.sandbox.mth5\_channel\_summary\_helpers module
 -----------------------------------------------------
 

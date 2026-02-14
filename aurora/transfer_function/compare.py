@@ -77,6 +77,11 @@ class CompareTF:
         label_01="emtf",
         label_02="aurora",
         save_plot_path=None,
+        rho_xx_ylims=None,
+        rho_xy_ylims=None,
+        rho_yx_ylims=None,
+        rho_yy_ylims=None,
+        phi_ylims=None,
     ):
         """
         Plots two transfer functions for comparison.
@@ -94,10 +99,12 @@ class CompareTF:
         -------
 
         """
+        xy = "xy"
         fig = plt.figure(figsize=(12, 6))
 
         for ii in range(2):
             for jj in range(2):
+                component = f"{xy[ii]}{xy[jj]}"
                 plot_num_res = 1 + ii * 2 + jj
                 plot_num_phase = 5 + ii * 2 + jj
                 ax = fig.add_subplot(2, 4, plot_num_res)
@@ -124,9 +131,17 @@ class CompareTF:
                 ax.set_title(self._comp_dict[plot_num_res])
                 # ax.set_xlabel("Period (s)")
                 if plot_num_res == 1:
-                    ax.set_ylabel("Apparent Resistivity ($\Omega \cdot m$)")
+                    ax.set_ylabel("Apparent Resistivity ($\\Omega \\cdot m$)")
                     ax.legend()
                 ax.grid(True, which="both", ls="--", lw=0.5, color="gray")
+                if component == "xx" and rho_xx_ylims is not None:
+                    ax.set_ylim(rho_xx_ylims)
+                if component == "xy" and rho_xy_ylims is not None:
+                    ax.set_ylim(rho_xy_ylims)
+                if component == "yx" and rho_yx_ylims is not None:
+                    ax.set_ylim(rho_yx_ylims)
+                if component == "yy" and rho_yy_ylims is not None:
+                    ax.set_ylim(rho_yy_ylims)
 
                 ax2 = fig.add_subplot(2, 4, plot_num_phase)
                 ax2.semilogx(
@@ -149,6 +164,7 @@ class CompareTF:
                 if plot_num_phase == 5:
                     ax2.set_ylabel("Phase (degrees)")
                     ax2.legend()
+
                 ax2.grid(True, which="both", ls="--", lw=0.5, color="gray")
 
         fig.tight_layout()
@@ -286,6 +302,7 @@ class CompareTF:
         self,
         rtol: float = 1,
         atol: float = 1,
+        atol_phase: float = 4.0,
     ) -> dict:
         """
         Compare transfer functions between two transfer_functions objects.
@@ -299,6 +316,8 @@ class CompareTF:
             Relative tolerance for np.allclose, defaults to 1e-2
         atol: float
             Absolute tolerance for np.allclose, defaults to 1e-2
+        atol_phase: float
+            Absolute tolerance for phase comparison, defaults to 4.0 degrees
 
         Returns
         -------
@@ -357,7 +376,7 @@ class CompareTF:
                         np.angle(z1[:, ii, jj]),
                         np.angle(z2[:, ii, jj]),
                         rtol=rtol,
-                        atol=atol,
+                        atol=atol_phase,
                     )
 
                     result["impedance_error_close"] = np.allclose(

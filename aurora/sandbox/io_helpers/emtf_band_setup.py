@@ -2,11 +2,12 @@
     In this module is a class that emulates the old EMTF Band Setup File
 
 """
-from loguru import logger
-from typing import Union, Optional
+import pathlib
+from typing import Optional, Union
+
 import numpy as np
 import pandas as pd
-import pathlib
+from loguru import logger
 
 
 class EMTFBandSetupFile:
@@ -72,7 +73,7 @@ class EMTFBandSetupFile:
         df = pd.read_csv(
             filepath,
             skiprows=1,
-            sep="\s+",
+            sep=r"\s+",
             names=["decimation_level", "lower_bound_index", "upper_bound_index"],
         )
         if len(df) != self.num_bands:

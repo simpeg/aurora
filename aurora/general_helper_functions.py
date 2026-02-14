@@ -2,18 +2,15 @@
 This module contains from miscellaneous functions and some global paths.
 """
 import inspect
-
-# import os
 import pathlib
-import scipy.io as sio
 import subprocess
-
-from loguru import logger
 from pathlib import Path
 
-import aurora
 import mt_metadata
-import mth5
+import scipy.io as sio
+from loguru import logger
+
+import aurora
 
 
 init_file = inspect.getfile(aurora)
@@ -61,30 +58,6 @@ mt_metadata_init = inspect.getfile(mt_metadata)
 MT_METADATA_DATA = Path(mt_metadata_init).parent.parent.joinpath("data")
 
 
-def count_lines(file_name):
-    """
-    acts like wc -l in unix,
-    raise FileNotFoundError: if file_name does not exist.
-
-    Parameters
-    ----------
-    file_name: str or pathlib.Path
-        The file to apply line counting to
-
-    Returns
-    -------
-    num_lines: int
-        Number of lines present in fileName or -1 if file does not exist
-
-    """
-    i = -1
-    with open(file_name) as f:
-        for i, l in enumerate(f):
-            pass
-    num_lines = i + 1
-    return num_lines
-
-
 def execute_subprocess(cmd, **kwargs):
     """
     A wrapper for subprocess.call
@@ -104,8 +77,8 @@ def execute_subprocess(cmd, **kwargs):
 
 def replace_in_file(file_path: pathlib.Path, old: str, new: str) -> None:
     """
-        Replace all instances of 'old' with 'new' in the given file.
-        :param file_path: Path to the file where replacements should be made.
+    Replace all instances of 'old' with 'new' in the given file.
+    :param file_path: Path to the file where replacements should be made.
 
     """
     if not file_path.exists():
