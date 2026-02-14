@@ -39,6 +39,11 @@ All notable changes to this project will be documented in this file.
 - Fix \c warning ([4a7808f](4a7808f8c8f1666c7ec66caadb381fbebd976088))
 
 
+## Miscellaneous Tasks
+
+- Bump version to  and update changelog [skip ci] ([386df6f](386df6f421f3f86018a9feeca64da735266b3e37))
+
+
 ## Revert
 
 - Revert parkfield paths to .cache ([d610149](d610149a215ade7db17317082b0b4e4a9eec9664))
