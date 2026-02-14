@@ -1,0 +1,136 @@
+# Notebook Testing Workflow
+# 
+# This workflow tests Jupyter notebooks and runs by default on:
+#   - Pull requests targeting the 'main' branch
+#
+# To manually trigger this workflow on any branch:
+#   1. Go to Actions tab in GitHub
+#   2. Select "Test Notebooks" workflow
+#   3. Click "Run workflow" dropdown
+#   4. Select your branch and click "Run workflow"
+
+name: Test Notebooks
+
+on:
+  pull_request:
+    branches:
+      - main
+  # Allow manual triggering from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  test-notebooks:
+    name: Notebooks (${{ matrix.python-version }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: true
+      matrix:
+        os: ["ubuntu-latest"]
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Cache MTH5 test files
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/aurora
+          key: mth5-test-files-${{ runner.os }}-${{ hashFiles('tests/conftest.py') }}
+          restore-keys: |
+            mth5-test-files-${{ runner.os }}-
+
+      - name: Create virtual environment and install dependencies
+        run: |
+          uv venv --python ${{ matrix.python-version }}
+          source .venv/bin/activate
+          uv pip install --upgrade pip
+          uv pip install 'setuptools<68'
+          uv pip install -e ".[dev,test]"
+          uv pip install mt_metadata[obspy]
+          uv pip install "mt_metadata[obspy]"
+          uv pip install mth5
+          uv pip install git+https://github.com/kujaku11/mth5_test_data.git
+          # Explicitly include nbconvert & ipykernel
+          uv pip install jupyter nbconvert nbformat ipykernel
+          python -m ipykernel install --user --name "python3"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc
+
+      - name: Execute Jupyter Notebooks
+        run: |
+          source .venv/bin/activate
+          # debugging: print locations of key packages
+          python -c "import pkg_resources; print('pkg_resources location:', pkg_resources.__file__)"
+          python -c "import setuptools; print('setuptools location:', setuptools.__file__)"
+          
+          python << 'EOF'
+          import nbformat
+          import subprocess
+          import sys
+          
+          notebooks = [
+              "docs/examples/dataset_definition.ipynb",
+              "docs/examples/operate_aurora.ipynb",
+              "docs/tutorials/pkd_units_check.ipynb",
+              "docs/tutorials/pole_zero_fitting/lemi_pole_zero_fitting_example.ipynb",
+              "docs/tutorials/processing_configuration.ipynb",
+              "docs/tutorials/process_cas04_multiple_station.ipynb",
+              "docs/tutorials/synthetic_data_processing.ipynb"
+          ]
+          
+          failures = []
+          
+          for nb_path in notebooks:
+              # Update kernel spec
+              print(f"Updating kernel in {nb_path}")
+              try:
+                  with open(nb_path, "r", encoding="utf-8") as f:
+                      nb = nbformat.read(f, as_version=4)
+                  
+                  nb["metadata"]["kernelspec"]["name"] = "python3"
+                  nb["metadata"]["kernelspec"]["display_name"] = "Python (python3)"
+                  
+                  with open(nb_path, "w", encoding="utf-8") as f:
+                      nbformat.write(nb, f)
+                  print(f"✓ Updated kernel in {nb_path}")
+              except Exception as e:
+                  print(f"✗ Failed to update kernel in {nb_path}:  {e}")
+                  failures.append(nb_path)
+                  continue
+              
+              # Execute notebook
+              print(f"Executing {nb_path}")
+              result = subprocess.run(
+                  ["jupyter", "nbconvert", "--to", "notebook", "--execute", nb_path],
+                  capture_output=True,
+                  text=True
+              )
+              
+              if result.returncode != 0:
+                  print(f"✗ Failed to execute {nb_path}")
+                  print(result.stderr)
+                  failures.append(nb_path)
+              else:
+                  print(f"✓ Successfully executed {nb_path}")
+          
+          if failures:
+              print("\n======= Summary =======")
+              print(f"Failed notebooks: {failures}")
+              sys.exit(1)
+          else:
+              print("\n✓ All notebooks executed successfully!")
+          EOF
