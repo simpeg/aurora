@@ -2,14 +2,13 @@
     This module contains functions that are associated with time series of Fourier coefficients
     TODO: Move these methods to mth5.processing.spectre.frequency_band_helpers
 """
-from loguru import logger
-from mt_metadata.processing.aurora import (
-    DecimationLevel as AuroraDecimationLevel,
-)
-from mt_metadata.processing.aurora import Band
-from mth5.timeseries.spectre.spectrogram import extract_band
 from typing import Optional, Tuple
+
 import xarray as xr
+from loguru import logger
+from mt_metadata.processing.aurora import Band
+from mt_metadata.processing.aurora import DecimationLevel as AuroraDecimationLevel
+from mt_timeseries.spectre.spectrogram import extract_band
 
 
 def get_band_for_tf_estimate(
