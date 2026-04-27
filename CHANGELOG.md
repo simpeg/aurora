@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## Miscellaneous Tasks
+
+- Bump version to  and update changelog [skip ci] ([c1576f6](c1576f6e249323b81f3a00dc19f48b25de820a07))
+
+
 ## Bug Fixes
 
 - Fix filter additons to use new add_filter method ([56ab23a](56ab23a18023e01be92e5af5126351236c7dcdd2))

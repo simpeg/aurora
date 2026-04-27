@@ -1,0 +1,78 @@
+name: Bump version and changelog
+
+on:
+  pull_request:
+    types: [labeled]
+    branches:
+      - main
+
+permissions:
+  contents: write
+  id-token: write
+  pull-requests: write
+
+jobs:
+  bump-version-and-changelog:
+    if: |
+      contains(github.event.pull_request.labels.*.name, 'release:major') ||
+      contains(github.event.pull_request.labels.*.name, 'release:minor') ||
+      contains(github.event.pull_request.labels.*.name, 'release:patch')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install tools
+        run: |
+          pip install bump-my-version build pandoc
+          sudo apt-get update
+          sudo apt-get install -y pandoc
+          cargo install git-cliff
+
+      - name: Set up Git user
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+      - name: Determine version bump type
+        id: bump
+        run: |
+          if [[ "${{ contains(github.event.pull_request.labels.*.name, 'release:major') }}" == "true" ]]; then
+            echo "type=major" >> $GITHUB_OUTPUT
+          elif [[ "${{ contains(github.event.pull_request.labels.*.name, 'release:minor') }}" == "true" ]]; then
+            echo "type=minor" >> $GITHUB_OUTPUT
+          else
+            echo "type=patch" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Bump version
+        run: bump-my-version bump ${{ steps.bump.outputs.type }}
+        env:
+          BMV_ALLOW_DIRTY: "true"
+
+      - name: Extract version
+        id: version
+        run: |
+          VERSION=$(bump-my-version show current)
+          echo "Extracted version: $VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Generate changelog
+        run: |
+          git cliff -o CHANGELOG.md
+          echo "Generated changelog for version ${{ steps.version.outputs.version }}"
+
+      - name: Commit and push changes to PR branch
+        run: |
+          git add .
+          git commit -m "chore: bump version to ${{ steps.version.outputs.version }} and update changelog [skip ci]" || echo "No changes to commit"
+          git push origin HEAD:${{ github.head_ref }}
