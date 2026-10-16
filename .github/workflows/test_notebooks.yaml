@@ -84,6 +84,7 @@ jobs:
               "docs/examples/operate_aurora.ipynb",
               "docs/tutorials/pkd_units_check.ipynb",
               "docs/tutorials/pole_zero_fitting/lemi_pole_zero_fitting_example.ipynb",
+              "docs/tutorials/earthscope_magnetic_and_electric_data_tutorial.ipynb",
               "docs/tutorials/processing_configuration.ipynb",
               "docs/tutorials/process_cas04_multiple_station.ipynb",
               "docs/tutorials/synthetic_data_processing.ipynb"

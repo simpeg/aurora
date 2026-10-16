@@ -55,6 +55,10 @@ autosummary_generate = True
 
 numpydoc_class_members_toctree = False
 
+# Keep documentation builds offline; notebooks are executed in the dedicated
+# Test Notebooks GitHub Actions workflow.
+nbsphinx_execute = "never"
+
 # API doc options
 apidoc_module_dir = "../aurora"
 apidoc_output_dir = "api/generated"
