@@ -5,8 +5,13 @@ Runs several synthetic processing tests from config creation to tf_cls.
 
 import logging
 
+import numpy as np
 import pytest
 
+from aurora.pipelines.process_mth5 import process_mth5
+from aurora.test_utils.synthetic.make_processing_configs import (
+    make_processing_config_and_kernel_dataset,
+)
 from aurora.test_utils.synthetic.processing_helpers import (
     process_synthetic_1,
     process_synthetic_1r2,
@@ -19,6 +24,50 @@ def setup_logging():
     """Disable noisy matplotlib loggers."""
     logging.getLogger("matplotlib.font_manager").disabled = True
     logging.getLogger("matplotlib.ticker").disabled = True
+
+
+def _synthetic_rho_phase(tf):
+    """Return median off-diagonal apparent resistivity and phase."""
+    frequency = 1.0 / np.asarray(tf.period)
+    impedance = np.asarray(tf.impedance)
+    rho_phase = []
+    for output_index, input_index in ((0, 1), (1, 0)):
+        z_component = impedance[:, output_index, input_index]
+        # Aurora's MT impedance convention is mV/km per nT.
+        apparent_resistivity = 0.2 * np.abs(z_component) ** 2 / frequency
+        phase = np.mod(np.angle(z_component, deg=True), 180.0)
+        rho_phase.append((np.nanmedian(apparent_resistivity), np.nanmedian(phase)))
+    return np.asarray(rho_phase)
+
+
+def test_arma_prewhitening_recovers_synthetic_half_space(worker_safe_test1_h5):
+    """ARMA(3, 0) FCs recover the test1 100 Ohm-m, 45-degree half-space."""
+    arma_dataset, arma_config = make_processing_config_and_kernel_dataset(
+        config_keyword="test1",
+        station_id="test1",
+        mth5s=[worker_safe_test1_h5],
+    )
+    for decimation in arma_config.decimations:
+        decimation.stft.prewhitening_type = "ARMA"
+        decimation.stft.prewhitening_ar_order = 3
+        decimation.stft.prewhitening_ma_order = 0
+
+    arma_tf = process_mth5(arma_config, tfk_dataset=arma_dataset)
+    arma_rho_phase = _synthetic_rho_phase(arma_tf)
+
+    np.testing.assert_allclose(
+        arma_rho_phase[:, 0], 100.0, rtol=0.1, err_msg="apparent resistivity"
+    )
+    np.testing.assert_allclose(arma_rho_phase[:, 1], 45.0, atol=5.0, err_msg="phase")
+
+    baseline_dataset, baseline_config = make_processing_config_and_kernel_dataset(
+        config_keyword="test1",
+        station_id="test1",
+        mth5s=[worker_safe_test1_h5],
+    )
+    baseline_tf = process_mth5(baseline_config, tfk_dataset=baseline_dataset)
+    baseline_rho_phase = _synthetic_rho_phase(baseline_tf)
+    np.testing.assert_allclose(arma_rho_phase, baseline_rho_phase, rtol=0.1, atol=5.0)
 
 
 @pytest.mark.skip(

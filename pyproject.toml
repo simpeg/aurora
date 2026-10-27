@@ -74,6 +74,10 @@ dev = [
     "sphinx_gallery",
     "sphinx_rtd_theme",
 ]
+issue-351 = [
+    "mth5 @ git+https://github.com/IAGA-DVI-DataStandards/mth5.git@feature/issue-351-ar-prewhitening",
+    "mt-metadata @ git+https://github.com/IAGA-DVI-DataStandards/mt-metadata.git@feature/issue-351-ar-prewhitening-metadata",
+]
 
 [tool.bumpversion]
 current_version = "0.6.2"
@@ -89,7 +93,6 @@ replace = 'version = "{new_version}"'
 
 [[tool.bumpversion.files]]
 filename = "aurora/__init__.py"
-
 
 
 

@@ -484,7 +484,7 @@ def run_ts_to_stft(
     # need to remove any nans before windowing, or else if there is a single
     # nan then the whole channel becomes nan.
     run_xrds = nan_to_mean(run_xrds_orig)
-    run_xrds = apply_prewhitening(decimation_obj.stft.prewhitening_type, run_xrds)
+    run_xrds, prewhitening_results = apply_prewhitening(decimation_obj.stft, run_xrds)
     run_xrds = truncate_to_clock_zero(decimation_obj, run_xrds)
     windowing_scheme = window_scheme_from_decimation(decimation_obj)
     windowed_obj = windowing_scheme.apply_sliding_window(
@@ -505,7 +505,12 @@ def run_ts_to_stft(
     )
 
     if decimation_obj.stft.recoloring:
-        stft_obj = apply_recoloring(decimation_obj.stft.prewhitening_type, stft_obj)
+        stft_obj = apply_recoloring(
+            decimation_obj.stft,
+            stft_obj,
+            sample_rate=windowing_scheme.sample_rate,
+            results=prewhitening_results,
+        )
 
     spectrogram = spectre.Spectrogram(dataset=stft_obj)
     return spectrogram
