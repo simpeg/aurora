@@ -391,7 +391,7 @@ def save_fourier_coefficients(
 
 def get_spectrograms(
     tfk: TransferFunctionKernel, i_dec_level: int, units: str = "MT"
-) -> dict:
+) -> dict | None:
     """
     Given a decimation level id, loads a dictianary of all spectragrams from information in tfk.
     TODO: Make this a method of TFK
@@ -409,9 +409,10 @@ def get_spectrograms(
 
     Returns
     -------
-    stfts: dict
+    stfts: dict or None
         The short time fourier transforms for the decimation level as a dictionary.
         Keys are "local" and "remote".  Values are lists, one (element) xr.Dataset per run
+        or None when a valid run cannot produce any STFT windows.
     """
 
     stfts = {}
@@ -438,13 +439,24 @@ def get_spectrograms(
         # Musgraves workaround for old MT data
         triage_run_id(row.run, run_obj)
 
-        stft_obj = make_stft_objects(
-            tfk.config,
-            i_dec_level,
-            run_obj,
-            run_xrds,
-            units,
-        )
+        try:
+            stft_obj = make_stft_objects(
+                tfk.config,
+                i_dec_level,
+                run_obj,
+                run_xrds,
+                units,
+            )
+        except ValueError as error:
+            logger.warning(
+                "Skipping decimation level {} because station {}, run {} "
+                "cannot produce STFT windows: {}",
+                i_dec_level,
+                row.station,
+                row.run,
+                error,
+            )
+            return None
         # TODO: Cast stft_obj to a Spectrogram here or in make_stft_objects
 
         # Pack FCs into h5
@@ -491,7 +503,7 @@ def run_ts_to_stft(
         run_xrds, dt=1.0 / decimation_obj.decimation.sample_rate
     )
     if not np.prod(windowed_obj.to_array().data.shape):
-        raise ValueError
+        raise ValueError("STFT windowing produced no samples")
 
     windowed_obj = WindowedTimeSeries.detrend(data=windowed_obj, detrend_type="linear")
     tapered_obj = WindowedTimeSeries.apply_taper(

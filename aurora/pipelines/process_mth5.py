@@ -50,7 +50,6 @@ from aurora.transfer_function.transfer_function_collection import (
 )
 from aurora.transfer_function.TTFZ import TTFZ
 
-
 SUPPORTED_PROCESSINGS = [
     "legacy",
 ]
@@ -188,6 +187,13 @@ def process_mth5_legacy(
         tfk.apply_clock_zero(dec_level_config)
 
         stfts = get_spectrograms(tfk, i_dec_level, units=units)
+        if stfts is None:
+            logger.warning(
+                "Skipping transfer-function estimation for decimation level {} "
+                "because no complete STFT set is available",
+                i_dec_level,
+            )
+            continue
 
         local_merged_stft_obj, remote_merged_stft_obj = merge_stfts(stfts, tfk)
 
