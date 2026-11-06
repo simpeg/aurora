@@ -4,9 +4,14 @@ Runs several synthetic processing tests from config creation to tf_cls.
 """
 
 import logging
+from unittest.mock import Mock, patch
 
+import numpy as np
+import pandas as pd
 import pytest
+import xarray as xr
 
+from aurora.time_series.spectrogram_helpers import get_spectrograms
 from aurora.test_utils.synthetic.processing_helpers import (
     process_synthetic_1,
     process_synthetic_1r2,
@@ -19,6 +24,56 @@ def setup_logging():
     """Disable noisy matplotlib loggers."""
     logging.getLogger("matplotlib.font_manager").disabled = True
     logging.getLogger("matplotlib.ticker").disabled = True
+
+
+def test_empty_stft_skips_decimation_without_saving_fourier_coefficients():
+    """A valid run that yields no windows skips its entire decimation level."""
+    run_object = Mock()
+    mth5_object = Mock()
+    mth5_object.from_reference.return_value = run_object
+    run_dataarray = xr.DataArray(
+        np.arange(4.0)[np.newaxis, :],
+        dims=["channel", "time"],
+        coords={
+            "channel": ["hx"],
+            "time": np.datetime64("2020-01-01T00:00:00")
+            + np.arange(4).astype("timedelta64[s]"),
+        },
+    )
+    tfk = Mock()
+    tfk.dataset_df = pd.DataFrame(
+        [
+            {
+                "mth5_obj": mth5_object,
+                "run_hdf5_reference": "run-reference",
+                "fc": False,
+                "run_dataarray": run_dataarray,
+                "run": "001",
+                "station": "test1",
+                "remote": False,
+            }
+        ]
+    )
+    tfk.is_valid_dataset.return_value = True
+
+    with (
+        patch("aurora.time_series.spectrogram_helpers.triage_run_id"),
+        patch(
+            "aurora.time_series.spectrogram_helpers.make_stft_objects",
+            side_effect=ValueError("STFT windowing produced no samples"),
+        ),
+        patch(
+            "aurora.time_series.spectrogram_helpers.save_fourier_coefficients"
+        ) as save_fourier_coefficients,
+        patch("aurora.time_series.spectrogram_helpers.logger.warning") as log_warning,
+    ):
+        stfts = get_spectrograms(tfk, i_dec_level=2)
+
+    assert stfts is None
+    save_fourier_coefficients.assert_not_called()
+    log_warning.assert_called_once()
+    assert "Skipping decimation level" in log_warning.call_args.args[0]
+    assert log_warning.call_args.args[1] == 2
 
 
 @pytest.mark.skip(
